@@ -10,10 +10,12 @@ The purpose of the OCI Open LZ is to:
 
 This repository is the source of truth for this blueprint where you can find all support materials. In the current version you can find the following elements:
 
-| NAME                                             | TYPE    | DESCRIPTION                                                                                                          |
-|--------------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------|
-| [OCI Open LZ Blueprint](/docs/OCI_Open_LZ.pdf)   | PDF     | This artefact presents the OCI Open LZ blueprint design with the functional, security, network, and operations view. |
-| [OCI Open LZ Diagrams](/docs/OCI_Open_LZ.drawio) | Draw.io | This artefact presents all the architecture diagrams in a reusable format.                                           |
+| NAME                                                                                                 | TYPE    | DESCRIPTION                                                                                                          |
+|------------------------------------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------|
+| [OCI Open LZ Blueprint](/docs/OCI_Open_LZ.pdf)                                                       | PDF     | This artefact presents the OCI Open LZ blueprint design with the functional, security, network, and operations view. |
+| [OCI Open LZ Diagrams](/docs/OCI_Open_LZ.drawio)                                                     | Draw.io | This artefact presents all the architecture diagrams in a reusable format.                                           |
+| [OCI CIS LZ IAM Repository](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) | Git     | CIS LZ Terraform modules for Identity and Access Management.                                                         |
+| [OCI CIS LZ Network Repository](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) | Git     | CIS LZ Terraform modules for Network resources.                                                                      |
 
 
 # Approach Considerations
