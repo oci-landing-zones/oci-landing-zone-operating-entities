@@ -2,20 +2,23 @@
 
 Welcome to the **OCI Open LZ**, the **Operating Entities Landing Zone**, a reference blueprint to simplify the onboarding of organizations, business units, and subsidiaries into OCI. 
 
-The purpose of the OCI Open LZ is to:
+The purpose of the **OCI Open LZ** is to:
 1. Provide a landing zone design ready to **onboard an enterprise organization** and its functional divisions - identified as **operating entities (OE)** with their teams, departments, and projects.
 2. Provide a cloud-native **operating model** to simplify and scale **day 2 operations**.
-3. **Enable customers, partners**, and the general **IT community** to **create their own landing zones** with **lower efforts** through a **comprehensive OCI reference architecture**.  
+3. **Enable customers, partners**, and the general **IT community** to **create their tailored landing zones** with **lower efforts** through a **comprehensive OCI reference architecture**.  
 4. Provide **tailoring guidelines** to help adjust the model. This asset can be used directly, tailored, or used as inspiration to create a new one - as it is not a prescribed solution.
 
-This repository is the source of truth for this blueprint where you can find all support materials. In the current version you can find the following elements:
+This repository is the source of truth for this blueprint where you can find all support materials associated with the phase where they should be used. In the current version you can find the following elements:
 
-| NAME                                                                                                 | TYPE    | DESCRIPTION                                                                                                          |
-|------------------------------------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------|
-| [OCI Open LZ Blueprint](/docs/OCI_Open_LZ.pdf)                                                       | PDF     | This artefact presents the OCI Open LZ blueprint design with the functional, security, network, and operations view. |
-| [OCI Open LZ Diagrams](/docs/OCI_Open_LZ.drawio)                                                     | Draw.io | This artefact presents all the architecture diagrams in a reusable format.                                           |
-| [OCI CIS LZ IAM Repository](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) | Git     | CIS LZ Terraform modules for Identity and Access Management.                                                         |
-| [OCI CIS LZ Network Repository](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) | Git     | CIS LZ Terraform modules for Network resources.                                                                      |
+| PHASE              | NAME                                                                                                                   | FORMAT   | DESCRIPTION                                                                                                          |
+|--------------------|------------------------------------------------------------------------------------------------------------------------|----------|----------------------------------------------------------------------------------------------------------------------|
+| Enablement         | [5 Steps to Onboard and Run OCI](https://www.youtube.com/watch?v=JWKRHfO4LnY&ab_channel=OracleLearning)                | Video    | Start here for an 5 minute overview of the key steps to onboard and run OCI with the Open LZ.                        |
+| Enablement, Design | [OCI Open LZ Blueprint](/docs/OCI_Open_LZ.pdf)                                                                         | PDF      | This artefact presents the OCI Open LZ blueprint design with the functional, security, network, and operations view. |
+| Design             | [OCI Open LZ Diagrams](/docs/OCI_Open_LZ.drawio)                                                                       | Draw.io  | This artefact presents all the architecture diagrams in a reusable format.                                           |
+| Run                | [Managing Shared Services Examples](r/examples/landing-zones/open-landing-zone/operation-entity-infrastructure/open-lz-oe-02-vision/Readme.md)                                                                                  | JSON/HCL | Supports Operation Scenario configuration 'OP.01 Manage Shared Services.'                                            |
+| Run                | [Managing OEs Examples](/examples/landing-zones/open-landing-zone/operation-entity-infrastructure/open-lz-oe-01-vision) | JSON/HCL | Supports Operation Scenario configuration 'OP.02 Manage OE'.                                                         |
+| Run                | [OCI CIS LZ IAM Repository](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam)                   | Git      | CIS LZ Terraform modules for Identity and Access Management to support runtime operations examples.                  |
+| Run                | [OCI CIS LZ Network Repository](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)        | Git      | CIS LZ Terraform modules for Network resources to support runtime operations examples.                               |
 
 
 # Approach Considerations
