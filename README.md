@@ -1,5 +1,10 @@
 # OCI Open LZ Blueprint
 
+
+<img src="oci_open_lz.png" alt= “” width="1200" height="value">
+
+&nbsp; 
+
 Welcome to the **OCI Open LZ**, the **Operating Entities Landing Zone**, a reference blueprint to simplify the onboarding of organizations, business units, and subsidiaries into OCI. 
 
 The purpose of the **OCI Open LZ** is to:
@@ -9,6 +14,8 @@ The purpose of the **OCI Open LZ** is to:
 4. Provide **tailoring guidelines** to help adjust the model. This asset can be used directly, tailored, or used as inspiration to create a new one - as it is not a prescribed solution.
 
 This repository is the source of truth for this blueprint where you can find all support materials associated with the phase where they should be used. In the current version you can find the following elements:
+
+&nbsp; 
 
 | PHASE              | NAME                                                                                                                   | FORMAT   | DESCRIPTION                                                                                                          |
 |--------------------|------------------------------------------------------------------------------------------------------------------------|----------|----------------------------------------------------------------------------------------------------------------------|
@@ -21,6 +28,7 @@ This repository is the source of truth for this blueprint where you can find all
 | Run                | [OCI CIS LZ IAM Repository](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam)                   | Git      | CIS LZ Terraform modules for Identity and Access Management to support runtime operations examples.                  |
 | Run                | [OCI CIS LZ Network Repository](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)        | Git      | CIS LZ Terraform modules for Network resources to support runtime operations examples.                               |
 
+&nbsp; 
 
 # Approach Considerations
 A landing zone can be set up in different ways and can take different amounts of time to implement. There are mainly two types of approaches:
@@ -28,3 +36,13 @@ A landing zone can be set up in different ways and can take different amounts of
 2.	**Tailored approaches** focuses on creating a landing that fits completely your requirements. They normally cover security, network, and operational topics, and can onboard a complete enterprise organization with one cloud operating model. This option is recommended when the standard approach is not enough (e.g., large organizations with fine-tuned security or network requirements, large and heterogeneous workloads landscape with multi-cloud scenarios, etc.) and experience tells us it can take from weeks to some months to set up - depending on requirements and team expertise.
       
 The **OCI Open LZ** is an example of the outcome of the latter approach, a tailored landing zone, and one of its purposes is to help reduce the design time, associated cost, and effort. 
+
+&nbsp; 
+
+# License
+
+Copyright (c) 2023 Oracle and/or its affiliates.
+
+Licensed under the Universal Permissive License (UPL), Version 1.0.
+
+See [LICENSE](https://github.com/oracle-devrel/technology-ngineering/blob/folder-structure/LICENSE) for more details.
