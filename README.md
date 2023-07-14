@@ -5,7 +5,7 @@
 
 &nbsp; 
 
-Welcome to the **OCI Open LZ**, the **Operating Entities Landing Zone**, a reference blueprint to simplify the onboarding of organizations, business units, and subsidiaries into OCI. 
+Welcome to the **OCI Open LZ**, the **Op**erating **En**tities **L**anding **Z**one, a reference **blueprint** to simplify the onboarding of organizations, business units, and subsidiaries into OCI. 
 
 The purpose of the **OCI Open LZ** is to:
 1. Provide a landing zone design ready to **onboard an enterprise organization** and its functional divisions - identified as **operating entities (OE)** with their teams, departments, and projects.
