@@ -1,4 +1,4 @@
-# **OCI Open LZ Blueprint**
+# **OCI Open LZ <span style="color:rgb(67,142,197)">Blueprint**</span>
 
 
 <img src="oci_open_lz.png" alt= “” width="1200" height="value">
