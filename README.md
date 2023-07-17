@@ -1,4 +1,4 @@
-# OCI Open LZ Blueprint
+# **OCI Open LZ Blueprint**
 
 
 <img src="oci_open_lz.png" alt= “” width="1200" height="value">
