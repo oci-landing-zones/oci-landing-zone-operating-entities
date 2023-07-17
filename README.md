@@ -1,11 +1,5 @@
 # **OCI Open LZ <span style="color:rgb(67,142,197)">Blueprint**</span>
 
- # $\textcolor{black}{\textsf{OCI Open LZ}}$  $\textcolor{#438EC5}{\textsf{Blueprint}}$ 
-
-
-
-
-# 
 
 <img src="oci_open_lz.png" alt= “” width="1200" height="value">
 
