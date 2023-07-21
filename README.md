@@ -1,11 +1,10 @@
-# **OCI Open LZ <span style="color:rgb(67,142,197)">Blueprint**</span>
-
+# **OCI Open LZ [Blueprint](#)**
 
 <img src="oci_open_lz.png" alt= “” width="1200" height="value">
 
 &nbsp; 
 
-Welcome to the **OCI Open LZ**, the **Op**erating **En**tities **L**anding **Z**one, a reference **blueprint** to simplify the onboarding of organizations, business units, and subsidiaries into OCI. 
+Welcome to the **OCI Open LZ**, the **Op**erating **En**tities **L**anding **Z**one, a reference **[blueprint](#)** to simplify the onboarding of organizations, business units, and subsidiaries into OCI. 
 
 The purpose of the **OCI Open LZ** is to:
 1. Provide a landing zone design ready to **onboard an enterprise organization** and its functional divisions - identified as **operating entities (OE)** with their teams, departments, and projects.
@@ -13,14 +12,15 @@ The purpose of the **OCI Open LZ** is to:
 3. **Enable customers, partners**, and the general **IT community** to **create their tailored landing zones** with **lower efforts** through a **comprehensive OCI reference architecture**.  
 4. Provide **tailoring guidelines** to help adjust the model. This asset can be used directly, tailored, or used as inspiration to create a new one - as it is not a prescribed solution.
 
-This repository is the source of truth for this blueprint where you can find all support materials associated with the phase where they should be used. In the current version you can find the following elements:
+This repository is the source of truth for this blueprint where you can find the support materials associated with the phase where they should be used. 
 
 &nbsp; 
 
 | PHASE              | NAME                                                                                                                   | FORMAT   | DESCRIPTION                                                                                                          |
 |--------------------|------------------------------------------------------------------------------------------------------------------------|----------|----------------------------------------------------------------------------------------------------------------------|
-| Enablement         | [5 Steps to Onboard and Run OCI](https://www.youtube.com/watch?v=JWKRHfO4LnY&ab_channel=OracleLearning)                | Video    |    Start here for a 5-minute overview of the key steps to onboard and run OCI with the Open LZ.                        |
+| Enablement         | [5 Steps to Onboard and Run OCI](https://www.youtube.com/watch?v=JWKRHfO4LnY&ab_channel=OracleLearning)                | Video    |    Start here for a 5-minute overview of the key steps to onboard and run OCI with the OCI Open LZ.                        |
 | Enablement         | [A Landing Zone Blueprint to Onboard and Run OCI](https://www.youtube.com/watch?v=xbKIxSERIxY)                | Video    | This recorded session discusses the differences between standard and tailored landing zones, presents the OCI Open LZ Blueprint views, and finishes with a demo of running OCI with Terraform configurable modules.                        |
+| Enablement         | [Tailored Landing Zones](https://www.youtube.com/watch?v=xbKIxSERIxY)                | MD    | This page presents what are tailored landing zones, their use cases, and assets available.                        |
 | Enablement, Design | [OCI Open LZ Blueprint](/docs/OCI_Open_LZ.pdf)                                                                         | PDF      | This artifact presents the OCI Open LZ blueprint design with the functional, security, network, and operations view. |
 | Design             | [OCI Open LZ Diagrams](/docs/OCI_Open_LZ.drawio)                                                                       | Draw.io  | This artifact contains all the architecture diagrams in a reusable format.                                           |
 | Run                | [Managing Shared Services Examples](/examples/landing-zones/open-landing-zone/operation-entity-infrastructure/open-lz-oe-02-vision/Readme.md)                                                                                  | JSON/HCL | Supports Operation Scenario configuration 'OP.01 Manage Shared Services.'                                            |
