@@ -1,0 +1,4068 @@
+Apply complete! Resources: 145 added, 0 changed, 0 destroyed.
+[0m[0m[1m[32m
+Outputs:
+
+[0mprovisioned_identity_resources = {
+  "compartments" = {
+    "CMP-OE01-COMMON-INFRA-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaz6z7rabfurzyuwwba6hsit7fvsm7j3a7l464vc4cbsub7t2qrsxa"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:13:59.298Z"
+      })
+      "description" = "oci-open-lz-customer OE01 common infra Compartment"
+      "enable_delete" = true
+      "freeform_tags" = tomap({
+        "cislz-terraform-module" = "iam-compartments/0.1.3"
+        "oci-open-lz" = "oci-open-lz-oe01-common-infra"
+        "oci-open-lz-cmp" = "oe-common-infra"
+        "oci-open-lz-customer" = "oci-open-lz-customer"
+      })
+      "id" = "ocid1.compartment.oc1..aaaaaaaatfb7vgtanvpmjq7q5cfwsype3kkp3bbqjrxfx2r3h3gchh23rc4q"
+      "inactive_state" = tostring(null)
+      "is_accessible" = true
+      "name" = "cmp-oe01-common-infra"
+      "state" = "ACTIVE"
+      "time_created" = "2023-07-28 11:13:59.896 +0000 UTC"
+      "timeouts" = null /* object */
+    }
+    "CMP-OE01-COMMON-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaadxfvqguqxxdvfi2tjwma3crhzyrv77znnr5ivkihceon3colydwq"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:13:36.910Z"
+      })
+      "description" = "oci-open-lz-customer OE01 common Compartment"
+      "enable_delete" = true
+      "freeform_tags" = tomap({
+        "cislz-terraform-module" = "iam-compartments/0.1.3"
+        "oci-open-lz" = "oci-open-lz-oe01-common"
+        "oci-open-lz-cmp" = "oe-common"
+        "oci-open-lz-customer" = "oci-open-lz-customer"
+      })
+      "id" = "ocid1.compartment.oc1..aaaaaaaaz6z7rabfurzyuwwba6hsit7fvsm7j3a7l464vc4cbsub7t2qrsxa"
+      "inactive_state" = tostring(null)
+      "is_accessible" = true
+      "name" = "cmp-oe01-common"
+      "state" = "ACTIVE"
+      "time_created" = "2023-07-28 11:13:36.963 +0000 UTC"
+      "timeouts" = null /* object */
+    }
+    "CMP-OE01-COMMON-NETWORK-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaz6z7rabfurzyuwwba6hsit7fvsm7j3a7l464vc4cbsub7t2qrsxa"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:13:59.274Z"
+      })
+      "description" = "oci-open-lz-customer OE01 common network Compartment"
+      "enable_delete" = true
+      "freeform_tags" = tomap({
+        "cislz-terraform-module" = "iam-compartments/0.1.3"
+        "oci-open-lz" = "oci-open-lz-oe01-common-network"
+        "oci-open-lz-cmp" = "oe-common-network"
+        "oci-open-lz-customer" = "oci-open-lz-customer"
+      })
+      "id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "inactive_state" = tostring(null)
+      "is_accessible" = true
+      "name" = "cmp-oe01-common-network"
+      "state" = "ACTIVE"
+      "time_created" = "2023-07-28 11:13:59.302 +0000 UTC"
+      "timeouts" = null /* object */
+    }
+    "CMP-OE01-DEVELOPMENT-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaadxfvqguqxxdvfi2tjwma3crhzyrv77znnr5ivkihceon3colydwq"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:13:37.236Z"
+      })
+      "description" = "oci-open-lz-customer OE01 development Compartment"
+      "enable_delete" = true
+      "freeform_tags" = tomap({
+        "cislz-terraform-module" = "iam-compartments/0.1.3"
+        "oci-open-lz" = "oci-open-lz-oe01-development"
+        "oci-open-lz-cmp" = "oe-development"
+        "oci-open-lz-customer" = "oci-open-lz-development"
+      })
+      "id" = "ocid1.compartment.oc1..aaaaaaaaf726lmhej3taaj4zz57ito2vaurejo7khkbdirqqzssiatjpfpaq"
+      "inactive_state" = tostring(null)
+      "is_accessible" = true
+      "name" = "cmp-oe01-development"
+      "state" = "ACTIVE"
+      "time_created" = "2023-07-28 11:13:37.263 +0000 UTC"
+      "timeouts" = null /* object */
+    }
+    "CMP-OE01-KEY" = {
+      "compartment_id" = "ocid1.tenancy.oc1..aaaaaaaaxzpxbcag7zgamh2erlggqro3y63tvm2rbkkjz4z2zskvagupiz7a"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:13:05.364Z"
+      })
+      "description" = "oci-open-lz-customer OE-01 top compartment"
+      "enable_delete" = true
+      "freeform_tags" = tomap({
+        "cislz-terraform-module" = "iam-compartments/0.1.3"
+        "oci-open-lz" = "oci-open-lz-oe01"
+        "oci-open-lz-cmp" = "oe-top"
+        "oci-open-lz-customer" = "oci-open-lz-customer"
+      })
+      "id" = "ocid1.compartment.oc1..aaaaaaaadxfvqguqxxdvfi2tjwma3crhzyrv77znnr5ivkihceon3colydwq"
+      "inactive_state" = tostring(null)
+      "is_accessible" = true
+      "name" = "cmp-oe1"
+      "state" = "ACTIVE"
+      "time_created" = "2023-07-28 11:13:05.647 +0000 UTC"
+      "timeouts" = null /* object */
+    }
+    "CMP-OE01-NONPROD-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaadxfvqguqxxdvfi2tjwma3crhzyrv77znnr5ivkihceon3colydwq"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:13:37.174Z"
+      })
+      "description" = "oci-open-lz-customer OE01 nonprod Compartment"
+      "enable_delete" = true
+      "freeform_tags" = tomap({
+        "cislz-terraform-module" = "iam-compartments/0.1.3"
+        "oci-open-lz" = "oci-open-lz-oe01-nonprod"
+        "oci-open-lz-cmp" = "oe-nonprod"
+        "oci-open-lz-customer" = "oci-open-lz-nonprod"
+      })
+      "id" = "ocid1.compartment.oc1..aaaaaaaasduur6lesnjgmjxennrdaam5xpoh252te2d3gejfwdyjecxhuniq"
+      "inactive_state" = tostring(null)
+      "is_accessible" = true
+      "name" = "cmp-oe01-nonprod"
+      "state" = "ACTIVE"
+      "time_created" = "2023-07-28 11:13:38.372 +0000 UTC"
+      "timeouts" = null /* object */
+    }
+    "CMP-OE01-PROD-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaadxfvqguqxxdvfi2tjwma3crhzyrv77znnr5ivkihceon3colydwq"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:13:37.163Z"
+      })
+      "description" = "oci-open-lz-customer OE01 prod Compartment"
+      "enable_delete" = true
+      "freeform_tags" = tomap({
+        "cislz-terraform-module" = "iam-compartments/0.1.3"
+        "oci-open-lz" = "oci-open-lz-oe01-prod"
+        "oci-open-lz-cmp" = "oe-prod"
+        "oci-open-lz-customer" = "oci-open-lz-prod"
+      })
+      "id" = "ocid1.compartment.oc1..aaaaaaaazrztl5tvbub7zl55bay64elmjsq2qjivy7kglyefekizzzkonwja"
+      "inactive_state" = tostring(null)
+      "is_accessible" = true
+      "name" = "cmp-oe01-prod"
+      "state" = "ACTIVE"
+      "time_created" = "2023-07-28 11:13:37.569 +0000 UTC"
+      "timeouts" = null /* object */
+    }
+    "CMP-OE01-SANDBOX-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaadxfvqguqxxdvfi2tjwma3crhzyrv77znnr5ivkihceon3colydwq"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:13:37.194Z"
+      })
+      "description" = "oci-open-lz-customer OE01 sandbox Compartment"
+      "enable_delete" = true
+      "freeform_tags" = tomap({
+        "cislz-terraform-module" = "iam-compartments/0.1.3"
+        "oci-open-lz" = "oci-open-lz-oe01-sandbox"
+        "oci-open-lz-cmp" = "oe-sandbox"
+        "oci-open-lz-customer" = "oci-open-lz-customer"
+      })
+      "id" = "ocid1.compartment.oc1..aaaaaaaab3e7egvgcj7qbpwpbwo46s6j5feieecyvfoyhwwnluqoyjy3jsoq"
+      "inactive_state" = tostring(null)
+      "is_accessible" = true
+      "name" = "cmp-oe01-sandbox"
+      "state" = "ACTIVE"
+      "time_created" = "2023-07-28 11:13:37.881 +0000 UTC"
+      "timeouts" = null /* object */
+    }
+  }
+  "dynamic_groups" = {}
+  "groups" = {}
+  "memberships" = {}
+  "policies" = {}
+}
+provisioned_networking_resources = {
+  "dhcp_options" = {
+    "VCN-FRANKFURT-OE01-CO-DHCP-OPTION-01-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:15.164Z"
+      })
+      "dhcp_options_key" = "VCN-FRANKFURT-OE01-CO-DHCP-OPTION-01-KEY"
+      "display_name" = "vcn_frankfurt_oe01_co_dhcp_option_01"
+      "domain_name_type" = "CUSTOM_DOMAIN"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaaj3wckkteapiokuxihbdx7gvo4sovz3ycu356usakfjao6qiuafyq"
+      "network_configuration_category" = "oe01"
+      "options" = toset([
+        {
+          "custom_dns_servers" = tolist([
+            "192.168.0.3",
+            "192.168.0.4",
+          ])
+          "search_domain_names" = tolist([])
+          "server_type" = "CustomDnsServer"
+          "type" = "DomainNameServer"
+        },
+        {
+          "custom_dns_servers" = tolist([])
+          "search_domain_names" = tolist([
+            "test.com",
+          ])
+          "server_type" = ""
+          "type" = "SearchDomain"
+        },
+      ])
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.245 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "VCN-FRANKFURT-OE01-CO-DHCP-OPTION-02-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:14.465Z"
+      })
+      "dhcp_options_key" = "VCN-FRANKFURT-OE01-CO-DHCP-OPTION-02-KEY"
+      "display_name" = "vcn_frankfurt_oe01_co_dhcp_option_02"
+      "domain_name_type" = "CUSTOM_DOMAIN"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaaozlheeglk6lk3qczrqaoq34vjfihr4aaehou74uzvtjsfzz3wcza"
+      "network_configuration_category" = "oe01"
+      "options" = toset([
+        {
+          "custom_dns_servers" = tolist([
+            "10.0.0.3",
+            "10.0.0.4",
+          ])
+          "search_domain_names" = tolist([])
+          "server_type" = "CustomDnsServer"
+          "type" = "DomainNameServer"
+        },
+        {
+          "custom_dns_servers" = tolist([])
+          "search_domain_names" = tolist([
+            "test.com",
+          ])
+          "server_type" = ""
+          "type" = "SearchDomain"
+        },
+      ])
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:14.505 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "VCN-FRANKFURT-OE01-DEV-DHCP-OPTION-01-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:15.246Z"
+      })
+      "dhcp_options_key" = "VCN-FRANKFURT-OE01-DEV-DHCP-OPTION-01-KEY"
+      "display_name" = "vcn_frankfurt_oe01_dev_dhcp_option_01"
+      "domain_name_type" = "CUSTOM_DOMAIN"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaa2z6xufo4wzvxpgy2kwa2qmp73nd2gonesizhdcszzkm2yjgapt7q"
+      "network_configuration_category" = "oe01"
+      "options" = toset([
+        {
+          "custom_dns_servers" = tolist([
+            "192.168.0.3",
+            "192.168.0.4",
+          ])
+          "search_domain_names" = tolist([])
+          "server_type" = "CustomDnsServer"
+          "type" = "DomainNameServer"
+        },
+        {
+          "custom_dns_servers" = tolist([])
+          "search_domain_names" = tolist([
+            "test.com",
+          ])
+          "server_type" = ""
+          "type" = "SearchDomain"
+        },
+      ])
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.341 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "VCN-FRANKFURT-OE01-DEV-DHCP-OPTION-02-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:14.618Z"
+      })
+      "dhcp_options_key" = "VCN-FRANKFURT-OE01-DEV-DHCP-OPTION-02-KEY"
+      "display_name" = "vcn_frankfurt_oe01_dev_dhcp_option_02"
+      "domain_name_type" = "CUSTOM_DOMAIN"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaa7zk3g2gayz6m5qeqq3m5yivtzu7hnowkts64zokgjc5p4em2re6a"
+      "network_configuration_category" = "oe01"
+      "options" = toset([
+        {
+          "custom_dns_servers" = tolist([
+            "10.0.0.3",
+            "10.0.0.4",
+          ])
+          "search_domain_names" = tolist([])
+          "server_type" = "CustomDnsServer"
+          "type" = "DomainNameServer"
+        },
+        {
+          "custom_dns_servers" = tolist([])
+          "search_domain_names" = tolist([
+            "test.com",
+          ])
+          "server_type" = ""
+          "type" = "SearchDomain"
+        },
+      ])
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:14.662 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "VCN-FRANKFURT-OE01-NP-DHCP-OPTION-01-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:14.413Z"
+      })
+      "dhcp_options_key" = "VCN-FRANKFURT-OE01-NP-DHCP-OPTION-01-KEY"
+      "display_name" = "vcn_frankfurt_oe01_np_dhcp_option_01"
+      "domain_name_type" = "CUSTOM_DOMAIN"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaavvr6kmuu4uuzyelxinnhrguoxt4fmlmi2czzmuayzx6awtak3diq"
+      "network_configuration_category" = "oe01"
+      "options" = toset([
+        {
+          "custom_dns_servers" = tolist([
+            "192.168.0.3",
+            "192.168.0.4",
+          ])
+          "search_domain_names" = tolist([])
+          "server_type" = "CustomDnsServer"
+          "type" = "DomainNameServer"
+        },
+        {
+          "custom_dns_servers" = tolist([])
+          "search_domain_names" = tolist([
+            "test.com",
+          ])
+          "server_type" = ""
+          "type" = "SearchDomain"
+        },
+      ])
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:14.469 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "VCN-FRANKFURT-OE01-NP-DHCP-OPTION-02-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:14.413Z"
+      })
+      "dhcp_options_key" = "VCN-FRANKFURT-OE01-NP-DHCP-OPTION-02-KEY"
+      "display_name" = "vcn_frankfurt_oe01_np_dhcp_option_02"
+      "domain_name_type" = "CUSTOM_DOMAIN"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaakrvmk2mxu3fwlqh5mvxhcjobi5qkrsfmdfsv472gh34hmf4ah7yq"
+      "network_configuration_category" = "oe01"
+      "options" = toset([
+        {
+          "custom_dns_servers" = tolist([
+            "10.0.0.3",
+            "10.0.0.4",
+          ])
+          "search_domain_names" = tolist([])
+          "server_type" = "CustomDnsServer"
+          "type" = "DomainNameServer"
+        },
+        {
+          "custom_dns_servers" = tolist([])
+          "search_domain_names" = tolist([
+            "test.com",
+          ])
+          "server_type" = ""
+          "type" = "SearchDomain"
+        },
+      ])
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.226 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "VCN-FRANKFURT-OE01-P-DHCP-OPTION-01-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:15.151Z"
+      })
+      "dhcp_options_key" = "VCN-FRANKFURT-OE01-P-DHCP-OPTION-01-KEY"
+      "display_name" = "vcn_frankfurt_oe01_p_dhcp_option_01"
+      "domain_name_type" = "CUSTOM_DOMAIN"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaa67dxzvvmbocfscfi6sio4xinck5qe3pt7hqee77vbnnovym2trca"
+      "network_configuration_category" = "oe01"
+      "options" = toset([
+        {
+          "custom_dns_servers" = tolist([
+            "192.168.0.3",
+            "192.168.0.4",
+          ])
+          "search_domain_names" = tolist([])
+          "server_type" = "CustomDnsServer"
+          "type" = "DomainNameServer"
+        },
+        {
+          "custom_dns_servers" = tolist([])
+          "search_domain_names" = tolist([
+            "test.com",
+          ])
+          "server_type" = ""
+          "type" = "SearchDomain"
+        },
+      ])
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.247 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "VCN-FRANKFURT-OE01-P-DHCP-OPTION-02-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:14.479Z"
+      })
+      "dhcp_options_key" = "VCN-FRANKFURT-OE01-P-DHCP-OPTION-02-KEY"
+      "display_name" = "vcn_frankfurt_oe01_p_dhcp_option_02"
+      "domain_name_type" = "CUSTOM_DOMAIN"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaa4fqbo4ahwo57fbgfyxf2c3cayyas5drhco534fqbbicg44uywcua"
+      "network_configuration_category" = "oe01"
+      "options" = toset([
+        {
+          "custom_dns_servers" = tolist([
+            "10.0.0.3",
+            "10.0.0.4",
+          ])
+          "search_domain_names" = tolist([])
+          "server_type" = "CustomDnsServer"
+          "type" = "DomainNameServer"
+        },
+        {
+          "custom_dns_servers" = tolist([])
+          "search_domain_names" = tolist([
+            "test.com",
+          ])
+          "server_type" = ""
+          "type" = "SearchDomain"
+        },
+      ])
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:14.544 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "VCN-FRANKFURT-OE01-SB-DHCP-OPTION-01-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:15.271Z"
+      })
+      "dhcp_options_key" = "VCN-FRANKFURT-OE01-SB-DHCP-OPTION-01-KEY"
+      "display_name" = "vcn_frankfurt_oe01_sb_dhcp_option_01"
+      "domain_name_type" = "CUSTOM_DOMAIN"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaawr2dbuqjtpannfnka3ettzkhr5zj4kk3zzhwseozaaaiffrmvdoq"
+      "network_configuration_category" = "oe01"
+      "options" = toset([
+        {
+          "custom_dns_servers" = tolist([
+            "192.168.0.3",
+            "192.168.0.4",
+          ])
+          "search_domain_names" = tolist([])
+          "server_type" = "CustomDnsServer"
+          "type" = "DomainNameServer"
+        },
+        {
+          "custom_dns_servers" = tolist([])
+          "search_domain_names" = tolist([
+            "test.com",
+          ])
+          "server_type" = ""
+          "type" = "SearchDomain"
+        },
+      ])
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.31 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "VCN-FRANKFURT-OE01-SB-DHCP-OPTION-02-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:14.492Z"
+      })
+      "dhcp_options_key" = "VCN-FRANKFURT-OE01-SB-DHCP-OPTION-02-KEY"
+      "display_name" = "vcn_frankfurt_oe01_sb_dhcp_option_02"
+      "domain_name_type" = "CUSTOM_DOMAIN"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaa3wmeeddbanvn5sviih523ysarggaesqrtjxug5sjgkr27rsm4jga"
+      "network_configuration_category" = "oe01"
+      "options" = toset([
+        {
+          "custom_dns_servers" = tolist([
+            "10.0.0.3",
+            "10.0.0.4",
+          ])
+          "search_domain_names" = tolist([])
+          "server_type" = "CustomDnsServer"
+          "type" = "DomainNameServer"
+        },
+        {
+          "custom_dns_servers" = tolist([])
+          "search_domain_names" = tolist([
+            "test.com",
+          ])
+          "server_type" = ""
+          "type" = "SearchDomain"
+        },
+      ])
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:14.538 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+  }
+  "drg_attachments" = {}
+  "drg_route_distributions" = {}
+  "drg_route_distributions_statements" = {}
+  "drg_route_table_route_rules" = {}
+  "drg_route_tables" = {}
+  "dynamic_routing_gateways" = {}
+  "internet_gateways" = {}
+  "l7_load_balancers" = {
+    "l7_lb_back_ends" = {
+      "EXAMPLE-01-LB-BCK-END-SET-01-BE-01" = {
+        "backendset_key" = "EXAMPLE-01-LB-BCK-END-SET-01"
+        "backendset_name" = "backend-set-01"
+        "backup" = false
+        "drain" = false
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/backendSets/backend-set-01/backends/10.0.2.128:80"
+        "ip_address" = "10.0.2.128"
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_name" = "OE-01-LBaaS"
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "name" = "10.0.2.128:80"
+        "network_configuration_category" = "oe01"
+        "offline" = false
+        "port" = 80
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+        "weight" = 1
+      }
+      "EXAMPLE-01-LB-BCK-END-SET-01-BE-02" = {
+        "backendset_key" = "EXAMPLE-01-LB-BCK-END-SET-01"
+        "backendset_name" = "backend-set-01"
+        "backup" = false
+        "drain" = false
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/backendSets/backend-set-01/backends/10.0.2.94:80"
+        "ip_address" = "10.0.2.94"
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_name" = "OE-01-LBaaS"
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "name" = "10.0.2.94:80"
+        "network_configuration_category" = "oe01"
+        "offline" = false
+        "port" = 80
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+        "weight" = 1
+      }
+    }
+    "l7_lb_backend_sets" = {
+      "EXAMPLE-01-LB-BCK-END-SET-01" = {
+        "backend" = toset([])
+        "health_checker" = tolist([
+          {
+            "interval_ms" = 10000
+            "is_force_plain_text" = false
+            "port" = 80
+            "protocol" = "HTTP"
+            "response_body_regex" = ".*"
+            "retries" = 3
+            "return_code" = 200
+            "timeout_in_millis" = 3000
+            "url_path" = "/"
+          },
+        ])
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/backendSets/backend-set-01"
+        "l7lb_backendset_key" = "EXAMPLE-01-LB-BCK-END-SET-01"
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_name" = "OE-01-LBaaS"
+        "lb_cookie_session_persistence_configuration" = tolist([
+          {
+            "cookie_name" = "example_cookie"
+            "disable_fallback" = false
+            "domain" = "Set-cookie"
+            "is_http_only" = true
+            "is_secure" = false
+            "max_age_in_seconds" = 3600
+            "path" = "/"
+          },
+        ])
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "name" = "backend-set-01"
+        "network_configuration_category" = "oe01"
+        "policy" = "LEAST_CONNECTIONS"
+        "session_persistence_configuration" = tolist([])
+        "ssl_configuration" = tolist([])
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+      }
+    }
+    "l7_lb_certificates" = {
+      "LB-1-CERT-1-KEY" = {
+        "ca_certificate" = "~/certs/ca.crt"
+        "certificate_name" = "lb1-cert1"
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/certificates/lb1-cert1"
+        "l7lb_certificate_key" = "LB-1-CERT-1-KEY"
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_name" = "OE-01-LBaaS"
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "network_configuration_category" = "oe01"
+        "passphrase" = tostring(null)
+        "private_key" = "~/certs/my_cert.key"
+        "public_certificate" = "~/certs/my_cert.crt"
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+      }
+    }
+    "l7_lb_cipher_suites" = {
+      "EXAMPLE-01-LB-CIPHER-SUITE-01-KEY" = {
+        "ciphers" = tolist([
+          "ECDHE-RSA-AES256-GCM-SHA384",
+          "ECDHE-ECDSA-AES256-GCM-SHA384",
+          "ECDHE-RSA-AES128-GCM-SHA256",
+        ])
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/sslCipherSuites/cipher_suite_01"
+        "l7lb_cs_key" = "EXAMPLE-01-LB-CIPHER-SUITE-01-KEY"
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_name" = "OE-01-LBaaS"
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "name" = "cipher_suite_01"
+        "network_configuration_category" = "oe01"
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+      }
+    }
+    "l7_lb_hostnames" = {
+      "LB1-HOSTNAME-1-KEY" = {
+        "hostname" = "oe01com"
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/hostnames/oe01"
+        "l7lb_hostname_key" = "LB1-HOSTNAME-1-KEY"
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_name" = "OE-01-LBaaS"
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "name" = "oe01"
+        "network_configuration_category" = "oe01"
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+      }
+      "LB1-HOSTNAME-2-KEY" = {
+        "hostname" = "loe01-1.com"
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/hostnames/oe01-1"
+        "l7lb_hostname_key" = "LB1-HOSTNAME-2-KEY"
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_name" = "OE-01-LBaaS"
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "name" = "oe01-1"
+        "network_configuration_category" = "oe01"
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+      }
+    }
+    "l7_lb_listeners" = {
+      "LB1-LSNR-1-80" = {
+        "connection_configuration" = tolist([
+          {
+            "backend_tcp_proxy_protocol_version" = 0
+            "idle_timeout_in_seconds" = "1200"
+          },
+        ])
+        "default_backend_set_name" = "backend-set-01"
+        "hostname_names" = tolist([])
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/listeners/lb1-lsnr1-80"
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_listener_key" = "LB1-LSNR-1-80"
+        "l7lb_name" = "OE-01-LBaaS"
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "name" = "lb1-lsnr1-80"
+        "network_configuration_category" = "oe01"
+        "path_route_set_name" = tostring(null)
+        "port" = 80
+        "protocol" = "HTTP"
+        "routing_policy_name" = tostring(null)
+        "rule_set_names" = tolist([])
+        "ssl_configuration" = tolist([])
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+      }
+      "LB1-LSNR-2-443" = {
+        "connection_configuration" = tolist([
+          {
+            "backend_tcp_proxy_protocol_version" = 0
+            "idle_timeout_in_seconds" = "1200"
+          },
+        ])
+        "default_backend_set_name" = "backend-set-01"
+        "hostname_names" = tolist([
+          "oe01",
+          "oe01-1",
+        ])
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/listeners/lb1-lsnr2-443"
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_listener_key" = "LB1-LSNR-2-443"
+        "l7lb_name" = "OE-01-LBaaS"
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "name" = "lb1-lsnr2-443"
+        "network_configuration_category" = "oe01"
+        "path_route_set_name" = "path_route_set_01"
+        "port" = 443
+        "protocol" = "HTTP"
+        "routing_policy_name" = tostring(null)
+        "rule_set_names" = tolist([
+          "example_rule_set",
+        ])
+        "ssl_configuration" = tolist([
+          {
+            "certificate_ids" = tolist(null) /* of string */
+            "certificate_name" = "lb1-cert1"
+            "cipher_suite_name" = "oci-default-ssl-cipher-suite-v1"
+            "protocols" = tolist([
+              "TLSv1.2",
+            ])
+            "server_order_preference" = "ENABLED"
+            "trusted_certificate_authority_ids" = tolist(null) /* of string */
+            "verify_depth" = 3
+            "verify_peer_certificate" = false
+          },
+        ])
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+      }
+    }
+    "l7_lb_path_route_sets" = {
+      "EXMPL_01_PATH_ROUTE_SET_01_KEY" = {
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/pathRouteSets/path_route_set_01"
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_name" = "OE-01-LBaaS"
+        "l7lb_prs_key" = "EXMPL_01_PATH_ROUTE_SET_01_KEY"
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "name" = "path_route_set_01"
+        "network_configuration_category" = "oe01"
+        "path_routes" = tolist([
+          {
+            "backend_set_name" = "backend-set-01"
+            "path" = "/example/video/123"
+            "path_match_type" = tolist([
+              {
+                "match_type" = "EXACT_MATCH"
+              },
+            ])
+          },
+          {
+            "backend_set_name" = "backend-set-01"
+            "path" = "/"
+            "path_match_type" = tolist([
+              {
+                "match_type" = "EXACT_MATCH"
+              },
+            ])
+          },
+        ])
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+      }
+    }
+    "l7_lb_routing_policies" = {}
+    "l7_lb_rule_sets" = {
+      "LB1-RULE-SET-1-KEY" = {
+        "id" = "loadBalancers/ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q/ruleSets/example_rule_set"
+        "items" = toset([
+          {
+            "action" = "ADD_HTTP_REQUEST_HEADER"
+            "allowed_methods" = toset([])
+            "are_invalid_characters_allowed" = false
+            "conditions" = tolist([])
+            "description" = ""
+            "header" = "example_header_name"
+            "http_large_header_size_in_kb" = 0
+            "prefix" = ""
+            "redirect_uri" = tolist([])
+            "response_code" = 0
+            "status_code" = 0
+            "suffix" = ""
+            "value" = "example_value"
+          },
+          {
+            "action" = "EXTEND_HTTP_REQUEST_HEADER_VALUE"
+            "allowed_methods" = toset([])
+            "are_invalid_characters_allowed" = false
+            "conditions" = tolist([])
+            "description" = ""
+            "header" = "example_header_name2"
+            "http_large_header_size_in_kb" = 0
+            "prefix" = "example_prefix_value"
+            "redirect_uri" = tolist([])
+            "response_code" = 0
+            "status_code" = 0
+            "suffix" = "example_suffix_value"
+            "value" = ""
+          },
+        ])
+        "l7lb_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "l7lb_key" = "OE_01_LB_KEY"
+        "l7lb_name" = "OE-01-LBaaS"
+        "l7lb_rule_set_key" = "LB1-RULE-SET-1-KEY"
+        "load_balancer_id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "name" = "example_rule_set"
+        "network_configuration_category" = "oe01"
+        "state" = "SUCCEEDED"
+        "timeouts" = null /* object */
+      }
+    }
+    "l7_load_balancers" = {
+      "OE_01_LB_KEY" = {
+        "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+        "defined_tags" = tomap({
+          "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+          "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+          "Oracle_Tags.CreatedOn" = "2023-07-28T11:21:23.643Z"
+        })
+        "display_name" = "OE-01-LBaaS"
+        "freeform_tags" = tomap({})
+        "id" = "ocid1.loadbalancer.oc1.eu-frankfurt-1.aaaaaaaaurtspntvmenwuknf32wlc2otnkuhzaodyr4zlbxar5i7mn7m473q"
+        "ip_mode" = "IPV4"
+        "is_private" = true
+        "network_configuration_category" = "oe01"
+        "network_security_group_ids" = toset([
+          "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafs62rrxrhd54ah7qtmxqqrtfp4lm2wkenjd6yv7zx5encksqrghq",
+        ])
+        "network_security_groups" = {
+          "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafs62rrxrhd54ah7qtmxqqrtfp4lm2wkenjd6yv7zx5encksqrghq" = {
+            "display_name" = "networksecuritygroup20230728111417"
+            "nsg_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafs62rrxrhd54ah7qtmxqqrtfp4lm2wkenjd6yv7zx5encksqrghq"
+            "nsg_key" = "NSG-02-OE01-P-VCN-KEY"
+          }
+        }
+        "reserved_ips" = tolist([])
+        "reserved_public_ips" = {}
+        "shape" = "flexible"
+        "shape_details" = tolist([
+          {
+            "maximum_bandwidth_in_mbps" = 100
+            "minimum_bandwidth_in_mbps" = 10
+          },
+        ])
+        "subnet_ids" = tolist([
+          "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaasbkjxb32fntcayxhtoaikaqrkojjmq5eguy2e3ndnl2fnqn2va4a",
+        ])
+        "subnets" = {
+          "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaasbkjxb32fntcayxhtoaikaqrkojjmq5eguy2e3ndnl2fnqn2va4a" = {
+            "display_name" = "sn_frankfurt_oe01_p_lb"
+            "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaasbkjxb32fntcayxhtoaikaqrkojjmq5eguy2e3ndnl2fnqn2va4a"
+            "subnet_key" = "SN-FRANKFURT-OE01-P-LB-KEY"
+            "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+            "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+            "vcn_name" = "vcn_frankfurt_oe01_p"
+          }
+        }
+      }
+    }
+  }
+  "local_peering_gateways" = {}
+  "nat_gateways" = {}
+  "network_security_groups" = {
+    "NSG-01-OE01-CO-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "networksecuritygroup20230728111417"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaa32ejm2rntoskcconpg7wpmmqfdsnb5rndbvqnf5y7h4r2krkssiq"
+      "network_configuration_category" = "oe01"
+      "nsg_key" = "NSG-01-OE01-CO-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:17.834 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "NSG-01-OE01-DEV-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "networksecuritygroup20230728111416"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaavwfpvempj4xolthp4sn4zbsc4aiylekeyydxhf6yw3khryee32fq"
+      "network_configuration_category" = "oe01"
+      "nsg_key" = "NSG-01-OE01-DEV-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.039 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "NSG-01-OE01-NP-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "networksecuritygroup20230728111415"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaayiqo7elhvkwkrvwmkteshfabb5i2xbycjwnt6q2qj74vsqwzf3qa"
+      "network_configuration_category" = "oe01"
+      "nsg_key" = "NSG-01-OE01-NP-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.492 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "NSG-01-OE01-P-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "networksecuritygroup20230728111415"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaa5ohe3d2hqjekwinhkqaypxjhj5ieicsfz2chpv7qa5vp7hqolnya"
+      "network_configuration_category" = "oe01"
+      "nsg_key" = "NSG-01-OE01-P-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.576 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "NSG-01-OE01-SB-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "networksecuritygroup20230728111416"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaae4ol2dyu5kopqljzd74o6wqr2nlxwv6gfdp2dzfp7ebdgh2zorwq"
+      "network_configuration_category" = "oe01"
+      "nsg_key" = "NSG-01-OE01-SB-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.031 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "NSG-02-OE01-CO-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "networksecuritygroup20230728111415"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaagh4cbjpqag5biegnevi3qvdqiykcgh4ifktxgv2b23vfaiuv3oia"
+      "network_configuration_category" = "oe01"
+      "nsg_key" = "NSG-02-OE01-CO-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.951 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "NSG-02-OE01-DEV-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "networksecuritygroup20230728111416"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaasudpnk4jcchzcqvenirxuog3o4ypt543xc6pubwfgnfxlofaiiea"
+      "network_configuration_category" = "oe01"
+      "nsg_key" = "NSG-02-OE01-DEV-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.913 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "NSG-02-OE01-NP-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "networksecuritygroup20230728111415"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaa7ur6gd3xgpccpbzy4vggch6zgqriyzdvclxd5uiyspa66syyskpa"
+      "network_configuration_category" = "oe01"
+      "nsg_key" = "NSG-02-OE01-NP-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.677 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "NSG-02-OE01-P-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "networksecuritygroup20230728111417"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafs62rrxrhd54ah7qtmxqqrtfp4lm2wkenjd6yv7zx5encksqrghq"
+      "network_configuration_category" = "oe01"
+      "nsg_key" = "NSG-02-OE01-P-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:17.373 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "NSG-02-OE01-SB-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "networksecuritygroup20230728111415"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafwram37bmvmt2dzihgsgofsongabgwypti26liljoxuoxrx7lnfq"
+      "network_configuration_category" = "oe01"
+      "nsg_key" = "NSG-02-OE01-SB-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.873 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+  }
+  "network_security_groups_egress_rules" = {
+    "NSG-01-OE01-CO-VCN-KEY.anywhere" = {
+      "description" = "egress to 0.0.0.0/0 over TCP"
+      "destination" = "0.0.0.0/0"
+      "destination_type" = "CIDR_BLOCK"
+      "direction" = "EGRESS"
+      "icmp_options" = tolist([])
+      "id" = "B339C5"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaa32ejm2rntoskcconpg7wpmmqfdsnb5rndbvqnf5y7h4r2krkssiq"
+      "network_security_group_key" = "NSG-01-OE01-CO-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111417"
+      "protocol" = "6"
+      "source" = tostring(null)
+      "source_type" = ""
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:25.062 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "NSG-01-OE01-DEV-VCN-KEY.anywhere" = {
+      "description" = "egress to 0.0.0.0/0 over TCP"
+      "destination" = "0.0.0.0/0"
+      "destination_type" = "CIDR_BLOCK"
+      "direction" = "EGRESS"
+      "icmp_options" = tolist([])
+      "id" = "1A2F83"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaavwfpvempj4xolthp4sn4zbsc4aiylekeyydxhf6yw3khryee32fq"
+      "network_security_group_key" = "NSG-01-OE01-DEV-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111416"
+      "protocol" = "6"
+      "source" = tostring(null)
+      "source_type" = ""
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:24.898 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "NSG-01-OE01-NP-VCN-KEY.anywhere" = {
+      "description" = "egress to 0.0.0.0/0 over TCP"
+      "destination" = "0.0.0.0/0"
+      "destination_type" = "CIDR_BLOCK"
+      "direction" = "EGRESS"
+      "icmp_options" = tolist([])
+      "id" = "DD6A4E"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaayiqo7elhvkwkrvwmkteshfabb5i2xbycjwnt6q2qj74vsqwzf3qa"
+      "network_security_group_key" = "NSG-01-OE01-NP-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = tostring(null)
+      "source_type" = ""
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:24.479 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "NSG-01-OE01-P-VCN-KEY.anywhere" = {
+      "description" = "egress to 0.0.0.0/0 over TCP"
+      "destination" = "0.0.0.0/0"
+      "destination_type" = "CIDR_BLOCK"
+      "direction" = "EGRESS"
+      "icmp_options" = tolist([])
+      "id" = "D9638E"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaa5ohe3d2hqjekwinhkqaypxjhj5ieicsfz2chpv7qa5vp7hqolnya"
+      "network_security_group_key" = "NSG-01-OE01-P-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = tostring(null)
+      "source_type" = ""
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:24.159 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "NSG-01-OE01-SB-VCN-KEY.anywhere" = {
+      "description" = "egress to 0.0.0.0/0 over TCP"
+      "destination" = "0.0.0.0/0"
+      "destination_type" = "CIDR_BLOCK"
+      "direction" = "EGRESS"
+      "icmp_options" = tolist([])
+      "id" = "5C03A2"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaae4ol2dyu5kopqljzd74o6wqr2nlxwv6gfdp2dzfp7ebdgh2zorwq"
+      "network_security_group_key" = "NSG-01-OE01-SB-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111416"
+      "protocol" = "6"
+      "source" = tostring(null)
+      "source_type" = ""
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:22.654 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "NSG-02-OE01-CO-VCN-KEY.anywhere" = {
+      "description" = "egress to 0.0.0.0/0 over TCP"
+      "destination" = "0.0.0.0/0"
+      "destination_type" = "CIDR_BLOCK"
+      "direction" = "EGRESS"
+      "icmp_options" = tolist([])
+      "id" = "AB682E"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaagh4cbjpqag5biegnevi3qvdqiykcgh4ifktxgv2b23vfaiuv3oia"
+      "network_security_group_key" = "NSG-02-OE01-CO-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = tostring(null)
+      "source_type" = ""
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:25.247 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "NSG-02-OE01-DEV-VCN-KEY.anywhere" = {
+      "description" = "egress to 0.0.0.0/0 over TCP"
+      "destination" = "0.0.0.0/0"
+      "destination_type" = "CIDR_BLOCK"
+      "direction" = "EGRESS"
+      "icmp_options" = tolist([])
+      "id" = "7F127A"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaasudpnk4jcchzcqvenirxuog3o4ypt543xc6pubwfgnfxlofaiiea"
+      "network_security_group_key" = "NSG-02-OE01-DEV-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111416"
+      "protocol" = "6"
+      "source" = tostring(null)
+      "source_type" = ""
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:25.444 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "NSG-02-OE01-NP-VCN-KEY.anywhere" = {
+      "description" = "egress to 0.0.0.0/0 over TCP"
+      "destination" = "0.0.0.0/0"
+      "destination_type" = "CIDR_BLOCK"
+      "direction" = "EGRESS"
+      "icmp_options" = tolist([])
+      "id" = "21648B"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaa7ur6gd3xgpccpbzy4vggch6zgqriyzdvclxd5uiyspa66syyskpa"
+      "network_security_group_key" = "NSG-02-OE01-NP-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = tostring(null)
+      "source_type" = ""
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:24.261 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "NSG-02-OE01-P-VCN-KEY.anywhere" = {
+      "description" = "egress to 0.0.0.0/0 over TCP"
+      "destination" = "0.0.0.0/0"
+      "destination_type" = "CIDR_BLOCK"
+      "direction" = "EGRESS"
+      "icmp_options" = tolist([])
+      "id" = "9C35B1"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafs62rrxrhd54ah7qtmxqqrtfp4lm2wkenjd6yv7zx5encksqrghq"
+      "network_security_group_key" = "NSG-02-OE01-P-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111417"
+      "protocol" = "6"
+      "source" = tostring(null)
+      "source_type" = ""
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:23.291 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "NSG-02-OE01-SB-VCN-KEY.anywhere" = {
+      "description" = "egress to 0.0.0.0/0 over TCP"
+      "destination" = "0.0.0.0/0"
+      "destination_type" = "CIDR_BLOCK"
+      "direction" = "EGRESS"
+      "icmp_options" = tolist([])
+      "id" = "EFF776"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafwram37bmvmt2dzihgsgofsongabgwypti26liljoxuoxrx7lnfq"
+      "network_security_group_key" = "NSG-02-OE01-SB-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = tostring(null)
+      "source_type" = ""
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:25.851 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+  }
+  "network_security_groups_ingress_rules" = {
+    "NSG-01-OE01-CO-VCN-KEY.ssh_22" = {
+      "description" = "ingress from 0.0.0.0/0 over TCP22"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "86889A"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaa32ejm2rntoskcconpg7wpmmqfdsnb5rndbvqnf5y7h4r2krkssiq"
+      "network_security_group_key" = "NSG-01-OE01-CO-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111417"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:24.237 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "NSG-01-OE01-DEV-VCN-KEY.ssh_22" = {
+      "description" = "ingress from 0.0.0.0/0 over TCP22"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "15853B"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaavwfpvempj4xolthp4sn4zbsc4aiylekeyydxhf6yw3khryee32fq"
+      "network_security_group_key" = "NSG-01-OE01-DEV-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111416"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:24.645 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "NSG-01-OE01-NP-VCN-KEY.ssh_22" = {
+      "description" = "ingress from 0.0.0.0/0 over TCP22"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "412BB9"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaayiqo7elhvkwkrvwmkteshfabb5i2xbycjwnt6q2qj74vsqwzf3qa"
+      "network_security_group_key" = "NSG-01-OE01-NP-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:23.632 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "NSG-01-OE01-P-VCN-KEY.ssh_22" = {
+      "description" = "ingress from 0.0.0.0/0 over TCP22"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "0BFDD1"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaa5ohe3d2hqjekwinhkqaypxjhj5ieicsfz2chpv7qa5vp7hqolnya"
+      "network_security_group_key" = "NSG-01-OE01-P-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:26.748 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "NSG-01-OE01-SB-VCN-KEY.ssh_22" = {
+      "description" = "ingress from 0.0.0.0/0 over TCP22"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "DF004A"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaae4ol2dyu5kopqljzd74o6wqr2nlxwv6gfdp2dzfp7ebdgh2zorwq"
+      "network_security_group_key" = "NSG-01-OE01-SB-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111416"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:22.985 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "NSG-02-OE01-CO-VCN-KEY.http_8080" = {
+      "description" = "ingress from 0.0.0.0/0 over HTTP8080"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "47DBDD"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaagh4cbjpqag5biegnevi3qvdqiykcgh4ifktxgv2b23vfaiuv3oia"
+      "network_security_group_key" = "NSG-02-OE01-CO-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 80
+              "min" = 80
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:24.246 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "NSG-02-OE01-CO-VCN-KEY.ssh_22" = {
+      "description" = "ingress from 0.0.0.0/0 over TCP22"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "7300C9"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaagh4cbjpqag5biegnevi3qvdqiykcgh4ifktxgv2b23vfaiuv3oia"
+      "network_security_group_key" = "NSG-02-OE01-CO-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:25.131 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "NSG-02-OE01-DEV-VCN-KEY.http_8080" = {
+      "description" = "ingress from 0.0.0.0/0 over HTTP8080"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "A8576A"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaasudpnk4jcchzcqvenirxuog3o4ypt543xc6pubwfgnfxlofaiiea"
+      "network_security_group_key" = "NSG-02-OE01-DEV-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111416"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 80
+              "min" = 80
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:25.261 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "NSG-02-OE01-DEV-VCN-KEY.ssh_22" = {
+      "description" = "ingress from 0.0.0.0/0 over TCP22"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "517FF6"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaasudpnk4jcchzcqvenirxuog3o4ypt543xc6pubwfgnfxlofaiiea"
+      "network_security_group_key" = "NSG-02-OE01-DEV-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111416"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:24.943 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "NSG-02-OE01-NP-VCN-KEY.http_8080" = {
+      "description" = "ingress from 0.0.0.0/0 over HTTP8080"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "733725"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaa7ur6gd3xgpccpbzy4vggch6zgqriyzdvclxd5uiyspa66syyskpa"
+      "network_security_group_key" = "NSG-02-OE01-NP-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 80
+              "min" = 80
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:24.958 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "NSG-02-OE01-NP-VCN-KEY.ssh_22" = {
+      "description" = "ingress from 0.0.0.0/0 over TCP22"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "199E9C"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaa7ur6gd3xgpccpbzy4vggch6zgqriyzdvclxd5uiyspa66syyskpa"
+      "network_security_group_key" = "NSG-02-OE01-NP-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:24.575 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "NSG-02-OE01-P-VCN-KEY.http_8080" = {
+      "description" = "ingress from 0.0.0.0/0 over HTTP8080"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "B0C7A0"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafs62rrxrhd54ah7qtmxqqrtfp4lm2wkenjd6yv7zx5encksqrghq"
+      "network_security_group_key" = "NSG-02-OE01-P-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111417"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 80
+              "min" = 80
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:23.748 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "NSG-02-OE01-P-VCN-KEY.ssh_22" = {
+      "description" = "ingress from 0.0.0.0/0 over TCP22"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "0C2027"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafs62rrxrhd54ah7qtmxqqrtfp4lm2wkenjd6yv7zx5encksqrghq"
+      "network_security_group_key" = "NSG-02-OE01-P-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111417"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:23.938 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "NSG-02-OE01-SB-VCN-KEY.http_8080" = {
+      "description" = "ingress from 0.0.0.0/0 over HTTP8080"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "9672BD"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafwram37bmvmt2dzihgsgofsongabgwypti26liljoxuoxrx7lnfq"
+      "network_security_group_key" = "NSG-02-OE01-SB-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 80
+              "min" = 80
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:27.062 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "NSG-02-OE01-SB-VCN-KEY.ssh_22" = {
+      "description" = "ingress from 0.0.0.0/0 over TCP22"
+      "destination" = tostring(null)
+      "destination_type" = ""
+      "direction" = "INGRESS"
+      "icmp_options" = tolist([])
+      "id" = "F6B050"
+      "is_valid" = true
+      "network_configuration_category" = "oe01"
+      "network_security_group_id" = "ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaafwram37bmvmt2dzihgsgofsongabgwypti26liljoxuoxrx7lnfq"
+      "network_security_group_key" = "NSG-02-OE01-SB-VCN-KEY"
+      "network_security_group_name" = "networksecuritygroup20230728111415"
+      "protocol" = "6"
+      "source" = "0.0.0.0/0"
+      "source_type" = "CIDR_BLOCK"
+      "stateless" = false
+      "tcp_options" = tolist([
+        {
+          "destination_port_range" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+            },
+          ])
+          "source_port_range" = tolist([])
+        },
+      ])
+      "time_created" = "2023-07-28 11:14:25.348 +0000 UTC"
+      "timeouts" = null /* object */
+      "udp_options" = tolist([])
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+  }
+  "oci_network_firewall_network_firewall_policies" = {}
+  "oci_network_firewall_network_firewalls" = {}
+  "public_ips" = {
+    "PROD-IP-LB-1-KEY" = {
+      "assigned_entity_id" = tostring(null)
+      "assigned_entity_type" = ""
+      "availability_domain" = tostring(null)
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "prod_ip_lb_1"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.publicip.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxhf65gjvpow4rwl5vs6kzfjl5dfwmcgkeid3f4pesbsq"
+      "ip_address" = "138.2.175.168"
+      "lifetime" = "RESERVED"
+      "network_configuration_category" = "oe01"
+      "private_ip_id" = tostring(null)
+      "pubips_key" = "PROD-IP-LB-1-KEY"
+      "public_ip_pool_id" = tostring(null)
+      "public_ip_pool_key" = "NOT DETERMINED AS NOT CREATED BY THIS AUTOMATION"
+      "scope" = "REGION"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.37 +0000 UTC"
+    }
+  }
+  "public_ips_pools" = {}
+  "remote_peering_connections" = {}
+  "route_tables" = {
+    "DEFAULT_ROUTE_TABLE_FOR_VCN_FRANKFURT_OE01_CO-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:13.162Z"
+      })
+      "display_name" = "Default Route Table for vcn_frankfurt_oe01_co"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaantbs3xvxvts3qjv4qazihfhdpdduvr6hbgjtvgvtip2vaqz4q5sa"
+      "network_configuration_category" = "oe01"
+      "route_rules" = tolist([])
+      "route_table_key" = "DEFAULT_ROUTE_TABLE_FOR_VCN_FRANKFURT_OE01_CO-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.337 +0000 UTC"
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "DEFAULT_ROUTE_TABLE_FOR_VCN_FRANKFURT_OE01_DEV-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:13.170Z"
+      })
+      "display_name" = "Default Route Table for vcn_frankfurt_oe01_dev"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaijkp5b4giv2euihldcp6dqksswizxptsofjxf5zxvfebg4fvo4qq"
+      "network_configuration_category" = "oe01"
+      "route_rules" = tolist([])
+      "route_table_key" = "DEFAULT_ROUTE_TABLE_FOR_VCN_FRANKFURT_OE01_DEV-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.315 +0000 UTC"
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "DEFAULT_ROUTE_TABLE_FOR_VCN_FRANKFURT_OE01_NP-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:13.168Z"
+      })
+      "display_name" = "Default Route Table for vcn_frankfurt_oe01_np"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaaibjnnavcvfoegfqheyzxf5zst2sukgmh5w3lycpioidvwwx26dq"
+      "network_configuration_category" = "oe01"
+      "route_rules" = tolist([])
+      "route_table_key" = "DEFAULT_ROUTE_TABLE_FOR_VCN_FRANKFURT_OE01_NP-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.291 +0000 UTC"
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "DEFAULT_ROUTE_TABLE_FOR_VCN_FRANKFURT_OE01_P-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:13.168Z"
+      })
+      "display_name" = "Default Route Table for vcn_frankfurt_oe01_p"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaj3ure5qfte6ftqcag5a4nzpn2mutsapdrhuypkc4wy33cwsm3okq"
+      "network_configuration_category" = "oe01"
+      "route_rules" = tolist([])
+      "route_table_key" = "DEFAULT_ROUTE_TABLE_FOR_VCN_FRANKFURT_OE01_P-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.373 +0000 UTC"
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "DEFAULT_ROUTE_TABLE_FOR_VCN_FRANKFURT_OE01_SB-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({
+        "CCA_Basic_Tag.email" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedBy" = "oracleidentitycloudservice/cosmin.tudor@oracle.com"
+        "Oracle_Tags.CreatedOn" = "2023-07-28T11:14:13.278Z"
+      })
+      "display_name" = "Default Route Table for vcn_frankfurt_oe01_sb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaahxicgv7h765osso7aaxbh3vy7ngpf65ljhmflemwofw23ya7bipq"
+      "network_configuration_category" = "oe01"
+      "route_rules" = tolist([])
+      "route_table_key" = "DEFAULT_ROUTE_TABLE_FOR_VCN_FRANKFURT_OE01_SB-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.407 +0000 UTC"
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "RT-01-OE01-CO-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "rt_01_oe01_co_vcn"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa4kgaubvhxbbbyiw5tp33rvsxtq7ov66vgs3ht3hqgadxc47fehwq"
+      "network_configuration_category" = "oe01"
+      "route_rules" = toset([])
+      "route_table_key" = "RT-01-OE01-CO-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:30.607 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "RT-01-OE01-DEV-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "rt_01_oe01_dev_vcn"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaawgh7zt5lr3yov2cdj255i7woklcqtbyn2br3wlnxb3qdkv6h5vka"
+      "network_configuration_category" = "oe01"
+      "route_rules" = toset([])
+      "route_table_key" = "RT-01-OE01-DEV-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:30.634 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "RT-01-OE01-NP-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "rt_01_oe01_np_vcn"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa3dj4ds7vfiteaviyc5wfqf2uc44tundjjqsrtei4yuogwxjxkj2q"
+      "network_configuration_category" = "oe01"
+      "route_rules" = toset([])
+      "route_table_key" = "RT-01-OE01-NP-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:30.592 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "RT-01-OE01-P-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "rt_01_oe01_p_vcn"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa4zvwgz4uwssib4m5qs42gumokjsga7mrjsvcimv2lcexbxhszrea"
+      "network_configuration_category" = "oe01"
+      "route_rules" = toset([])
+      "route_table_key" = "RT-01-OE01-P-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:30.679 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "RT-01-OE01-SB-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "rt_01_oe01_sb_vcn"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaanirylmukzddni453pddsnhom2p4w4fymtvfg4borawvdvpe2prma"
+      "network_configuration_category" = "oe01"
+      "route_rules" = toset([])
+      "route_table_key" = "RT-01-OE01-SB-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:30.64 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "RT-02-OE01-CO-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "rt_02_oe01_co_vcn"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "network_configuration_category" = "oe01"
+      "route_rules" = toset([
+        {
+          "cidr_block" = ""
+          "description" = "Route for sgw"
+          "destination" = "oci-fra-objectstorage"
+          "destination_type" = "SERVICE_CIDR_BLOCK"
+          "network_entity_id" = "ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaacotnkw4cspr7ku6snlhljloybogud4axtayfffj2sxhgqgf6j77a"
+          "route_type" = ""
+        },
+      ])
+      "route_table_key" = "RT-02-OE01-CO-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:30.652 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "RT-02-OE01-DEV-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "rt_02_oe01_dev_vcn"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "network_configuration_category" = "oe01"
+      "route_rules" = toset([
+        {
+          "cidr_block" = ""
+          "description" = "Route for sgw"
+          "destination" = "oci-fra-objectstorage"
+          "destination_type" = "SERVICE_CIDR_BLOCK"
+          "network_entity_id" = "ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaan5hs7723nykgyzssb2irfw6kdz2qug2syvae2jn2cvffkzocp3ya"
+          "route_type" = ""
+        },
+      ])
+      "route_table_key" = "RT-02-OE01-DEV-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:30.543 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "RT-02-OE01-NP-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "rt_02_oe01_np_vcn"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "network_configuration_category" = "oe01"
+      "route_rules" = toset([
+        {
+          "cidr_block" = ""
+          "description" = "Route for sgw"
+          "destination" = "oci-fra-objectstorage"
+          "destination_type" = "SERVICE_CIDR_BLOCK"
+          "network_entity_id" = "ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaa7hpdoj2x4fq5qlre7bcjgsg3xjdxe4pkwetnzjw7sxv4yep5yeia"
+          "route_type" = ""
+        },
+      ])
+      "route_table_key" = "RT-02-OE01-NP-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:30.681 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "RT-02-OE01-P-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "rt_02_oe01_p_vcn"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "network_configuration_category" = "oe01"
+      "route_rules" = toset([
+        {
+          "cidr_block" = ""
+          "description" = "Route for sgw"
+          "destination" = "oci-fra-objectstorage"
+          "destination_type" = "SERVICE_CIDR_BLOCK"
+          "network_entity_id" = "ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaa3veibr3y6obyc5zlc3vbswqjwbojftytoieqxjkyshkcol7vyhja"
+          "route_type" = ""
+        },
+      ])
+      "route_table_key" = "RT-02-OE01-P-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:30.702 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "RT-02-OE01-SB-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "rt_02_oe01_sb_vcn"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "network_configuration_category" = "oe01"
+      "route_rules" = toset([
+        {
+          "cidr_block" = ""
+          "description" = "Route for sgw"
+          "destination" = "oci-fra-objectstorage"
+          "destination_type" = "SERVICE_CIDR_BLOCK"
+          "network_entity_id" = "ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaam4rpb343idr5c7pkbredglnqsv2plp6rjh6zxvx2w4gpks6dapfq"
+          "route_type" = ""
+        },
+      ])
+      "route_table_key" = "RT-02-OE01-SB-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:30.706 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+  }
+  "route_tables_attachments" = {
+    "SN-FRANKFURT-OE01-CO-DNS" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaky4a7kh6eortclkyl6qmaqioy23g5moxopvp7xyds3ipoqyzbezq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "route_table_key" = "RT-02-OE01-CO-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_co_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-CO-DNS"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaky4a7kh6eortclkyl6qmaqioy23g5moxopvp7xyds3ipoqyzbezq"
+      "subnet_key" = "SN-FRANKFURT-OE01-CO-DNS"
+      "subnet_name" = "sn_frankfurt_oe01_co_dns"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "SN-FRANKFURT-OE01-CO-FW-EW-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa57u5aiplwn6jicisxmfpjxjn6vwbxm5tdz3nd7sknlaupvg3b2zq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "route_table_key" = "RT-02-OE01-CO-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_co_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-CO-FW-EW-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa57u5aiplwn6jicisxmfpjxjn6vwbxm5tdz3nd7sknlaupvg3b2zq"
+      "subnet_key" = "SN-FRANKFURT-OE01-CO-FW-EW-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_co_fw_ew"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "SN-FRANKFURT-OE01-CO-LOGS-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaxljvnfkmmxpahhzirj2dybqwk32dfp736d4qk6lnzh4fyz4tujbq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "route_table_key" = "RT-02-OE01-CO-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_co_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-CO-LOGS-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaxljvnfkmmxpahhzirj2dybqwk32dfp736d4qk6lnzh4fyz4tujbq"
+      "subnet_key" = "SN-FRANKFURT-OE01-CO-LOGS-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_co_logs"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "SN-FRANKFURT-OE01-CO-MGMT-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaah4dw2udfbdsar4vjvkmypg2ylhk3ewiurjoi6lfccc6jd2jq6yra/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "route_table_key" = "RT-02-OE01-CO-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_co_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-CO-MGMT-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaah4dw2udfbdsar4vjvkmypg2ylhk3ewiurjoi6lfccc6jd2jq6yra"
+      "subnet_key" = "SN-FRANKFURT-OE01-CO-MGMT-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_co_mgmt"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "SN-FRANKFURT-OE01-DEV-APPS-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaasxahva63jjtf74pg5koozcoztd562heqiqouv3wgume6vazjhsiq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "route_table_key" = "RT-02-OE01-DEV-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_dev_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-DEV-APPS-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaasxahva63jjtf74pg5koozcoztd562heqiqouv3wgume6vazjhsiq"
+      "subnet_key" = "SN-FRANKFURT-OE01-DEV-APPS-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_dev_apps"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "SN-FRANKFURT-OE01-DEV-DB-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaawe6ngxpndu4upegiubyklguvfqslax6gs3zuyfpqyy5x773vcaoq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "route_table_key" = "RT-02-OE01-DEV-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_dev_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-DEV-DB-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaawe6ngxpndu4upegiubyklguvfqslax6gs3zuyfpqyy5x773vcaoq"
+      "subnet_key" = "SN-FRANKFURT-OE01-DEV-DB-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_dev_db"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "SN-FRANKFURT-OE01-DEV-INFRA-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaajng3fjpnixibzgmzfdd6g5nj7i3yqxzsgcbjbdwme4ffpmeazrwq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "route_table_key" = "RT-02-OE01-DEV-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_dev_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-DEV-INFRA-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaajng3fjpnixibzgmzfdd6g5nj7i3yqxzsgcbjbdwme4ffpmeazrwq"
+      "subnet_key" = "SN-FRANKFURT-OE01-DEV-INFRA-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_dev_infra"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "SN-FRANKFURT-OE01-DEV-LB-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa4cwrqonbmzuo22mgxjvpfxi4w3uhyp53coldca4atlvgsn3275zq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "route_table_key" = "RT-02-OE01-DEV-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_dev_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-DEV-LB-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa4cwrqonbmzuo22mgxjvpfxi4w3uhyp53coldca4atlvgsn3275zq"
+      "subnet_key" = "SN-FRANKFURT-OE01-DEV-LB-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_dev_lb"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "SN-FRANKFURT-OE01-NP-APPS-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa5powg6wvkuhlhd6no2namg7p2h4b2uqlwzhu6gk7xf6uhdumwnpq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "route_table_key" = "RT-02-OE01-NP-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_np_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-NP-APPS-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa5powg6wvkuhlhd6no2namg7p2h4b2uqlwzhu6gk7xf6uhdumwnpq"
+      "subnet_key" = "SN-FRANKFURT-OE01-NP-APPS-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_np_apps"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "SN-FRANKFURT-OE01-NP-DB-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa6iedf7g7xsgdpjysgfassfnzv2gsi2m33smi6cfqpbw7ag25fogq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "route_table_key" = "RT-02-OE01-NP-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_np_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-NP-DB-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa6iedf7g7xsgdpjysgfassfnzv2gsi2m33smi6cfqpbw7ag25fogq"
+      "subnet_key" = "SN-FRANKFURT-OE01-NP-DB-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_np_db"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "SN-FRANKFURT-OE01-NP-INFRA-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa7lafibp4re6pdovme4edlhsnan4dhb5hbznfnxe6mjdibkk33bya/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "route_table_key" = "RT-02-OE01-NP-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_np_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-NP-INFRA-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa7lafibp4re6pdovme4edlhsnan4dhb5hbznfnxe6mjdibkk33bya"
+      "subnet_key" = "SN-FRANKFURT-OE01-NP-INFRA-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_np_infra"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "SN-FRANKFURT-OE01-NP-LB-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaxeqsfgbuyrhqov24s4ijgh4fujrjnuk3fkfwgafx5k3gstspppoa/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "route_table_key" = "RT-02-OE01-NP-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_np_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-NP-LB-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaxeqsfgbuyrhqov24s4ijgh4fujrjnuk3fkfwgafx5k3gstspppoa"
+      "subnet_key" = "SN-FRANKFURT-OE01-NP-LB-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_np_lb"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "SN-FRANKFURT-OE01-P-APPS-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaptk6ue5dlk6ramqoadgj4u5l4czho5tyjpjrwg4lqchdpd24kcgq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "route_table_key" = "RT-02-OE01-P-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_p_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-P-APPS-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaptk6ue5dlk6ramqoadgj4u5l4czho5tyjpjrwg4lqchdpd24kcgq"
+      "subnet_key" = "SN-FRANKFURT-OE01-P-APPS-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_p_apps"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "SN-FRANKFURT-OE01-P-DB-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaamtjrrtze6go6q33cmwqvbdkd2yrqjpxcjj5chgg4xmwhzeyrcqxa/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "route_table_key" = "RT-02-OE01-P-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_p_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-P-DB-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaamtjrrtze6go6q33cmwqvbdkd2yrqjpxcjj5chgg4xmwhzeyrcqxa"
+      "subnet_key" = "SN-FRANKFURT-OE01-P-DB-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_p_db"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "SN-FRANKFURT-OE01-P-INFRA-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa2weigy24cybmzzldp7txgek7mjocsvfyruyasunq26kzobcmmlkq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "route_table_key" = "RT-02-OE01-P-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_p_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-P-INFRA-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa2weigy24cybmzzldp7txgek7mjocsvfyruyasunq26kzobcmmlkq"
+      "subnet_key" = "SN-FRANKFURT-OE01-P-INFRA-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_p_infra"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "SN-FRANKFURT-OE01-P-LB-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaasbkjxb32fntcayxhtoaikaqrkojjmq5eguy2e3ndnl2fnqn2va4a/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "route_table_key" = "RT-02-OE01-P-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_p_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-P-LB-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaasbkjxb32fntcayxhtoaikaqrkojjmq5eguy2e3ndnl2fnqn2va4a"
+      "subnet_key" = "SN-FRANKFURT-OE01-P-LB-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_p_lb"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "SN-FRANKFURT-OE01-SB-APPS-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaazcl4bxps54u2rnlfhzxmsx2j36cqtvues5dmhwzyfy3tpu4ngz3q/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "route_table_key" = "RT-02-OE01-SB-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_sb_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-SB-APPS-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaazcl4bxps54u2rnlfhzxmsx2j36cqtvues5dmhwzyfy3tpu4ngz3q"
+      "subnet_key" = "SN-FRANKFURT-OE01-SB-APPS-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_sb_apps"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "SN-FRANKFURT-OE01-SB-DB-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaayuwecltdzzvuwylm44qoucy7ucivdq5ujnngup2gev66ucphay7q/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "route_table_key" = "RT-02-OE01-SB-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_sb_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-SB-DB-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaayuwecltdzzvuwylm44qoucy7ucivdq5ujnngup2gev66ucphay7q"
+      "subnet_key" = "SN-FRANKFURT-OE01-SB-DB-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_sb_db"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "SN-FRANKFURT-OE01-SB-INRA-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaalw4zxvadfagmcovokpwfi42ytrqjq3yrhlcmktgjzdj73qidfopa/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "route_table_key" = "RT-02-OE01-SB-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_sb_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-SB-INRA-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaalw4zxvadfagmcovokpwfi42ytrqjq3yrhlcmktgjzdj73qidfopa"
+      "subnet_key" = "SN-FRANKFURT-OE01-SB-INRA-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_sb_infra"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "SN-FRANKFURT-OE01-SB-LB-KEY" = {
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa465rqu4mawqebsv47wco444a7hp5gpykdazwbidtohgblpj4boxq/ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "route_table_key" = "RT-02-OE01-SB-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_sb_vcn"
+      "rta_key" = "SN-FRANKFURT-OE01-SB-LB-KEY"
+      "subnet_id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa465rqu4mawqebsv47wco444a7hp5gpykdazwbidtohgblpj4boxq"
+      "subnet_key" = "SN-FRANKFURT-OE01-SB-LB-KEY"
+      "subnet_name" = "sn_frankfurt_oe01_sb_lb"
+      "timeouts" = null /* object */
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+  }
+  "security_lists" = {
+    "SECLIST-01-OE01-CO-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "seclist_01_oe01_co_vcn"
+      "egress_security_rules" = toset([
+        {
+          "description" = "egress to 0.0.0.0/0 over ALL protocols"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "all"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+        {
+          "description" = "egress to 0.0.0.0/0 over any protocol"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "all"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaa7jjkujo2aop36lu5iairngpeu2iy5lazq4jnytua6mto6rb7fwaa"
+      "ingress_security_rules" = toset([
+        {
+          "description" = "ingress from 0.0.0.0/0 over TCP22"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+              "source_port_range" = tolist([])
+            },
+          ])
+          "udp_options" = tolist([])
+        },
+      ])
+      "network_configuration_category" = "oe01"
+      "sec_list_key" = "SECLIST-01-OE01-CO-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.434 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "SECLIST-01-OE01-DEV-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "seclist_01_oe01_dev_vcn"
+      "egress_security_rules" = toset([
+        {
+          "description" = "egress to 0.0.0.0/0 over ALL protocols"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "all"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+        {
+          "description" = "egress to 0.0.0.0/0 over any protocol"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "all"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaagdlnpggfmjlgw5hhhzrvhf637p3nlle2oijl4wdfsov2z5xoi6dq"
+      "ingress_security_rules" = toset([
+        {
+          "description" = "ingress from 0.0.0.0/0 over TCP22"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+              "source_port_range" = tolist([])
+            },
+          ])
+          "udp_options" = tolist([])
+        },
+      ])
+      "network_configuration_category" = "oe01"
+      "sec_list_key" = "SECLIST-01-OE01-DEV-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.085 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "SECLIST-01-OE01-NP-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "seclist_01_oe01_np_vcn"
+      "egress_security_rules" = toset([
+        {
+          "description" = "egress to 0.0.0.0/0 over ALL protocols"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "all"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+        {
+          "description" = "egress to 0.0.0.0/0 over any protocol"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "all"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaa5qjhli5ws7chv6i5pbplsawcqu6y4s7itcj7kieu3yhcvdgf5gaq"
+      "ingress_security_rules" = toset([
+        {
+          "description" = "ingress from 0.0.0.0/0 over TCP22"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+              "source_port_range" = tolist([])
+            },
+          ])
+          "udp_options" = tolist([])
+        },
+      ])
+      "network_configuration_category" = "oe01"
+      "sec_list_key" = "SECLIST-01-OE01-NP-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.458 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "SECLIST-01-OE01-P-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "seclist_01_oe01_p_vcn"
+      "egress_security_rules" = toset([
+        {
+          "description" = "egress to 0.0.0.0/0 over ALL protocols"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "all"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+        {
+          "description" = "egress to 0.0.0.0/0 over any protocol"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "all"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaa457sbgvg57fbe2qrqrsigpp3cgg4boxdshjjdvgmurqkg7esobia"
+      "ingress_security_rules" = toset([
+        {
+          "description" = "ingress from 0.0.0.0/0 over TCP22"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+              "source_port_range" = tolist([])
+            },
+          ])
+          "udp_options" = tolist([])
+        },
+      ])
+      "network_configuration_category" = "oe01"
+      "sec_list_key" = "SECLIST-01-OE01-P-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.11 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "SECLIST-01-OE01-SB-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "seclist_01_oe01_sb_vcn"
+      "egress_security_rules" = toset([
+        {
+          "description" = "egress to 0.0.0.0/0 over ALL protocols"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "all"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+        {
+          "description" = "egress to 0.0.0.0/0 over any protocol"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "all"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaafirslrb2co2fgzxwtsjts6lkrf7nt466f46juim7opldxd4g45xa"
+      "ingress_security_rules" = toset([
+        {
+          "description" = "ingress from 0.0.0.0/0 over TCP22"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([
+            {
+              "max" = 22
+              "min" = 22
+              "source_port_range" = tolist([])
+            },
+          ])
+          "udp_options" = tolist([])
+        },
+      ])
+      "network_configuration_category" = "oe01"
+      "sec_list_key" = "SECLIST-01-OE01-SB-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.487 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+    "SECLIST-02-OE01-CO-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "seclist_02_oe01_co_vcn"
+      "egress_security_rules" = toset([
+        {
+          "description" = "egress to 0.0.0.0/0 over TCP"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaace5z3upxastmkmlghi4lsuos3uttziqfxohpoyt3exscfamcyypq"
+      "ingress_security_rules" = toset([
+        {
+          "description" = "ingress from 0.0.0.0/0 over HTTP8080"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([
+            {
+              "max" = 80
+              "min" = 80
+              "source_port_range" = tolist([])
+            },
+          ])
+          "udp_options" = tolist([])
+        },
+        {
+          "description" = "ingress from 0.0.0.0/0 over TCP22"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "network_configuration_category" = "oe01"
+      "sec_list_key" = "SECLIST-02-OE01-CO-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.561 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "SECLIST-02-OE01-DEV-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "seclist_02_oe01_dev_vcn"
+      "egress_security_rules" = toset([
+        {
+          "description" = "egress to 0.0.0.0/0 over TCP"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaa62raikvvurdd6qps3gnjk22o7qpus2u6v3qn2oe6fbsjthfggynq"
+      "ingress_security_rules" = toset([
+        {
+          "description" = "ingress from 0.0.0.0/0 over HTTP8080"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([
+            {
+              "max" = 80
+              "min" = 80
+              "source_port_range" = tolist([])
+            },
+          ])
+          "udp_options" = tolist([])
+        },
+        {
+          "description" = "ingress from 0.0.0.0/0 over TCP22"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "network_configuration_category" = "oe01"
+      "sec_list_key" = "SECLIST-02-OE01-DEV-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.544 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "SECLIST-02-OE01-NP-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "seclist_02_oe01_np_vcn"
+      "egress_security_rules" = toset([
+        {
+          "description" = "egress to 0.0.0.0/0 over TCP"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaabmox3boas5ejy4qcnl6i3nxfklyyqykm2dkfo7hornhisfdz6oiq"
+      "ingress_security_rules" = toset([
+        {
+          "description" = "ingress from 0.0.0.0/0 over HTTP8080"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([
+            {
+              "max" = 80
+              "min" = 80
+              "source_port_range" = tolist([])
+            },
+          ])
+          "udp_options" = tolist([])
+        },
+        {
+          "description" = "ingress from 0.0.0.0/0 over TCP22"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "network_configuration_category" = "oe01"
+      "sec_list_key" = "SECLIST-02-OE01-NP-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.103 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "SECLIST-02-OE01-P-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "seclist_02_oe01_p_vcn"
+      "egress_security_rules" = toset([
+        {
+          "description" = "egress to 0.0.0.0/0 over TCP"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaatoa665wzqmnmw3zdbfrsaokcueirn4vparj6qvjtob4ytv3lzp2q"
+      "ingress_security_rules" = toset([
+        {
+          "description" = "ingress from 0.0.0.0/0 over HTTP8080"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([
+            {
+              "max" = 80
+              "min" = 80
+              "source_port_range" = tolist([])
+            },
+          ])
+          "udp_options" = tolist([])
+        },
+        {
+          "description" = "ingress from 0.0.0.0/0 over TCP22"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "network_configuration_category" = "oe01"
+      "sec_list_key" = "SECLIST-02-OE01-P-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.517 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "SECLIST-02-OE01-SB-VCN-KEY" = {
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "seclist_02_oe01_sb_vcn"
+      "egress_security_rules" = toset([
+        {
+          "description" = "egress to 0.0.0.0/0 over TCP"
+          "destination" = "0.0.0.0/0"
+          "destination_type" = "CIDR_BLOCK"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaaye7bqrnam5rhjzgfjbns5d2q4udkmdviybzbrxye2c6t4wj24yua"
+      "ingress_security_rules" = toset([
+        {
+          "description" = "ingress from 0.0.0.0/0 over HTTP8080"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([
+            {
+              "max" = 80
+              "min" = 80
+              "source_port_range" = tolist([])
+            },
+          ])
+          "udp_options" = tolist([])
+        },
+        {
+          "description" = "ingress from 0.0.0.0/0 over TCP22"
+          "icmp_options" = tolist([])
+          "protocol" = "6"
+          "source" = "0.0.0.0/0"
+          "source_type" = "CIDR_BLOCK"
+          "stateless" = false
+          "tcp_options" = tolist([])
+          "udp_options" = tolist([])
+        },
+      ])
+      "network_configuration_category" = "oe01"
+      "sec_list_key" = "SECLIST-02-OE01-SB-VCN-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:16.468 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+  }
+  "service_gateways" = {
+    "SG-FRANKFURT-OE01-CO-KEY" = {
+      "block_traffic" = false
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "sg_frankfurt_oe01_co"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaacotnkw4cspr7ku6snlhljloybogud4axtayfffj2sxhgqgf6j77a"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = tostring(null)
+      "route_table_key" = tostring(null)
+      "route_table_name" = null
+      "services" = toset([
+        {
+          "service_id" = "ocid1.service.oc1.eu-frankfurt-1.aaaaaaaalblrg4eycfxwohulzwwq63btwptzs2hva3muxfan5ro5x7glehtq"
+          "service_name" = "OCI FRA Object Storage"
+        },
+      ])
+      "sgw-key" = "SG-FRANKFURT-OE01-CO-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:14.761 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+    }
+    "SG-FRANKFURT-OE01-DEV-KEY" = {
+      "block_traffic" = false
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "sg_frankfurt_oe01_dev"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaan5hs7723nykgyzssb2irfw6kdz2qug2syvae2jn2cvffkzocp3ya"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = tostring(null)
+      "route_table_key" = tostring(null)
+      "route_table_name" = null
+      "services" = toset([
+        {
+          "service_id" = "ocid1.service.oc1.eu-frankfurt-1.aaaaaaaalblrg4eycfxwohulzwwq63btwptzs2hva3muxfan5ro5x7glehtq"
+          "service_name" = "OCI FRA Object Storage"
+        },
+      ])
+      "sgw-key" = "SG-FRANKFURT-OE01-DEV-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.187 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+    }
+    "SG-FRANKFURT-OE01-NP-KEY" = {
+      "block_traffic" = false
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "sg_frankfurt_oe01_np"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaa7hpdoj2x4fq5qlre7bcjgsg3xjdxe4pkwetnzjw7sxv4yep5yeia"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = tostring(null)
+      "route_table_key" = tostring(null)
+      "route_table_name" = null
+      "services" = toset([
+        {
+          "service_id" = "ocid1.service.oc1.eu-frankfurt-1.aaaaaaaalblrg4eycfxwohulzwwq63btwptzs2hva3muxfan5ro5x7glehtq"
+          "service_name" = "OCI FRA Object Storage"
+        },
+      ])
+      "sgw-key" = "SG-FRANKFURT-OE01-NP-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.105 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+    }
+    "SG-FRANKFURT-OE01-P-KEY" = {
+      "block_traffic" = false
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "sg_frankfurt_oe01_p"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaa3veibr3y6obyc5zlc3vbswqjwbojftytoieqxjkyshkcol7vyhja"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = tostring(null)
+      "route_table_key" = tostring(null)
+      "route_table_name" = null
+      "services" = toset([
+        {
+          "service_id" = "ocid1.service.oc1.eu-frankfurt-1.aaaaaaaalblrg4eycfxwohulzwwq63btwptzs2hva3muxfan5ro5x7glehtq"
+          "service_name" = "OCI FRA Object Storage"
+        },
+      ])
+      "sgw-key" = "SG-FRANKFURT-OE01-P-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:14.926 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+    }
+    "SG-FRANKFURT-OE01-SB-KEY" = {
+      "block_traffic" = false
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "display_name" = "sg_frankfurt_oe01_sb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaam4rpb343idr5c7pkbredglnqsv2plp6rjh6zxvx2w4gpks6dapfq"
+      "network_configuration_category" = "oe01"
+      "route_table_id" = tostring(null)
+      "route_table_key" = tostring(null)
+      "route_table_name" = null
+      "services" = toset([
+        {
+          "service_id" = "ocid1.service.oc1.eu-frankfurt-1.aaaaaaaalblrg4eycfxwohulzwwq63btwptzs2hva3muxfan5ro5x7glehtq"
+          "service_name" = "OCI FRA Object Storage"
+        },
+      ])
+      "sgw-key" = "SG-FRANKFURT-OE01-SB-KEY"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:15.139 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+    }
+  }
+  "subnets" = {
+    "SN-FRANKFURT-OE01-CO-DNS" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.1.128/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaa7ttn2qib7xqhzsctmscr4ztctxjrb4zztqcawrbw7gc2p363xvdq"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_co_dns"
+      "dns_label" = "oe01codns"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaky4a7kh6eortclkyl6qmaqioy23g5moxopvp7xyds3ipoqyzbezq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "route_table_key" = "RT-02-OE01-CO-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_co_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaace5z3upxastmkmlghi4lsuos3uttziqfxohpoyt3exscfamcyypq" = {
+          "display_name" = "seclist_02_oe01_co_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-CO-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01codns.oe01co.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-CO-DNS"
+      "time_created" = "2023-07-28 11:14:22.563 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+      "virtual_router_ip" = "172.168.1.129"
+      "virtual_router_mac" = "00:00:17:0F:F6:F3"
+    }
+    "SN-FRANKFURT-OE01-CO-FW-EW-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.0.0/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaa7ttn2qib7xqhzsctmscr4ztctxjrb4zztqcawrbw7gc2p363xvdq"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_co_fw_ew"
+      "dns_label" = "oe01cofwew"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa57u5aiplwn6jicisxmfpjxjn6vwbxm5tdz3nd7sknlaupvg3b2zq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "route_table_key" = "RT-02-OE01-CO-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_co_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaace5z3upxastmkmlghi4lsuos3uttziqfxohpoyt3exscfamcyypq" = {
+          "display_name" = "seclist_02_oe01_co_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-CO-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01cofwew.oe01co.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-CO-FW-EW-KEY"
+      "time_created" = "2023-07-28 11:14:19.871 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+      "virtual_router_ip" = "172.168.0.1"
+      "virtual_router_mac" = "00:00:17:0F:F6:F3"
+    }
+    "SN-FRANKFURT-OE01-CO-LOGS-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.1.0/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaa7ttn2qib7xqhzsctmscr4ztctxjrb4zztqcawrbw7gc2p363xvdq"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_co_logs"
+      "dns_label" = "oe01cologs"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaxljvnfkmmxpahhzirj2dybqwk32dfp736d4qk6lnzh4fyz4tujbq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "route_table_key" = "RT-02-OE01-CO-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_co_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaace5z3upxastmkmlghi4lsuos3uttziqfxohpoyt3exscfamcyypq" = {
+          "display_name" = "seclist_02_oe01_co_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-CO-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01cologs.oe01co.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-CO-LOGS-KEY"
+      "time_created" = "2023-07-28 11:14:17.594 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+      "virtual_router_ip" = "172.168.1.1"
+      "virtual_router_mac" = "00:00:17:0F:F6:F3"
+    }
+    "SN-FRANKFURT-OE01-CO-MGMT-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.0.128/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaa7ttn2qib7xqhzsctmscr4ztctxjrb4zztqcawrbw7gc2p363xvdq"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_co_mgmt"
+      "dns_label" = "oe01comgmt"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaah4dw2udfbdsar4vjvkmypg2ylhk3ewiurjoi6lfccc6jd2jq6yra"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaap4rgt2owhpjxa7gav7j3yvewmr5dzjxbtsksxmxnn27euaerm2la"
+      "route_table_key" = "RT-02-OE01-CO-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_co_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaace5z3upxastmkmlghi4lsuos3uttziqfxohpoyt3exscfamcyypq" = {
+          "display_name" = "seclist_02_oe01_co_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-CO-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01comgmt.oe01co.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-CO-MGMT-KEY"
+      "time_created" = "2023-07-28 11:14:17.224 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_co"
+      "virtual_router_ip" = "172.168.0.129"
+      "virtual_router_mac" = "00:00:17:0F:F6:F3"
+    }
+    "SN-FRANKFURT-OE01-DEV-APPS-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.3.0/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaaea2gy2oayhamugvyic3bqzqhjnyk764ykb6rlnqk6rfqu672ykma"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_dev_apps"
+      "dns_label" = "oe01devapps"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaasxahva63jjtf74pg5koozcoztd562heqiqouv3wgume6vazjhsiq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "route_table_key" = "RT-02-OE01-DEV-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_dev_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaa62raikvvurdd6qps3gnjk22o7qpus2u6v3qn2oe6fbsjthfggynq" = {
+          "display_name" = "seclist_02_oe01_dev_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-DEV-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01devapps.oe01dev.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-DEV-APPS-KEY"
+      "time_created" = "2023-07-28 11:14:21.585 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+      "virtual_router_ip" = "172.168.3.1"
+      "virtual_router_mac" = "00:00:17:62:92:BC"
+    }
+    "SN-FRANKFURT-OE01-DEV-DB-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.3.128/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaaea2gy2oayhamugvyic3bqzqhjnyk764ykb6rlnqk6rfqu672ykma"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_dev_db"
+      "dns_label" = "oe01devdb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaawe6ngxpndu4upegiubyklguvfqslax6gs3zuyfpqyy5x773vcaoq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "route_table_key" = "RT-02-OE01-DEV-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_dev_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaa62raikvvurdd6qps3gnjk22o7qpus2u6v3qn2oe6fbsjthfggynq" = {
+          "display_name" = "seclist_02_oe01_dev_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-DEV-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01devdb.oe01dev.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-DEV-DB-KEY"
+      "time_created" = "2023-07-28 11:14:22.308 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+      "virtual_router_ip" = "172.168.3.129"
+      "virtual_router_mac" = "00:00:17:62:92:BC"
+    }
+    "SN-FRANKFURT-OE01-DEV-INFRA-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.2.128/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaaea2gy2oayhamugvyic3bqzqhjnyk764ykb6rlnqk6rfqu672ykma"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_dev_infra"
+      "dns_label" = "oe01devinfra"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaajng3fjpnixibzgmzfdd6g5nj7i3yqxzsgcbjbdwme4ffpmeazrwq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "route_table_key" = "RT-02-OE01-DEV-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_dev_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaa62raikvvurdd6qps3gnjk22o7qpus2u6v3qn2oe6fbsjthfggynq" = {
+          "display_name" = "seclist_02_oe01_dev_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-DEV-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01devinfra.oe01dev.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-DEV-INFRA-KEY"
+      "time_created" = "2023-07-28 11:14:20.976 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+      "virtual_router_ip" = "172.168.2.129"
+      "virtual_router_mac" = "00:00:17:62:92:BC"
+    }
+    "SN-FRANKFURT-OE01-DEV-LB-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.2.0/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaaea2gy2oayhamugvyic3bqzqhjnyk764ykb6rlnqk6rfqu672ykma"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_dev_lb"
+      "dns_label" = "oe01devlb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa4cwrqonbmzuo22mgxjvpfxi4w3uhyp53coldca4atlvgsn3275zq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaa7at7jknz3eqyd22rk4ihxxaljwtu5an24f2h2p5q5f7b6ehknlda"
+      "route_table_key" = "RT-02-OE01-DEV-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_dev_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaa62raikvvurdd6qps3gnjk22o7qpus2u6v3qn2oe6fbsjthfggynq" = {
+          "display_name" = "seclist_02_oe01_dev_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-DEV-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01devlb.oe01dev.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-DEV-LB-KEY"
+      "time_created" = "2023-07-28 11:14:21.946 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_dev"
+      "virtual_router_ip" = "172.168.2.1"
+      "virtual_router_mac" = "00:00:17:62:92:BC"
+    }
+    "SN-FRANKFURT-OE01-NP-APPS-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.5.0/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaamrzo7wokamwca7kawtag2v5iqstivkqvykjocda74463ps22bkeq"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_np_apps"
+      "dns_label" = "oe01npapps"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa5powg6wvkuhlhd6no2namg7p2h4b2uqlwzhu6gk7xf6uhdumwnpq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "route_table_key" = "RT-02-OE01-NP-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_np_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaabmox3boas5ejy4qcnl6i3nxfklyyqykm2dkfo7hornhisfdz6oiq" = {
+          "display_name" = "seclist_02_oe01_np_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-NP-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01npapps.oe01np.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-NP-APPS-KEY"
+      "time_created" = "2023-07-28 11:14:22.247 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+      "virtual_router_ip" = "172.168.5.1"
+      "virtual_router_mac" = "00:00:17:78:35:06"
+    }
+    "SN-FRANKFURT-OE01-NP-DB-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.5.128/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaamrzo7wokamwca7kawtag2v5iqstivkqvykjocda74463ps22bkeq"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_np_db"
+      "dns_label" = "oe01npdb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa6iedf7g7xsgdpjysgfassfnzv2gsi2m33smi6cfqpbw7ag25fogq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "route_table_key" = "RT-02-OE01-NP-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_np_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaabmox3boas5ejy4qcnl6i3nxfklyyqykm2dkfo7hornhisfdz6oiq" = {
+          "display_name" = "seclist_02_oe01_np_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-NP-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01npdb.oe01np.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-NP-DB-KEY"
+      "time_created" = "2023-07-28 11:14:17.526 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+      "virtual_router_ip" = "172.168.5.129"
+      "virtual_router_mac" = "00:00:17:78:35:06"
+    }
+    "SN-FRANKFURT-OE01-NP-INFRA-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.4.128/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaamrzo7wokamwca7kawtag2v5iqstivkqvykjocda74463ps22bkeq"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_np_infra"
+      "dns_label" = "oe01npinfra"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa7lafibp4re6pdovme4edlhsnan4dhb5hbznfnxe6mjdibkk33bya"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "route_table_key" = "RT-02-OE01-NP-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_np_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaabmox3boas5ejy4qcnl6i3nxfklyyqykm2dkfo7hornhisfdz6oiq" = {
+          "display_name" = "seclist_02_oe01_np_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-NP-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01npinfra.oe01np.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-NP-INFRA-KEY"
+      "time_created" = "2023-07-28 11:14:17.064 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+      "virtual_router_ip" = "172.168.4.129"
+      "virtual_router_mac" = "00:00:17:78:35:06"
+    }
+    "SN-FRANKFURT-OE01-NP-LB-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.4.0/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaamrzo7wokamwca7kawtag2v5iqstivkqvykjocda74463ps22bkeq"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_np_lb"
+      "dns_label" = "oe01nplb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaxeqsfgbuyrhqov24s4ijgh4fujrjnuk3fkfwgafx5k3gstspppoa"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaewvtm62fgsfqrckczrd4vltuns3gocfaiscfdqdxbgilt56me7qq"
+      "route_table_key" = "RT-02-OE01-NP-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_np_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaabmox3boas5ejy4qcnl6i3nxfklyyqykm2dkfo7hornhisfdz6oiq" = {
+          "display_name" = "seclist_02_oe01_np_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-NP-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01nplb.oe01np.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-NP-LB-KEY"
+      "time_created" = "2023-07-28 11:14:17.965 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_np"
+      "virtual_router_ip" = "172.168.4.1"
+      "virtual_router_mac" = "00:00:17:78:35:06"
+    }
+    "SN-FRANKFURT-OE01-P-APPS-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.7.0/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaavovdfrnivr4zrxctixgoemzjq5qvmbktz5kyfsb66h4f6jlmrwma"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_p_apps"
+      "dns_label" = "oe01papps"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaaptk6ue5dlk6ramqoadgj4u5l4czho5tyjpjrwg4lqchdpd24kcgq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "route_table_key" = "RT-02-OE01-P-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_p_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaatoa665wzqmnmw3zdbfrsaokcueirn4vparj6qvjtob4ytv3lzp2q" = {
+          "display_name" = "seclist_02_oe01_p_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-P-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01papps.oe01p.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-P-APPS-KEY"
+      "time_created" = "2023-07-28 11:14:17.067 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+      "virtual_router_ip" = "172.168.7.1"
+      "virtual_router_mac" = "00:00:17:D8:8D:69"
+    }
+    "SN-FRANKFURT-OE01-P-DB-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.7.128/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaavovdfrnivr4zrxctixgoemzjq5qvmbktz5kyfsb66h4f6jlmrwma"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_p_db"
+      "dns_label" = "oe01pdb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaamtjrrtze6go6q33cmwqvbdkd2yrqjpxcjj5chgg4xmwhzeyrcqxa"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "route_table_key" = "RT-02-OE01-P-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_p_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaatoa665wzqmnmw3zdbfrsaokcueirn4vparj6qvjtob4ytv3lzp2q" = {
+          "display_name" = "seclist_02_oe01_p_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-P-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01pdb.oe01p.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-P-DB-KEY"
+      "time_created" = "2023-07-28 11:14:17.481 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+      "virtual_router_ip" = "172.168.7.129"
+      "virtual_router_mac" = "00:00:17:D8:8D:69"
+    }
+    "SN-FRANKFURT-OE01-P-INFRA-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.6.128/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaavovdfrnivr4zrxctixgoemzjq5qvmbktz5kyfsb66h4f6jlmrwma"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_p_infra"
+      "dns_label" = "oe01pinfra"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa2weigy24cybmzzldp7txgek7mjocsvfyruyasunq26kzobcmmlkq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "route_table_key" = "RT-02-OE01-P-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_p_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaatoa665wzqmnmw3zdbfrsaokcueirn4vparj6qvjtob4ytv3lzp2q" = {
+          "display_name" = "seclist_02_oe01_p_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-P-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01pinfra.oe01p.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-P-INFRA-KEY"
+      "time_created" = "2023-07-28 11:14:18.24 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+      "virtual_router_ip" = "172.168.6.129"
+      "virtual_router_mac" = "00:00:17:D8:8D:69"
+    }
+    "SN-FRANKFURT-OE01-P-LB-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.6.0/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaavovdfrnivr4zrxctixgoemzjq5qvmbktz5kyfsb66h4f6jlmrwma"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_p_lb"
+      "dns_label" = "oe01plb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaasbkjxb32fntcayxhtoaikaqrkojjmq5eguy2e3ndnl2fnqn2va4a"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaik32ghm2egyhiwcutanfz7khe26gda42q4er3t6powxkmg52vghq"
+      "route_table_key" = "RT-02-OE01-P-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_p_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaatoa665wzqmnmw3zdbfrsaokcueirn4vparj6qvjtob4ytv3lzp2q" = {
+          "display_name" = "seclist_02_oe01_p_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-P-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01plb.oe01p.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-P-LB-KEY"
+      "time_created" = "2023-07-28 11:14:17.795 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_p"
+      "virtual_router_ip" = "172.168.6.1"
+      "virtual_router_mac" = "00:00:17:D8:8D:69"
+    }
+    "SN-FRANKFURT-OE01-SB-APPS-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.9.0/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaajrtranmre2keczmkkfcs6ylibd4c7qg4dcmplb7royaukt5wjrta"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_sb_apps"
+      "dns_label" = "oe01sbapps"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaazcl4bxps54u2rnlfhzxmsx2j36cqtvues5dmhwzyfy3tpu4ngz3q"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "route_table_key" = "RT-02-OE01-SB-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_sb_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaaye7bqrnam5rhjzgfjbns5d2q4udkmdviybzbrxye2c6t4wj24yua" = {
+          "display_name" = "seclist_02_oe01_sb_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-SB-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01sbapps.oe01sb.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-SB-APPS-KEY"
+      "time_created" = "2023-07-28 11:14:18.328 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+      "virtual_router_ip" = "172.168.9.1"
+      "virtual_router_mac" = "00:00:17:85:B0:2B"
+    }
+    "SN-FRANKFURT-OE01-SB-DB-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.9.128/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaajrtranmre2keczmkkfcs6ylibd4c7qg4dcmplb7royaukt5wjrta"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_sb_db"
+      "dns_label" = "oe01sbdb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaayuwecltdzzvuwylm44qoucy7ucivdq5ujnngup2gev66ucphay7q"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "route_table_key" = "RT-02-OE01-SB-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_sb_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaaye7bqrnam5rhjzgfjbns5d2q4udkmdviybzbrxye2c6t4wj24yua" = {
+          "display_name" = "seclist_02_oe01_sb_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-SB-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01sbdb.oe01sb.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-SB-DB-KEY"
+      "time_created" = "2023-07-28 11:14:22.195 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+      "virtual_router_ip" = "172.168.9.129"
+      "virtual_router_mac" = "00:00:17:85:B0:2B"
+    }
+    "SN-FRANKFURT-OE01-SB-INRA-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.8.128/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaajrtranmre2keczmkkfcs6ylibd4c7qg4dcmplb7royaukt5wjrta"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_sb_infra"
+      "dns_label" = "oe01sbinfra"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaalw4zxvadfagmcovokpwfi42ytrqjq3yrhlcmktgjzdj73qidfopa"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "route_table_key" = "RT-02-OE01-SB-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_sb_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaaye7bqrnam5rhjzgfjbns5d2q4udkmdviybzbrxye2c6t4wj24yua" = {
+          "display_name" = "seclist_02_oe01_sb_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-SB-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01sbinfra.oe01sb.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-SB-INRA-KEY"
+      "time_created" = "2023-07-28 11:14:22.633 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+      "virtual_router_ip" = "172.168.8.129"
+      "virtual_router_mac" = "00:00:17:85:B0:2B"
+    }
+    "SN-FRANKFURT-OE01-SB-LB-KEY" = {
+      "availability_domain" = tostring(null)
+      "cidr_block" = "172.168.8.0/25"
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "defined_tags" = tomap({})
+      "dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaajrtranmre2keczmkkfcs6ylibd4c7qg4dcmplb7royaukt5wjrta"
+      "dhcp_options_key" = "default_dhcp_options"
+      "dhcp_options_name" = "default_dhcp_options"
+      "display_name" = "sn_frankfurt_oe01_sb_lb"
+      "dns_label" = "oe01sblb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa465rqu4mawqebsv47wco444a7hp5gpykdazwbidtohgblpj4boxq"
+      "ipv6cidr_block" = tostring(null)
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6virtual_router_ip" = tostring(null)
+      "network_configuration_category" = "oe01"
+      "prohibit_internet_ingress" = true
+      "prohibit_public_ip_on_vnic" = true
+      "route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaamh2djklgorybtedufh2x2glj537lhvxuyzzjmfygv6tk6wisijaq"
+      "route_table_key" = "RT-02-OE01-SB-VCN-KEY"
+      "route_table_name" = "rt_02_oe01_sb_vcn"
+      "security_lists" = {
+        "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaaye7bqrnam5rhjzgfjbns5d2q4udkmdviybzbrxye2c6t4wj24yua" = {
+          "display_name" = "seclist_02_oe01_sb_vcn"
+          "sec_list_key" = "SECLIST-02-OE01-SB-VCN-KEY"
+        }
+      }
+      "state" = "UPDATING"
+      "subnet_domain_name" = "oe01sblb.oe01sb.oraclevcn.com"
+      "subnet_key" = "SN-FRANKFURT-OE01-SB-LB-KEY"
+      "time_created" = "2023-07-28 11:14:19.697 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+      "vcn_name" = "vcn_frankfurt_oe01_sb"
+      "virtual_router_ip" = "172.168.8.1"
+      "virtual_router_mac" = "00:00:17:85:B0:2B"
+    }
+  }
+  "vcns" = {
+    "VCN-FRANKFURT-OE01-CO-KEY" = {
+      "byoipv6cidr_blocks" = tolist([])
+      "byoipv6cidr_details" = tolist([])
+      "cidr_block" = "172.168.0.0/23"
+      "cidr_blocks" = tolist([
+        "172.168.0.0/23",
+      ])
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "default_dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaa7ttn2qib7xqhzsctmscr4ztctxjrb4zztqcawrbw7gc2p363xvdq"
+      "default_route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaantbs3xvxvts3qjv4qazihfhdpdduvr6hbgjtvgvtip2vaqz4q5sa"
+      "default_security_list_id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaaywzvulvga5vbizrf2jkelmad6tsxqmbmpgykac7v6d5rv466enda"
+      "defined_tags" = tomap({})
+      "display_name" = "vcn_frankfurt_oe01_co"
+      "dns_label" = "oe01co"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiajkbt6yhd6uugnyq6n343oevzvmc7woltbtuo7lxywkda"
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6private_cidr_blocks" = tolist([])
+      "is_ipv6enabled" = false
+      "is_oracle_gua_allocation_enabled" = tobool(null)
+      "network_configuration_category" = "oe01"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.337 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_domain_name" = "oe01co.oraclevcn.com"
+      "vcn_key" = "VCN-FRANKFURT-OE01-CO-KEY"
+    }
+    "VCN-FRANKFURT-OE01-DEV-KEY" = {
+      "byoipv6cidr_blocks" = tolist([])
+      "byoipv6cidr_details" = tolist([])
+      "cidr_block" = "172.168.2.0/23"
+      "cidr_blocks" = tolist([
+        "172.168.2.0/23",
+      ])
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "default_dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaaea2gy2oayhamugvyic3bqzqhjnyk764ykb6rlnqk6rfqu672ykma"
+      "default_route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaijkp5b4giv2euihldcp6dqksswizxptsofjxf5zxvfebg4fvo4qq"
+      "default_security_list_id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaansqlidrb5o43hrwdpvyemth5ttwlv4ge3gbeimu5xly5jc36lo3a"
+      "defined_tags" = tomap({})
+      "display_name" = "vcn_frankfurt_oe01_dev"
+      "dns_label" = "oe01dev"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiazqnyymxsdtjlppqehjlfudkcqvt63xddfuaebfsxucuq"
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6private_cidr_blocks" = tolist([])
+      "is_ipv6enabled" = false
+      "is_oracle_gua_allocation_enabled" = tobool(null)
+      "network_configuration_category" = "oe01"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.315 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_domain_name" = "oe01dev.oraclevcn.com"
+      "vcn_key" = "VCN-FRANKFURT-OE01-DEV-KEY"
+    }
+    "VCN-FRANKFURT-OE01-NP-KEY" = {
+      "byoipv6cidr_blocks" = tolist([])
+      "byoipv6cidr_details" = tolist([])
+      "cidr_block" = "172.168.4.0/23"
+      "cidr_blocks" = tolist([
+        "172.168.4.0/23",
+      ])
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "default_dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaamrzo7wokamwca7kawtag2v5iqstivkqvykjocda74463ps22bkeq"
+      "default_route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaaibjnnavcvfoegfqheyzxf5zst2sukgmh5w3lycpioidvwwx26dq"
+      "default_security_list_id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaajc5ccsywiihi74vlyyc6fqzfmvvw2syy3lchwvakv4czhsqxuvxa"
+      "defined_tags" = tomap({})
+      "display_name" = "vcn_frankfurt_oe01_np"
+      "dns_label" = "oe01np"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkianeznrmk7yytl56mpd7uiecy4c6t5ubmc722i4oti2pwq"
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6private_cidr_blocks" = tolist([])
+      "is_ipv6enabled" = false
+      "is_oracle_gua_allocation_enabled" = tobool(null)
+      "network_configuration_category" = "oe01"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.291 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_domain_name" = "oe01np.oraclevcn.com"
+      "vcn_key" = "VCN-FRANKFURT-OE01-NP-KEY"
+    }
+    "VCN-FRANKFURT-OE01-P-KEY" = {
+      "byoipv6cidr_blocks" = tolist([])
+      "byoipv6cidr_details" = tolist([])
+      "cidr_block" = "172.168.6.0/23"
+      "cidr_blocks" = tolist([
+        "172.168.6.0/23",
+      ])
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "default_dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaavovdfrnivr4zrxctixgoemzjq5qvmbktz5kyfsb66h4f6jlmrwma"
+      "default_route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaaj3ure5qfte6ftqcag5a4nzpn2mutsapdrhuypkc4wy33cwsm3okq"
+      "default_security_list_id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaaw2npecsoxcfxj3qhfnine3syjz2dpbt3iyjmux5gvni5yg5l4vvq"
+      "defined_tags" = tomap({})
+      "display_name" = "vcn_frankfurt_oe01_p"
+      "dns_label" = "oe01p"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkia5vh66ywgnh6wk5k6di73er32n4kagf3zugopkkx2glmq"
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6private_cidr_blocks" = tolist([])
+      "is_ipv6enabled" = false
+      "is_oracle_gua_allocation_enabled" = tobool(null)
+      "network_configuration_category" = "oe01"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.373 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_domain_name" = "oe01p.oraclevcn.com"
+      "vcn_key" = "VCN-FRANKFURT-OE01-P-KEY"
+    }
+    "VCN-FRANKFURT-OE01-SB-KEY" = {
+      "byoipv6cidr_blocks" = tolist([])
+      "byoipv6cidr_details" = tolist([])
+      "cidr_block" = "172.168.8.0/23"
+      "cidr_blocks" = tolist([
+        "172.168.8.0/23",
+      ])
+      "compartment_id" = "ocid1.compartment.oc1..aaaaaaaaw2yskdixf43ssmll2ihoqkqekke5hiskr3njan5t4bbvg3t7smna"
+      "default_dhcp_options_id" = "ocid1.dhcpoptions.oc1.eu-frankfurt-1.aaaaaaaajrtranmre2keczmkkfcs6ylibd4c7qg4dcmplb7royaukt5wjrta"
+      "default_route_table_id" = "ocid1.routetable.oc1.eu-frankfurt-1.aaaaaaaahxicgv7h765osso7aaxbh3vy7ngpf65ljhmflemwofw23ya7bipq"
+      "default_security_list_id" = "ocid1.securitylist.oc1.eu-frankfurt-1.aaaaaaaah7uq5dc2fgmitx5jwg34ox3gjdszb27umsnctojj76zujf4fd54a"
+      "defined_tags" = tomap({})
+      "display_name" = "vcn_frankfurt_oe01_sb"
+      "dns_label" = "oe01sb"
+      "freeform_tags" = tomap({})
+      "id" = "ocid1.vcn.oc1.eu-frankfurt-1.amaaaaaattkvkkiaxgxeip3d5sbpvqelgw2ijsd5nzgiqtiw7ku4clwwinia"
+      "ipv6cidr_blocks" = tolist([])
+      "ipv6private_cidr_blocks" = tolist([])
+      "is_ipv6enabled" = false
+      "is_oracle_gua_allocation_enabled" = tobool(null)
+      "network_configuration_category" = "oe01"
+      "state" = "AVAILABLE"
+      "time_created" = "2023-07-28 11:14:13.407 +0000 UTC"
+      "timeouts" = null /* object */
+      "vcn_domain_name" = "oe01sb.oraclevcn.com"
+      "vcn_key" = "VCN-FRANKFURT-OE01-SB-KEY"
+    }
+  }
+}
