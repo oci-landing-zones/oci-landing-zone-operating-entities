@@ -95,9 +95,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **3.2 Groups**
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Groups topology, from the shared infrastructure configuration example this is not yet covered.
-
-Meanwhile, you can proceed by updating with the desired groups, or use the empty groups configuration looks like in the example below:
+Here we have an example of the sahred infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
 
 ```
 ...
