@@ -20,10 +20,11 @@
 | **OP. NAME** | Manage Shared Services | 
 | **OBJECTIVE** | Creates or changes the shared elements of the landing zone and applies posture management |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: DRG, VCN, Subnets, SL, RT, DRG Attach., Network Firewall, DNS, Load Balancers  |
-| **IAM CONFIGURATION**| [open_lz_shared_identity.auto.tfvars.json](open_lz_shared_identity.auto.tfvars.json)|
-| **NETWORK CONFIGURATION** |[open_lz_shared_network.auto.tfvars.json](open_lz_shared_network.auto.tfvars.json) |
+| **IAM CONFIG**| [open_lz_shared_identity.auto.tfvars.json](open_lz_shared_identity.auto.tfvars.json)|
+| **NETWORK CONFIG** |[open_lz_shared_network.auto.tfvars.json](open_lz_shared_network.auto.tfvars.json) |
+| **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../design/OCI_Open_LZ.pdf) |
-| **PRE-ACTIVITIES** | N/A |
+| **PRE-ACTIVITIES** | Tenancy created |
 | **POST-ACTIVITIES** | N/A |
 | | |
 
