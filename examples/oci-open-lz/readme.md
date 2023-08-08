@@ -14,7 +14,7 @@ In the current version, two of the five operations scenarios are presented with 
 1. [**OP.01 – Manage Shared Services:** ](shared/readme.md)Creates or changes the shared elements of the landing zone and applies posture management.
 2.  [**OP.02 – Manage OE:**](operating-entities/oe01/readme.md) Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.
 3.  **OP.03 – Manage Department:** Creates and changes a new department structure to receive department projects.
-4.  **OP.04 Manage Project Environment:** Creates or changes a project with the related environments and application layers.
+4.  **OP.04 - Manage Project Environment:** Creates or changes a project with the related environments and application layers.
 5.  **OP.05 – Manage PoC Project:** Creates or changes a PoC project in the OE Sandbox environment.
 
 

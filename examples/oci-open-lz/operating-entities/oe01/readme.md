@@ -19,8 +19,9 @@
 | **OP. NAME** | Manage Operating Entity | 
 | **OBJECTIVE** | Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.  |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: VCN, Subnets, SL, RT, DRG Attachments, Service/Internet Gateways |
-| **IAM CONFIGURATION**| [open_lz_oe_01_identity.auto.tfvars.json](open_lz_oe_01_identity.auto.tfvars.json)|
-| **NETWORK CONFIGURATION** |[open_lz_oe_01_network.auto.tfvars.json](open_lz_oe_01_network.auto.tfvars.json) |
+| **IAM CONFIG**| [open_lz_oe_01_identity.auto.tfvars.json](open_lz_oe_01_identity.auto.tfvars.json)|
+| **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](open_lz_oe_01_network.auto.tfvars.json) |
+| **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../../design/OCI_Open_LZ.pdf).|
 | **PRE-ACTIVITIES** | [OP.01 Shared Services](../../shared/readme.md) executed. |
 | **POST-ACTIVITIES** | The first execution of this operation by the Central IT team requires the hand-over to the target OE Operations team the OCIDs for their OE core resources. |
