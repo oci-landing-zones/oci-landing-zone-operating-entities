@@ -96,15 +96,44 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **3.2 Groups**
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Groups topology, from the shared infrastructure configuration example this is not yet covered.
-
-Meanwhile, you can proceed by updating with the desired groups, or use the empty groups configuration looks like in the example below:
+Here we have an example of the sahred infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
 
 ```
 ...
     "groups_configuration": {
-        "groups": {}
-    }
+        "default_defined_tags": null,
+        "default_freeform_tags": null,
+        "groups": {
+            "GRP-IAM-ADMINS": {
+                "name": "grp-iam-admins",  
+                "description": "GRP.01 Tenancy global Identity and access management administrator."
+            },
+            "GRP-CREDENTIAL-ADMINS": { 
+                "name": "grp-credential-admins",  
+                "description": "GRP.02 Tenancy global credential administrator."
+            },
+            "GRP-ANNOUNCEMENT-READERS": { 
+                "name": "grp-announcement-readers",  
+                "description": "GRP.03 Tenancy global readers of OCI monitoring information."
+            },
+            "GRP-BUDGET-ADMINS": { 
+                "name": "grp-budget-admins",  
+                "description": "GRP.04 Tenancy global budget control."
+            }, 
+            "GRP-AUDITORS": { 
+                "name": "grp-auditors",  
+                "description": "GRP.05 Tenancy global read access (for security auditing or health checks)."
+            }, 
+            "GRP-NETWORK-ADMINS": { 
+                "name": "grp-network-admins",  
+                "description": "GRP.06 Tenancy global and shared network administration group, including common OE network elements."
+            }, 
+            "GRP-SECURITY-ADMINS": { 
+                "name": "grp-security-admins",  
+                "description": "GRP.07 Tenancy global and shared security administration group."
+            }
+        }
+    },
 ...
 ```
 
