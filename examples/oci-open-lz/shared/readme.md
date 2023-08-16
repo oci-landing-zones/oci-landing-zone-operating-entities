@@ -96,7 +96,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **3.2 Groups**
 
-Here we have an example of the sahred infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
 
 ```
 ...
@@ -144,15 +144,21 @@ For an example of such configuration and for extended documentation please refer
 
 ### **3.3 Dynamic Groups**
 
+Here we have an example of the shared infrastructure OCI IAM Dynamics groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Dynamic Groups topology, from the shared infrastructure configuration example this is not yet covered.
-
-Meanwhile, you can proceed by updating with the desired dynamic groups, or use the empty groups configuration looks like in the example below:
 
 ```
 ...
-    "dynamic_groups_configuration": {
-        "dynamic_groups": {}
+   "dynamic_groups_configuration": {
+        "default_defined_tags": null,
+        "default_freeform_tags": null,
+        "dynamic_groups": {
+            "DGP-SEC-FUN": {
+                "name": "dgp-pj-sec-fun",
+                "description": "DGP.01 Open LZ dynamic group for security functions execution.",
+                "matching_rule": "ALL {resource.type = 'fnfun', resource.compartment.id = 'cmp-security-id-tbu'}"
+            }
+        }
     }
 ...
 ```
