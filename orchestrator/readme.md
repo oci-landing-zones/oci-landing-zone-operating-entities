@@ -15,7 +15,7 @@
 
 
 ## **1. Overview**
-The **OCI Open LZ Orchestrator Terraform module** enables the **provisioning and change** of **Terraform CIS v3 resources** in **one single operation**. With this capability, cloud operations on any landing zone following this model tend to be very simple, as it is possible to use different types of resources in one command, and this module will sort out the terraform resource dependency graph for you.
+The **OCI Open LZ Orchestrator Terraform module** enables the **provisioning and change** of **Terraform OCI CIS v3 resources** in **one single operation**. With this capability, cloud operations on any landing zone following this model tend to be very simple, as it is possible to use different types of resources in one command, and this module will sort out the Terraform resource dependency graph for you.
 
 In the current version, the following resources are integrated or being integrated:
 
@@ -122,7 +122,7 @@ Warning: Experimental feature "module_variable_optional_attrs" is active
 Note the warning is harmless. The code has been tested with Terraform 1.3.x and the implementation is fully compatible.
 
 If you really want to use Terraform 1.3.x, in [providers.tf](./providers.tf):
-1. Change the terraform version requirement to:
+1. Change the Terraform version requirement to:
 
 ```
 required_version = ">= 1.3.0"
@@ -180,10 +180,10 @@ The input parameters for the module can be divided into 3 categories, for which 
     - ```private_key_path```
     - ```region```
  2. Identity configuration single complex type: ```open_lz_shared_identity.auto.tfvars``` (HCL) or ```open_lz_shared_identity.auto.tfvars.json``` (JSON). This configuration will cover 4 input variables:
-    - ```compartments_configuration``` - For complete documentation of configuring the ```compartments_configuration``` input variable please refer to the terraform-oci-cis-landing-zone-iam/compartments terraform module [documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/compartments/README.md).
-    - ```groups_configuration``` - For complete documentation of configuring the ```groups_configuration``` input variable please refer to the terraform-oci-cis-landing-zone-iam/groups terraform module [documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/groups/README.md).
-    - ```dynamic_groups_configuration``` - For complete documentation of configuring the ```dynamic_groups_configuration``` input variable please refer to the terraform-oci-cis-landing-zone-iam/dynamic-groups terraform module [documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/dynamic-groups/README.md).
-    - ```policies_configuration``` - For complete documentation of configuring the ```policies_configuration``` input variable please refer to the terraform-oci-cis-landing-zone-iam/dynamic-groups terraform module [documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/policies/README.md).
+    - ```compartments_configuration``` &ndash; For complete documentation of configuring the ```compartments_configuration``` input variable please refer to the terraform-oci-cis-landing-zone-iam/compartments Terraform module [documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/compartments/README.md).
+    - ```groups_configuration``` &ndash; For complete documentation of configuring the ```groups_configuration``` input variable please refer to the terraform-oci-cis-landing-zone-iam/groups Terraform module [documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/groups/README.md).
+    - ```dynamic_groups_configuration``` &ndash; For complete documentation of configuring the ```dynamic_groups_configuration``` input variable please refer to the terraform-oci-cis-landing-zone-iam/dynamic-groups Terraform module [documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/dynamic-groups/README.md).
+    - ```policies_configuration``` &ndash; For complete documentation of configuring the ```policies_configuration``` input variable please refer to the terraform-oci-cis-landing-zone-iam/dynamic-groups Terraform module [documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/policies/README.md).
 
 
 
@@ -194,7 +194,7 @@ The input parameters for the module can be divided into 3 categories, for which 
     
         The ```network_configuration``` complex type fully supports optional attributes as long as they do not break any dependency imposed by OCI.
 
-        For complete documentation of configuring the ```network_configuration``` input variable please refer to the terraform-oci-cis-landing-zone-networking terraform module [documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking#how-to-use-the-module).
+        For complete documentation of configuring the ```network_configuration``` input variable please refer to the terraform-oci-cis-landing-zone-networking Terraform module [documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking#how-to-use-the-module).
 
 &nbsp; 
 
