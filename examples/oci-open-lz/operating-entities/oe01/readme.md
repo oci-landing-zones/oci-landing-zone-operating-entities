@@ -6,7 +6,7 @@
 [2. Setup Terraform Authentication](#2-setup-terraform-authentication)</br>
 [3. Setup IAM Configuration](#3-setup-iam-configuration)</br>
 [4. Setup Network Configuration](#4-setup-network-configuration)</br>
-[5. Run the Configurations (TF Plan & Apply)](#5-run-the-configurations)</br>
+[5. Run the Configurations (Terraform Plan and Apply)](#5-run-the-configurations)</br>
 
 
 &nbsp; 
@@ -17,8 +17,8 @@
 |---|---| 
 | **OP. ID** | OP.02 |
 | **OP. NAME** | Manage Operating Entity | 
-| **OBJECTIVE** | Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.  |
-| **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: VCN, Subnets, SL, RT, DRG Attachments, Service/Internet Gateways |
+| **OBJECTIVE** | Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources. |
+| **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: VCN, Subnets, SL, RT, DRG Attachments, Service/Internet Gateways. |
 | **IAM CONFIG**| [open_lz_oe_01_identity.auto.tfvars.json](open_lz_oe_01_identity.auto.tfvars.json)|
 | **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](open_lz_oe_01_network.auto.tfvars.json) |
 | **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
@@ -38,7 +38,7 @@ For authenticating against the OCI tenancy terraform execute the following [inst
 
 ## **3. Setup IAM Configuration**
 
-For configuring and running the OCI Open LZ Manage OE IAM layer use the following json file: [open_lz_oe_01_identity.auto.tfvars.json](./open_lz_oe_01_identity.auto.tfvars.json). You can customize this  configuration to fit your exact OCI IAM topology.
+For configuring and running the OCI Open LZ Manage OE IAM layer use the following JSON file: [open_lz_oe_01_identity.auto.tfvars.json](./open_lz_oe_01_identity.auto.tfvars.json). You can customize this  configuration to fit your exact OCI IAM topology.
 
 This configuration file will cover the following four categories of resources described in the next sections.
 
@@ -54,13 +54,13 @@ The diagram below identifies the compartments in the scope of this operation.
 
 &nbsp; 
 
-The corresponding json configuration for the compartments topology described above is: 
+The corresponding JSON configuration for the compartments topology described above is: 
 
 ```
 ...
     "compartments_configuration": {
         "enable_delete": "true",
-        "default_parent_ocid": "ocid1.tenancy.oc1..aaaaaaaaxzpxbcag7zgamh2erlggqro3y63tvm2rbkkjz4z2zskvagupiz7a",
+        "default_parent_ocid": "ocid1.tenancy.oc1..aaaaaaaaexampleocid",
         "compartments": {
             "CMP-OE01-KEY": {
                 "name": "cmp-oe1",
@@ -170,7 +170,7 @@ Meanwhile, you can proceed by updating with the desired groups, or use the empty
 ...
 ```
 
-This automation provides fully supports any kind of OCI IAM Groups topology to be specified in the json format. 
+This automation provides fully supports any kind of OCI IAM Groups topology to be specified in the JSON format. 
 For an example of such configuration and for extended documentation please refer to the [Identity & Access Management CIS Terraform module groups example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/groups/examples/vision/input.auto.tfvars.template).
 
 &nbsp; 
@@ -190,7 +190,7 @@ Meanwhile, you can proceed by updating with the desired dynamic groups, or use t
 ...
 ```
 
-This automation provides fully supports any kind of OCI IAM Dynamic Groups to be specified in the json format. 
+This automation provides fully supports any kind of OCI IAM Dynamic Groups to be specified in the JSON format. 
 For an example of such configuration and for extended documentation please refer to the [Identity & Access Management CIS Terraform module dynamic groups example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/dynamic-groups/examples/vision/input.auto.tfvars.template).
 
 &nbsp; 
@@ -212,7 +212,7 @@ Meanwhile, you can proceed by updating with the desired policies, or use the fol
 ...
 ```
 
-This automation provides fully supports any type of OCI IAM Policy  to be specified in the json format. 
+This automation provides fully supports any type of OCI IAM Policy  to be specified in the JSON format. 
 For an example of such configuration and for extended documentation please refer to the [Identity & Access Management CIS Terraform module policies examples](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies/examples).
 
 
@@ -227,9 +227,9 @@ For configuring the OCI Open LZ Shared Infrastructure Network layer open and edi
 ![Network Diagram](diagrams/OCI_Open_LZ_OP02_ManageOE_Network.png)
 
 
-You can customize this json configuration to fit your exact OCI Networking topology. This terraform automation is extremely versatible and can support any type of network topology. 
+You can customize this JSON configuration to fit your exact OCI Networking topology. This terraform automation is extremely versatible and can support any type of network topology. 
 
-For complete documentation and a larger set of examples on configuring an OCI networking topology using this json terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) documentation and examples.
+For complete documentation and a larger set of examples on configuring an OCI networking topology using this JSON terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) documentation and examples.
 
 The examples given with this code, expects to find valid certificates in your home directory to import into the Load Balancers to be created for SSL connections. If you don't have any valid certificates signed by a trusted CA, you can create self-signed certificates to run the examples following the instructions in [LBaaS self-signed certificates creation example](../../common_lbaas_self-signed_certificates_howto.md).
 
@@ -262,7 +262,7 @@ Run terraform init to download all the required external terraform providers and
 
  ### **5.4 Run ```terraform plan```**
 
-Run terraform plan with the IAM and Network configuration.
+Run ```terraform plan``` with the IAM and Network configuration.
 
 ```
 terraform plan \
@@ -282,7 +282,7 @@ The ideal scenario regarding the **state file** will be for each configuration t
 
 ### **5.5 Run ```terraform apply```**
 
-Run terraform plan with the IAM and Network configuration. After  its execution the configured resources will be provisioned or updated on OCI.
+Run ```terraform apply``` with the IAM and Network configuration. After its execution the configured resources will be provisioned or updated on OCI.
 
 ```
 terraform apply \
@@ -292,4 +292,4 @@ terraform apply \
 -state ../examples/oci-open-lz/operating-entities/oe01/terraform.tfstate
 ```
 
-Depending on your json configuration configurations the output of the ```terraform apply``` should be identical or similar to this [example](./tf_apply_output_example.out).
+Depending on your JSON configuration configurations the output of the ```terraform apply``` should be identical or similar to this [example](./tf_apply_output_example.out).
