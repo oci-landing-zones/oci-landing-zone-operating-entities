@@ -95,7 +95,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **3.2 Groups**
 
-Here is have an example of the sahred infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
 
 ```
 ...
