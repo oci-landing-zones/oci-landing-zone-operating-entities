@@ -144,7 +144,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **3.3 Dynamic Groups**
 
-Here we have an example of the shared infrastructure OCI IAM Dynamics groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
+Here is have an example of the sahred infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
 
 
 ```
