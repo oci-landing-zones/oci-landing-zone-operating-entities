@@ -144,7 +144,7 @@ For an example of such a configuration and for extended documentation please ref
 
 ### **3.3 Dynamic Groups**
 
-Here is have an example of the sahred infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
 
 
 ```
@@ -154,14 +154,16 @@ Here is have an example of the sahred infrastructure OCI IAM Groups topology con
         "default_freeform_tags": null,
         "dynamic_groups": {
             "DGP-SEC-FUN": {
-                "name": "dgp-pj-sec-fun",
-                "description": "DGP.01 Open LZ dynamic group for security functions execution.",
-                "matching_rule": "ALL {resource.type = 'fnfun', resource.compartment.id = 'cmp-security-id-tbu'}"
+                "name": "dgp-security-functions",
+                "description": "DGP.01 Allows all resources of type fnfunc in the Security compartment, cmp-security..",
+                "matching_rule": "ALL {resource.type = 'fnfun', resource.compartment.id = 'cmp-security'}"
             }
         }
     }
 ...
 ```
+
+Note: in matching_rule you must include resource.compartment.id, this has to be uddated to de proper value.
 
 This automation fully supports any kind of OCI IAM Dynamic Groups to be specified in the JSON format.
 
