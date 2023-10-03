@@ -11,10 +11,13 @@ variable "home_region" {}
 variable "compartments_configuration" {
   description = "The compartments configuration. Use the compartments attribute to define your topology. OCI supports compartment hierarchies up to six levels."
   type = object({
-    default_parent_ocid   = string                # the default parent for all top (first level) compartments. Use parent_ocid attribute to specify different parents.
-    default_defined_tags  = optional(map(string)) # applies to all compartments, unless overriden by defined_tags in a compartment object
-    default_freeform_tags = optional(map(string)) # applies to all compartments, unless overriden by freeform_tags in a compartment object
-    enable_delete         = optional(bool)        # whether or not compartments are physically deleted when destroyed. Default is false.
+    derive_keys_from_hierarchy = optional(bool)        # Whether identifying keys should be derived from the provided compartments hierarchy
+    module_name                = optional(string)      # The module name.
+    tags_dependency            = optional(map(any))    #  Map of objects containing the externally managed tags this module may depend on. All map objects must have the same type and must contain at least an 'id' attribute (representing the tag OCID) of string type.
+    default_parent_ocid        = optional(string)      # the default parent for all top (first level) compartments. Use parent_ocid attribute within each compartment to specify different parents.
+    default_defined_tags       = optional(map(string)) # applies to all compartments, unless overriden by defined_tags in a compartment object
+    default_freeform_tags      = optional(map(string)) # applies to all compartments, unless overriden by freeform_tags in a compartment object
+    enable_delete              = optional(bool)        # whether or not compartments are physically deleted when destroyed. Default is false.
     compartments = map(object({
       name          = string
       description   = string
@@ -22,7 +25,7 @@ variable "compartments_configuration" {
       defined_tags  = optional(map(string))
       freeform_tags = optional(map(string))
       tag_defaults = optional(map(object({
-        tag_ocid         = string,
+        tag_id           = string,
         default_value    = string,
         is_user_required = optional(bool)
       })))
@@ -32,7 +35,7 @@ variable "compartments_configuration" {
         defined_tags  = optional(map(string))
         freeform_tags = optional(map(string))
         tag_defaults = optional(map(object({
-          tag_ocid         = string,
+          tag_id           = string,
           default_value    = string,
           is_user_required = optional(bool)
         })))
@@ -42,7 +45,7 @@ variable "compartments_configuration" {
           defined_tags  = optional(map(string))
           freeform_tags = optional(map(string))
           tag_defaults = optional(map(object({
-            tag_ocid         = string,
+            tag_id           = string,
             default_value    = string,
             is_user_required = optional(bool)
           })))
@@ -52,7 +55,7 @@ variable "compartments_configuration" {
             defined_tags  = optional(map(string))
             freeform_tags = optional(map(string))
             tag_defaults = optional(map(object({
-              tag_ocid         = string,
+              tag_id           = string,
               default_value    = string,
               is_user_required = optional(bool)
             })))
@@ -62,7 +65,7 @@ variable "compartments_configuration" {
               defined_tags  = optional(map(string))
               freeform_tags = optional(map(string))
               tag_defaults = optional(map(object({
-                tag_ocid         = string,
+                tag_id           = string,
                 default_value    = string,
                 is_user_required = optional(bool)
               })))
@@ -72,7 +75,7 @@ variable "compartments_configuration" {
                 defined_tags  = optional(map(string))
                 freeform_tags = optional(map(string))
                 tag_defaults = optional(map(object({
-                  tag_ocid         = string,
+                  tag_id           = string,
                   default_value    = string,
                   is_user_required = optional(bool)
                 })))
@@ -83,11 +86,13 @@ variable "compartments_configuration" {
       })))
     }))
   })
+  default = null
 }
 
 variable "groups_configuration" {
   description = "The groups configuration."
   type = object({
+    module_name           = optional(string) # The module name.
     default_defined_tags  = optional(map(string)),
     default_freeform_tags = optional(map(string))
     groups = map(object({
@@ -98,11 +103,13 @@ variable "groups_configuration" {
       freeform_tags = optional(map(string))
     }))
   })
+  default = null
 }
 
 variable "dynamic_groups_configuration" {
   description = "The dynamic groups."
   type = object({
+    module_name           = optional(string) # The module name.
     default_defined_tags  = optional(map(string)),
     default_freeform_tags = optional(map(string))
     dynamic_groups = map(object({
@@ -113,28 +120,17 @@ variable "dynamic_groups_configuration" {
       freeform_tags = optional(map(string))
     }))
   })
+  default = null
 }
 
 variable "policies_configuration" {
   description = "Policies configuration"
   type = object({
-    enable_cis_benchmark_checks            = optional(bool)  # Whether to check policies for CIS Foundations Benchmark recommendations. Default is true.
-    enable_tenancy_level_template_policies = optional(bool)  # Enables the module to manage template (pre-configured) policies at the root compartment) (a.k.a tenancy) level. Attribute groups_with_tenancy_level_roles only applies if this is set to true. Default is false.
-    groups_with_tenancy_level_roles = optional(list(object({ # A list of group names and their roles at the root compartment (a.k.a tenancy) level. Pre-configured policies are assigned to each group in the root compartment. Only applicable if attribute enable_tenancy_level_template_policies is set to true.
-      name  = string
-      roles = string
-    })))
-    enable_compartment_level_template_policies = optional(bool)   # Enables the module to manage template (pre-configured) policies at the compartment level (compartments other than root). Default is true.
-    policy_name_prefix                         = optional(string) # A prefix to be prepended to all policy names
-    policy_name_suffix                         = optional(string) # A suffix to be appended to all policy names
-    supplied_compartments = optional(map(object({                 # List of compartments that are policy targets. This is a workaround to Terraform behavior. Please see note below.
-      name          = string
-      ocid          = string
-      freeform_tags = map(string)
-    })))
-    defined_tags  = optional(map(string))     # Any defined tags to apply on the template (pre-configured) policies.
-    freeform_tags = optional(map(string))     # Any freeform tags to apply on the template (pre-configured) policies.
-    supplied_policies = optional(map(object({ # A map of directly supplied policies. Use this to suplement the template (pre-configured) policies. For completely overriding the template policies, set attributes enable_compartment_level_template_policies and enable_tenancy_level_template_policies to false.
+    enable_output               = optional(bool)   # Whether Terraform should enable module output.
+    enable_debug                = optional(bool)   # Whether Terraform should enable module debug information.
+    module_name                 = optional(string) # The module name.
+    enable_cis_benchmark_checks = optional(bool)   # Whether to check policies for CIS Foundations Benchmark recommendations. Default is true.
+    supplied_policies = optional(map(object({      # A map of directly supplied policies. Use this to suplement or override the template policies.
       name             = string
       description      = string
       compartment_ocid = string
@@ -142,9 +138,40 @@ variable "policies_configuration" {
       defined_tags     = optional(map(string))
       freeform_tags    = optional(map(string))
     })))
-    enable_output = optional(bool) # Whether the module generates output. Default is false.
-    enable_debug  = optional(bool) # # Whether the module generates debug output. Default is false.
+    template_policies = optional(object({                        # An object describing the template policies. In this mode, policies are derived according to tenancy_level_settings and compartment_level_settings.
+      tenancy_level_settings = optional(object({                 # Settings for tenancy level (Root compartment) policies generation.
+        groups_with_tenancy_level_roles = optional(list(object({ # A list of group names and their roles at the tenancy level. Template policies are granted to each group in the Root compartment.
+          name  = string
+          roles = string
+        })))
+        oci_services = optional(object({
+          enable_all_policies            = optional(bool)
+          enable_scanning_policies       = optional(bool)
+          enable_cloud_guard_policies    = optional(bool)
+          enable_os_management_policies  = optional(bool)
+          enable_block_storage_policies  = optional(bool)
+          enable_file_storage_policies   = optional(bool)
+          enable_oke_policies            = optional(bool)
+          enable_streaming_policies      = optional(bool)
+          enable_object_storage_policies = optional(bool)
+        }))
+        policy_name_prefix = optional(string) # A prefix to Root compartment policy names.
+      }))
+      compartment_level_settings = optional(object({  # Settings for compartment (non Root) level policies generation.
+        supplied_compartments = optional(map(object({ # List of compartments that are policy targets.
+          name           = string                     # The compartment name
+          ocid           = string                     # The compartment ocid
+          cislz_metadata = map(string)                # The compartment metadata. See module README.md for details.
+        })))
+        #policy_name_prefix = optional(string) # A prefix to compartment policy names.
+      }))
+    }))
+    policy_name_prefix = optional(string)      # A prefix to all policy names.
+    policy_name_suffix = optional(string)      # A suffix to all policy names.
+    defined_tags       = optional(map(string)) # Any defined tags to apply on the template (pre-configured) policies.
+    freeform_tags      = optional(map(string)) # Any freeform tags to apply on the template (pre-configured) policies.
   })
+  default = null
 }
 
 variable "network_configuration" {
@@ -918,4 +945,5 @@ variable "network_configuration" {
       }
     )))
   })
+  default = null
 }
