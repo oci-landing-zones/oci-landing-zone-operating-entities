@@ -1,0 +1,33 @@
+  
+title: "An OCI Open Landing Zone Stack: OP.01 – Manage Shared Services"
+stackDescription: "Creates or changes the shared elements of the OCI Open Landing Zone."
+schemaVersion: 1.1.0
+version: "0.0.1"
+locale: "en"
+variableGroups:
+  - title: "INPUT JSON CONFIGURATION FILES URLS"
+    visible: true
+    variables:
+      - input_config_files_urls
+  - title: "Hidden Variables"
+    visible: false
+    variables:
+      - "tenancy_ocid"
+      - "user_ocid"
+      - "fingerprint"
+      - "private_key_path"
+      - "private_key_password"
+      - "region"
+      - "home_region"
+variables:
+  input_config_files_urls:
+    type: array
+    items:
+      type: string
+    multiline: true
+    uniqueItems: true
+    title: Type or Paste the URLs
+    additionalProps:
+        allowMultiple: true
+    description: "Only JSON files accepted - HCL not supported yet"
+    required: false

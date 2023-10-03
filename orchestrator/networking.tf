@@ -383,6 +383,6 @@ locals {
 }
 
 module "terraform-oci-cis-landing-zone-network" {
-  source                = "git@github.com:oracle-quickstart/terraform-oci-cis-landing-zone-networking.git?ref=v0.5.3"
+  source                = "git::https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking.git?ref=v0.5.3"
   network_configuration = local.network_configuration
 }
