@@ -1,6 +1,5 @@
 # OP.02 – Manage Operating Entity (OE)
 
-[![Deploy_To_OCI](../../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/operating-entities/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/operating-entities/oe01/open_lz_oe_01_network.auto.tfvars.json"})
 
 ## **Table of Contents**
 
@@ -27,7 +26,7 @@
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../../design/OCI_Open_LZ.pdf).|
 | **PRE-ACTIVITIES** | [OP.01 Shared Services](../../shared/readme.md) executed. |
 | **POST-ACTIVITIES** | The first execution of this operation by the Central IT team requires the hand-over to the target OE Operations team the OCIDs for their OE core resources. |
-| | |
+| **RUN SCENARIO** | [![Deploy_To_OCI](../../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/operating-entities/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/operating-entities/oe01/open_lz_oe_01_network.auto.tfvars.json"}) |
 
 &nbsp; 
 
