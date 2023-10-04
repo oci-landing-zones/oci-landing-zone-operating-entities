@@ -1,5 +1,7 @@
 # OP.01 – Manage Shared Services
 
+[![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip)
+
 ## **Table of Contents**
 
 [1. Summary](#1-summary)</br>
