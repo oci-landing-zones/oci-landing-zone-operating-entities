@@ -1,0 +1,1058 @@
+---
+network_configuration:
+  default_compartment_key: CMP-OE01-COMMON-NETWORK-KEY
+  default_enable_cis_checks: false
+  network_configuration_categories:
+    oe01:
+      category_compartment_key: CMP-OE01-COMMON-NETWORK-KEY
+      vcns:
+        VCN-FRANKFURT-OE01-CO-KEY:
+          block_nat_traffic: false
+          cidr_blocks:
+          - 172.168.0.0/23
+          dhcp_options:
+            VCN-FRANKFURT-OE01-CO-DHCP-OPTION-01-KEY:
+              display_name: vcn_frankfurt_oe01_co_dhcp_option_01
+              domain_name_type: test
+              options:
+                options_1:
+                  custom_dns_servers:
+                  - 192.168.0.3
+                  - 192.168.0.4
+                  server_type: CustomDnsServer
+                  type: DomainNameServer
+                options_2:
+                  search_domain_names:
+                  - test.com
+                  type: SearchDomain
+            VCN-FRANKFURT-OE01-CO-DHCP-OPTION-02-KEY:
+              display_name: vcn_frankfurt_oe01_co_dhcp_option_02
+              domain_name_type: test
+              options:
+                options_1:
+                  custom_dns_servers:
+                  - 10.0.0.3
+                  - 10.0.0.4
+                  server_type: CustomDnsServer
+                  type: DomainNameServer
+                options_2:
+                  search_domain_names:
+                  - test.com
+                  type: SearchDomain
+          display_name: vcn_frankfurt_oe01_co
+          dns_label: oe01co
+          is_attach_drg: false
+          is_create_igw: false
+          is_ipv6enabled: false
+          is_oracle_gua_allocation_enabled: false
+          network_security_groups:
+            NSG-01-OE01-CO-VCN-KEY:
+              egress_rules:
+                anywhere:
+                  description: egress to 0.0.0.0/0 over TCP
+                  dst: 0.0.0.0/0
+                  dst_type: CIDR_BLOCK
+                  protocol: TCP
+                  stateless: false
+              freeform_tags:
+              ingress_rules:
+                ssh_22:
+                  description: ingress from 0.0.0.0/0 over TCP 22
+                  dst_port_max: 22
+                  dst_port_min: 22
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+            NSG-02-OE01-CO-VCN-KEY:
+              egress_rules:
+                anywhere:
+                  description: egress to 0.0.0.0/0 over TCP
+                  dst: 0.0.0.0/0
+                  dst_type: CIDR_BLOCK
+                  protocol: TCP
+                  stateless: false
+              ingress_rules:
+                http_8080:
+                  description: ingress from 0.0.0.0/0 over HTTP 8080
+                  dst_port_max: 80
+                  dst_port_min: 80
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+                ssh_22:
+                  description: ingress from 0.0.0.0/0 over TCP 22
+                  dst_port_max: 22
+                  dst_port_min: 22
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+          route_tables:
+            RT-01-OE01-CO-VCN-KEY:
+              display_name: rt_01_oe01_co_vcn
+              route_rules: {}
+            RT-02-OE01-CO-VCN-KEY:
+              display_name: rt_02_oe01_co_vcn
+              freeform_tags:
+              route_rules:
+                sgw_route:
+                  description: Route for sgw
+                  destination: oci-fra-objectstorage
+                  destination_type: SERVICE_CIDR_BLOCK
+                  network_entity_key: SG-FRANKFURT-OE01-CO-KEY
+          security_lists:
+            SECLIST-01-OE01-CO-VCN-KEY:
+              display_name: seclist_01_oe01_co_vcn
+              egress_rules:
+              - description: egress to 0.0.0.0/0 over ALL protocols
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: ALL
+                stateless: false
+              - description: egress to 0.0.0.0/0 over any protocol
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: ALL
+                stateless: false
+              freeform_tags:
+              ingress_rules:
+              - description: ingress from 0.0.0.0/0 over TCP22
+                dst_port_max: 22
+                dst_port_min: 22
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+            SECLIST-02-OE01-CO-VCN-KEY:
+              display_name: seclist_02_oe01_co_vcn
+              egress_rules:
+              - description: egress to 0.0.0.0/0 over TCP
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: TCP
+                stateless: false
+              ingress_rules:
+              - description: ingress from 0.0.0.0/0 over TCP22
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+              - description: ingress from 0.0.0.0/0 over HTTP8080
+                dst_port_max: 80
+                dst_port_min: 80
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+          subnets:
+            SN-FRANKFURT-OE01-CO-FW-EW-KEY:
+              cidr_block: 172.168.0.0/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_co_fw_ew
+              dns_label: oe01cofwew
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-CO-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-CO-VCN-KEY
+            SN-FRANKFURT-OE01-CO-MGMT-KEY:
+              cidr_block: 172.168.0.128/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_co_mgmt
+              dns_label: oe01comgmt
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-CO-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-CO-VCN-KEY
+            SN-FRANKFURT-OE01-CO-LOGS-KEY:
+              cidr_block: 172.168.1.0/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_co_logs
+              dns_label: oe01cologs
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-CO-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-CO-VCN-KEY
+            SN-FRANKFURT-OE01-CO-DNS:
+              cidr_block: 172.168.1.128/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_co_dns
+              dns_label: oe01codns
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-CO-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-CO-VCN-KEY
+          vcn_specific_gateways:
+            service_gateways:
+              SG-FRANKFURT-OE01-CO-KEY:
+                display_name: sg_frankfurt_oe01_co
+        VCN-FRANKFURT-OE01-DEV-KEY:
+          block_nat_traffic: false
+          cidr_blocks:
+          - 172.168.2.0/23
+          dhcp_options:
+            VCN-FRANKFURT-OE01-DEV-DHCP-OPTION-01-KEY:
+              display_name: vcn_frankfurt_oe01_dev_dhcp_option_01
+              domain_name_type: test
+              options:
+                options_1:
+                  custom_dns_servers:
+                  - 192.168.0.3
+                  - 192.168.0.4
+                  server_type: CustomDnsServer
+                  type: DomainNameServer
+                options_2:
+                  search_domain_names:
+                  - test.com
+                  type: SearchDomain
+            VCN-FRANKFURT-OE01-DEV-DHCP-OPTION-02-KEY:
+              display_name: vcn_frankfurt_oe01_dev_dhcp_option_02
+              domain_name_type: test
+              options:
+                options_1:
+                  custom_dns_servers:
+                  - 10.0.0.3
+                  - 10.0.0.4
+                  server_type: CustomDnsServer
+                  type: DomainNameServer
+                options_2:
+                  search_domain_names:
+                  - test.com
+                  type: SearchDomain
+          display_name: vcn_frankfurt_oe01_dev
+          dns_label: oe01dev
+          is_attach_drg: false
+          is_create_igw: false
+          is_ipv6enabled: false
+          is_oracle_gua_allocation_enabled: false
+          network_security_groups:
+            NSG-01-OE01-DEV-VCN-KEY:
+              egress_rules:
+                anywhere:
+                  description: egress to 0.0.0.0/0 over TCP
+                  dst: 0.0.0.0/0
+                  dst_type: CIDR_BLOCK
+                  protocol: TCP
+                  stateless: false
+              freeform_tags:
+              ingress_rules:
+                ssh_22:
+                  description: ingress from 0.0.0.0/0 over TCP22
+                  dst_port_max: 22
+                  dst_port_min: 22
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+            NSG-02-OE01-DEV-VCN-KEY:
+              egress_rules:
+                anywhere:
+                  description: egress to 0.0.0.0/0 over TCP
+                  dst: 0.0.0.0/0
+                  dst_type: CIDR_BLOCK
+                  protocol: TCP
+                  stateless: false
+              ingress_rules:
+                http_8080:
+                  description: ingress from 0.0.0.0/0 over HTTP8080
+                  dst_port_max: 80
+                  dst_port_min: 80
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+                ssh_22:
+                  description: ingress from 0.0.0.0/0 over TCP22
+                  dst_port_max: 22
+                  dst_port_min: 22
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+          route_tables:
+            RT-01-OE01-DEV-VCN-KEY:
+              display_name: rt_01_oe01_dev_vcn
+              route_rules: {}
+            RT-02-OE01-DEV-VCN-KEY:
+              display_name: rt_02_oe01_dev_vcn
+              freeform_tags:
+              route_rules:
+                sgw_route:
+                  description: Route for sgw
+                  destination: oci-fra-objectstorage
+                  destination_type: SERVICE_CIDR_BLOCK
+                  network_entity_key: SG-FRANKFURT-OE01-DEV-KEY
+          security_lists:
+            SECLIST-01-OE01-DEV-VCN-KEY:
+              display_name: seclist_01_oe01_dev_vcn
+              egress_rules:
+              - description: egress to 0.0.0.0/0 over ALL protocols
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: ALL
+                stateless: false
+              - description: egress to 0.0.0.0/0 over any protocol
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: ALL
+                stateless: false
+              freeform_tags:
+              ingress_rules:
+              - description: ingress from 0.0.0.0/0 over TCP22
+                dst_port_max: 22
+                dst_port_min: 22
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+            SECLIST-02-OE01-DEV-VCN-KEY:
+              display_name: seclist_02_oe01_dev_vcn
+              egress_rules:
+              - description: egress to 0.0.0.0/0 over TCP
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: TCP
+                stateless: false
+              ingress_rules:
+              - description: ingress from 0.0.0.0/0 over TCP22
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+              - description: ingress from 0.0.0.0/0 over HTTP8080
+                dst_port_max: 80
+                dst_port_min: 80
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+          subnets:
+            SN-FRANKFURT-OE01-DEV-LB-KEY:
+              cidr_block: 172.168.2.0/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_dev_lb
+              dns_label: oe01devlb
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-DEV-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-DEV-VCN-KEY
+            SN-FRANKFURT-OE01-DEV-INFRA-KEY:
+              cidr_block: 172.168.2.128/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_dev_infra
+              dns_label: oe01devinfra
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-DEV-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-DEV-VCN-KEY
+            SN-FRANKFURT-OE01-DEV-APPS-KEY:
+              cidr_block: 172.168.3.0/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_dev_apps
+              dns_label: oe01devapps
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-DEV-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-DEV-VCN-KEY
+            SN-FRANKFURT-OE01-DEV-DB-KEY:
+              cidr_block: 172.168.3.128/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_dev_db
+              dns_label: oe01devdb
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-DEV-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-DEV-VCN-KEY
+          vcn_specific_gateways:
+            service_gateways:
+              SG-FRANKFURT-OE01-DEV-KEY:
+                display_name: sg_frankfurt_oe01_dev
+        VCN-FRANKFURT-OE01-NP-KEY:
+          block_nat_traffic: false
+          cidr_blocks:
+          - 172.168.4.0/23
+          dhcp_options:
+            VCN-FRANKFURT-OE01-NP-DHCP-OPTION-01-KEY:
+              display_name: vcn_frankfurt_oe01_np_dhcp_option_01
+              domain_name_type: test
+              options:
+                options_1:
+                  custom_dns_servers:
+                  - 192.168.0.3
+                  - 192.168.0.4
+                  server_type: CustomDnsServer
+                  type: DomainNameServer
+                options_2:
+                  search_domain_names:
+                  - test.com
+                  type: SearchDomain
+            VCN-FRANKFURT-OE01-NP-DHCP-OPTION-02-KEY:
+              display_name: vcn_frankfurt_oe01_np_dhcp_option_02
+              domain_name_type: test
+              options:
+                options_1:
+                  custom_dns_servers:
+                  - 10.0.0.3
+                  - 10.0.0.4
+                  server_type: CustomDnsServer
+                  type: DomainNameServer
+                options_2:
+                  search_domain_names:
+                  - test.com
+                  type: SearchDomain
+          display_name: vcn_frankfurt_oe01_np
+          dns_label: oe01np
+          is_attach_drg: false
+          is_create_igw: false
+          is_ipv6enabled: false
+          is_oracle_gua_allocation_enabled: false
+          network_security_groups:
+            NSG-01-OE01-NP-VCN-KEY:
+              egress_rules:
+                anywhere:
+                  description: egress to 0.0.0.0/0 over TCP
+                  dst: 0.0.0.0/0
+                  dst_type: CIDR_BLOCK
+                  protocol: TCP
+                  stateless: false
+              freeform_tags:
+              ingress_rules:
+                ssh_22:
+                  description: ingress from 0.0.0.0/0 over TCP22
+                  dst_port_max: 22
+                  dst_port_min: 22
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+            NSG-02-OE01-NP-VCN-KEY:
+              egress_rules:
+                anywhere:
+                  description: egress to 0.0.0.0/0 over TCP
+                  dst: 0.0.0.0/0
+                  dst_type: CIDR_BLOCK
+                  protocol: TCP
+                  stateless: false
+              ingress_rules:
+                http_8080:
+                  description: ingress from 0.0.0.0/0 over HTTP8080
+                  dst_port_max: 80
+                  dst_port_min: 80
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+                ssh_22:
+                  description: ingress from 0.0.0.0/0 over TCP22
+                  dst_port_max: 22
+                  dst_port_min: 22
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+          route_tables:
+            RT-01-OE01-NP-VCN-KEY:
+              display_name: rt_01_oe01_np_vcn
+              route_rules: {}
+            RT-02-OE01-NP-VCN-KEY:
+              display_name: rt_02_oe01_np_vcn
+              freeform_tags:
+              route_rules:
+                sgw_route:
+                  description: Route for sgw
+                  destination: oci-fra-objectstorage
+                  destination_type: SERVICE_CIDR_BLOCK
+                  network_entity_key: SG-FRANKFURT-OE01-NP-KEY
+          security_lists:
+            SECLIST-01-OE01-NP-VCN-KEY:
+              display_name: seclist_01_oe01_np_vcn
+              egress_rules:
+              - description: egress to 0.0.0.0/0 over ALL protocols
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: ALL
+                stateless: false
+              - description: egress to 0.0.0.0/0 over any protocol
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: ALL
+                stateless: false
+              freeform_tags:
+              ingress_rules:
+              - description: ingress from 0.0.0.0/0 over TCP22
+                dst_port_max: 22
+                dst_port_min: 22
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+            SECLIST-02-OE01-NP-VCN-KEY:
+              display_name: seclist_02_oe01_np_vcn
+              egress_rules:
+              - description: egress to 0.0.0.0/0 over TCP
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: TCP
+                stateless: false
+              ingress_rules:
+              - description: ingress from 0.0.0.0/0 over TCP22
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+              - description: ingress from 0.0.0.0/0 over HTTP8080
+                dst_port_max: 80
+                dst_port_min: 80
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+          subnets:
+            SN-FRANKFURT-OE01-NP-LB-KEY:
+              cidr_block: 172.168.4.0/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_np_lb
+              dns_label: oe01nplb
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-NP-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-NP-VCN-KEY
+            SN-FRANKFURT-OE01-NP-INFRA-KEY:
+              cidr_block: 172.168.4.128/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_np_infra
+              dns_label: oe01npinfra
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-NP-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-NP-VCN-KEY
+            SN-FRANKFURT-OE01-NP-APPS-KEY:
+              cidr_block: 172.168.5.0/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_np_apps
+              dns_label: oe01npapps
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-NP-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-NP-VCN-KEY
+            SN-FRANKFURT-OE01-NP-DB-KEY:
+              cidr_block: 172.168.5.128/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_np_db
+              dns_label: oe01npdb
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-NP-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-NP-VCN-KEY
+          vcn_specific_gateways:
+            service_gateways:
+              SG-FRANKFURT-OE01-NP-KEY:
+                display_name: sg_frankfurt_oe01_np
+        VCN-FRANKFURT-OE01-P-KEY:
+          block_nat_traffic: false
+          cidr_blocks:
+          - 172.168.6.0/23
+          dhcp_options:
+            VCN-FRANKFURT-OE01-P-DHCP-OPTION-01-KEY:
+              display_name: vcn_frankfurt_oe01_p_dhcp_option_01
+              domain_name_type: test
+              options:
+                options_1:
+                  custom_dns_servers:
+                  - 192.168.0.3
+                  - 192.168.0.4
+                  server_type: CustomDnsServer
+                  type: DomainNameServer
+                options_2:
+                  search_domain_names:
+                  - test.com
+                  type: SearchDomain
+            VCN-FRANKFURT-OE01-P-DHCP-OPTION-02-KEY:
+              display_name: vcn_frankfurt_oe01_p_dhcp_option_02
+              domain_name_type: test
+              options:
+                options_1:
+                  custom_dns_servers:
+                  - 10.0.0.3
+                  - 10.0.0.4
+                  server_type: CustomDnsServer
+                  type: DomainNameServer
+                options_2:
+                  search_domain_names:
+                  - test.com
+                  type: SearchDomain
+          display_name: vcn_frankfurt_oe01_p
+          dns_label: oe01p
+          is_attach_drg: false
+          is_create_igw: false
+          is_ipv6enabled: false
+          is_oracle_gua_allocation_enabled: false
+          network_security_groups:
+            NSG-01-OE01-P-VCN-KEY:
+              egress_rules:
+                anywhere:
+                  description: egress to 0.0.0.0/0 over TCP
+                  dst: 0.0.0.0/0
+                  dst_type: CIDR_BLOCK
+                  protocol: TCP
+                  stateless: false
+              freeform_tags:
+              ingress_rules:
+                ssh_22:
+                  description: ingress from 0.0.0.0/0 over TCP22
+                  dst_port_max: 22
+                  dst_port_min: 22
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+            NSG-02-OE01-P-VCN-KEY:
+              egress_rules:
+                anywhere:
+                  description: egress to 0.0.0.0/0 over TCP
+                  dst: 0.0.0.0/0
+                  dst_type: CIDR_BLOCK
+                  protocol: TCP
+                  stateless: false
+              ingress_rules:
+                http_8080:
+                  description: ingress from 0.0.0.0/0 over HTTP8080
+                  dst_port_max: 80
+                  dst_port_min: 80
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+                ssh_22:
+                  description: ingress from 0.0.0.0/0 over TCP22
+                  dst_port_max: 22
+                  dst_port_min: 22
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+          route_tables:
+            RT-01-OE01-P-VCN-KEY:
+              display_name: rt_01_oe01_p_vcn
+              route_rules: {}
+            RT-02-OE01-P-VCN-KEY:
+              display_name: rt_02_oe01_p_vcn
+              freeform_tags:
+              route_rules:
+                sgw_route:
+                  description: Route for sgw
+                  destination: oci-fra-objectstorage
+                  destination_type: SERVICE_CIDR_BLOCK
+                  network_entity_key: SG-FRANKFURT-OE01-P-KEY
+          security_lists:
+            SECLIST-01-OE01-P-VCN-KEY:
+              display_name: seclist_01_oe01_p_vcn
+              egress_rules:
+              - description: egress to 0.0.0.0/0 over ALL protocols
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: ALL
+                stateless: false
+              - description: egress to 0.0.0.0/0 over any protocol
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: ALL
+                stateless: false
+              freeform_tags:
+              ingress_rules:
+              - description: ingress from 0.0.0.0/0 over TCP22
+                dst_port_max: 22
+                dst_port_min: 22
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+            SECLIST-02-OE01-P-VCN-KEY:
+              display_name: seclist_02_oe01_p_vcn
+              egress_rules:
+              - description: egress to 0.0.0.0/0 over TCP
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: TCP
+                stateless: false
+              ingress_rules:
+              - description: ingress from 0.0.0.0/0 over TCP22
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+              - description: ingress from 0.0.0.0/0 over HTTP8080
+                dst_port_max: 80
+                dst_port_min: 80
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+          subnets:
+            SN-FRANKFURT-OE01-P-LB-KEY:
+              cidr_block: 172.168.6.0/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_p_lb
+              dns_label: oe01plb
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-P-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-P-VCN-KEY
+            SN-FRANKFURT-OE01-P-INFRA-KEY:
+              cidr_block: 172.168.6.128/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_p_infra
+              dns_label: oe01pinfra
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-P-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-P-VCN-KEY
+            SN-FRANKFURT-OE01-P-APPS-KEY:
+              cidr_block: 172.168.7.0/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_p_apps
+              dns_label: oe01papps
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-P-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-P-VCN-KEY
+            SN-FRANKFURT-OE01-P-DB-KEY:
+              cidr_block: 172.168.7.128/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_p_db
+              dns_label: oe01pdb
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-P-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-P-VCN-KEY
+          vcn_specific_gateways:
+            service_gateways:
+              SG-FRANKFURT-OE01-P-KEY:
+                display_name: sg_frankfurt_oe01_p
+        VCN-FRANKFURT-OE01-SB-KEY:
+          block_nat_traffic: false
+          cidr_blocks:
+          - 172.168.8.0/23
+          dhcp_options:
+            VCN-FRANKFURT-OE01-SB-DHCP-OPTION-01-KEY:
+              display_name: vcn_frankfurt_oe01_sb_dhcp_option_01
+              domain_name_type: test
+              options:
+                options_1:
+                  custom_dns_servers:
+                  - 192.168.0.3
+                  - 192.168.0.4
+                  server_type: CustomDnsServer
+                  type: DomainNameServer
+                options_2:
+                  search_domain_names:
+                  - test.com
+                  type: SearchDomain
+            VCN-FRANKFURT-OE01-SB-DHCP-OPTION-02-KEY:
+              display_name: vcn_frankfurt_oe01_sb_dhcp_option_02
+              domain_name_type: test
+              options:
+                options_1:
+                  custom_dns_servers:
+                  - 10.0.0.3
+                  - 10.0.0.4
+                  server_type: CustomDnsServer
+                  type: DomainNameServer
+                options_2:
+                  search_domain_names:
+                  - test.com
+                  type: SearchDomain
+          display_name: vcn_frankfurt_oe01_sb
+          dns_label: oe01sb
+          is_attach_drg: false
+          is_create_igw: false
+          is_ipv6enabled: false
+          is_oracle_gua_allocation_enabled: false
+          network_security_groups:
+            NSG-01-OE01-SB-VCN-KEY:
+              egress_rules:
+                anywhere:
+                  description: egress to 0.0.0.0/0 over TCP
+                  dst: 0.0.0.0/0
+                  dst_type: CIDR_BLOCK
+                  protocol: TCP
+                  stateless: false
+              freeform_tags:
+              ingress_rules:
+                ssh_22:
+                  description: ingress from 0.0.0.0/0 over TCP22
+                  dst_port_max: 22
+                  dst_port_min: 22
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+            NSG-02-OE01-SB-VCN-KEY:
+              egress_rules:
+                anywhere:
+                  description: egress to 0.0.0.0/0 over TCP
+                  dst: 0.0.0.0/0
+                  dst_type: CIDR_BLOCK
+                  protocol: TCP
+                  stateless: false
+              ingress_rules:
+                http_8080:
+                  description: ingress from 0.0.0.0/0 over HTTP8080
+                  dst_port_max: 80
+                  dst_port_min: 80
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+                ssh_22:
+                  description: ingress from 0.0.0.0/0 over TCP22
+                  dst_port_max: 22
+                  dst_port_min: 22
+                  protocol: TCP
+                  src: 0.0.0.0/0
+                  src_type: CIDR_BLOCK
+                  stateless: false
+          route_tables:
+            RT-01-OE01-SB-VCN-KEY:
+              display_name: rt_01_oe01_sb_vcn
+              route_rules: {}
+            RT-02-OE01-SB-VCN-KEY:
+              display_name: rt_02_oe01_sb_vcn
+              freeform_tags:
+              route_rules:
+                sgw_route:
+                  description: Route for sgw
+                  destination: oci-fra-objectstorage
+                  destination_type: SERVICE_CIDR_BLOCK
+                  network_entity_key: SG-FRANKFURT-OE01-SB-KEY
+          security_lists:
+            SECLIST-01-OE01-SB-VCN-KEY:
+              display_name: seclist_01_oe01_sb_vcn
+              egress_rules:
+              - description: egress to 0.0.0.0/0 over ALL protocols
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: ALL
+                stateless: false
+              - description: egress to 0.0.0.0/0 over any protocol
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: ALL
+                stateless: false
+              freeform_tags:
+              ingress_rules:
+              - description: ingress from 0.0.0.0/0 over TCP22
+                dst_port_max: 22
+                dst_port_min: 22
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+            SECLIST-02-OE01-SB-VCN-KEY:
+              display_name: seclist_02_oe01_sb_vcn
+              egress_rules:
+              - description: egress to 0.0.0.0/0 over TCP
+                dst: 0.0.0.0/0
+                dst_type: CIDR_BLOCK
+                protocol: TCP
+                stateless: false
+              ingress_rules:
+              - description: ingress from 0.0.0.0/0 over TCP22
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+              - description: ingress from 0.0.0.0/0 over HTTP8080
+                dst_port_max: 80
+                dst_port_min: 80
+                protocol: TCP
+                src: 0.0.0.0/0
+                src_type: CIDR_BLOCK
+                stateless: false
+          subnets:
+            SN-FRANKFURT-OE01-SB-LB-KEY:
+              cidr_block: 172.168.8.0/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_sb_lb
+              dns_label: oe01sblb
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-SB-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-SB-VCN-KEY
+            SN-FRANKFURT-OE01-SB-INRA-KEY:
+              cidr_block: 172.168.8.128/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_sb_infra
+              dns_label: oe01sbinfra
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-SB-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-SB-VCN-KEY
+            SN-FRANKFURT-OE01-SB-APPS-KEY:
+              cidr_block: 172.168.9.0/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_sb_apps
+              dns_label: oe01sbapps
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-SB-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-SB-VCN-KEY
+            SN-FRANKFURT-OE01-SB-DB-KEY:
+              cidr_block: 172.168.9.128/25
+              dhcp_options_key: default_dhcp_options
+              display_name: sn_frankfurt_oe01_sb_db
+              dns_label: oe01sbdb
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: RT-02-OE01-SB-VCN-KEY
+              security_list_keys:
+              - SECLIST-02-OE01-SB-VCN-KEY
+          vcn_specific_gateways:
+            service_gateways:
+              SG-FRANKFURT-OE01-SB-KEY:
+                display_name: sg_frankfurt_oe01_sb
+      IPs:
+        public_ips:
+          PROD-IP-LB-1-KEY:
+            lifetime: RESERVED
+            display_name: prod_ip_lb_1
+      non_vcn_specific_gateways:
+        l7_load_balancers:
+          OE_01_LB_KEY:
+            backend_sets:
+              EXAMPLE-01-LB-BCK-END-SET-01:
+                backends:
+                  EXAMPLE-01-LB-BCK-END-SET-01-BE-01:
+                    ip_address: 10.0.2.128
+                    port: 80
+                  EXAMPLE-01-LB-BCK-END-SET-01-BE-02:
+                    ip_address: 10.0.2.94
+                    port: 80
+                health_checker:
+                  interval_ms: 10000
+                  is_force_plain_text: true
+                  port: 80
+                  protocol: HTTP
+                  retries: 3
+                  return_code: 200
+                  timeout_in_millis: 3000
+                  url_path: "/"
+                lb_cookie_session_persistence_configuration:
+                  cookie_name: example_cookie
+                  disable_fallback: false
+                  domain: Set-cookie
+                  is_http_only: true
+                  is_secure: false
+                  max_age_in_seconds: 3600
+                  path: "/"
+                name: backend-set-01
+                policy: LEAST_CONNECTIONS
+            certificates:
+              LB-1-CERT-1-KEY:
+                ca_certificate: "~/certs/ca.crt"
+                certificate_name: lb1-cert1
+                private_key: "~/certs/my_cert.key"
+                public_certificate: "~/certs/my_cert.crt"
+            cipher_suites:
+              EXAMPLE-01-LB-CIPHER-SUITE-01-KEY:
+                ciphers:
+                - ECDHE-RSA-AES256-GCM-SHA384
+                - ECDHE-ECDSA-AES256-GCM-SHA384
+                - ECDHE-RSA-AES128-GCM-SHA256
+                name: cipher_suite_01
+            display_name: OE-01-LBaaS
+            host_names:
+              LB1-HOSTNAME-1-KEY:
+                hostname: oe01com
+                name: oe01
+              LB1-HOSTNAME-2-KEY:
+                hostname: loe01-1.com
+                name: oe01-1
+            ip_mode: IPV4
+            is_private: true
+            listeners:
+              LB1-LSNR-1-80:
+                connection_configuration:
+                  idle_timeout_in_seconds: 1200
+                default_backend_set_key: EXAMPLE-01-LB-BCK-END-SET-01
+                name: lb1-lsnr1-80
+                port: '80'
+                protocol: HTTP
+              LB1-LSNR-2-443:
+                connection_configuration:
+                  idle_timeout_in_seconds: 1200
+                default_backend_set_key: EXAMPLE-01-LB-BCK-END-SET-01
+                hostname_keys:
+                - LB1-HOSTNAME-1-KEY
+                - LB1-HOSTNAME-2-KEY
+                name: lb1-lsnr2-443
+                path_route_set_key: EXMPL_01_PATH_ROUTE_SET_01_KEY
+                port: '443'
+                protocol: HTTP
+                routing_policy_key:
+                rule_set_keys:
+                - LB1-RULE-SET-1-KEY
+                ssl_configuration:
+                  certificate_key: LB-1-CERT-1-KEY
+                  protocols:
+                  - TLSv1.2
+                  server_order_preference: ENABLED
+                  verify_depth: 3
+                  verify_peer_certificate: false
+            network_security_group_keys:
+            - NSG-02-OE01-P-VCN-KEY
+            path_route_sets:
+              EXMPL_01_PATH_ROUTE_SET_01_KEY:
+                name: path_route_set_01
+                path_routes:
+                  CUSTOM-KEY:
+                    backend_set_key: EXAMPLE-01-LB-BCK-END-SET-01
+                    path: "/example/video/123"
+                    path_match_type:
+                      match_type: EXACT_MATCH
+                  DEFAULT-KEY:
+                    backend_set_key: EXAMPLE-01-LB-BCK-END-SET-01
+                    path: "/"
+                    path_match_type:
+                      match_type: EXACT_MATCH
+            rule_sets:
+              LB1-RULE-SET-1-KEY:
+                items:
+                  ITEM-1-KEY:
+                    action: ADD_HTTP_REQUEST_HEADER
+                    header: example_header_name
+                    value: example_value
+                  ITEM-2-KEY:
+                    action: EXTEND_HTTP_REQUEST_HEADER_VALUE
+                    header: example_header_name2
+                    prefix: example_prefix_value
+                    suffix: example_suffix_value
+                    value: example_value
+                name: example_rule_set
+            shape: flexible
+            shape_details:
+              maximum_bandwidth_in_mbps: 100
+              minimum_bandwidth_in_mbps: 10
+            subnet_ids: []
+            subnet_keys:
+            - SN-FRANKFURT-OE01-P-LB-KEY

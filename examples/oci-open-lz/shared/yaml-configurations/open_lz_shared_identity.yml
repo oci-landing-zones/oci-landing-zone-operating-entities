@@ -1,0 +1,61 @@
+---
+compartments_configuration:
+  enable_delete: 'true'
+  compartments:
+    CMP-SECURITY-KEY:
+      name: cmp-security
+      description: oci-open-lz-customer Shared Security Compartment
+      defined_tags:
+      freeform_tags:
+        oci-open-lz: openlz-shared
+        oci-open-lz-customer: oci-open-lz-customer
+        oci-open-lz-cmp: security
+    CMP-NETWORK-KEY:
+      name: cmp-network
+      description: oci-open-lz-customer Shared Network Compartment
+      defined_tags:
+      freeform_tags:
+        oci-open-lz: openlz-shared
+        oci-open-lz-customer: oci-open-lz-customer
+        oci-open-lz-cmp: network
+groups_configuration:
+  default_defined_tags:
+  default_freeform_tags:
+  groups:
+    GRP-IAM-ADMINS:
+      name: grp-iam-admins
+      description: GRP.01 Tenancy global Identity and access management administrator.
+    GRP-CREDENTIAL-ADMINS:
+      name: grp-credential-admins
+      description: GRP.02 Tenancy global credential administrator.
+    GRP-ANNOUNCEMENT-READERS:
+      name: grp-announcement-readers
+      description: GRP.03 Tenancy global readers of OCI monitoring information.
+    GRP-BUDGET-ADMINS:
+      name: grp-budget-admins
+      description: GRP.04 Tenancy global budget control.
+    GRP-AUDITORS:
+      name: grp-auditors
+      description: GRP.05 Tenancy global read access (for security auditing or health
+        checks).
+    GRP-NETWORK-ADMINS:
+      name: grp-network-admins
+      description: GRP.06 Tenancy global and shared network administration group,
+        including common OE network elements.
+    GRP-SECURITY-ADMINS:
+      name: grp-security-admins
+      description: GRP.07 Tenancy global and shared security administration group.
+dynamic_groups_configuration:
+  default_defined_tags:
+  default_freeform_tags:
+  dynamic_groups:
+    DGP-SEC-FUN:
+      name: dgp-security-functions
+      description: DGP.01 Allows all resources of type fnfunc in the Security compartment,
+        cmp-security.
+      matching_rule: ALL {resource.type = 'fnfun', resource.compartment.id = 'cmp-security'}
+policies_configuration:
+  enable_compartment_level_template_policies: 'false'
+  enable_tenancy_level_template_policies: 'false'
+  enable_cis_benchmark_checks: 'false'
+  groups_with_tenancy_level_roles: []
