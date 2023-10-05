@@ -8,7 +8,7 @@
 [2. IAM Requirements](#2-iam-requirements)</br>
 [3. How to Invoke the Module](#3-how-to-invoke-the-module)</br>
 [4. How to Use the module](#4-how-to-use-the-module)</br>
-[5. Using the Module with ORM](#5-example-of-using-the-module)</br>
+[5. Using the Module with ORM](#5-using-the-module-with-orm)</br>
 [6. Related Documentation](#6-related-documentation)</br>
 [7. Contributing](#7-contributing)</br>
 [8 License](#8-license)</br>
