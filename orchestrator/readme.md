@@ -18,7 +18,7 @@
 
 
 ## **1. Overview**
-The **OCI Open LZ Orchestrator Terraform module** enables the **provisioning and change** of **Terraform OCI CIS v3 resources** in **one single operation**. With this capability, cloud operations on any landing zone following this model tend to be very simple, as it is possible to use different types of resources in one command, and this module will sort out the Terraform resource dependency graph for you.
+The **OCI Open LZ Orchestrator Terraform module** enables the **provisioning and change** of **Terraform OCI CIS LZ Enhanced Modules resources** in **one single operation**. With this capability, cloud operations on any landing zone following this model tend to be very simple, as it is possible to use different types of resources in one command, and this module will sort out the Terraform resource dependency graph for you.
 
 In the current version, the following resources are integrated or being integrated:
 
