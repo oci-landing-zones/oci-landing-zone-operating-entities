@@ -3,8 +3,8 @@
 
 
 title: "An OCI Open Landing Zone Stack: OP.01 – Manage Shared Services"
-stackDescription: "Creates or changes the shared elements of the OCI Open Landing Zone."
-description: "Creates or changes the shared elements of the OCI Open Landing Zone."
+stackDescription: "Creates or changes the shared elements of the OCI Open Landing Zone. The Working directory must be set to: terraform-oci-open-lz-master/orchestrator/orm-facade"
+description: "Creates or changes the shared elements of the OCI Open Landing Zone. reates or changes the shared elements of the OCI Open Landing Zone. The Working directory must be set to: terraform-oci-open-lz-master/orchestrator/orm-facade"
 schemaVersion: 1.1.0
 version: "0.0.1"
 locale: "en"
