@@ -967,12 +967,6 @@ network_configuration:
                   path: "/"
                 name: backend-set-01
                 policy: LEAST_CONNECTIONS
-            certificates:
-              LB-1-CERT-1-KEY:
-                ca_certificate: "~/certs/ca.crt"
-                certificate_name: lb1-cert1
-                private_key: "~/certs/my_cert.key"
-                public_certificate: "~/certs/my_cert.crt"
             cipher_suites:
               EXAMPLE-01-LB-CIPHER-SUITE-01-KEY:
                 ciphers:
@@ -998,27 +992,6 @@ network_configuration:
                 name: lb1-lsnr1-80
                 port: '80'
                 protocol: HTTP
-              LB1-LSNR-2-443:
-                connection_configuration:
-                  idle_timeout_in_seconds: 1200
-                default_backend_set_key: EXAMPLE-01-LB-BCK-END-SET-01
-                hostname_keys:
-                - LB1-HOSTNAME-1-KEY
-                - LB1-HOSTNAME-2-KEY
-                name: lb1-lsnr2-443
-                path_route_set_key: EXMPL_01_PATH_ROUTE_SET_01_KEY
-                port: '443'
-                protocol: HTTP
-                routing_policy_key:
-                rule_set_keys:
-                - LB1-RULE-SET-1-KEY
-                ssl_configuration:
-                  certificate_key: LB-1-CERT-1-KEY
-                  protocols:
-                  - TLSv1.2
-                  server_order_preference: ENABLED
-                  verify_depth: 3
-                  verify_peer_certificate: false
             network_security_group_keys:
             - NSG-02-OE01-P-VCN-KEY
             path_route_sets:
