@@ -3,14 +3,11 @@
 
 
 title: "An OCI Open Landing Zone Stack: OP.01 – Manage Shared Services"
-stackDescription: "Creates or changes the shared elements of the OCI Open Landing Zone. The Working directory must be set to: terraform-oci-open-lz-master/orchestrator/orm-facade"
-description: "Creates or changes the shared elements of the OCI Open Landing Zone. reates or changes the shared elements of the OCI Open Landing Zone. The Working directory must be set to: terraform-oci-open-lz-master/orchestrator/orm-facade"
+stackDescription: "Creates or changes the shared elements of the OCI Open Landing Zone."
+description: "Creates or changes the shared elements of the OCI Open Landing Zone. reates or changes the shared elements of the OCI Open Landing Zone."
 schemaVersion: 1.1.0
 version: "0.0.1"
 locale: "en"
-
-workingDirectory: terraform-oci-open-lz-master/orchestrator/orm-facade
-name: oci-open-landing-zone
 
 # URL of CIS Landing Zone logo icon used on Application Information tab.
 logoUrl: "https://objectstorage.us-ashburn-1.oraclecloud.com/p/taf6kC9fSJyQDNSYbxvqxS_JsdnSu56oFZ3-1h5vI7-WfJUv77mplChopLxZPePW/n/ociateam/b/cis-landing-zone/o/landing_zone_130.png"
