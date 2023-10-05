@@ -1,6 +1,5 @@
 # The OCI Open LZ Orchestrator Module
 
-[![Deploy_To_OCI](../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip)
 
 
 ## **Table of Contents**
@@ -204,6 +203,16 @@ The input parameters for the module can be divided into 3 categories, for which 
 ## **5. Example of Using the Module**
 
 Refer to the examples presented on the [OCI Open LZ Runtime View](/examples/oci-open-lz/readme.md).
+
+For an ad-hoc use where you can select your resources, follow these guidelines:
+1. [![Deploy_To_OCI](../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip)
+2. Accept terms,  wait for the configuration to load. 
+3. Set the working directory to “orm-facade”. 
+4. Set the stack name you prefer.
+5. Set the terraform version to 1.2.x. Click Next. 
+6. Add your json/yaml configuration files. Click Next.
+8. Un-check run apply. Click Create.
+
 
 &nbsp; 
 
