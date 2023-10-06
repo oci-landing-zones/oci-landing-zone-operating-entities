@@ -244,10 +244,10 @@ Run ```terraform plan`````` with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../examples/oci-open-lz/shared/oci-credentials.tfvars.json \
--var-file ../examples/oci-open-lz/shared/open_lz_shared_identity.auto.tfvars.json \
--var-file ../examples/oci-open-lz/shared/open_lz_shared_network.auto.tfvars.json \
--state ../examples/oci-open-lz/shared/terraform.tfstate
+-var-file ../examples/oci-open-lz/op01_manage_shared_services/oci-credentials.tfvars.json \
+-var-file ../examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json \
+-var-file ../examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json \
+-state ../examples/oci-open-lz/op01_manage_shared_services/terraform.tfstate
 ```
 
 After the execution please analyze the output of the command above and check if it corresponds to your desired configuration.
@@ -264,10 +264,10 @@ Run ```terraform apply``` with the IAM and Network configuration. After its exec
 
 ```
 terraform apply \
--var-file ../examples/oci-open-lz/shared/oci-credentials.tfvars.json \
--var-file ../examples/oci-open-lz/shared/open_lz_shared_identity.auto.tfvars.json \
--var-file ../examples/oci-open-lz/shared/open_lz_shared_network.auto.tfvars.json \
--state ../examples/oci-open-lz/shared/terraform.tfstate
+-var-file ../examples/oci-open-lz/op01_manage_shared_services/oci-credentials.tfvars.json \
+-var-file ../examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json \
+-var-file ../examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json \
+-state ../examples/oci-open-lz/op01_manage_shared_services/terraform.tfstate
 ```
 
 Depending on your JSON configuration configurations the output of the ```terraform apply``` should be identical or similar to this [example](./tf_apply_output_example.out).

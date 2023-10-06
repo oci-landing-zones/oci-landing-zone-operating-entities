@@ -269,10 +269,10 @@ Run ```terraform plan``` with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../examples/oci-open-lz/operating-entities/oe01/oci-credentials.tfvars.json \
--var-file ../examples/oci-open-lz/operating-entities/oe01/open_lz_oe_01_identity.auto.tfvars.json \
--var-file ../examples/oci-open-lz/operating-entities/oe01/open_lz_oe_01_network.auto.tfvars.json \
--state ../examples/oci-open-lz/operating-entities/oe01/terraform.tfstate
+-var-file ../examples/oci-open-lz/op02_manage_oes/oe01/oci-credentials.tfvars.json \
+-var-file ../examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json \
+-var-file ../examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json \
+-state ../examples/oci-open-lz/op02_manage_oes/oe01/terraform.tfstate
 ```
 
 After the execution please analyze the output of the command above and check if it corresponds to your desired configuration.
@@ -289,10 +289,10 @@ Run ```terraform apply``` with the IAM and Network configuration. After its exec
 
 ```
 terraform apply \
--var-file ../examples/oci-open-lz/operating-entities/oe01/oci-credentials.tfvars.json \
--var-file ../examples/oci-open-lz/operating-entities/oe01/open_lz_oe_01_identity.auto.tfvars.json \
--var-file ../examples/oci-open-lz/operating-entities/oe01/open_lz_oe_01_network.auto.tfvars.json \
--state ../examples/oci-open-lz/operating-entities/oe01/terraform.tfstate
+-var-file ../examples/oci-open-lz/op02_manage_oes/oe01/oci-credentials.tfvars.json \
+-var-file ../examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json \
+-var-file ../examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json \
+-state ../examples/oci-open-lz/op02_manage_oes/oe01/terraform.tfstate
 ```
 
 Depending on your JSON configuration configurations the output of the ```terraform apply``` should be identical or similar to this [example](./tf_apply_output_example.out).
