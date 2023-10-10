@@ -37,7 +37,7 @@ For authenticating against the OCI tenancy terraform execute the following [inst
 
 ## **3. Setup IAM Configuration**
 
-For configuring and running the OCI Open LZ Manage Dept IAM layer use the following JSON file: [open_lz_oe_01_prod_dep_a_identity.auto.tfvars.json](./open_lz_oe_01_prod_dept_a_identity.auto.tfvars.json). You can customize this  configuration to fit your exact OCI IAM topology.
+For configuring and running the OCI Open LZ Manage Dept IAM layer use the following JSON file: [open_lz_oe_01_prod_deptA_identity.auto.tfvars.json](./open_lz_oe_01_prod_deptA_identity.auto.tfvars.json). You can customize this  configuration to fit your exact OCI IAM topology.
 
 This configuration file will cover the following four categories of resources described in the next sections.
 
@@ -153,24 +153,11 @@ For an example of such configuration and for extended documentation please refer
 
 &nbsp; 
 
-## **4. Setup Network Configuration**
 
-At the department level, it is not proposed in the Open LZ design any network artifact belonging at department level. However, you have to supply an empty networking JSON configuration file in order to being able to create the compartment structure.
-
-
-```
-{
-    "network_configuration": {
-    }
-}   
-```
-
+## **4. Run the Configurations**
 &nbsp; 
 
-## **5. Run the Configurations**
-&nbsp; 
-
-### **5.1 Clone this Git repo to your Machine**
+### **4.1 Clone this Git repo to your Machine**
 
 ```
 git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.0.0
@@ -180,19 +167,19 @@ For referring to a specific module version, append *ref=\<version\>* to the *sou
 
 &nbsp; 
 
-###  **5.2 Change the Directory to the Terraform Orchestrator Module**
+###  **4.2 Change the Directory to the Terraform Orchestrator Module**
 
  Change the directory to the [```terraform-oci-open-lz/orchestrator```](../../../orchestrator/) terraform orchestrator module.
 
 &nbsp; 
 
- ### **5.3 Run ```terraform init```**
+ ### **4.3 Run ```terraform init```**
 
 Run terraform init to download all the required external terraform providers and terraform modules. See [command example](./tf_init_output_example.out) for more details on the expected output.
 
 &nbsp; 
 
- ### **5.4 Run ```terraform plan```**
+ ### **4.4 Run ```terraform plan```**
 
 Run ```terraform plan``` with the IAM and Network configuration.
 
@@ -200,7 +187,6 @@ Run ```terraform plan``` with the IAM and Network configuration.
 terraform plan \
 -var-file ../examples/oci-open-lz/op03_manage_department/oci-credentials.tfvars.json \
 -var-file ../examples/oci-open-lz/op03_manage_department/oe01/open_lz_oe_01_identity.auto.tfvars.json \
--var-file ../examples/oci-open-lz/op03_manage_department/open_lz_oe_01_network.auto.tfvars.json \
 -state ../examples/oci-open-lz/op03_manage_department/terraform.tfstate
 ```
 
@@ -212,7 +198,7 @@ The ideal scenario regarding the **state file** will be for each configuration t
 
 &nbsp; 
 
-### **5.5 Run ```terraform apply```**
+### **4.5 Run ```terraform apply```**
 
 Run ```terraform apply``` with the IAM and Network configuration. After its execution the configured resources will be provisioned or updated on OCI.
 
@@ -220,7 +206,6 @@ Run ```terraform apply``` with the IAM and Network configuration. After its exec
 terraform apply \
 -var-file ../examples/oci-open-lz/op03_manage_department/oci-credentials.tfvars.json \
 -var-file ../examples/oci-open-lz/op03_manage_department/open_lz_oe_01_identity.auto.tfvars.json \
--var-file ../examples/oci-open-lz/op03_manage_department/open_lz_oe_01_network.auto.tfvars.json \
 -state ../examples/oci-open-lz/op03_manage_department/terraform.tfstate
 ```
 
