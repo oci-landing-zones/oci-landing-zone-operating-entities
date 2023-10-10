@@ -37,7 +37,7 @@ For authenticating against the OCI tenancy terraform execute the following [inst
 
 ## **3. Setup IAM Configuration**
 
-For configuring and running the OCI Open LZ Manage Dept IAM layer use the following JSON file: [open_lz_oe_01_prod_dep_a_identity.auto.tfvars.json](./open_lz_oe_01_prod_dept_a_identity.auto.tfvars.json). You can customize this  configuration to fit your exact OCI IAM topology.
+For configuring and running the OCI Open LZ Manage Dept IAM layer use the following JSON file: [open_lz_oe_01_prod_deptA_identity.auto.tfvars.json](./open_lz_oe_01_prod_deptA_identity.auto.tfvars.json). You can customize this  configuration to fit your exact OCI IAM topology.
 
 This configuration file will cover the following four categories of resources described in the next sections.
 
