@@ -51,7 +51,7 @@ The diagram below identifies the compartments in the scope of this operation.
 
 &nbsp; 
 
-![Diagram](diagrams/OCI_Open_LZ_SharedInfrastructure_Compartments.png)
+![Diagram](diagrams/OCI_Open_LZ_SharedInfrastructure_Compartments.jpg)
 
 &nbsp; 
 
@@ -202,7 +202,7 @@ For configuring the OCI Open LZ Shared Infrastructure Network layer open and edi
 
 &nbsp; 
 
-![Network Diagram](./diagrams/OCI_Open_LZ_SharedInfrastructure_Network.png)
+![Network Diagram](./diagrams/OCI_Open_LZ_SharedInfrastructure_Network.jpg)
 
 
 You can customize this JSON configuration to fit your exact OCI Networking topology. This Terraform automation is extremely versatible and can support any type of network topology. 
