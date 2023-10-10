@@ -21,22 +21,22 @@ Find available the [drawio file](/design/models/OCI_OpenLZ_Models.drawio) for fu
 ## Model 1 - The OE/BU Landing Zone
 &nbsp; 
 
-<img src="../../images/models/oci_landingzone_model1_oedriven.png" width="1000" height="value">
+<img src="../../images/models/oci_landingzone_model1_oedriven.jpg" width="1000" height="value">
 &nbsp; 
 
 ## Model 2 - The Service Landing Zone
 &nbsp; 
-<img src="../../images/models/oci_landingzone_model2_servicedriven.png" width="1000" height="value">
+<img src="../../images/models/oci_landingzone_model2_servicedriven.jpg" width="1000" height="value">
 &nbsp; 
 
 ## Model 3 - The Environment Landing Zone
 &nbsp; 
-<img src="../../images/models/oci_landingzone_model3_environmentdriven.png" width="1000" height="value">
+<img src="../../images/models/oci_landingzone_model3_environmentdriven.jpg" width="1000" height="value">
 &nbsp; 
 
 ## Model 4 - The Project Landing Zone
 &nbsp; 
-<img src="../../images/models/oci_landingzone_model4_projectdriven.png" width="1000" height="value">
+<img src="../../images/models/oci_landingzone_model4_projectdriven.jpg" width="1000" height="value">
 &nbsp; 
 
 &nbsp; 
