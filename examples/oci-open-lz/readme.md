@@ -4,15 +4,33 @@ The **examples** section presents **OCI Open LZ Runtime View**, i.e., the **day 
 
 &nbsp; 
 
-## Operation Scenarios / Running Examples
+## Segregating Operational Responsibilities
 
-The operations scenarios are one of the most important elements of this blueprint, as they represent the use cases and its key activities on the OCI Open LZ that create or update resources. 
+The **operations scenarios** are one of the most important elements of this blueprint, as they represent the use cases and its key activities on the OCI Open LZ that create or update resources. 
 
 An operation scenario is normally triggered by a service request, on a ticketing system. In a more formal definition, it should be seen as an operational process, which is a set of correlated activities executed as one unit of work, with its own frequency. The owner of each scenario will be the cloud operations team which has associated OCI Groups and Policies that allow the management of those resources. 
 
-In the current version, the following operations scenarios are available with their **runtime configurations**, ready for execution with **Terraform CLI** or **Oracle Resource Manager** (ORM):
-1. [**OP.01 – Manage Shared Services:**](/examples/oci-open-lz/op01_manage_shared_services/readme.md) Creates or changes the shared elements of the landing zone and applies posture management.
-2. [**OP.02 – Manage OE:**](/examples/oci-open-lz/op02_manage_oes/oe01/readme.md) Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.
-3. [**OP.03 – Manage Department:**](/examples/oci-open-lz/op03_manage_department/readme.md) Creates and changes a new department structure to receive department projects.
-4. [**OP.04 - Manage Project Environment:**](/examples/oci-open-lz/op04_manage_projects/readme.md) Creates or changes a project with the related environments and application layers.
-5. **OP.05 – Manage PoC Project:** Creates or changes a PoC project in the OE Sandbox environment.
+Note the distribution of operations between cloud operations teams is a design topic on the OCI Open LZ Operations View. 
+
+&nbsp; 
+
+## Central Operations Team - Operations Scenarios
+
+Per OCI Open LZ Design, this team is responsible for managing the landing zone share resources and OEs network resources, and can execute the following operations:
+
+- [**OP.01 – Manage Shared Services:**](/examples/oci-open-lz/op01_manage_shared_services/readme.md) Creates or changes the shared elements of the landing zone and applies posture management.
+- [**OP.02 – Manage OE:**](/examples/oci-open-lz/op02_manage_oes/oe01/readme.md) Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.
+  
+Each scenario has its **runtime configurations** ready for execution with **Terraform CLI** or **Oracle Resource Manager** (ORM).
+
+&nbsp; 
+
+## OE Operations Teams - Operations Scenarios
+
+Per OCI Open LZ Design, these teams, one per OE, are responsible for managing the OE resources such as projects and PoC, and can execute the following operations:
+
+- [**OP.03 – Manage Department:**](/examples/oci-open-lz/op03_manage_department/readme.md) Creates and changes a new department structure to receive department projects.
+- [**OP.04 - Manage Project Environment:**](/examples/oci-open-lz/op04_manage_projects/readme.md) Creates or changes a project with the related environments and application layers.
+- **OP.05 – Manage PoC Project:** Creates or changes a PoC project in the OE Sandbox environment.
+
+Each scenario has its **runtime configurations** ready for execution with **Terraform CLI** or **Oracle Resource Manager** (ORM).
