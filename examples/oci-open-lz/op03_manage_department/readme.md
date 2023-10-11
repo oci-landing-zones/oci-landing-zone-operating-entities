@@ -49,7 +49,7 @@ The diagram below identifies the compartments in the scope of this operation.
 
 &nbsp; 
 
-![Diagram](./diagrams/OCI_Open_LZ_OP03_ManageDept_Compartments.png)
+![Diagram](./diagrams/OCI_Open_LZ_OP03_ManageDept_Compartments.jpg)
 
 &nbsp; 
 
