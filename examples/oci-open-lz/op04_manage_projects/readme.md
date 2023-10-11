@@ -51,7 +51,7 @@ The diagram below identifies the compartments in the scope of this operation.
 
 &nbsp; 
 
-![Diagram](diagrams/OCI_Open_LZ_OP04_ManageProj_Compartments.png)
+![Diagram](diagrams/OCI_Open_LZ_OP04_ManageProj_Compartments.jpg)
 
 &nbsp; 
 
@@ -194,7 +194,7 @@ For configuring the OCI Open LZ OE01 Project environment Network layer open and 
 
 &nbsp; 
 
-![Network Diagram](./diagrams/OCI_Open_LZ_OP04_ManageProj_Network.png)
+![Network Diagram](./diagrams/OCI_Open_LZ_OP04_ManageProj_Network.jpg)
 
 
 You can customize this json configuration to fit your exact OCI Networking topology. This terraform automation is extremely versatible and can support any type of network topology. 
