@@ -1,0 +1,20 @@
+---
+compartments_configuration:
+  enable_delete: 'true'
+  default_parent_ocid: ocid1.compartment.oc1..aaaaaaaaxfarkh5iv5koprnn4lv2plfewtcejhsp2u5cktvof74oqs6wouea
+  compartments:
+    CMP-OE01-PROD-DEPT-A-KEY:
+      name: cmp-oe1-p-deptA
+      description: oci-open-lz-customer OE-01 Production environment, Department A
+        compartment
+      defined_tags:
+      freeform_tags:
+        oci-open-lz: oci-open-lz-oe01
+        oci-open-lz-customer: oci-open-lz-customer
+        oci-open-lz-cmp: oe-top
+groups_configuration:
+  groups: {}
+dynamic_groups_configuration:
+  dynamic_groups: {}
+policies_configuration:
+  supplied_policies: {}
