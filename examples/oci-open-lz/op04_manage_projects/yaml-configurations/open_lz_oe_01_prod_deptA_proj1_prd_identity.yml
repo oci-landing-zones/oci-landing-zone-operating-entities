@@ -1,0 +1,62 @@
+---
+compartments_configuration:
+  enable_delete: 'true'
+  default_parent_ocid: ocid1.compartment.oc1..aaaaaaaahbecq4nmlp6vvofm4kg5v7soryyrft2kb5iptugx7noumwwez2bq
+  compartments:
+    CMP-OE01-PROD-DEPT-A-PROJ1-PRD-KEY:
+      name: cmp-oe01-p-deptA-proj1-prd
+      description: oci-open-lz-customer OE-01 Production environment, Department A
+        compartment, Project 1, Production env
+      parent_id: ocid1.compartment.oc1..aaaaaaaahbecq4nmlp6vvofm4kg5v7soryyrft2kb5iptugx7noumwwez2bq
+      defined_tags:
+      freeform_tags:
+        oci-open-lz: openlz-shared
+        oci-open-lz-customer: oci-open-lz-customer
+        oci-open-lz-cmp: security
+      children:
+        CMP-OE01-PROD-DEPT-A-PROJ1-PRD-APP-KEY:
+          name: cmp-oe01-p-deptA-proj1-prd-app
+          description: oci-open-lz-customer OE-01 Production environment, Department
+            A compartment, Project 1, Production env, Application layer
+          defined_tags:
+          freeform_tags:
+            oci-open-lz: cmp-oe01-p-deptA-proj1-prd-app
+            oci-open-lz-customer: oci-open-lz-customer
+            oci-open-lz-cmp: oe01-prod-deptA-proj1-prd-app
+          CMP-OE01-PROD-DEPT-A-PROJ1-PRD-DB-KEY:
+            name: cmp-oe01-p-deptA-proj1-prd-db
+            description: oci-open-lz-customer OE-01 Production environment, Department
+              A compartment, Project 1, Production env, Database layer
+            defined_tags:
+            freeform_tags:
+              oci-open-lz: cmp-oe01-p-deptA-proj1-prd-db
+              oci-open-lz-customer: oci-open-lz-customer
+              oci-open-lz-cmp: oe01-prod-deptA-proj1-prd-db
+          CMP-OE01-COMMON-NETWORK-KEY:
+            name: cmp-oe01-p-deptA-proj1-prd-infra
+            description: oci-open-lz-customer OE-01 Production environment, Department
+              A compartment, Project 1, Production env, Infrastructure layer
+            defined_tags:
+            freeform_tags:
+              oci-open-lz: cmp-oe01-p-deptA-proj1-prd-infra
+              oci-open-lz-customer: oci-open-lz-customer
+              oci-open-lz-cmp: oe01-prod-deptA-proj1-prd-infra
+groups_configuration:
+  default_defined_tags:
+  default_freeform_tags:
+  groups:
+    GRP-OE01-PROD-DEPTA-PROJ1-PRD-APP-ADMINS:
+      name: grp-pa-oe01-prod-deptA-proj1-prd-app-admins
+      description: GRP.OE.03 Group responsible for administrating OE01/PROD/DEPT_A/PROJ1/APP
+        related applications.
+    GRP-OE01-PROD-DEPTA-PROJ1-PRD-DB-ADMINS:
+      name: grp-pa-oe01-prod-deptA-proj1-prd-db-admins
+      description: GRP.OE.04 Group responsible for administrating OE01/PROD/DEPT_A/PROJ1/APP
+        related databases.
+dynamic_groups_configuration:
+  dynamic_groups: {}
+policies_configuration:
+  enable_compartment_level_template_policies: 'false'
+  enable_tenancy_level_template_policies: 'false'
+  enable_cis_benchmark_checks: 'false'
+  groups_with_tenancy_level_roles: []
