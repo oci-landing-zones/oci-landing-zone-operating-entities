@@ -24,7 +24,7 @@
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../design/OCI_Open_LZ.pdf) |
 | **PRE-ACTIVITIES** | Deploy CIS LZ  |
 | **POST-ACTIVITIES** | N/A |
-| **RUN WITH ORM** | 1. [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-ebs-lz/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-ebs-lz/ebs_network_rt_sl_v1.auto.tfvars.json"}) </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “orm-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the defaul configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create. |
+| **RUN WITH ORM** | TBC |
 | **CONFIG & RUN - TERRAFORM CLI** | Follow the steps below. |
 
 &nbsp; 
