@@ -48,7 +48,7 @@ This configuration file will cover the following four categories of resources de
 
 The diagram below identifies the compartments in the scope of this operation.
 &nbsp; 
-![Diagram](diagrams/IAM.png)
+![Diagram](diagrams/Compartments.png)
 &nbsp; 
 
 The corresponding json configuration for the compartment topology described above is: 
