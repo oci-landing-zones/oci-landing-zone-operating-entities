@@ -135,7 +135,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **3.3 Policies**
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Policies topology, from the shared infrastructure configuration example this is not yet covered.
+Although the [OCI Open LZ design document](../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Policies topology, from the shared infrastructure configuration example this is not yet covered.
 
 Meanwhile, you can proceed by updating with the desired policies, or use the following example:
 
@@ -155,7 +155,6 @@ Meanwhile, you can proceed by updating with the desired policies, or use the fol
                     "allow group ebslz-ebs-prod-admin-group to manage load-balancers in compartment ebslz-ebs-prod-cmp",
                     "allow group ebslz-ebs-prod-admin-group to manage volume-family in compartment ebslz-ebs-prod-cmp",
                     "allow group ebslz-ebs-prod-admin-group to manage tag-namespaces in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read all-resources in compartment ebslz-ebs-prod-cmp",
                     "allow group ebslz-ebs-prod-admin-group to manage alarms in compartment ebslz-ebs-prod-cmp",
                     "allow group ebslz-ebs-prod-admin-group to manage metrics in compartment ebslz-ebs-prod-cmp",
                     "allow group ebslz-ebs-prod-admin-group to manage object-family in compartment ebslz-ebs-prod-cmp",
@@ -175,9 +174,7 @@ Meanwhile, you can proceed by updating with the desired policies, or use the fol
                     "allow group ebslz-ebs-prod-admin-group to manage object-family in compartment ebslz-ebs-prod-cmp",
                     "allow group ebslz-ebs-prod-admin-group to manage repos in compartment ebslz-ebs-prod-cmp",
                     "allow group ebslz-ebs-prod-admin-group to manage cloudevents-rules in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage alarms in compartment ebslz-ebs-prod-cmp",
                     "allow group ebslz-ebs-prod-admin-group to manage metrics in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage logs in compartment ebslz-ebs-prod-cmp",
                     "allow group ebslz-ebs-prod-admin-group to read instance-images in compartment ebslz-ebs-prod-cmp",
                     "allow group ebslz-ebs-prod-admin-group to read app-catalog-listing in compartment ebslz-ebs-prod-cmp"
                 ]
@@ -257,9 +254,9 @@ Meanwhile, you can proceed by updating with the desired policies, or use the fol
                 "compartment_ocid": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
                 "statements": [
                     "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read virtual-network-family in compartment ebslz-network-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nonprod-admin-groupto use vnics in compartment ebslz-network-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nonprod-admin-group to use vnics in compartment ebslz-network-cmp",
                     "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage private-ips in compartment ebslz-network-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nonprod-admin-groupto use subnets in compartment ebslz-network-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nonprod-admin-group to use subnets in compartment ebslz-network-cmp",
                     "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use network-security-groups in compartment ebslz-network-cmp"
                 ]
             },
