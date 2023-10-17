@@ -21,7 +21,7 @@
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: Route tables, Security Lists  |
 | **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
 | **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](ebs_network_rt_sl_v1.auto.tfvars.json) |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../design/OCI_Open_LZ.pdf) |
+| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../design/OCI_Open_LZ.pdf) |
 | **PRE-ACTIVITIES** | Deploy CIS LZ  |
 | **POST-ACTIVITIES** | N/A |
 | **RUN WITH ORM** | TBC |
@@ -31,7 +31,7 @@
 
 ## **2. Setup Terraform Authentication**
 
-For authenticating against the OCI tenancy terraform execute the following [instructions](../common_terraform_authentication.md).
+For authenticating against the OCI tenancy terraform execute the following [instructions](../oci-open-lz/common_terraform_authentication.md).
 
 
 &nbsp; 
