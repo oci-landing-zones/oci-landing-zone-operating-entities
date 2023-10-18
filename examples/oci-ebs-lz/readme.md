@@ -7,6 +7,7 @@
 [3. Setup IAM Configuration](#3-setup-iam-configuration)</br>
 [4. Setup Network Configuration](#4-setup-network-configuration)</br>
 [5. Run the Configurations (TF Plan & Apply)](#5-run-the-configurations)</br>
+[6. Known Issues](#6-Known-issues)</br>
 
 
 &nbsp; 
@@ -21,17 +22,17 @@
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: Route tables, Security Lists  |
 | **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
 | **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](ebs_network_rt_sl_v1.auto.tfvars.json) |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../design/OCI_Open_LZ.pdf) |
+| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../design/OCI_Open_LZ.pdf) |
 | **PRE-ACTIVITIES** | Deploy CIS LZ  |
 | **POST-ACTIVITIES** | N/A |
-| **RUN WITH ORM** | TBC |
+| **RUN WITH ORM** | TBC|
 | **CONFIG & RUN - TERRAFORM CLI** | Follow the steps below. |
 
 &nbsp; 
 
 ## **2. Setup Terraform Authentication**
 
-For authenticating against the OCI tenancy terraform execute the following [instructions](../oci-open-lz/common_terraform_authentication.md).
+For authenticating against the OCI tenancy terraform execute the following [instructions](../common_terraform_authentication.md).
 
 
 &nbsp; 
@@ -40,7 +41,7 @@ For authenticating against the OCI tenancy terraform execute the following [inst
 
 For configuring and running the Open LZ EBS extension IAM layer use the following JSON file: [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](ebs_identity_cmp_grp_pl_v1.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
-This configuration file will cover the following four categories of resources described in the next sections.
+This configuration file will cover the following three categories of resources described in the next sections.
 
 &nbsp; 
 
@@ -48,7 +49,7 @@ This configuration file will cover the following four categories of resources de
 
 The diagram below identifies the compartments in the scope of this operation.
 &nbsp; 
-![Diagram](diagrams/Compartments.png)
+![Diagram](diagrams/IAM.png)
 &nbsp; 
 
 The corresponding json configuration for the compartment topology described above is: 
@@ -114,11 +115,11 @@ The diagram below identifies the groups in the scope of this operation.
                 "name": "ebslz-ebs-prod-admin-group",
                 "description": "EBS extension group for ebs prod management"
             },
-            "ebslz-ebs-nonprod-admin-group": {
+            "ebslz-ebs-nprod-admin-group": {
                 "name": "ebslz-ebs-nprod-admin-group",
                 "description": "EBS extension group for ebs Non prod management"
             },
-            "ebslz-ebs-mngmt-admin-group": {
+            "ebslz-ebs-mgt-admin-group": {
                 "name": "cislz-ebs-mgt-admin-group",
                 "description": "EBS extension group for ebs management"
             }
@@ -135,152 +136,154 @@ For an example of such configuration and for extended documentation please refer
 
 ### **3.3 Policies**
 
-Although the [OCI Open LZ design document](../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Policies topology, from the shared infrastructure configuration example this is not yet covered.
 
-Meanwhile, you can proceed by updating with the desired policies, or use the following example:
+**Note**: For each policy select your desired compartment_ocid
 
 ```
 ...
 
-    "policies_configuration": {
+"policies_configuration": {
         "supplied_policies": {
             "ebslz-ebs-prod-admin-policy": {
                 "name": "ebslz-ebs-prod-admin-policy",
                 "description": "ebs policy",
-                "compartment_ocid": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": "ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
                 "statements": [
-                    "allow group ebslz-ebs-prod-admin-group to read all-resources in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage instance-family in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage database-family in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage load-balancers in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage volume-family in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage tag-namespaces in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage alarms in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage metrics in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage object-family in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage orm-stacks in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage orm-jobs in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage orm-config-source-providers in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read audit-events in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read work-requests in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage bastion-session in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read instance-agent-plugins in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage functions-family in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage api-gateway-family in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage ons-family in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage streams in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage cluster-family in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage logs in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage object-family in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage repos in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage cloudevents-rules in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage metrics in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read instance-images in compartment ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read app-catalog-listing in compartment ebslz-ebs-prod-cmp"
+                    "allow group ebslz-ebs-prod-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage instance-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage database-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage load-balancers in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage volume-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage tag-namespaces in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage alarms in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage metrics in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage orm-stacks in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage orm-jobs in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage orm-config-source-providers in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to read audit-events in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to read work-requests in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage bastion-session in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to read instance-agent-plugins in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage functions-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage api-gateway-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage ons-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage streams in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage cluster-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage logs in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage repos in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage cloudevents-rules in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage alarms in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage metrics in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to manage logs in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to read instance-images in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
+                    "allow group ebslz-ebs-prod-admin-group to read app-catalog-listing in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp"
                 ]
             },
             "ebslz-ebs-nprod-admin-policy": {
                 "name": "ebslz-ebs-nprod-admin-policy",
                 "description": "ebs non prod policy",
-                "compartment_ocid": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": "ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
                 "statements": [
-                    "allow group ebslz-ebs-nprod-admin-group to read all-resources in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage instance-family in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage database-family in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage load-balancers in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage volume-family in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage tag-namespaces in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read all-resources in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage alarms in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage metrics in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage object-family in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage orm-stacks in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage orm-jobs in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage orm-config-source-providers in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read audit-events in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read work-requests in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage bastion-session in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read instance-agent-plugins in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage functions-family in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage api-gateway-family in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage ons-family in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage streams in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage cluster-family in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage logs in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage object-family in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage repos in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage cloudevents-rules in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read instance-images in compartment ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read app-catalog-listing in compartment ebslz-ebs-nprod-cmp"
+                    "allow group ebslz-ebs-nprod-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage instance-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage database-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage load-balancers in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage volume-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage tag-namespaces in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage alarms in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage metrics in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage orm-stacks in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage orm-jobs in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage orm-config-source-providers in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to read audit-events in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to read work-requests in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage bastion-session in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to read instance-agent-plugins in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage functions-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage api-gateway-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage ons-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage streams in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage cluster-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage logs in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage repos in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to manage cloudevents-rules in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to read instance-images in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
+                    "allow group ebslz-ebs-nprod-admin-group to read app-catalog-listing in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp"
                 ]
             },
             "ebslz-ebs-mgt-admin-policy": {
                 "name": "ebslz-ebs-mgt-admin-policy",
                 "description": "ebs mngmt policy",
-                "compartment_ocid": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": "ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
                 "statements": [
-                    "allow group ebslz-ebs-mgt-admin-group to read all-resources in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage instance-family in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage database-family in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage load-balancers in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage volume-family in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage tag-namespaces in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to read all-resources in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage alarms in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage metrics in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage object-family in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage orm-stacks in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage orm-jobs in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage orm-config-source-providers in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to read audit-events in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to read work-requests in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage bastion-session in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to read instance-agent-plugins in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage functions-family in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage api-gateway-family in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage ons-family in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage streams in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage cluster-family in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage logs in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage object-family in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage repos in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage cloudevents-rules in compartment ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to read app-catalog-listing in compartment ebslz-ebs-mgt-cmp"
+                    "allow group ebslz-ebs-mgt-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage instance-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage database-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage load-balancers in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage volume-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage tag-namespaces in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage alarms in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage metrics in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage orm-stacks in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage orm-jobs in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage orm-config-source-providers in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to read audit-events in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to read work-requests in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage bastion-session in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to read instance-agent-plugins in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage functions-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage api-gateway-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage ons-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage streams in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage cluster-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage logs in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage repos in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to manage cloudevents-rules in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group to read app-catalog-listing in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp"
                 ]
             },
             "ebslz-ebs-network-admin-policy": {
                 "name": "ebslz-ebs-network-admin-policy",
                 "description": "ebs neetwork policy",
-                "compartment_ocid": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": "ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
                 "statements": [
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read virtual-network-family in compartment ebslz-network-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nonprod-admin-group to use vnics in compartment ebslz-network-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage private-ips in compartment ebslz-network-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nonprod-admin-group to use subnets in compartment ebslz-network-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use network-security-groups in compartment ebslz-network-cmp"
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read virtual-network-family in compartment ebslz1-network-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nonprod-admin-groupto use vnics in compartment ebslz1-network-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage private-ips in compartment ebslz1-network-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nonprod-admin-groupto use subnets in compartment ebslz1-network-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use network-security-groups in compartment ebslz1-network-cmp"
                 ]
             },
             "ebslz-ebs-security-admin-policy": {
                 "name": "ebslz-ebs-security-admin-policy",
                 "description": "ebs security policy",
-                "compartment_ocid": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": ""ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
                 "statements": [
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read vss-family in compartment ebslz-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use vaults in compartment ebslz-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read logging-family in compartment ebslz-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use bastion in compartment ebslz-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage bastion-session in compartment ebslz-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to inspect keys in compartment ebslz-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage cloudevents-rules in compartment ebslz-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage alarms in compartment ebslz-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage metrics in compartment ebslz-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read instance-agent-plugins in compartment ebslz-security-cmp"
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read vss-family in compartment ebslz1-security-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use vaults in compartment ebslz1-security-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read logging-family in compartment ebslz1-security-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use bastion in compartment ebslz1-security-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage bastion-session in compartment ebslz1-security-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to inspect keys in compartment ebslz1-security-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage cloudevents-rules in compartment ebslz1-security-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage alarms in compartment ebslz1-security-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage metrics in compartment ebslz1-security-cmp",
+                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read instance-agent-plugins in compartment ebslz1-security-cmp"
                 ]
             },
             "ebslz-ebs-root-admin-policy": {
-                "name": "ebslz-ebs-root-admin-policy",
+                "name": "cislz-ebs-root-admin-policy",
                 "description": "ebs root policy",
-                "compartment_ocid": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": ""ocid1.rootcompartment.oc1..aaaaaaaaxzexampleocid",
                 "statements": [
                     "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to inspect compartments in tenancy",
                     "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to inspect users in tenancy",
@@ -295,6 +298,8 @@ Meanwhile, you can proceed by updating with the desired policies, or use the fol
                 ]
             }
         }
+    }
+
   
 ...
 ```
@@ -308,7 +313,8 @@ For an example of such configuration and for extended documentation please refer
 ## **4. Setup Network Configuration**
 
 
-For configuring and running the Open LZ EBS extension Network layer use the following JSON file: ebs_network_rt_sl_v1.auto.tfvars.json .This configuration covers the following networking diagram.
+For configuring and running the Open LZ EBS extension Network layer use the following JSON file: [ebs_network_rt_sl_v1.auto.tfvars.json](ebs_network_rt_sl_v1.auto.tfvars.json)
+This configuration covers the following networking diagram. We are deploying Table routes and Security Lists.
 
 &nbsp; 
 
@@ -316,6 +322,11 @@ For configuring and running the Open LZ EBS extension Network layer use the foll
 
 For complete documentation and a larger set of examples on configuring an OCI networking topology using this json terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) documentation and examples.
 
+**Note:**
+&nbsp; 
+* change compartment_id with the OCID of the network cmp (created with CIS LZ in ##OP01)
+* change all vcn_id for the corresponding vcn of each route table.
+* change network_entity_id in route rules to the corresponding service gateways ids or drg ids.
 &nbsp; 
 
 ## **5. Run the Configurations**
@@ -324,10 +335,10 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 ### **5.1 Clone this Git repo to your Machine**
 
 ```
-git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.0.0
+git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git
 ```
 
-For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value.
+For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. Example: git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.0.0
 
 &nbsp; 
 
@@ -378,3 +389,29 @@ terraform apply \
 
 Depending on your json configuration configurations the output of the ```terraform apply``` should be identical or similar to this [example](./tf_apply_output_example.out).
 
+## **6. Known Issues**
+
+### **6.5 ```Policy error```**
+
+```
+400-InvalidParameter, Compartment {ebslz-ebs-cmp:ebslz-ebs-nprod-cmp} does not exist or is not part of the policy compartment subtree
+│ Suggestion: Please update the parameter(s) in the Terraform config as per error message Compartment {ebslz-ebs-cmp:ebslz-ebs-nprod-cmp} does not exist or is not part of the policy compartment subtree
+│ Documentation: https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_policy 
+│ API Reference: https://docs.oracle.com/iaas/api/#/en/identity/20160918/Policy/CreatePolicy 
+│ Request Target: POST https://identity.eu-frankfurt-1.oci.oraclecloud.com/20160918/policies 
+│ Provider version: 5.15.0, released on 2023-10-04. This provider is 2 Update(s) behind to current. 
+│ Service: Identity Policy 
+│ Operation Name: CreatePolicy 
+│ OPC request ID: 33ff328d7fe0175638e619bc27211854/3CD31809CBAC9EE12C6BE5D040D4D4E7/582906BF0BCFBB09FC88552AC6275DF7 
+│ 
+│ 
+│   with module.cislz_policies.oci_identity_policy.these["ebslz-ebs-nprod-admin-policy"],
+│   on .terraform/modules/cislz_policies/policies/main.tf line 22, in resource "oci_identity_policy" "these":
+│   22: resource "oci_identity_policy" "these" {
+│ 
+```
+**Analysis:**
+The compartment associated to the policy is not available during policy creation.
+
+**workaround:**
+Re-run the apply job.
