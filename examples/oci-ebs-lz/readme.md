@@ -2,12 +2,12 @@
 
 ## **Table of Contents**
 
-[1. Summary](#1-summary)</br>
-[2. Review the Design](#2-review-the-design)</br>
-[3. Setup IAM Configuration](#3-setup-iam-configuration)</br>
-[4. Setup Network Configuration](#4-setup-network-configuration)</br>
-[5. Run with ORM](#5-run-configurations-with-orm) or [6. Run with Terraform CLI](#6-run-configurations-with-terraform-cli)</br>
-[7. Known Issues](#7-known-issues)</br>
+1. [Summary](#1-summary)</br>
+2. [Review the Design](#2-review-the-design)</br>
+3. [Setup IAM Configuration](#3-setup-iam-configuration)</br>
+4. [Setup Network Configuration](#4-setup-network-configuration)</br>
+5. [Run with ORM](#5-run-configurations-with-orm) or 6. [Run with Terraform CLI](#6-run-configurations-with-terraform-cli)</br>
+6. [Known Issues](#7-known-issues)</br>
 
 
 &nbsp; 
