@@ -331,7 +331,7 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 
 ## **5. Run Configurations with ORM**
 &nbsp; 
-| |  |
+| STEP | ACTION |
 |---|---| 
 | 1 |  [![Deploy_To_OCI](../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-ebs-lz/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-ebs-lz/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json"}) |
 | 2 |  Accept terms,  wait for the configuration to load. 
