@@ -3,11 +3,11 @@
 ## **Table of Contents**
 
 [1. Summary](#1-summary)</br>
-[2. Setup Terraform Authentication](#2-setup-terraform-authentication)</br>
-[3. Setup IAM Configuration](#3-setup-iam-configuration)</br>
-[4. Setup Network Configuration](#4-setup-network-configuration)</br>
-[5. Run the Configurations (TF Plan & Apply)](#5-run-the-configurations)</br>
-[6. Known Issues](#6-Known-issues)</br>
+[2. Setup IAM Configuration](#2-setup-iam-configuration)</br>
+[3. Setup Network Configuration](#3-setup-network-configuration)</br>
+[4. Run with ORM](#4-run-configurations-with-orm)</br>
+[4. Run with Terraform CLI](#5-run-configurations-with-terraform-cli)</br>
+[5. Known Issues](#6-known-issues)</br>
 
 
 &nbsp; 
@@ -16,28 +16,21 @@
 
 | |  |
 |---|---| 
-| **OP. ID** | OP.02 |
-| **OP. NAME** | Deploy EBS resources | 
-| **OBJECTIVE** | Cover specific EBS network and security layers |
+| **OP. ID** | OP.EBS.01 |
+| **OP. NAME** | Manage EBS Landing Resources | 
+| **OBJECTIVE** | - Create compartments and IAM for EBS. </br>- Injecct into CIS LZ network Route Tables and Security List. |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: Route tables, Security Lists  |
 | **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
 | **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](ebs_network_rt_sl_v1.auto.tfvars.json) |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../design/OCI_Open_LZ.pdf) |
-| **PRE-ACTIVITIES** | Deploy CIS LZ  |
-| **POST-ACTIVITIES** | N/A |
-| **RUN WITH ORM** | TBC|
-| **CONFIG & RUN - TERRAFORM CLI** | Follow the steps below. |
-
-&nbsp; 
-
-## **2. Setup Terraform Authentication**
-
-For authenticating against the OCI tenancy terraform execute the following [instructions](../common_terraform_authentication.md).
+| **DETAILS** |  This EBS setup is an extension of the CIS OCI Landing Zone. |
+| **PRE-ACTIVITIES** | Deploy [CIS OCI Landing Zone](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/standard_landing_zones/cis_lz_v2/cis_landing_zone_v2.md).  |
+| **ACTIVITIES** | [1. Setup IAM Configuration](#3-setup-iam-configuration) </br>[2. Setup Network Configuration](#4-setup-network-configuration)</br>3. [Run with ORM](#4-run-configurations-with-orm) or with [Terraform CLI](#4-run-configurations-with-terraform-cli) . |
+| **POST-ACTIVITIES** | EBS Landing Zone is ready. Install EBS. |
 
 
 &nbsp; 
 
-## **3. Setup IAM Configuration**
+## **2. Setup IAM Configuration**
 
 For configuring and running the Open LZ EBS extension IAM layer use the following JSON file: [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](ebs_identity_cmp_grp_pl_v1.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
@@ -45,7 +38,7 @@ This configuration file will cover the following three categories of resources d
 
 &nbsp; 
 
-###  **3.1. Compartments**
+###  **2.1. Compartments**
 
 The diagram below identifies the compartments in the scope of this operation.
 &nbsp; 
@@ -97,7 +90,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 &nbsp; 
 
-### **3.2 Groups**
+### **2.2 Groups**
 
 The diagram below identifies the groups in the scope of this operation.
 
@@ -134,7 +127,7 @@ For an example of such configuration and for extended documentation please refer
 &nbsp; 
 
 
-### **3.3 Policies**
+### **2.3 Policies**
 
 
 **Note**: For each policy select your desired compartment_ocid
@@ -310,7 +303,7 @@ For an example of such configuration and for extended documentation please refer
 
 &nbsp; 
 
-## **4. Setup Network Configuration**
+## **3. Setup Network Configuration**
 
 
 For configuring and running the Open LZ EBS extension Network layer use the following JSON file: [ebs_network_rt_sl_v1.auto.tfvars.json](ebs_network_rt_sl_v1.auto.tfvars.json)
@@ -327,12 +320,37 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 * change compartment_id with the OCID of the network cmp (created with CIS LZ in ##OP01)
 * change all vcn_id for the corresponding vcn of each route table.
 * change network_entity_id in route rules to the corresponding service gateways ids or drg ids.
+
 &nbsp; 
 
-## **5. Run the Configurations**
+## **4. Run Configurations with ORM**
+&nbsp; 
+| |  |
+|---|---| 
+| 1 |  [![Deploy_To_OCI](../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-ebs-lz/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-ebs-lz/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json"}) |
+| 2 |  Accept terms,  wait for the configuration to load. 
+| 3 |  Set the working directory to “orm-facade”. | 
+| 4 | Set the stack name to "OP.EBS.01 - Manage EBS Landing Resources". | 
+| 5 | Set the terraform version to 1.2.x. Click Next. | 
+| 6 | Accept the defaul configurations. Click Next. Optionally, replace with your json/yaml config files. | 
+| 7 | Un-check run apply. Click Create.| 
+
+
 &nbsp; 
 
-### **5.1 Clone this Git repo to your Machine**
+
+## **5. Run Configurations with Terraform CLI**
+&nbsp; 
+
+### **5,1. Setup Terraform Authentication**
+
+For authenticating against the OCI tenancy terraform execute the following [instructions](../common_terraform_authentication.md).
+
+
+&nbsp; 
+
+
+### **5.2 Clone this Git repo to your Machine**
 
 ```
 git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git
@@ -342,19 +360,19 @@ For referring to a specific module version, append *ref=\<version\>* to the *sou
 
 &nbsp; 
 
-###  **5.2 Change the Directory to the Terraform Orchestrator Module**
+###  **5.3 Change the Directory to the Terraform Orchestrator Module**
 
  Change the directory to the [```terraform-oci-open-lz/orchestrator```](../../../../orchestrator/) terraform orchestrator module.
 
 &nbsp; 
 
- ### **5.3 Run ```terraform init```**
+ ### **5.4 Run ```terraform init```**
 
 Run terraform init to download all the required external terraform providers and terraform modules. See [command example](./tf_init_output_example.out) for more details on the expected output.
 
 &nbsp; 
 
- ### **5.4 Run ```terraform plan```**
+ ### **5.5 Run ```terraform plan```**
 
 Run terraform plan with the IAM and Network configuration.
 
@@ -374,7 +392,7 @@ The ideal scenario regarding the **state file** will be for each configuration t
 
 &nbsp; 
 
-### **5.5 Run ```terraform apply```**
+### **5.6 Run ```terraform apply```**
 
 Run terraform plan with the IAM and Network configuration. After  its execution the configured resources will be provisioned or updated on OCI.
 
@@ -391,7 +409,7 @@ Depending on your json configuration configurations the output of the ```terrafo
 
 ## **6. Known Issues**
 
-### **6.5 ```Policy error```**
+### **6.1 ```Policy error```**
 
 ```
 400-InvalidParameter, Compartment {ebslz-ebs-cmp:ebslz-ebs-nprod-cmp} does not exist or is not part of the policy compartment subtree
