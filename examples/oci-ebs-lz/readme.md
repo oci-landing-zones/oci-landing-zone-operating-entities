@@ -24,7 +24,7 @@
 | **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](ebs_network_rt_sl_v1.auto.tfvars.json) |
 | **DETAILS** |  This EBS setup is an extension of the CIS OCI Landing Zone. |
 | **PRE-ACTIVITIES** | Deploy [CIS OCI Landing Zone](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/standard_landing_zones/cis_lz_v2/cis_landing_zone_v2.md).  |
-| **ACTIVITIES** | [1. Setup IAM Configuration](#3-setup-iam-configuration) </br>[2. Setup Network Configuration](#4-setup-network-configuration)</br>3. [Run with ORM](#4-run-configurations-with-orm) or with [Terraform CLI](#4-run-configurations-with-terraform-cli) . |
+| **ACTIVITIES** | [1. Setup IAM Configuration](#2-setup-iam-configuration) </br>[2. Setup Network Configuration](#3-setup-network-configuration)</br>3. [Run with ORM](#4-run-configurations-with-orm) or with [Terraform CLI](#4-run-configurations-with-terraform-cli) . |
 | **POST-ACTIVITIES** | EBS Landing Zone is ready. Install EBS. |
 
 
