@@ -4,7 +4,7 @@
 
 Welcome to the OCI Landing Zone Models.
 
-The objective of this asset is to present the most-common landing zone models used with our costumers, as examples of landing zones tailored from the OCI Open LZ blueprint.
+The objective of this asset is to present the most common landing zone models used with our customers, as examples of landing zones tailored from the OCI Open LZ blueprint.
 
 There are four landing zone models:
 - Model 1 - The OE/BU Landing Zone
@@ -12,9 +12,9 @@ There are four landing zone models:
 - Model 3 - The Environment Landing Zone
 - Model 4 - The Project Landing Zone
 
-Note that others models exist, different or derivated from these ones. The objective is not to be exaustive, but to present different possible flavours.
+Note that other models exist, different or derivated from these. The objective is not to be exhaustive, but to present different possible flavors.
 
-Find available the [drawio file](/design/models/OCI_OpenLZ_Models.drawio) for further design activities on top of them.
+Find available the [draw.io file](/design/models/OCI_OpenLZ_Models.drawio) for further design activities on top of them.
 
 &nbsp; 
 
