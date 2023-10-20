@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Oracle and/or its affiliates.
 # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
+# User Credentials 
 variable "tenancy_ocid" {
   type    = string
   default = null
@@ -26,6 +27,8 @@ variable "home_region" {
   default = null
 }
 
+
+# Compartments Input Variable. Complex object with 6 hieararchial maps
 variable "compartments_configuration" {
   description = "The compartments configuration. Use the compartments attribute to define your topology. OCI supports compartment hierarchies up to six levels."
   type = object({
@@ -107,6 +110,7 @@ variable "compartments_configuration" {
   default = null
 }
 
+# Groups Input Variable. Complex object with one Map.
 variable "groups_configuration" {
   description = "The groups configuration."
   type = object({
@@ -124,6 +128,7 @@ variable "groups_configuration" {
   default = null
 }
 
+# Dynamic Groups Input Variable. Complex object with one Map.
 variable "dynamic_groups_configuration" {
   description = "The dynamic groups."
   type = object({
@@ -141,6 +146,8 @@ variable "dynamic_groups_configuration" {
   default = null
 }
 
+
+# Policies Input Variable. Complex object.
 variable "policies_configuration" {
   description = "Policies configuration"
   type = object({
@@ -156,7 +163,7 @@ variable "policies_configuration" {
       defined_tags     = optional(map(string))
       freeform_tags    = optional(map(string))
     })))
-    template_policies = optional(object({                        # An object describing the template policies. In this mode, policies are derived according to tenancy_level_settings and compartment_level_settings.
+    template_policies = optional(object({          # An object describing the template policies. In this mode, policies are derived according to tenancy_level_settings and compartment_level_settings.
       tenancy_level_settings = optional(object({                 # Settings for tenancy level (Root compartment) policies generation.
         groups_with_tenancy_level_roles = optional(list(object({ # A list of group names and their roles at the tenancy level. Template policies are granted to each group in the Root compartment.
           name  = string
@@ -192,6 +199,8 @@ variable "policies_configuration" {
   default = null
 }
 
+# Network Input Variable. 
+# Map of Categories
 variable "network_configuration" {
   type = object({
     default_compartment_id     = optional(string),
@@ -201,14 +210,18 @@ variable "network_configuration" {
     default_enable_cis_checks  = optional(bool),
     default_ssh_ports_to_check = optional(list(number)),
 
+    # Map of Categories. A category is an funnctional aggregation of resources such as: Production, Non-Production, etc.
     network_configuration_categories = optional(map(object({
+      
+      # Common elements for a category
       category_compartment_id     = optional(string),
       category_compartment_key    = optional(string),
       category_defined_tags       = optional(map(string)),
       category_freeform_tags      = optional(map(string)),
-      category_enable_cis_checks  = optional(bool),
-      category_ssh_ports_to_check = optional(list(number)),
+      category_enable_cis_checks  = optional(bool), # CIS Control variable. Default is true.
+      category_ssh_ports_to_check = optional(list(number)), # CIS Control. If category_enable_cis_checks is true it validates SSH ports against CIS best practices.
 
+      # Map of VCNs, Follows the OCI Resources native structure, as defined in the OCI Terraform provider and REST API.
       vcns = optional(map(object({
         compartment_id  = optional(string),
         compartment_key = optional(string),
@@ -226,6 +239,7 @@ variable "network_configuration" {
         defined_tags                     = optional(map(string)),
         freeform_tags                    = optional(map(string)),
 
+        # Map of VCN Security Lists
         security_lists = optional(map(object({
           compartment_id  = optional(string),
           compartment_key = optional(string),
@@ -260,6 +274,7 @@ variable "network_configuration" {
           })))
         })))
 
+        # Map of VCN Route Tables
         route_tables = optional(map(object({
           compartment_id  = optional(string),
           compartment_key = optional(string),
@@ -267,14 +282,16 @@ variable "network_configuration" {
           freeform_tags   = optional(map(string)),
           display_name    = optional(string),
           route_rules = optional(map(object({
-            network_entity_id  = optional(string),
-            network_entity_key = optional(string),
+            # TODO: id and key can be merged into one variable where the id/key logic is determind by a substring check.
+            network_entity_id  = optional(string), # Next hop OCID, use this when the target resources was created outside this automation.
+            network_entity_key = optional(string), # Next hop Key, use this when the target resources in this configuration.
             description        = optional(string),
-            destination        = optional(string),
-            destination_type   = optional(string)
+            destination        = optional(string), # Destination CIDR block
+            destination_type   = optional(string) # SERVICE_CIDR_BLOCK or CIDR_BLOCK
           })))
         })))
 
+        # Map of DHCP Options
         dhcp_options = optional(map(object({
           compartment_id   = optional(string),
           compartment_key  = optional(string),
@@ -290,6 +307,8 @@ variable "network_configuration" {
           }))
         })))
 
+        # Map of Subnets 
+        # TODO: OCI Resources that need to be related to these Subnets will need to reference the Subnet key on the output (e.g., Compute, Databases).
         subnets = optional(map(object({
           cidr_block      = string,
           compartment_id  = optional(string),
@@ -305,10 +324,13 @@ variable "network_configuration" {
           ipv6cidr_blocks            = optional(list(string)),
           prohibit_internet_ingress  = optional(bool),
           prohibit_public_ip_on_vnic = optional(bool),
-          route_table_key            = optional(string),
-          security_list_keys         = optional(list(string))
+          route_table_key            = optional(string), # Related route table key
+          security_list_keys         = optional(list(string)) # Related security lists keys (list of)
         })))
 
+        # Map of NSG. It's related to the parent VCN by hierarchy.
+        # TODO: OCI Resources that need to be related to these NSGs will need to reference the NSG key on the output (e.g., Compute, Databases).
+        # Load Balancer and Network Firewall are already integrated.
         network_security_groups = optional(map(object({
           compartment_id  = optional(string),
           compartment_key = optional(string),
@@ -343,6 +365,7 @@ variable "network_configuration" {
           })))
         })))
 
+        # Map of Specific Gateways 
         vcn_specific_gateways = optional(object({
           internet_gateways = optional(map(object({
             compartment_id  = optional(string),
@@ -351,7 +374,7 @@ variable "network_configuration" {
             defined_tags    = optional(map(string)),
             display_name    = optional(string),
             freeform_tags   = optional(map(string)),
-            route_table_key = optional(string)
+            route_table_key = optional(string) # Related route table. Enables the route incoming traffic to another resource (e.g., Firewall).
           })))
 
           nat_gateways = optional(map(object({
@@ -362,7 +385,7 @@ variable "network_configuration" {
             display_name    = optional(string),
             freeform_tags   = optional(map(string)),
             public_ip_id    = optional(string),
-            route_table_key = optional(string)
+            route_table_key = optional(string) # Related route table. Enables the route incoming traffic to another resource (e.g., Firewall).
           })))
 
           service_gateways = optional(map(object({
@@ -371,7 +394,7 @@ variable "network_configuration" {
             defined_tags    = optional(map(string)),
             display_name    = optional(string),
             freeform_tags   = optional(map(string)),
-            route_table_key = optional(string)
+            route_table_key = optional(string) # Related route table. Clarify use case.
           })))
 
           local_peering_gateways = optional(map(object({
@@ -382,7 +405,7 @@ variable "network_configuration" {
             freeform_tags   = optional(map(string)),
             peer_id         = optional(string),
             peer_key        = optional(string),
-            route_table_key = optional(string)
+            route_table_key = optional(string) # Related route table. Enables the route incoming traffic to another resource (e.g., Firewall).
           })))
         }))
       })))
