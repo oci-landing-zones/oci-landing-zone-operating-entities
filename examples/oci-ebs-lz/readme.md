@@ -335,7 +335,7 @@ The Open EBS LZ pattern includes these three operations:
 |---|---|---| 
 | ID | Description | Time | 
 | **[OP. ID.01](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/examples/oci-ebs-lz/op01-deploy-CIS)** | Deploy CIS. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services | 5' configuration + 10' deployment | 
-| **[OP. ID.02](https://github.com/paolajuarezgomez/OpenLZ/tree/master/examples/oci-ebs-lz/op02_deploy_Open_EBS_pattern)**| Deploy EBS extension. Include EBS network resources (spokes VCNs, Table Routes, Security Lists ), IAM EBS resources ( groups, policies) |  5' configuration + 10' deployment | 
+| **[OP. ID.02]([https://github.com/paolajuarezgomez/OpenLZ/tree/master/examples/oci-ebs-lz/op02_deploy_Open_EBS_pattern](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern)**| Deploy EBS extension. Include EBS network resources (spokes VCNs, Table Routes, Security Lists ), IAM EBS resources ( groups, policies) |  5' configuration + 10' deployment | 
 | **OP. ID.03** | Manual changes |   5'| 
  
 
