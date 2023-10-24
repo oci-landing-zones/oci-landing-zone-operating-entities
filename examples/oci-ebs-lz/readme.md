@@ -65,7 +65,7 @@ The following architecture diagrams show a landing zone setup for deploying Orac
 > Compartments help you organize and control access to your resources. A compartment is a collection of related resources (such as cloud networks, compute instances, or block volumes) that can be accessed only by those groups that have been given permission by an administrator in your organization.
 &nbsp;
 
-![Diagram](Diagrams/Compartments.png)
+![Compartments](diagrams/Compartments.png)
 
 | |  | | | |
 |---|---|---|---|---| 
@@ -88,7 +88,7 @@ The following architecture diagrams show a landing zone setup for deploying Orac
 &nbsp; 
 
 
-![Diagram](Diagrams/Groups.png)
+![Groups](diagrams/Groups.png)
 
 | |  | | | 
 |---|---|---|---| 
@@ -154,7 +154,7 @@ The following architecture diagrams show a landing zone setup for deploying Orac
 
 ## **NETWORK VIEW**
 
-![Diagram](Diagrams/Network.png)
+![Network](diagrams/Network.png)
 
 &nbsp; 
 **EBS LZ pattern includes the following VCNs:**
