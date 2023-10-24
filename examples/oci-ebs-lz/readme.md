@@ -154,7 +154,7 @@ The following architecture diagrams show a landing zone setup for deploying Orac
 
 ## **NETWORK VIEW**
 
-![Network](diagrams/Network.png)
+![Network](diagrams/Networkd.png)
 
 &nbsp; 
 **EBS LZ pattern includes the following VCNs:**
