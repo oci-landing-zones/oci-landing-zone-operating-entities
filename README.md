@@ -10,7 +10,7 @@ The purpose of the **OCI Open LZ** is to:
 1. Provide an end-to-end **landing zone design**, ready to **onboard an enterprise organization** and its functional divisions &ndash; identified as **operating entities (OE)** with their teams, departments, and projects.
 2. Provide a **cloud-native operating model** to simplify and scale **day two operations**.
 3. Demonstrate the operating model and **run OCI** with a **configurable [Terraform](orchestrator/Readme.md) approach**.
-4. **Enable customers, partners, independent software vendors (ISV),**, and the general **IT community** to **create/use tailored landing zones** with **lower efforts** through a **comprehensive OCI reference architecture**.  
+4. **Enable customers, partners, independent software vendors (ISV)**, and the general **IT community** to **create/use tailored landing zones** with **lower efforts** through a **comprehensive OCI reference architecture**.  
 5. Provide **tailoring guidelines** to help adjust the model. This asset can be used directly, tailored, or used as inspiration to create a new one &ndash; as it is not a prescribed solution.
    
 
