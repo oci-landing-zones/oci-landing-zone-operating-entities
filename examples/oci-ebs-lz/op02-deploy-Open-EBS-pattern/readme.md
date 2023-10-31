@@ -56,7 +56,8 @@ The diagram below identifies the compartments in the scope of this operation.
 The corresponding json configuration for the compartment topology described above is: 
 
 ```
-...
+Example of a compartment structure creation:
+
 {
     "compartments_configuration": {
         "enable_delete": "true",
@@ -91,7 +92,7 @@ The corresponding json configuration for the compartment topology described abov
             }
         }
     },
-...
+
 ```
 
 For extended documentation please refer to the [Identity & Access Management CIS Terraform module compartments example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/compartments/examples/vision/input.auto.tfvars.template).
@@ -106,8 +107,9 @@ The diagram below identifies the groups in the scope of this operation.
 ![Diagram](diagrams/groups.png)
 &nbsp; 
 
+Example of a group creation:
 ```
-...
+
    "groups_configuration": {
         "default_defined_tags": null,
         "default_freeform_tags": null,
@@ -126,7 +128,7 @@ The diagram below identifies the groups in the scope of this operation.
             }
         }
     },
-...
+
 ```
 
 This automation provides fully supports any kind of OCI IAM Groups topology to be specified in the json format. 
@@ -137,12 +139,8 @@ For an example of such configuration and for extended documentation please refer
 
 ### **3.3 Policies**
 
-
-**Note**: For each policy select your desired compartment_ocid
-
+Example of policy creation:
 ```
-...
-
 "policies_configuration": {
         "supplied_policies": {
             "ebslz-ebs-prod-admin-policy": {
@@ -267,7 +265,7 @@ For an example of such configuration and for extended documentation please refer
             "ebslz-ebs-security-admin-policy": {
                 "name": "ebslz-ebs-security-admin-policy",
                 "description": "ebs security policy",
-                "compartment_ocid": ""ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": "ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
                 "statements": [
                     "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read vss-family in compartment ebslz1-security-cmp",
                     "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use vaults in compartment ebslz1-security-cmp",
@@ -301,9 +299,9 @@ For an example of such configuration and for extended documentation please refer
         }
     }
 
-  
-...
 ```
+
+**Note**: For each policy select your desired compartment_ocid
 
 This automation fully supports any type of OCI IAM Policy to be specified in the json format. 
 For an example of such configuration and for extended documentation please refer to the [Identity & Access Management CIS Terraform module policies examples](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies/examples).
@@ -323,23 +321,253 @@ This configuration covers the following networking diagram.
 
 For complete documentation and a larger set of examples on configuring an OCI networking topology using this json terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) documentation and examples.
 
-Network layer cover the next resources:
+The network layer covers the next resources:
 
-###  **4.1. Spoke VCNs and Subnets**
+###  **4.1. Spoke VCNs**
 
-###  **4.2. Gateways**
+OCI defines network resources in a hierarchy. This means that subnets, route tables, security lists, or gateways will depend on a specific VCN.
+We will create three Spokes VCNs (VCN.02,VCN.03,VCN.04)
 
-###  **4.3. Security Lists**
+Example of a VCN creation:
 
-###  **4.4. Route Tables**
+```
+
+      "vcns": {
+                    "VCN-FRANKFURT-MGT-KEY": {
+                        "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
+                        "block_nat_traffic": true,
+                        "cidr_blocks": [
+                            "10.1.1.0/24"
+                        ],
+                        "display_name": "ebslz2-mgt-vcn",
+                        "dns_label": "ebsmgtvcnfra",
+                        "is_attach_drg": false,
+                        "is_create_igw": false,
+                        "is_ipv6enabled": false,
+                        "is_oracle_gua_allocation_enabled": false,
+                        "route_tables": {},
+                        "security_lists": {},
+                        "subnets": {},
+                        "vcn_specific_gateways": {},
+                }
+```
+**Note**: 
+* Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
 
 
-**Note:**
-&nbsp; 
-* change compartment_id with the OCID of the network cmp (created with CIS LZ in ##OP01)
-* change all vcn_id for the corresponding vcn of each route table.
-* change network_entity_id in route rules to the corresponding service gateways ids or drg ids.
-&nbsp; 
+###  **4.2. Subnets**
+
+We will create a three-layer configuration, adding three subnets per vcn.
+
+Example of a Subnet creation:
+
+```
+ "subnets": {
+                            "SN-FRANKFURT-MGT-LB-KEY": {
+                                "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
+                                "availability_domain": null,
+                                "cidr_block": "10.1.1.0/26",
+                                "dhcp_options_key": "default_dhcp_options",
+                                "display_name": "ebs-mgt-web-subnet",
+                                "dns_label": null,
+                                "prohibit_internet_ingress": true,
+                                "prohibit_public_ip_on_vnic": true,
+                                "route_table_key": "RT-MGT-WEB-VCN-KEY",
+                                "security_list_keys": [
+                                    "SL-MGT-WEB-VCN-KEY"
+                                ]
+                            }
+                        },
+
+```
+**Note**: 
+* Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+* Add route_table_key and security_list_keys to assign the desired route tables and security list to each subnet.
+
+
+
+###  **4.3. Gateways**
+
+We will add a SG per spoke VCN.
+
+Example of a Service Gateway creation:
+
+```
+
+     "vcn_specific_gateways": {
+                            "service_gateways": {
+                                "SG-FRANKFURT-HUB-KEY": {
+                                    "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
+                                    "display_name": "ebs-mgt-vcn-sgw"
+                                }
+                            }
+                        }
+
+
+```
+**Note**: Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+
+
+###  **4.4. Security Lists**
+
+We will create one SL per subnet. (SL.5,SL.6,SL.7,SL.8,SL.9,SL.10,SL.11,SL.12,SL.13)
+
+Example of a Security List creation:
+
+```
+
+ "security_lists": {
+                            "SL-MGT-WEB-VCN-KEY": {
+                                "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
+                                "display_name": "ebs-mgt-web-subnet-security-list",
+                                "egress_rules": [
+                                    {
+                                        "description": "egress to 0.0.0.0/0 over ALL protocols",
+                                        "dst": "0.0.0.0/0",
+                                        "dst_type": "CIDR_BLOCK",
+                                        "protocol": "ALL",
+                                        "stateless": false
+                                    }
+                                ],
+                                "freeform_tags": null,
+                                "ingress_rules": [
+                                    {
+                                        "description": "ingress from 0.0.0.0/0 over TCP22",
+                                        "dst_port_max": 22,
+                                        "dst_port_min": 22,
+                                        "protocol": "TCP",
+                                        "src": "0.0.0.0/0",
+                                        "src_type": "CIDR_BLOCK",
+                                        "stateless": false
+                                    }
+                                ]
+                            }
+                        },
+
+```
+**Note**: Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+
+
+###  **4.5. Route Tables**
+
+We need to create Route tables in the spoke VCNs (RT.9, RT.10, RT.11, RT.12, RT.13, RT.14, RT.15, RT.16, RT.17):
+
+Example of a Route table creation:
+
+```
+     "route_tables": {
+                            "RT-MGT-WEB-VCN-KEY": {
+                                "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
+                                "display_name": "ebs-mgt-web-subnet-rtable",
+                                "route_rules": {
+                                    "drg_route": {
+                                        "description": "test",
+                                        "destination": "0.0.0.0/0",
+                                        "destination_type": "CIDR_BLOCK",
+                                        "network_entity_id": "ocid1.drg.oc1.aaaaaaaaxzexampleocid"
+                                    }
+                                }
+                            }
+                        },
+
+```
+**Note**: 
+* Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+* Change network_entity_id in route rules to the corresponding service gateways ids or drg ids.
+
+
+Also, we need to inject route tables in the Hub VCN (RT.5, RT.6, RT.7, RT.8): 
+
+Example of a Route table injection:
+
+```
+        "inject_into_existing_vcns": {
+                    "VCN-FRANKFURT-HUB-KEY": {
+                        "vcn_id": "ocid1.vcn..oc1..aaaaaaaaxzexampleocid",
+                        "route_tables": {
+                            "RT-DMZ-MGMT-KEY": {
+                                "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
+                                "display_name": "ebslz-dmz-mgmt-subnet-rtable",
+                                "defined_tags": null,
+                                "freeform_tags": null,
+                                "route_rules": {
+                                    "sgw_route": {
+                                        "network_entity_id":"ocid1.servicegateway.oc1.aaaaaaaaxzexampleocid",
+                                        "description": "Route for sgw",
+                                        "destination": "oci-fra-objectstorage",
+                                        "destination_type": "SERVICE_CIDR_BLOCK"
+                                    },
+                                    "igw_route": {
+                                        "description": "Traffic destined to 0.0.0.0/0 CIDR range goes to Internet Gateway.",
+                                        "destination": "0.0.0.0/0",
+                                        "destination_type": "CIDR_BLOCK",
+                                        "network_entity_id": "ocid1.internetgateway.oc1.aaaaaaaaxzexampleocid"
+                                    },
+                                    "drg_route_1": {
+                                        "description": "Traffic destined to ebs-mgt-vcn VCN goes to DRG.",
+                                        "destination": "10.0.1.0/24",
+                                        "destination_type": "CIDR_BLOCK",
+                                        "network_entity_id": "ocid1.drg.oc1.aaaaaaaaxzexampleocid"
+                                    },
+                                    "drg_route_2": {
+                                        "description": "Traffic destined to ebs-nprod-vcn VCN goes to DRG.",
+                                        "destination": "10.0.4.0/22",
+                                        "destination_type": "CIDR_BLOCK",
+                                        "network_entity_id": "ocid1.drg.oc1.aaaaaaaaxzexampleocid"
+                                    },
+                                    "drg_route_3": {
+                                        "description": "Traffic destined to ebs-prod-vcn VCN goes to DRG.",
+                                        "destination": "10.0.8.0/22",
+                                        "destination_type": "CIDR_BLOCK",
+                                        "network_entity_id": "ocid1.drg.oc1.aaaaaaaaxzexampleocid"
+                                    }
+                                }
+                            },
+
+```
+
+**Note**: 
+* Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+* Change vcn_ocid with the ocid of the Hub VCN.
+* Change network_entity_id in route rules to the corresponding internet gateways, service gateways ids or drg ids.
+
+
+###  **4.6. DRG Attachements **
+
+We need to add new DRG attachments (DRGA.02, DRGA.03, DRGA.04) to the DRG ( DRG.01) created by de CIS LZ (OP#01)
+
+Example of a DRG attachment creation:
+
+```
+    "inject_into_existing_drgs": {
+          "DRG-FRANKFURT-KEY":
+            {
+                  "drg_id": "ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaavzoj4fr4gncc6f244hbuwxh526fzvp24kt55pk2c5ok2xyfkmjha",                                    
+                  "drg_attachments": 
+                  {
+                     "DRG-FRANKFURT-VCN-FRANKFURT-MGT-KEY":
+                     {
+                        "defined_tags": null,
+                        "display_name": "ebslz2-mgt-vcn-drg-attachment",
+                        "freeform_tags": null,
+                        "drg_route_table_id": "ocid1.drgroutetable.oc1.eu-frankfurt-1.aaaaaaaac7gqyzaugfljfs7ele6c2cgeegwwf42h762cu2ynw6oxaj6xaesa",
+                        "drg_route_table_name": null,
+                        "network_details": 
+                         {
+                            "attached_resource_id": null,
+                            "attached_resource_key": "VCN-FRANKFURT-MGT-KEY",
+                            "type": "VCN",
+                            "route_table_id": null,
+                            "route_table_name": null,
+                            "vcn_route_type": null
+                         }
+                   }
+                }
+            }
+
+        }
+
+```
 
 ## **5. Run the Configurations**
 &nbsp; 
