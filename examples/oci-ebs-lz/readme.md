@@ -1,4 +1,4 @@
-# Open LZ EBS Pattern.
+# OCI Open EBS Landing Zone .
 
 Welcome to the EBS Landing Zone pattern. This pattern presents a design for an OCI landing zone for EBS.
 
