@@ -1,5 +1,11 @@
-# Copyright (c) 2023, Oracle and/or its affiliates.
-# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+# ####################################################################################################### #
+# Copyright (c) 2023 Oracle and/or its affiliates,  All rights reserved.                                  #
+# Licensed under the Universal Permissive License v 1.0 as shown at https: //oss.oracle.com/licenses/upl. #
+# Author: Cosmin Tudor                                                                                    #
+# Author email: cosmin.tudor@oracle.com                                                                   #
+# Last Modified: Thu Nov 16 2023                                                                          #
+# Modified by: Cosmin Tudor, email: cosmin.tudor@oracle.com                                               #
+# ####################################################################################################### #
 
 locals {
   network_configuration = var.network_configuration != null ? length(var.network_configuration) > 0 ? {
@@ -29,6 +35,14 @@ locals {
             block_nat_traffic                = vcn_value.block_nat_traffic
             defined_tags                     = vcn_value.defined_tags
             freeform_tags                    = vcn_value.freeform_tags
+            default_security_list = vcn_value.default_security_list != null ? {
+              compartment_id = vcn_value.default_security_list.compartment_id != null ? vcn_value.default_security_list.compartment_id : vcn_value.default_security_list.compartment_key != null ? local.compartments[vcn_value.default_security_list.compartment_key].id : null
+              defined_tags   = vcn_value.default_security_list.defined_tags
+              freeform_tags  = vcn_value.default_security_list.freeform_tags
+              display_name   = vcn_value.default_security_list.display_name
+              ingress_rules  = vcn_value.default_security_list.ingress_rules
+              egress_rules   = vcn_value.default_security_list.egress_rules
+            } : null
             security_lists = vcn_value.security_lists != null ? length(vcn_value.security_lists) > 0 ? {
               for seclist_key, seclist_value in vcn_value.security_lists : seclist_key => {
                 compartment_id = seclist_value.compartment_id != null ? seclist_value.compartment_id : seclist_value.compartment_key != null ? local.compartments[seclist_value.compartment_key].id : null
@@ -39,6 +53,13 @@ locals {
                 egress_rules   = seclist_value.egress_rules
               }
             } : {} : {}
+            default_route_table = vcn_value.default_route_table != null ? {
+              compartment_id = vcn_value.default_route_table.compartment_id != null ? vcn_value.default_route_table.compartment_id : vcn_value.default_route_table.compartment_key != null ? local.compartments[vcn_value.default_route_table.compartment_key].id : null
+              defined_tags   = vcn_value.default_route_table.defined_tags
+              freeform_tags  = vcn_value.default_route_table.freeform_tags
+              display_name   = vcn_value.default_route_table.display_name
+              route_rules    = vcn_value.default_route_table.route_rules
+            } : null
             route_tables = vcn_value.route_tables != null ? length(vcn_value.route_tables) > 0 ? {
               for rt_key, rt_value in vcn_value.route_tables : rt_key => {
                 compartment_id = rt_value.compartment_id != null ? rt_value.compartment_id : rt_value.compartment_key != null ? local.compartments[rt_value.compartment_key].id : null
@@ -48,6 +69,14 @@ locals {
                 route_rules    = rt_value.route_rules
               }
             } : {} : {}
+            default_dhcp_options = vcn_value.default_dhcp_options != null ? {
+              compartment_id   = vcn_value.default_dhcp_options.compartment_id != null ? vcn_value.default_dhcp_options.compartment_id : vcn_value.default_dhcp_options.compartment_key != null ? local.compartments[vcn_value.default_dhcp_options.compartment_key].id : null
+              defined_tags     = vcn_value.default_dhcp_options.defined_tags
+              freeform_tags    = vcn_value.default_dhcp_options.freeform_tags
+              display_name     = vcn_value.default_dhcp_options.display_name
+              domain_name_type = vcn_value.default_dhcp_options.domain_name_type
+              options          = vcn_value.default_dhcp_options.options
+            } : null
             dhcp_options = vcn_value.dhcp_options != null ? length(vcn_value.dhcp_options) > 0 ? {
               for dhcpo_key, dhcpo_value in vcn_value.dhcp_options : dhcpo_key => {
                 compartment_id   = dhcpo_value.compartment_id != null ? dhcpo_value.compartment_id : dhcpo_value.compartment_key != null ? local.compartments[dhcpo_value.compartment_key].id : null
@@ -116,7 +145,7 @@ locals {
                   display_name    = svcg_value.display_name
                   freeform_tags   = svcg_value.freeform_tags
                   route_table_key = svcg_value.route_table_key
-
+                  services        = svcg_value.services
                 }
               } : {} : {}
               local_peering_gateways = vcn_value.vcn_specific_gateways.local_peering_gateways != null ? length(vcn_value.vcn_specific_gateways.local_peering_gateways) > 0 ? {
@@ -136,6 +165,14 @@ locals {
         inject_into_existing_vcns = netconfig_value.inject_into_existing_vcns != null ? length(netconfig_value.inject_into_existing_vcns) > 0 ? {
           for vcn_key, vcn_value in netconfig_value.inject_into_existing_vcns : vcn_key => {
             vcn_id = vcn_value.vcn_id
+            default_security_list = vcn_value.default_security_list != null ? {
+              compartment_id = vcn_value.default_security_list.compartment_id != null ? vcn_value.default_security_list.compartment_id : vcn_value.default_security_list.compartment_key != null ? local.compartments[vcn_value.default_security_list.compartment_key].id : null
+              defined_tags   = vcn_value.default_security_list.defined_tags
+              freeform_tags  = vcn_value.default_security_list.freeform_tags
+              display_name   = vcn_value.default_security_list.display_name
+              ingress_rules  = vcn_value.default_security_list.ingress_rules
+              egress_rules   = vcn_value.default_security_list.egress_rules
+            } : null
             security_lists = vcn_value.security_lists != null ? length(vcn_value.security_lists) > 0 ? {
               for seclist_key, seclist_value in vcn_value.security_lists : seclist_key => {
                 compartment_id = seclist_value.compartment_id != null ? seclist_value.compartment_id : seclist_value.compartment_key != null ? local.compartments[seclist_value.compartment_key].id : null
@@ -146,6 +183,13 @@ locals {
                 egress_rules   = seclist_value.egress_rules
               }
             } : {} : {}
+            default_route_table = vcn_value.default_route_table != null ? {
+              compartment_id = vcn_value.default_route_table.compartment_id != null ? vcn_value.default_route_table.compartment_id : vcn_value.default_route_table.compartment_key != null ? local.compartments[vcn_value.default_route_table.compartment_key].id : null
+              defined_tags   = vcn_value.default_route_table.defined_tags
+              freeform_tags  = vcn_value.default_route_table.freeform_tags
+              display_name   = vcn_value.default_route_table.display_name
+              route_rules    = vcn_value.default_route_table.route_rules
+            } : null
             route_tables = vcn_value.route_tables != null ? length(vcn_value.route_tables) > 0 ? {
               for rt_key, rt_value in vcn_value.route_tables : rt_key => {
                 compartment_id = rt_value.compartment_id != null ? rt_value.compartment_id : rt_value.compartment_key != null ? local.compartments[rt_value.compartment_key].id : null
@@ -155,6 +199,14 @@ locals {
                 route_rules    = rt_value.route_rules
               }
             } : {} : {}
+            default_dhcp_options = vcn_value.default_dhcp_options != null ? {
+              compartment_id   = vcn_value.default_dhcp_options.compartment_id != null ? vcn_value.default_dhcp_options.compartment_id : vcn_value.default_dhcp_options.compartment_key != null ? local.compartments[vcn_value.default_dhcp_options.compartment_key].id : null
+              defined_tags     = vcn_value.default_dhcp_options.defined_tags
+              freeform_tags    = vcn_value.default_dhcp_options.freeform_tags
+              display_name     = vcn_value.default_dhcp_options.display_name
+              domain_name_type = vcn_value.default_dhcp_options.domain_name_type
+              options          = vcn_value.default_dhcp_options.options
+            } : null
             dhcp_options = vcn_value.dhcp_options != null ? length(vcn_value.dhcp_options) > 0 ? {
               for dhcpo_key, dhcpo_value in vcn_value.dhcp_options : dhcpo_key => {
                 compartment_id   = dhcpo_value.compartment_id != null ? dhcpo_value.compartment_id : dhcpo_value.compartment_key != null ? local.compartments[dhcpo_value.compartment_key].id : null
@@ -228,7 +280,7 @@ locals {
                   freeform_tags    = svcg_value.freeform_tags
                   route_table_name = svcg_value.route_table_name
                   route_table_key  = svcg_value.route_table_key
-
+                  services         = svcg_value.services
                 }
               } : {} : {}
               local_peering_gateways = vcn_value.vcn_specific_gateways.local_peering_gateways != null ? length(vcn_value.vcn_specific_gateways.local_peering_gateways) > 0 ? {
@@ -293,6 +345,86 @@ locals {
               drg_attachments         = drg_value.drg_attachments
               drg_route_tables        = drg_value.drg_route_tables
               drg_route_distributions = drg_value.drg_route_distributions
+            }
+          } : {} : {}
+
+          customer_premises_equipments = netconfig_value.non_vcn_specific_gateways.customer_premises_equipments != null ? length(netconfig_value.non_vcn_specific_gateways.customer_premises_equipments) > 0 ? { for cpe_key, cpe_value in netconfig_value.non_vcn_specific_gateways.customer_premises_equipments : cpe_key => {
+            compartment_id               = cpe_value.compartment_id != null ? cpe_value.compartment_id : cpe_value.compartment_key != null ? local.compartments[cpe_value.compartment_key].id : null
+            ip_address                   = cpe_value.ip_address
+            defined_tags                 = cpe_value.defined_tags
+            display_name                 = cpe_value.display_name
+            freeform_tags                = cpe_value.freeform_tags
+            cpe_device_shape_id          = cpe_value.cpe_device_shape_id
+            cpe_device_shape_vendor_name = cpe_value.cpe_device_shape_vendor_name
+            }
+          } : {} : {}
+
+          ipsecs = netconfig_value.non_vcn_specific_gateways.ipsecs != null ? length(netconfig_value.non_vcn_specific_gateways.ipsecs) > 0 ? {
+            for ipsec_key, ipsec_value in netconfig_value.non_vcn_specific_gateways.ipsecs : ipsec_key => {
+              compartment_id            = ipsec_value.compartment_id != null ? ipsec_value.compartment_id : ipsec_value.compartment_key != null ? local.compartments[ipsec_value.compartment_key].id : null
+              cpe_id                    = ipsec_value.cpe_id
+              cpe_key                   = ipsec_value.cpe_key
+              drg_id                    = ipsec_value.drg_id
+              drg_key                   = ipsec_value.drg_key
+              static_routes             = ipsec_value.static_routes
+              cpe_local_identifier      = ipsec_value.cpe_local_identifier
+              cpe_local_identifier_type = ipsec_value.cpe_local_identifier_type
+              defined_tags              = ipsec_value.defined_tags
+              display_name              = ipsec_value.display_name
+              freeform_tags             = ipsec_value.freeform_tags
+              tunnels_management        = ipsec_value.tunnels_management
+            }
+          } : {} : {}
+
+          fast_connect_virtual_circuits = netconfig_value.non_vcn_specific_gateways.fast_connect_virtual_circuits != null ? length(netconfig_value.non_vcn_specific_gateways.fast_connect_virtual_circuits) > 0 ? {
+            for fcvc_key, fcvc_value in netconfig_value.non_vcn_specific_gateways.fast_connect_virtual_circuits : fcvc_key => {
+              compartment_id                              = fcvc_value.compartment_id != null ? fcvc_value.compartment_id : fcvc_value.compartment_key != null ? local.compartments[fcvc_value.compartment_key].id : null
+              provision_fc_virtual_circuit                = fcvc_value.provision_fc_virtual_circuit
+              show_available_fc_virtual_circuit_providers = fcvc_value.show_available_fc_virtual_circuit_providers
+              type                                        = fcvc_value.type
+              #Optional
+              bandwidth_shape_name      = fcvc_value.bandwidth_shape_name
+              bgp_admin_state           = fcvc_value.bgp_admin_state
+              cross_connect_mappings    = fcvc_value.cross_connect_mappings
+              customer_asn              = fcvc_value.customer_asn
+              defined_tags              = fcvc_value.defined_tags
+              display_name              = fcvc_value.display_name
+              freeform_tags             = fcvc_value.freeform_tags
+              ip_mtu                    = fcvc_value.ip_mtu
+              is_bfd_enabled            = fcvc_value.is_bfd_enabled
+              gateway_id                = fcvc_value.gateway_id
+              gateway_key               = fcvc_value.gateway_key
+              provider_service_id       = fcvc_value.provider_service_id
+              provider_service_key      = fcvc_value.provider_service_key
+              provider_service_key_name = fcvc_value.provider_service_key_name
+              public_prefixes           = fcvc_value.public_prefixes
+              region                    = fcvc_value.region
+              routing_policy            = fcvc_value.routing_policy
+            }
+          } : {} : {}
+
+          cross_connect_groups = netconfig_value.non_vcn_specific_gateways.cross_connect_groups != null ? length(netconfig_value.non_vcn_specific_gateways.cross_connect_groups) > 0 ? {
+            for ccg_key, ccg_value in netconfig_value.non_vcn_specific_gateways.cross_connect_groups : ccg_key => {
+              compartment_id          = ccg_value.compartment_id != null ? ccg_value.compartment_id : ccg_value.compartment_key != null ? local.compartments[ccg_value.compartment_key].id : null
+              customer_reference_name = ccg_value.customer_reference_name
+              defined_tags            = ccg_value.defined_tags
+              display_name            = ccg_value.display_name
+              freeform_tags           = ccg_value.freeform_tags
+              cross_connects = ccg_value.cross_connects != null ? length(ccg_value.cross_connectss) > 0 ? {
+                for cc_key, cc_value in ccg_value.cross_connects : cc_key => {
+                  compartment_id                                = cc_value.compartment_id != null ? cc_value.compartment_id : cc_value.compartment_key != null ? local.compartments[cc_value.compartment_key].id : null
+                  location_name                                 = cc_value.location_name
+                  port_speed_shape_name                         = cc_value.port_speed_shape_name
+                  customer_reference_name                       = cc_value.customer_reference_name
+                  defined_tags                                  = cc_value.defined_tags
+                  display_name                                  = cc_value.display_name
+                  far_cross_connect_or_cross_connect_group_id   = cc_value.far_cross_connect_or_cross_connect_group_id
+                  far_cross_connect_or_cross_connect_group_key  = cc_value.far_cross_connect_or_cross_connect_group_key
+                  freeform_tags                                 = cc_value.freeform_tags
+                  near_cross_connect_or_cross_connect_group_id  = cc_value.near_cross_connect_or_cross_connect_group_id
+                  near_cross_connect_or_cross_connect_group_key = cc_value.near_cross_connect_or_cross_connect_group_key
+                }
+              } : {} : {}
             }
           } : {} : {}
 
@@ -383,6 +515,6 @@ locals {
 }
 
 module "terraform-oci-cis-landing-zone-network" {
-  source                = "git::https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking.git?ref=v0.5.3"
+  source                = "git::https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking.git?ref=v0.6.0"
   network_configuration = local.network_configuration
 }
