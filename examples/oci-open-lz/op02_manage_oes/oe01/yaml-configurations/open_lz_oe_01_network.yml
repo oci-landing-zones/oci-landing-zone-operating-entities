@@ -1,3 +1,12 @@
+# ####################################################################################################### #
+# Copyright (c) 2023 Oracle and/or its affiliates,  All rights reserved.                                  #
+# Licensed under the Universal Permissive License v 1.0 as shown at https: //oss.oracle.com/licenses/upl. #
+# Author: Cosmin Tudor                                                                                    #
+# Author email: cosmin.tudor@oracle.com                                                                   #
+# Last Modified: Thu Nov 16 2023                                                                          #
+# Modified by: Cosmin Tudor, email: cosmin.tudor@oracle.com                                               #
+# ####################################################################################################### #
+
 ---
 network_configuration:
   default_compartment_key: CMP-OE01-COMMON-NETWORK-KEY
@@ -99,7 +108,7 @@ network_configuration:
               route_rules:
                 sgw_route:
                   description: Route for sgw
-                  destination: oci-fra-objectstorage
+                  destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                   network_entity_key: SG-FRANKFURT-OE01-CO-KEY
           security_lists:
@@ -191,6 +200,7 @@ network_configuration:
             service_gateways:
               SG-FRANKFURT-OE01-CO-KEY:
                 display_name: sg_frankfurt_oe01_co
+                services: objectstorage
         VCN-FRANKFURT-OE01-DEV-KEY:
           block_nat_traffic: false
           cidr_blocks:
@@ -284,7 +294,7 @@ network_configuration:
               route_rules:
                 sgw_route:
                   description: Route for sgw
-                  destination: oci-fra-objectstorage
+                  destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                   network_entity_key: SG-FRANKFURT-OE01-DEV-KEY
           security_lists:
@@ -376,6 +386,7 @@ network_configuration:
             service_gateways:
               SG-FRANKFURT-OE01-DEV-KEY:
                 display_name: sg_frankfurt_oe01_dev
+                services: objectstorage
         VCN-FRANKFURT-OE01-NP-KEY:
           block_nat_traffic: false
           cidr_blocks:
@@ -469,7 +480,7 @@ network_configuration:
               route_rules:
                 sgw_route:
                   description: Route for sgw
-                  destination: oci-fra-objectstorage
+                  destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                   network_entity_key: SG-FRANKFURT-OE01-NP-KEY
           security_lists:
@@ -561,6 +572,7 @@ network_configuration:
             service_gateways:
               SG-FRANKFURT-OE01-NP-KEY:
                 display_name: sg_frankfurt_oe01_np
+                services: objectstorage
         VCN-FRANKFURT-OE01-P-KEY:
           block_nat_traffic: false
           cidr_blocks:
@@ -654,7 +666,7 @@ network_configuration:
               route_rules:
                 sgw_route:
                   description: Route for sgw
-                  destination: oci-fra-objectstorage
+                  destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                   network_entity_key: SG-FRANKFURT-OE01-P-KEY
           security_lists:
@@ -746,6 +758,7 @@ network_configuration:
             service_gateways:
               SG-FRANKFURT-OE01-P-KEY:
                 display_name: sg_frankfurt_oe01_p
+                services: objectstorage
         VCN-FRANKFURT-OE01-SB-KEY:
           block_nat_traffic: false
           cidr_blocks:
@@ -839,7 +852,7 @@ network_configuration:
               route_rules:
                 sgw_route:
                   description: Route for sgw
-                  destination: oci-fra-objectstorage
+                  destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                   network_entity_key: SG-FRANKFURT-OE01-SB-KEY
           security_lists:
@@ -931,6 +944,7 @@ network_configuration:
             service_gateways:
               SG-FRANKFURT-OE01-SB-KEY:
                 display_name: sg_frankfurt_oe01_sb
+                services: objectstorage
       IPs:
         public_ips:
           PROD-IP-LB-1-KEY:
