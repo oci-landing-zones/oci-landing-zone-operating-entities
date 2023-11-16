@@ -1,5 +1,11 @@
-# Copyright (c) 2023 Oracle and/or its affiliates.
-# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+# ####################################################################################################### #
+# Copyright (c) 2023 Oracle and/or its affiliates,  All rights reserved.                                  #
+# Licensed under the Universal Permissive License v 1.0 as shown at https: //oss.oracle.com/licenses/upl. #
+# Author: Cosmin Tudor                                                                                    #
+# Author email: cosmin.tudor@oracle.com                                                                   #
+# Last Modified: Thu Nov 16 2023                                                                          #
+# Modified by: Cosmin Tudor, email: cosmin.tudor@oracle.com                                               #
+# ####################################################################################################### #
 
 # User Credentials 
 variable "tenancy_ocid" {
@@ -163,7 +169,7 @@ variable "policies_configuration" {
       defined_tags     = optional(map(string))
       freeform_tags    = optional(map(string))
     })))
-    template_policies = optional(object({          # An object describing the template policies. In this mode, policies are derived according to tenancy_level_settings and compartment_level_settings.
+    template_policies = optional(object({                        # An object describing the template policies. In this mode, policies are derived according to tenancy_level_settings and compartment_level_settings.
       tenancy_level_settings = optional(object({                 # Settings for tenancy level (Root compartment) policies generation.
         groups_with_tenancy_level_roles = optional(list(object({ # A list of group names and their roles at the tenancy level. Template policies are granted to each group in the Root compartment.
           name  = string
@@ -210,18 +216,14 @@ variable "network_configuration" {
     default_enable_cis_checks  = optional(bool),
     default_ssh_ports_to_check = optional(list(number)),
 
-    # Map of Categories. A category is an funnctional aggregation of resources such as: Production, Non-Production, etc.
     network_configuration_categories = optional(map(object({
-      
-      # Common elements for a category
       category_compartment_id     = optional(string),
       category_compartment_key    = optional(string),
       category_defined_tags       = optional(map(string)),
       category_freeform_tags      = optional(map(string)),
-      category_enable_cis_checks  = optional(bool), # CIS Control variable. Default is true.
-      category_ssh_ports_to_check = optional(list(number)), # CIS Control. If category_enable_cis_checks is true it validates SSH ports against CIS best practices.
+      category_enable_cis_checks  = optional(bool),
+      category_ssh_ports_to_check = optional(list(number)),
 
-      # Map of VCNs, Follows the OCI Resources native structure, as defined in the OCI Terraform provider and REST API.
       vcns = optional(map(object({
         compartment_id  = optional(string),
         compartment_key = optional(string),
@@ -239,7 +241,39 @@ variable "network_configuration" {
         defined_tags                     = optional(map(string)),
         freeform_tags                    = optional(map(string)),
 
-        # Map of VCN Security Lists
+        default_security_list = optional(object({
+          compartment_id  = optional(string),
+          compartment_key = optional(string),
+          defined_tags    = optional(map(string)),
+          freeform_tags   = optional(map(string)),
+          ingress_rules = optional(list(object({
+            stateless    = optional(bool),
+            protocol     = string,
+            description  = optional(string),
+            src          = string,
+            src_type     = string,
+            src_port_min = optional(number),
+            src_port_max = optional(number),
+            dst_port_min = optional(number),
+            dst_port_max = optional(number),
+            icmp_type    = optional(number),
+            icmp_code    = optional(number)
+          }))),
+          egress_rules = optional(list(object({
+            stateless    = optional(bool),
+            protocol     = string,
+            description  = optional(string),
+            dst          = string,
+            dst_type     = string,
+            src_port_min = optional(number),
+            src_port_max = optional(number),
+            dst_port_min = optional(number),
+            dst_port_max = optional(number),
+            icmp_type    = optional(number),
+            icmp_code    = optional(number)
+          })))
+        }))
+
         security_lists = optional(map(object({
           compartment_id  = optional(string),
           compartment_key = optional(string),
@@ -274,7 +308,27 @@ variable "network_configuration" {
           })))
         })))
 
-        # Map of VCN Route Tables
+        default_route_table = optional(object({
+          compartment_id  = optional(string),
+          compartment_key = optional(string),
+          defined_tags    = optional(map(string)),
+          freeform_tags   = optional(map(string)),
+          display_name    = optional(string),
+          route_rules = optional(map(object({
+            network_entity_id  = optional(string),
+            network_entity_key = optional(string),
+            description        = optional(string),
+            // Supported values:
+            //    - "a cidr block"
+            //    - "objectstorage" or "all-services" - only for "SERVICE_CIDR_BLOCK"
+            destination = optional(string),
+            // Supported values:
+            //    - "CIDR_BLOCK"
+            //    - "SERVICE_CIDR_BLOCK" - only for SGW
+            destination_type = optional(string),
+          })))
+        }))
+
         route_tables = optional(map(object({
           compartment_id  = optional(string),
           compartment_key = optional(string),
@@ -282,16 +336,35 @@ variable "network_configuration" {
           freeform_tags   = optional(map(string)),
           display_name    = optional(string),
           route_rules = optional(map(object({
-            # TODO: id and key can be merged into one variable where the id/key logic is determind by a substring check.
-            network_entity_id  = optional(string), # Next hop OCID, use this when the target resources was created outside this automation.
-            network_entity_key = optional(string), # Next hop Key, use this when the target resources in this configuration.
+            network_entity_id  = optional(string),
+            network_entity_key = optional(string),
             description        = optional(string),
-            destination        = optional(string), # Destination CIDR block
-            destination_type   = optional(string) # SERVICE_CIDR_BLOCK or CIDR_BLOCK
+            // Supported values:
+            //    - "a cidr block"
+            //    - "objectstorage" or "all-services" - only for "SERVICE_CIDR_BLOCK"
+            destination = optional(string),
+            // Supported values:
+            //    - "CIDR_BLOCK"
+            //    - "SERVICE_CIDR_BLOCK" - only for SGW
+            destination_type = optional(string),
           })))
         })))
 
-        # Map of DHCP Options
+        default_dhcp_options = optional(object({
+          compartment_id   = optional(string),
+          compartment_key  = optional(string),
+          display_name     = optional(string),
+          defined_tags     = optional(map(string)),
+          freeform_tags    = optional(map(string)),
+          domain_name_type = optional(string),
+          options = map(object({
+            type                = string,
+            server_type         = optional(string),
+            custom_dns_servers  = optional(list(string))
+            search_domain_names = optional(list(string))
+          }))
+        }))
+
         dhcp_options = optional(map(object({
           compartment_id   = optional(string),
           compartment_key  = optional(string),
@@ -307,8 +380,6 @@ variable "network_configuration" {
           }))
         })))
 
-        # Map of Subnets 
-        # TODO: OCI Resources that need to be related to these Subnets will need to reference the Subnet key on the output (e.g., Compute, Databases).
         subnets = optional(map(object({
           cidr_block      = string,
           compartment_id  = optional(string),
@@ -324,13 +395,10 @@ variable "network_configuration" {
           ipv6cidr_blocks            = optional(list(string)),
           prohibit_internet_ingress  = optional(bool),
           prohibit_public_ip_on_vnic = optional(bool),
-          route_table_key            = optional(string), # Related route table key
-          security_list_keys         = optional(list(string)) # Related security lists keys (list of)
+          route_table_key            = optional(string),
+          security_list_keys         = optional(list(string))
         })))
 
-        # Map of NSG. It's related to the parent VCN by hierarchy.
-        # TODO: OCI Resources that need to be related to these NSGs will need to reference the NSG key on the output (e.g., Compute, Databases).
-        # Load Balancer and Network Firewall are already integrated.
         network_security_groups = optional(map(object({
           compartment_id  = optional(string),
           compartment_key = optional(string),
@@ -365,7 +433,6 @@ variable "network_configuration" {
           })))
         })))
 
-        # Map of Specific Gateways 
         vcn_specific_gateways = optional(object({
           internet_gateways = optional(map(object({
             compartment_id  = optional(string),
@@ -374,7 +441,7 @@ variable "network_configuration" {
             defined_tags    = optional(map(string)),
             display_name    = optional(string),
             freeform_tags   = optional(map(string)),
-            route_table_key = optional(string) # Related route table. Enables the route incoming traffic to another resource (e.g., Firewall).
+            route_table_key = optional(string)
           })))
 
           nat_gateways = optional(map(object({
@@ -385,16 +452,20 @@ variable "network_configuration" {
             display_name    = optional(string),
             freeform_tags   = optional(map(string)),
             public_ip_id    = optional(string),
-            route_table_key = optional(string) # Related route table. Enables the route incoming traffic to another resource (e.g., Firewall).
+            route_table_key = optional(string)
           })))
 
           service_gateways = optional(map(object({
             compartment_id  = optional(string),
             compartment_key = optional(string),
+            // SGW services value:
+            //       - objectstorage - for object storage access
+            //       - all-services - for all OCI internal network services access
+            services        = string,
             defined_tags    = optional(map(string)),
             display_name    = optional(string),
             freeform_tags   = optional(map(string)),
-            route_table_key = optional(string) # Related route table. Clarify use case.
+            route_table_key = optional(string)
           })))
 
           local_peering_gateways = optional(map(object({
@@ -405,18 +476,48 @@ variable "network_configuration" {
             freeform_tags   = optional(map(string)),
             peer_id         = optional(string),
             peer_key        = optional(string),
-            route_table_key = optional(string) # Related route table. Enables the route incoming traffic to another resource (e.g., Firewall).
+            route_table_key = optional(string)
           })))
         }))
       })))
 
-      # Injects NEW elements into existing VCNs, as extensions.
-      # Repeats the above variabe structure.
       inject_into_existing_vcns = optional(map(object({
 
-        vcn_id = string, # OCID of the target VCN
-  
-        # All objects above have to be NEW objects. Existing ones cannot be changed.
+        vcn_id = string,
+
+        default_security_list = optional(object({
+          compartment_id  = optional(string),
+          compartment_key = optional(string),
+          defined_tags    = optional(map(string)),
+          freeform_tags   = optional(map(string)),
+          ingress_rules = optional(list(object({
+            stateless    = optional(bool),
+            protocol     = string,
+            description  = optional(string),
+            src          = string,
+            src_type     = string,
+            src_port_min = optional(number),
+            src_port_max = optional(number),
+            dst_port_min = optional(number),
+            dst_port_max = optional(number),
+            icmp_type    = optional(number),
+            icmp_code    = optional(number)
+          }))),
+          egress_rules = optional(list(object({
+            stateless    = optional(bool),
+            protocol     = string,
+            description  = optional(string),
+            dst          = string,
+            dst_type     = string,
+            src_port_min = optional(number),
+            src_port_max = optional(number),
+            dst_port_min = optional(number),
+            dst_port_max = optional(number),
+            icmp_type    = optional(number),
+            icmp_code    = optional(number)
+          })))
+        }))
+
         security_lists = optional(map(object({
           compartment_id  = optional(string),
           compartment_key = optional(string),
@@ -451,7 +552,27 @@ variable "network_configuration" {
           })))
         })))
 
-        # All objects above have to be NEW objects. Existing ones cannot be changed.
+        default_route_table = optional(object({
+          compartment_id  = optional(string),
+          compartment_key = optional(string),
+          defined_tags    = optional(map(string)),
+          freeform_tags   = optional(map(string)),
+          display_name    = optional(string),
+          route_rules = optional(map(object({
+            network_entity_id  = optional(string),
+            network_entity_key = optional(string),
+            description        = optional(string),
+            // Supported values:
+            //    - "a cidr block"
+            //    - "objectstorage" or "all-services" - only for "SERVICE_CIDR_BLOCK"
+            destination = optional(string),
+            // Supported values:
+            //    - "CIDR_BLOCK"
+            //    - "SERVICE_CIDR_BLOCK" - only for SGW
+            destination_type = optional(string),
+          })))
+        }))
+
         route_tables = optional(map(object({
           compartment_id  = optional(string),
           compartment_key = optional(string),
@@ -462,12 +583,33 @@ variable "network_configuration" {
             network_entity_id  = optional(string),
             network_entity_key = optional(string),
             description        = optional(string),
-            destination        = optional(string),
-            destination_type   = optional(string)
+            description        = optional(string),
+            // Supported values:
+            //    - "a cidr block"
+            //    - "objectstorage" or "all-services" - only for "SERVICE_CIDR_BLOCK"
+            destination = optional(string),
+            // Supported values:
+            //    - "CIDR_BLOCK"
+            //    - "SERVICE_CIDR_BLOCK" - only for SGW
+            destination_type = optional(string)
           })))
         })))
 
-        # All objects above have to be NEW objects. Existing ones cannot be changed.
+        default_dhcp_options = optional(object({
+          compartment_id   = optional(string),
+          compartment_key  = optional(string),
+          display_name     = optional(string),
+          defined_tags     = optional(map(string)),
+          freeform_tags    = optional(map(string)),
+          domain_name_type = optional(string),
+          options = map(object({
+            type                = string,
+            server_type         = optional(string),
+            custom_dns_servers  = optional(list(string))
+            search_domain_names = optional(list(string))
+          }))
+        }))
+
         dhcp_options = optional(map(object({
           compartment_id   = optional(string),
           compartment_key  = optional(string),
@@ -483,7 +625,6 @@ variable "network_configuration" {
           }))
         })))
 
-        # All objects above have to be NEW objects. Existing ones cannot be changed.
         subnets = optional(map(object({
           cidr_block      = string,
           compartment_id  = optional(string),
@@ -506,7 +647,6 @@ variable "network_configuration" {
           security_list_keys         = optional(list(string))
         })))
 
-       # All objects above have to be NEW objects. Existing ones cannot be changed.
         network_security_groups = optional(map(object({
           compartment_id  = optional(string),
           compartment_key = optional(string),
@@ -541,7 +681,6 @@ variable "network_configuration" {
           })))
         })))
 
-        # All objects above have to be NEW objects. Existing ones cannot be changed.
         vcn_specific_gateways = optional(object({
           internet_gateways = optional(map(object({
             compartment_id  = optional(string),
@@ -569,6 +708,10 @@ variable "network_configuration" {
           service_gateways = optional(map(object({
             compartment_id  = optional(string),
             compartment_key = optional(string),
+            // SGW services value:
+            //       - objectstorage - for object storage access
+            //       - all-services - for all OCI internal network services access
+            services        = string,
             defined_tags    = optional(map(string)),
             display_name    = optional(string),
             freeform_tags   = optional(map(string)),
@@ -590,7 +733,6 @@ variable "network_configuration" {
         }))
       })))
 
-      # Reserve public IPs. Can be used to attach to resources, such as LBs.
       IPs = optional(object({
 
         public_ips_pools = optional(map(object({
@@ -614,7 +756,8 @@ variable "network_configuration" {
         })))
       }))
 
-      # Used for gateways that are not related to VCNs: DRG, Network Firewall, Load Balancers.
+
+
       non_vcn_specific_gateways = optional(object({
 
         dynamic_routing_gateways = optional(map(object({
@@ -623,74 +766,6 @@ variable "network_configuration" {
           defined_tags    = optional(map(string)),
           display_name    = optional(string),
           freeform_tags   = optional(map(string)),
-
-          # Connects to VCNs outside regions
-          remote_peering_connections = optional(map(object({
-            compartment_id   = optional(string),
-            compartment_key  = optional(string),
-            defined_tags     = optional(map(string)),
-            display_name     = optional(string),
-            freeform_tags    = optional(map(string)),
-            peer_id          = optional(string), # OCID of the remote VCN
-            peer_key         = optional(string), 
-            peer_region_name = optional(string)
-          })))
-          
-          # DRG Attachnents from a VCN to a DRG
-          drg_attachments = optional(map(object({
-            defined_tags        = optional(map(string)),
-            display_name        = optional(string),
-            freeform_tags       = optional(map(string)),
-            drg_route_table_id  = optional(string), # Required to route traffic, filled in the next attibute 'drg_route_tables'
-            drg_route_table_key = optional(string),
-            network_details = optional(object({
-              attached_resource_id  = optional(string),
-              attached_resource_key = optional(string),
-              type                  = string,
-              route_table_id        = optional(string),
-              route_table_key       = optional(string),
-              vcn_route_type        = optional(string)
-            }))
-          })))
-          
-          # DRG Route tables for each DRG Attachment. Unless the drg attachment route table is already created, 
-          # the size of this map should be the same size of the 'drg_attachments' map.
-          drg_route_tables = optional(map(object({
-            defined_tags                      = optional(map(string)),
-            display_name                      = optional(string),
-            freeform_tags                     = optional(map(string)),
-            import_drg_route_distribution_id  = optional(string),
-            import_drg_route_distribution_key = optional(string),
-            is_ecmp_enabled                   = optional(bool),
-            route_rules = optional(map(object({
-              destination                 = string,
-              destination_type            = string,
-              next_hop_drg_attachment_id  = string,
-              next_hop_drg_attachment_key = string,
-            })))
-          })))
-
-          # Advertises/routes cidrs among spokes. Only used on BGP traffic (dynamic).
-          drg_route_distributions = optional(map(object({
-            distribution_type = string,
-            defined_tags      = optional(map(string)),
-            display_name      = optional(string),
-            freeform_tags     = optional(map(string))
-            statements = optional(map(object({
-              action = string,
-              match_criteria = optional(map(object({
-                match_type        = string,
-                attachment_type   = optional(string),
-                drg_attachment_id = optional(string),
-              })))
-              priority = optional(number)
-            })))
-          })))
-        })))
-
-        # Used when the resources below are created on an existing DRG.
-        inject_into_existing_drgs = optional(map(object({
-          drg_id = string, #OCID of the DRG 
 
           remote_peering_connections = optional(map(object({
             compartment_id   = optional(string),
@@ -729,8 +804,8 @@ variable "network_configuration" {
             route_rules = optional(map(object({
               destination                 = string,
               destination_type            = string,
-              next_hop_drg_attachment_id  = string,
-              next_hop_drg_attachment_key = string,
+              next_hop_drg_attachment_id  = optional(string),
+              next_hop_drg_attachment_key = optional(string),
             })))
           })))
 
@@ -741,30 +816,204 @@ variable "network_configuration" {
             freeform_tags     = optional(map(string))
             statements = optional(map(object({
               action = string,
-              match_criteria = optional(map(object({
-                match_type        = string,
-                attachment_type   = optional(string),
-                drg_attachment_id = optional(string),
-              })))
+              match_criteria = optional(object({
+                match_type         = string,
+                attachment_type    = optional(string),
+                drg_attachment_id  = optional(string),
+                drg_attachment_key = optional(string)
+              }))
+              priority = optional(number)
+            })))
+          })))
+        })))
+
+        customer_premises_equipments = optional(map(object({
+          compartment_id               = optional(string),
+          ip_address                   = string,
+          defined_tags                 = optional(map(string)),
+          display_name                 = optional(string),
+          freeform_tags                = optional(map(string)),
+          cpe_device_shape_id          = optional(string),
+          cpe_device_shape_vendor_name = optional(string)
+        })))
+
+        ipsecs = optional(map(object({
+          compartment_id            = optional(string),
+          cpe_id                    = optional(string),
+          cpe_key                   = optional(string),
+          drg_id                    = optional(string),
+          drg_key                   = optional(string),
+          static_routes             = list(string),
+          cpe_local_identifier      = optional(string),
+          cpe_local_identifier_type = optional(string),
+          defined_tags              = optional(map(string)),
+          display_name              = optional(string),
+          freeform_tags             = optional(map(string)),
+          tunnels_management = optional(object({
+            tunnel_1 = optional(object({
+              routing = string,
+              bgp_session_info = optional(object({
+                customer_bgp_asn      = optional(string),
+                customer_interface_ip = optional(string),
+                oracle_interface_ip   = optional(string)
+              }))
+              encryption_domain_config = optional(object({
+                cpe_traffic_selector    = optional(string),
+                oracle_traffic_selector = optional(string)
+              }))
+              shared_secret = optional(string),
+              ike_version   = optional(string)
+            })),
+            tunnel_2 = optional(object({
+              routing = string,
+              bgp_session_info = optional(object({
+                customer_bgp_asn      = optional(string),
+                customer_interface_ip = optional(string),
+                oracle_interface_ip   = optional(string)
+              }))
+              encryption_domain_config = optional(object({
+                cpe_traffic_selector    = optional(string),
+                oracle_traffic_selector = optional(string)
+              }))
+              shared_secret = optional(string),
+              ike_version   = optional(string)
+            }))
+          }))
+        })))
+
+        fast_connect_virtual_circuits = optional(map(object({
+          #Required
+          compartment_id                              = optional(string),
+          provision_fc_virtual_circuit                = bool,
+          show_available_fc_virtual_circuit_providers = bool,
+          type                                        = string,
+          #Optional
+          bandwidth_shape_name = optional(string),
+          bgp_admin_state      = optional(string),
+          cross_connect_mappings = optional(map(object({
+            #Optional
+            bgp_md5auth_key                          = optional(string)
+            cross_connect_or_cross_connect_group_id  = optional(string)
+            cross_connect_or_cross_connect_group_key = optional(string)
+            customer_bgp_peering_ip                  = optional(string)
+            customer_bgp_peering_ipv6                = optional(string)
+            oracle_bgp_peering_ip                    = optional(string)
+            oracle_bgp_peering_ipv6                  = optional(string)
+            vlan                                     = optional(string)
+          })))
+          customer_asn              = optional(string)
+          defined_tags              = optional(map(string))
+          display_name              = optional(string)
+          freeform_tags             = optional(map(string))
+          ip_mtu                    = optional(number)
+          is_bfd_enabled            = optional(bool)
+          gateway_id                = optional(string)
+          gateway_key               = optional(string)
+          provider_service_id       = optional(string)
+          provider_service_key      = optional(string)
+          provider_service_key_name = optional(string)
+          public_prefixes = optional(map(object({
+            #Required
+            cidr_block = string,
+          })))
+          region         = optional(string)
+          routing_policy = optional(list(string))
+        })))
+
+        cross_connect_groups = optional(map(object({
+          compartment_id          = optional(string),
+          customer_reference_name = optional(string),
+          defined_tags            = optional(map(string)),
+          display_name            = optional(string),
+          freeform_tags           = optional(map(string)),
+          cross_connects = optional(map(object({
+            compartment_id                                = optional(string),
+            location_name                                 = string,
+            port_speed_shape_name                         = string,
+            customer_reference_name                       = optional(string),
+            defined_tags                                  = optional(map(string))
+            display_name                                  = optional(string),
+            far_cross_connect_or_cross_connect_group_id   = optional(string),
+            far_cross_connect_or_cross_connect_group_key  = optional(string),
+            freeform_tags                                 = optional(map(string))
+            near_cross_connect_or_cross_connect_group_id  = optional(string),
+            near_cross_connect_or_cross_connect_group_key = optional(string),
+          })))
+        })))
+
+        inject_into_existing_drgs = optional(map(object({
+          drg_id = string,
+
+          remote_peering_connections = optional(map(object({
+            compartment_id   = optional(string),
+            compartment_key  = optional(string),
+            defined_tags     = optional(map(string)),
+            display_name     = optional(string),
+            freeform_tags    = optional(map(string)),
+            peer_id          = optional(string),
+            peer_key         = optional(string),
+            peer_region_name = optional(string)
+          })))
+
+          drg_attachments = optional(map(object({
+            defined_tags        = optional(map(string)),
+            display_name        = optional(string),
+            freeform_tags       = optional(map(string)),
+            drg_route_table_id  = optional(string),
+            drg_route_table_key = optional(string),
+            network_details = optional(object({
+              attached_resource_id  = optional(string),
+              attached_resource_key = optional(string),
+              type                  = string,
+              route_table_id        = optional(string),
+              route_table_key       = optional(string),
+              vcn_route_type        = optional(string)
+            }))
+          })))
+
+          drg_route_tables = optional(map(object({
+            defined_tags                      = optional(map(string)),
+            display_name                      = optional(string),
+            freeform_tags                     = optional(map(string)),
+            import_drg_route_distribution_id  = optional(string),
+            import_drg_route_distribution_key = optional(string),
+            is_ecmp_enabled                   = optional(bool),
+            route_rules = optional(map(object({
+              destination                 = string,
+              destination_type            = string,
+              next_hop_drg_attachment_id  = optional(string),
+              next_hop_drg_attachment_key = optional(string),
+            })))
+          })))
+
+          drg_route_distributions = optional(map(object({
+            distribution_type = string,
+            defined_tags      = optional(map(string)),
+            display_name      = optional(string),
+            freeform_tags     = optional(map(string))
+            statements = optional(map(object({
+              action = string,
+              match_criteria = optional(object({
+                match_type         = string,
+                attachment_type    = optional(string),
+                drg_attachment_id  = optional(string),
+                drg_attachment_key = optional(string)
+              }))
               priority = number
             })))
           })))
         })))
 
-        # Network Firewall related resource Map
         network_firewalls_configuration = optional(object({
-          
-          # Network Firewall Resource
           network_firewalls = optional(map(object({
             availability_domain         = optional(number),
-            compartment_id              = optional(string), 
-            compartment_key             = optional(string), 
+            compartment_id              = optional(string),
             defined_tags                = optional(map(string)),
             display_name                = optional(string),
             freeform_tags               = optional(map(string)),
             ipv4address                 = optional(string),
             ipv6address                 = optional(string),
-            network_security_group_ids  = optional(list(string)), # List of NSG that will be associated to this firewall
+            network_security_group_ids  = optional(list(string)),
             network_security_group_keys = optional(list(string)),
             subnet_id                   = optional(string),
             subnet_key                  = optional(string),
@@ -772,15 +1021,12 @@ variable "network_configuration" {
             network_firewall_policy_key = optional(string)
           }))),
 
-          # Map of policies to be used by Firewall Resources
           network_firewall_policies = optional(map(object({
             compartment_id  = optional(string),
             compartment_key = optional(string),
             defined_tags    = optional(map(string)),
             display_name    = optional(string),
             freeform_tags   = optional(map(string)),
-            
-            # https://docs.oracle.com/en-us/iaas/api/#/en/network-firewall/20230501/Application/CreateApplication
             application_lists = optional(map(object({
               application_list_name = string,
               application_values = map(object({
@@ -791,8 +1037,6 @@ variable "network_configuration" {
                 maximum_port = optional(number)
               }))
             })))
-            
-            # https://docs.oracle.com/en-us/iaas/api/#/en/network-firewall/20230501/datatypes/CreateDecryptionProfileDetails
             decryption_profiles = optional(map(object({
               is_out_of_capacity_blocked            = bool,
               is_unsupported_cipher_blocked         = bool,
@@ -806,8 +1050,6 @@ variable "network_configuration" {
               is_unknown_revocation_status_blocked  = optional(bool),
               is_untrusted_issuer_blocked           = optional(bool)
             })))
-            
-            # https://docs.oracle.com/en-us/iaas/api/#/en/network-firewall/20230501/DecryptionRule/CreateDecryptionRule 
             decryption_rules = optional(map(object({
               action             = string,
               name               = string,
@@ -818,37 +1060,27 @@ variable "network_configuration" {
                 sources      = optional(list(string))
               }))
             })))
-
-            # Source IP Addresses allowed
-            # https://docs.oracle.com/en-us/iaas/api/#/en/network-firewall/20230501/AddressList/CreateAddressList
             ip_address_lists = optional(map(object({
               ip_address_list_name  = string,
               ip_address_list_value = list(string)
             })))
-
-            # https://docs.oracle.com/en-us/iaas/api/#/en/network-firewall/20230501/MappedSecret/CreateMappedSecret 
             mapped_secrets = optional(map(object({
               key             = optional(string),
               type            = string,
               vault_secret_id = string,
               version_number  = string,
             })))
-
-            # Conditions associated to Source Traffic allowed
-            # https://docs.oracle.com/en-us/iaas/api/#/en/network-firewall/20230501/datatypes/CreateSecurityRuleDetails
             security_rules = optional(map(object({
-              action     = string, # INSPECT, etc..
-              inspection = optional(string), # INTRUSION INSPECTION, etc..
+              action     = string,
+              inspection = optional(string),
               name       = string
-              conditions = map(object({ # https://docs.oracle.com/en-us/iaas/api/#/en/network-firewall/20230501/datatypes/SecurityRuleMatchCriteria 
-                applications = optional(list(string)), # Elements from 'application_lists'
-                destinations = optional(list(string)), # List of target IPs
-                sources      = optional(list(string)), # List of source IPs
-                urls         = optional(list(string)) # List of URL patterns
+              conditions = map(object({
+                applications = optional(list(string)),
+                destinations = optional(list(string)),
+                sources      = optional(list(string)),
+                urls         = optional(list(string))
               }))
             })))
-
-            # https://docs.oracle.com/en-us/iaas/api/#/en/network-firewall/20230501/UrlList/CreateUrlList
             url_lists = optional(map(object({
               url_list_name = string,
               url_list_values = map(object({
@@ -1022,5 +1254,4 @@ variable "network_configuration" {
       }
     )))
   })
-  default = null
 }

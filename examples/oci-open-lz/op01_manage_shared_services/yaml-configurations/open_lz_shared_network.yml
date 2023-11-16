@@ -1,3 +1,12 @@
+# ####################################################################################################### #
+# Copyright (c) 2023 Oracle and/or its affiliates,  All rights reserved.                                  #
+# Licensed under the Universal Permissive License v 1.0 as shown at https: //oss.oracle.com/licenses/upl. #
+# Author: Cosmin Tudor                                                                                    #
+# Author email: cosmin.tudor@oracle.com                                                                   #
+# Last Modified: Thu Nov 16 2023                                                                          #
+# Modified by: Cosmin Tudor, email: cosmin.tudor@oracle.com                                               #
+# ####################################################################################################### #
+
 ---
 network_configuration:
   default_compartment_key: CMP-NETWORK-KEY
@@ -143,7 +152,7 @@ network_configuration:
               route_rules:
                 sgw_route:
                   description: Route for sgw
-                  destination: oci-fra-objectstorage
+                  destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                   network_entity_key: SG-FRANKFURT-HUB-KEY
           security_lists:
@@ -260,6 +269,7 @@ network_configuration:
             service_gateways:
               SG-FRANKFURT-HUB-KEY:
                 display_name: sg_frankfurt_hub
+                services: objectstorage
       IPs:
         public_ips:
           SHARED-IP-LB-SHARED-KEY:
