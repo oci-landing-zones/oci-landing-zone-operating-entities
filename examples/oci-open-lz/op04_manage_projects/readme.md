@@ -199,7 +199,6 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 
 
 ## **4. Run with ORM**
-&nbsp; 
 
 | STEP |  ACTION |
 |---|---| 

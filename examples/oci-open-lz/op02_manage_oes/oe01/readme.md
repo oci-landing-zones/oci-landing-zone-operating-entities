@@ -234,7 +234,6 @@ The examples given with this code, expects to find valid certificates in your ho
 &nbsp; 
 
 ## **4. Run with ORM**
-&nbsp; 
 
 | STEP |  ACTION |
 |---|---| 

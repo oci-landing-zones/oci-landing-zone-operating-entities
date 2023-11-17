@@ -147,7 +147,6 @@ For an example of such configuration and for extended documentation please refer
 &nbsp; 
 
 ## **3. Run with ORM**
-&nbsp; 
 
 | STEP |  ACTION |
 |---|---| 
