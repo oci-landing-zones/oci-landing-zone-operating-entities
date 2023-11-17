@@ -69,8 +69,40 @@ compartments_configuration:
             oci-open-lz-customer: oci-open-lz-prod
             oci-open-lz-cmp: oe-prod
 groups_configuration:
-  groups: {}
+  groups:
+    GRP-OE01-ADMINS:
+      name: grp-oe01-admins
+      description: GRP.OE.01 OE specific administrator group responsible for creating
+        compartments.
+    GRP-OE01-NETWORK-ADMINS:
+      name: grp-oe01-network-admins
+      description: GRP.OE.02 use the OE common networking and manages project NSGs.
 dynamic_groups_configuration:
-  dynamic_groups: {}
+  dynamic_groups:
+    DGP-OS-MANAGEMENT:
+      name: dgp-os-management
+      description: DGP.01 Holds the compartments which contain the VM images to be
+        automatically patched by the OS Management Service.
+      matching_rule: ALL {instance.compartment.id = 'cmp-oe01-common-infra'}
 policies_configuration:
-  supplied_policies: {}
+  enable_cis_benchmark_checks: 'false'
+  supplied_policies:
+    PCY-OE01-ADMINISTRATION:
+      name: pcy-oe01-administration
+      description: POL.0E.01 Open LZ policy which allows the grp-oe01-admins group
+        users to manage the compartment structure of the OE.
+      compartment_ocid: ocid1.tenancy.oc1..example
+      statements:
+      - allow group grp-oe01-admins to use cloud-shell in compartment cmp-oe1
+      - allow group grp-oe01-admins to manage policies in compartment cmp-oe1
+      - allow group grp-oe01-admins to manage policies in compartment cmp-oe1
+    PCY-OE01-NETWORK-ADMINISTRATION:
+      name: pcy-oe01-network-administration
+      description: POL.0E.02 Open LZ policy which allows the grp-oe01-network-admins
+        group users to manage NSGs in the OE network.
+      compartment_ocid: ocid1.tenancy.oc1..example
+      statements:
+      - allow group grp-oe01-network-admins to use cloud-shell in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network
+      - allow group grp-oe01-network-admins to read all-resources in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network
+      - allow group grp-oe01-network-admins to manage network-security-groups in compartment
+        cmp-oe1:cmp-oe01-common:cmp-oe01-common-network

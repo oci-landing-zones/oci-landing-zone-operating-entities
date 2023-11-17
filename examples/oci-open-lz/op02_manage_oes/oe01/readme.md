@@ -156,14 +156,21 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **2.2 Groups**
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Groups topology, from the shared infrastructure configuration example this is not yet covered.
-
-Meanwhile, you can proceed by updating with the desired groups, or use the empty groups configuration looks like in the example below:
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
 
 ```
 ...
     "groups_configuration": {
-        "groups": {}
+        "groups": {            
+            "GRP-OE01-ADMINS": {
+            "name": "grp-oe01-admins",  
+            "description": "GRP.OE.01 OE specific administrator group responsible for creating compartments."
+            },
+            "GRP-OE01-NETWORK-ADMINS": {
+                "name": "grp-oe01-network-admins",  
+                "description": "GRP.OE.02 use the OE common networking and manages project NSGs."
+            }
+        }
     }
 ...
 ```
@@ -176,14 +183,18 @@ For an example of such configuration and for extended documentation please refer
 ### **2.3 Dynamic Groups**
 
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Dynamic Groups topology, from the shared infrastructure configuration example this is not yet covered.
-
-Meanwhile, you can proceed by updating with the desired dynamic groups, or use the empty groups configuration looks like in the example below:
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the  [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
 
 ```
 ...
     "dynamic_groups_configuration": {
-        "dynamic_groups": {}
+        "dynamic_groups": {
+            "DGP-OS-MANAGEMENT": {
+                "name": "dgp-os-management",
+                "description": "DGP.01 Holds the compartments which contain the VM images to be automatically patched by the OS Management Service.",
+                "matching_rule": "ALL {instance.compartment.id = 'cmp-oe01-common-infra'}"
+            }
+        }
     }
 ...
 ```
@@ -195,17 +206,36 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.4 Policies**
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Policies topology, from the shared infrastructure configuration example this is not yet covered.
+We provide here an example on how to setup the IAM policies for the design discused in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf). Notice that these policies must be considered as an example on how to deploy the blueprint based on CIS separation of duties, but not as a prescribed configuration. We encourage you to review and adapt to your design.
 
-Meanwhile, you can proceed by updating with the desired policies, or use the following example:
+For this example, replace the compartment_ocid to your tenancy OCID.
 
 ```
 ...
     "policies_configuration": {
-        "enable_compartment_level_template_policies": "false",
-        "enable_tenancy_level_template_policies": "false",
         "enable_cis_benchmark_checks": "false",
-        "groups_with_tenancy_level_roles": []
+        "supplied_policies": {
+            "PCY-OE01-ADMINISTRATION": {
+                "name": "pcy-oe01-administration",
+                "description": "POL.0E.01 Open LZ policy which allows the grp-oe01-admins group users to manage the compartment structure of the OE.",
+                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "statements": [
+                    "allow group grp-oe01-admins to use cloud-shell in compartment cmp-oe1",
+                    "allow group grp-oe01-admins to manage policies in compartment cmp-oe1",
+                    "allow group grp-oe01-admins to manage policies in compartment cmp-oe1"
+                ]
+            },
+            "PCY-OE01-NETWORK-ADMINISTRATION": {
+                "name": "pcy-oe01-network-administration",
+                "description": "POL.0E.02 Open LZ policy which allows the grp-oe01-network-admins group users to manage NSGs in the OE network.",
+                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "statements": [
+                    "allow group grp-oe01-network-admins to use cloud-shell in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network",
+                    "allow group grp-oe01-network-admins to read all-resources in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network",
+                    "allow group grp-oe01-network-admins to manage network-security-groups in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network"
+                ]
+            }
+        }
     }
 ...
 ```
