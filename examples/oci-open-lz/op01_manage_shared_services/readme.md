@@ -172,17 +172,184 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.4 Policies**
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage of shared infrastructure OCI IAM Policies topology, from the shared infrastructure configuration example this is not yet covered.
+We provide here an example on how to setup the IAM policies for the design discused in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf). Notice that these policies must be considered as an example on how to deploy the blueprint based on CIS separation of duties, but not as a prescribed configuration. We encourage you to review and adapt to your design.
 
-Meanwhile, you can proceed by updating with the desired policies, or use the following example:
+For this example, replace the compartment_ocid to your tenancy OCID.
 
 ```
 ...
-    "policies_configuration": {
-        "enable_compartment_level_template_policies": "false",
-        "enable_tenancy_level_template_policies": "false",
+   "policies_configuration": {
         "enable_cis_benchmark_checks": "false",
-        "groups_with_tenancy_level_roles": []
+        "supplied_policies": {
+            "PCY-SERVICES": {
+                "name": "pcy-services",
+                "description": "POL.00 Open LZ policy for all supported resources in the tenancy.",
+                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "statements": [
+                    "allow service cloudguard to read all-resources in tenancy",
+                    "allow service cloudguard to use network-security-groups in tenancy",
+                    "allow service vulnerability-scanning-service to manage instances in tenancy",
+                    "allow service vulnerability-scanning-service to read compartments in tenancy",
+                    "allow service vulnerability-scanning-service to read repos in tenancy",
+                    "allow service vulnerability-scanning-service to read vnics in tenancy",
+                    "allow service vulnerability-scanning-service to read vnic-attachments in tenancy",
+                    "allow service osms to read instances in tenancy",
+                    "allow service blockstorage, oke, streaming, Fssoc1Prod, objectstorage-eu-amsterdam-1,objectstorage-eu-frankfurt-1 to use keys in tenancy"
+                ]
+            },
+            "PCY-IAM-ADMINISTRATION": {
+                "name": "pcy-iam-administration",
+                "description": "POL.01 Open LZ allows grp-iam-admins group users to manage IAM resoures in the tenancy.",
+                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "statements": [
+                    "allow group grp-iam-admins to inspect users in tenancy",
+                    "allow group grp-iam-admins to manage users in tenancy where all {request.operation != 'ListApiKeys',request.operation != 'ListAuthTokens',request.operation != 'ListCustomerSecretKeys',request.operation != 'UploadApiKey',request.operation != 'DeleteApiKey',request.operation != 'UpdateAuthToken',request.operation != 'CreateAuthToken',request.operation != 'DeleteAuthToken',request.operation != 'CreateSecretKey',request.operation != 'UpdateCustomerSecretKey',request.operation != 'DeleteCustomerSecretKey'}",
+                    "allow group grp-iam-admins to inspect groups in tenancy",
+                    "allow group grp-iam-admins to read policies in tenancy",
+                    "allow group grp-iam-admins to manage groups in tenancy where all {target.group.name != 'Administrators',target.group.name != 'grp-credential-admins'}",
+                    "allow group grp-iam-admins to inspect identity-providers in tenancy",
+                    "allow group grp-iam-admins to manage identity-providers in tenancy where any {request.operation = 'AddIdpGroupMapping', request.operation = 'DeleteIdpGroupMapping'}",
+                    "allow group grp-iam-admins to manage dynamic-groups in tenancy",
+                    "allow group grp-iam-admins to manage authentication-policies in tenancy",
+                    "allow group grp-iam-admins to manage network-sources in tenancy",
+                    "allow group grp-iam-admins to manage quota in tenancy",
+                    "allow group grp-iam-admins to use cloud-shell in tenancy",
+                    "allow group grp-iam-admins to manage tag-defaults in tenancy",
+                    "allow group grp-iam-admins to manage tag-namespaces in tenancy",
+                    "allow group grp-iam-admins to manage orm-jobs in tenancy",
+                    "allow group grp-iam-admins to manage orm-config-source-providers in tenancy"
+                ]
+            },
+            "PCY-CREDENTIAL-ADMINISTRATION": {
+                "name": "pcy-credential-administration",
+                "description": "POL.02 Open LZ policy which allows grp-credential-admins group users to manage user credentials of local users in the tenancy .",
+                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "statements": [
+                    "allow group grp-credential-admins to inspect users in tenancy",
+                    "allow group grp-credential-admins to inspect groups in tenancy",
+                    "allow group grp-credential-admins to manage users in tenancy where any {request.operation = 'ListApiKeys',request.operation = 'ListAuthTokens',request.operation = 'ListCustomerSecretKeys',request.operation = 'UploadApiKey',request.operation = 'DeleteApiKey',request.operation = 'UpdateAuthToken',request.operation = 'CreateAuthToken',request.operation = 'DeleteAuthToken',request.operation = 'CreateSecretKey',request.operation = 'UpdateCustomerSecretKey',request.operation = 'DeleteCustomerSecretKey',request.operation = 'UpdateUserCapabilities'}",
+                    "allow group grp-credential-admins to use cloud-shell in tenancy"
+                ]
+            },
+            "PCY-ANNOUNCEMENT-READERS": {
+                "name": "pcy-announcement-readers",
+                "description": "POL.03 Open LZ policy which allows grp-announcement-readers group users to read OCI announcements in the tenancy.",
+                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "statements": [
+                    "allow group grp-announcement-readers to read announcements in tenancy",
+                    "allow group grp-announcement-readers to use cloud-shell in tenancy"
+                ]
+            },
+            "PCY-BUDGET-ADMINISTRATION": {
+                "name": "pcy-budget-administration",
+                "description": "POL.04 Open LZ policy which allows grp-budget-admins group users to manage all budget resources in the tenancy.",
+                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "statements": [
+                    "define tenancy usage-report as ocid1.tenancy.oc1..example",
+                    "endorse group grp-budget-admins to read objects in tenancy usage-report",
+                    "allow group grp-budget-admins to manage usage-report in tenancy",
+                    "allow group grp-budget-admins to manage usage-budgets in tenancy"
+                ]
+            },
+            "PCY-AUDITING": {
+                "name": "pcy-auditing",
+                "description": "POL.05 Open LZ policy which allows grp-auditors group users to read all the resources in the tenancy.",
+                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "statements": [
+                    "allow group grp-auditors to inspect all-resources in tenancy",
+                    "allow group grp-auditors to read instances in tenancy",
+                    "allow group grp-auditors to read load-balancers in tenancy",
+                    "allow group grp-auditors to read buckets in tenancy",
+                    "allow group grp-auditors to read nat-gateways in tenancy",
+                    "allow group grp-auditors to read public-ips in tenancy",
+                    "allow group grp-auditors to read file-family in tenancy",
+                    "allow group grp-auditors to read instance-configurations in tenancy",
+                    "allow group grp-auditors to read network-security-groups in tenancy",
+                    "allow group grp-auditors to read resource-availability in tenancy",
+                    "allow group grp-auditors to read audit-events in tenancy",
+                    "allow group grp-auditors to read users in tenancy",
+                    "allow group grp-auditors to use cloud-shell in tenancy",
+                    "allow group grp-auditors to read vss-family in tenancy",
+                    "allow group grp-auditors to read usage-budgets in tenancy",
+                    "allow group grp-auditors to read usage-reports in tenancy",
+                    "allow group grp-auditors to read data-safe-family in tenancy"
+                ]
+            },
+            "PCY-NETWORK-ADMINISTRATION": {
+                "name": "pcy-network-administration",
+                "description": "POL.06 Open LZ policy which allows grp-network-admins group users to manage all network resources in the compartment.",
+                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "statements": [
+                    "allow group grp-network-admins to use cloud-shell in tenancy",
+                    "allow group grp-network-admins to read usage-budgets in tenancy",
+                    "allow group grp-network-admins to read usage-reports in tenancy",
+                    "allow group grp-network-admins to read objectstorage-namespaces in tenancy",
+                    "allow group grp-network-admins to read all-resources in compartment cmp-network",
+                    "allow group grp-network-admins to manage virtual-network-family in compartment cmp-network",
+                    "allow group grp-network-admins to manage dns in compartment paalonso-openlz-tfcli:cmp-network",
+                    "allow group grp-network-admins to manage load-balancers in compartment cmp-network",
+                    "allow group grp-network-admins to manage alarms in compartment cmp-network",
+                    "allow group grp-network-admins to manage metrics in compartment cmp-network",
+                    "allow group grp-network-admins to manage ons-family in compartment cmp-network",
+                    "allow group grp-network-admins to manage orm-stacks in compartment cmp-network",
+                    "allow group grp-network-admins to manage orm-jobs in compartment cmp-network",
+                    "allow group grp-network-admins to manage orm-config-source-providers in compartment cmp-network"
+                ]
+            },
+            "PCY-SECURITY-ADMINISTRATION": {
+                "name": "pcy-security-administration",
+                "description": "POL.07 Open LZ policy which allows grp-security-admins group users to manage all security resources in the security compartment.",
+                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "statements": [
+                    "allow group grp-security-admins to use cloud-shell in tenancy",
+                    "allow group grp-security-admins to read usage-budgets in tenancy",
+                    "allow group grp-security-admins to read usage-reports in tenancy",
+                    "allow group grp-security-admins to read objectstorage-namespaces in tenancy",
+                    "allow group grp-security-admins to manage cloudevents-rules in tenancy",
+                    "allow group grp-security-admins to manage cloud-guard-family in tenancy",
+                    "allow group grp-security-admins to read tenancies in tenancy",
+                    "allow group grp-security-admins to manage tag-namespaces in tenancy",
+                    "allow group grp-security-admins to manage tag-defaults in tenancy",
+                    "allow group grp-security-admins to manage repos in tenancy",
+                    "allow group grp-security-admins to read audit-events in tenancy",
+                    "allow group grp-security-admins to read app-catalog-listing in tenancy",
+                    "allow group grp-security-admins to read instance-images in tenancy",
+                    "allow group grp-security-admins to inspect buckets in tenancy",
+                    "allow group grp-security-admins to read all-resources in compartment cmp-security",
+                    "allow group grp-security-admins to manage instance-family in compartment cmp-security",
+                    "allow group grp-security-admins to manage volume-family in compartment cmp-security where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group grp-security-admins to manage object-family in compartment cmp-security where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group grp-security-admins to manage file-family in compartment cmp-security where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group grp-security-admins to manage vaults in compartment cmp-security",
+                    "allow group grp-security-admins to manage keys in compartment cmp-security",
+                    "allow group grp-security-admins to manage secret-family in compartment cmp-security",
+                    "allow group grp-security-admins to manage logging-family in compartment cmp-security",
+                    "allow group grp-security-admins to manage serviceconnectors in compartment cmp-security",
+                    "allow group grp-security-admins to manage streams in compartment cmp-security",
+                    "allow group grp-security-admins to manage ons-family in compartment cmp-security",
+                    "allow group grp-security-admins to manage functions-family in compartment cmp-security",
+                    "allow group grp-security-admins to manage waas-family in compartment cmp-security",
+                    "allow group grp-security-admins to manage security-zone in compartment cmp-security",
+                    "allow group grp-security-admins to manage orm-stacks in compartment cmp-security",
+                    "allow group grp-security-admins to manage orm-jobs in compartment cmp-security",
+                    "allow group grp-security-admins to manage orm-config-source-providers in compartment cmp-security",
+                    "allow group grp-security-admins to manage vss-family in compartment cmp-security",
+                    "allow group grp-security-admins to read work-requests in compartment cmp-security",
+                    "allow group grp-security-admins to manage bastion-family in compartment cmp-security",
+                    "allow group grp-security-admins to read instance-agent-plugins in compartment cmp-security",
+                    "allow group grp-security-admins to manage cloudevents-rules in compartment cmp-security",
+                    "allow group grp-security-admins to manage alarms in compartment cmp-security",
+                    "allow group grp-security-admins to manage metrics in compartment cmp-security",
+                    "allow group grp-security-admins to use key-delegate in compartment cmp-security",
+                    "allow group grp-security-admins to read virtual-network-family in compartment cmp-security",
+                    "allow group grp-security-admins to use subnets in compartment cmp-security",
+                    "allow group grp-security-admins to use network-security-groups in compartment cmp-security",
+                    "allow group grp-security-admins to use vnics in compartment cmp-security",
+                    "allow group grp-security-admins to manage private-ips in compartment cmp-security",
+                    "allow group grp-security-admins to read keys in compartment cmp-security"
+                ]
+            }
+        }
     }
 ...
 ```
