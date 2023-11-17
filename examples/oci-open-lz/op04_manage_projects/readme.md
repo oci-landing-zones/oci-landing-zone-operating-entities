@@ -209,7 +209,8 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 | **4** | Set the stack name you prefer. | 
 | **5** |  Set the terraform version to 1.2.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next. Optionally,replace with your json/yaml config files. |
-| **8** | Un-check run apply. Click Create. |
+| **7** | Un-check run apply. Click Create. 
+
 &nbsp; 
 
 &nbsp; 

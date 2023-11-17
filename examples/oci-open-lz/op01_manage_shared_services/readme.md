@@ -212,7 +212,7 @@ The example given with this code, expects to find valid certificates in your hom
 &nbsp; 
 
 ## **4. Run with ORM**
-&nbsp; 
+
 
 | STEP |  ACTION |
 |---|---| 
@@ -222,7 +222,7 @@ The example given with this code, expects to find valid certificates in your hom
 | **4** | Set the stack name you prefer. | 
 | **5** |  Set the terraform version to 1.2.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next. Optionally,replace with your json/yaml config files. |
-| **8** | Un-check run apply. Click Create. |
+| **7** | Un-check run apply. Click Create. 
 
 &nbsp; 
 
