@@ -212,6 +212,7 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 | **8** | Un-check run apply. Click Create. |
 &nbsp; 
 
+&nbsp; 
 
 ## **5. Run with Terraform CLI**
 &nbsp; 
