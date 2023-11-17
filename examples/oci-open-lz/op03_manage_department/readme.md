@@ -3,9 +3,9 @@
 ## **Table of Contents**
 
 [1. Summary](#1-summary)</br>
-[2. Setup Terraform Authentication](#2-setup-terraform-authentication)</br>
-[3. Setup IAM Configuration](#3-setup-iam-configuration)</br>
-[4. Run the Configurations (Terraform Plan and Apply)](#4-run-the-configurations)</br>
+[2. Setup IAM Configuration](#2-setup-iam-configuration)</br>
+[3. Run with ORM](#3-run-with-orm) </br>
+[4. Run with TF CLI](#4-run-with-terraform-cli)
 
 
 &nbsp; 
@@ -23,19 +23,12 @@
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../../design/OCI_Open_LZ.pdf).|
 | **PRE-ACTIVITIES** | [OP.02 Manage Operating Entity (OE)](../op02_manage_oes/readme.md) executed. |
 | **POST-ACTIVITIES** | The execution of this operation by the OE Ops Team creates the department in an specific OE environment. Replicate for other existing OE environments where the department should belong to. |
-| **RUN WITH ORM** | 1. [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op03_manage_department/open_lz_oe_01_prod_deptA_identity.auto.tfvars.json"}) </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “orm-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the defaul configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create. |
-| **CONFIG & RUN - TERRAFORM CLI** | Follow the steps below. |
-
-&nbsp; 
-
-## **2. Setup Terraform Authentication**
-
-For authenticating against the OCI tenancy terraform execute the following [instructions](/examples/oci-open-lz/common_terraform_authentication.md).
+| **RUN OPERATION** | Use [ORM](#3-run-with-orm) or use [Terraform CLI](#4-run-with-terraform-cli). |
 
 
 &nbsp; 
 
-## **3. Setup IAM Configuration**
+## **2. Setup IAM Configuration**
 
 For configuring and running the OCI Open LZ Manage Dept IAM layer use the following JSON file: [open_lz_oe_01_prod_deptA_identity.auto.tfvars.json](./open_lz_oe_01_prod_deptA_identity.auto.tfvars.json). You can customize this  configuration to fit your exact OCI IAM topology.
 
@@ -43,7 +36,7 @@ This configuration file will cover the following four categories of resources de
 
 &nbsp; 
 
-###  **3.1. Compartments**
+###  **2.1. Compartments**
 
 The diagram below identifies the compartments in the scope of this operation.
 
@@ -92,7 +85,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 &nbsp; 
 
-### **3.2 Groups**
+### **2.2 Groups**
 
 The [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full explanation of the possible separation of duties with the different tenancy structure levels. The department structure is optional. We take it into consideration just in case you have department's level security.
 
@@ -111,7 +104,7 @@ For an example of such configuration and for extended documentation please refer
 
 &nbsp; 
 
-### **3.3 Dynamic Groups**
+### **2.3 Dynamic Groups**
 
 The [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full explanation of the possible separation of duties with the different tenancy structure levels. It is not specified for the departments any configuration.
 
@@ -130,7 +123,7 @@ For an example of such configuration and for extended documentation please refer
 
 &nbsp; 
 
-### **3.4 Policies**
+### **2.4 Policies**
 
 The [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full explanation of the possible separation of duties with the different tenancy structure levels. It is not specified for the departments any configuration.
 
@@ -153,11 +146,32 @@ For an example of such configuration and for extended documentation please refer
 
 &nbsp; 
 
-
-## **4. Run the Configurations**
+## **3. Run with ORM**
 &nbsp; 
 
-### **4.1 Clone this Git repo to your Machine**
+| STEP |  ACTION |
+|---|---| 
+| **1** |  [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op03_manage_department/open_lz_oe_01_prod_deptA_identity.auto.tfvars.json"})  |
+| **2** | Accept terms,  wait for the configuration to load. |
+| **3** | Set the working directory to “orm-facade”. | 
+| **4** | Set the stack name you prefer. | 
+| **5** |  Set the terraform version to 1.2.x. Click Next. | 
+| **6** | Accept the defaul configurations. Click Next. Optionally,replace with your json/yaml config files. |
+| **7** | Un-check run apply. Click Create. |
+&nbsp; 
+
+## **4. Run with Terraform CLI**
+&nbsp; 
+
+
+### **4.1. Setup Terraform Authentication**
+
+For authenticating against the OCI tenancy terraform execute the following [instructions](/examples/oci-open-lz/common_terraform_authentication.md).
+
+&nbsp; 
+
+
+### **4.2 Clone this Git repo to your Machine**
 
 ```
 git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.0.0
@@ -167,19 +181,19 @@ For referring to a specific module version, append *ref=\<version\>* to the *sou
 
 &nbsp; 
 
-###  **4.2 Change the Directory to the Terraform Orchestrator Module**
+###  **4.3 Change the Directory to the Terraform Orchestrator Module**
 
  Change the directory to the [```terraform-oci-open-lz/orchestrator```](../../../orchestrator/) terraform orchestrator module.
 
 &nbsp; 
 
- ### **4.3 Run ```terraform init```**
+ ### **4.4 Run ```terraform init```**
 
 Run terraform init to download all the required external terraform providers and terraform modules. See [command example](./tf_init_output_example.out) for more details on the expected output.
 
 &nbsp; 
 
- ### **4.4 Run ```terraform plan```**
+ ### **4.5 Run ```terraform plan```**
 
 Run ```terraform plan``` with the IAM and Network configuration.
 
@@ -198,7 +212,7 @@ The ideal scenario regarding the **state file** will be for each configuration t
 
 &nbsp; 
 
-### **4.5 Run ```terraform apply```**
+### **4.6 Run ```terraform apply```**
 
 Run ```terraform apply``` with the IAM and Network configuration. After its execution the configured resources will be provisioned or updated on OCI.
 
