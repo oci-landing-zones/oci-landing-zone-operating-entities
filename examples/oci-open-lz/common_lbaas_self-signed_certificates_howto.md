@@ -4,7 +4,7 @@ For the examples given for shared OE, it is required that you have valid Load Ba
 
 The Load Balancer service doesn't generate SSL certificates. You can import existing certificates created by external parties or you could use self-signed certificates. 
 
-For educational purposes, we leave here how to create self-signed certificates, which are not adecuate for production purposes but will allow you to deploy the Open LZ shared or OE environments and get familiar with it.
+For educational purposes, we leave here how to create self-signed certificates, which are not adequate for production purposes but will allow you to deploy the Open LZ shared or OE environments and get familiar with it.
 
 In the shared or OE examples you will find in the ```open_lz_*_network.auto.tfvars.json`````` a section for Load Balancers with the following information:
 
@@ -37,15 +37,16 @@ For the creation of your own self-signed certificates and using the name and loc
 
   4. Create a cert key and certificate signing request (CSR):
       ```
-      openssl req -nekey rsa:2048 -nodes -keyout my_cert.key -out my_cert.csr
+      openssl req -newkey rsa:2048 -nodes -keyout my_cert.key -out my_cert.csr
       ```
 
   5. Sign the certificate CSR with Root CA:
       ```
       cat my_cert.txt
-      authorityKeyIdentifier=keyid,issuer 
-      basicConstraints=CA:FALSE 
-      subjectAltName = @alt_names [alt_names] 
+      authorityKeyIdentifier=keyid,issuer
+      basicConstraints=CA:FALSE
+      subjectAltName = @alt_names
+      [alt_names]
       DNS.1 = oe01.com
       
       openssl x509 -req -CA ca.crt -CAkey ca.key -in my_cert.csr -out my_cert.crt -days 365 -CAcreateserial -extfile my_cert.txt
