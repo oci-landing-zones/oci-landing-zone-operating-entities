@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2023-11-17T09:50:01.444Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="trPGRDaMzSAEc9UIY8Zk" version="22.0.3" type="device" pages="19">
+<mxfile host="Electron" modified="2023-11-20T12:19:00.449Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="uhk_hmhaYp_9LNwVYkSI" version="22.0.3" type="device" pages="19">
   <diagram id="b9hU5v1Cp9lCEPGJeyjb" name="WELCOME">
     <mxGraphModel dx="1314" dy="953" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -5901,7 +5901,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="OPS - Operations Scenarios" id="0p_-ZAbrWuw2IeWPW0S5">
-    <mxGraphModel dx="1314" dy="953" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1752" dy="1271" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="LBNAozDEcYqfEnfwiS03-0" />
         <mxCell id="LBNAozDEcYqfEnfwiS03-1" parent="LBNAozDEcYqfEnfwiS03-0" />
@@ -6032,82 +6032,14 @@
         <mxCell id="LBNAozDEcYqfEnfwiS03-51" value="&lt;b&gt;OCI OPEN LZ - OPERATIONS VIEW - OPERATIONS SCENARIO (REPEATABLE ELEMENTS / TEMPLATES)&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#cce2e9;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
           <mxGeometry x="80" y="40" width="1360" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="h8PDNtghWhMh0ePToyn4-0" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=none;strokeColor=#FFD966;strokeWidth=2;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="90" y="240" width="270" height="500" as="geometry" />
-        </mxCell>
-        <mxCell id="h8PDNtghWhMh0ePToyn4-1" value="&lt;b&gt;OP.01 MANAGE SHARED SERVICES&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="119" y="760" width="230" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="h8PDNtghWhMh0ePToyn4-2" value="&lt;b&gt;OP.02 MANAGE OE&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="579" y="760" width="130" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="h8PDNtghWhMh0ePToyn4-3" value="&lt;b&gt;OP.03 MANAGE DEPT.&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="908" y="760" width="150" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="h8PDNtghWhMh0ePToyn4-13" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=24;edgeStyle=orthogonalEdgeStyle;strokeColor=#0066CC;" parent="LBNAozDEcYqfEnfwiS03-1" source="yLGN0gBkA9ZHpzFpxp3k-0" target="h8PDNtghWhMh0ePToyn4-2" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="667" y="1004" as="targetPoint" />
-            <mxPoint x="666.56" y="1080.74" as="sourcePoint" />
-            <Array as="points">
-              <mxPoint x="480" y="1010" />
-              <mxPoint x="641" y="1010" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="h8PDNtghWhMh0ePToyn4-14" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=24;edgeStyle=orthogonalEdgeStyle;exitX=0.391;exitY=0.091;exitDx=0;exitDy=0;exitPerimeter=0;strokeColor=#CCCC00;" parent="LBNAozDEcYqfEnfwiS03-1" source="yLGN0gBkA9ZHpzFpxp3k-3" target="h8PDNtghWhMh0ePToyn4-1" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="810" y="990" as="targetPoint" />
-            <mxPoint x="390" y="1100" as="sourcePoint" />
-            <Array as="points">
-              <mxPoint x="410" y="1010" />
-              <mxPoint x="228" y="1010" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="h8PDNtghWhMh0ePToyn4-24" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=24;edgeStyle=orthogonalEdgeStyle;entryX=0.406;entryY=1.035;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.021;exitY=0.112;exitDx=0;exitDy=0;exitPerimeter=0;strokeColor=#FF8000;" parent="LBNAozDEcYqfEnfwiS03-1" source="yLGN0gBkA9ZHpzFpxp3k-9" target="h8PDNtghWhMh0ePToyn4-3" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="810" y="990" as="targetPoint" />
-            <mxPoint x="1430" y="1079" as="sourcePoint" />
-            <Array as="points">
-              <mxPoint x="1062" y="1050" />
-              <mxPoint x="1060" y="1050" />
-              <mxPoint x="1060" y="1010" />
-              <mxPoint x="969" y="1010" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="h8PDNtghWhMh0ePToyn4-25" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=none;strokeColor=#99c6d4;strokeWidth=2;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="370" y="240" width="500" height="500" as="geometry" />
-        </mxCell>
-        <mxCell id="h8PDNtghWhMh0ePToyn4-26" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=none;strokeColor=#bfbfbf;strokeWidth=2;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="1050" y="240" width="370" height="500" as="geometry" />
-        </mxCell>
-        <mxCell id="1G5S2S8ZX2eEneuSz0e6-0" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=none;strokeColor=#e6aa56;strokeWidth=2;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="890" y="240" width="140" height="500" as="geometry" />
-        </mxCell>
         <mxCell id="FADjmdrhl2ED937hWMtO-0" value="&lt;div style=&quot;font-size: 1px&quot;&gt;&lt;p style=&quot;align:center;margin-left:0;margin-right:0;margin-top:0px;margin-bottom:0px;text-indent:0;valign:middle;direction:ltr;&quot;&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;/p&gt;&lt;p style=&quot;align:center;margin-left:0;margin-right:0;margin-top:0px;margin-bottom:0px;text-indent:0;valign:middle;direction:ltr;&quot;&gt;&lt;font style=&quot;font-size:16.93px;font-family:Oracle Sans;color:#000000;direction:ltr;letter-spacing:0px;line-height:120%;opacity:1&quot;&gt;&lt;b&gt;LZ OPS Central Team&lt;/b&gt;&lt;br&gt;&lt;/font&gt;&lt;/p&gt;&lt;/div&gt;" style="verticalAlign=middle;align=center;vsdxID=63;fillColor=none;gradientColor=none;shape=stencil(nZBLDoAgDERP0z3SIyjew0SURgSD+Lu9kMZoXLhwN9O+tukAlrNpJg1SzDH4QW/URgNYgZTkjA4UkwJUgGXng+6DX1zLfmoymdXo17xh5zmRJ6Q42BWCfc2oJfdAr+Yv+AP9Cb7OJ3H/2JG1HNGz/84klThPVCc=);strokeColor=none;spacingTop=-3;spacingBottom=-3;spacingLeft=-3;spacingRight=-3;points=[];labelBackgroundColor=none;rounded=0;html=1;whiteSpace=wrap;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
           <mxGeometry x="349" y="1110" width="191" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="FADjmdrhl2ED937hWMtO-1" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json&quot;&gt;OP.01 IaC IAM Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;fillColor=#f5f5f5;rounded=1;arcSize=8;strokeColor=#FFD966;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;fontColor=#333333;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="93" y="820.5" width="270" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="FADjmdrhl2ED937hWMtO-2" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json&quot;&gt;OP.01 IaC Network Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;fillColor=#f5f5f5;rounded=1;arcSize=8;strokeColor=#FFD966;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;fontColor=#333333;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="93" y="870.5" width="270" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="FADjmdrhl2ED937hWMtO-3" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json&quot;&gt;OP.02 IaC IAM Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;fillColor=#f5f5f5;rounded=1;arcSize=8;strokeColor=#004C99;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;fontColor=#333333;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="509" y="820.5" width="270" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="FADjmdrhl2ED937hWMtO-4" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json&quot;&gt;OP.02 IaC Network Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;fillColor=#f5f5f5;rounded=1;arcSize=8;strokeColor=#004C99;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;fontColor=#333333;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="509" y="870.5" width="270" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="FADjmdrhl2ED937hWMtO-5" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op03_manage_department/open_lz_oe_01_prod_deptA_identity.auto.tfvars.json&quot;&gt;OP.03 IaC IAM Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;fillColor=#f5f5f5;rounded=1;arcSize=8;strokeColor=#e6aa56;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;fontColor=#333333;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="848" y="820.5" width="270" height="40" as="geometry" />
         </mxCell>
         <mxCell id="DX-Sh-ecYvz8KObziAHq-0" value="&lt;div style=&quot;font-size: 1px&quot;&gt;&lt;p style=&quot;align:center;margin-left:0;margin-right:0;margin-top:0px;margin-bottom:0px;text-indent:0;valign:middle;direction:ltr;&quot;&gt;&lt;font style=&quot;font-size:16.93px;font-family:Oracle Sans;color:#000000;direction:ltr;letter-spacing:0px;line-height:120%;opacity:1&quot;&gt;&lt;b&gt;&amp;lt;OE&amp;gt; OPS Team:&lt;/b&gt;&lt;/font&gt;&lt;/p&gt;&lt;/div&gt;" style="verticalAlign=middle;align=center;vsdxID=63;fillColor=none;gradientColor=none;shape=stencil(nZBLDoAgDERP0z3SIyjew0SURgSD+Lu9kMZoXLhwN9O+tukAlrNpJg1SzDH4QW/URgNYgZTkjA4UkwJUgGXng+6DX1zLfmoymdXo17xh5zmRJ6Q42BWCfc2oJfdAr+Yv+AP9Cb7OJ3H/2JG1HNGz/84klThPVCc=);strokeColor=none;spacingTop=-3;spacingBottom=-3;spacingLeft=-3;spacingRight=-3;points=[];labelBackgroundColor=none;rounded=0;html=1;whiteSpace=wrap;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
           <mxGeometry x="1040" y="1110" width="140" height="20" as="geometry" />
         </mxCell>
         <mxCell id="DX-Sh-ecYvz8KObziAHq-3" value="&lt;b&gt;OP.04 MANAGE PROJECT&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
-          <mxGeometry x="1191" y="760" width="170" height="30" as="geometry" />
+          <mxGeometry x="1191" y="710" width="170" height="30" as="geometry" />
         </mxCell>
         <mxCell id="yLGN0gBkA9ZHpzFpxp3k-0" style="vsdxID=54;fillColor=none;gradientColor=none;strokeColor=none;spacingTop=-3;spacingBottom=-3;spacingLeft=-3;spacingRight=-3;points=[];labelBackgroundColor=none;rounded=0;html=1;whiteSpace=wrap;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
           <mxGeometry x="400" y="1050" width="80" height="42" as="geometry" />
@@ -6157,7 +6089,22 @@
         <mxCell id="yLGN0gBkA9ZHpzFpxp3k-16" style="vsdxID=61;fillColor=#2d5967;gradientColor=none;shape=stencil(UzV2Ls5ILEhVNTIoLinKz04tz0wpyVA1dlE1MsrMy0gtyiwBslSNXVWNndPyi1LTi/JL81Ig/IJEkEoQKze/DGRCBUSfAUiHkUElhGdkpmdiBBZxgyjOyczDqdjQwAC3UpgkWYrxKDU11rMwIVYxBZ7DUAxkIMIwLTMnBxIFyPLoYQ4UgsSXsSsA);strokeColor=none;spacingTop=-3;spacingBottom=-3;spacingLeft=-3;spacingRight=-3;points=[];labelBackgroundColor=none;rounded=0;html=1;whiteSpace=wrap;" parent="yLGN0gBkA9ZHpzFpxp3k-9" vertex="1">
           <mxGeometry x="47" y="31" width="2" height="10" as="geometry" />
         </mxCell>
-        <mxCell id="yLGN0gBkA9ZHpzFpxp3k-17" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=24;edgeStyle=orthogonalEdgeStyle;entryX=0.506;entryY=0.99;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#808080;" parent="LBNAozDEcYqfEnfwiS03-1" target="DX-Sh-ecYvz8KObziAHq-3" edge="1">
+        <mxCell id="nF12oMZIb4n0hLZhJZrZ-6" value="CONTROL VERSION" parent="LBNAozDEcYqfEnfwiS03-0" />
+        <mxCell id="nF12oMZIb4n0hLZhJZrZ-0" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=11;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;dashed=1;fontColor=#333333;" vertex="1" parent="nF12oMZIb4n0hLZhJZrZ-6">
+          <mxGeometry x="80" y="800" width="1550" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="nF12oMZIb4n0hLZhJZrZ-1" value="&lt;b&gt;CONTROL VERSION SYSTEM&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="nF12oMZIb4n0hLZhJZrZ-6">
+          <mxGeometry x="1430" y="940" width="190" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="nF12oMZIb4n0hLZhJZrZ-5" value="AUTOMATION" parent="LBNAozDEcYqfEnfwiS03-0" />
+        <mxCell id="nF12oMZIb4n0hLZhJZrZ-2" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=27;fillColor=#CCCCCC;strokeColor=#666666;strokeWidth=2;dashed=1;dashPattern=1 4;fontColor=#333333;" vertex="1" parent="nF12oMZIb4n0hLZhJZrZ-5">
+          <mxGeometry x="90" y="760" width="1540" height="27" as="geometry" />
+        </mxCell>
+        <mxCell id="nF12oMZIb4n0hLZhJZrZ-3" value="&lt;b&gt;ORM / TF CLI / YOUR CI/CD IT STACK&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="nF12oMZIb4n0hLZhJZrZ-5">
+          <mxGeometry x="1370" y="760" width="240" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="nF12oMZIb4n0hLZhJZrZ-4" value="OPERATIONS" parent="LBNAozDEcYqfEnfwiS03-0" />
+        <mxCell id="yLGN0gBkA9ZHpzFpxp3k-17" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=24;edgeStyle=orthogonalEdgeStyle;entryX=0.506;entryY=0.99;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#808080;" parent="nF12oMZIb4n0hLZhJZrZ-4" target="DX-Sh-ecYvz8KObziAHq-3" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="961" y="991" as="targetPoint" />
             <mxPoint x="1130" y="1065" as="sourcePoint" />
@@ -6169,11 +6116,79 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="DX-Sh-ecYvz8KObziAHq-1" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_identity.auto.tfvars.json&quot;&gt;OP.04 IaC IAM Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;fillColor=#f5f5f5;rounded=1;arcSize=8;strokeColor=#bfbfbf;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;fontColor=#333333;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
+        <mxCell id="h8PDNtghWhMh0ePToyn4-24" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=24;edgeStyle=orthogonalEdgeStyle;entryX=0.406;entryY=1.035;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.021;exitY=0.112;exitDx=0;exitDy=0;exitPerimeter=0;strokeColor=#FF8000;" parent="nF12oMZIb4n0hLZhJZrZ-4" source="yLGN0gBkA9ZHpzFpxp3k-9" target="h8PDNtghWhMh0ePToyn4-3" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="810" y="990" as="targetPoint" />
+            <mxPoint x="1430" y="1079" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="1062" y="1050" />
+              <mxPoint x="1060" y="1050" />
+              <mxPoint x="1060" y="1010" />
+              <mxPoint x="949" y="1010" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="h8PDNtghWhMh0ePToyn4-13" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=24;edgeStyle=orthogonalEdgeStyle;strokeColor=#0066CC;" parent="nF12oMZIb4n0hLZhJZrZ-4" source="yLGN0gBkA9ZHpzFpxp3k-0" target="h8PDNtghWhMh0ePToyn4-2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="667" y="1004" as="targetPoint" />
+            <mxPoint x="666.56" y="1080.74" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="480" y="1010" />
+              <mxPoint x="641" y="1010" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="h8PDNtghWhMh0ePToyn4-14" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=24;edgeStyle=orthogonalEdgeStyle;exitX=0.391;exitY=0.091;exitDx=0;exitDy=0;exitPerimeter=0;strokeColor=#CCCC00;" parent="nF12oMZIb4n0hLZhJZrZ-4" source="yLGN0gBkA9ZHpzFpxp3k-3" target="h8PDNtghWhMh0ePToyn4-1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="810" y="990" as="targetPoint" />
+            <mxPoint x="390" y="1100" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="410" y="1010" />
+              <mxPoint x="228" y="1010" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FADjmdrhl2ED937hWMtO-2" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json&quot;&gt;OP.01 IaC Network Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;rounded=1;arcSize=8;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="93" y="870.5" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="FADjmdrhl2ED937hWMtO-1" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json&quot;&gt;OP.01 IaC IAM Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;rounded=1;arcSize=8;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="93" y="820.5" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="FADjmdrhl2ED937hWMtO-3" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json&quot;&gt;OP.02 IaC IAM Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;rounded=1;arcSize=8;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="509" y="820.5" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="FADjmdrhl2ED937hWMtO-5" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op03_manage_department/open_lz_oe_01_prod_deptA_identity.auto.tfvars.json&quot;&gt;OP.03 IaC IAM Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;rounded=1;arcSize=8;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="848" y="820.5" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="DX-Sh-ecYvz8KObziAHq-1" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_identity.auto.tfvars.json&quot;&gt;OP.04 IaC IAM Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;rounded=1;arcSize=8;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
           <mxGeometry x="1150" y="820.5" width="270" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="DX-Sh-ecYvz8KObziAHq-2" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json&quot;&gt;OP.04 IaC Network Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;fillColor=#f5f5f5;rounded=1;arcSize=8;strokeColor=#bfbfbf;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;fontColor=#333333;" parent="LBNAozDEcYqfEnfwiS03-1" vertex="1">
+        <mxCell id="DX-Sh-ecYvz8KObziAHq-2" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json&quot;&gt;OP.04 IaC Network Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;rounded=1;arcSize=8;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
           <mxGeometry x="1150" y="870.5" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="FADjmdrhl2ED937hWMtO-4" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;a href=&quot;https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json&quot;&gt;OP.02 IaC Network Configuration&lt;/a&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;align=center;fontFamily=Oracle Sans;verticalAlign=top;fillColor=#f5f5f5;rounded=1;arcSize=8;strokeColor=#004C99;fontSize=11;spacingRight=5;spacing=9;fontStyle=1;fontColor=#333333;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="509" y="870.5" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="h8PDNtghWhMh0ePToyn4-0" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=none;strokeColor=#FFD966;strokeWidth=2;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="90" y="240" width="270" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="h8PDNtghWhMh0ePToyn4-1" value="&lt;b&gt;OP.01 MANAGE SHARED SERVICES&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="119" y="710" width="230" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="1G5S2S8ZX2eEneuSz0e6-0" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=none;strokeColor=#e6aa56;strokeWidth=2;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="890" y="240" width="140" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="h8PDNtghWhMh0ePToyn4-25" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=none;strokeColor=#99c6d4;strokeWidth=2;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="370" y="240" width="500" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="h8PDNtghWhMh0ePToyn4-26" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=none;strokeColor=#bfbfbf;strokeWidth=2;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="1050" y="240" width="370" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="h8PDNtghWhMh0ePToyn4-2" value="&lt;b&gt;OP.02 MANAGE OE&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="579" y="710" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="h8PDNtghWhMh0ePToyn4-3" value="&lt;b&gt;OP.03 MANAGE DEPT.&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="nF12oMZIb4n0hLZhJZrZ-4" vertex="1">
+          <mxGeometry x="888" y="710" width="150" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
