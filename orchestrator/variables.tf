@@ -3,7 +3,7 @@
 # Licensed under the Universal Permissive License v 1.0 as shown at https: //oss.oracle.com/licenses/upl. #
 # Author: Cosmin Tudor                                                                                    #
 # Author email: cosmin.tudor@oracle.com                                                                   #
-# Last Modified: Thu Nov 16 2023                                                                          #
+# Last Modified: Tue Nov 21 2023                                                                          #
 # Modified by: Cosmin Tudor, email: cosmin.tudor@oracle.com                                               #
 # ####################################################################################################### #
 
@@ -884,6 +884,7 @@ variable "network_configuration" {
         fast_connect_virtual_circuits = optional(map(object({
           #Required
           compartment_id                              = optional(string),
+          compartment_key                             = optional(string),
           provision_fc_virtual_circuit                = bool,
           show_available_fc_virtual_circuit_providers = bool,
           type                                        = string,
