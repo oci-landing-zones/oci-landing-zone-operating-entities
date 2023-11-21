@@ -116,7 +116,7 @@ locals {
                 display_name   = nsg_value.display_name
               }
             } : {} : {}
-            vcn_specific_gateways = {
+            vcn_specific_gateways = vcn_value.vcn_specific_gateways != null ? {
               internet_gateways = vcn_value.vcn_specific_gateways.internet_gateways != null ? length(vcn_value.vcn_specific_gateways.internet_gateways) > 0 ? {
                 for ig_key, ig_value in vcn_value.vcn_specific_gateways.internet_gateways : ig_key => {
                   compartment_id  = ig_value.compartment_id != null ? ig_value.compartment_id : ig_value.compartment_key != null ? local.compartments[ig_value.compartment_key].id : null
@@ -159,7 +159,7 @@ locals {
                   route_table_key = lpg_value.route_table_key
                 }
               } : {} : {}
-            }
+            } : null
           }
         } : {} : {}
         inject_into_existing_vcns = netconfig_value.inject_into_existing_vcns != null ? length(netconfig_value.inject_into_existing_vcns) > 0 ? {
