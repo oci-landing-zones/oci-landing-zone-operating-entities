@@ -21,18 +21,17 @@ The main objective of this artifact is to provide autonomy to **design** a landi
 
 The OCI Learn LZ has the following characteristics:
 
-1. OCI Landing Zone resources are organized by: Application Functional Domains (Layers), Environments, Projects, and Project Layers
-2. Landing Zone scales by: Domains and Projects, Environments, and Project layers have always the same number.
-3. There is a Central IT  that controls the common elements of the landing zone. **You are part of this team**.
-4. There are several Project Teams, that control their resources. Projects in this exercise are out of scope.
-5. Projects will share domain-specific network elements (VCNs) and have dedicated elements, such as Subnets and NSGs. NSGs are handled by Project Teams. Project elements are out of scope.
-6. This Landing Zone Model is suitable to aggregate workloads by domain, enterprise-wide. Examples of application domains are Channels, Integrations, Core Systems, etc.
-7. The operating model used to provision and change resources is through **versioned IaC configurations** in git repositories. **ORM** will be used to create stacks that aggregate those configurations and run Terraform plan/apply commands.
+1. **Resource Organization:** OCI Landing Zone resources are organized by Application Functional Domains, Environments, Projects, and Project Layers. This model is suitable to **aggregate workloads by domain**, enterprise-wide. Examples of application domains are Channels, Integrations, Core Systems, etc.
+2. **Scalability**: Landing Zone **scales by Domains and Projects**. The Environments and Project layers have always the same number.
+3. **Cloud Operations Central Team:** There is a **Central IT Team** that controls the common elements of the landing zone. **You are part of this team**.
+4. **Cloud Ops Project Teams:** There are several **Project Teams**, that control their resources. Projects in this exercise are **out of scope**.
+5. **Projects**: Projects will share domain-specific network elements (VCNs) and have dedicated elements, such as Subnets and NSGs. NSGs are handled by Project Teams. Project elements are out of scope.
+6. **Operating Model**: The operating model used to provision and change resources is through **versioned IaC configurations** in **git repositories**. **ORM** will be used to create stacks that aggregate those configurations and run Terraform plan/apply commands.
 
 &nbsp; 
 
 
-Please review the above characteristics in the diagram below, which presents the key functional elements of the landing zone, in an entity relationship diagram (ERD) format. It also presents ORM and the Control Version System to version the IaC configurations, used by each of the responsible teams. Remember, you are part of the Central IT Team.
+Please review the above characteristics in the diagram below, which presents the key functional elements of the landing zone, in an entity relationship diagram (ERD) format. It also presents ORM and the Control Version System to version the IaC configurations, used by each of the responsible operations teams. Remember, **you are part of the Central IT Team**.
 
 &nbsp; 
 
@@ -53,5 +52,5 @@ There are two exercises in the OCI Learn LZ, one for security elements, where yo
 
 | EXERCISE | OBJECTIVE  | RUN IT |  
 |---|---|---|
-| #1 - Security | Create the OCI Learn LZ Tenancy Structure | [Here](/examples/oci-learn-lz/exercise1/readme.md)|
-| #2 - Network | Create the OCI Learn LZ Network Structure | [Here](/examples/oci-learn-lz/exercise2/readme.md)||
+| #1 - Security | Create the OCI Learn LZ **tenancy structure**. | [Here](/examples/oci-learn-lz/exercise1/readme.md)|
+| #2 - Network | Create the OCI Learn LZ **network structure** on top of the tenancy structure.| [Here](/examples/oci-learn-lz/exercise2/readme.md)||
