@@ -10,7 +10,7 @@
 
 ## 1. Objectives
 
-Welcome to the **Open Learn LZ**. The main objective of this artifact is: 
+Welcome to the **Open Learn LZ**, a set of **exercises** to learn and configure landing zones. Its main objectives are: 
 1. Provide elementary landing zone **design** capabilities with draw.io.
 2. Create skills in **IaC configurations**, by configuring the OCI Learn LZ resources.
 3. Demostrate a **cloud-native operating model** with versioned configurations and an automation engine - such as ORM.
