@@ -42,7 +42,7 @@ Your objective is to review the initial network structure created by your team, 
 
 ## 3. Complete the Configuration
 
-Your objective is to update the tenancy structure with a missing application **core systems domain**, and finalize the **channels** domain.
+Your objective is to update the network structure with a missing application **core systems domain**, and finalize the **channels** domain.
 
 &nbsp; 
 
