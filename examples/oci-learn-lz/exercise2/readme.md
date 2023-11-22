@@ -85,7 +85,7 @@ Your objective is to run your new configuration with ORM. The image below contai
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---| 
-| **1** | [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json"}) |
+| **1** | [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_final.yml,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network_final.yml"}) |
 | **2** | Accept terms,  wait for the configuration to load. |
 | **3** | Set the working directory to “**orm-facade**”. | 
 | **4** | Set the stack name you prefer. | 
@@ -100,7 +100,7 @@ Your objective is to run your new configuration with ORM. The image below contai
 
 &nbsp; 
 
-<img src="diagrams/oci_learn_lz-exercise1-step4.jpg" alt= “” width="1200" height="value">
+<img src="diagrams/oci_learn_lz-exercise2-step4.jpg" alt= “” width="1200" height="value">
 
 &nbsp; 
 
