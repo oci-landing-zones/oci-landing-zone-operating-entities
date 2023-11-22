@@ -37,7 +37,7 @@ Please review the above characteristics in the diagram below, which presents the
 &nbsp; 
 
 
-<img src="diagrans/oci_learn_lz-fun-erd.jpg" alt= “” width="1200" height="value">
+<img src="diagrams/oci_learn_lz-fun-erd.jpg" alt= “” width="1200" height="value">
 
 &nbsp; 
 
