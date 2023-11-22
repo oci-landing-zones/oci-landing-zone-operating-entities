@@ -15,6 +15,15 @@ Solve specific requirements when the standard is not enough. These LZs run with 
 THIS WILL BE ADDED SOON.
 
 
+
+| ID | NAME | DESCRIPTION  | DESIGN | RUN  
+|---|---|---|---|---|
+| TLZ.01 | OCI Open LZ | Operating-Entities LZ | here | here |
+| TLZ.02 | OCI Service LZ  | Service-Driven LZ | | |
+| TLZ.03 | OCI Domain LZ  | Applications Domain-Driven LZ | | |
+| TLZ.04 | OCI Project LZ  | Project-Driven LZ | | |
+| WLZ.01 | OCI Open EBS LZ | Landing Zone ready for EBS | here | here | 
+
 &nbsp; 
 
 ## 2. Workload Landing Zone 
