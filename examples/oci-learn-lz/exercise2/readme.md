@@ -31,8 +31,8 @@ Your objective is to review the initial network structure created by your team, 
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
 | 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layer is disabled. |
 | 3 | Review the network structure design that is already created. The image below presents it. |
-| 4 | Review the tenancy structure IaC related configuration in oci-learn-lz/exercise2/config-yaml/[oci_learn_lz_network_initial.yml](/examples/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network_initial.yml). |
-
+| 4 | Copy the configuration file [oci_learn_lz_network.yml](/examples/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise2.
+| 5 | Review the tenancy structure configuration in you **local**  **oci_learn_lz_iam.yml** file. |
 
 &nbsp; 
 
@@ -51,7 +51,8 @@ Your objective is to update the network structure and add the network elements f
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
 | 2 | Enable the Layer "STEP 2 - EXERCISE". Make sure the STEP 1 layer is enabled. |
 | 3 | Review the target network structure design for the domain. The image below presents it. |
-| 4 | Update the final network structure IaC related configuration and save it as "**oci_learn_lz_network_updated.yml**". |
+| 4 | Update the network structure IaC configuration with the new changes in your **local oci_learn_lz_network.yml** file. |
+
 
 
 &nbsp; 
@@ -62,13 +63,13 @@ Your objective is to update the network structure and add the network elements f
 
 ## 4. Version your Configuration
 
-Your objective is to commit the new IaC configuration to your operations git repository.
+Your objective is to commit to your operations git repository the new configuration.
 
 &nbsp; 
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
-| 1 | Commit to you operations git repository the new IaC Network configuration file (**oci_learn_lz_network_updated.yml**). The image belowcontains a high-level representations of this. |
+| 1 | Push your local changes on the **oci_learn_lz_network.yml** to the remote OCI-LEARN-LZ-OPS-REPO. The image below is a high-level representations of this. |
 
 &nbsp; 
 
@@ -87,7 +88,7 @@ Your objective is to update your ORM stack from exercise 1 with the network conf
 |---|---| 
 | **1** | Edit the ORM Stack created on Exercise #1. |
 | **2** | Don't change any value on the first screen. Click Next.  |
-| **3** | Add the new network configuration by copying and pasting the **git raw url** of the **oci_learn_lz_network_updated.yml**. </br>**NOTE**: Do not delete the existing IAM configuration, this is an incremental operation on resources. |
+| **3** | Add the new network configuration by copying and pasting the **public git raw url** of the **oci_learn_lz_network.yml**. </br>**NOTE**: Do not delete the existing IAM configuration, this is an incremental operation on resources. |
 | **4** | Run terraform Plan, and Terraform Apply |
 | **5** | Review the created resources, they should match the design diagrams. |
 
