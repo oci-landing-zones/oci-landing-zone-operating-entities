@@ -19,9 +19,15 @@ Welcome to the **Open Learn LZ**, a set of **exercises** to learn how to **desig
 &nbsp; 
 
 ## 2. Before you Start
+### 2.1 Have an OCI Account
 Anyone can run the OCI-Learn-LZ exercises. If you don't have an OCI Paid Account, to execute the exercises you will need and [OCI Free Tier](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier.htm) account.
 
-**Note** that an OCI Free Tier account after a predefined time or initial credits consumed, is automatically limited to use Always Free resources - if not upgraded. If this is your case, you need to free all VCNs resources as exercise 2 will use two VCNs which is the limite of the always free model.
+**Note** that an OCI Free Tier account after a predefined time or initial credits consumed, is automatically limited to use Always Free resources - if not upgraded. If this is your case, you need to free all VCNs resources as exercise 2 will use two VCNs which is the limit of the always free model.
+
+&nbsp; 
+
+### 2.2 Clone this Repository
+Before you progress further we recommend to clone this repository and use an IDE for the exercises (e.g., Visual Builder Studio).
 
 &nbsp; 
 
