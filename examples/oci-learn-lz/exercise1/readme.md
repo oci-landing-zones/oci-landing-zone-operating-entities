@@ -1,4 +1,4 @@
-# OCI Learn LZ - Exercise #1 - Tenancy Structure
+# OCI Learn LZ - Exercise #1 Tenancy Structure
 
 ## **Table of Contents**
 
