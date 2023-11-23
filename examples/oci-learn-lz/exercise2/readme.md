@@ -1,4 +1,4 @@
-# OCI Learn LZ - Exercise #2 - Network Structure
+# OCI Learn LZ - Exercise #2 Network Structure
 
 ## **Table of Contents**
 
