@@ -24,12 +24,27 @@ Anyone can run the OCI-Learn-LZ exercises. If you don't have an OCI Paid Account
 
 **Note** that an OCI Free Tier account after a predefined time or initial credits consumed, is automatically limited to use Always Free resources - if not upgraded. If this is your case, you need to free all VCNs resources as exercise 2 will use two VCNs which is the limit of the always free model.
 
-&nbsp; 
-
-### 2.2 Clone this Repository
-Before you progress further we recommend to clone this repository and use an IDE for the exercises (e.g., Visual Builder Studio).
 
 &nbsp; 
+
+### 2.2 Create a Public Git Repository
+Before you progress it's essential to **create a public git repository** to use with the exercises, as you will need to push configuration files into a public repository - for them to be visible by ORM. 
+
+**Create three folders** on the new repository:
+1. oci-learn-lz
+2. oci-learn-lz/exercise1
+3. oci-learn-lz/exercise2
+
+This repository will be referenced in the exercises as **OCI-LEARN-LZ-OPS-REPO**.
+
+&nbsp; 
+
+### 2.3 Use an IDE integrated with GIT 
+We highly recommend using an IDE for the exercises (e.g., Visual Builder Studio), as it helps with the formatting of yaml files. The same IDE can be integrated with GIT, having the development tools all in the same place.
+After having the IDE set, clone the repository created in step 2.2 to have your local working copy.
+
+&nbsp; 
+
 
 ## 3. Functional Context 
 
@@ -40,8 +55,9 @@ The OCI Learn LZ has the following characteristics:
 2. **Scalability**: This Landing Zone **scales by Domains and Projects**. The Environments and Project layers have always the same structural elements.
 3. **Cloud Ops - Central Team:** There is a **Central IT Team** that controls the common elements of the landing zone. **You are part of this team**.
 4. **Cloud Ops - Project Teams:** There are several **Project Teams**, that control their resources. Projects in this exercise are **out of scope**.
-5. **Projects**: Projects will share domain-specific network elements (VCNs) and have dedicated elements, such as Subnets and NSGs. NSGs are handled by Project Teams. Project elements are currently out of the scope of this exercise.
-6. **Operating Model**: The operating model used to provision and change resources is through **versioned IaC configurations** in **git repositories**. **ORM** will be used to create stacks that aggregate those configurations and run Terraform plan/apply commands, maintaining the state on each stack.
+5. **Projects**: Projects will share domain-specific network elements (VCNs) and have dedicated elements, such as Subnets and NSGs. NSGs are handled by Project Teams. Project elements are currently **out of the scope** of this exercise.
+6. **Collaboration Model**: Inside the IT Central team, you will collaborate with your colleagues using Git repositories, meaning your operations are versioned configurations, and the source of truth is in Git.
+7. **Operating Model**: The operating model used to provision and change resources is through **versioned IaC configurations** in **git repositories**. **ORM** will be used to create stacks that aggregate those configurations and run Terraform plan/apply commands, maintaining the state on each stack.
 
 &nbsp; 
 

@@ -31,7 +31,8 @@ Your objective is to review the initial tenancy structure created by your team, 
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "SEC - EXERCISE #1" |
 | 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layer is disabled. |
 | 3 | Review the tenancy structure design that is already created. The image below presents it. |
-| 4 | Review the tenancy structure IaC related configuration in oci-learn-lz/exercise1/config-yaml/[oci_learn_lz_iam_initial.yml](/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_initial.yml). |
+| 4 | Copy the configuration file [oci_learn_lz_iam.yml](/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise1.
+| 5 | Review the tenancy structure configuration in you **local**  **oci_learn_lz_iam.yml** file. |
 
 
 &nbsp; 
@@ -51,7 +52,7 @@ Your objective is to update the tenancy structure with a missing application **c
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "SEC - EXERCISE #1" |
 | 2 | Enable the Layer "STEP 2 - EXERCISE". Make sure the STEP 1 layer is enabled. |
 | 3 | Review the target tenancy structure design with the two domains. The image below presents it. |
-| 4 | Update the final tenancy structure IaC related configuration and save it as "**oci_learn_lz_iam_updated.yml**". |
+| 4 | Update the tenancy structure IaC configuration with the new changes in your **local oci_learn_lz_iam.yml** file. |
 
 
 &nbsp; 
@@ -68,7 +69,7 @@ Your objective is to commit to your operations git repository the new configurat
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
-| 1 | Commit to you operations git repository the new IaC IAM configuration file (**oci_learn_lz_iam_updated.yml**). The image below is a high-level representations of this. |
+| 1 | Push your local changes on the **oci_learn_lz_iam.yml** to the remote OCI-LEARN-LZ-OPS-REPO. The image below is a high-level representations of this. |
 
 &nbsp; 
 
@@ -85,16 +86,16 @@ Your objective is to run your new configuration with ORM. The image below contai
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---| 
-| **1** | [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_final.yml"}) |
-| **2** | Accept terms,  wait for the configuration to load. |
+| **1** | Create a new ORM Stack: [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_solution.yml"}) |
+| **2** | Accept terms,  **wait** for the configuration to load. |
 | **3** | Set the working directory to “**orm-facade**”. | 
-| **4** | Set the stack name you prefer. | 
-| **5** | Set the terraform version to 1.2.x. Click Next. | 
+| **4** | Set the stack **name** you prefer. | 
+| **5** | Set the terraform **version** to 1.2.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next.  |
-| **7** | Delete the default configuration and update it with the **git raw link to you new IAM file**.|
-| **8** | Un-check run apply. Click Create. |
-| **9** | Run terraform Plan, and Terraform Apply |
-| **10** | Review the created resources, they should match the design diagrams. |
+| **7** | **Delete** the default configuration and **update** it with the **git raw link** of your **oci_learn_lz_iam.yml**  remote file.|
+| **8** | **Un-check** run apply. Click Create. |
+| **9** | Run Terraform **Plan** and review the output messages. |
+| **10** | Run Terraform **Apply** and review the created resources, they should match the design diagrams. |
 
 &nbsp; 
 
