@@ -16,22 +16,22 @@ Welcome to the **Open Learn LZ** Exercise #2.
 
 The main objective is to **create**, **version**, and **run** the IaC configurations for the OCI Learn LZ Network Structure.
 
-In this exercise, you will create the network structure IaC configuration for the missing domain. Your IT Central Team colleagues already started this, **your mission is to finish the configuration.** 
+In this exercise, you will create the network structure IaC configuration that will contain the Hub and one Domain (Channels). Your IT Central Team colleagues already started this, **your mission is to finish the configuration.** 
 
 &nbsp; 
 
 ## 2. View the Initial Configuration
 
-Your objective is to review the initial network structure created by your team, containing the **hub elements**, and shared network for the **channels** domain.
+Your objective is to review the initial network structure created by your team, containing the **hub elements**.
 
 &nbsp; 
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
-| 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layers is disabled. |
+| 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layer is disabled. |
 | 3 | Review the network structure design that is already created. The image below presents it. |
-| 4 | Review the tenancy structure IaC related configuration in oci-learn-lz/exercise2/config-yaml/[oci_learn_lz_network_initial.yml](/examples/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network_final.yml). |
+| 4 | Review the tenancy structure IaC related configuration in oci-learn-lz/exercise2/config-yaml/[oci_learn_lz_network_initial.yml](/examples/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network_initial.yml). |
 
 
 &nbsp; 
@@ -42,15 +42,15 @@ Your objective is to review the initial network structure created by your team, 
 
 ## 3. Complete the Configuration
 
-Your objective is to update the network structure with a missing application **core systems domain**, and finalize the **channels** domain.
+Your objective is to update the network structure and add the network elements for the application **channel domain**.
 
 &nbsp; 
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
-| 2 | Enable the Layer "STEP 2 - EXERCISE". Make sure the STEP 1 layers is enabled. |
-| 3 | Review the target network structure design with the two domains. The image below presents it. |
+| 2 | Enable the Layer "STEP 2 - EXERCISE". Make sure the STEP 1 layer is enabled. |
+| 3 | Review the target network structure design for the domain. The image below presents it. |
 | 4 | Update the final network structure IaC related configuration and save it as "**oci_learn_lz_network_updated.yml**". |
 
 
@@ -62,7 +62,7 @@ Your objective is to update the network structure with a missing application **c
 
 ## 4. Version your Configuration
 
-Your objective is to commit to your operations git repository the new configuration.
+Your objective is to commit the new IaC configuration to your operations git repository.
 
 &nbsp; 
 
@@ -76,25 +76,20 @@ Your objective is to commit to your operations git repository the new configurat
 
 &nbsp; 
 
-## 5. Run your Configuration with ORM
+## 5. Update and Run your ORM Stack  
 
-Your objective is to run your new configuration with ORM. The image below contains the high-level automation mechanism, which is based on an ORM Stack that is linked to your versioned configuration file(s).
+Your objective is to update your ORM stack from exercise 1 with the network configuration. The image below contains the high-level automation mechanism, which is based on an ORM Stack that is linked to your versioned configuration file(s).
 
 &nbsp; 
 
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---| 
-| **1** | [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_final.yml,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network_final.yml"}) |
-| **2** | Accept terms,  wait for the configuration to load. |
-| **3** | Set the working directory to “**orm-facade**”. | 
-| **4** | Set the stack name you prefer. | 
-| **5** | Set the terraform version to 1.2.x. Click Next. | 
-| **6** | Accept the defaul configurations. Click Next.  |
-| **7** | Delete the default configuration and update it with the **git raw link to you new Network file**.|
-| **8** | Un-check run apply. Click Create. |
-| **9** | Run terraform Plan, and Terraform Apply |
-| **10** | Review the created resources, they should match the design diagrams. |
+| **1** | Edit the ORM Stack created on Exercise #1. |
+| **2** | Don't change any value on the first screen. Click Next.  |
+| **3** | Add the new network configuration by copying and pasting the **git raw url** of the **oci_learn_lz_network_updated.yml**. </br>**NOTE**: Do not delete the existing IAM configuration, this is an incremental operation on resources. |
+| **4** | Run terraform Plan, and Terraform Apply |
+| **5** | Review the created resources, they should match the design diagrams. |
 
 &nbsp; 
 
@@ -104,9 +99,9 @@ Your objective is to run your new configuration with ORM. The image below contai
 
 &nbsp; 
 
-After finalizing this exercise you have now a coherent set of artifacts: a design, a versioned configuration, OCI instantiated resources, and an ORM stack that contains the statefile.
+After finalizing this exercise you have now a coherent set of artifacts: a design, a versioned configuration, OCI instantiated resources, and an ORM stack that contains the state file.
 
-Thank you for executing these exercises. More follow-up exercises will be added soon. Don't hesitate to reach out for any related topic.
+Thank you for executing these exercises. More follow-up exercises will be added soon, for new domains and north-south and east-west communications. Don't hesitate to reach out for any related topic.
 
 &nbsp; 
 

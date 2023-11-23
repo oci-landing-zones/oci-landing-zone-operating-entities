@@ -1,6 +1,6 @@
 # OCI Learn LZ
 
-## **Table of Contents**
+### **Table of Contents**
 
 [1. Objective](#1-objective)</br>
 [2. Functional View](#2-functional-view)</br>
