@@ -32,7 +32,7 @@ Your objective is to review the initial network structure created by your team, 
 | 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layer is disabled. |
 | 3 | Review the network structure design that is already created. The image below presents it. |
 | 4 | Copy the configuration file [oci_learn_lz_network.yml](/examples/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise2.
-| 5 | Review the tenancy structure configuration in you **local**  **oci_learn_lz_iam.yml** file. |
+| 5 | Review the network structure configuration in you **local**  **oci_learn_lz_network.yml** file. |
 
 &nbsp; 
 
@@ -51,7 +51,7 @@ Your objective is to update the network structure and add the network elements f
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
 | 2 | Enable the Layer "STEP 2 - EXERCISE". Make sure the STEP 1 layer is enabled. |
 | 3 | Review the target network structure design for the domain. The image below presents it. |
-| 4 | Update the network structure IaC configuration with the new changes in your **local oci_learn_lz_network.yml** file. |
+| 4 | Update the network structure IaC configuration with the new changes in your **local oci_learn_lz_network.yml** file. Add the following elements: </br>1. Create a new IaC **Network Category** for the Channel Spoke, and make sure this category is associated to right compartment.</br>2. Create a new VNC inside the category, adding the CIDR block, name, security list and subnet. </br>**Hint**: You can use the HUB configuration as a template. |
 
 
 
