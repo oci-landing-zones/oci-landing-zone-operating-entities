@@ -16,7 +16,7 @@ Welcome to the **Open Learn LZ** Exercise #1.
 
 The main objective is to **create**, **version**, and **run** the IaC configurations for the OCI Learn LZ Tenancy Structure.
 
-In this exercise, you will create the tenancy structure IaC configuration for the missing domains. Your IT Central Team colleagues already started this, **your mission is to finish the configuration.** 
+In this exercise, you will create the tenancy structure IaC configuration to include the target domains. Your IT Central Team colleagues already started this, **your mission is to finish the configuration.** 
 
 &nbsp; 
 
@@ -29,9 +29,9 @@ Your objective is to review the initial tenancy structure created by your team, 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "SEC - EXERCISE #1" |
-| 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layers is disabled. |
+| 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layer is disabled. |
 | 3 | Review the tenancy structure design that is already created. The image below presents it. |
-| 4 | Review the tenancy structure IaC related configuration in oci-learn-lz/exercise1/config-yaml/[oci_learn_lz_iam_initial.yml](/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_final.yml). |
+| 4 | Review the tenancy structure IaC related configuration in oci-learn-lz/exercise1/config-yaml/[oci_learn_lz_iam_initial.yml](/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_initial.yml). |
 
 
 &nbsp; 
@@ -49,7 +49,7 @@ Your objective is to update the tenancy structure with a missing application **c
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "SEC - EXERCISE #1" |
-| 2 | Enable the Layer "STEP 2 - EXERCISE". Make sure the STEP 1 layers is enabled. |
+| 2 | Enable the Layer "STEP 2 - EXERCISE". Make sure the STEP 1 layer is enabled. |
 | 3 | Review the target tenancy structure design with the two domains. The image below presents it. |
 | 4 | Update the final tenancy structure IaC related configuration and save it as "**oci_learn_lz_iam_updated.yml**". |
 
@@ -104,7 +104,7 @@ Your objective is to run your new configuration with ORM. The image below contai
 
 &nbsp; 
 
-After finalizing this exercise you have now a coherent set of artifacts: a design, a versioned configuration, OCI instantiated resources, and an ORM stack that contains the statefile.
+After finalizing this exercise you have now a coherent set of artifacts: a design, a versioned configuration, OCI instantiated resources, and an ORM stack that contains the state file.
 
 You can proceed to [Exercise 2](/examples/oci-learn-lz/exercise2/readme.md).
 
