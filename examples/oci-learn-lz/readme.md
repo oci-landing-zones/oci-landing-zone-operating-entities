@@ -3,8 +3,9 @@
 ### **Table of Contents**
 
 [1. Objective](#1-objective)</br>
-[2. Functional View](#2-functional-view)</br>
-[3. Exercises](#3-exercises)</br>
+[2. Before you Start](#2-before-you-start)</br>
+[3. Functional Content](#3-functional-context)</br>
+[4. Exercises](#4-exercises)</br>
 
 &nbsp; 
 
@@ -17,7 +18,14 @@ Welcome to the **Open Learn LZ**, a set of **exercises** to learn how to **desig
 
 &nbsp; 
 
-## 2. Functional View 
+## 2. Before you Start
+Anyone can run the OCI-Learn-LZ exercises. If you don't have an OCI Paid Account, to execute the exercises you will need and [OCI Free Tier](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier.htm) account.
+
+**Note** that an OCI Free Tier account after a predefined time or initial credits consumed, is automatically limited to use Always Free resources - if not upgraded. If this is your case, you need to free all VCNs resources as exercise 2 will use two VCNs which is the limite of the always free model.
+
+&nbsp; 
+
+## 3. Functional Context 
 
 
 The OCI Learn LZ has the following characteristics:
@@ -45,7 +53,7 @@ If we can compare Landing Zones to airports: The OCI Learn LZ is an airport with
 
 &nbsp; 
 
-## 3. Exercises 
+## 4. Exercises 
 
 There are two exercises in the OCI Learn LZ, one for security elements, where you will create the tenancy structure, and one for the network elements, where you will create the shared and domain-related elements, that will be used by projects.
 
