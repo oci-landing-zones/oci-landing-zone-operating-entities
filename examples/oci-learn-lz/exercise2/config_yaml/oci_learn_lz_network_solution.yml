@@ -60,7 +60,7 @@ network_configuration:
           is_ipv6enabled: false
           is_oracle_gua_allocation_enabled: false
           route_tables:
-            SUBNET-H-RT-KEY:
+            SUBNET-HUB-RT-KEY:
               display_name: subnet-hub-rt
               route_rules: {}
           subnets:
