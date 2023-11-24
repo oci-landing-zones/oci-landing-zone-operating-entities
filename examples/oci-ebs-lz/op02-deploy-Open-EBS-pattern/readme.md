@@ -21,8 +21,8 @@
 | **OP. NAME** | Deploy EBS resources | 
 | **OBJECTIVE** | Cover specific EBS network and security layers |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists  |
-| **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
-| **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](ebs_network_rt_sl_v1.auto.tfvars.json) |
+| **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
+| **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](/json/ebs_network_rt_sl_v1.auto.tfvars.json) |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../design/OCI_Open_LZ.pdf) |
 | **PRE-ACTIVITIES** | OP.01. Deploy CIS LZ  |
 | **POST-ACTIVITIES** | Deploy EBS workload |
