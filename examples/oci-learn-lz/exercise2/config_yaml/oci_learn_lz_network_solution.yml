@@ -63,10 +63,10 @@ network_configuration:
           is_oracle_gua_allocation_enabled: false
           route_tables:
             SUBNET-H-RT-KEY:
-              display_name: subnet-h-rt
+              display_name: subnet-hub-rt
               route_rules: {}
           subnets:
-            SUBNET-H-KEY:
+            SUBNET-HUB-KEY:
               cidr_block: 10.0.0.0/26
               dhcp_options_key: default_dhcp_options
               display_name: sn-fra-hub-fw
@@ -74,7 +74,7 @@ network_configuration:
               ipv6cidr_blocks: []
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
-              route_table_key: SUBNET-H-RT-KEY
+              route_table_key: SUBNET-HUB-RT-KEY
               security_list_keys:
               - default_security_list
     SPOKE-CHANNELS:
