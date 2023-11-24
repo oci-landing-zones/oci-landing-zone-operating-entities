@@ -40,7 +40,9 @@ Before you progress it's essential to **create a public git repository** to use 
 2. oci-learn-lz/exercise1
 3. oci-learn-lz/exercise2
 
-This repository will be referenced in the exercises as **OCI-LEARN-LZ-OPS-REPO**.
+ Make sure you have this **repository cloned** locally and use the IDE to execute your local changes throughout the exercises. 
+ 
+ This repository will be referenced in the exercises as **OCI-LEARN-LZ-OPS-REPO**.
 
 &nbsp; 
 
