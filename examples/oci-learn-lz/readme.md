@@ -27,10 +27,15 @@ Anyone can run the OCI-Learn-LZ exercises. If you don't have an OCI Paid Account
 
 &nbsp; 
 
-### 2.2 Create a Public Git Repository
+### 2.2 Use an IDE integrated with GIT 
+We highly recommend using an IDE for the exercises (e.g., Visual Studio Code), as it helps with the formatting of configuration files. The same IDE can be integrated with GIT, having the development tools all in the same place.
+
+&nbsp; 
+
+### 2.3 Create a Public Git Repository
 Before you progress it's essential to **create a public git repository** to use with the exercises, as you will need to push configuration files into a public repository - for them to be visible by ORM. 
 
-**Create three folders** on the new repository:
+**Create three folders** on your new repository:
 1. oci-learn-lz
 2. oci-learn-lz/exercise1
 3. oci-learn-lz/exercise2
@@ -39,11 +44,6 @@ This repository will be referenced in the exercises as **OCI-LEARN-LZ-OPS-REPO**
 
 &nbsp; 
 
-### 2.3 Use an IDE integrated with GIT 
-We highly recommend using an IDE for the exercises (e.g., Visual Builder Studio), as it helps with the formatting of yaml files. The same IDE can be integrated with GIT, having the development tools all in the same place.
-After having the IDE set, clone the repository created in step 2.2 to have your local working copy.
-
-&nbsp; 
 
 
 ## 3. Functional Context 
