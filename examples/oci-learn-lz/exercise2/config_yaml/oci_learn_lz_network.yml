@@ -52,8 +52,6 @@ network_configuration:
               stateless: false
           display_name: vcn-fra-hub
           dns_label: vcnfrahub
-          is_attach_drg: false
-          is_create_igw: false
           is_ipv6enabled: false
           is_oracle_gua_allocation_enabled: false
           route_tables:
