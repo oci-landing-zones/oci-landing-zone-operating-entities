@@ -40,7 +40,7 @@ For authenticating against the OCI tenancy terraform execute the following [inst
 
 ## **3. Setup IAM Configuration**
 
-For configuring and running the Open LZ EBS extension IAM layer use the following JSON file: [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](ebs_identity_cmp_grp_pl_v1.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the Open LZ EBS extension IAM layer use the following JSON file: [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file will cover the following three categories of resources described in the next sections.
 
@@ -600,9 +600,9 @@ Run terraform plan with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../examples/oci-ebs-lz/oci-credentials.tfvars.json \
--var-file ../examples/oci-ebs-lz/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
--var-file ../examples/oci-ebs-lz/ebs_network_rt_sl_v1.auto.tfvars.json \
+-var-file ../examples/oci-ebs-lz/json/oci-credentials.tfvars.json \
+-var-file ../examples/oci-ebs-lz/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
+-var-file ../examples/oci-ebs-lz/json/ebs_network_rt_sl_v1.auto.tfvars.json \
 -state ../examples/oci-ebs-lz/terraform.tfstate
 ```
 
@@ -620,9 +620,9 @@ Run terraform plan with the IAM and Network configuration. After  its execution 
 
 ```
 terraform apply \
--var-file ../examples/oci-ebs-lz/oci-credentials.tfvars.json \
--var-file ../examples/oci-ebs-lz/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
--var-file ../examples/oci-ebs-lz/ebs_network_rt_sl_v1.auto.tfvars.json \
+-var-file ../examples/oci-ebs-lz/json/oci-credentials.tfvars.json \
+-var-file ../examples/oci-ebs-lz/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
+-var-file ../examples/oci-ebs-lz/json/ebs_network_rt_sl_v1.auto.tfvars.json \
 -state ../examples/oci-ebs-lz/terraform.tfstate
 
 ```
