@@ -63,13 +63,13 @@ Your objective is to update the tenancy structure with a missing application **c
 
 ## 4. Version your Configuration
 
-Your objective is to commit to your operations git repository the new configuration.
+Your objective is to update your configurations on the OCI-LEARN-LZ-OPS-REPO git repository.
 
 &nbsp; 
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
-| 1 | Push your local changes on the **oci_learn_lz_iam.yml** to the remote OCI-LEARN-LZ-OPS-REPO. The image below is a high-level representations of this. |
+| 1 | Push your local changes on the **oci_learn_lz_iam.yml** to the remote OCI-LEARN-LZ-OPS-REPO/**exercise1** folder. </br>The image below is a high-level representations of this. |
 
 &nbsp; 
 

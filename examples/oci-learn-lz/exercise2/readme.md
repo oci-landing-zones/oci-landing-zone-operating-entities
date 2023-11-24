@@ -51,7 +51,7 @@ Your objective is to update the network structure and add the network elements f
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
 | 2 | Enable the Layer "STEP 2 - EXERCISE". Make sure the STEP 1 layer is enabled. |
 | 3 | Review the target network structure design for the domain. The image below presents it. |
-| 4 | **Update** the network structure IaC configuration with the new changes in your **local oci_learn_lz_network.yml** file. Add the following elements: </br>**1. Create a new IaC Network Category** for the **Domain Channel**, and make sure this category is associated to right compartment.</br>**2. Create a new VNC** inside the Channel Domain Category, adding the CIDR block, VCN name, default security list, one subnet, and a subnet route table (without routing rules).</br>**Hint**: You can use the HUB configuration as a template. |
+| 4 | **Update** the network structure IaC configuration with the new changes in your **local oci_learn_lz_network.yml** file. Add the following elements:  <br></br>**1. Create a new IaC Network Category** for the **Domain Channel**, and make sure this category is associated to right compartment.</br><br>**2. Create a new VNC** inside the Channel Domain Category, adding the CIDR block, VCN name, default security list, one subnet, and a subnet route table (without routing rules).<br></br>**3.** **Create the DRG Attachment** for the new VCN at the Hub level. <br> <br>**Hint**: You can use the HUB configuration as a template.|
 
 
 
@@ -63,13 +63,13 @@ Your objective is to update the network structure and add the network elements f
 
 ## 4. Version your Configuration
 
-Your objective is to commit to your operations git repository the new configuration.
+Your objective is to update your configurations on the OCI-LEARN-LZ-OPS-REPO git repository.
 
 &nbsp; 
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
-| 1 | Push your local changes on the **oci_learn_lz_network.yml** to the remote OCI-LEARN-LZ-OPS-REPO. The image below is a high-level representations of this. |
+| 1 | Push your local changes on the **oci_learn_lz_network.yml** to the remote OCI-LEARN-LZ-OPS-REPO/**exercise2** folder. </br>The image below is a high-level representations of this. |
 
 &nbsp; 
 
