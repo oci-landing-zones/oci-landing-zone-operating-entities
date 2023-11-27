@@ -31,8 +31,9 @@ Your objective is to review the initial tenancy structure created by your team, 
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "SEC - EXERCISE #1" |
 | 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layer is disabled. |
 | 3 | Review the tenancy structure design that is already created. The image below presents it. |
-| 4 | Copy the configuration file [oci_learn_lz_iam.yml](/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise1.
-| 5 | Review the tenancy structure configuration in you **local**  **oci_learn_lz_iam.yml** file. |
+| 4 | Review configurations. First review what is [possible to configure](/examples/oci-learn-lz/exercise1/diagrams/oci_iam_config_all_variables.jpg) and then review the [exercise specific configurations](/examples/oci-learn-lz/exercise1/diagrams/oci_iam_config_exercise_variables.jpg) scope. These views are also available on the draw.io tabs. |
+| 5 | Copy the configuration file [oci_learn_lz_iam.yml](/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise1.
+| 6 | Review the tenancy structure configuration in you **local**  **oci_learn_lz_iam.yml** file. |
 
 
 &nbsp; 
