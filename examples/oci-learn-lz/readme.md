@@ -5,7 +5,7 @@
 [1. Objective](#1-objective)</br>
 [2. Before you Start](#2-before-you-start)</br>
 [3. Functional Content](#3-functional-context)</br>
-[4. Exercises](#4-exercises)</br>
+[4. Hands-on Exercises](#4-exercises)</br>
 
 &nbsp; 
 
@@ -67,7 +67,6 @@ The OCI Learn LZ has the following characteristics:
 The diagram below presents the key functional elements of the landing zone, in an Entity **Relationship Diagram (ERD)** format. It also presents the operating model with ORM and Git to version the IaC configurations, used by each of the responsible operations teams. For the exercise scope, Remember that **you are part of the Central IT Team**.
 
 &nbsp; 
-
 
 <img src="diagrams/oci_learn_lz-fun-erd.jpg" alt= “” width="1200" height="value">
 
