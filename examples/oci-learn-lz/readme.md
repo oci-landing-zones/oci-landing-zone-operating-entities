@@ -85,7 +85,7 @@ The OCI Learn LZ has a set of exercises that are presented in the form of **(1)*
 
 &nbsp; 
 
-<img src="diagrams/oci_learn_lz-tech.jpg" alt= “” width="1200" height="value">
+<img src="diagrams/oci_learn_lz-tech.jpg" alt= “” width="700" height="value">
 
 &nbsp; 
 
