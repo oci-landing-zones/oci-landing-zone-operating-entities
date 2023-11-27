@@ -80,7 +80,7 @@ If we can compare Landing Zones to airports: The OCI Learn LZ is an airport with
 
 ## 4. Exercises 
 
-The OCI Learn LZ has a set of exercises that are presented in the form of **(1)** design diagrams (in draw.io format), and a set of IaC **(2)** configurations (in yaml format) that match these designs. The objective is that you complete these exercises and **(3)** run the new configurations with a dedicated ORM Stack. This ORM Stack will use your configurations as input to the CIS Landing Zone modules and create the OCI Resources. The diagram below presents this flow.
+The OCI Learn LZ has a set of exercises that are presented in the form of **(1)** design diagrams (in draw.io format), and a set of IaC **(2)** configurations (in yaml format) that match these designs. The objective is that you complete these exercises and **(3)** run the new configurations with a dedicated ORM Stack. This ORM Stack will use your configurations as input to the [CIS  Landing Zone Enhanced Modules](https://www.ateam-oracle.com/post/cis-landing-zone-enhanced-modules) and create the OCI Resources. The diagram below presents this flow.
 
 &nbsp; 
 
