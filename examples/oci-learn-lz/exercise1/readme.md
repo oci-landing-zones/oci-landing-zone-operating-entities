@@ -93,7 +93,7 @@ Your objective is to run your new configuration with ORM. The image below contai
 | **4** | Set the stack **name** you prefer. | 
 | **5** | Set the terraform **version** to 1.2.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next.  |
-| **7** | **Delete** the default configuration and **update** it with the **git raw link** of your **oci_learn_lz_iam.yml**  remote file.|
+| **7** | **Delete** the default configuration link and **paste** the new **git raw link** of your **oci_learn_lz_iam.yml** remote file. Don't forget to press enter or click on the "Add" after pasting. |
 | **8** | **Un-check** run apply. Click Create. |
 | **9** | Run Terraform **Plan** and review the output messages. |
 | **10** | Run Terraform **Apply** and review the created resources, they should match the design diagrams. |
