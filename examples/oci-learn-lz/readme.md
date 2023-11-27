@@ -11,10 +11,10 @@
 
 ## 1. Objectives
 
-Welcome to the **Open Learn LZ**, a set of **exercises** to learn how to **design** and **configure** landing zones. Its main objectives are: 
-1. Provide elementary landing zone **design** capabilities with draw.io.
+Welcome to the **Open Learn LZ**, a set of **exercises** to learn how to **design**, **configure**, and **run** OCI landing zones. Its main objectives are: 
+1. Provide elementary landing zone **design** capabilities using draw.io.
 2. Create skills in **IaC configurations**, by configuring the OCI Learn LZ resources. You do not code OCI landing zones anymore, you configure them.
-3. Demonstrate a **cloud-native operating model** with versioned configurations and an automation engine - based in ORM.
+3. Demonstrate a **cloud-native operating model** with versioned configurations and an automation engine - based on ORM.
 
 &nbsp; 
 
@@ -75,11 +75,21 @@ The diagram below presents the key functional elements of the landing zone, in a
 
 If we can compare Landing Zones to airports: The OCI Learn LZ is an airport with different types of terminals (domains) that can be - but don't have to be - operated independently at any time by different teams. Each terminal can have a different security posture (domestic, international, etc.), teams, and resources.
 
+
+
 &nbsp; 
 
 ## 4. Exercises 
 
-There are two exercises in the OCI Learn LZ, one for security elements, where you will create the tenancy structure, and one for the network elements, where you will create the shared and domain-related elements, that will be used by projects.
+The OCI Learn LZ has a set of exercises that are presented in the form of **(1)** design diagrams (in draw.io format), and a set of IaC **(2)** configurations (in yaml format) that match these designs. The objective is that you complete these exercises and **(3)** run the new configurations with a dedicated ORM Stack. This ORM Stack will use your configurations as input to the CIS Landing Zone modules and create the OCI Resources. The diagram below presents this flow.
+
+&nbsp; 
+
+<img src="diagrams/oci_learn_lz-tech.jpg" alt= “” width="1200" height="value">
+
+&nbsp; 
+
+There are currently two exercises available: one for security elements, where you will create the tenancy structure, and one for the network elements, where you will create the shared and domain-related elements, that will be used by projects.
 
 &nbsp; 
 
