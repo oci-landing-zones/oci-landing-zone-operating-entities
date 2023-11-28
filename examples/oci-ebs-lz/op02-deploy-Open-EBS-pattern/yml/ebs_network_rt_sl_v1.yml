@@ -15,7 +15,7 @@ network_configuration:
           route_tables:
             RT-DMZ-MGMT-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz1-dmz-mgmt-subnet-rtable
+              display_name: ebslz-dmz1-mgmt-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
@@ -34,20 +34,20 @@ network_configuration:
                   description: Traffic destined to ebs-mgt-vcn VCN goes to DRG.
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_2:
                   description: Traffic destined to ebs-nprod-vcn VCN goes to DRG.
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_3:
                   description: Traffic destined to ebs-prod-vcn VCN goes to DRG.
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
             RT-DMZ-INDOOR-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz1-dmz-indoor-subnet-rtable
+              display_name: ebslz-dmz1-indoor-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
@@ -66,20 +66,20 @@ network_configuration:
                   description: Traffic destined to ebs-mgt-vcn VCN goes to DRG.
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_2:
                   description: Traffic destined to ebs-nprod-vcn VCN goes to DRG.
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_3:
                   description: Traffic destined to ebs-prod-vcn VCN goes to DRG.
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
             RT-DMZ-HA-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz1-dmz-ha-subnet-rtable
+              display_name: ebslz-dmz1-ha-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
@@ -98,20 +98,20 @@ network_configuration:
                   description: Traffic destined to ebs-mgt-vcn VCN goes to DRG.
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_2:
                   description: Traffic destined to ebs-nprod-vcn VCN goes to DRG.
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_3:
                   description: Traffic destined to ebs-prod-vcn VCN goes to DRG.
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
             RT-DMZ-OUTDOOR-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz1-dmz-outdoor-subnet-rtable
+              display_name: ebslz-dmz1-outdoor-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
@@ -130,17 +130,17 @@ network_configuration:
                   description: Traffic destined to ebs-mgt-vcn VCN goes to DRG.
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_2:
                   description: Traffic destined to ebs-nprod-vcn VCN goes to DRG.
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_3:
                   description: Traffic destined to ebs-prod-vcn VCN goes to DRG.
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
     spokes:
       vcns:
         VCN-FRANKFURT-MGT-KEY:
@@ -173,12 +173,12 @@ network_configuration:
                   description: ebslz-ebs-mgt-vcn to ebslz-ebs-nprod-vcn VCN
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_2:
                   description: ebslz-ebs-mgt-vcn to ebslz-ebs-prod-vcn VCN
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
             RT-MGT-APP-VCN-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
               display_name: ebslz-ebs-mgt-app-subnet-rtable
@@ -199,12 +199,12 @@ network_configuration:
                   description: ebslz-ebs-mgt-vcn to ebslz-ebs-nprod-vcn VCN
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_2:
                   description: ebslz-ebs-mgt-vcn to ebslz-ebs-prod-vcn VCN
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
             RT-MGT-DB-VCN-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
               display_name: ebslz-ebs-mgt-db-subnet-rtable
@@ -450,7 +450,7 @@ network_configuration:
                   description: ebslz-ebs-nprod-vcn VCN to ebslz-ebs-mgt-vcn VCN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
             RT-NPROD-APP-VCN-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
               display_name: ebslz-ebs-nprod-app-subnet-rtable
@@ -471,7 +471,7 @@ network_configuration:
                   description: ebslz-ebs-nprod-vcn VCN to ebslz-ebs-mgt-vcn VCNN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
             RT-NPROD-DB-VCN-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
               display_name: ebslz-ebs-nprod-db-subnet-rtable
@@ -492,7 +492,7 @@ network_configuration:
                   description: ebslz-ebs-nprod-vcn VCN to ebslz-ebs-mgt-vcn VCN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
           security_lists:
             SL-NPROD-WEB-VCN-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
@@ -788,7 +788,7 @@ network_configuration:
                   description: ebslz-ebs-prod-vcn VCN to ebslz-ebs-mgt-vcn VCN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
             RT-PROD-APP-VCN-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
               display_name: ebslz-ebs-prod-app-subnet-rtable
@@ -809,7 +809,7 @@ network_configuration:
                   description: ebslz-ebs-prod-vcn VCN to ebslz-ebs-mgt-vcn VCNN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
             RT-PROD-DB-VCN-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
               display_name: ebslz-ebs-prod-db-subnet-rtable
@@ -830,7 +830,7 @@ network_configuration:
                   description: ebslz-ebs-prod-vcn VCN to ebslz-ebs-mgt-vcn VCN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
           security_lists:
             SL-PROD-WEB-VCN-KEY:
               compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
@@ -1100,13 +1100,13 @@ network_configuration:
       non_vcn_specific_gateways:
         inject_into_existing_drgs:
           DRG-FRANKFURT-KEY:
-            drg_id: ocid1.drg.oc1.eu-frankfurt-1.xxxxxxx
+            drg_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
             drg_attachments:
               DRG-FRANKFURT-VCN-FRANKFURT-MGT-KEY:
                 defined_tags:
                 display_name: ebslz-ebs-mgt-vcn-drg-attachment
                 freeform_tags:
-                drg_route_table_id: ''
+                drg_route_table_id: ocid1.drgroutetable.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_table_name:
                 network_details:
                   attached_resource_id:
@@ -1119,7 +1119,7 @@ network_configuration:
                 defined_tags:
                 display_name: ebslz-ebs-nprod-vcn-drg-attachment
                 freeform_tags:
-                drg_route_table_id: ''
+                drg_route_table_id: ocid1.drgroutetable.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_table_name:
                 network_details:
                   attached_resource_id:
@@ -1132,7 +1132,7 @@ network_configuration:
                 defined_tags:
                 display_name: ebslz-ebs-prod-vcn-drg-attachment
                 freeform_tags:
-                drg_route_table_id: ''
+                drg_route_table_id: ocid1.drgroutetable.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
                 drg_route_table_name:
                 network_details:
                   attached_resource_id:

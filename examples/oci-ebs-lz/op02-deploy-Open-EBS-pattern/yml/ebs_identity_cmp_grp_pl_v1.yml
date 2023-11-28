@@ -5,13 +5,15 @@
 
 
 ---
+---
 compartments_configuration:
   enable_delete: 'true'
-  default_parent_ocid: ocid1.tenancy.oc1..aaaaaaaaxxxx
+  default_parent_ocid: ocid1.compartment.oc1..aaaaaaaaxxxx
   compartments:
     CMP-EBS-KEY:
       name: ebslz-ebs-cmp
       description: EBS compartment for all resources related to EBS
+      parent_id: ocid1.compartment.oc1..aaaaaaaaxxxx
       defined_tags:
       freeform_tags:
       children:
@@ -50,7 +52,7 @@ policies_configuration:
     ebslz-ebs-prod-admin-policy:
       name: ebslz-ebs-prod-admin-policy
       description: ebs prod policy
-      compartment_ocid: ocid1.tenancy.oc1..aaaaaaaaxxxx
+      compartment_ocid: ocid1.compartment.oc1..aaaaaaaaxxxx
       statements:
       - allow group ebslz-ebs-prod-admin-group to read all-resources in compartment
         ebslz-ebs-cmp:ebslz-ebs-prod-cmp
@@ -99,7 +101,7 @@ policies_configuration:
     ebslz-ebs-nprod-admin-policy:
       name: ebslz-ebs-nprod-admin-policy
       description: ebs non prod policy
-      compartment_ocid: ocid1.tenancy.oc1..aaaaaaaaxxxx
+      compartment_ocid: ocid1.compartment.oc1..aaaaaaaaxxxx
       statements:
       - allow group ebslz-ebs-nprod-admin-group to read all-resources in compartment
         ebslz-ebs-cmp:ebslz-ebs-nprod-cmp
@@ -149,7 +151,7 @@ policies_configuration:
     ebslz-ebs-mgt-admin-policy:
       name: ebslz-ebs-mgt-admin-policy
       description: ebs mngmt policy
-      compartment_ocid: ocid1.tenancy.oc1..aaaaaaaaxxxx
+      compartment_ocid: ocid1.compartment.oc1..aaaaaaaaxxxx
       statements:
       - allow group ebslz-ebs-mgt-admin-group to read all-resources in compartment
         ebslz-ebs-cmp:ebslz-ebs-mgt-cmp
@@ -198,7 +200,7 @@ policies_configuration:
     ebslz-ebs-network-admin-policy:
       name: ebslz-ebs-network-admin-policy
       description: ebs network policy
-      compartment_ocid: ocid1.tenancy.oc1..aaaaaaaaxxxx
+      compartment_ocid: ocid1.compartment.oc1..aaaaaaaaxxxx
       statements:
       - allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group
         to read virtual-network-family in compartment ebslz-network-cmp
@@ -213,7 +215,7 @@ policies_configuration:
     ebslz-ebs-security-admin-policy:
       name: ebslz-ebs-security-admin-policy
       description: ebs security policy
-      compartment_ocid: ocid1.tenancy.oc1..aaaaaaaaxxxx
+      compartment_ocid: ocid1.compartment.oc1..aaaaaaaaxxxx
       statements:
       - allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group
         to read vss-family in compartment ebslz-security-cmp
