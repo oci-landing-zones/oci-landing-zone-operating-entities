@@ -1,16 +1,16 @@
-# Open Landing Zones Catalogue 
+# Open Catalogue 
 
-## **Table of Contents**
+## **Contents**
 
-[1. LEARNING](#1-learning)</br>
-[2. BLUEPRINTS](#2-blueprints)</br>
-[3. WORKLOADS](#3-workloads)</br>
+[1. Learning](#1-learning)</br>
+[2. Blueprints](#2-blueprints)</br>
+[3. Workloads](#3-workloads)</br>
 
 &nbsp; 
 
-Welcome to the **Landing Zones Catalogue**. 
-
 The OCI Open LZ is much more than a blueprint, is a set of artifacts that can reduce your efforts in any OCI design and OCI running activities. It provides best practices with design blueprints, landing zone exercises, and runnable IaC configurations to provision or change OCI resources. 
+
+Welcome to the **Open Catalogue**. 
 
 &nbsp; 
 
