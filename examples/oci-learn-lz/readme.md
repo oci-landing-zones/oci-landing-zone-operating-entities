@@ -1,4 +1,4 @@
-# **OCI Learn LZ**
+# **The OCI Learn LZ**
 
 **Table of Contents**
 
