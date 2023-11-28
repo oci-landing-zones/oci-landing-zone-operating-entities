@@ -17,7 +17,7 @@ Welcome to the **OCI Open LZ Blueprint**, the **Op**erating **En**tities **L**an
 <img src="../images/oci_open_lz_hl_design.jpg" alt= “” width="1200" height="value">
 &nbsp; 
 
-If **cloud landing zones** are analogous to **airports**, the OCI Open LZ is a highly scalable airport with the possibility of having different terminals (OEs), that can be &ndash; but don't have to be &ndash; operated independently by different companies/subsidiaries. Each terminal can have a different security posture (domestic, international, etc.), teams, and resources, and communication between those terminals, inside or outside the airport, is possible, automated, and secured. 
+If **cloud landing zones** are analogous to **airports**, the OCI Open LZ is a highly secure and scalable airport with the possibility of having different terminals (OEs), that can be &ndash; but don't have to be &ndash; operated independently by different companies/subsidiaries. Each terminal can have a different security posture (domestic, international, etc.), teams, and resources, and communication between those terminals, inside or outside the airport, is possible, automated, and secured. 
 
 &nbsp; 
 
