@@ -1,20 +1,20 @@
-# OCI Open LZ Catalogue 
+# Open Landing Zones Catalogue 
 
 ## **Table of Contents**
 
-[1. LEARNING](#1-learning-landing-zones)</br>
-[2. BLUEPTRINTS](#2-blueprint-landing-zones)</br>
-[3. WORKLOADS](#3-workloads-landing-zones)</br>
+[1. LEARNING](#1-learning)</br>
+[2. BLUEPRINTS](#2-blueprints)</br>
+[3. WORKLOADS](#3-workloads)</br>
 
 &nbsp; 
 
-Welcome to the **OCI Open LZ Catalogue**. 
+Welcome to the **Landing Zones Catalogue**. 
 
 The OCI Open LZ is much more than a blueprint, is a set of artifacts that can reduce your efforts in any OCI design and OCI running activities. It provides best practices with design blueprints, landing zone exercises, and runnable IaC configurations to provision or change OCI resources. 
 
 &nbsp; 
 
-## 1. Learning Landing Zones
+## 1. Learning
 
 If you're starting on landing zone design and/or IaC configurations, this is your section.
 
@@ -30,7 +30,7 @@ If you're starting on landing zone design and/or IaC configurations, this is you
 
 &nbsp; 
 
-## 2. Blueprint Landing Zones
+## 2. Blueprints
 
 The blueprints help solve specific and complex OCI landing and operation requirements - when you're [tailoring a landing zone](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/tailored_landing_zones/tailored_landing_zones.md). These elements have complete OCI SecNetOps designs and OCI runtime with IaC configuration. They are used to scale/bridge with existing operating models, complying with fine-grained segregations of duties, strong network isolation, and heterogeneous workloads.
 
@@ -45,7 +45,7 @@ The blueprints help solve specific and complex OCI landing and operation require
 
 &nbsp; 
 
-## 3. Workloads Landing Zones
+## 3. Workloads
 
 &nbsp; 
 

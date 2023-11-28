@@ -31,8 +31,9 @@ Your objective is to review the initial network structure created by your team, 
 | 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
 | 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layer is disabled. |
 | 3 | Review the network structure design that is already created. The image below presents it. |
-| 4 | Copy the configuration file [oci_learn_lz_network.yml](/examples/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise2.
-| 5 | Review the network structure configuration in you **local**  **oci_learn_lz_network.yml** file. |
+| 4 | Review configurations. First review what is [possible to configure](/examples/oci-learn-lz/exercise2/diagrams/oci_network_config_all_variables.jpg) and then review the [exercise specific configurations](/examples/oci-learn-lz/exercise2/diagrams/oci_network_config_exercise_variables.jpg) scope. These views are also available on the draw.io tabs. |
+| 5 | Copy the configuration file [oci_learn_lz_network.yml](/examples/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise2.
+| 6 | Review the network structure configuration in you **local**  **oci_learn_lz_network.yml** file. |
 
 &nbsp; 
 
@@ -88,7 +89,7 @@ Your objective is to update your ORM stack from exercise 1 with the network conf
 |---|---| 
 | **1** | Edit the ORM Stack created on Exercise #1. |
 | **2** | Don't change any value on the first screen. Click Next.  |
-| **3** | Add the new network configuration by copying and pasting the **public git raw url** of the **oci_learn_lz_network.yml**. </br>**NOTE**: Do not delete the existing IAM configuration, this is an incremental operation on resources. |
+| **3** | Add the new network configuration by copying and pasting the **public git raw url** of the **oci_learn_lz_network.yml**.   </br>**NOTE 1**: Do not delete the existing IAM configuration, this is an incremental operation on resources. </br>**NOTE 2**: Don't forget to press enter or click on the "Add" pop-up after pasting the network url.|
 | **4** | Run terraform Plan, and Terraform Apply |
 | **5** | Review the created resources, they should match the design diagrams. |
 
