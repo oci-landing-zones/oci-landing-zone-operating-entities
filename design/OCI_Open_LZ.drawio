@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2023-11-20T15:28:47.090Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="7wnwoFnNvuRjdBAKuG-5" version="22.0.3" type="device" pages="19">
+<mxfile host="Electron" modified="2023-11-28T14:38:42.813Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="S8iSnc3v2yF1aV-EcXv2" version="22.0.3" type="device" pages="19">
   <diagram id="b9hU5v1Cp9lCEPGJeyjb" name="WELCOME">
     <mxGraphModel dx="1314" dy="953" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -236,7 +236,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="GPQNfREd9XtQGrKAktpl" name="SEC - Tenancy Structure">
-    <mxGraphModel dx="1314" dy="953" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1143" dy="829" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" value="Background" parent="0" />
@@ -705,7 +705,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="NET (1) - Structure" id="-hqdkerAnXdNHrQ5AolV">
-    <mxGraphModel dx="1314" dy="953" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1051" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="GU9-9-ZgyPJUUnVXDipt-0" />
         <mxCell id="GU9-9-ZgyPJUUnVXDipt-1" parent="GU9-9-ZgyPJUUnVXDipt-0" />
@@ -6194,7 +6194,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="OPS - OP.01 Manage Shared Services" id="QfvPMfeixgobJUx9MliK">
-    <mxGraphModel dx="1314" dy="953" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1877" dy="1361" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="OmhxztXAxSLM4RJb-AsK-0" />
         <mxCell id="OmhxztXAxSLM4RJb-AsK-1" parent="OmhxztXAxSLM4RJb-AsK-0" />
@@ -6365,11 +6365,6 @@
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="542" y="642" as="targetPoint" />
             <mxPoint x="870.6400000000003" y="44.440000000000055" as="sourcePoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="GUJlD1Xab1g5p3aHtGo0-1" value="&lt;span style=&quot;background-color: rgb(245, 244, 242);&quot;&gt;&amp;lt;&amp;lt;manage&amp;gt;&amp;gt;&lt;/span&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#151514;" parent="GUJlD1Xab1g5p3aHtGo0-0" vertex="1" connectable="0">
-          <mxGeometry x="-0.0866" y="3" relative="1" as="geometry">
-            <mxPoint x="-218" y="7" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="GUJlD1Xab1g5p3aHtGo0-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1.005;entryY=0.851;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1.003;exitY=0.367;exitDx=0;exitDy=0;exitPerimeter=0;" parent="OmhxztXAxSLM4RJb-AsK-2" source="GUJlD1Xab1g5p3aHtGo0-2" target="OmhxztXAxSLM4RJb-AsK-6" edge="1">
@@ -6634,7 +6629,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="OPS - OP.02 ManageOE_Example" id="5JBTDVl8Njv89AFvwue0">
-    <mxGraphModel dx="1314" dy="953" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1546" dy="1121" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="InFkdXOsKyJmfcPOynwQ-0" />
         <mxCell id="InFkdXOsKyJmfcPOynwQ-1" parent="InFkdXOsKyJmfcPOynwQ-0" />
@@ -6704,11 +6699,6 @@
             <mxPoint x="870.6400000000003" y="44.440000000000055" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="bIcotJeZ6R1c0QgoGG2t-2" value="&lt;span style=&quot;background-color: rgb(245, 244, 242);&quot;&gt;&amp;lt;&amp;lt;manage&amp;gt;&amp;gt;&lt;/span&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#151514;" parent="bIcotJeZ6R1c0QgoGG2t-1" vertex="1" connectable="0">
-          <mxGeometry x="-0.0866" y="3" relative="1" as="geometry">
-            <mxPoint x="-218" y="7" as="offset" />
-          </mxGeometry>
-        </mxCell>
         <mxCell id="bIcotJeZ6R1c0QgoGG2t-10" style="vsdxID=54;fillColor=none;gradientColor=none;strokeColor=none;spacingTop=-3;spacingBottom=-3;spacingLeft=-3;spacingRight=-3;points=[];labelBackgroundColor=none;rounded=0;html=1;whiteSpace=wrap;" parent="InFkdXOsKyJmfcPOynwQ-2" vertex="1">
           <mxGeometry x="501" y="720" width="80" height="42" as="geometry" />
         </mxCell>
@@ -6758,15 +6748,6 @@
         </mxCell>
         <mxCell id="e-HO-T_FPBObfQ8Vq7Dh-0" value="&lt;b&gt;L2 - OE ENVIRONMENTS&lt;br&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeWidth=1;dashed=1;align=left;fontFamily=Oracle Sans;verticalAlign=top;fillColor=#d6e8d5;strokeColor=#2d4049;dashPattern=1 1;fontSize=12;perimeterSpacing=0;spacingLeft=5;" parent="InFkdXOsKyJmfcPOynwQ-1" vertex="1">
           <mxGeometry x="1160" y="496" width="200" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="CtjGP1N6R3uTQNfc93D4-0" style="vsdxID=51;fillColor=none;gradientColor=none;strokeColor=none;spacingTop=-3;spacingBottom=-3;spacingLeft=-3;spacingRight=-3;points=[];labelBackgroundColor=none;rounded=0;html=1;whiteSpace=wrap;" parent="InFkdXOsKyJmfcPOynwQ-1" vertex="1">
-          <mxGeometry x="268" y="930" width="150" height="46" as="geometry" />
-        </mxCell>
-        <mxCell id="CtjGP1N6R3uTQNfc93D4-1" style="vsdxID=52;fillColor=#FFFFFF;gradientColor=none;shape=stencil(lVfLctswDPwaXTEEwec5Tf4j0zi1pq6dcZzW+ftClSgRkM1UNwnZlXfxIJiOHt73z2+7zpr3y/n0c/enf7nsO/rWWdsf97tzf+Gnjh47eng9nXc/zqeP48v4/vY8IIenX6ffwxeuI88MDGs+x7ecwft/kacRfOiPd8HRQhLg7x/n8dMo4dNrMBBoDF3tGPJAaQKVCIOm0JXGECLkgiKNuqkTCUIWWjcTnIfY8laLmkIOV/7QQAzSIAUIXhmsUFOIsK23YkyRBNjUWzGmUATrlFwHqOphlFRuECXV3JdJDrKUuQlMrLlZhJqC6/SWjBNEJ105C56kM844SWOOP4UNvQth7jFLW/ytCDf8RauaLENMyl+FsjOKrPLnwKkpcglSbAgmyGooIuQWIQFJAs4Dfs9hRcG5CbMaI0aVyfpcWtXoClao0q4Evi04JSkYy5jcEewMkJOCPTil1/HPqopwswQpl5OJWcktoJtqPYJX6VV4LdZ7MKiyu+goJ25adNiVo3LgZghq7jlV1BgPZmSd2haetwN6SWgXL3Dbq/ZM4GyT8MXA6vwxw6jzpd5Pdo2yc6lQZTAQJJQZHAraOORDAmul4K2E1RG2chjAS4P10VgMerBqLVCc98BssEKVibRtvRWjrJem2Ao/hbh31Q7jJESp1UBGKTVyxZTUGXRTacrgZK9txa8WujZXU3Cd5MlL4hKrXuPDxjnpL3lIVvrj08a3BFcM3cK3CQnMFwTtMDsIapvVczJfmYz0FxBMlv4WTCkoQUPrApfv/3HH3QDddHdegflhuaK/9ofDeMOv/66v9Bwa/x2gx78=);strokeColor=none;spacingTop=-3;spacingBottom=-3;spacingLeft=-3;spacingRight=-3;points=[];labelBackgroundColor=none;rounded=0;html=1;whiteSpace=wrap;" parent="CtjGP1N6R3uTQNfc93D4-0" vertex="1">
-          <mxGeometry x="1" width="82" height="44" as="geometry" />
-        </mxCell>
-        <mxCell id="CtjGP1N6R3uTQNfc93D4-2" style="vsdxID=53;fillColor=#FFFFFF;gradientColor=none;shape=stencil(pVnBctwgDP2avTKAAJtz2v5Hptk0O02zmU3SJn9ftjYgJFvY6W1Dnmw9IT0JfICbl4fb5+PB6pfXy/nn8c/p7vXhAF8O1p6eHo6X02v6dYCvB7i5P1+OPy7nt6e76e/n2yvy+uvX+ff1Ce+T3TgoGK9WVn9MK04B/Fv4NuEfT08iPi2EPXiwSjcv+P52mTwy3GRegkGF6SX63c4or6KfUfOSs2rMKJhRoEYzo+YlFxRYwWFkMa14m1fWGBonG1CGsTqaGVabwjAm0rZlGIxyQ8sQo+alweTHLzqMLeYVr6xbN7B0C/fimUM0IJbtOGZqc6KVOFsetJm7QaGFTftnvBp2bTg3cF5pK/EzTmnfEnRGeZLS2HdbEt9Cl2EqqTlYyw4jizneqQbHPQYmKjeKDHlKRxUpQRS5XLNZbQo/q/OrasmKkgRO2bhDwjheljCO70oYNlmXMOD7vSBhoGvQtkkYttiU0ck3st9dCQNUjVnCUkZbwjCoMJCa1cpawhBJeWY4KhcFh3kJFlFbNHC6TeeBBJDSK/ic3kGNY8vN6SyChVtCacINo3IBe+XFWkrSYEj28FpySFJyaFUgteRQKwUCWoxT2sOyYct46qwnuoacyG4NLM0RnezWyBo1i1PraoAiHR8laeaQrBkYio9iFgRbO6Up6Rt8yy+1qtjSS1HMCZ35BbSnmTIoK7kb6wZ/0iD1JedFgnzUSskXIyEYqu/rfQmjal8SihgbbGpL3KDblrDJainhwK22pWFhktw5Kf8vnkzuUQ2taOs9DxfAAxuBtRjjgbV+TQLMtaq03Jo/CAQr20vywdGETwnkhT7HDWiGMm58cIOqOwK/6wTQ5ZdAkhhjzShzpJUqijX+kuxreOtEPFP7UfmhjYdj4fCedUatRnJuwZ0GCGi5hfMUJnjWR1EeG+ZHbeP9mRR4d5IjmwxIc+rg2QTGtnphAqNll2wGOoHxQ2Ttq5UfP0TWWWbZ4UAHhVR7UTgUcoPO1M3wname4QWF4yO9AMYHkg1ymDYhj8ErcmjQA1fl0PBjUEcODfOzI4fcoCeH2CKn4ajIvYVJR3do6aVKzPEu/ND4VqdVI6ibWRr4opCj/BjbnfjQucJQk0JQt+R8VEBuIXRLbLBKyNz2aBJ9zuMNYKOlvKV6KaL5rZAIz//8FLjDkcJp+HhWktMa3pF84kAVb/nO5utCdKqFTTk2spn0MwZOrLoRNZOclU4ZeiGK5sEs/rU2gYO2XR7xMbNz4cvwnbF31xgrg9sBOfBLAvlWIaB7iGIgnij5G+SbmUAeX+4A18ZPz/QWS6nlfufc9uwmIgQ2cCVvB4keb8HdAO6OeM+g3VNYOMNr8YiLLAw1qVNSBeUAVjksQ1IFwab0gKWGJV5rLbDbi+841MGnH/VL0f3p8XH60IT/T78spaXpqxR8/Qs=);strokeColor=none;spacingTop=-3;spacingBottom=-3;spacingLeft=-3;spacingRight=-3;points=[];labelBackgroundColor=none;rounded=0;html=1;whiteSpace=wrap;" parent="CtjGP1N6R3uTQNfc93D4-0" vertex="1">
-          <mxGeometry width="84" height="46" as="geometry" />
         </mxCell>
         <mxCell id="InFkdXOsKyJmfcPOynwQ-30" value="L2" parent="InFkdXOsKyJmfcPOynwQ-0" />
         <mxCell id="InFkdXOsKyJmfcPOynwQ-31" value="&lt;b&gt;&lt;font color=&quot;#ae562c&quot;&gt;cmp-oe01-common&lt;/font&gt;&lt;/b&gt;" style="whiteSpace=wrap;html=1;strokeWidth=1;dashed=1;align=left;fontFamily=Oracle Sans;verticalAlign=top;fillColor=#faf8a9;strokeColor=#d79b00;dashPattern=1 1;fontSize=12;perimeterSpacing=0;spacingLeft=5;" parent="InFkdXOsKyJmfcPOynwQ-30" vertex="1">
@@ -7411,7 +7392,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="OPS - OP.04 Manage Project" id="XVMn2DR37HvivLzx0KsU">
-    <mxGraphModel dx="1314" dy="953" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2022" dy="1466" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="yxI3hD-Ul4WoLwnbTDr2-0" />
         <mxCell id="yxI3hD-Ul4WoLwnbTDr2-1" parent="yxI3hD-Ul4WoLwnbTDr2-0" />
