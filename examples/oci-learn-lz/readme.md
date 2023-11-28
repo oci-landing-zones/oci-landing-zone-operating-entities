@@ -92,7 +92,7 @@ There are currently two exercises available: one for security elements, where yo
 
 &nbsp; 
 
-| EXERCISE | OBJECTIVE  | RUN IT |  
-|---|---|---|
-| #1 - Security | Create the OCI Learn LZ **tenancy structure**. | [Here](/examples/oci-learn-lz/exercise1/readme.md)|
-| #2 - Network | Create the OCI Learn LZ **network structure** on top of the tenancy structure.| [Here](/examples/oci-learn-lz/exercise2/readme.md)||
+| EXERCISE | AREA | OBJECTIVE  | RUN IT |  
+|---|---|---|---|
+| #1 |  **Security** | Complete the OCI Learn LZ **tenancy structure**. | [Here](/examples/oci-learn-lz/exercise1/readme.md)|
+| #2 | **Network** | Complete the OCI Learn LZ **network structure** on top of the tenancy structure, for one Domain.| [Here](/examples/oci-learn-lz/exercise2/readme.md)||
