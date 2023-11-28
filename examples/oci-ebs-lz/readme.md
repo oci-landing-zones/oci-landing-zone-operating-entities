@@ -1,4 +1,4 @@
-# OCI Open EBS Landing Zone
+# OCI EBS LZ
 
 ## **Table of Contents**
 
@@ -12,61 +12,23 @@
 
 ## **1. Introduction**
 
-Welcome to the OCI Open EBS Landing Zone. This pattern presents a design for an OCI landing zone for EBS.
+Welcome to the OCI Oracle E-Business Suite (EBS)  Landing Zone.
 
-The OCI Open EBS LZ is a secure cloud environment, designed with best practices to simplify the onboarding of EBS workloads and enable the continuous operations of their cloud resources. This reference architecture provides a Terraform-based landing zone configuration that meets the security guidance prescribed in the CIS Oracle Cloud Infrastructure Foundations Benchmark.
+The OCI Open EBS LZ is a secure cloud environment, designed with best practices to simplify the onboarding of EBS workloads and enable the continuous operations of their cloud resources. This reference architecture provides a landing zone IaC **configuration** that meets the security guidance prescribed in the CIS Oracle Cloud Infrastructure Foundations Benchmark.
 
-Before migrating your on-premises Oracle E-Business Suite (EBS) to Oracle Cloud Infrastructure (OCI) you should deploy our Open EBS LZ Landing Zone. In this solution, you will learn how to deploy a landing zone with a new tenancy which also meets the specific requirements for deploying an EBS workload. 
+It's highly recommended to deploy this Landing Zone before migrating an on-premises Oracle EBS to OCI, as it sets a complete OCI foundation for its workloads. 
 
 &nbsp; 
 
 ## **2. Design Decisions**
 
+|ID   |	DESIGN DECISION | DESCRIPTION |
+|---|---|---|
+| **1** | **Standard LZ** | <ul> <li>  Deploy the OCI CIS Secure Landing Zone as the foundation </p></li> <li> Extend the Landing Zone using the OCI Open LZ EBS extension pattern </li> </ul> |
+|**2** | **Tenancy Structure** |  Extend the standard landing zone compartment structure with additional compartments for EBS-related resources: <ul> <li> <p> Parent EBS compartment </p></li><li><p>EBS Management compartment for resources such as EBS Cloud Manager </p></li> <li> <p> EBS Non-Production environments compartment </p></li><li> <p> EBS Production environment compartment</p></li>
+|**3** | **Groups & Policies** | Additional groups and associated policies are deployed to manage EBS compartment resources. |
+| **4** |  **Runtime** | The EBS Landing Zone will be set up using the OCI CIS LZ deployment for the initial setup and extended utilizing the OCI Open LZ Runtime approach for the EBS extension. Additional manual configuration tasks are also required to be completed. 
 
-<table>
-  <tbody>
-    <tr>
-      <th> ID </th>
-      <th align="left">DESIGN DECISION	</th>
-      <th align="left"> DESCRIPTION </th>
-    </tr>
-    <tr>
-      <td> 0  </td>
-      <td align="left">Standard Landing Zone	</td>
-      <td align="left">  <ul> <li>  Deploy the OCI CIS Secure Landing Zone as the foundation </p></li> <li> Extend the Landing Zone using the OCI Open LZ EBS extension pattern </li> </ul> 
-    <tr>
-      <td> 1 </td>
-      <td align="left"> Compartments </td>
-       <td align="left">  Extend the OCI Secure LZ compartment structure with additional compartments for EBS related resources: <ul> <li> <p> Parent EBS compartment </p></li><li><p>EBS Management compartment for resources such as EBS Cloud Manager </p></li> <li> <p> EBS Non-Production environments compartment </p></li><li> <p> EBS Production environment compartment</p></li>
-</ul> 
-    <tr>
-    <tr>
-      <td>2</td>
-      <td align="left">Groups & Policies</td>
-      <td align="left">Additional groups and associated policies are deployed to manage EBS compartment resources.
-</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td align="left">Network Structure</td>
-      <td align="left">Hub and Spoke architecture is used.
-
-</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td align="left">Network Connectivity</td>
-      <td align="left"></td>
-    </tr>
-   <td>5</td>
-      <td align="left"> Automation </td>
-      <td align="left"> The Landing Zone will be deployed using the automated OCI Secure Landing Zone deployment for the initial landing zone and extended utilizing the OCI Open Landing Zone modules with the EBS extension pattern <ul>   <li><p> 1. OCI Secure Landing Zone Terraform </p> </li>  <li><p> 2. OCI Open Landing Zone Terraform </p> </li> <li><p> 3. Additional manual configuration tasks are also required to be completed. </p> </li> 
-</ul> </td>
-    </tr>
-  </tbody>
-</table>
-
-The following architecture diagrams show a landing zone setup for deploying Oracle E-Business Suite using EBS Cloud Manager.
 
 &nbsp; 
 
@@ -351,7 +313,7 @@ The following tables describe the proposed DRGs and DRG Attachments.
 
 &nbsp; 
 
-**DRG Attachments**
+#### **DRG Attachments**
 
 
 > [!NOTE]
