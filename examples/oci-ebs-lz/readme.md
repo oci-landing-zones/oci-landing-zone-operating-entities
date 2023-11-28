@@ -1,4 +1,4 @@
-# OCI EBS LZ
+# **The OCI EBS LZ**
 
 **Table of Contents**
 

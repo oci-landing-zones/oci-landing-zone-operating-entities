@@ -1,4 +1,4 @@
-# Open Catalogue 
+# **The Open Catalogue** 
 
 ## **Contents**
 

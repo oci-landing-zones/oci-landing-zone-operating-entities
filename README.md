@@ -1,4 +1,4 @@
-# **The OCI Open Landing Zone**
+# **The OCI Open LZ**
 
 <img src="images/oci_open_lz.jpg" width="1200" height="value">
 
