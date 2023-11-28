@@ -1,15 +1,15 @@
 # OCI Learn LZ
 
-### **Table of Contents**
+**Table of Contents**
 
-[1. Objective](#1-objective)</br>
+[1. Introduction](#1-introduction)</br>
 [2. Before you Start](#2-before-you-start)</br>
 [3. Functional Content](#3-functional-context)</br>
 [4. Hands-on Exercises](#4-exercises)</br>
 
 &nbsp; 
 
-## 1. Objectives
+## 1. Introduction
 
 Welcome to the **Open Learn LZ**, a set of **exercises** to learn how to **design**, **configure**, and **run** OCI landing zones. Its main objectives are: 
 1. Provide elementary landing zone **design** capabilities using draw.io.

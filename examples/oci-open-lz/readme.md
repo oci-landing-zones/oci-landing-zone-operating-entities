@@ -1,10 +1,21 @@
 # OCI Open LZ Runtime View
 
-The **examples** section presents **OCI Open LZ Runtime View**, i.e., the **day two execution** of the operations scenarios introduced in [OCI Open LZ Operations View](../../design/OCI_Open_LZ.pdf).
+**Table of Contents**
+
+[1. Introduction](#1-introduction)</br>
+[2. Operational Segregation](#2-segregating-operational-responsibilities)</br>
+[3. Central Operations Team](#3-central-operations-team---operations-scenarios)</br>
+[4. OE Operations Teams](#4-oe-operations-teams---operations-scenarios)</br>
 
 &nbsp; 
 
-## Segregating Operational Responsibilities
+## 1. Introduction
+
+This section presents **OCI Open LZ Runtime View**, i.e., the **day two execution** of the operations scenarios introduced in [OCI Open LZ Operations View](../../design/OCI_Open_LZ.pdf).
+
+&nbsp; 
+
+## 2. Segregating Operational Responsibilities
 
 The **operations scenarios** are one of the most important elements of this blueprint, as they represent the use cases and its key activities on the OCI Open LZ that create or update resources. 
 
@@ -14,7 +25,7 @@ Note the distribution of operations between cloud operations teams is a design t
 
 &nbsp; 
 
-## Central Operations Team - Operations Scenarios
+## 3. Central Operations Team - Operations Scenarios
 
 Per OCI Open LZ Design, this team is responsible for managing the landing zone share resources and OEs network resources, and can execute the following operations:
 
@@ -25,7 +36,7 @@ Each scenario has its **runtime configurations** ready for execution with **Terr
 
 &nbsp; 
 
-## OE Operations Teams - Operations Scenarios
+## 4. OE Operations Teams - Operations Scenarios
 
 Per OCI Open LZ Design, these teams, one per OE, are responsible for managing the OE resources such as projects and PoC, and can execute the following operations:
 
