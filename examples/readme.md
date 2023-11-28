@@ -55,7 +55,7 @@ A set of landing zones ready for specific workloads. Each flavor has a design wi
 
 | NAME | OBJECTIVE  | DESIGN | RUNTIME | 
 |---|---|---|---|
-| OCI Open EBS LZ | A ready-made landing zone for EBS with a complete design and IaC runtime. | [View](/examples/oci-ebs-lz/readme.md) | [View](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/readme.md) |
+| OCI EBS LZ | A ready-made landing zone for EBS with a complete design and IaC runtime. | [View](/examples/oci-ebs-lz/readme.md) | [View](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/readme.md) |
 
 
 &nbsp; 
