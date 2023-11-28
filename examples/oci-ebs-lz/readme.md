@@ -1,6 +1,6 @@
 # OCI EBS LZ
 
-## **Table of Contents**
+**Table of Contents**
 
 [1. Introduction](#1-introduction)</br>
 [2. Design Decisions](#2-design-decisions)</br>

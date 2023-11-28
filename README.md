@@ -1,35 +1,23 @@
-# **OCI Open LZ [Blueprint](#)**
+# **The OCI Open Landing Zone**
 
 <img src="images/oci_open_lz.jpg" width="1200" height="value">
 
 &nbsp; 
 
-Welcome to the **OCI Open LZ**, the **Op**erating **En**tities **L**anding **Z**one, a **runnable [blueprint](#)**, to simplify the onboarding of organizations, business units, and subsidiaries into OCI. 
+Welcome to the **OCI Open LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI. 
 
-The purpose of the **OCI Open LZ** is to:
-1. Provide an end-to-end **landing zone design**, ready to **onboard an enterprise organization** and its functional divisions &ndash; identified as **operating entities (OE)** with their teams, departments, and projects.
-2. Provide a **cloud-native operating model** to simplify and scale **day two operations**.
-3. Demonstrate the operating model and **run OCI** with a **configurable [Terraform](orchestrator/Readme.md) approach**.
-4. **Enable customers, partners, independent software vendors (ISV)**, and the general **IT community** to **create/use tailored landing zones** with **lower efforts** through a **comprehensive OCI reference architecture**.  
-5. Provide **tailoring guidelines** to help adjust the model. This asset can be used directly, tailored, or used as inspiration to create a new one &ndash; as it is not a prescribed solution.
+The objective of the **OCI Open LZ** is to provide:
+1. **[A Blueprint](/design/readme.md):** A complete end-to-end landing zone design, ready to onboard an enterprise organization and its functional divisions &ndash; identified as operating entities (OE) with their teams, departments, and projects.
+2. **[An Operating Model](/examples/oci-open-lz/readme.md):** a complete cloud-native / gitops operations design to simplify and scale day two operations, focusing on IaC configurations and not on code.
+3. **[Enablement](/examples/oci-learn-lz/readme.md):** to our customers, partners, independent software vendors (ISV), and the general IT community to create, configure, and run OCI landing zones with lower efforts and shorted.  
+4. **[A Catalogue](/examples/readme.md)**: as the entry point for finding all types of landing zones, related designs and runtimes.
    
-
-&nbsp; 
-
-Before starting, find below the **seven characteristics** of the OCI Open LZ. For more details on the design, see the table in the next section.
-
-&nbsp; 
-
-<img src="images/oci_open_lz_hl_design.jpg" alt= “” width="1200" height="value">
-&nbsp; 
-
-If **cloud landing zones** are analogous to **airports**, the OCI Open LZ is a highly scalable airport with the possibility of having different terminals (OEs), that can be &ndash; but don't have to be &ndash; operated independently by different companies/subsidiaries. Each terminal can have a different security posture (domestic, international, etc.), teams, and resources, and communication between those terminals, inside or outside the airport, is possible, automated, and secured. 
 
 &nbsp; 
 
 ## How to Start
 
-This repository is the source of truth for this blueprint, where you can find all the materials to **design**, **configure**, and **run** your landing zone. 
+This repository is the source of truth for the OCI Open LZ, where you can find all the materials to **design**, **configure**, and **run**  OCI landing zones. The following activities are proposed as guidance to create your OCI-tailored landing zone.
 
 &nbsp; 
 
@@ -37,10 +25,10 @@ This repository is the source of truth for this blueprint, where you can find al
 | # | ACTIVITY | ASSETS| DESCRIPTION   | 
 |---|---|---|---|
 | **1**| **PREPARE** | [5 Steps in 5'](https://www.youtube.com/watch?v=JWKRHfO4LnY&ab_channel=OracleLearning),</br>[A Blueprint to Onboard and Run OCI ](https://www.youtube.com/watch?v=xbKIxSERIxY) | These recorded sessions discusses the differences between [standard](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/standard_landing_zones/standard_landing_zones.md) and [tailored landing zones](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/tailored_landing_zones/tailored_landing_zones.md), presenting the OCI Open LZ Blueprint tailored views, and running a demo  with Terraform configurable modules. |
-| **2** | **ENABLE** | [OCI Learn LZ](/examples/oci-learn-lz/****)| Use the OCI Learn LZ exercises to understand how to **design** and **configure** OCI Landing Zones. |
-| **3** | **DESIGN** | [OCI Open LZ PDF](/design/OCI_Open_LZ.pdf),</br>[ OCI Open LZ Draw.io ](/design/OCI_Open_LZ.drawio)   | Present the OCI Open LZ **blueprint design** with the functional, security, network, and operations view, with all the diagrams in a reusable format. Other **landing zone models** are also [available](/design/models/readme.md). |   
-| **4** | **CONFIGURE** | [OCI Open LZ Runtime View](/examples/oci-open-lz/readme.md) | Operations  **configurations** for running the OCI Open LZ. These configurations are run with [OCI Open LZ Terraform Orchestrator Module ](orchestrator/readme.md) on top of the [CIS  Landing Zone Enhanced Modules](https://www.ateam-oracle.com/post/cis-landing-zone-enhanced-modules) |                
-| **5** | **RUN** | [OCI Open LZ Terraform Orchestrator ](/orchestrator/readme.md) | The OCI Open LZ blueprint **automation interface**, a Terraform module that orchestrates the [OCI CIS LZ IAM ](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) and the [OCI CIS LZ Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) Modules into one consolidated automation, with several resource types in the same run. It supports **any OCI landing zone configuration**, including - but not limited to &ndash; the OCI Open LZ. </br>Run the Orchestrator with your configurations or with the provided [operations examples](/examples/oci-open-lz/readme.md) using **Terraform CLI** or **Oracle Resource Manager (ORM)**.|
+| **2** | **ENABLE** | [OCI Learn LZ](/examples/oci-learn-lz/readme.md)| Use the OCI Learn LZ exercises to understand how to **design** and **configure** OCI Landing Zones. |
+| **3** | **DESIGN** | [OCI Open LZ PDF](/design/OCI_Open_LZ.pdf),</br>[ OCI Open LZ Draw.io ](/design/OCI_Open_LZ.drawio)   | Use the OCI Open LZ **blueprint** to design your functional, security, network, and operations view, with all the diagrams in a reusable format. Other **landing zone models** are also [available](/design/models/readme.md). |   
+| **4** | **CONFIGURE** | [OCI Open LZ Runtime View](/examples/oci-open-lz/readme.md) | Use the  OCI Open LZ runtime  **configurations** as your IaC templates. These configurations are easily adjustable to any other landing zone model and are run with [OCI Open LZ Terraform Orchestrator Module ](orchestrator/readme.md) on top of the [CIS  Landing Zone Enhanced Modules](https://www.ateam-oracle.com/post/cis-landing-zone-enhanced-modules). |                
+| **5** | **RUN** | [OCI Open LZ Terraform Orchestrator ](/orchestrator/readme.md) | Use the OCI Open LZ **orchestrator** to run an operation on several resource types into one consolidated execution. It supports **any OCI landing zone configuration**, including - but not limited to &ndash; the OCI Open LZ. </br>Use the **orchestrator** with your configurations or with the provided [operations examples](/examples/oci-open-lz/readme.md) using **Terraform CLI** or **Oracle Resource Manager (ORM)**.|
 
 
 &nbsp; 
