@@ -10,7 +10,7 @@ The objective of the **OCI Open LZ** is to provide:
 1. **[A Blueprint](/design/readme.md):** A complete SecNetOps landing zone design, ready to onboard an enterprise organization and its functional divisions &ndash; identified as operating entities (OE) with their teams, departments, and projects.
 2. **[An Operating Model](/examples/oci-open-lz/readme.md):** a complete cloud-native / gitops runtime to simplify and scale day two operations, focusing on IaC configurations and not on code.
 3. **[Enablement](/examples/oci-learn-lz/readme.md):** to our customers, partners, independent software vendors (ISV), and the general IT community to create, configure, and run OCI landing zones with lower efforts and reduced timeframes.
-4. **[A Catalogue](/examples/readme.md)**: as the entry point for finding all types of landing zones, related designs and runtimes.
+4. **[A Catalogue](/examples/readme.md)**: as the entry point to find more landing zones, related designs and runtime configurations.
    
 
 &nbsp; 
