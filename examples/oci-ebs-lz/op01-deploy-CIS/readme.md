@@ -33,6 +33,6 @@ The outcome should cover the design shown in the next diagrams.
 
 ![Diagram](Diagrams/Compartments.png)
 
-![Diagram](Diagrams/Groups.png)
+![Diagram](Diagrams/groups.png)
 
 ![Diagram](Diagrams/Network.png)
