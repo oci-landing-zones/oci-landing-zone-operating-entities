@@ -165,7 +165,7 @@ This section presents the Oracle Resource Manager steps with associated input. T
 
 &nbsp; 
 
-You can proceed to [OP#02](/examples/oci-ebs-lz/readme.md).
+You can proceed to [OP#02](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/readme.md)
 
 &nbsp; 
 
