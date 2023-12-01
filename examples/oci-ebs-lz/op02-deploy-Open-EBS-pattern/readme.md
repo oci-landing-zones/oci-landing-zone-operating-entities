@@ -58,7 +58,7 @@ Search for the values indicated below and replace with the correct OCIDs:
 
 The diagram below identifies the compartments in the scope of this operation.
 &nbsp; 
-![Diagram](diagrams/IAM.png)
+![Diagram](diagrams/Compartments.png)
 &nbsp; 
 
 The corresponding json configuration for the compartment topology described above is: 
