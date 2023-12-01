@@ -35,4 +35,4 @@ The outcome should cover the design shown in the next diagrams.
 
 ![Diagram](Diagrams/Groups.png)
 
-![Diagram](Diagrams/Networkd.png)
+![Diagram](Diagrams/Network.png)
