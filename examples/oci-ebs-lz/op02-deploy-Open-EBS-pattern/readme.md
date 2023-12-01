@@ -112,7 +112,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 The diagram below identifies the groups in the scope of this operation.
 
 &nbsp; 
-![Diagram](diagrams/groups.png)
+![Diagram](diagrams/Groups.png)
 &nbsp; 
 
 Example of a group creation:
