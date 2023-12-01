@@ -555,7 +555,7 @@ Example of a Route table injection:
 * Change network_entity_id in route rules to the corresponding internet gateways, service gateways ids or drg ids.
 
 
-###  **4.6. DRG Attachements **
+###  **4.6. DRG Attachements**
 
 We need to add new DRG attachments (DRGA.02, DRGA.03, DRGA.04) to the DRG ( DRG.01) created by de CIS LZ (OP#01)
 
