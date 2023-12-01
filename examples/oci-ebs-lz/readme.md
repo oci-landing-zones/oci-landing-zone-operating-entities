@@ -24,7 +24,7 @@ It's highly recommended to deploy this Landing Zone before migrating an on-premi
 
 |ID   |	DESIGN DECISION | DESCRIPTION |
 |---|---|---|
-| **1** | **Standard LZ** | <ul> <li>  Deploy the OCI CIS Secure Landing Zone as the foundation </p></li> <li> Extend the Landing Zone using the OCI Open LZ EBS extension pattern </li> </ul> |
+| **1** | **Standard LZ** | <ul> <li>  OCI CIS Secure Landing Zone is being deployed as a foundation </p></li> <li> The OCI Open LZ EBS extention is used to extend the CIS LZ to accomodate EBS Workloads </li> </ul> |
 |**2** | **Tenancy Structure** |  Extend the standard landing zone compartment structure with additional compartments for EBS-related resources: <ul> <li> <p> Parent EBS compartment </p></li><li><p>EBS Management compartment for resources such as EBS Cloud Manager </p></li> <li> <p> EBS Non-Production environments compartment </p></li><li> <p> EBS Production environment compartment</p></li>
 |**3** | **Groups & Policies** | Additional groups and associated policies are deployed to manage EBS compartment resources. |
 | **4** |  **Runtime** | The EBS Landing Zone will be set up using the OCI CIS LZ deployment for the initial setup and extended utilizing the OCI Open LZ Runtime approach for the EBS extension. Additional manual configuration tasks are also required to be completed. 
@@ -74,7 +74,7 @@ The OCI Open EBS LZ  includes the following groups:
 &nbsp; 
 
 > [!NOTE]
-> In Oracle Identity Cloud Service, groups are the links between user accounts and applications.
+> In OCI Identity and Access Management, groups are the links between user accounts and applications.
 
 &nbsp; 
 
@@ -89,15 +89,16 @@ The OCI Open EBS LZ  includes the following groups:
 |GRP.01|	OP#01|	ebslz-cost-admin-group	|CIS Landing Zone group for Cost management|
 |GRP.02|	OP#01|	ebslz-security-admin-group|	CIS Landing Zone group for security services management|
 |GRP.03|	OP#01|	ebslz-auditor-group	|CIS Landing Zone group for auditing the tenancy|
-|GRP.04|	OP#01|	ebslz-database-admin-group	|CIS Landing Zone group for managing databases|
-|GRP.05|	OP#01|	ebslz-appdev-admin-group	|CIS Landing Zone group for managing app development related services|
-|GRP.06|	OP#01|	ebslz-storage-admin-group	|CIS Landing Zone group for storage services management|
-|GRP.07|	OP#01|	ebslz-cred-admin-group	|CIS Landing Zone group for managing users credentials in the tenancy|
-|GRP.08|	OP#01|	ebslz-announcement-reader-group	|CIS Landing Zone group for reading Console announcements|
-|GRP.09|	OP#01|	ebslz-iam-admin-group|	CIS Landing Zone group for managing IAM resources in the tenancy|
-|GRP.10|	OP#02|	ebslz-ebs-mgt-admin-group	|EBS Management admin group for resources in the EBS Management compartment|
-|GRP.11|OP#02|ebslz-ebs-nprod-admin-group	|EBS Non-Production admin group for resources in the EBS Non-Production compartment|
-|GRP.12|	OP#02|	ebslz-ebs-prod-admin-group|	EBS Production admin group for resources in the EBS Production compartment|
+|GRP.04|	OP#01|	ebslz-network-admin-group	|CIS Landing Zone group for managing networks|
+|GRP.05|	OP#01|	ebslz-database-admin-group	|CIS Landing Zone group for managing databases|
+|GRP.06|	OP#01|	ebslz-appdev-admin-group	|CIS Landing Zone group for managing app development related services|
+|GRP.07|	OP#01|	ebslz-storage-admin-group	|CIS Landing Zone group for storage services management|
+|GRP.08|	OP#01|	ebslz-cred-admin-group	|CIS Landing Zone group for managing users credentials in the tenancy|
+|GRP.09|	OP#01|	ebslz-announcement-reader-group	|CIS Landing Zone group for reading Console announcements|
+|GRP.10|	OP#01|	ebslz-iam-admin-group|	CIS Landing Zone group for managing IAM resources in the tenancy|
+|GRP.11|	OP#02|	ebslz-ebs-mgt-admin-group	|EBS Management admin group for resources in the EBS Management compartment|
+|GRP.12|OP#02|ebslz-ebs-nprod-admin-group	|EBS Non-Production admin group for resources in the EBS Non-Production compartment|
+|GRP.13|	OP#02|	ebslz-ebs-prod-admin-group|	EBS Production admin group for resources in the EBS Production compartment|
 
 &nbsp; 
 
@@ -389,7 +390,7 @@ The following table describes the proposed Service Gateways.
 
 &nbsp; 
 
-This chapter presents the day two execution of the OCI Open EBS LZ operations scenarios.
+This chapter presents the OCI Open EBS LZ operations scenarios.
 
  The operations scenarios are one of the most important elements of this design, as they represent the use cases and its key activities on the OCI Open EBS LZ that create or update resources.
 
