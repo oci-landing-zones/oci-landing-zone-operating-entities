@@ -1,5 +1,5 @@
 
-# Open LZ EBS extension Pattern.
+# Deploy Open LZ EBS extension Pattern
 
 ## **Table of Contents**
 
@@ -44,13 +44,12 @@ For configuring and running the Open LZ EBS extension IAM layer use the followin
 
 This configuration file will cover the following three categories of resources described in the next sections.
 
-This configuration file will require changes to the resources to reference the OCIDs of the CIS Landing Zone which were deployed in OP01.
+This configuration file will require changes to reference the OCIDs of the CIS Landing Zone resources which were deployed in OP01.
 Search for the values indicated below and replace with the correct OCIDs:
 
 | Resource | OCID Text to Replace | Description |
 |---|---|---|
-| Containing Compartment | ocid1.compartment.oc1..aaaaaaaaxxxx | The containing compartment, if there is no containing compartment then replace with the root compartment
-| Root Compartment | ocid1.tenancy.oc1..aaaaaaaaxxxx | The root compartment OCID for the tenancy
+| Root Compartment | \<OCID-COMPARTMENT-ROOT> | The root compartment OCID for the tenancy
 
 &nbsp; 
 
@@ -63,35 +62,33 @@ The diagram below identifies the compartments in the scope of this operation.
 
 The corresponding json configuration for the compartment topology described above is: 
 
-```
 Example of a compartment structure creation:
-
-{
+```
     "compartments_configuration": {
         "enable_delete": "true",
-        "default_parent_ocid": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
+        "default_parent_ocid": "<OCID-COMPARTMENT-ROOT>",
         "compartments": {
             "CMP-EBS-KEY": {
-                "name": "ebslz-ebs-cmp",
+                "name": "ebs-cmp",
                 "description": "EBS compartment for all resources related to EBS",
-                "parent_id": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
+                "parent_id": "<OCID-COMPARTMENT-ROOT>",
                 "defined_tags": null,
                 "freeform_tags": null,
                 "children": {
                     "CMP-EBS-PROD-KEY": {
-                        "name": "esblz-ebs-prod-cmp",
+                        "name": "ebs-prod-cmp",
                         "description": "EBS prod compartment",
                         "defined_tags": null,
                         "freeform_tags": {}
                     },
-                    "CMP-EBS-NONPROD-KEY": {
-                        "name": "esblz-ebs-nprod-cmp",
+                    "CMP-EBS-NPROD-KEY": {
+                        "name": "ebs-nprod-cmp",
                         "description": "EBS non prod compartment",
                         "defined_tags": null,
                         "freeform_tags": {}
                     },
-                    "CMP-EBS-MNGMT-KEY": {
-                        "name": "esblz-ebs-mgt-cmp",
+                    "CMP-EBS-MGT-KEY": {
+                        "name": "ebs-mgt-cmp",
                         "description": "EBS management compartment",
                         "defined_tags": null,
                         "freeform_tags": {}
@@ -100,7 +97,6 @@ Example of a compartment structure creation:
             }
         }
     },
-
 ```
 
 For extended documentation please refer to the [Identity & Access Management CIS Terraform module compartments example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/compartments/examples/vision/input.auto.tfvars.template).
@@ -117,26 +113,24 @@ The diagram below identifies the groups in the scope of this operation.
 
 Example of a group creation:
 ```
-
-   "groups_configuration": {
+    "groups_configuration": {
         "default_defined_tags": null,
         "default_freeform_tags": null,
         "groups": {
-            "ebslz-ebs-prod-admin-group": {
-                "name": "ebslz-ebs-prod-admin-group",
+            "ebs-prod-admin-group": {
+                "name": "ebs-prod-admin-group",
                 "description": "EBS extension group for ebs prod management"
             },
-            "ebslz-ebs-nprod-admin-group": {
-                "name": "ebslz-ebs-nprod-admin-group",
+            "ebs-nprod-admin-group": {
+                "name": "ebs-nprod-admin-group",
                 "description": "EBS extension group for ebs Non prod management"
             },
-            "ebslz-ebs-mgt-admin-group": {
-                "name": "cislz-ebs-mgt-admin-group",
+            "ebs-mgt-admin-group": {
+                "name": "ebs-mgt-admin-group",
                 "description": "EBS extension group for ebs management"
             }
         }
     },
-
 ```
 
 This automation provides fully supports any kind of OCI IAM Groups topology to be specified in the json format. 
@@ -149,164 +143,155 @@ For an example of such configuration and for extended documentation please refer
 
 Example of policy creation:
 ```
-"policies_configuration": {
+    "policies_configuration": {
         "supplied_policies": {
-            "ebslz-ebs-prod-admin-policy": {
-                "name": "ebslz-ebs-prod-admin-policy",
-                "description": "ebs policy",
-                "compartment_ocid": "ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
+            "ebs-prod-admin-policy": {
+                "name": "ebs-prod-admin-policy",
+                "description": "ebs prod policy",
+                "compartment_ocid": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
-                    "allow group ebslz-ebs-prod-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage instance-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage database-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage load-balancers in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage volume-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage tag-namespaces in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage alarms in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage metrics in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage orm-stacks in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage orm-jobs in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage orm-config-source-providers in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read audit-events in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read work-requests in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage bastion-session in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read instance-agent-plugins in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage functions-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage api-gateway-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage ons-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage streams in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage cluster-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage logs in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage repos in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage cloudevents-rules in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage alarms in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage metrics in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to manage logs in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read instance-images in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp",
-                    "allow group ebslz-ebs-prod-admin-group to read app-catalog-listing in compartment ebslz-ebs-cmp:ebslz-ebs-prod-cmp"
+                    "allow group ebs-prod-admin-group to read all-resources in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage instance-family in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage database-family in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage load-balancers in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage volume-family in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage tag-namespaces in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage alarms in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage metrics in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage object-family in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage orm-stacks in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage orm-jobs in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage orm-config-source-providers in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to read audit-events in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to read work-requests in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage bastion-session in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to read instance-agent-plugins in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage functions-family in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage api-gateway-family in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage ons-family in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage streams in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage cluster-family in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage logs in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage object-family in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage repos in compartment ebs-cmp:ebs-prod-cmp",
+                    "allow group ebs-prod-admin-group to manage cloudevents-rules in compartment ebs-cmp:ebs-prod-cmp"
                 ]
             },
-            "ebslz-ebs-nprod-admin-policy": {
-                "name": "ebslz-ebs-nprod-admin-policy",
+            "ebs-nprod-admin-policy": {
+                "name": "ebs-nprod-admin-policy",
                 "description": "ebs non prod policy",
-                "compartment_ocid": "ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
-                    "allow group ebslz-ebs-nprod-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage instance-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage database-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage load-balancers in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage volume-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage tag-namespaces in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage alarms in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage metrics in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage orm-stacks in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage orm-jobs in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage orm-config-source-providers in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read audit-events in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read work-requests in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage bastion-session in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read instance-agent-plugins in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage functions-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage api-gateway-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage ons-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage streams in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage cluster-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage logs in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage repos in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to manage cloudevents-rules in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read instance-images in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp",
-                    "allow group ebslz-ebs-nprod-admin-group to read app-catalog-listing in compartment ebslz-ebs-cmp:ebslz-ebs-nprod-cmp"
+                    "allow group ebs-nprod-admin-group to read all-resources in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage instance-family in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage database-family in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage load-balancers in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage volume-family in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage tag-namespaces in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage alarms in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage metrics in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage object-family in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage orm-stacks in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage orm-jobs in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage orm-config-source-providers in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to read audit-events in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to read work-requests in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage bastion-session in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to read instance-agent-plugins in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage functions-family in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage api-gateway-family in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage ons-family in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage streams in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage cluster-family in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage logs in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage object-family in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage repos in compartment ebs-cmp:ebs-nprod-cmp",
+                    "allow group ebs-nprod-admin-group to manage cloudevents-rules in compartment ebs-cmp:ebs-nprod-cmp"
                 ]
             },
-            "ebslz-ebs-mgt-admin-policy": {
-                "name": "ebslz-ebs-mgt-admin-policy",
+            "ebs-mgt-admin-policy": {
+                "name": "ebs-mgt-admin-policy",
                 "description": "ebs mngmt policy",
-                "compartment_ocid": "ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
-                    "allow group ebslz-ebs-mgt-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage instance-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage database-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage load-balancers in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage volume-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage tag-namespaces in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to read all-resources in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage alarms in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage metrics in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage orm-stacks in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage orm-jobs in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage orm-config-source-providers in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to read audit-events in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to read work-requests in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage bastion-session in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to read instance-agent-plugins in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage functions-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage api-gateway-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage ons-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage streams in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage cluster-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage logs in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage object-family in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage repos in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to manage cloudevents-rules in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group to read app-catalog-listing in compartment ebslz-ebs-cmp:ebslz-ebs-mgt-cmp"
+                    "allow group ebs-mgt-admin-group to read all-resources in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage instance-family in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage database-family in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage load-balancers in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage volume-family in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage tag-namespaces in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage alarms in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage metrics in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage object-family in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage orm-stacks in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage orm-jobs in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage orm-config-source-providers in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to read audit-events in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to read work-requests in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage bastion-session in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to read instance-agent-plugins in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage functions-family in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage api-gateway-family in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage ons-family in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage streams in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage cluster-family in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage logs in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage object-family in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage repos in compartment ebs-cmp:ebs-mgt-cmp",
+                    "allow group ebs-mgt-admin-group to manage cloudevents-rules in compartment ebs-cmp:ebs-mgt-cmp"
                 ]
             },
-            "ebslz-ebs-network-admin-policy": {
-                "name": "ebslz-ebs-network-admin-policy",
-                "description": "ebs neetwork policy",
-                "compartment_ocid": "ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
+            "ebs-network-admin-policy": {
+                "name": "ebs-network-admin-policy",
+                "description": "ebs network policy",
+                "compartment_ocid": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read virtual-network-family in compartment ebslz1-network-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nonprod-admin-groupto use vnics in compartment ebslz1-network-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage private-ips in compartment ebslz1-network-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nonprod-admin-groupto use subnets in compartment ebslz1-network-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use network-security-groups in compartment ebslz1-network-cmp"
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to read virtual-network-family in compartment network-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-groupto use vnics in compartment network-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to manage private-ips in compartment network-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-groupto use subnets in compartment network-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to use network-security-groups in compartment network-cmp"
                 ]
             },
-            "ebslz-ebs-security-admin-policy": {
-                "name": "ebslz-ebs-security-admin-policy",
+            "ebs-security-admin-policy": {
+                "name": "ebs-security-admin-policy",
                 "description": "ebs security policy",
-                "compartment_ocid": "ocid1.CISParentcompartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read vss-family in compartment ebslz1-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use vaults in compartment ebslz1-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read logging-family in compartment ebslz1-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use bastion in compartment ebslz1-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage bastion-session in compartment ebslz1-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to inspect keys in compartment ebslz1-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage cloudevents-rules in compartment ebslz1-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage alarms in compartment ebslz1-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage metrics in compartment ebslz1-security-cmp",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read instance-agent-plugins in compartment ebslz1-security-cmp"
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to read vss-family in compartment security-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to use vaults in compartment security-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to read logging-family in compartment security-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to use bastion in compartment security-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to manage bastion-session in compartment security-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to inspect keys in compartment security-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to manage cloudevents-rules in compartment security-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to manage alarms in compartment security-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to manage metrics in compartment security-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to read instance-agent-plugins in compartment security-cmp"
                 ]
             },
-            "ebslz-ebs-root-admin-policy": {
-                "name": "ebslz-ebs-root-admin-policy",
+            "ebs-root-admin-policy": {
+                "name": "ebs-root-admin-policy",
                 "description": "ebs root policy",
-                "compartment_ocid": ""ocid1.rootcompartment.oc1..aaaaaaaaxzexampleocid",
+                "compartment_ocid": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to inspect compartments in tenancy",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to inspect users in tenancy",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to inspect groups in tenancy",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use tag-namespaces in tenancy where target.tag-namespace.name='Oracle-Tags'",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use tag-namespaces in tenancy where target.tag-namespace.name='Operations'",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to use cloud-shell in tenancy",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read usage-budgets in tenancy",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to read usage-reports in tenancy",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to manage app-catalog-listing in tenancy",
-                    "allow group ebslz-ebs-mgt-admin-group, ebslz-ebs-prod-admin-group, ebslz-ebs-nprod-admin-group to inspect dynamic-groups in tenancy"
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to inspect compartments in tenancy",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to inspect users in tenancy",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to inspect groups in tenancy",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to use tag-namespaces in tenancy where target.tag-namespace.name='Oracle-Tags'",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to use tag-namespaces in tenancy where target.tag-namespace.name='Operations'",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to use cloud-shell in tenancy",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to read usage-budgets in tenancy",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to read usage-reports in tenancy",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to manage app-catalog-listing in tenancy",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to inspect dynamic-groups in tenancy",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to read app-catalog-listing in compartment ebs-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to read instance-images in compartment ebs-cmp",
+                    "allow group ebs-mgt-admin-group, ebs-prod-admin-group, ebs-nprod-admin-group to read repos in compartment ebs-cmp"
                 ]
             }
         }
     }
-
 ```
 
 **Note**: For each policy select your desired compartment_ocid
@@ -325,14 +310,20 @@ For configuring and running the Open LZ EBS extension Network layer use the foll
 This configuration file will require changes to the resources to reference the OCIDs of the CIS Landing Zone which were deployed in OP01.
 Search for the values indicated below and replace with the correct OCIDs:
 
-| Resource | OCID Text to Replace | Description |
-|---|---|---|
-| VCN | ocid1.vcn.oc1.eu-frankfurt-1.xxxx | The OCID of the Hub VCN deployed by CIS ebslz-dmz-vcn
-| Network Compartment | ocid1.compartment.oc1..aaaaaaaaxxxxxx | The OCID of the CIS Network Compartment ebslz-network-cmp
-| Service Gateway | ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaxxxxxxx | The OCID of the Hub Service Gateway deployed by CIS 
-| Internet Gateway | ocid1.internetgateway.oc1.eu-frankfurt-1.aaaaaaaxxxxxx | The OCID of the Hub Internet Gateway deployed by CIS 
-| Dynamic Routing Gateway | ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx | The OCID of the Hub DRG deployed by CIS 
-| DRG Route Table | ocid1.drgroutetable.oc1.eu-frankfurt-1.aaaaaaaxxxxxx | The OCID of the Hub DRG VCN Route Table deployed by CIS "Autogenerated Drg Route Table for VCN attachments"
+| Resource         | OCID Text to Replace | Description |
+|------------------|----------------------|-------------|
+| VCN | \<OCID-VCN-HUB> | The OCID of the Hub VCN deployed by CIS: "dmz-vcn"
+| Network Compartment | \<OCID-COMPARTMENT-NETWORK> | The OCID of the CIS Network Compartment: "network-cmp"
+| Service Gateway | \<OCID-SERVICE-GATEWAY-HUB> | The OCID of the Hub Service Gateway deployed by CIS 
+| Internet Gateway | \<OCID-INTERNET-GATEWAY-HUB> | The OCID of the Hub Internet Gateway deployed by CIS 
+| Dynamic Routing Gateway | \<OCID-DYNAMIC-ROUTING-GATEWAY> | The OCID of the DRG deployed by CIS 
+| DRG Route Table | \<OCID-DRG-ROUTE_TABLE> | The OCID of the DRG VCN Route Table deployed by CIS: "Autogenerated Drg Route Table for VCN attachments"
+
+In addition, the following text must have the **xxx** contained within to be replaced with the appropriate Region Key, a list of region keys can be found [Here](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm).
+
+| Text to Replace | Example Replacement | Description |
+|-----------------|---------------------|-------------|
+| all-**xxx**-services-in-oracle-services-network | all-**fra**-services-in-oracle-services-network | This shows the correct replacement text for the Frankfurt region |
 
 &nbsp; 
 
@@ -354,28 +345,27 @@ We will create three Spokes VCNs (VCN.02,VCN.03,VCN.04)
 Example of a VCN creation:
 
 ```
-
-      "vcns": {
-                    "VCN-FRANKFURT-MGT-KEY": {
-                        "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
-                        "block_nat_traffic": true,
-                        "cidr_blocks": [
-                            "10.1.1.0/24"
-                        ],
-                        "display_name": "ebslz-mgt-vcn",
-                        "dns_label": "ebsmgtvcnfra",
-                        "is_attach_drg": false,
-                        "is_create_igw": false,
-                        "is_ipv6enabled": false,
-                        "is_oracle_gua_allocation_enabled": false,
-                        "route_tables": {},
-                        "security_lists": {},
-                        "subnets": {},
-                        "vcn_specific_gateways": {},
-                }
+"vcns": {
+    "VCN-EBS-MGT-KEY": {
+        "compartment_id": "<OCID-COMPARTMENT-NETWORK>",
+        "block_nat_traffic": true,
+        "cidr_blocks": [
+            "10.0.1.0/24"
+        ],
+        "display_name": "ebs-mgt-vcn",
+        "dns_label": "ebsmgtvcn",
+        "is_attach_drg": true,
+        "is_create_igw": false,
+        "is_ipv6enabled": false,
+        "is_oracle_gua_allocation_enabled": false,
+        "route_tables": {},
+        "security_lists": {},
+        "subnets": {},
+        "vcn_specific_gateways": {},
+}
 ```
 **Note**: 
-* Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+* Change compartment_ocid with the ocid of the network compartment. **network-cmp ( CMP-02 )**
 
 
 ###  **4.2. Subnets**
@@ -385,50 +375,52 @@ We will create a three-layer configuration, adding three subnets per vcn.
 Example of a Subnet creation:
 
 ```
- "subnets": {
-                            "SN-FRANKFURT-MGT-LB-KEY": {
-                                "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
-                                "availability_domain": null,
-                                "cidr_block": "10.1.1.0/26",
-                                "dhcp_options_key": "default_dhcp_options",
-                                "display_name": "ebslz-mgt-web-subnet",
-                                "dns_label": null,
-                                "prohibit_internet_ingress": true,
-                                "prohibit_public_ip_on_vnic": true,
-                                "route_table_key": "RT-MGT-WEB-VCN-KEY",
-                                "security_list_keys": [
-                                    "SL-MGT-WEB-VCN-KEY"
-                                ]
-                            }
-                        },
-
+"subnets": {
+    "SN-MGT-WEB-KEY": {
+        "compartment_id": "<OCID-COMPARTMENT-NETWORK>",
+        "availability_domain": null,
+        "cidr_block": "10.0.1.0/26",
+        "dhcp_options_key": "default_dhcp_options",
+        "display_name": "ebs-mgt-web-subnet",
+        "dns_label": "ebsmgtwebsn",
+        "prohibit_internet_ingress": true,
+        "prohibit_public_ip_on_vnic": true,
+        "route_table_key": "RT-MGT-WEB-VCN-KEY",
+        "security_list_keys": [
+            "SL-MGT-WEB-VCN-KEY"
+        ]
+    },
 ```
 **Note**: 
-* Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+* Change compartment_ocid with the ocid of the network compartment. **network-cmp ( CMP-02 )**
 * Add route_table_key and security_list_keys to assign the desired route tables and security list to each subnet.
 
 
 
 ###  **4.3. Gateways**
 
-We will add a SG per spoke VCN.
+We will add a Service Gateway and a NAT Gateway per spoke VCN.
 
-Example of a Service Gateway creation:
-
-```
-
-     "vcn_specific_gateways": {
-                            "service_gateways": {
-                                "SG-FRANKFURT-HUB-KEY": {
-                                    "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
-                                    "display_name": "ebslz-mgt-vcn-sgw"
-                                }
-                            }
-                        }
-
+Example of a Service Gateway and NAT Gateway creation:
 
 ```
-**Note**: Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+"vcn_specific_gateways": {
+    "service_gateways": {
+        "SG-EBS-MGT-KEY": {
+            "compartment_id": "<OCID-COMPARTMENT-NETWORK>",
+            "display_name": "ebs-mgt-sgw",
+            "services": "objectstorage"
+        }
+    },
+    "nat_gateways": {
+        "NG-EBS-MGT-KEY": {
+            "compartment_id": "<OCID-COMPARTMENT-NETWORK>",
+            "display_name": "ebs-mgt-ngw"
+        }
+    }
+}
+```
+**Note**: Change compartment_ocid with the ocid of the network compartment. **network-cmp ( CMP-02 )**
 
 
 ###  **4.4. Security Lists**
@@ -438,37 +430,36 @@ We will create one SL per subnet. (SL.5,SL.6,SL.7,SL.8,SL.9,SL.10,SL.11,SL.12,SL
 Example of a Security List creation:
 
 ```
-
- "security_lists": {
-                            "SL-MGT-WEB-VCN-KEY": {
-                                "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
-                                "display_name": "ebslz-mgt-web-subnet-security-list",
-                                "egress_rules": [
-                                    {
-                                        "description": "egress to 0.0.0.0/0 over ALL protocols",
-                                        "dst": "0.0.0.0/0",
-                                        "dst_type": "CIDR_BLOCK",
-                                        "protocol": "ALL",
-                                        "stateless": false
-                                    }
-                                ],
-                                "freeform_tags": null,
-                                "ingress_rules": [
-                                    {
-                                        "description": "ingress from 0.0.0.0/0 over TCP22",
-                                        "dst_port_max": 22,
-                                        "dst_port_min": 22,
-                                        "protocol": "TCP",
-                                        "src": "0.0.0.0/0",
-                                        "src_type": "CIDR_BLOCK",
-                                        "stateless": false
-                                    }
-                                ]
-                            }
-                        },
-
+"security_lists": {
+    "SL-MGT-WEB-VCN-KEY": {
+        "compartment_id": "<OCID-COMPARTMENT-NETWORK>",
+        "display_name": "ebs-mgt-web-subnet-security-list",
+        "defined_tags": null,
+        "freeform_tags": null,
+        "egress_rules": [
+            {
+                "description": "Any egress from ebs-mgt-web-subnet",
+                "dst": "0.0.0.0/0",
+                "dst_type": "CIDR_BLOCK",
+                "protocol": "TCP",
+                "stateless": false
+            }
+        ],
+        "ingress_rules": [
+            {
+                "description": "SSL External access to ebsmgt UI via LBR",
+                "dst_port_max": 443,
+                "dst_port_min": 443,
+                "protocol": "TCP",
+                "src": "0.0.0.0/0",
+                "src_type": "CIDR_BLOCK",
+                "stateless": false
+            }
+        ]
+    }
+},
 ```
-**Note**: Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+**Note**: Change compartment_ocid with the ocid of the network compartment. **network-cmp ( CMP-02 )**
 
 
 ###  **4.5. Route Tables**
@@ -478,24 +469,40 @@ We need to create Route tables in the spoke VCNs (RT.9, RT.10, RT.11, RT.12, RT.
 Example of a Route table creation:
 
 ```
-     "route_tables": {
-                            "RT-MGT-WEB-VCN-KEY": {
-                                "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
-                                "display_name": "ebslz-mgt-web-subnet-rtable",
-                                "route_rules": {
-                                    "drg_route": {
-                                        "description": "test",
-                                        "destination": "0.0.0.0/0",
-                                        "destination_type": "CIDR_BLOCK",
-                                        "network_entity_id": "ocid1.drg.oc1.aaaaaaaaxzexampleocid"
-                                    }
-                                }
-                            }
-                        },
-
+"route_tables": {
+    "RT-MGT-WEB-VCN-KEY": {
+        "compartment_id": "<OCID-COMPARTMENT-NETWORK>",
+        "display_name": "ebs-mgt-web-subnet-rtable",
+        "route_rules": {
+            "sgw_route": {
+                "network_entity_key": "SG-EBS-MGT-KEY",
+                "description": "Route for sgw",
+                "destination": "all-services",
+                "destination_type": "SERVICE_CIDR_BLOCK"
+            },
+            "ngw_route": {
+                "network_entity_key": "NG-EBS-MGT-KEY",
+                "description": "Route to ngw for EBS object storage location",
+                "destination": "134.70.0.0/16",
+                "destination_type": "CIDR_BLOCK"
+            },
+            "drg_route_1": {
+                "description": "ebs-mgt-vcn to ebs-nprod-vcn VCN",
+                "destination": "10.0.4.0/22",
+                "destination_type": "CIDR_BLOCK",
+                "network_entity_id": "<OCID-DYNAMIC-ROUTING-GATEWAY>"
+            },
+            "drg_route_2": {
+                "description": "ebs-mgt-vcn to ebs-prod-vcn VCN",
+                "destination": "10.0.8.0/22",
+                "destination_type": "CIDR_BLOCK",
+                "network_entity_id": "<OCID-DYNAMIC-ROUTING-GATEWAY>"
+            }
+        }
+    },
 ```
 **Note**: 
-* Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+* Change compartment_ocid with the ocid of the network compartment. **network-cmp ( CMP-02 )**
 * Change network_entity_id in route rules to the corresponding service gateways ids or drg ids.
 
 
@@ -504,93 +511,93 @@ Also, we need to inject route tables in the Hub VCN (RT.5, RT.6, RT.7, RT.8):
 Example of a Route table injection:
 
 ```
-        "inject_into_existing_vcns": {
-                    "VCN-FRANKFURT-HUB-KEY": {
-                        "vcn_id": "ocid1.vcn..oc1..aaaaaaaaxzexampleocid",
-                        "route_tables": {
-                            "RT-DMZ-MGMT-KEY": {
-                                "compartment_id": "ocid1.CISNetworkcompartment.oc1..aaaaaaaaxzexampleocid",
-                                "display_name": "ebslz-dmz-mgmt-subnet-rtable",
-                                "defined_tags": null,
-                                "freeform_tags": null,
-                                "route_rules": {
-                                    "sgw_route": {
-                                        "network_entity_id":"ocid1.servicegateway.oc1.aaaaaaaaxzexampleocid",
-                                        "description": "Route for sgw",
-                                        "destination": "oci-fra-objectstorage",
-                                        "destination_type": "SERVICE_CIDR_BLOCK"
-                                    },
-                                    "igw_route": {
-                                        "description": "Traffic destined to 0.0.0.0/0 CIDR range goes to Internet Gateway.",
-                                        "destination": "0.0.0.0/0",
-                                        "destination_type": "CIDR_BLOCK",
-                                        "network_entity_id": "ocid1.internetgateway.oc1.aaaaaaaaxzexampleocid"
-                                    },
-                                    "drg_route_1": {
-                                        "description": "Traffic destined to ebs-mgt-vcn VCN goes to DRG.",
-                                        "destination": "10.0.1.0/24",
-                                        "destination_type": "CIDR_BLOCK",
-                                        "network_entity_id": "ocid1.drg.oc1.aaaaaaaaxzexampleocid"
-                                    },
-                                    "drg_route_2": {
-                                        "description": "Traffic destined to ebs-nprod-vcn VCN goes to DRG.",
-                                        "destination": "10.0.4.0/22",
-                                        "destination_type": "CIDR_BLOCK",
-                                        "network_entity_id": "ocid1.drg.oc1.aaaaaaaaxzexampleocid"
-                                    },
-                                    "drg_route_3": {
-                                        "description": "Traffic destined to ebs-prod-vcn VCN goes to DRG.",
-                                        "destination": "10.0.8.0/22",
-                                        "destination_type": "CIDR_BLOCK",
-                                        "network_entity_id": "ocid1.drg.oc1.aaaaaaaaxzexampleocid"
-                                    }
-                                }
-                            },
-
+"inject_into_existing_vcns": {
+"VCN-HUB-KEY": {
+"vcn_id": "<OCID-VCN-HUB>",
+"route_tables": {
+"RT-DMZ-MGMT-KEY": {
+    "compartment_id": "<OCID-COMPARTMENT-NETWORK>",
+    "display_name": "dmz1-mgmt-subnet-rtable",
+    "defined_tags": null,
+    "freeform_tags": null,
+    "route_rules": {
+        "sgw_route": {
+            "network_entity_id": "<OCID-SERVICE-GATEWAY-HUB>",
+            "description": "Route for sgw",
+            "destination": "objectstorage",
+            "destination_type": "SERVICE_CIDR_BLOCK"
+        },
+        "igw_route": {
+            "description": "Traffic destined to 0.0.0.0/0 CIDR range goes to Internet Gateway.",
+            "destination": "0.0.0.0/0",
+            "destination_type": "CIDR_BLOCK",
+            "network_entity_id": "<OCID-INTERNET-GATEWAY-HUB>"
+        },
+        "drg_route_1": {
+            "description": "Traffic destined to ebs-mgt-vcn VCN goes to DRG.",
+            "destination": "10.0.1.0/24",
+            "destination_type": "CIDR_BLOCK",
+            "network_entity_id": "<OCID-DYNAMIC-ROUTING-GATEWAY>"
+        },
+        "drg_route_2": {
+            "description": "Traffic destined to ebs-nprod-vcn VCN goes to DRG.",
+            "destination": "10.0.4.0/22",
+            "destination_type": "CIDR_BLOCK",
+            "network_entity_id": "<OCID-DYNAMIC-ROUTING-GATEWAY>"
+        },
+        "drg_route_3": {
+            "description": "Traffic destined to ebs-prod-vcn VCN goes to DRG.",
+            "destination": "10.0.8.0/22",
+            "destination_type": "CIDR_BLOCK",
+            "network_entity_id": "<OCID-DYNAMIC-ROUTING-GATEWAY>"
+        }
+    }
+},
 ```
 
 **Note**: 
-* Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
 * Change vcn_ocid with the ocid of the Hub VCN.
+* Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
 * Change network_entity_id in route rules to the corresponding internet gateways, service gateways ids or drg ids.
 
 
 ###  **4.6. DRG Attachements**
 
-We need to add new DRG attachments (DRGA.02, DRGA.03, DRGA.04) to the DRG ( DRG.01) created by de CIS LZ (OP#01)
+We need to add new DRG attachments (DRGA.02, DRGA.03, DRGA.04) to the DRG ( DRG.01) created by the CIS LZ (OP#01)
 
 Example of a DRG attachment creation:
 
 ```
-    "inject_into_existing_drgs": {
-          "DRG-FRANKFURT-KEY":
-            {
-                  "drg_id": "ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx",                                    
-                  "drg_attachments": 
-                  {
-                     "DRG-FRANKFURT-VCN-FRANKFURT-MGT-KEY":
-                     {
+"drgattach": {
+    "non_vcn_specific_gateways": {
+        "inject_into_existing_drgs": {
+            "DRG-KEY": {
+                "drg_id": "<OCID-DYNAMIC-ROUTING-GATEWAY>",
+                "drg_attachments": {
+                    "DRG-VCN-EBS-MGT-KEY": {
                         "defined_tags": null,
-                        "display_name": "ebslz-mgt-vcn-drg-attachment",
+                        "display_name": "ebs-mgt-vcn-drg-attachment",
                         "freeform_tags": null,
-                        "drg_route_table_id": "ocid1.drgroutetable.oc1.eu-frankfurt-1.aaaaaaaxxxxxx",
+                        "drg_route_table_id": "<OCID-DRG-ROUTE_TABLE>",
                         "drg_route_table_name": null,
-                        "network_details": 
-                         {
+                        "network_details": {
                             "attached_resource_id": null,
-                            "attached_resource_key": "VCN-FRANKFURT-MGT-KEY",
+                            "attached_resource_key": "VCN-EBS-MGT-KEY",
                             "type": "VCN",
                             "route_table_id": null,
                             "route_table_name": null,
                             "vcn_route_type": null
-                         }
-                   }
+                        }
+                    }
                 }
             }
-
         }
-
+    }
+}
 ```
+
+**Note**: 
+* Change drg_route_table_id with the ocid of the DRG VCN Route Table deployed by CIS: "Autogenerated Drg Route Table for VCN attachments"
 
 ## **5. Run the Configurations**
 &nbsp; 
@@ -678,3 +685,17 @@ The compartment associated to the policy is not available during policy creation
 
 **workaround:**
 Re-run the apply job.
+
+&nbsp; 
+
+You can proceed to [OP#03](/examples/oci-ebs-lz/op03-manual-changes/readme.md)
+
+&nbsp; 
+
+# License
+
+Copyright (c) 2023 Oracle and/or its affiliates.
+
+Licensed under the Universal Permissive License (UPL), Version 1.0.
+
+See [LICENSE](LICENSE) for more details.
