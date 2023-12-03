@@ -59,7 +59,7 @@ This section presents the Oracle Resource Manager steps with associated input. T
 | # | Input Field | Value |
 |---|-------------| ----- |
 | 1 | Region | < region name > |
-| 2 | Service Label | ebslz |
+| 2 | Service Label | < your landing zone prefix > |
 | 3 | CIS Level | 2 |
 | 4 | Use an enclosing compartment? | Uncheck |
 | 5 | Advanced Options | Uncheck |

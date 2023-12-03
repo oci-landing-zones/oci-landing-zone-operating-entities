@@ -1,20 +1,38 @@
-Attach the following Route tables to the DMZ-vcn Subnets:
+# Manual Changes
+
+The following manual changes are required to be performed using the OCI Console.
+
+## **1. Required Steps**
+
+Attach the following Route tables to the DMZ VCN Subnets:
 
 | |  | | 
 |---|---|---|
 |**ID**   |	**Subnet**	 |**Route Table Name**	 |	
-|RT.05	|dmz-mgmt-subnet	|	ebslz-dmz1-mgmt-subnet-rtable|
-|RT.06	|dmz-indoor-subnet|ebslz-dmz1-indoor-subnet-rtable|
-|RT.07	|dmz-ha-subnet|ebslz-dmz1-ha-subnet-rtable|
-|RT.08  |dmz-outdoor-subnet|ebslz-dmz1-outdoor-subnet-rtable|
+|RT.05	|dmz-mgmt-subnet	|dmz1-mgmt-subnet-rtable|
+|RT.06	|dmz-indoor-subnet  |dmz1-indoor-subnet-rtable|
+|RT.07	|dmz-ha-subnet      |dmz1-ha-subnet-rtable|
+|RT.08  |dmz-outdoor-subnet |dmz1-outdoor-subnet-rtable|
 
+## **2. Optional Steps**
 
-(Optional ) Remove previous versions of Route tables from DMZ-vcn:
+Remove the previous versions of the Route tables from the DMZ VCN:
 
 | |  | 
 |---|---|
 |**ID**  |**Route Table Name**	 |	
-|RT.01	|	ebslz-dmz-mgmt-subnet-rtable|
-|RT.02	|ebslz-dmz-indoor-subnet-rtable|
-|RT.03	|	ebslz-dmz-ha-subnet-rtable|
-|RT.04  |ebslz-dmz-outdoor-subnet-rtable|
+|RT.01	|dmz-mgmt-subnet-rtable|
+|RT.02	|dmz-indoor-subnet-rtable|
+|RT.03	|dmz-ha-subnet-rtable|
+|RT.04  |dmz-outdoor-subnet-rtable|
+
+
+&nbsp; 
+
+# License
+
+Copyright (c) 2023 Oracle and/or its affiliates.
+
+Licensed under the Universal Permissive License (UPL), Version 1.0.
+
+See [LICENSE](LICENSE) for more details.

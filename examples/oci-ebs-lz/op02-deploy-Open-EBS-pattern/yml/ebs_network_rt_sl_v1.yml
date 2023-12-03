@@ -10,17 +10,17 @@ network_configuration:
   network_configuration_categories:
     addroute:
       inject_into_existing_vcns:
-        VCN-FRANKFURT-HUB-KEY:
-          vcn_id: ocid1.vcn.oc1.eu-frankfurt-1.xxxx
+        VCN-HUB-KEY:
+          vcn_id: "<OCID-VCN-HUB>"
           route_tables:
             RT-DMZ-MGMT-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-dmz1-mgmt-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: dmz1-mgmt-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
                 sgw_route:
-                  network_entity_id: ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaxxxxxxx
+                  network_entity_id: "<OCID-SERVICE-GATEWAY-HUB>"
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
@@ -29,30 +29,30 @@ network_configuration:
                     Gateway.
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.internetgateway.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-INTERNET-GATEWAY-HUB>"
                 drg_route_1:
                   description: Traffic destined to ebs-mgt-vcn VCN goes to DRG.
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
                 drg_route_2:
                   description: Traffic destined to ebs-nprod-vcn VCN goes to DRG.
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
                 drg_route_3:
                   description: Traffic destined to ebs-prod-vcn VCN goes to DRG.
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
             RT-DMZ-INDOOR-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-dmz1-indoor-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: dmz1-indoor-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
                 sgw_route:
-                  network_entity_id: ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaxxxxxxx
+                  network_entity_id: "<OCID-SERVICE-GATEWAY-HUB>"
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
@@ -61,30 +61,30 @@ network_configuration:
                     Gateway.
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.internetgateway.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-INTERNET-GATEWAY-HUB>"
                 drg_route_1:
                   description: Traffic destined to ebs-mgt-vcn VCN goes to DRG.
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
                 drg_route_2:
                   description: Traffic destined to ebs-nprod-vcn VCN goes to DRG.
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
                 drg_route_3:
                   description: Traffic destined to ebs-prod-vcn VCN goes to DRG.
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
             RT-DMZ-HA-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-dmz1-ha-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: dmz1-ha-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
                 sgw_route:
-                  network_entity_id: ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaxxxxxxx
+                  network_entity_id: "<OCID-SERVICE-GATEWAY-HUB>"
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
@@ -93,30 +93,30 @@ network_configuration:
                     Gateway.
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.internetgateway.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-INTERNET-GATEWAY-HUB>"
                 drg_route_1:
                   description: Traffic destined to ebs-mgt-vcn VCN goes to DRG.
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
                 drg_route_2:
                   description: Traffic destined to ebs-nprod-vcn VCN goes to DRG.
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
                 drg_route_3:
                   description: Traffic destined to ebs-prod-vcn VCN goes to DRG.
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
             RT-DMZ-OUTDOOR-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-dmz1-outdoor-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: dmz1-outdoor-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
                 sgw_route:
-                  network_entity_id: ocid1.servicegateway.oc1.eu-frankfurt-1.aaaaaaaxxxxxxx
+                  network_entity_id: "<OCID-SERVICE-GATEWAY-HUB>"
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
@@ -125,30 +125,30 @@ network_configuration:
                     Gateway.
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.internetgateway.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-INTERNET-GATEWAY-HUB>"
                 drg_route_1:
                   description: Traffic destined to ebs-mgt-vcn VCN goes to DRG.
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
                 drg_route_2:
                   description: Traffic destined to ebs-nprod-vcn VCN goes to DRG.
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
                 drg_route_3:
                   description: Traffic destined to ebs-prod-vcn VCN goes to DRG.
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
     spokes:
       vcns:
-        VCN-FRANKFURT-MGT-KEY:
-          compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+        VCN-EBS-MGT-KEY:
+          compartment_id: "<OCID-COMPARTMENT-NETWORK>"
           block_nat_traffic: true
           cidr_blocks:
           - 10.0.1.0/24
-          display_name: ebslz-ebs-mgt-vcn
+          display_name: ebs-mgt-vcn
           dns_label: ebsmgtvcn
           is_attach_drg: true
           is_create_igw: false
@@ -156,88 +156,88 @@ network_configuration:
           is_oracle_gua_allocation_enabled: false
           route_tables:
             RT-MGT-WEB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-mgt-web-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-mgt-web-subnet-rtable
               route_rules:
                 sgw_route:
-                  network_entity_key: SG-FRANKFURT-MGT-KEY
+                  network_entity_key: SG-EBS-MGT-KEY
                   description: Route for sgw
                   destination: all-services
                   destination_type: SERVICE_CIDR_BLOCK
                 ngw_route:
-                  network_entity_key: NG-FRANKFURT-MGT-KEY
+                  network_entity_key: NG-EBS-MGT-KEY
                   description: Route to ngw for EBS object storage location
                   destination: 134.70.0.0/16
                   destination_type: CIDR_BLOCK
                 drg_route_1:
-                  description: ebslz-ebs-mgt-vcn to ebslz-ebs-nprod-vcn VCN
+                  description: ebs-mgt-vcn to ebs-nprod-vcn VCN
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
                 drg_route_2:
-                  description: ebslz-ebs-mgt-vcn to ebslz-ebs-prod-vcn VCN
+                  description: ebs-mgt-vcn to ebs-prod-vcn VCN
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
             RT-MGT-APP-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-mgt-app-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-mgt-app-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
                 sgw_route:
-                  network_entity_key: SG-FRANKFURT-MGT-KEY
+                  network_entity_key: SG-EBS-MGT-KEY
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                 ngw_route:
-                  network_entity_key: NG-FRANKFURT-MGT-KEY
+                  network_entity_key: NG-EBS-MGT-KEY
                   description: Route to ngw for EBS object storage and IDCS host
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
                 drg_route_1:
-                  description: ebslz-ebs-mgt-vcn to ebslz-ebs-nprod-vcn VCN
+                  description: ebs-mgt-vcn to ebs-nprod-vcn VCN
                   destination: 10.0.4.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
                 drg_route_2:
-                  description: ebslz-ebs-mgt-vcn to ebslz-ebs-prod-vcn VCN
+                  description: ebs-mgt-vcn to ebs-prod-vcn VCN
                   destination: 10.0.8.0/22
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
             RT-MGT-DB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-mgt-db-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-mgt-db-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
                 sgw_route:
-                  network_entity_key: SG-FRANKFURT-MGT-KEY
+                  network_entity_key: SG-EBS-MGT-KEY
                   description: Route for sgw
                   destination: all-services
                   destination_type: SERVICE_CIDR_BLOCK
           security_lists:
             SL-MGT-WEB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-mgt-web-subnet-security-list
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-mgt-web-subnet-security-list
               defined_tags:
               freeform_tags:
               egress_rules:
-              - description: ebslz-ebs-mgt-web-subnet to ebslz-ebs-mgt-app-subnet
-                  cloud manager port
+              - description: ebs-mgt-web-subnet to ebs-mgt-app-subnet cloud manager
+                  port
                 dst: 10.0.1.128/25
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 dst_port_max: 8081
                 dst_port_min: 8081
                 stateless: false
-              - description: Any egress from ebslz-ebs-mgt-web-subnet
+              - description: Any egress from ebs-mgt-web-subnet
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
               ingress_rules:
-              - description: SSL External access to ebslzebsmgt UI via LBR
+              - description: SSL External access to ebsmgt UI via LBR
                 dst_port_max: 443
                 dst_port_min: 443
                 protocol: TCP
@@ -245,12 +245,12 @@ network_configuration:
                 src_type: CIDR_BLOCK
                 stateless: false
             SL-MGT-APP-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-mgt-app-subnet-security-list
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-mgt-app-subnet-security-list
               defined_tags:
               freeform_tags:
               egress_rules:
-              - description: allows ebslz-ebs-mgt-vcn Egress via NAT Gateway
+              - description: allows ebs-mgt-vcn Egress via NAT Gateway
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: TCP
@@ -289,7 +289,7 @@ network_configuration:
                 protocol: TCP
                 stateless: false
               - description: ORA services in region
-                dst: all-fra-services-in-oracle-services-network
+                dst: all-xxx-services-in-oracle-services-network
                 dst_type: SERVICE_CIDR_BLOCK
                 protocol: TCP
                 stateless: false
@@ -338,37 +338,35 @@ network_configuration:
                 src: 10.0.1.0/24
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: ebslz-ebs-mgt-vcn access from ebslz-ebs-mgt-web-subnet
+              - description: ebs-mgt-vcn access from ebs-mgt-web-subnet
                 dst_port_max: 8081
                 dst_port_min: 8081
                 protocol: TCP
                 src: 10.0.1.0/26
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn SSL access from EBS NonProd apps tier '
+              - description: 'ebs-mgt-vcn SSL access from EBS NonProd apps tier '
                 dst_port_max: 443
                 dst_port_min: 443
                 protocol: TCP
                 src: 10.0.5.0/24
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn SSL access from EBS NonProd database
-                  tier '
+              - description: 'ebs-mgt-vcn SSL access from EBS NonProd database tier '
                 dst_port_max: 443
                 dst_port_min: 443
                 protocol: TCP
                 src: 10.0.6.0/24
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn SSL access from EBS Prod apps tier '
+              - description: 'ebs-mgt-vcn SSL access from EBS Prod apps tier '
                 dst_port_max: 443
                 dst_port_min: 443
                 protocol: TCP
                 src: 10.0.9.0/24
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn SSL access from EBS Prod database
-                  tier  '
+              - description: 'ebs-mgt-vcn SSL access from EBS Prod database tier  '
                 dst_port_max: 443
                 dst_port_min: 443
                 protocol: TCP
@@ -377,11 +375,11 @@ network_configuration:
                 stateless: false
           subnets:
             SN-MGT-WEB-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
               availability_domain:
               cidr_block: 10.0.1.0/26
               dhcp_options_key: default_dhcp_options
-              display_name: ebslz-ebs-mgt-web-subnet
+              display_name: ebs-mgt-web-subnet
               dns_label: ebsmgtwebsn
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
@@ -389,11 +387,11 @@ network_configuration:
               security_list_keys:
               - SL-MGT-WEB-VCN-KEY
             SN-MGT-APP-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
               availability_domain:
               cidr_block: 10.0.1.128/25
               dhcp_options_key: default_dhcp_options
-              display_name: ebslz-ebs-mgt-app-subnet
+              display_name: ebs-mgt-app-subnet
               dns_label: ebsmgtappsn
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
@@ -401,31 +399,31 @@ network_configuration:
               security_list_keys:
               - SL-MGT-APP-VCN-KEY
             SN-MGT-DB-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
               availability_domain:
               cidr_block: 10.0.1.64/26
               dhcp_options_key: default_dhcp_options
-              display_name: ebslz-ebs-mgt-db-subnet
+              display_name: ebs-mgt-db-subnet
               dns_label: ebsmgtdbsn
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
               route_table_key: RT-MGT-DB-VCN-KEY
           vcn_specific_gateways:
             service_gateways:
-              SG-FRANKFURT-MGT-KEY:
-                compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-                display_name: ebslz-ebs-mgt-sgw
+              SG-EBS-MGT-KEY:
+                compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+                display_name: ebs-mgt-sgw
                 services: objectstorage
             nat_gateways:
-              NG-FRANKFURT-MGT-KEY:
-                compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-                display_name: ebslz-ebs-mgt-ngw
-        VCN-FRANKFURT-NPROD-KEY:
-          compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              NG-EBS-MGT-KEY:
+                compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+                display_name: ebs-mgt-ngw
+        VCN-EBS-NPROD-KEY:
+          compartment_id: "<OCID-COMPARTMENT-NETWORK>"
           block_nat_traffic: true
           cidr_blocks:
           - 10.0.4.0/22
-          display_name: ebslz-ebs-nprod-vcn
+          display_name: ebs-nprod-vcn
           dns_label: ebsnprodvcn
           is_attach_drg: true
           is_create_igw: false
@@ -433,79 +431,79 @@ network_configuration:
           is_oracle_gua_allocation_enabled: false
           route_tables:
             RT-NPROD-WEB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-nprod-web-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-nprod-web-subnet-rtable
               route_rules:
                 sgw_route:
-                  network_entity_key: SG-FRANKFURT-NPROD-KEY
+                  network_entity_key: SG-EBS-NPROD-KEY
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                 ngw_route:
-                  network_entity_key: NG-FRANKFURT-NPROD-KEY
+                  network_entity_key: NG-EBS-NPROD-KEY
                   description: Route to ngw
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
                 drg_route_1:
-                  description: ebslz-ebs-nprod-vcn VCN to ebslz-ebs-mgt-vcn VCN
+                  description: ebs-nprod-vcn VCN to ebs-mgt-vcn VCN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
             RT-NPROD-APP-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-nprod-app-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-nprod-app-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
                 sgw_route:
-                  network_entity_key: SG-FRANKFURT-NPROD-KEY
+                  network_entity_key: SG-EBS-NPROD-KEY
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                 ngw_route:
-                  network_entity_key: NG-FRANKFURT-NPROD-KEY
+                  network_entity_key: NG-EBS-NPROD-KEY
                   description: Route to ngw
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
                 drg_route_1:
-                  description: ebslz-ebs-nprod-vcn VCN to ebslz-ebs-mgt-vcn VCNN
+                  description: ebs-nprod-vcn VCN to ebs-mgt-vcn VCNN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
             RT-NPROD-DB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-nprod-db-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-nprod-db-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
                 sgw_route:
-                  network_entity_key: SG-FRANKFURT-NPROD-KEY
+                  network_entity_key: SG-EBS-NPROD-KEY
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                 ngw_route:
-                  network_entity_key: NG-FRANKFURT-NPROD-KEY
+                  network_entity_key: NG-EBS-NPROD-KEY
                   description: Route to ngw
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
                 drg_route_1:
-                  description: ebslz-ebs-nprod-vcn VCN to ebslz-ebs-mgt-vcn VCN
+                  description: ebs-nprod-vcn VCN to ebs-mgt-vcn VCN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
           security_lists:
             SL-NPROD-WEB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-nprod-web-subnet-security-list
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-nprod-web-subnet-security-list
               defined_tags:
               freeform_tags:
               egress_rules:
-              - description: ICMP from ebslz-ebs-nprod-web-subnet
+              - description: ICMP from ebs-nprod-web-subnet
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: ICMP
                 stateless: false
-              - description: ebslz-ebs-nprod-web-subnet to EBS Apps Tier
+              - description: ebs-nprod-web-subnet to EBS Apps Tier
                 dst: 10.0.5.0/24
                 dst_port_max: 8000
                 dst_port_min: 8000
@@ -521,50 +519,49 @@ network_configuration:
                 src_type: CIDR_BLOCK
                 stateless: false
             SL-NPROD-APP-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-nprod-app-subnet-security-list
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-nprod-app-subnet-security-list
               defined_tags:
               freeform_tags:
               egress_rules:
-              - description: ebslz-ebs-nprod-app-subnet to object storage via NAT
+              - description: ebs-nprod-app-subnet to object storage via NAT
                 dst: 134.70.0.0/16
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-nprod-app-subnet to Oracle services in region
-                dst: all-fra-services-in-oracle-services-network
+              - description: ebs-nprod-app-subnet to Oracle services in region
+                dst: all-xxx-services-in-oracle-services-network
                 dst_type: SERVICE_CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ICMP to Oracle services in region from ebslz-ebs-nprod-app-subnet
-                dst: all-fra-services-in-oracle-services-network
+              - description: ICMP to Oracle services in region from ebs-nprod-app-subnet
+                dst: all-xxx-services-in-oracle-services-network
                 dst_type: SERVICE_CIDR_BLOCK
                 protocol: ICMP
                 stateless: false
-              - description: ebslz-ebs-nprod-app-subnet to itself
+              - description: ebs-nprod-app-subnet to itself
                 dst: 10.0.5.0/24
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-nprod-app-subnet to ebslz-ebs-prod-db-subnet
-                  database port
+              - description: ebs-nprod-app-subnet to ebs-prod-db-subnet database port
                 dst: 10.0.6.0/24
                 dst_port_max: 1524
                 dst_port_min: 1521
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-nprod-app-subnet to ebslz-ebs-mgt-app-subnet
+              - description: ebs-nprod-app-subnet to ebs-mgt-app-subnet
                 dst: 10.0.1.128/25
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-nprod-app-subnet to NAT
+              - description: ebs-nprod-app-subnet to NAT
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ICMP from ebslz-ebs-nprod-app-subnet
+              - description: ICMP from ebs-nprod-app-subnet
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: ICMP
@@ -575,7 +572,7 @@ network_configuration:
                 src: 10.0.5.0/24
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn ICMP to EBS NonProd app tier '
+              - description: 'ebs-mgt-vcn ICMP to EBS NonProd app tier '
                 protocol: ICMP
                 src: 10.0.1.128/25
                 src_type: CIDR_BLOCK
@@ -585,15 +582,14 @@ network_configuration:
                 src: 10.0.4.0/24
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn SSL access from EBS NonProd database
-                  tier '
+              - description: 'ebs-mgt-vcn SSL access from EBS NonProd database tier '
                 protocol: TCP
                 src: 10.0.1.128/25
                 dst_port_max: 22
                 dst_port_min: 22
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn SSH to EBS NonProd app tier '
+              - description: 'ebs-mgt-vcn SSH to EBS NonProd app tier '
                 protocol: ICMP
                 src: 10.0.6.0/24
                 src_type: CIDR_BLOCK
@@ -610,8 +606,7 @@ network_configuration:
                 dst_port_min: 8000
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: ebslz-ebs-mgt-vcn to  FMW components delivered with EBS
-                  12.2
+              - description: ebs-mgt-vcn to  FMW components delivered with EBS 12.2
                 protocol: TCP
                 src: 10.0.1.128/25
                 dst_port_max: 7002
@@ -619,56 +614,54 @@ network_configuration:
                 src_type: CIDR_BLOCK
                 stateless: false
             SL-NPROD-DB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-nprod-db-subnet-security-list
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-nprod-db-subnet-security-list
               defined_tags:
               freeform_tags:
               egress_rules:
-              - description: ebslz-ebs-nprod-db-subnet to object storage via NAT
+              - description: ebs-nprod-db-subnet to object storage via NAT
                 dst: 134.70.0.0/16
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-nprod-db-subnet to ebslz-ebs-mgt-app-subnet
-                  SSL
+              - description: ebs-nprod-db-subnet to ebs-mgt-app-subnet SSL
                 dst: 10.0.1.128/25
                 dst_port_max: 443
                 dst_port_min: 443
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-nprod-db-subnet to itself, port 1521-1524
+              - description: ebs-nprod-db-subnet to itself, port 1521-1524
                 dst: 10.0.6.0/24
                 dst_port_max: 1524
                 dst_port_min: 1521
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-nprod-db-subnet to itself SSH
+              - description: ebs-nprod-db-subnet to itself SSH
                 dst: 10.0.6.0/24
                 dst_port_max: 22
                 dst_port_min: 22
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ICMP from ebslz-ebs-nprod-db-subnet
+              - description: ICMP from ebs-nprod-db-subnet
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: ICMP
                 stateless: false
-              - description: ebslz-ebs-nprod-db-subnet to Oracle services in region
-                dst: all-fra-services-in-oracle-services-network
+              - description: ebs-nprod-db-subnet to Oracle services in region
+                dst: all-xxx-services-in-oracle-services-network
                 dst_type: SERVICE_CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ICMP from ebslz-ebs-nprod-db-subnet to Oracle services
-                  in region
-                dst: all-fra-services-in-oracle-services-network
+              - description: ICMP from ebs-nprod-db-subnet to Oracle services in region
+                dst: all-xxx-services-in-oracle-services-network
                 dst_type: SERVICE_CIDR_BLOCK
                 protocol: ICMP
                 stateless: false
               ingress_rules:
-              - description: 'ebslz-ebs-mgt-vcn ICMP to EBS Non Prod db tier '
+              - description: 'ebs-mgt-vcn ICMP to EBS Non Prod db tier '
                 protocol: ICMP
                 src: 10.0.1.128/25
                 src_type: CIDR_BLOCK
@@ -678,7 +671,7 @@ network_configuration:
                 src: 10.0.6.0/24
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn SSH to EBS Non Prod db tier '
+              - description: 'ebs-mgt-vcn SSH to EBS Non Prod db tier '
                 dst_port_max: 22
                 dst_port_min: 22
                 protocol: TCP
@@ -713,11 +706,11 @@ network_configuration:
                 stateless: false
           subnets:
             SN-NPROD-WEB-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
               availability_domain:
               cidr_block: 10.0.4.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: ebslz-ebs-nprod-web-subnet
+              display_name: ebs-nprod-web-subnet
               dns_label: ebsnprodwebsn
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
@@ -725,11 +718,11 @@ network_configuration:
               security_list_keys:
               - SL-NPROD-WEB-VCN-KEY
             SN-NPROD-APP-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
               availability_domain:
               cidr_block: 10.0.5.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: ebslz-ebs-nprod-app-subnet
+              display_name: ebs-nprod-app-subnet
               dns_label: ebsnprodappsn
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
@@ -737,11 +730,11 @@ network_configuration:
               security_list_keys:
               - SL-NPROD-APP-VCN-KEY
             SN-NPROD-DB-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
               availability_domain:
               cidr_block: 10.0.6.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: ebslz-ebs-nprod-db-subnet
+              display_name: ebs-nprod-db-subnet
               dns_label: ebsnproddbsn
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
@@ -750,20 +743,20 @@ network_configuration:
               - SL-NPROD-DB-VCN-KEY
           vcn_specific_gateways:
             service_gateways:
-              SG-FRANKFURT-NPROD-KEY:
-                compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-                display_name: ebslz-ebs-nprod-sgw
+              SG-EBS-NPROD-KEY:
+                compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+                display_name: ebs-nprod-sgw
                 services: objectstorage
             nat_gateways:
-              NG-FRANKFURT-NPROD-KEY:
-                compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-                display_name: ebslz-ebs-nprod-ngw
-        VCN-FRANKFURT-PROD-KEY:
-          compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              NG-EBS-NPROD-KEY:
+                compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+                display_name: ebs-nprod-ngw
+        VCN-EBS-PROD-KEY:
+          compartment_id: "<OCID-COMPARTMENT-NETWORK>"
           block_nat_traffic: true
           cidr_blocks:
           - 10.0.8.0/22
-          display_name: ebslz-ebs-prod-vcn
+          display_name: ebs-prod-vcn
           dns_label: ebsprodvcn
           is_attach_drg: true
           is_create_igw: false
@@ -771,79 +764,79 @@ network_configuration:
           is_oracle_gua_allocation_enabled: false
           route_tables:
             RT-PROD-WEB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-prod-web-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-prod-web-subnet-rtable
               route_rules:
                 sgw_route:
-                  network_entity_key: SG-FRANKFURT-PROD-KEY
+                  network_entity_key: SG-EBS-PROD-KEY
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                 ngw_route:
-                  network_entity_key: NG-FRANKFURT-PROD-KEY
+                  network_entity_key: NG-EBS-PROD-KEY
                   description: Route to ngw
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
                 drg_route_1:
-                  description: ebslz-ebs-prod-vcn VCN to ebslz-ebs-mgt-vcn VCN
+                  description: ebs-prod-vcn VCN to ebs-mgt-vcn VCN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
             RT-PROD-APP-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-prod-app-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-prod-app-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
                 sgw_route:
-                  network_entity_key: SG-FRANKFURT-PROD-KEY
+                  network_entity_key: SG-EBS-PROD-KEY
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                 ngw_route:
-                  network_entity_key: NG-FRANKFURT-PROD-KEY
+                  network_entity_key: NG-EBS-PROD-KEY
                   description: Route to ngw
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
                 drg_route_1:
-                  description: ebslz-ebs-prod-vcn VCN to ebslz-ebs-mgt-vcn VCNN
+                  description: ebs-prod-vcn VCN to ebs-mgt-vcn VCNN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
             RT-PROD-DB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-prod-db-subnet-rtable
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-prod-db-subnet-rtable
               defined_tags:
               freeform_tags:
               route_rules:
                 sgw_route:
-                  network_entity_key: SG-FRANKFURT-PROD-KEY
+                  network_entity_key: SG-EBS-PROD-KEY
                   description: Route for sgw
                   destination: objectstorage
                   destination_type: SERVICE_CIDR_BLOCK
                 ngw_route:
-                  network_entity_key: NG-FRANKFURT-PROD-KEY
+                  network_entity_key: NG-EBS-PROD-KEY
                   description: Route to ngw
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
                 drg_route_1:
-                  description: ebslz-ebs-prod-vcn VCN to ebslz-ebs-mgt-vcn VCN
+                  description: ebs-prod-vcn VCN to ebs-mgt-vcn VCN
                   destination: 10.0.1.0/24
                   destination_type: CIDR_BLOCK
-                  network_entity_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                  network_entity_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
           security_lists:
             SL-PROD-WEB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-prod-web-subnet-security-list
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-prod-web-subnet-security-list
               defined_tags:
               freeform_tags:
               egress_rules:
-              - description: ICMP from ebslz-ebs-prod-web-subnet
+              - description: ICMP from ebs-prod-web-subnet
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: ICMP
                 stateless: false
-              - description: ebslz-ebs-prod-web-subnet to EBS Apps Tier
+              - description: ebs-prod-web-subnet to EBS Apps Tier
                 dst: 10.0.9.0/24
                 dst_port_max: 8000
                 dst_port_min: 8000
@@ -859,50 +852,49 @@ network_configuration:
                 src_type: CIDR_BLOCK
                 stateless: false
             SL-PROD-APP-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-prod-app-subnet-security-list
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-prod-app-subnet-security-list
               defined_tags:
               freeform_tags:
               egress_rules:
-              - description: ebslz-ebs-prod-app-subnet to object storage via NAT
+              - description: ebs-prod-app-subnet to object storage via NAT
                 dst: 134.70.0.0/16
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-prod-app-subnet to Oracle services in region
-                dst: all-fra-services-in-oracle-services-network
+              - description: ebs-prod-app-subnet to Oracle services in region
+                dst: all-xxx-services-in-oracle-services-network
                 dst_type: SERVICE_CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ICMP to Oracle services in region from ebslz-ebs-prod-app-subnet
-                dst: all-fra-services-in-oracle-services-network
+              - description: ICMP to Oracle services in region from ebs-prod-app-subnet
+                dst: all-xxx-services-in-oracle-services-network
                 dst_type: SERVICE_CIDR_BLOCK
                 protocol: ICMP
                 stateless: false
-              - description: ebslz-ebs-prod-app-subnet to itself
+              - description: ebs-prod-app-subnet to itself
                 dst: 10.0.8.0/24
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-prod-app-subnet to ebslz-ebs-prod-db-subnet
-                  database port
+              - description: ebs-prod-app-subnet to ebs-prod-db-subnet database port
                 dst: 10.0.9.0/24
                 dst_port_max: 1524
                 dst_port_min: 1521
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-prod-app-subnet to ebslz-ebs-mgt-app-subnet
+              - description: ebs-prod-app-subnet to ebs-mgt-app-subnet
                 dst: 10.0.1.128/25
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-prod-app-subnet to NAT
+              - description: ebs-prod-app-subnet to NAT
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ICMP from ebslz-ebs-prod-app-subnet
+              - description: ICMP from ebs-prod-app-subnet
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: ICMP
@@ -913,7 +905,7 @@ network_configuration:
                 src: 10.0.9.0/24
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn ICMP to EBS Prod app tier '
+              - description: 'ebs-mgt-vcn ICMP to EBS Prod app tier '
                 protocol: ICMP
                 src: 10.0.1.128/25
                 src_type: CIDR_BLOCK
@@ -923,15 +915,14 @@ network_configuration:
                 src: 10.0.8.0/24
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn SSL access from EBS NonProd database
-                  tier '
+              - description: 'ebs-mgt-vcn SSL access from EBS NonProd database tier '
                 protocol: TCP
                 src: 10.0.1.128/25
                 dst_port_max: 22
                 dst_port_min: 22
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn SSH to EBS Prod app tier '
+              - description: 'ebs-mgt-vcn SSH to EBS Prod app tier '
                 protocol: ICMP
                 src: 10.0.10.0/24
                 src_type: CIDR_BLOCK
@@ -948,8 +939,7 @@ network_configuration:
                 dst_port_min: 8000
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: ebslz-ebs-mgt-vcn to  FMW components delivered with EBS
-                  12.2
+              - description: ebs-mgt-vcn to  FMW components delivered with EBS 12.2
                 protocol: TCP
                 src: 10.0.1.128/25
                 dst_port_max: 7002
@@ -957,56 +947,54 @@ network_configuration:
                 src_type: CIDR_BLOCK
                 stateless: false
             SL-PROD-DB-VCN-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-              display_name: ebslz-ebs-prod-db-subnet-security-list
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+              display_name: ebs-prod-db-subnet-security-list
               defined_tags:
               freeform_tags:
               egress_rules:
-              - description: ebslz-ebs-prod-db-subnet to object storage via NAT
+              - description: ebs-prod-db-subnet to object storage via NAT
                 dst: 134.70.0.0/16
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-prod-db-subnet to ebslz-ebs-mgt-app-subnet
-                  SSL
+              - description: ebs-prod-db-subnet to ebs-mgt-app-subnet SSL
                 dst: 10.0.1.128/25
                 dst_port_max: 443
                 dst_port_min: 443
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-prod-db-subnet to itself, port 1521-1524
+              - description: ebs-prod-db-subnet to itself, port 1521-1524
                 dst: 10.0.10.0/24
                 dst_port_max: 1524
                 dst_port_min: 1521
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ebslz-ebs-prod-db-subnet to itself SSH
+              - description: ebs-prod-db-subnet to itself SSH
                 dst: 10.0.10.0/24
                 dst_port_max: 22
                 dst_port_min: 22
                 dst_type: CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ICMP from ebslz-ebs-prod-db-subnet
+              - description: ICMP from ebs-prod-db-subnet
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: ICMP
                 stateless: false
-              - description: ebslz-ebs-prod-db-subnet to Oracle services in region
-                dst: all-fra-services-in-oracle-services-network
+              - description: ebs-prod-db-subnet to Oracle services in region
+                dst: all-xxx-services-in-oracle-services-network
                 dst_type: SERVICE_CIDR_BLOCK
                 protocol: TCP
                 stateless: false
-              - description: ICMP from ebslz-ebs-prod-db-subnet to Oracle services
-                  in region
-                dst: all-fra-services-in-oracle-services-network
+              - description: ICMP from ebs-prod-db-subnet to Oracle services in region
+                dst: all-xxx-services-in-oracle-services-network
                 dst_type: SERVICE_CIDR_BLOCK
                 protocol: ICMP
                 stateless: false
               ingress_rules:
-              - description: 'ebslz-ebs-mgt-vcn ICMP to EBS Prod db tier '
+              - description: 'ebs-mgt-vcn ICMP to EBS Prod db tier '
                 protocol: ICMP
                 src: 10.0.1.128/25
                 src_type: CIDR_BLOCK
@@ -1016,7 +1004,7 @@ network_configuration:
                 src: 10.0.10.0/24
                 src_type: CIDR_BLOCK
                 stateless: false
-              - description: 'ebslz-ebs-mgt-vcn SSH to EBS Prod db tier '
+              - description: 'ebs-mgt-vcn SSH to EBS Prod db tier '
                 dst_port_max: 22
                 dst_port_min: 22
                 protocol: TCP
@@ -1051,11 +1039,11 @@ network_configuration:
                 stateless: false
           subnets:
             SN-PROD-WEB-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
               availability_domain:
               cidr_block: 10.0.8.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: ebslz-ebs-prod-web-subnet
+              display_name: ebs-prod-web-subnet
               dns_label: ebsprodwebsn
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
@@ -1063,11 +1051,11 @@ network_configuration:
               security_list_keys:
               - SL-PROD-WEB-VCN-KEY
             SN-PROD-APP-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
               availability_domain:
               cidr_block: 10.0.9.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: ebslz-ebs-prod-app-subnet
+              display_name: ebs-prod-app-subnet
               dns_label: ebsprodappsn
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
@@ -1075,11 +1063,11 @@ network_configuration:
               security_list_keys:
               - SL-PROD-APP-VCN-KEY
             SN-PROD-DB-KEY:
-              compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
+              compartment_id: "<OCID-COMPARTMENT-NETWORK>"
               availability_domain:
               cidr_block: 10.0.10.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: ebslz-ebs-prod-db-subnet
+              display_name: ebs-prod-db-subnet
               dns_label: ebsproddbsn
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
@@ -1088,55 +1076,55 @@ network_configuration:
               - SL-PROD-DB-VCN-KEY
           vcn_specific_gateways:
             service_gateways:
-              SG-FRANKFURT-PROD-KEY:
-                compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-                display_name: ebslz-ebs-prod-sgw
+              SG-EBS-PROD-KEY:
+                compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+                display_name: ebs-prod-sgw
                 services: objectstorage
             nat_gateways:
-              NG-FRANKFURT-PROD-KEY:
-                compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxx
-                display_name: ebslz-ebs-prod-ngw
+              NG-EBS-PROD-KEY:
+                compartment_id: "<OCID-COMPARTMENT-NETWORK>"
+                display_name: ebs-prod-ngw
     drgattach:
       non_vcn_specific_gateways:
         inject_into_existing_drgs:
-          DRG-FRANKFURT-KEY:
-            drg_id: ocid1.drg.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+          DRG-KEY:
+            drg_id: "<OCID-DYNAMIC-ROUTING-GATEWAY>"
             drg_attachments:
-              DRG-FRANKFURT-VCN-FRANKFURT-MGT-KEY:
+              DRG-VCN-EBS-MGT-KEY:
                 defined_tags:
-                display_name: ebslz-ebs-mgt-vcn-drg-attachment
+                display_name: ebs-mgt-vcn-drg-attachment
                 freeform_tags:
-                drg_route_table_id: ocid1.drgroutetable.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                drg_route_table_id: "<OCID-DRG-ROUTE_TABLE>"
                 drg_route_table_name:
                 network_details:
                   attached_resource_id:
-                  attached_resource_key: VCN-FRANKFURT-MGT-KEY
+                  attached_resource_key: VCN-EBS-MGT-KEY
                   type: VCN
                   route_table_id:
                   route_table_name:
                   vcn_route_type:
-              DRG-FRANKFURT-VCN-FRANKFURT-NPROD-KEY:
+              DRG-VCN-EBS-NPROD-KEY:
                 defined_tags:
-                display_name: ebslz-ebs-nprod-vcn-drg-attachment
+                display_name: ebs-nprod-vcn-drg-attachment
                 freeform_tags:
-                drg_route_table_id: ocid1.drgroutetable.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                drg_route_table_id: "<OCID-DRG-ROUTE_TABLE>"
                 drg_route_table_name:
                 network_details:
                   attached_resource_id:
-                  attached_resource_key: VCN-FRANKFURT-NPROD-KEY
+                  attached_resource_key: VCN-EBS-NPROD-KEY
                   type: VCN
                   route_table_id:
                   route_table_name:
                   vcn_route_type:
-              DRG-FRANKFURT-VCN-FRANKFURT-PROD-KEY:
+              DRG-VCN-EBS-PROD-KEY:
                 defined_tags:
-                display_name: ebslz-ebs-prod-vcn-drg-attachment
+                display_name: ebs-prod-vcn-drg-attachment
                 freeform_tags:
-                drg_route_table_id: ocid1.drgroutetable.oc1.eu-frankfurt-1.aaaaaaaxxxxxx
+                drg_route_table_id: "<OCID-DRG-ROUTE_TABLE>"
                 drg_route_table_name:
                 network_details:
                   attached_resource_id:
-                  attached_resource_key: VCN-FRANKFURT-PROD-KEY
+                  attached_resource_key: VCN-EBS-PROD-KEY
                   type: VCN
                   route_table_id:
                   route_table_name:
