@@ -557,7 +557,7 @@ Example of a Route table injection:
 
 **Note**: 
 * Change vcn_ocid with the ocid of the Hub VCN.
-* Change compartment_ocid with the ocid of the network compartment. **ebslz-network-cmp ( CMP-02 )**
+* Change compartment_ocid with the ocid of the network compartment. **network-cmp ( CMP-02 )**
 * Change network_entity_id in route rules to the corresponding internet gateways, service gateways ids or drg ids.
 
 
@@ -664,8 +664,8 @@ Depending on your json configuration configurations the output of the ```terrafo
 ### **6.5 ```Policy error```**
 
 ```
-400-InvalidParameter, Compartment {ebslz-ebs-cmp:ebslz-ebs-nprod-cmp} does not exist or is not part of the policy compartment subtree
-│ Suggestion: Please update the parameter(s) in the Terraform config as per error message Compartment {ebslz-ebs-cmp:ebslz-ebs-nprod-cmp} does not exist or is not part of the policy compartment subtree
+400-InvalidParameter, Compartment {ebs-cmp:ebs-nprod-cmp} does not exist or is not part of the policy compartment subtree
+│ Suggestion: Please update the parameter(s) in the Terraform config as per error message Compartment {ebs-cmp:ebs-nprod-cmp} does not exist or is not part of the policy compartment subtree
 │ Documentation: https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_policy 
 │ API Reference: https://docs.oracle.com/iaas/api/#/en/identity/20160918/Policy/CreatePolicy 
 │ Request Target: POST https://identity.eu-frankfurt-1.oci.oraclecloud.com/20160918/policies 
@@ -675,7 +675,7 @@ Depending on your json configuration configurations the output of the ```terrafo
 │ OPC request ID: 33ff328d7fe0175638e619bc27211854/3CD31809CBAC9EE12C6BE5D040D4D4E7/582906BF0BCFBB09FC88552AC6275DF7 
 │ 
 │ 
-│   with module.cislz_policies.oci_identity_policy.these["ebslz-ebs-nprod-admin-policy"],
+│   with module.cislz_policies.oci_identity_policy.these["ebs-nprod-admin-policy"],
 │   on .terraform/modules/cislz_policies/policies/main.tf line 22, in resource "oci_identity_policy" "these":
 │   22: resource "oci_identity_policy" "these" {
 │ 
