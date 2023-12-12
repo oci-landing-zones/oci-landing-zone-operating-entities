@@ -1,14 +1,14 @@
 
-# Deploy Open LZ EBS extension Pattern
+# OP.02 - Manage EBS Landing Zone Extension
 
 ## **Table of Contents**
 
 [1. Summary](#1-summary)</br>
-[2. Setup Terraform Authentication](#2-setup-terraform-authentication)</br>
-[3. Setup IAM Configuration](#3-setup-iam-configuration)</br>
-[4. Setup Network Configuration](#4-setup-network-configuration)</br>
-[5. Run the Configurations (TF Plan & Apply)](#5-run-the-configurations)</br>
-[6. Known Issues](#6-Known-issues)</br>
+[2. Setup IAM Configuration](#2-setup-iam-configuration)</br>
+[3. Setup Network Configuration](#3-setup-network-configuration)</br>
+[4. Run with ORM](#4-run-with-orm)</br>
+[5. Run with TF CLI](#5-run-with-terraform-cli)</br>
+[6. Known Issues](#6-known-issues)</br>
 
 
 &nbsp; 
@@ -18,27 +18,18 @@
 | |  |
 |---|---| 
 | **OP. ID** | OP.02 |
-| **OP. NAME** | Deploy EBS resources | 
-| **OBJECTIVE** | Cover specific EBS network and security layers |
+| **OP. NAME** |  Manage EBS Landing Zone Extension | 
+| **OBJECTIVE** | Provision/change OCI EBS Landing Zone IAM and Network Extensions. |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists  |
 | **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
 | **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/json/ebs_network_rt_sl_v1.auto.tfvars.json) |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../design/OCI_Open_LZ.pdf) |
-| **PRE-ACTIVITIES** | OP.01. Deploy CIS LZ  |
-| **POST-ACTIVITIES** | Deploy EBS workload |
-| **RUN WITH ORM** | TBC|
-| **CONFIG & RUN - TERRAFORM CLI** | Follow the steps below. |
+| **PRE-ACTIVITIES** | Execute [OP.01. Deploy OCI CIS LZ](/examples/oci-ebs-lz/op01-deploy-CIS/readme.md)  |
+| **POST-ACTIVITIES** | Execute [OP.03 Manual Changes](/examples/oci-ebs-lz/op03-manual-changes/readme.md) |
+| **RUN OPERATION** | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli). |
 
 &nbsp; 
 
-## **2. Setup Terraform Authentication**
-
-For authenticating against the OCI tenancy terraform execute the following [instructions](common_terraform_authentication.md).
-
-
-&nbsp; 
-
-## **3. Setup IAM Configuration**
+## **2. Setup IAM Configuration**
 
 For configuring and running the Open LZ EBS extension IAM layer use the following JSON file: [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
@@ -53,7 +44,7 @@ Search for the values indicated below and replace with the correct OCIDs:
 
 &nbsp; 
 
-###  **3.1. Compartments**
+###  **2.1. Compartments**
 
 The diagram below identifies the compartments in the scope of this operation.
 &nbsp; 
@@ -103,7 +94,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 &nbsp; 
 
-### **3.2 Groups**
+### **2.2 Groups**
 
 The diagram below identifies the groups in the scope of this operation.
 
@@ -139,7 +130,7 @@ For an example of such configuration and for extended documentation please refer
 &nbsp; 
 
 
-### **3.3 Policies**
+### **2.3 Policies**
 
 Example of policy creation:
 ```
@@ -302,7 +293,7 @@ For an example of such configuration and for extended documentation please refer
 
 &nbsp; 
 
-## **4. Setup Network Configuration**
+## **3. Setup Network Configuration**
 
 
 For configuring and running the Open LZ EBS extension Network layer use the following JSON file: [ebs_network_rt_sl_v1.auto.tfvars.json](ebs_network_rt_sl_v1.auto.tfvars.json)
@@ -337,7 +328,7 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 
 The network layer covers the next resources:
 
-###  **4.1. Spoke VCNs**
+###  **3.1. Spoke VCNs**
 
 OCI defines network resources in a hierarchy. This means that subnets, route tables, security lists, or gateways will depend on a specific VCN.
 We will create three Spokes VCNs (VCN.02,VCN.03,VCN.04)
@@ -397,7 +388,7 @@ Example of a Subnet creation:
 
 
 
-###  **4.3. Gateways**
+###  **3.3. Gateways**
 
 We will add a Service Gateway and a NAT Gateway per spoke VCN.
 
@@ -423,7 +414,7 @@ Example of a Service Gateway and NAT Gateway creation:
 **Note**: Change compartment_ocid with the ocid of the network compartment. **network-cmp ( CMP-02 )**
 
 
-###  **4.4. Security Lists**
+###  **3.4. Security Lists**
 
 We will create one SL per subnet. (SL.5,SL.6,SL.7,SL.8,SL.9,SL.10,SL.11,SL.12,SL.13)
 
@@ -462,7 +453,7 @@ Example of a Security List creation:
 **Note**: Change compartment_ocid with the ocid of the network compartment. **network-cmp ( CMP-02 )**
 
 
-###  **4.5. Route Tables**
+###  **3.5. Route Tables**
 
 We need to create Route tables in the spoke VCNs (RT.9, RT.10, RT.11, RT.12, RT.13, RT.14, RT.15, RT.16, RT.17):
 
@@ -561,7 +552,7 @@ Example of a Route table injection:
 * Change network_entity_id in route rules to the corresponding internet gateways, service gateways ids or drg ids.
 
 
-###  **4.6. DRG Attachements**
+###  **3.6. DRG Attachements**
 
 We need to add new DRG attachments (DRGA.02, DRGA.03, DRGA.04) to the DRG ( DRG.01) created by the CIS LZ (OP#01)
 
@@ -599,10 +590,32 @@ Example of a DRG attachment creation:
 **Note**: 
 * Change drg_route_table_id with the ocid of the DRG VCN Route Table deployed by CIS: "Autogenerated Drg Route Table for VCN attachments"
 
-## **5. Run the Configurations**
+## **4. Run with ORM**
+
+| STEP |  ACTION |
+|---|---| 
+| **1** | [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":","}) |
+| **2** | Accept terms,  wait for the configuration to load. |
+| **3** | Set the working directory to “orm-facade”. | 
+| **4** | Set the stack name you prefer. | 
+| **5** | Set the terraform version to 1.2.x. Click Next. | 
+| **6** | Update with the links to your IAM and Network configurations. Click Next. |
+| **7** | Un-check run apply. Click Create. 
+
 &nbsp; 
 
-### **5.1 Clone this Git repo to your Machine**
+
+## **5. Run with Terraform CLI**
+&nbsp; 
+
+### **5.1 Setup Terraform Authentication**
+
+For authenticating against the OCI tenancy terraform execute the following [instructions](common_terraform_authentication.md).
+
+
+&nbsp; 
+
+### **5.2 Clone this Git repo to your Machine**
 
 ```
 git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git
@@ -612,19 +625,19 @@ For referring to a specific module version, append *ref=\<version\>* to the *sou
 
 &nbsp; 
 
-###  **5.2 Change the Directory to the Terraform Orchestrator Module**
+###  **5.3 Change the Directory to the Terraform Orchestrator Module**
 
  Change the directory to the [```terraform-oci-open-lz/orchestrator```](../../../../orchestrator/) terraform orchestrator module.
 
 &nbsp; 
 
- ### **5.3 Run ```terraform init```**
+ ### **5.4 Run ```terraform init```**
 
 Run terraform init to download all the required external terraform providers and terraform modules. See [command example](./tf_init_output_example.out) for more details on the expected output.
 
 &nbsp; 
 
- ### **5.4 Run ```terraform plan```**
+ ### **5.5 Run ```terraform plan```**
 
 Run terraform plan with the IAM and Network configuration.
 
@@ -644,7 +657,7 @@ The ideal scenario regarding the **state file** will be for each configuration t
 
 &nbsp; 
 
-### **5.5 Run ```terraform apply```**
+### **5.6 Run ```terraform apply```**
 
 Run terraform plan with the IAM and Network configuration. After  its execution the configured resources will be provisioned or updated on OCI.
 
@@ -661,7 +674,7 @@ Depending on your json configuration configurations the output of the ```terrafo
 
 ## **6. Known Issues**
 
-### **6.5 ```Policy error```**
+### **6.1 ```Policy error```**
 
 ```
 400-InvalidParameter, Compartment {ebs-cmp:ebs-nprod-cmp} does not exist or is not part of the policy compartment subtree
@@ -688,7 +701,7 @@ Re-run the apply job.
 
 &nbsp; 
 
-You can proceed to [OP#03](/examples/oci-ebs-lz/op03-manual-changes/readme.md)
+You can proceed to [OP.03 Execute Manual Changes](/examples/oci-ebs-lz/op03-manual-changes/readme.md).
 
 &nbsp; 
 
