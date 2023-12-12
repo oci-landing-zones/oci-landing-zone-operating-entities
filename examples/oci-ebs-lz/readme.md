@@ -56,14 +56,14 @@ The following table provides details on the compartments presented above, their 
 |ID   |	OP	 |Level	 |	Name	 | Objectives |
 |---|---|---|---|---| 
 |CMP.00   |	OP. ID.01	 |0	 |	( root) Tenancy		 | Holds tenancy global resources	 |
-|CMP.01		 | OP. ID.01		 |	1		 |ebslz-security-cmp		 |Support shared central resources associated with security	 |
-|CMP.02		 | OP. ID.01	 |1		 |ebslz-network-cmp		 | Support shared central resources associated with network	 |
-|CMP.03		 | OP. ID.01 |	1	 |	ebslz-database-cmp		 |Support database workload resources ( can be removed if not needed)	 |
-|CMP.04	 |	OP. ID.01|	1	 |	ebslz-appdev-cmp		 |Support appdev workload resources ( can be removed if not needed)	 |
-|CMP.05	 |	OP. ID.02	 |	1	 |	ebslz-ebs-cmp		 |Parent EBS compartment 	 |
-|CMP.06	 | OP. ID.02	| 2 	 |ebslz-ebs-mgt-cmp		 |EBS Management compartment for resources such as EBS Cloud Manager	 |
-|CMP.07	 |	OP. ID.02		 |2		 |ebslz-ebs-nprod-cmp	 |	EBS Non-Production environments compartment	 |
-|CMP.08	 |	OP. ID.02		 |2		 |ebslz-ebs-prod-cmp		 |EBS Production environment compartment	 |
+|CMP.01		 | OP. ID.01		 |	1		 |security-cmp		 |Support shared central resources associated with security	 |
+|CMP.02		 | OP. ID.01	 |1		 |network-cmp		 | Support shared central resources associated with network	 |
+|CMP.03		 | OP. ID.01 |	1	 |	database-cmp		 |Support database workload resources ( can be removed if not needed)	 |
+|CMP.04	 |	OP. ID.01|	1	 |	appdev-cmp		 |Support appdev workload resources ( can be removed if not needed)	 |
+|CMP.05	 |	OP. ID.02	 |	1	 |	ebs-cmp		 |Parent EBS compartment 	 |
+|CMP.06	 | OP. ID.02	| 2 	 |ebs-mgt-cmp		 |EBS Management compartment for resources such as EBS Cloud Manager	 |
+|CMP.07	 |	OP. ID.02		 |2		 |ebs-nprod-cmp	 |	EBS Non-Production environments compartment	 |
+|CMP.08	 |	OP. ID.02		 |2		 |ebs-prod-cmp		 |EBS Production environment compartment	 |
 
 &nbsp; 
 
@@ -86,19 +86,19 @@ The OCI Open EBS LZ  includes the following groups:
 
 |ID   |	OP	 | Name	| Objective |
 |---|---|---|---| 
-|GRP.01|	OP#01|	ebslz-cost-admin-group	|CIS Landing Zone group for Cost management|
-|GRP.02|	OP#01|	ebslz-security-admin-group|	CIS Landing Zone group for security services management|
-|GRP.03|	OP#01|	ebslz-auditor-group	|CIS Landing Zone group for auditing the tenancy|
-|GRP.04|	OP#01|	ebslz-network-admin-group	|CIS Landing Zone group for managing networks|
-|GRP.05|	OP#01|	ebslz-database-admin-group	|CIS Landing Zone group for managing databases|
-|GRP.06|	OP#01|	ebslz-appdev-admin-group	|CIS Landing Zone group for managing app development related services|
-|GRP.07|	OP#01|	ebslz-storage-admin-group	|CIS Landing Zone group for storage services management|
-|GRP.08|	OP#01|	ebslz-cred-admin-group	|CIS Landing Zone group for managing users credentials in the tenancy|
-|GRP.09|	OP#01|	ebslz-announcement-reader-group	|CIS Landing Zone group for reading Console announcements|
-|GRP.10|	OP#01|	ebslz-iam-admin-group|	CIS Landing Zone group for managing IAM resources in the tenancy|
-|GRP.11|	OP#02|	ebslz-ebs-mgt-admin-group	|EBS Management admin group for resources in the EBS Management compartment|
-|GRP.12|OP#02|ebslz-ebs-nprod-admin-group	|EBS Non-Production admin group for resources in the EBS Non-Production compartment|
-|GRP.13|	OP#02|	ebslz-ebs-prod-admin-group|	EBS Production admin group for resources in the EBS Production compartment|
+|GRP.01|	OP#01|	cost-admin-group	|CIS Landing Zone group for Cost management|
+|GRP.02|	OP#01|	security-admin-group|	CIS Landing Zone group for security services management|
+|GRP.03|	OP#01|	auditor-group	|CIS Landing Zone group for auditing the tenancy|
+|GRP.04|	OP#01|	network-admin-group	|CIS Landing Zone group for managing networks|
+|GRP.05|	OP#01|	database-admin-group	|CIS Landing Zone group for managing databases|
+|GRP.06|	OP#01|	appdev-admin-group	|CIS Landing Zone group for managing app development related services|
+|GRP.07|	OP#01|	storage-admin-group	|CIS Landing Zone group for storage services management|
+|GRP.08|	OP#01|	cred-admin-group	|CIS Landing Zone group for managing users credentials in the tenancy|
+|GRP.09|	OP#01|	announcement-reader-group	|CIS Landing Zone group for reading Console announcements|
+|GRP.10|	OP#01|	iam-admin-group|	CIS Landing Zone group for managing IAM resources in the tenancy|
+|GRP.11|	OP#02|	ebs-mgt-admin-group	|EBS Management admin group for resources in the EBS Management compartment|
+|GRP.12|OP#02|ebs-nprod-admin-group	|EBS Non-Production admin group for resources in the EBS Non-Production compartment|
+|GRP.13|	OP#02|	ebs-prod-admin-group|	EBS Production admin group for resources in the EBS Production compartment|
 
 &nbsp; 
 
@@ -115,10 +115,10 @@ The OCI Open EBS LZ  includes the following dynamic groups:
 
 |ID   |	OP	 | Name	| Objective |
 |---|---|---|---| 
-|DG.01|	OP#01|	ebslz-database-kms-dynamic-group	|CIS Landing Zone dynamic group for databases accessing Key Management service (aka Vault service).|
-|DG.02|	OP#01|	ebslz-appdev-computeagent-dynamic-group|	CIS Landing Zone dynamic group for Compute Agent plugin execution.|
-|DG.03|	OP#01|	ebslz-appdev-fun-dynamic-group	|CIS Landing Zone dynamic group for application functions execution.	|
-|DG.04|	OP#01|	ebslz-sec-fun-dynamic-group	|CIS Landing Zone dynamic group for security functions execution.|
+|DG.01|	OP#01|	database-kms-dynamic-group	|CIS Landing Zone dynamic group for databases accessing Key Management service (aka Vault service).|
+|DG.02|	OP#01|	appdev-computeagent-dynamic-group|	CIS Landing Zone dynamic group for Compute Agent plugin execution.|
+|DG.03|	OP#01|	appdev-fun-dynamic-group	|CIS Landing Zone dynamic group for application functions execution.	|
+|DG.04|	OP#01|	sec-fun-dynamic-group	|CIS Landing Zone dynamic group for security functions execution.|
 
 
 &nbsp; 
@@ -137,20 +137,20 @@ The OCI Open EBS LZ includes the following policies:
 
 |ID   |	OP	 |  Name	| Objective |
 |---|---|---|---| 
-|POL.01|	OP#01|	ebslz-iam-admin-root-policy	|CIS Landing Zone root compartment policy for ebslz1-iam-admin-group group|
-|POL.02	|OP#01	|ebslz-auditor-policy	|CIS Landing Zone root compartment policy for ebslz1-auditor-group group|
-|POL.03	|OP#01	|ebslz-cost-admin-root-policy	|CIS Landing Zone root compartment policy for ebslz1-cost-admin-group group|
-|POL.04	|OP#01	|ebslz-credential-admin-policy	|CIS Landing Zone root compartment policy for ebslz1-cred-admin-group group|
-|POL.05	|OP#01	|ebslz-basic-root-policy	|CIS Landing Zone basic root compartment policy|
-|POL.06	|OP#01	|ebslz-announcement-reader-policy	|CIS Landing Zone root compartment policy for ebslz-announcement-reader-group group|
-|POL.07	|OP#01	|ebslz-security-admin-root-policy	|CIS Landing Zone root compartment policy for ebslz-security-admin-group group|
-|POL.08	|OP#01	|ebslz-services-policy	|CIS Landing Zone policy for OCI services|
-|POL.09	|OP#02	|ebslz-ebs-root-admin-policy	|EBS root policies|
-|POL.10 |OP#02|ebslz-ebs-security-admin-policy	|EBS security-related policies|
-|POL.11	|OP#02|	ebslz-ebs-network-admin-policy|	EBS network-related policies|
-|POL.12	|OP#02	|ebslz-ebs-mgt-admin-policy|	EBS policies for EBS Management compartment|
-|POL.13	|OP#02	|ebslz-ebs-nprod-admin-policy|	EBS policies for EBS Non-Production compartment|
-|POL.14	|OP#02	|ebslz-ebs-prod-admin-policy|	EBS policies for EBS Production compartment|
+|POL.01|	OP#01|	iam-admin-root-policy	|CIS Landing Zone root compartment policy for ebslz1-iam-admin-group group|
+|POL.02	|OP#01	|auditor-policy	|CIS Landing Zone root compartment policy for ebslz1-auditor-group group|
+|POL.03	|OP#01	|cost-admin-root-policy	|CIS Landing Zone root compartment policy for ebslz1-cost-admin-group group|
+|POL.04	|OP#01	|credential-admin-policy	|CIS Landing Zone root compartment policy for ebslz1-cred-admin-group group|
+|POL.05	|OP#01	|basic-root-policy	|CIS Landing Zone basic root compartment policy|
+|POL.06	|OP#01	|announcement-reader-policy	|CIS Landing Zone root compartment policy for announcement-reader-group group|
+|POL.07	|OP#01	|security-admin-root-policy	|CIS Landing Zone root compartment policy for security-admin-group group|
+|POL.08	|OP#01	|services-policy	|CIS Landing Zone policy for OCI services|
+|POL.09	|OP#02	|ebs-root-admin-policy	|EBS root policies|
+|POL.10 |OP#02|ebs-security-admin-policy	|EBS security-related policies|
+|POL.11	|OP#02|	ebs-network-admin-policy|	EBS network-related policies|
+|POL.12	|OP#02	|ebs-mgt-admin-policy|	EBS policies for EBS Management compartment|
+|POL.13	|OP#02	|ebs-nprod-admin-policy|	EBS policies for EBS Non-Production compartment|
+|POL.14	|OP#02	|ebs-prod-admin-policy|	EBS policies for EBS Production compartment|
 
 &nbsp; 
 &nbsp; 
@@ -231,8 +231,8 @@ The following table describes the proposed NSGs.
 
 |ID   |	OP	 | NSG Name	| NSG Description |
 |---|---|---|---| 
-|NSG.01|	OP#01|	ebslz-dmz-vcn-bastion-nsg	|CIS Landing Zone Hub bastion NSG|
-|NSG.02	|OP#01|	ebslz-dmz-vcn-services-nsg|	CIS Landing Zone Hub service NSG|
+|NSG.01|	OP#01|	dmz-vcn-bastion-nsg	|CIS Landing Zone Hub bastion NSG|
+|NSG.02	|OP#01|	dmz-vcn-services-nsg|	CIS Landing Zone Hub service NSG|
 
 &nbsp; 
 
@@ -249,19 +249,19 @@ The following table describes the proposed Route Tables.
  
 |ID   |	OP	 | TR Name	| TR Description |
 |---|---|---|---| 
-|RT.01	|OP#01	|ebslz-dmz-mgmt-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
-|RT.02	|OP#01	|ebslz-dmz-indoor-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
-|RT.03	|OP#01	|ebslz-dmz-ha-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
-|RT.04	|OP#01	|ebslz-dmz-outdoor-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
-|RT.05	|OP#02	|ebslz-mgt-web-subnet-rtable	|EBS Open LZ Extension EBS Management Load Balancer Subnet Route Table.|
-|RT.06	|OP#02	|ebslz-mgt-app-subnet-rtable	|EBS Open LZ Extension EBS Management Application Tier Subnet Route Table.|
-|RT.07	|OP#02	|ebslz-mgt-db-subnet-rtable	|EBS Open LZ Extension EBS Management Database Tier Subnet Route Table.|
-|RT.08	|OP#02	|ebslz-nprod-web-subnet-rtable	|EBS Open LZ Extension EBS Non-Production Load Balancer Subnet Route Table.|
-|RT.09	|OP#02	|ebslz-nprod-app-subnet-rtable	|EBS Open LZ Extension EBS Non-Production Application Tier Subnet Route Table.|
-|RT.10	|OP#02	|ebslz-nprod-db-subnet-rtable	|EBS Open LZ Extension EBS Non-Production Database Tier Subnet Route Table.|
-|RT.11	|OP#02	|ebslz-prod-web-subnet-rtable	|EBS Open LZ Extension EBS Production Load Balancer Subnet Route Table.|
-|RT.12	|OP#02	|ebslz-prod-app-subnet-rtable	|EBS Open LZ Extension EBS Production Application Tier Subnet Route Table|
-|RT.13	|OP#02	|ebslz-prod-db-subnet-rtable	|EBS Open LZ Extension EBS Production Database Tier Subnet Route Table|
+|RT.01	|OP#01	|dmz-mgmt-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
+|RT.02	|OP#01	|dmz-indoor-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
+|RT.03	|OP#01	|dmz-ha-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
+|RT.04	|OP#01	|dmz-outdoor-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
+|RT.05	|OP#02	|mgt-web-subnet-rtable	|EBS Open LZ Extension EBS Management Load Balancer Subnet Route Table.|
+|RT.06	|OP#02	|mgt-app-subnet-rtable	|EBS Open LZ Extension EBS Management Application Tier Subnet Route Table.|
+|RT.07	|OP#02	|mgt-db-subnet-rtable	|EBS Open LZ Extension EBS Management Database Tier Subnet Route Table.|
+|RT.08	|OP#02	|nprod-web-subnet-rtable	|EBS Open LZ Extension EBS Non-Production Load Balancer Subnet Route Table.|
+|RT.09	|OP#02	|nprod-app-subnet-rtable	|EBS Open LZ Extension EBS Non-Production Application Tier Subnet Route Table.|
+|RT.10	|OP#02	|nprod-db-subnet-rtable	|EBS Open LZ Extension EBS Non-Production Database Tier Subnet Route Table.|
+|RT.11	|OP#02	|prod-web-subnet-rtable	|EBS Open LZ Extension EBS Production Load Balancer Subnet Route Table.|
+|RT.12	|OP#02	|prod-app-subnet-rtable	|EBS Open LZ Extension EBS Production Application Tier Subnet Route Table|
+|RT.13	|OP#02	|prod-db-subnet-rtable	|EBS Open LZ Extension EBS Production Database Tier Subnet Route Table|
 
 &nbsp; 
 
@@ -277,19 +277,19 @@ The following table describes the proposed Security Lists (SLs).
 
 |ID   |	OP	 | SL Name	| SL Description |
 |---|---|---|---| 
-|SL.01	|OP#01|	ebslz-dmz-vcn-indoor-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
-|SL.02	|OP#01|	ebslz-dmz-vcn-outdoor-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
-|SL.03	|OP#01|	ebslz-dmz-vcn-mgmt-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
-|SL.04	|OP#01|	ebslz-dmz-vcn-ha-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
-|SL.05	|OP#02|	ebslz-mgt-web-subnet-security-list	|EBS Open LZ Extension EBS Management Load Balancer Subnet Security List	|
-|SL.06	|OP#02|	ebslz-mgt-app-subnet-security-list	|EBS Open LZ Extension EBS Management Application Tier Subnet Security List	|
-|SL.07	|OP#02|	ebslz-mgt-db-subnet-security-list	|EBS Open LZ Extension EBS Management Database Tier Subnet Security List	|
-|SL.08	|OP#02|	ebslz-nprod-web-subnet-security-list	|EBS Open LZ Extension EBS Non-Production Load Balancer Subnet Security List	|
-|SL.09	|OP#02|	ebslz-nprod-app-subnet-security-list	|EBS Open LZ Extension EBS Non-Production Application Tier Subnet Security List	|
-|SL.10	|OP#02|	ebslz-nprod-db-subnet-security-list	|EBS Open LZ Extension EBS Non-Production Database Tier Subnet Security List	|
-|SL.11	|OP#02|	ebslz-prod-web-subnet-security-list	|EBS Open LZ Extension EBS Production Load Balancer Subnet Security List	|
-|SL.12	|OP#02|	ebslz-prod-app-subnet-security-list	|EBS Open LZ Extension EBS Production Application Tier Subnet Security List	|
-|SL.13	|OP#02|	ebslz-prod-db-subnet-security-list	|EBS Open LZ Extension EBS Production Database Tier Subnet Security List	|
+|SL.01	|OP#01|	dmz-vcn-indoor-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
+|SL.02	|OP#01|	dmz-vcn-outdoor-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
+|SL.03	|OP#01|	dmz-vcn-mgmt-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
+|SL.04	|OP#01|	dmz-vcn-ha-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
+|SL.05	|OP#02|	mgt-web-subnet-security-list	|EBS Open LZ Extension EBS Management Load Balancer Subnet Security List	|
+|SL.06	|OP#02|	mgt-app-subnet-security-list	|EBS Open LZ Extension EBS Management Application Tier Subnet Security List	|
+|SL.07	|OP#02|	mgt-db-subnet-security-list	|EBS Open LZ Extension EBS Management Database Tier Subnet Security List	|
+|SL.08	|OP#02|	nprod-web-subnet-security-list	|EBS Open LZ Extension EBS Non-Production Load Balancer Subnet Security List	|
+|SL.09	|OP#02|	nprod-app-subnet-security-list	|EBS Open LZ Extension EBS Non-Production Application Tier Subnet Security List	|
+|SL.10	|OP#02|	nprod-db-subnet-security-list	|EBS Open LZ Extension EBS Non-Production Database Tier Subnet Security List	|
+|SL.11	|OP#02|	prod-web-subnet-security-list	|EBS Open LZ Extension EBS Production Load Balancer Subnet Security List	|
+|SL.12	|OP#02|	prod-app-subnet-security-list	|EBS Open LZ Extension EBS Production Application Tier Subnet Security List	|
+|SL.13	|OP#02|	prod-db-subnet-security-list	|EBS Open LZ Extension EBS Production Database Tier Subnet Security List	|
 
 &nbsp; 
 
@@ -310,7 +310,7 @@ The following tables describe the proposed DRGs and DRG Attachments.
 
 |ID   |	OP	 | DRG Name	| DRG Description |
 |---|---|---|---| 
-|DRG.01|	OP#01|	ebslz-drg | DRG deployed by CIS LZ |
+|DRG.01|	OP#01|	drg | DRG deployed by CIS LZ |
 
 &nbsp; 
 
@@ -324,10 +324,10 @@ The following tables describe the proposed DRGs and DRG Attachments.
 
 | ID   |	OP	 | DRG Attachment Name	| Attachments Description | 
 |---|---|---|---| 
-|DRGA.01|	OP#01|	ebslz-dmz-vcn-drg-attachment| DRG Attachment deployed by CIS LZ |
-|DRGA.02|	OP#02|	ebslz-mgt-vcn-drg-attachment| DRG Attachment deployed by EBS LZ extension |
-|DRGA.03|	OP#02|	ebslz-prod-vcn-drg-attachment| DRG Attachment deployed by EBS LZ extension|
-|DRGA.04|	OP#02|	ebslz-nprod-vcn-drg-attachment| DRG Attachment deployed by EBS LZ extension|
+|DRGA.01|	OP#01|	dmz-vcn-drg-attachment| DRG Attachment deployed by CIS LZ |
+|DRGA.02|	OP#02|	mgt-vcn-drg-attachment| DRG Attachment deployed by EBS LZ extension |
+|DRGA.03|	OP#02|	prod-vcn-drg-attachment| DRG Attachment deployed by EBS LZ extension|
+|DRGA.04|	OP#02|	nprod-vcn-drg-attachment| DRG Attachment deployed by EBS LZ extension|
 
 &nbsp; 
 
@@ -343,7 +343,7 @@ The following table describes the proposed Internet Gateways.
 
 | ID   |	OP	 | IG Name	| IG Description |
 |---|---|---|---| 
-|IG.01|	OP#01|	ebslz-dmz-vcn-igw | IG in the Hub VCN |
+|IG.01|	OP#01|	dmz-vcn-igw | IG in the Hub VCN |
 
 
 &nbsp; 
@@ -360,7 +360,7 @@ The following table describes the proposed NAT Gateways.
 
 | ID  |	OP	 | NG Name	| NG Description |
 |---|---|---|---| 
-|NG.01|	OP#01|	ebslz-dmz-vcn-natgw | NG in the Hub VCN |
+|NG.01|	OP#01|	dmz-vcn-natgw | NG in the Hub VCN |
 
 &nbsp; 
 
@@ -376,10 +376,10 @@ The following table describes the proposed Service Gateways.
 
 |ID   |	OP	 | SG Name	| SG Description |
 |---|---|---|---| 
-|SG.01|	OP#01|	ebslz-dmz-vcn-sgw | SG in the Hub VCN |
-|SG.02|	OP#02|	ebslz-mgt-vcn-sgw | SG in the mgt spoke VCN |
-|SG.03|	OP#02|	ebslz-prod-vcn-sgw | SG in the prod spoke VCN |
-|SG.04|	OP#02|	ebslz-nprod-vcn-sgw | SG in the nprod spoke VCN |
+|SG.01|	OP#01|	dmz-vcn-sgw | SG in the Hub VCN |
+|SG.02|	OP#02|	mgt-vcn-sgw | SG in the mgt spoke VCN |
+|SG.03|	OP#02|	prod-vcn-sgw | SG in the prod spoke VCN |
+|SG.04|	OP#02|	nprod-vcn-sgw | SG in the nprod spoke VCN |
 
 &nbsp; 
 &nbsp; 
