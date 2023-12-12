@@ -18,6 +18,7 @@ The OCI EBS LZ is a secure cloud environment, designed with best practices to si
 
 It's highly recommended to deploy this Landing Zone before migrating an on-premises Oracle EBS to OCI, as it sets a complete OCI foundation for its workloads. 
 
+
 &nbsp; 
 
 ## **2. Design Overview**
@@ -28,7 +29,7 @@ It's highly recommended to deploy this Landing Zone before migrating an on-premi
 |**2** | **Tenancy Structure** |  Extend the standard landing zone compartment structure with additional compartments for EBS-related resources: </br>- Parent EBS compartment.</br>- EBS Management compartment for resources such as EBS Cloud Manager.</br>- EBS Non-Production environments compartment </br>- EBS Production environment compartment.
 |**3** | **Groups & Policies** | Additional groups and associated policies are deployed to manage EBS compartment resources. |
 |**4** | **Network Structure** | Additional VCNs and related elements will be added - to segregate EBS environments - as Spoke extensions to the OCI CIS LZ Hub. |
-|**5** |  **Runtime** | The EBS Landing Zone will be set up using the OCI CIS LZ deployment for the initial setup and extended with the OCI Open LZ Runtime approach for the EBS extension. Additional manual configuration tasks are also required to be completed. 
+|**5** |  **Runtime** | - There will be **three runtime operations** to deploy this landing zone: **(1)** The OCI CIS LZ will be used as an initial setup and **(2)** extended with the OCI EBS LZ Runtime configurations. Additional **(3)** manual configuration tasks are also required to complete the setup. </br> - Note that the **'Operation/(OP)**' column on the next sections identifies the three moment in time when OCI resources are created. <br>- For more details refer to the [Runtime](#5-runtime-view) section.
 
 
 &nbsp; 
@@ -39,7 +40,7 @@ It's highly recommended to deploy this Landing Zone before migrating an on-premi
 
 ### **3.1 Compartments**
 
-The OCI Open EBS LZ  includes the following compartments:
+The OCI  EBS LZ  includes the following compartments:
 &nbsp; 
 > [!NOTE]
 > Compartments help you organize and control access to your resources. A compartment is a collection of related resources (such as cloud networks, compute instances, or block volumes) that can be accessed only by those groups that have been given permission by an administrator in your organization.
@@ -50,7 +51,7 @@ The OCI Open EBS LZ  includes the following compartments:
 
 &nbsp; 
 
-The following table provides details on the compartments presented above, their level of deepness in the tenancy, and objectives.
+The following table provides details on the compartments presented above, their level of deepness in the tenancy, and objectives. 
 
 &nbsp; 
 
@@ -70,7 +71,7 @@ The following table provides details on the compartments presented above, their 
 
 ### **3.2 Groups**
 
-The OCI Open EBS LZ  includes the following groups:
+The OCI EBS LZ  includes the following groups. 
 
 &nbsp; 
 
@@ -105,7 +106,7 @@ The OCI Open EBS LZ  includes the following groups:
 
 ### **3.3 Dynamic Groups**
 
-The OCI Open EBS LZ  includes the following dynamic groups:
+The OCI  EBS LZ  includes the following dynamic groups:
 
 &nbsp; 
 
@@ -126,7 +127,7 @@ The OCI Open EBS LZ  includes the following dynamic groups:
 
 ### **3.4 Policies**
 
-The OCI Open EBS LZ includes the following policies:
+The OCI EBS LZ includes the following policies:
 
 &nbsp; 
 
@@ -161,7 +162,7 @@ The OCI Open EBS LZ includes the following policies:
 &nbsp; 
 
 
-The following diagram presents the network structure of the OCI Open EBS LZ.
+The following diagram presents the network structure of the OCI EBS LZ.
 
 &nbsp; 
 
@@ -389,15 +390,15 @@ The following table describes the proposed Service Gateways.
 
 &nbsp; 
 
-This chapter presents the OCI Open EBS LZ operations scenarios.
+This chapter presents the OCI EBS LZ operations scenarios.
 
- The operations scenarios are one of the most important elements of this design, as they represent the use cases and its key activities on the OCI Open EBS LZ that create or update resources.
+ The operations scenarios are one of the most important elements of this design, as they represent the use cases and its key activities on the OCI EBS LZ that create or update resources.
 
 An operation scenario is normally triggered by a service request, on a ticketing system. In a more formal definition, it should be seen as an operational process, which is a set of correlated activities executed as one unit of work, with its own frequency. The owner of each scenario will be the cloud operations team which has associated OCI Groups and Policies that allow the management of those resources.
 
 &nbsp; 
 
-The OCI Open EBS LZ has three operation scenarios described in the following table.
+The OCI EBS LZ has three operation scenarios described in the following table.
 
 &nbsp; 
 
