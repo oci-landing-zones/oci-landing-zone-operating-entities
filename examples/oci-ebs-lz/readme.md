@@ -12,22 +12,23 @@
 
 ## **1. Introduction**
 
-Welcome to the OCI Oracle E-Business Suite (EBS)  Landing Zone.
+Welcome to the **OCI Oracle E-Business Suite (EBS)**  Landing Zone.
 
-The OCI Open EBS LZ is a secure cloud environment, designed with best practices to simplify the onboarding of EBS workloads and enable the continuous operations of their cloud resources. This reference architecture provides a landing zone IaC **configuration** that meets the security guidance prescribed in the CIS Oracle Cloud Infrastructure Foundations Benchmark.
+The OCI EBS LZ is a secure cloud environment, designed with best practices to simplify the onboarding of EBS workloads and enable the continuous operations of their cloud resources. This reference architecture provides a landing zone IaC **configuration** that meets the security guidance prescribed in the CIS Oracle Cloud Infrastructure Foundations Benchmark.
 
 It's highly recommended to deploy this Landing Zone before migrating an on-premises Oracle EBS to OCI, as it sets a complete OCI foundation for its workloads. 
 
 &nbsp; 
 
-## **2. Design Decisions**
+## **2. Design Overview**
 
 |ID   |	DOMAIN | DESCRIPTION |
 |---|---|---|
-| **1** | **Base Landing Zone** | - OCI CIS Landing Zone will be deployed as a foundation. </br>- The OCI LZ EBS extention will be used to extend the CIS LZ and accomodate EBS Workloads. </li> </ul> |
+| **1** | **General** | - OCI OCI CIS LZ will be deployed as a foundation. </br>- The OCI EBS LZ will extend the OCI CIS LZ and accomodate EBS Workloads. </li> </ul> |
 |**2** | **Tenancy Structure** |  Extend the standard landing zone compartment structure with additional compartments for EBS-related resources: </br>- Parent EBS compartment.</br>- EBS Management compartment for resources such as EBS Cloud Manager.</br>- EBS Non-Production environments compartment </br>- EBS Production environment compartment.
 |**3** | **Groups & Policies** | Additional groups and associated policies are deployed to manage EBS compartment resources. |
-| **4** |  **Runtime** | The EBS Landing Zone will be set up using the OCI CIS LZ deployment for the initial setup and extended with the OCI Open LZ Runtime approach for the EBS extension. Additional manual configuration tasks are also required to be completed. 
+|**4** | **Network Structure** | Additional VCNs and related elements will be added - to segregate EBS environments - as Spoke extensions to the OCI CIS LZ Hub. |
+|**5** |  **Runtime** | The EBS Landing Zone will be set up using the OCI CIS LZ deployment for the initial setup and extended with the OCI Open LZ Runtime approach for the EBS extension. Additional manual configuration tasks are also required to be completed. 
 
 
 &nbsp; 
@@ -86,16 +87,16 @@ The OCI Open EBS LZ  includes the following groups:
 
 |ID   |	OP	 | Name	| Objective |
 |---|---|---|---| 
-|GRP.01|	OP#01|	cost-admin-group	|CIS Landing Zone group for Cost management|
-|GRP.02|	OP#01|	security-admin-group|	CIS Landing Zone group for security services management|
-|GRP.03|	OP#01|	auditor-group	|CIS Landing Zone group for auditing the tenancy|
-|GRP.04|	OP#01|	network-admin-group	|CIS Landing Zone group for managing networks|
-|GRP.05|	OP#01|	database-admin-group	|CIS Landing Zone group for managing databases|
-|GRP.06|	OP#01|	appdev-admin-group	|CIS Landing Zone group for managing app development related services|
-|GRP.07|	OP#01|	storage-admin-group	|CIS Landing Zone group for storage services management|
-|GRP.08|	OP#01|	cred-admin-group	|CIS Landing Zone group for managing users credentials in the tenancy|
-|GRP.09|	OP#01|	announcement-reader-group	|CIS Landing Zone group for reading Console announcements|
-|GRP.10|	OP#01|	iam-admin-group|	CIS Landing Zone group for managing IAM resources in the tenancy|
+|GRP.01|	OP#01|	cost-admin-group	|OCI CIS LZ group for Cost management|
+|GRP.02|	OP#01|	security-admin-group|	OCI CIS LZ group for security services management|
+|GRP.03|	OP#01|	auditor-group	|OCI CIS LZ group for auditing the tenancy|
+|GRP.04|	OP#01|	network-admin-group	|OCI CIS LZ group for managing networks|
+|GRP.05|	OP#01|	database-admin-group	|OCI CIS LZ group for managing databases|
+|GRP.06|	OP#01|	appdev-admin-group	|OCI CIS LZ group for managing app development related services|
+|GRP.07|	OP#01|	storage-admin-group	|OCI CIS LZ group for storage services management|
+|GRP.08|	OP#01|	cred-admin-group	|OCI CIS LZ group for managing users credentials in the tenancy|
+|GRP.09|	OP#01|	announcement-reader-group	|OCI CIS LZ group for reading Console announcements|
+|GRP.10|	OP#01|	iam-admin-group|	OCI CIS LZ group for managing IAM resources in the tenancy|
 |GRP.11|	OP#02|	ebs-mgt-admin-group	|EBS Management admin group for resources in the EBS Management compartment|
 |GRP.12|OP#02|ebs-nprod-admin-group	|EBS Non-Production admin group for resources in the EBS Non-Production compartment|
 |GRP.13|	OP#02|	ebs-prod-admin-group|	EBS Production admin group for resources in the EBS Production compartment|
@@ -115,10 +116,10 @@ The OCI Open EBS LZ  includes the following dynamic groups:
 
 |ID   |	OP	 | Name	| Objective |
 |---|---|---|---| 
-|DG.01|	OP#01|	database-kms-dynamic-group	|CIS Landing Zone dynamic group for databases accessing Key Management service (aka Vault service).|
-|DG.02|	OP#01|	appdev-computeagent-dynamic-group|	CIS Landing Zone dynamic group for Compute Agent plugin execution.|
-|DG.03|	OP#01|	appdev-fun-dynamic-group	|CIS Landing Zone dynamic group for application functions execution.	|
-|DG.04|	OP#01|	sec-fun-dynamic-group	|CIS Landing Zone dynamic group for security functions execution.|
+|DG.01|	OP#01|	database-kms-dynamic-group	|OCI CIS LZ dynamic group for databases accessing Key Management service (aka Vault service).|
+|DG.02|	OP#01|	appdev-computeagent-dynamic-group|	OCI CIS LZ dynamic group for Compute Agent plugin execution.|
+|DG.03|	OP#01|	appdev-fun-dynamic-group	|OCI CIS LZ dynamic group for application functions execution.	|
+|DG.04|	OP#01|	sec-fun-dynamic-group	|OCI CIS LZ dynamic group for security functions execution.|
 
 
 &nbsp; 
@@ -137,14 +138,14 @@ The OCI Open EBS LZ includes the following policies:
 
 |ID   |	OP	 |  Name	| Objective |
 |---|---|---|---| 
-|POL.01|	OP#01|	iam-admin-root-policy	|CIS Landing Zone root compartment policy for ebslz1-iam-admin-group group|
-|POL.02	|OP#01	|auditor-policy	|CIS Landing Zone root compartment policy for ebslz1-auditor-group group|
-|POL.03	|OP#01	|cost-admin-root-policy	|CIS Landing Zone root compartment policy for ebslz1-cost-admin-group group|
-|POL.04	|OP#01	|credential-admin-policy	|CIS Landing Zone root compartment policy for ebslz1-cred-admin-group group|
-|POL.05	|OP#01	|basic-root-policy	|CIS Landing Zone basic root compartment policy|
-|POL.06	|OP#01	|announcement-reader-policy	|CIS Landing Zone root compartment policy for announcement-reader-group group|
-|POL.07	|OP#01	|security-admin-root-policy	|CIS Landing Zone root compartment policy for security-admin-group group|
-|POL.08	|OP#01	|services-policy	|CIS Landing Zone policy for OCI services|
+|POL.01|	OP#01|	iam-admin-root-policy	|OCI CIS LZ root compartment policy for ebslz1-iam-admin-group group|
+|POL.02	|OP#01	|auditor-policy	|OCI CIS LZ root compartment policy for ebslz1-auditor-group group|
+|POL.03	|OP#01	|cost-admin-root-policy	|OCI CIS LZ root compartment policy for ebslz1-cost-admin-group group|
+|POL.04	|OP#01	|credential-admin-policy	|OCI CIS LZ root compartment policy for ebslz1-cred-admin-group group|
+|POL.05	|OP#01	|basic-root-policy	|OCI CIS LZ basic root compartment policy|
+|POL.06	|OP#01	|announcement-reader-policy	|OCI CIS LZ root compartment policy for announcement-reader-group group|
+|POL.07	|OP#01	|security-admin-root-policy	|OCI CIS LZ root compartment policy for security-admin-group group|
+|POL.08	|OP#01	|services-policy	|OCI CIS LZ policy for OCI services|
 |POL.09	|OP#02	|ebs-root-admin-policy	|EBS root policies|
 |POL.10 |OP#02|ebs-security-admin-policy	|EBS security-related policies|
 |POL.11	|OP#02|	ebs-network-admin-policy|	EBS network-related policies|
@@ -181,10 +182,10 @@ The following table describes the proposed VCNs.
 
 |ID   |	OP	 | VCN Name	| Objective |
 |---|---|---|---| 
-|VCN.01|	OP#01|	dmz-vcn	|CIS Landing Zone Hub VCN|
-|VCN.02	|OP#02	|ebs-mgt-vcn	|CIS Landing Zone Spoke VCN. E-Business Suite Management VCN which will contain EBS Cloud Manager|
-|VCN.03	|OP#02|	ebs-nprod-vcn	|CIS Landing Zone Spoke VCN. E-Business Suite Non-Production Environments VCN|
-|VCN.04	|OP#02|	ebs-prod-vcn	|CIS Landing Zone Spoke VCN. E-Business Suite Production Environment VCN|
+|VCN.01|	OP#01|	dmz-vcn	| CIS OCI Landing Zone Hub VCN. |
+|VCN.02	|OP#02	|ebs-mgt-vcn	| Spoke VCN for EBS Cloud Manager. |
+|VCN.03	|OP#02|	ebs-nprod-vcn	| Spoke VCN for EBS Non-Production Environment. |
+|VCN.04	|OP#02|	ebs-prod-vcn	| Spoke VCN for EBS Production Environment. N|
 
 &nbsp; 
 
@@ -202,19 +203,19 @@ The following table describes the proposed Subnets.
 
 |ID   |	OP	 | Subnet Name	| Objectives |
 |---|---|---|---| 
-|SN.01|	OP#01|	dmz-outdoor-subnet	|CIS Landing Zone Hub public Subnet|
-|SN.02|	OP#01|	dmz-ha-subnet	|CIS Landing Zone Hub private Subnet|
-|SN.03	|OP#01	|dmz-mgmt-subnet	|CIS Landing Zone Hub public Subnet|
-|SN.04|	OP#01|	dmz-indoor-subnet	|CIS Landing Zone Hub private Subnet|
-|SN.05	|OP#02|	ebs-mgt-web-subnet	|CIS Landing Zone EBS Management Load Balancer Subnet|
-|SN.06	|OP#02	|ebs-mgt-app-subnet	|CIS Landing Zone EBS Management Application Tier Subnet|
-|SN.07|	OP#02	|ebs-mgt-db-subnet	|CIS Landing Zone EBS Management Database Tier Subnet|
-|SN.08|	OP#02	|ebs-nprod-web-subnet	|CIS Landing Zone EBS Non-Production Load Balancer Subnet|
-|SN.09	|OP#02	|ebs-nprod-app-subnet	|CIS Landing Zone EBS Non-Production Application Tier Subnet|
-|SN.10	|OP#02|	ebs-nprod-db-subnet	|CIS Landing Zone EBS Non-Production Database Tier Subnet|
-|SN.11	|OP#02|	ebs-prod-web-subnet	|CIS Landing Zone EBS Production Load Balancer Subnet|
-|SN.12|	OP#02	|ebs-prod-app-subnet	|CIS Landing Zone EBS Production Application Tier Subnet|
-|SN.13|	OP#02	|ebs-prod-db-subnet	|CIS Landing Zone EBS Production Database Tier Subnet|
+|SN.01|	OP#01|	dmz-outdoor-subnet	| OCI CIS LZ Hub public Subnet. |
+|SN.02|	OP#01|	dmz-ha-subnet	| OCI CIS LZ Hub private Subnet. |
+|SN.03	|OP#01	|dmz-mgmt-subnet	|OCI CIS LZ Hub public Subnet. |
+|SN.04|	OP#01|	dmz-indoor-subnet	|OCI CIS LZ Hub private Subnet- |
+|SN.05	|OP#02|	ebs-mgt-web-subnet	|  EBS Management Load Balancer Subnet. |
+|SN.06	|OP#02	|ebs-mgt-app-subnet	|EBS Management Application Tier Subnet. |
+|SN.07|	OP#02	|ebs-mgt-db-subnet	| EBS Management Database Tier Subnet. |
+|SN.08|	OP#02	|ebs-nprod-web-subnet	| EBS Non-Production Load Balancer Subnet. |
+|SN.09	|OP#02	|ebs-nprod-app-subnet	| EBS Non-Production Application Tier Subnet. |
+|SN.10	|OP#02|	ebs-nprod-db-subnet	| EBS Non-Production Database Tier Subnet. |
+|SN.11	|OP#02|	ebs-prod-web-subnet	| EBS Production Load Balancer Subnet|
+|SN.12|	OP#02	|ebs-prod-app-subnet	| EBS Production Application Tier Subnet|
+|SN.13|	OP#02	|ebs-prod-db-subnet	| EBS Production Database Tier Subnet|
 
 &nbsp; 
 
@@ -231,8 +232,8 @@ The following table describes the proposed NSGs.
 
 |ID   |	OP	 | NSG Name	| NSG Description |
 |---|---|---|---| 
-|NSG.01|	OP#01|	dmz-vcn-bastion-nsg	|CIS Landing Zone Hub bastion NSG|
-|NSG.02	|OP#01|	dmz-vcn-services-nsg|	CIS Landing Zone Hub service NSG|
+|NSG.01|	OP#01|	dmz-vcn-bastion-nsg	|OCI CIS LZ Hub bastion NSG|
+|NSG.02	|OP#01|	dmz-vcn-services-nsg|	OCI CIS LZ Hub service NSG|
 
 &nbsp; 
 
@@ -249,19 +250,19 @@ The following table describes the proposed Route Tables.
  
 |ID   |	OP	 | TR Name	| TR Description |
 |---|---|---|---| 
-|RT.01	|OP#01	|dmz-mgmt-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
-|RT.02	|OP#01	|dmz-indoor-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
-|RT.03	|OP#01	|dmz-ha-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
-|RT.04	|OP#01	|dmz-outdoor-subnet-rtable	|CIS Landing Zone Hub Subnet Route Table|
-|RT.05	|OP#02	|mgt-web-subnet-rtable	|EBS Open LZ Extension EBS Management Load Balancer Subnet Route Table.|
-|RT.06	|OP#02	|mgt-app-subnet-rtable	|EBS Open LZ Extension EBS Management Application Tier Subnet Route Table.|
-|RT.07	|OP#02	|mgt-db-subnet-rtable	|EBS Open LZ Extension EBS Management Database Tier Subnet Route Table.|
-|RT.08	|OP#02	|nprod-web-subnet-rtable	|EBS Open LZ Extension EBS Non-Production Load Balancer Subnet Route Table.|
-|RT.09	|OP#02	|nprod-app-subnet-rtable	|EBS Open LZ Extension EBS Non-Production Application Tier Subnet Route Table.|
-|RT.10	|OP#02	|nprod-db-subnet-rtable	|EBS Open LZ Extension EBS Non-Production Database Tier Subnet Route Table.|
-|RT.11	|OP#02	|prod-web-subnet-rtable	|EBS Open LZ Extension EBS Production Load Balancer Subnet Route Table.|
-|RT.12	|OP#02	|prod-app-subnet-rtable	|EBS Open LZ Extension EBS Production Application Tier Subnet Route Table|
-|RT.13	|OP#02	|prod-db-subnet-rtable	|EBS Open LZ Extension EBS Production Database Tier Subnet Route Table|
+|RT.01	|OP#01	|dmz-mgmt-subnet-rtable	|OCI CIS LZ Hub Subnet Route Table|
+|RT.02	|OP#01	|dmz-indoor-subnet-rtable	|OCI CIS LZ Hub Subnet Route Table|
+|RT.03	|OP#01	|dmz-ha-subnet-rtable	|OCI CIS LZ Hub Subnet Route Table|
+|RT.04	|OP#01	|dmz-outdoor-subnet-rtable	|OCI CIS LZ Hub Subnet Route Table|
+|RT.05	|OP#02	|mgt-web-subnet-rtable	| EBS Management Load Balancer Subnet Route Table.|
+|RT.06	|OP#02	|mgt-app-subnet-rtable	| EBS Management Application Tier Subnet Route Table.|
+|RT.07	|OP#02	|mgt-db-subnet-rtable	| EBS Management Database Tier Subnet Route Table.|
+|RT.08	|OP#02	|nprod-web-subnet-rtable	| EBS Non-Production Load Balancer Subnet Route Table.|
+|RT.09	|OP#02	|nprod-app-subnet-rtable	| EBS Non-Production Application Tier Subnet Route Table.|
+|RT.10	|OP#02	|nprod-db-subnet-rtable	| EBS Non-Production Database Tier Subnet Route Table.|
+|RT.11	|OP#02	|prod-web-subnet-rtable	| EBS Production Load Balancer Subnet Route Table.|
+|RT.12	|OP#02	|prod-app-subnet-rtable	| EBS Production Application Tier Subnet Route Table|
+|RT.13	|OP#02	|prod-db-subnet-rtable	| EBS Production Database Tier Subnet Route Table|
 
 &nbsp; 
 
@@ -277,19 +278,19 @@ The following table describes the proposed Security Lists (SLs).
 
 |ID   |	OP	 | SL Name	| SL Description |
 |---|---|---|---| 
-|SL.01	|OP#01|	dmz-vcn-indoor-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
-|SL.02	|OP#01|	dmz-vcn-outdoor-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
-|SL.03	|OP#01|	dmz-vcn-mgmt-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
-|SL.04	|OP#01|	dmz-vcn-ha-subnet-security-list	|CIS Landing Zone Hub Subnet Security List	|
-|SL.05	|OP#02|	mgt-web-subnet-security-list	|EBS Open LZ Extension EBS Management Load Balancer Subnet Security List	|
-|SL.06	|OP#02|	mgt-app-subnet-security-list	|EBS Open LZ Extension EBS Management Application Tier Subnet Security List	|
-|SL.07	|OP#02|	mgt-db-subnet-security-list	|EBS Open LZ Extension EBS Management Database Tier Subnet Security List	|
-|SL.08	|OP#02|	nprod-web-subnet-security-list	|EBS Open LZ Extension EBS Non-Production Load Balancer Subnet Security List	|
-|SL.09	|OP#02|	nprod-app-subnet-security-list	|EBS Open LZ Extension EBS Non-Production Application Tier Subnet Security List	|
-|SL.10	|OP#02|	nprod-db-subnet-security-list	|EBS Open LZ Extension EBS Non-Production Database Tier Subnet Security List	|
-|SL.11	|OP#02|	prod-web-subnet-security-list	|EBS Open LZ Extension EBS Production Load Balancer Subnet Security List	|
-|SL.12	|OP#02|	prod-app-subnet-security-list	|EBS Open LZ Extension EBS Production Application Tier Subnet Security List	|
-|SL.13	|OP#02|	prod-db-subnet-security-list	|EBS Open LZ Extension EBS Production Database Tier Subnet Security List	|
+|SL.01	|OP#01|	dmz-vcn-indoor-subnet-security-list	|OCI CIS LZ Hub Subnet Security List	|
+|SL.02	|OP#01|	dmz-vcn-outdoor-subnet-security-list	|OCI CIS LZ Hub Subnet Security List	|
+|SL.03	|OP#01|	dmz-vcn-mgmt-subnet-security-list	|OCI CIS LZ Hub Subnet Security List	|
+|SL.04	|OP#01|	dmz-vcn-ha-subnet-security-list	|OCI CIS LZ Hub Subnet Security List	|
+|SL.05	|OP#02|	mgt-web-subnet-security-list	| EBS Management Load Balancer Subnet Security List	|
+|SL.06	|OP#02|	mgt-app-subnet-security-list	| EBS Management Application Tier Subnet Security List	|
+|SL.07	|OP#02|	mgt-db-subnet-security-list	| EBS Management Database Tier Subnet Security List	|
+|SL.08	|OP#02|	nprod-web-subnet-security-list	| EBS Non-Production Load Balancer Subnet Security List	|
+|SL.09	|OP#02|	nprod-app-subnet-security-list	| EBS Non-Production Application Tier Subnet Security List	|
+|SL.10	|OP#02|	nprod-db-subnet-security-list	| EBS Non-Production Database Tier Subnet Security List	|
+|SL.11	|OP#02|	prod-web-subnet-security-list	| EBS Production Load Balancer Subnet Security List	|
+|SL.12	|OP#02|	prod-app-subnet-security-list	| EBS Production Application Tier Subnet Security List	|
+|SL.13	|OP#02|	prod-db-subnet-security-list	| EBS Production Database Tier Subnet Security List	|
 
 &nbsp; 
 
@@ -324,10 +325,10 @@ The following tables describe the proposed DRGs and DRG Attachments.
 
 | ID   |	OP	 | DRG Attachment Name	| Attachments Description | 
 |---|---|---|---| 
-|DRGA.01|	OP#01|	dmz-vcn-drg-attachment| DRG Attachment deployed by CIS LZ |
-|DRGA.02|	OP#02|	mgt-vcn-drg-attachment| DRG Attachment deployed by EBS LZ extension |
-|DRGA.03|	OP#02|	prod-vcn-drg-attachment| DRG Attachment deployed by EBS LZ extension|
-|DRGA.04|	OP#02|	nprod-vcn-drg-attachment| DRG Attachment deployed by EBS LZ extension|
+|DRGA.01|	OP#01|	dmz-vcn-drg-attachment| DRG Attachment for the OCI CIS LZ Hub VCN.  |
+|DRGA.02|	OP#02|	mgt-vcn-drg-attachment| DRG Attachment for EBS management VCN. |
+|DRGA.03|	OP#02|	prod-vcn-drg-attachment| DRG Attachment for EBS production VCN. |
+|DRGA.04|	OP#02|	nprod-vcn-drg-attachment| DRG Attachment for EBS non-production VCN. |
 
 &nbsp; 
 
@@ -343,7 +344,7 @@ The following table describes the proposed Internet Gateways.
 
 | ID   |	OP	 | IG Name	| IG Description |
 |---|---|---|---| 
-|IG.01|	OP#01|	dmz-vcn-igw | IG in the Hub VCN |
+|IG.01|	OP#01|	dmz-vcn-igw | Internet Gateway in the Hub VCN. |
 
 
 &nbsp; 
@@ -360,7 +361,7 @@ The following table describes the proposed NAT Gateways.
 
 | ID  |	OP	 | NG Name	| NG Description |
 |---|---|---|---| 
-|NG.01|	OP#01|	dmz-vcn-natgw | NG in the Hub VCN |
+|NG.01|	OP#01|	dmz-vcn-natgw | NAT Gateway in the Hub VCN. |
 
 &nbsp; 
 
@@ -376,14 +377,12 @@ The following table describes the proposed Service Gateways.
 
 |ID   |	OP	 | SG Name	| SG Description |
 |---|---|---|---| 
-|SG.01|	OP#01|	dmz-vcn-sgw | SG in the Hub VCN |
-|SG.02|	OP#02|	mgt-vcn-sgw | SG in the mgt spoke VCN |
-|SG.03|	OP#02|	prod-vcn-sgw | SG in the prod spoke VCN |
-|SG.04|	OP#02|	nprod-vcn-sgw | SG in the nprod spoke VCN |
+|SG.01|	OP#01|	dmz-vcn-sgw | SG in the Hub VCN. |
+|SG.02|	OP#02|	mgt-vcn-sgw | SG in the EBS management spoke VCN. |
+|SG.03|	OP#02|	prod-vcn-sgw | SG in the EBS production spoke VCN. |
+|SG.04|	OP#02|	nprod-vcn-sgw | SG in the EBS non-production spoke VCN. |
 
 &nbsp; 
-&nbsp; 
-
 
 
 ## **5. Runtime View**
@@ -404,8 +403,8 @@ The OCI Open EBS LZ has three operation scenarios described in the following tab
 
 | OP ID | Operations Scenario Description | Time Effort | 
 |---|---|---| 
-| **[OP. ID.01](/examples/oci-ebs-lz/op01-deploy-CIS/readme.md)** | D**eploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services | 5' configuration + 10' deployment | 
-| **[OP. ID.02](/examples/oci-ebs-lz/op02-manage-ebs-lz-extension/readme.md)**| **Deploy EBS extension**. Include EBS network resources (spokes VCNs, Table Routes, Security Lists ), IAM EBS resources ( groups, policies) |  5' configuration + 10' deployment | 
+| **[OP. ID.01](/examples/oci-ebs-lz/op01-deploy-CIS/readme.md)** | D**eploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services. | 5' configuration + 10' deployment | 
+| **[OP. ID.02](/examples/oci-ebs-lz/op02-manage-ebs-lz-extension/readme.md)**| **Deploy EBS extension**. Include EBS network resources (spokes VCNs, Table Routes, Security Lists ), IAM EBS resources ( groups, policies). |  5' configuration + 10' deployment | 
 | **[OP. ID.03](/examples/oci-ebs-lz/op03-manual-changes/readme.md)**| **Manual changes**. |   5'| 
  
 
