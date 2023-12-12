@@ -22,12 +22,12 @@ It's highly recommended to deploy this Landing Zone before migrating an on-premi
 
 ## **2. Design Decisions**
 
-|ID   |	DESIGN DECISION | DESCRIPTION |
+|ID   |	DOMAIN | DESCRIPTION |
 |---|---|---|
-| **1** | **Standard LZ** | <ul> <li>  OCI CIS Secure Landing Zone is being deployed as a foundation </p></li> <li> The OCI Open LZ EBS extention is used to extend the CIS LZ to accomodate EBS Workloads </li> </ul> |
-|**2** | **Tenancy Structure** |  Extend the standard landing zone compartment structure with additional compartments for EBS-related resources: <ul> <li> <p> Parent EBS compartment </p></li><li><p>EBS Management compartment for resources such as EBS Cloud Manager </p></li> <li> <p> EBS Non-Production environments compartment </p></li><li> <p> EBS Production environment compartment</p></li>
+| **1** | **Base Landing Zone** | - OCI CIS Landing Zone will be deployed as a foundation. </br>- The OCI LZ EBS extention will be used to extend the CIS LZ and accomodate EBS Workloads. </li> </ul> |
+|**2** | **Tenancy Structure** |  Extend the standard landing zone compartment structure with additional compartments for EBS-related resources: </br>- Parent EBS compartment.</br>- EBS Management compartment for resources such as EBS Cloud Manager.</br>- EBS Non-Production environments compartment </br>- EBS Production environment compartment.
 |**3** | **Groups & Policies** | Additional groups and associated policies are deployed to manage EBS compartment resources. |
-| **4** |  **Runtime** | The EBS Landing Zone will be set up using the OCI CIS LZ deployment for the initial setup and extended utilizing the OCI Open LZ Runtime approach for the EBS extension. Additional manual configuration tasks are also required to be completed. 
+| **4** |  **Runtime** | The EBS Landing Zone will be set up using the OCI CIS LZ deployment for the initial setup and extended with the OCI Open LZ Runtime approach for the EBS extension. Additional manual configuration tasks are also required to be completed. 
 
 
 &nbsp; 
@@ -404,9 +404,9 @@ The OCI Open EBS LZ has three operation scenarios described in the following tab
 
 | OP ID | Operations Scenario Description | Time Effort | 
 |---|---|---| 
-| **[OP. ID.01](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/examples/oci-ebs-lz/op01-deploy-CIS)** | Deploy CIS. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services | 5' configuration + 10' deployment | 
-| **[OP. ID.02](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern)**| Deploy EBS extension. Include EBS network resources (spokes VCNs, Table Routes, Security Lists ), IAM EBS resources ( groups, policies) |  5' configuration + 10' deployment | 
-| **[OP. ID.03](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/examples/oci-ebs-lz/op03-manual-changes)**| Manual changes |   5'| 
+| **[OP. ID.01](/examples/oci-ebs-lz/op01-deploy-CIS/readme.md)** | D**eploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services | 5' configuration + 10' deployment | 
+| **[OP. ID.02](/examples/oci-ebs-lz/op02-manage-ebs-lz-extension/readme.md)**| **Deploy EBS extension**. Include EBS network resources (spokes VCNs, Table Routes, Security Lists ), IAM EBS resources ( groups, policies) |  5' configuration + 10' deployment | 
+| **[OP. ID.03](/examples/oci-ebs-lz/op03-manual-changes/readme.md)**| **Manual changes**. |   5'| 
  
 
 &nbsp; 
