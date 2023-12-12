@@ -404,9 +404,9 @@ The OCI EBS LZ has three operation scenarios described in the following table.
 
 | OP ID | Operations Scenario Description | Time Effort | 
 |---|---|---| 
-| **[OP. ID.01](/examples/oci-ebs-lz/op01-deploy-CIS/readme.md)** | D**eploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services. | 5' configuration + 10' deployment | 
-| **[OP. ID.02](/examples/oci-ebs-lz/op02-manage-ebs-lz-extension/readme.md)**| **Deploy EBS extension**. Include EBS network resources (spokes VCNs, Table Routes, Security Lists ), IAM EBS resources ( groups, policies). |  5' configuration + 10' deployment | 
-| **[OP. ID.03](/examples/oci-ebs-lz/op03-manual-changes/readme.md)**| **Manual changes**. |   5'| 
+| **[OP. ID.01](/examples/oci-ebs-lz/op01-deploy-CIS/readme.md)** | D**eploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services. | **< 1h** | 
+| **[OP. ID.02](/examples/oci-ebs-lz/op02-manage-ebs-lz-extension/readme.md)**| **Deploy EBS extension**. Include EBS network resources (Spokes VCNs, Table Routes, Security Lists) and IAM EBS resources (Groups, Policies). | **< 2h** excluding TF environment configuration | 
+| **[OP. ID.03](/examples/oci-ebs-lz/op03-manual-changes/readme.md)**| **Manual changes**. | **< 15m** | 
  
 
 &nbsp; 
