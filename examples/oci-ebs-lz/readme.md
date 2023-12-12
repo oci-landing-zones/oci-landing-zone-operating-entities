@@ -55,7 +55,7 @@ The following table provides details on the compartments presented above, their 
 
 &nbsp; 
 
-|ID   |	OP	 |Level	 |	Name	 | Objectives |
+|ID   |	OP	 | LEVEL	 |	NAME	 | OBJECTIVES |
 |---|---|---|---|---| 
 |CMP.00   |	OP. ID.01	 |0	 |	( root) Tenancy		 | Holds tenancy global resources	 |
 |CMP.01		 | OP. ID.01		 |	1		 |security-cmp		 |Support shared central resources associated with security	 |
@@ -86,7 +86,7 @@ The OCI EBS LZ  includes the following groups.
 &nbsp; 
 
 
-|ID   |	OP	 | Name	| Objective |
+|ID   |	OP	 | NAME	| OBJECTIVES |
 |---|---|---|---| 
 |GRP.01|	OP#01|	cost-admin-group	|OCI CIS LZ group for Cost management|
 |GRP.02|	OP#01|	security-admin-group|	OCI CIS LZ group for security services management|
@@ -115,7 +115,7 @@ The OCI  EBS LZ  includes the following dynamic groups:
 
 &nbsp; 
 
-|ID   |	OP	 | Name	| Objective |
+|ID   |	OP	 | NAME	| OBJECTIVES |
 |---|---|---|---| 
 |DG.01|	OP#01|	database-kms-dynamic-group	|OCI CIS LZ dynamic group for databases accessing Key Management service (aka Vault service).|
 |DG.02|	OP#01|	appdev-computeagent-dynamic-group|	OCI CIS LZ dynamic group for Compute Agent plugin execution.|
@@ -137,7 +137,7 @@ The OCI EBS LZ includes the following policies:
 &nbsp; 
 
 
-|ID   |	OP	 |  Name	| Objective |
+|ID   |	OP	 |  NAME	| OBJECTIVES |
 |---|---|---|---| 
 |POL.01|	OP#01|	iam-admin-root-policy	|OCI CIS LZ root compartment policy for ebslz1-iam-admin-group group|
 |POL.02	|OP#01	|auditor-policy	|OCI CIS LZ root compartment policy for ebslz1-auditor-group group|
@@ -181,7 +181,7 @@ The following table describes the proposed VCNs.
 &nbsp; 
 
 
-|ID   |	OP	 | VCN Name	| Objective |
+|ID   |	OP	 | NAME	| OBJECTIVES |
 |---|---|---|---| 
 |VCN.01|	OP#01|	dmz-vcn	| CIS OCI Landing Zone Hub VCN. |
 |VCN.02	|OP#02	|ebs-mgt-vcn	| Spoke VCN for EBS Cloud Manager. |
@@ -202,7 +202,7 @@ The following table describes the proposed Subnets.
 &nbsp; 
 
 
-|ID   |	OP	 | Subnet Name	| Objectives |
+|ID   |	OP	 |  NAME	| OBJECTIVES |
 |---|---|---|---| 
 |SN.01|	OP#01|	dmz-outdoor-subnet	| OCI CIS LZ Hub public Subnet. |
 |SN.02|	OP#01|	dmz-ha-subnet	| OCI CIS LZ Hub private Subnet. |
@@ -231,7 +231,7 @@ The following table describes the proposed NSGs.
 
 &nbsp; 
 
-|ID   |	OP	 | NSG Name	| NSG Description |
+|ID   |	OP	 |  NAME	| OBJECTIVES |
 |---|---|---|---| 
 |NSG.01|	OP#01|	dmz-vcn-bastion-nsg	|OCI CIS LZ Hub bastion NSG|
 |NSG.02	|OP#01|	dmz-vcn-services-nsg|	OCI CIS LZ Hub service NSG|
@@ -249,7 +249,7 @@ The following table describes the proposed Route Tables.
 
 &nbsp; 
  
-|ID   |	OP	 | TR Name	| TR Description |
+|ID   |	OP	 |  NAME	| OBJECTIVES |
 |---|---|---|---| 
 |RT.01	|OP#01	|dmz-mgmt-subnet-rtable	|OCI CIS LZ Hub Subnet Route Table|
 |RT.02	|OP#01	|dmz-indoor-subnet-rtable	|OCI CIS LZ Hub Subnet Route Table|
@@ -277,7 +277,7 @@ The following table describes the proposed Security Lists (SLs).
 > A security list consists of a set of ingress and egress security rules that apply to all the VNICs in any subnet that the security list is associated with. This means that all the VNICs in a given subnet are subject to the same set of security lists
 &nbsp;
 
-|ID   |	OP	 | SL Name	| SL Description |
+|ID   |	OP	 |  NAME	| OBJECTIVES |
 |---|---|---|---| 
 |SL.01	|OP#01|	dmz-vcn-indoor-subnet-security-list	|OCI CIS LZ Hub Subnet Security List	|
 |SL.02	|OP#01|	dmz-vcn-outdoor-subnet-security-list	|OCI CIS LZ Hub Subnet Security List	|
@@ -310,7 +310,7 @@ The following tables describe the proposed DRGs and DRG Attachments.
 
 &nbsp;
 
-|ID   |	OP	 | DRG Name	| DRG Description |
+|ID   |	OP	 |  NAME	| OBJECTIVES |
 |---|---|---|---| 
 |DRG.01|	OP#01|	drg | DRG deployed by CIS LZ |
 
@@ -324,7 +324,7 @@ The following tables describe the proposed DRGs and DRG Attachments.
 
 &nbsp;
 
-| ID   |	OP	 | DRG Attachment Name	| Attachments Description | 
+| ID   |	OP	 |  NAME	| OBJECTIVES |
 |---|---|---|---| 
 |DRGA.01|	OP#01|	dmz-vcn-drg-attachment| DRG Attachment for the OCI CIS LZ Hub VCN.  |
 |DRGA.02|	OP#02|	mgt-vcn-drg-attachment| DRG Attachment for EBS management VCN. |
@@ -343,7 +343,7 @@ The following table describes the proposed Internet Gateways.
 
 &nbsp;
 
-| ID   |	OP	 | IG Name	| IG Description |
+| ID   |	OP	 |  NAME	| OBJECTIVES |
 |---|---|---|---| 
 |IG.01|	OP#01|	dmz-vcn-igw | Internet Gateway in the Hub VCN. |
 
@@ -360,7 +360,7 @@ The following table describes the proposed NAT Gateways.
 
 &nbsp;
 
-| ID  |	OP	 | NG Name	| NG Description |
+| ID  |	OP	 |  NAME	| OBJECTIVES |
 |---|---|---|---| 
 |NG.01|	OP#01|	dmz-vcn-natgw | NAT Gateway in the Hub VCN. |
 
@@ -376,7 +376,7 @@ The following table describes the proposed Service Gateways.
 
 &nbsp;
 
-|ID   |	OP	 | SG Name	| SG Description |
+|ID   |	OP	 |  NAME	| OBJECTIVES |
 |---|---|---|---| 
 |SG.01|	OP#01|	dmz-vcn-sgw | SG in the Hub VCN. |
 |SG.02|	OP#02|	mgt-vcn-sgw | SG in the EBS management spoke VCN. |
@@ -402,9 +402,9 @@ The OCI EBS LZ has three operation scenarios described in the following table.
 
 &nbsp; 
 
-| OP ID | Operations Scenario Description | Time Effort | 
+| OP. ID | OPERATION SCENARIOS DESCRIPTION | TIME EFFORTS | 
 |---|---|---| 
-| **[OP. ID.01](/examples/oci-ebs-lz/op01-deploy-CIS/readme.md)** | D**eploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services. | **< 1h** | 
+| **[OP. ID.01](/examples/oci-ebs-lz/op01-deploy-CIS/readme.md)** | **Deploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services. | **< 1h** | 
 | **[OP. ID.02](/examples/oci-ebs-lz/op02-manage-ebs-lz-extension/readme.md)**| **Deploy EBS extension**. Include EBS network resources (Spokes VCNs, Table Routes, Security Lists) and IAM EBS resources (Groups, Policies). | **< 2h** excluding TF environment configuration | 
 | **[OP. ID.03](/examples/oci-ebs-lz/op03-manual-changes/readme.md)**| **Manual changes**. | **< 15m** | 
  
