@@ -1,4 +1,4 @@
-# **OCI Open LZ - Runtime View**
+# **OCI Open LZ [Blueprint](#) - Runtime View**
 
 **Table of Contents**
 

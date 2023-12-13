@@ -1,4 +1,4 @@
-# **The OCI Open LZ [Blueprint](#)**
+# **OCI Open LZ [Blueprint](#)**
 
 **Table of Contents**
 
