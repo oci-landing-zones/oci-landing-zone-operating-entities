@@ -246,6 +246,7 @@ variable "network_configuration" {
           compartment_key = optional(string),
           defined_tags    = optional(map(string)),
           freeform_tags   = optional(map(string)),
+          display_name    = optional(string),
           ingress_rules = optional(list(object({
             stateless    = optional(bool),
             protocol     = string,
