@@ -41,14 +41,14 @@ variable "compartments_configuration" {
     derive_keys_from_hierarchy = optional(bool)        # Whether identifying keys should be derived from the provided compartments hierarchy
     module_name                = optional(string)      # The module name.
     tags_dependency            = optional(map(any))    #  Map of objects containing the externally managed tags this module may depend on. All map objects must have the same type and must contain at least an 'id' attribute (representing the tag OCID) of string type.
-    default_parent_ocid        = optional(string)      # the default parent for all top (first level) compartments. Use parent_ocid attribute within each compartment to specify different parents.
+    default_parent_id          = optional(string)      # the default parent for all top (first level) compartments. Use parent_ocid attribute within each compartment to specify different parents.
     default_defined_tags       = optional(map(string)) # applies to all compartments, unless overriden by defined_tags in a compartment object
     default_freeform_tags      = optional(map(string)) # applies to all compartments, unless overriden by freeform_tags in a compartment object
     enable_delete              = optional(bool)        # whether or not compartments are physically deleted when destroyed. Default is false.
     compartments = map(object({
       name          = string
       description   = string
-      parent_ocid   = optional(string)
+      parent_id     = optional(string)
       defined_tags  = optional(map(string))
       freeform_tags = optional(map(string))
       tag_defaults = optional(map(object({
