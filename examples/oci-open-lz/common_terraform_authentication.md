@@ -5,7 +5,6 @@ For authenticating against the OCI tenancy Terraform needs the following informa
 ```
 "fingerprint": "<PEM key fingerprint>",
 "private_key_path": "<path to the private key that matches the fingerprint above>",
-"region": "<your region>",
 "tenancy_id": "<tenancy OCID>",
 "user_id": "<user OCID>",
 "home_region": "<home region>",
