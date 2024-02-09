@@ -20,23 +20,20 @@
 | **OP. ID** | OP.02 |
 | **OP. NAME** | Manage Operating Entity | 
 | **OBJECTIVE** | Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources. |
-| **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: VCN, Subnets, SL, RT, DRG Attachments, Service/Internet Gateways. |
+| **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: VCN, Subnets, SL and RT. |
 | **IAM CONFIG**| [open_lz_oe_01_identity.auto.tfvars.json](open_lz_oe_01_identity.auto.tfvars.json)|
 | **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](open_lz_oe_01_network.auto.tfvars.json) |
 | **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../../design/OCI_Open_LZ.pdf).|
 | **PRE-ACTIVITIES** | [OP.01 Shared Services](../../shared/readme.md) executed. Update network config with OCID of the hub. |
-| **POST-ACTIVITIES** | The first execution of this operation by the Central IT team requires the hand-over to the target OE Operations team the OCIDs for their OE core resources. |
+| **POST-ACTIVITIES** | **POST.OP02_01** The first execution of this operation by the Central IT team requires the hand-over to the target OE Operations team the OCIDs for their OE core resources</br> **POST.OP.02_02** Update the dynamic group instance.compartment.ocid with the OCID of the compartment of the dynamic groups members|
 | **RUN OPERATION** | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli). |
-
-
-
 
 &nbsp; 
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the OCI Open LZ Manage OE IAM layer use the following JSON file: [open_lz_oe_01_identity.auto.tfvars.json](./open_lz_oe_01_identity.auto.tfvars.json). You can customize this  configuration to fit your exact OCI IAM topology.
+For configuring and running the OCI Open LZ Manage OE IAM layer use the following JSON file: [open_lz_oe_01_identity.auto.tfvars.json](./open_lz_oe_01_identity.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file will cover the following four categories of resources described in the next sections.
 
@@ -58,7 +55,7 @@ The corresponding JSON configuration for the compartments topology described abo
 ...
     "compartments_configuration": {
         "enable_delete": "true",
-        "default_parent_ocid": "ocid1.tenancy.oc1..aaaaaaaaexampleocid",
+        "default_parent_ocid": "<OCID-COMPARTMENT-ROOT>",
         "compartments": {
             "CMP-OE01-KEY": {
                 "name": "cmp-oe1",
@@ -149,7 +146,6 @@ The corresponding JSON configuration for the compartments topology described abo
 ...
 ```
 
-
 For extended documentation please refer to the [Identity & Access Management CIS Terraform module compartments example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/compartments/examples/vision/input.auto.tfvars.template).
 
 &nbsp; 
@@ -176,14 +172,14 @@ Here we have an example of the shared infrastructure OCI IAM Groups topology con
 ```
 
 This automation provides fully supports any kind of OCI IAM Groups topology to be specified in the JSON format. 
+
 For an example of such configuration and for extended documentation please refer to the [Identity & Access Management CIS Terraform module groups example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/groups/examples/vision/input.auto.tfvars.template).
 
 &nbsp; 
 
 ### **2.3 Dynamic Groups**
 
-
-Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the  [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf).
 
 ```
 ...
@@ -192,14 +188,17 @@ Here we have an example of the shared infrastructure OCI IAM Groups topology con
             "DGP-OS-MANAGEMENT": {
                 "name": "dgp-os-management",
                 "description": "DGP.01 Holds the compartments which contain the VM images to be automatically patched by the OS Management Service.",
-                "matching_rule": "ALL {instance.compartment.id = 'cmp-oe01-common-infra'}"
+                "matching_rule": "ALL {instance.compartment.id = '<OCID-COMPARTMENT-OE01-COMMON-INFRA>'}"
             }
         }
     }
 ...
 ```
 
+Note: in matching_rule instance.compartment.id you must include the OCID of the compartment where the dynamic group compute instance members belong to. This has to be updated to the proper value after the initial compartments creation, once that the OCID of the compartment has been created.
+
 This automation provides fully supports any kind of OCI IAM Dynamic Groups to be specified in the JSON format. 
+
 For an example of such configuration and for extended documentation please refer to the [Identity & Access Management CIS Terraform module dynamic groups example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/dynamic-groups/examples/vision/input.auto.tfvars.template).
 
 &nbsp; 
@@ -208,7 +207,7 @@ For an example of such configuration and for extended documentation please refer
 
 We provide here an example on how to setup the IAM policies for the design discused in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf). Notice that these policies must be considered as an example on how to deploy the blueprint based on CIS separation of duties, but not as a prescribed configuration. We encourage you to review and adapt to your design.
 
-For this example, replace the compartment_ocid to your tenancy OCID.
+For this example, replace the compartment_ocid "<OCID-COMPARTMENT-ROOT>" value to your tenancy OCID.
 
 ```
 ...
@@ -218,7 +217,7 @@ For this example, replace the compartment_ocid to your tenancy OCID.
             "PCY-OE01-ADMINISTRATION": {
                 "name": "pcy-oe01-administration",
                 "description": "POL.0E.01 Open LZ policy which allows the grp-oe01-admins group users to manage the compartment structure of the OE.",
-                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "compartment_ocid": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
                     "allow group grp-oe01-admins to use cloud-shell in compartment cmp-oe1",
                     "allow group grp-oe01-admins to manage policies in compartment cmp-oe1",
@@ -228,7 +227,7 @@ For this example, replace the compartment_ocid to your tenancy OCID.
             "PCY-OE01-NETWORK-ADMINISTRATION": {
                 "name": "pcy-oe01-network-administration",
                 "description": "POL.0E.02 Open LZ policy which allows the grp-oe01-network-admins group users to manage NSGs in the OE network.",
-                "compartment_ocid": "ocid1.tenancy.oc1..example",
+                "compartment_ocid": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
                     "allow group grp-oe01-network-admins to use cloud-shell in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network",
                     "allow group grp-oe01-network-admins to read all-resources in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network",
@@ -240,9 +239,9 @@ For this example, replace the compartment_ocid to your tenancy OCID.
 ...
 ```
 
-This automation provides fully supports any type of OCI IAM Policy  to be specified in the JSON format. 
-For an example of such configuration and for extended documentation please refer to the [Identity & Access Management CIS Terraform module policies examples](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies/examples).
+This automation provides fully supports any type of OCI IAM Policy to be specified in the JSON format. 
 
+For an example of such configuration and for extended documentation please refer to the [Identity & Access Management CIS Terraform module policies examples](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies/examples).
 
 &nbsp; 
 
@@ -254,12 +253,11 @@ For configuring the OCI Open LZ Shared Infrastructure Network layer open and edi
 
 ![Network Diagram](diagrams/OCI_Open_LZ_OP02_ManageOE_Network.jpg)
 
-
 You can customize this JSON configuration to fit your exact OCI Networking topology. This terraform automation is extremely versatible and can support any type of network topology. 
 
 For complete documentation and a larger set of examples on configuring an OCI networking topology using this JSON terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) documentation and examples.
 
-The examples given with this code, expects to find valid certificates in your home directory to import into the Load Balancers to be created for SSL connections. If you don't have any valid certificates signed by a trusted CA, you can create self-signed certificates to run the examples following the instructions in [LBaaS self-signed certificates creation example](../../common_lbaas_self-signed_certificates_howto.md).
+For a better understanding on this configuration example, check the [OE01 network configuration explained](oe01_network_config_explained.md) page.
 
 &nbsp; 
 
@@ -288,17 +286,23 @@ For authenticating against the OCI tenancy terraform execute the following [inst
 
 ### **5.2 Clone this Git repo to your Machine**
 
+Cloning the latest version:
 ```
-git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.0.0
+git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git
 ```
 
-For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value.
+For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. 
+
+E.g.: 
+```
+git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.0.0
+``````
 
 &nbsp; 
 
 ###  **5.2 Change the Directory to the Terraform Orchestrator Module**
 
- Change the directory to the [```terraform-oci-open-lz/orchestrator```](../../../../orchestrator/) terraform orchestrator module.
+Change the directory to the [```terraform-oci-open-lz/orchestrator```](../../../../orchestrator/) terraform orchestrator module.
 
 &nbsp; 
 
@@ -346,7 +350,7 @@ Depending on your JSON configuration configurations the output of the ```terrafo
 
 # License
 
-Copyright (c) 2023 Oracle and/or its affiliates.
+Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
