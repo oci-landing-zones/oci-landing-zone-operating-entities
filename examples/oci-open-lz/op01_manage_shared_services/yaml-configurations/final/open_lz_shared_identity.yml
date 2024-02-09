@@ -53,7 +53,7 @@ dynamic_groups_configuration:
       name: dgp-security-functions
       description: DGP.01 Allows all resources of type fnfunc in the Security compartment,
         cmp-security.
-      matching_rule: ALL {resource.type = 'fnfun', resource.compartment.id = '<OCID-COMPARTMENT-SECURITY>'}
+      matching_rule: ALL {resource.type = 'fnfun', resource.compartment.id = 'cmp-security'}
 policies_configuration:
   enable_cis_benchmark_checks: 'false'
   supplied_policies:
@@ -72,8 +72,8 @@ policies_configuration:
       - allow service osms to read instances in tenancy
       - allow service blockstorage, oke, streaming, Fssoc1Prod, objectstorage-eu-amsterdam-1,objectstorage-eu-frankfurt-1
         to use keys in tenancy
-    PCY-IAM-ADMINISTRATION:
-      name: pcy-iam-administration
+    PCY-IAM-ADMIN-ROOT:
+      name: pcy-iam-admin-root
       description: POL.01 Open LZ allows grp-iam-admins group users to manage IAM
         resoures in the tenancy.
       compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
@@ -102,8 +102,8 @@ policies_configuration:
       - allow group grp-iam-admins to manage tag-namespaces in tenancy
       - allow group grp-iam-admins to manage orm-jobs in tenancy
       - allow group grp-iam-admins to manage orm-config-source-providers in tenancy
-    PCY-CREDENTIAL-ADMINISTRATION:
-      name: pcy-credential-administration
+    PCY-CREDENTIALS-ADMINS:
+      name: pcy-credentials-admins
       description: POL.02 Open LZ policy which allows grp-credential-admins group
         users to manage user credentials of local users in the tenancy .
       compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
@@ -125,20 +125,20 @@ policies_configuration:
       statements:
       - allow group grp-announcement-readers to read announcements in tenancy
       - allow group grp-announcement-readers to use cloud-shell in tenancy
-    PCY-BUDGET-ADMINISTRATION:
-      name: pcy-budget-administration
-      description: POL.04 Open LZ policy which allows grp-budget-admins group users
-        to manage all budget resources in the tenancy.
+    PCY-BUDGET-ADMINS:
+      name: pcy-budget-admins
+      description: POL.04 Open LZ policy which allows paalonso-openlz-tfcli-grp-budget-admins
+        group users to manage all budget resources in the tenancy.
       compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
       statements:
-      - define tenancy usage-report as ocid1.tenancy.oc1..example
+      - define tenancy usage-report as <OCID-COMPARTMENT-ROOT>
       - endorse group grp-budget-admins to read objects in tenancy usage-report
       - allow group grp-budget-admins to manage usage-report in tenancy
       - allow group grp-budget-admins to manage usage-budgets in tenancy
-    PCY-AUDITING:
-      name: pcy-auditing
-      description: POL.05 Open LZ policy which allows grp-auditors group users to
-        read all the resources in the tenancy.
+    PCY-AUDITORS:
+      name: pcy-auditors
+      description: POL.05 Open LZ policy which allows grp-auditors group group users
+        to read all the resources in the tenancy.
       compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - allow group grp-auditors to inspect all-resources in tenancy
@@ -158,8 +158,8 @@ policies_configuration:
       - allow group grp-auditors to read usage-budgets in tenancy
       - allow group grp-auditors to read usage-reports in tenancy
       - allow group grp-auditors to read data-safe-family in tenancy
-    PCY-NETWORK-ADMINISTRATION:
-      name: pcy-network-administration
+    PCY-NETWORK-ADMINS:
+      name: pcy-network-admins
       description: POL.06 Open LZ policy which allows grp-network-admins group users
         to manage all network resources in the compartment.
       compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
@@ -180,8 +180,8 @@ policies_configuration:
       - allow group grp-network-admins to manage orm-jobs in compartment cmp-network
       - allow group grp-network-admins to manage orm-config-source-providers in compartment
         cmp-network
-    PCY-SECURITY-ADMINISTRATION:
-      name: pcy-security-administration
+    PCY-SECURITY-ADMINS:
+      name: pcy-security-admins
       description: POL.07 Open LZ policy which allows grp-security-admins group users
         to manage all security resources in the security compartment.
       compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
@@ -245,3 +245,21 @@ policies_configuration:
       - allow group grp-security-admins to use vnics in compartment cmp-security
       - allow group grp-security-admins to manage private-ips in compartment cmp-security
       - allow group grp-security-admins to read keys in compartment cmp-security
+    PCY-OE01-PROD-DEPTA-PROJ1-COMMON-SECURITY:
+      name: pcy-oe01-prod-depta-proj1-common-security
+      description: Open LZ policy which allows the grp-pa-oe01-prod-deptA-proj1-prd-app-admins
+        group users to access common security resources in the OE.
+      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      statements:
+      - allow group grp-pa-oe01-prod-deptA-proj1-prd-app-admins,grp-pa-oe01-prod-deptA-proj1-prd-db-admins,grp-pa-oe01-prod-deptA-proj1-prd-infra-admins
+        to use vaults in compartment cmp-security
+      - allow group grp-pa-oe01-prod-deptA-proj1-prd-app-admins,grp-pa-oe01-prod-deptA-proj1-prd-db-admins,grp-pa-oe01-prod-deptA-proj1-prd-infra-admins
+        to manage instance-images in compartment cmp-security
+      - allow group grp-pa-oe01-prod-deptA-proj1-prd-app-admins,grp-pa-oe01-prod-deptA-proj1-prd-db-admins,grp-pa-oe01-prod-deptA-proj1-prd-infra-admins
+        to read vss-family in compartment cmp-security
+      - allow group grp-pa-oe01-prod-deptA-proj1-prd-app-admins,grp-pa-oe01-prod-deptA-proj1-prd-db-admins,grp-pa-oe01-prod-deptA-proj1-prd-infra-admins
+        to use bastion in compartment cmp-security
+      - allow group grp-pa-oe01-prod-deptA-proj1-prd-app-admins,grp-pa-oe01-prod-deptA-proj1-prd-db-admins,grp-pa-oe01-prod-deptA-proj1-prd-infra-admins
+        to manage bastion-session in compartment cmp-security
+      - allow group grp-pa-oe01-prod-deptA-proj1-prd-app-admins,grp-pa-oe01-prod-deptA-proj1-prd-db-admins,grp-pa-oe01-prod-deptA-proj1-prd-infra-admins
+        to read logging-family in compartment cmp-security
