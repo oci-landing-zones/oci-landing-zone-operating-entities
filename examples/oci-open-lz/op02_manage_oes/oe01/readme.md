@@ -25,8 +25,8 @@
 | **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](open_lz_oe_01_network.auto.tfvars.json) |
 | **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../../design/OCI_Open_LZ.pdf).|
-| **PRE-ACTIVITIES** | [OP.01 Shared Services](../../shared/readme.md) executed. Update network config with OCID of the hub. |
-| **POST-ACTIVITIES** | **POST.OP02_01** The first execution of this operation by the Central IT team requires the hand-over to the target OE Operations team the OCIDs for their OE core resources</br> **POST.OP.02_02** Update the dynamic group instance.compartment.ocid with the OCID of the compartment of the dynamic groups members|
+| **PRE-ACTIVITIES** | [OP.01 Shared Services](../../op01_manage_shared_services/readme.md) executed. Update network config with OCID of the hub. |
+| **POST-ACTIVITIES** | **POST.OP02.01** The first execution of this operation by the Central IT team requires the hand-over to the target OE Operations team the OCIDs for their OE core resources</br> [**POST.OP.02.02**](./post_op02_02_update_dynamic_groups/readme.md) Update the dynamic group instance.compartment.ocid with the OCID of the compartment of the dynamic groups members.</br> [**POST.OP.03.03**](./post_op02_03_update_iam_policies_project_team/readme.md) After the on-boarding of a new OE project, update IAM policies to give access to the OE Project Team to shared networking resources.|
 | **RUN OPERATION** | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli). |
 
 &nbsp; 
