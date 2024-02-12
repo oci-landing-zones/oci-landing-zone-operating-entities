@@ -31,7 +31,7 @@ Remove the previous versions of the Route tables from the DMZ VCN:
 
 # License
 
-Copyright (c) 2023 Oracle and/or its affiliates.
+Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
