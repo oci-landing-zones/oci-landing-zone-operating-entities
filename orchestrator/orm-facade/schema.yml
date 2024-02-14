@@ -73,6 +73,6 @@ outputGroups:
     outputs:
       - ${provisioned_identity_resources}    
 
-  - title: Neworking Resources
+  - title: Networking Resources
     outputs:
       - ${provisioned_networking_resources}    

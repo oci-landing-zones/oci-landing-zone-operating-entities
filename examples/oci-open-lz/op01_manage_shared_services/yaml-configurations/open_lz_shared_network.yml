@@ -1,12 +1,3 @@
-# ####################################################################################################### #
-# Copyright (c) 2023 Oracle and/or its affiliates,  All rights reserved.                                  #
-# Licensed under the Universal Permissive License v 1.0 as shown at https: //oss.oracle.com/licenses/upl. #
-# Author: Cosmin Tudor                                                                                    #
-# Author email: cosmin.tudor@oracle.com                                                                   #
-# Last Modified: Thu Nov 16 2023                                                                          #
-# Modified by: Cosmin Tudor, email: cosmin.tudor@oracle.com                                               #
-# ####################################################################################################### #
-
 ---
 network_configuration:
   default_compartment_key: CMP-NETWORK-KEY
@@ -15,14 +6,14 @@ network_configuration:
     shared:
       category_compartment_key: CMP-NETWORK-KEY
       vcns:
-        VCN-FRANKFURT-HUB-KEY:
+        VCN-FRA-HUB-KEY:
           block_nat_traffic: false
           cidr_blocks:
           - 10.0.0.0/18
           - 192.168.0.0/18
           dhcp_options:
-            VCN-FRANKFURT-HUB-DHCP-OPTION-01-KEY:
-              display_name: vcn_frankfurt_hub_dhcp_option_01
+            VCN-FRA-HUB-DHCP-OPTION-01-KEY:
+              display_name: vcn-fra-hub-dhcp-option-01
               domain_name_type: test
               options:
                 options_1:
@@ -35,8 +26,8 @@ network_configuration:
                   search_domain_names:
                   - test.com
                   type: SearchDomain
-            VCN-FRANKFURT-HUB-DHCP-OPTION-02-KEY:
-              display_name: vcn_frankfurt_hub_dhcp_option_02
+            VCN-FRA-HUB-DHCP-OPTION-02-KEY:
+              display_name: vcn-fra-hub-dhcp-option-02
               domain_name_type: test
               options:
                 options_1:
@@ -49,7 +40,7 @@ network_configuration:
                   search_domain_names:
                   - test.com
                   type: SearchDomain
-          display_name: vcn_frankfurt_hub
+          display_name: vcn-fra-hub
           dns_label: hub
           is_attach_drg: false
           is_create_igw: false
@@ -57,6 +48,7 @@ network_configuration:
           is_oracle_gua_allocation_enabled: false
           network_security_groups:
             NSG-01-HUB-VCN-KEY:
+              display_name: nsg-01-hub-vcn
               egress_rules:
                 anywhere:
                   description: egress to 0.0.0.0/0 over TCP
@@ -64,7 +56,7 @@ network_configuration:
                   dst_type: CIDR_BLOCK
                   protocol: TCP
                   stateless: false
-              freeform_tags:
+              freeform_tags: 
               ingress_rules:
                 ssh_22:
                   description: ingress from 0.0.0.0/0 over TCP22
@@ -75,6 +67,7 @@ network_configuration:
                   src_type: CIDR_BLOCK
                   stateless: false
             NSG-02-HUB-VCN-KEY:
+              display_name: nsg-02-hub-vcn
               egress_rules:
                 anywhere:
                   description: egress to 0.0.0.0/0 over TCP
@@ -108,6 +101,7 @@ network_configuration:
                   src_type: CIDR_BLOCK
                   stateless: false
             NSG-03-HUB-VCN-KEY:
+              display_name: nsg-03-hub-vcn
               egress_rules:
                 anywhere:
                   description: egress to 0.0.0.0/0 over TCP
@@ -133,169 +127,490 @@ network_configuration:
                   src_type: CIDR_BLOCK
                   stateless: false
           route_tables:
-            RT-01-HUB-VCN-KEY:
-              display_name: rt_01_hub_vcn
+            RT-00-HUB-VCN-INGRESS-KEY:
+              display_name: rt-00-hub-vcn-ingress
+              route_rules:
+                rt_hub_def_sn:
+                  description: Route outgoing traffic
+                  destination: 0.0.0.0/0
+                  destination_type: CIDR_BLOCK
+                  network_entity_id: "<NS PRIVATE IP OCID>"
+                rt_hub_lb_sn:
+                  description: Route incoming traffic to Hub LB subnet
+                  destination: 10.0.0.0/24
+                  destination_type: CIDR_BLOCK
+                  network_entity_id: "<NS PRIVATE IP OCID>"
+            RT-01-HUB-VCN-LB-KEY:
+              display_name: rt-01-hub-vcn-lb
               route_rules:
                 drg_route:
                   description: Route for IPSec VPN
                   destination: 148.20.57.8/29
                   destination_type: CIDR_BLOCK
-                  network_entity_key: DRG-FRANKFURT-HUB-KEY
+                  network_entity_key: DRG-FRA-HUB-KEY
                 internet_route:
                   description: Route for internet access
                   destination: 0.0.0.0/0
                   destination_type: CIDR_BLOCK
-                  network_entity_key: IG-FRANKFURT-HUB-KEY
-            RT-02-HUB-VCN-KEY:
-              display_name: rt_02_hub_vcn
-              freeform_tags:
+                  network_entity_key: IG-FRA-HUB-KEY
+            RT-02-HUB-VCN-NFWNS-KEY:
+              display_name: rt-02-hub-vcn-nfwns
+              freeform_tags: 
+              route_rules:
+                ngw_route:
+                  description: Route for North-South NFW to NAT GW
+                  destination: 0.0.0.0/0
+                  destination_type: CIDR_BLOCK
+                  network_entity_key: NG-FRA-HUB-KEY
+            RT-03-HUB-VCN-NFWEW-KEY:
+              display_name: rt-03-hub-vcn-nfwew
+              freeform_tags: 
+              route_rules: {}
+            RT-04-HUB-VCN-NATGW-KEY:
+              display_name: rt-04-hub-vcn-natgw
+              freeform_tags: 
+              route_rules:
+                nat_route:
+                  description: Route for ngw
+                  destination: 0.0.0.0/0
+                  destination_type: CIDR_BLOCK
+                  network_entity_id: "<NS PRIVATE IP OCID>"
+            RT-05-HUB-VCN-KEY:
+              display_name: rt-05-hub-vcn-osn
+              freeform_tags: 
               route_rules:
                 sgw_route:
                   description: Route for sgw
-                  destination: objectstorage
+                  destination: all-services
                   destination_type: SERVICE_CIDR_BLOCK
-                  network_entity_key: SG-FRANKFURT-HUB-KEY
+                  network_entity_key: SG-FRA-HUB-KEY
+          default_security_list:
+            display_name: defseclist-fra-hub-vcn
+            egress_rules: []
+            ingress_rules:
+            - stateless: false
+              protocol: ICMP
+              description: ICMP type 3 code 4
+              src: 0.0.0.0/0
+              src_type: CIDR_BLOCK
+              icmp_type: 3
+              icmp_code: 4
+            - stateless: false
+              protocol: ICMP
+              description: ICMP type 3
+              src: 10.0.0.0/18
+              src_type: CIDR_BLOCK
+              icmp_type: 3
+              icmp_code: -1
+            - stateless: false
+              protocol: ICMP
+              description: ICMP type 3
+              src: 192.168.0.0/18
+              src_type: CIDR_BLOCK
+              icmp_type: 3
+              icmp_code: -1
           security_lists:
-            SECLIST-01-HUB-VCN-KEY:
-              display_name: seclist_01_hub_vcn
+            SL-01-HUB-VCN-KEY:
+              display_name: sl-01-hub-vcn
               egress_rules:
               - description: egress to 0.0.0.0/0 over ALL protocols
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
                 protocol: ALL
                 stateless: false
-              - description: egress to 0.0.0.0/0 over any protocol
-                dst: 0.0.0.0/0
-                dst_type: CIDR_BLOCK
-                protocol: ALL
-                stateless: false
-              freeform_tags:
+              freeform_tags: 
               ingress_rules:
-              - description: ingress from 0.0.0.0/0 over TCP22
-                dst_port_max: 22
-                dst_port_min: 22
+              - description: ingress from 0.0.0.0/0 ALL ports
                 protocol: TCP
                 src: 0.0.0.0/0
                 src_type: CIDR_BLOCK
                 stateless: false
-            SECLIST-02-HUB-VCN-KEY:
-              display_name: seclist_02_hub_vcn
+            SL-02-HUB-VCN-KEY:
+              display_name: sl-02-hub-vcn
               egress_rules:
               - description: egress to 0.0.0.0/0 over TCP
                 dst: 0.0.0.0/0
                 dst_type: CIDR_BLOCK
-                protocol: TCP
+                protocol: ALL
                 stateless: false
               ingress_rules:
-              - description: ingress from 0.0.0.0/0 over TCP22
-                protocol: TCP
-                src: 0.0.0.0/0
-                src_type: CIDR_BLOCK
-                stateless: false
-              - description: ingress from 0.0.0.0/0 over HTTP8080
-                dst_port_max: 80
-                dst_port_min: 80
-                protocol: TCP
+              - description: ingress from 0.0.0.0/0 over all ports
+                protocol: ALL
                 src: 0.0.0.0/0
                 src_type: CIDR_BLOCK
                 stateless: false
           subnets:
-            SN-FRANKFURT-HUB-LB-KEY:
-              availability_domain:
+            SN-FRA-HUB-LB-KEY:
+              availability_domain: 
               cidr_block: 10.0.0.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: sn_frankfurt_hub_lb
+              display_name: sn-fra-hub-lb
               dns_label: hublb
               prohibit_internet_ingress: false
               prohibit_public_ip_on_vnic: false
               route_table_key: RT-01-HUB-VCN-KEY
               security_list_keys:
               - SECLIST-01-HUB-VCN-KEY
-            SN-FRANKFURT-HUB-FW-NS-KEY:
+            SN-FRA-HUB-FW-NS-KEY:
               cidr_block: 192.168.1.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: sn_frankfurt_hub_fw_ns
+              display_name: sn-fra-hub-fw-ns
               dns_label: hubfwns
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
               route_table_key: RT-02-HUB-VCN-KEY
               security_list_keys:
               - SECLIST-02-HUB-VCN-KEY
-            SN-FRANKFURT-HUB-FW-EW-KEY:
+            SN-FRA-HUB-FW-EW-KEY:
               cidr_block: 192.168.2.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: sn_frankfurt_hub_fw_ew
+              display_name: sn-fra-hub-fw-ew
               dns_label: hubfwew
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
-              route_table_key: RT-02-HUB-VCN-KEY
+              route_table_key: RT-03-HUB-VCN-KEY
               security_list_keys:
               - SECLIST-02-HUB-VCN-KEY
-            SN-FRANKFURT-HUB-FW-MGMT-KEY:
+            SN-FRA-HUB-FW-MGMT-KEY:
               cidr_block: 192.168.3.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: sn_frankfurt_hub_mgmt
+              display_name: sn-fra-hub-mgmt
               dns_label: hubmgmt
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
-              route_table_key: RT-02-HUB-VCN-KEY
+              route_table_key: RT-05-HUB-VCN-KEY
               security_list_keys:
               - SECLIST-02-HUB-VCN-KEY
-            SN-FRANKFURT-HUB-FW-LOGS-KEY:
+            SN-FRA-HUB-FW-LOGS-KEY:
               cidr_block: 192.168.4.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: sn_frankfurt_hub_logs
+              display_name: sn-fra-hub-logs
               dns_label: hublogs
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
-              route_table_key: RT-02-HUB-VCN-KEY
+              route_table_key: RT-05-HUB-VCN-KEY
               security_list_keys:
               - SECLIST-02-HUB-VCN-KEY
-            SN-FRANKFURT-HUB-FW-LOGS-DNS:
+            SN-FRA-HUB-FW-LOGS-DNS:
               cidr_block: 192.168.5.0/24
               dhcp_options_key: default_dhcp_options
-              display_name: sn_frankfurt_hub_dns
+              display_name: sn-fra-hub-dns
               dns_label: hubdns
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
-              route_table_key: RT-02-HUB-VCN-KEY
+              route_table_key: RT-05-HUB-VCN-KEY
               security_list_keys:
               - SECLIST-02-HUB-VCN-KEY
           vcn_specific_gateways:
             internet_gateways:
-              IG-FRANKFURT-HUB-KEY:
-                display_name: ig_frankfurt_hub
+              IG-FRA-HUB-KEY:
+                display_name: ig-fra-hub
                 enabled: true
+            nat_gateways:
+              NG-FRA-HUB-KEY:
+                display_name: ng-fra-hub
+                enabled: true
+                route_table_key: RT-04-HUB-VCN-KEY
             service_gateways:
-              SG-FRANKFURT-HUB-KEY:
-                display_name: sg_frankfurt_hub
-                services: objectstorage
-      IPs:
-        public_ips:
-          SHARED-IP-LB-SHARED-KEY:
-            lifetime: RESERVED
-            display_name: prod_ip_lb_1
+              SG-FRA-HUB-KEY:
+                display_name: sg-fra-hub
+                services: all-services
       non_vcn_specific_gateways:
         dynamic_routing_gateways:
-          DRG-FRANKFURT-HUB-KEY:
-            display_name: drg-frankfurt-hub
+          DRG-FRA-HUB-KEY:
+            display_name: drg-fra-hub
             drg_attachments:
-              DRG-FRANKFURT-HUB-VCN-FRANKFURT-HUB-KEY:
-                display_name: drg_frankfurt_hub_vcn_frankfurt_hub
+              DRG-FRA-HUB-VCN-FRA-HUB-KEY:
+                display_name: drgatt-fra-hub-vcn
+                drg_route_table_key: DRG-RT-FRA-HUB-KEY
                 network_details:
-                  attached_resource_key: VCN-FRANKFURT-HUB-KEY
+                  attached_resource_key: VCN-FRA-HUB-KEY
                   type: VCN
+                  route_table_key: RT-00-HUB-VCN-KEY
+            drg_route_distributions:
+              IMPORT-HUB-RTD-KEY:
+                display_name: import-rtd-hub
+                distribution_type: IMPORT
+                statements:
+                  drg_route_distribution_vcn:
+                    priority: 1
+                    action: ACCEPT
+                    match_criteria:
+                      match_type: DRG_ATTACHMENT_TYPE
+                      attachment_type: VCN
+            drg_route_tables:
+              DRG-RT-FRA-HUB-KEY:
+                display_name: drg-rt-fra-hub
+                import_drg_route_distribution_key: IMPORT-HUB-RTD-KEY
+                is_ecmp_enabled: false
+                route_tables: {}
+        network_firewalls_configuration:
+          network_firewalls:
+            NFW-FRA-HUB-NS-KEY:
+              display_name: nfw-fra-hub-ns
+              ipv4address: 192.168.1.10
+              subnet_key: SN-FRANKFURT-HUB-FW-NS-KEY
+              network_firewall_policy_key: NFW-POLICY-FRA-HUB-NS-POL1-KEY
+            NFW-FRA-HUB-EW-KEY:
+              display_name: nfw-fra-hub-ew
+              ipv4address: 192.168.2.10
+              subnet_key: SN-FRANKFURT-HUB-FW-EW-KEY
+              network_firewall_policy_key: NFW-POLICY-FRA-HUB-EW-POL1-KEY
+          network_firewall_policies:
+            NFW-POLICY-FRA-HUB-NS-POL1-KEY:
+              display_name: nfw-policy-fra-hub-ns-pol1
+              application_lists:
+                NFW-APP-LIST-FRA-HUB-NS-1:
+                  application_list_name: nfw-app-list-fra-hub-ns-1
+                  application_values:
+                    NFW-APP-LIST-FRA-HUB-NS-1-1:
+                      maximum_port: 80
+                      minimum_port: 80
+                      type: TCP
+                    NFW-APP-LIST-FRA-HUB-NS-1-2:
+                      maximum_port: 22
+                      minimum_port: 22
+                      type: TCP
+              ip_address_lists:
+                NFW-IP-LIST-FRA-HUB-NS-1:
+                  ip_address_list_name: nfw-ip-list-fra-hub-ns-1
+                  ip_address_list_value:
+                  - 172.168.7.10
+                  - 10.0.0.155
+              security_rules:
+                SECURITY-RULE-A:
+                  action: ALLOW
+                  name: SecurityRuleA
+                  conditions:
+                    PRD-COND1-A:
+                      applications:
+                      - nfw-app-list-fra-hub-ns-1
+                      destinations: []
+                      sources: []
+                      urls: []
+                SECURITY-RULE-C:
+                  action: ALLOW
+                  name: SecurityRuleC
+                  conditions:
+                    PRD-COND1-A:
+                      applications: []
+                      destinations: []
+                      sources:
+                      - nfw-ip-list-fra-hub-ns-1
+                      urls:
+                      - nfw-url-list-fra-hub-ns-2
+                SECURITY-RULE-B:
+                  action: INSPECT
+                  inspection: INTRUSION_DETECTION
+                  name: SecurityRuleB
+                  conditions:
+                    PRD-COND1-B:
+                      applications:
+                      - nfw-app-list-fra-hub-ns-1
+                      destinations: []
+                      sources:
+                      - nfw-ip-list-fra-hub-ns-1
+                      urls:
+                      - nfw-url-list-fra-hub-ns-1
+              url_lists:
+                NFW-URL-LIST-FRA-HUB-NS-1:
+                  url_list_name: nfw-url-list-fra-hub-ns-1
+                  url_list_values:
+                    NFW-URL-LIST-FRA-HUB-NS-1-1:
+                      pattern: testapp1.example.com
+                      type: SIMPLE
+                NFW-URL-LIST-FRA-HUB-NS-2:
+                  url_list_name: nfw-url-list-fra-hub-ns-2
+                  url_list_values:
+                    NFW-URL-LIST-FRA-HUB-NS-2-1:
+                      pattern: pypi.python.org
+                      type: SIMPLE
+                    NFW-URL-LIST-FRA-HUB-NS-2-2:
+                      pattern: www.google.com
+                      type: SIMPLE
+            NFW-POLICY-FRA-HUB-NS-POL2-KEY:
+              display_name: nfw-policy-fra-hub-ns-pol2
+              application_lists:
+                NFW-APP-LIST-FRA-HUB-NS-1:
+                  application_list_name: nfw-app-list-fra-hub-ns-1
+                  application_values:
+                    NFW-APP-LIST-FRA-HUB-NS-1-1:
+                      maximum_port: 8080
+                      minimum_port: 80
+                      type: TCP
+                    NFW-APP-LIST-FRA-HUB-NS-1-2:
+                      maximum_port: 22
+                      minimum_port: 22
+                      type: TCP
+              ip_address_lists:
+                NFW-IP-LIST-FRA-HUB-NS-1:
+                  ip_address_list_name: nfw-ip-list-fra-hub-ns-1
+                  ip_address_list_value:
+                  - 172.168.7.10
+                  - 10.0.0.155
+              security_rules:
+                SECURITY-RULE-A:
+                  action: ALLOW
+                  name: SecurityRuleA
+                  conditions:
+                    PRD-COND1-A:
+                      applications:
+                      - nfw-app-list-fra-hub-ns-1
+                      destinations: []
+                      sources: []
+                      urls: []
+                SECURITY-RULE-C:
+                  action: ALLOW
+                  name: SecurityRuleC
+                  conditions:
+                    PRD-COND1-A:
+                      applications: []
+                      destinations: []
+                      sources: []
+                      urls:
+                      - nfw-url-list-fra-hub-ns-2
+                SECURITY-RULE-B:
+                  action: INSPECT
+                  inspection: INTRUSION_DETECTION
+                  name: SecurityRuleB
+                  conditions:
+                    PRD-COND1-B:
+                      applications:
+                      - nfw-app-list-fra-hub-ns-1
+                      destinations: []
+                      sources:
+                      - nfw-ip-list-fra-hub-ns-1
+                      urls:
+                      - nfw-url-list-fra-hub-ns-1
+              url_lists:
+                NFW-URL-LIST-FRA-HUB-NS-1:
+                  url_list_name: nfw-url-list-fra-hub-ns-1
+                  url_list_values:
+                    NFW-URL-LIST-FRA-HUB-NS-1-1:
+                      pattern: testapp1.example.com
+                      type: SIMPLE
+                NFW-URL-LIST-FRA-HUB-NS-2:
+                  url_list_name: nfw-url-list-fra-hub-ns-2
+                  url_list_values:
+                    NFW-URL-LIST-FRA-HUB-NS-2-1:
+                      pattern: pypi.python.org
+                      type: SIMPLE
+                    NFW-URL-LIST-FRA-HUB-NS-2-2:
+                      pattern: www.google.com
+                      type: SIMPLE
+            NFW-POLICY-FRA-HUB-EW-POL1-KEY:
+              display_name: nfw-policy-fra-hub-ew-pol1
+              application_lists:
+                NFW-APP-LIST-FRA-HUB-EW-1:
+                  application_list_name: nfw-app-list-fra-hub-ew-1
+                  application_values:
+                    NFW-APP-LIST-FRA-HUB-NS-1-1:
+                      maximum_port: 8080
+                      minimum_port: 80
+                      type: TCP
+              ip_address_lists:
+                NFW-IP-LIST-FRA-HUB-EW-1:
+                  ip_address_list_name: nfw-ip-list-fra-hub-ew-1
+                  ip_address_list_value:
+                  - 172.168.7.10
+              security_rules:
+                SECURITY-RULE-A:
+                  action: ALLOW
+                  name: SecurityRuleA
+                  conditions:
+                    PRD-COND1-A:
+                      applications: []
+                      destinations: []
+                      sources:
+                      - nfw-ip-list-fra-hub-ew-1
+                      urls: []
+                SECURITY-RULE-B:
+                  action: INSPECT
+                  inspection: INTRUSION_DETECTION
+                  name: SecurityRuleB
+                  conditions:
+                    PRD-COND1-B:
+                      applications:
+                      - nfw-app-list-fra-hub-ew-1
+                      destinations: []
+                      sources:
+                      - nfw-ip-list-fra-hub-ew-1
+                      urls:
+                      - nfw-url-list-fra-hub-ew-1
+              url_lists:
+                NFW-URL-LIST-FRA-HUB-EW-1:
+                  url_list_name: nfw-url-list-fra-hub-ew-1
+                  url_list_values:
+                    NFW-URL-LIST-FRA-HUB-EW-1-1:
+                      pattern: testapp1.example.com
+                      type: SIMPLE
+                NFW-URL-LIST-FRA-HUB-NS-2:
+                  url_list_name: nfw-url-list-fra-hub-ew-2
+                  url_list_values:
+                    NFW-URL-LIST-FRA-HUB-EW-2-1:
+                      pattern: pypi.python.org
+                      type: SIMPLE
+                    NFW-URL-LIST-FRA-HUB-EW-2-2:
+                      pattern: www.google.com
+                      type: SIMPLE
+            NFW-POLICY-FRA-HUB-EW-POL2-KEY:
+              display_name: nfw-policy-fra-hub-ew-pol2
+              application_lists:
+                NFW-APP-LIST-FRA-HUB-EW-1:
+                  application_list_name: nfw-app-list-fra-hub-ew-1
+                  application_values:
+                    NFW-APP-LIST-FRA-HUB-NS-1-1:
+                      maximum_port: 8080
+                      minimum_port: 80
+                      type: TCP
+              ip_address_lists:
+                NFW-IP-LIST-FRA-HUB-EW-1:
+                  ip_address_list_name: nfw-ip-list-fra-hub-ew-1
+                  ip_address_list_value:
+                  - 172.168.7.10
+              security_rules:
+                SECURITY-RULE-A:
+                  action: ALLOW
+                  name: SecurityRuleA
+                  conditions:
+                    PRD-COND1-A:
+                      applications: []
+                      destinations: []
+                      sources: []
+                      urls: []
+                SECURITY-RULE-B:
+                  action: INSPECT
+                  inspection: INTRUSION_DETECTION
+                  name: SecurityRuleB
+                  conditions:
+                    PRD-COND1-B:
+                      applications:
+                      - nfw-app-list-fra-hub-ew-1
+                      destinations: []
+                      sources:
+                      - nfw-ip-list-fra-hub-ew-1
+                      urls:
+                      - nfw-url-list-fra-hub-ew-1
+              url_lists:
+                NFW-URL-LIST-FRA-HUB-EW-1:
+                  url_list_name: nfw-url-list-fra-hub-ew-1
+                  url_list_values:
+                    NFW-URL-LIST-FRA-HUB-EW-1-1:
+                      pattern: testapp1.example.com
+                      type: SIMPLE
+                NFW-URL-LIST-FRA-HUB-EW-2:
+                  url_list_name: nfw-url-list-fra-hub-ew-2
+                  url_list_values:
+                    NFW-URL-LIST-FRA-HUB-EW-2-1:
+                      pattern: pypi.python.org
+                      type: SIMPLE
+                    NFW-URL-LIST-FRA-HUB-EW-2-2:
+                      pattern: www.google.com
+                      type: SIMPLE
         l7_load_balancers:
-          SHARED_LB_KEY:
+          LB-HUB-KEY:
             backend_sets:
-              SHARED-LB-BCK-END-SET-01:
-                backends:
-                  SHARED-LB-BCK-END-SET-01-BE-01:
-                    ip_address: 10.0.2.128
-                    port: 80
-                  SHARED-LB-BCK-END-SET-01-BE-02:
-                    ip_address: 10.0.2.94
-                    port: 80
+              LB-HUB-BKSET-00:
                 health_checker:
                   interval_ms: 10000
                   is_force_plain_text: true
@@ -305,75 +620,25 @@ network_configuration:
                   return_code: 200
                   timeout_in_millis: 3000
                   url_path: "/"
-                lb_cookie_session_persistence_configuration:
-                  cookie_name: example_cookie
-                  disable_fallback: false
-                  domain: Set-cookie
-                  is_http_only: true
-                  is_secure: false
-                  max_age_in_seconds: 3600
-                  path: "/"
-                name: backend-set-01
+                name: lb-hub-bkset-00
                 policy: LEAST_CONNECTIONS
-            cipher_suites:
-              SHARED-LB-CIPHER-SUITE-01-KEY:
-                ciphers:
-                - ECDHE-RSA-AES256-GCM-SHA384
-                - ECDHE-ECDSA-AES256-GCM-SHA384
-                - ECDHE-RSA-AES128-GCM-SHA256
-                name: cipher_suite_01
-            display_name: SHARED-LBaaS
-            host_names:
-              LB1-HOSTNAME-1-KEY:
-                hostname: oe01.com
-                name: oe01
-              LB1-HOSTNAME-2-KEY:
-                hostname: oe02.com
-                name: oe02
+            display_name: lb-hub-01
             ip_mode: IPV4
-            is_private: true
+            is_private: false
             listeners:
               LB1-LSNR-1-80:
                 connection_configuration:
                   idle_timeout_in_seconds: 1200
-                default_backend_set_key: SHARED-LB-BCK-END-SET-01
-                name: lb1-lsnr1-80
+                default_backend_set_key: LB-HUB-BKSET-00
+                name: lb-hub-01-lsnr1-80
                 port: '80'
                 protocol: HTTP
             network_security_group_keys:
             - NSG-02-HUB-VCN-KEY
-            path_route_sets:
-              EXMPL_01_PATH_ROUTE_SET_01_KEY:
-                name: path_route_set_01
-                path_routes:
-                  CUSTOM-KEY:
-                    backend_set_key: SHARED-LB-BCK-END-SET-01
-                    path: "/example/video/123"
-                    path_match_type:
-                      match_type: EXACT_MATCH
-                  DEFAULT-KEY:
-                    backend_set_key: SHARED-LB-BCK-END-SET-01
-                    path: "/"
-                    path_match_type:
-                      match_type: EXACT_MATCH
-            rule_sets:
-              LB1-RULE-SET-1-KEY:
-                items:
-                  ITEM-1-KEY:
-                    action: ADD_HTTP_REQUEST_HEADER
-                    header: example_header_name
-                    value: example_value
-                  ITEM-2-KEY:
-                    action: EXTEND_HTTP_REQUEST_HEADER_VALUE
-                    header: example_header_name2
-                    prefix: example_prefix_value
-                    suffix: example_suffix_value
-                    value: example_value
-                name: example_rule_set
             shape: flexible
             shape_details:
               maximum_bandwidth_in_mbps: 100
               minimum_bandwidth_in_mbps: 10
             subnet_ids: []
             subnet_keys:
-            - SN-FRANKFURT-HUB-LB-KEY
+            - SN-FRA-HUB-LB-KEY

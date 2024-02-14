@@ -415,7 +415,7 @@ The OCI EBS LZ has three operation scenarios described in the following table.
 
 # License
 
-Copyright (c) 2023 Oracle and/or its affiliates.
+Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 

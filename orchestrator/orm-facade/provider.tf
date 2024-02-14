@@ -3,8 +3,8 @@
 # Licensed under the Universal Permissive License v 1.0 as shown at https: //oss.oracle.com/licenses/upl. #
 # Author: Cosmin Tudor                                                                                    #
 # Author email: cosmin.tudor@oracle.com                                                                   #
-# Last Modified: Thu Nov 16 2023                                                                          #
-# Modified by: Cosmin Tudor, email: cosmin.tudor@oracle.com                                               #
+# Last Modified: Dec 22 2023                                                                          #
+# Modified by: Pablo Alonso, email: pablo.alonso@oracle.com                                               #
 # ####################################################################################################### #
 
 provider "oci" {
