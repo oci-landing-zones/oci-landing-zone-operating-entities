@@ -27,9 +27,7 @@
 
 ## **2. Network Configuration Changes**
 
-After having the OCID of the Private IP VNIC of the new North-South OCI Network Firewall, update the route rules in the Hub VCN ingress route table (rt-00-hub-vcn), and the route for the NAT Gateway (rt-04-hub-vcn), replacing the "NS PRIVATE IP OCID" with the Private IP OCID of the firewall.
-
-After updating this configuration and saving the changes, you would be able to re-run the plan/apply Terraform operations with ORM or Terraform CLI in the same way you did the OP.01.
+After having the OCID of the Private IP VNIC of the new North-South OCI Network Firewall, update the route rules in the Hub VCN ingress route table (rt-00-hub-vcn), and the route for the NAT Gateway (rt-04-hub-vcn) with the route rules that contains the Private IP OCID of the firewall.
 
 You can find out the North-South private IP OCID (*"ipv4address_ocid"*) in the generated terraform state file of the OP.01 or the outputs after the apply operation like:
 
@@ -42,15 +40,15 @@ You can find out the North-South private IP OCID (*"ipv4address_ocid"*) in the g
       "ipv4address_ocid" = "ocid1.privateip.oc1..."
 ```
 
-You can replace the *"NS PRIVATE IP OCID"* in your network JSON configuration file for the OP.01 with the OCID of the NS FW *"ipv4address_ocid"* value:
+You can add the following route rules *"rt_hub_def_sn"* and *"rt_hub_lb_sn"* to the route table *RT-00-HUB-VCN-INGRESS-KEY*, and the route rule *"nat_route"* of the route table *RT-04-HUB-VCN-NATGW-KEY* with the *"NS PRIVATE IP OCID"* in your network JSON configuration file for the OP.01 with the OCID of the NS FW *"ipv4address_ocid"* value:
 
 ```
 ...
 "VCN-FRANKFURT-HUB-KEY": {
 (...)
     "route_tables": {
-        "RT-00-HUB-VCN-KEY": {
-            "display_name": "rt-00-hub-vcn",
+        "RT-00-HUB-VCN-INGRESS-KEY": {
+            "display_name": "rt-00-hub-vcn-ingress",
             "route_rules": {
                 "rt_hub_def_sn": {
                     "description": "Route outgoing traffic",
@@ -67,8 +65,8 @@ You can replace the *"NS PRIVATE IP OCID"* in your network JSON configuration fi
             }
         },
         (...)
-        "RT-04-HUB-VCN-KEY": {
-            "display_name": "rt-04-hub-vcn",
+        "RT-04-HUB-VCN-NATGW-KEY": {
+            "display_name": "rt-04-hub-vcn-natgw",
             "freeform_tags": null,
             "route_rules": {
                 "nat_route": {
@@ -79,9 +77,11 @@ You can replace the *"NS PRIVATE IP OCID"* in your network JSON configuration fi
                 }
             }
         },
-
 ...
 ```
+
+After updating this configuration and saving the changes, you would be able to re-run the plan/apply Terraform operations with ORM or Terraform CLI in the same way you did the OP.01.
+
 
 # License
 

@@ -472,6 +472,8 @@ The route tables used in our example are:
 | vcn-fra-oe01-p | rt-01-oe01-p-vcn | All FRA services in OSN | Service Gateway | sg-fra-oe01-p | Route to Service Gateway |
 | vcn-fra-oe01-p | rt-01-oe01-p-vcn | 0.0.0.0/0 | Dynamic Routing Gateway | drg-fra-hub OCID | Route to Service Gateway |
 
+It is important to highlight that for the VCNs route table it is needed that the *"HUB DRG OCID"* is replaced before running the configuration with the corresponding HUB DRG OCID obteined from the OP.01 operations.
+
 To define the route tables in the JSON configuration we use:
 
 ```

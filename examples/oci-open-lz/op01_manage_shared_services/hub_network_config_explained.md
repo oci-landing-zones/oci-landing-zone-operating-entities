@@ -94,9 +94,9 @@ Example of subnet configuration:
         "dns_label": "hublb",
         "prohibit_internet_ingress": false,
         "prohibit_public_ip_on_vnic": false,
-        "route_table_key": "RT-01-HUB-VCN-KEY",
+        "route_table_key": "RT-01-HUB-VCN-LB-KEY",
         "security_list_keys": [
-            "SECLIST-01-HUB-VCN-KEY"
+            "SL-01-HUB-VCN-KEY"
         ]
     },
     "SN-FRA-HUB-FW-NS-KEY": {
@@ -106,9 +106,9 @@ Example of subnet configuration:
         "dns_label": "hubfwns",
         "prohibit_internet_ingress": true,
         "prohibit_public_ip_on_vnic": true,
-        "route_table_key": "RT-02-HUB-VCN-KEY",
+        "route_table_key": "RT-02-HUB-VCN-NFWNS-KEY",
         "security_list_keys": [
-            "SECLIST-02-HUB-VCN-KEY"
+            "SL-02-HUB-VCN-KEY"
         ]
     },
     "SN-FRA-HUB-FW-EW-KEY": {
@@ -118,9 +118,9 @@ Example of subnet configuration:
         "dns_label": "hubfwew",
         "prohibit_internet_ingress": true,
         "prohibit_public_ip_on_vnic": true,
-        "route_table_key": "RT-03-HUB-VCN-KEY",
+        "route_table_key": "RT-03-HUB-VCN-NFWEW-KEY",
         "security_list_keys": [
-            "SECLIST-02-HUB-VCN-KEY"
+            "SL-02-HUB-VCN-KEY"
         ]
     },
     "SN-FRA-HUB-FW-MGMT-KEY": {
@@ -130,9 +130,9 @@ Example of subnet configuration:
         "dns_label": "hubmgmt",
         "prohibit_internet_ingress": true,
         "prohibit_public_ip_on_vnic": true,
-        "route_table_key": "RT-05-HUB-VCN-KEY",
+        "route_table_key": "RT-05-HUB-VCN-OSN-KEY",
         "security_list_keys": [
-            "SECLIST-02-HUB-VCN-KEY"
+            "SL-02-HUB-VCN-KEY"
         ]
     },
     "SN-FRA-HUB-FW-LOGS-KEY": {
@@ -142,9 +142,9 @@ Example of subnet configuration:
         "dns_label": "hublogs",
         "prohibit_internet_ingress": true,
         "prohibit_public_ip_on_vnic": true,
-        "route_table_key": "RT-05-HUB-VCN-KEY",
+        "route_table_key": "RT-05-HUB-VCN-OSN-KEY",
         "security_list_keys": [
-            "SECLIST-02-HUB-VCN-KEY"
+            "SL-02-HUB-VCN-KEY"
         ]
     },
     "SN-FRA-HUB-FW-LOGS-DNS": {
@@ -154,9 +154,9 @@ Example of subnet configuration:
         "dns_label": "hubdns",
         "prohibit_internet_ingress": true,
         "prohibit_public_ip_on_vnic": true,
-        "route_table_key": "RT-05-HUB-VCN-KEY",
+        "route_table_key": "RT-05-HUB-VCN-OSN-KEY",
         "security_list_keys": [
-            "SECLIST-02-HUB-VCN-KEY"
+            "SL-02-HUB-VCN-KEY"
         ]
     }
 },
@@ -179,46 +179,32 @@ The route tables, within their rules, used in our example are:
 | rt-04-hub-vcn | 0.0.0.0/0 | Private IP | NFW NS IP OCID (192.168.1.10) | Route Table for NAT GW.
 | rt-05-hub-vcn | All FRA Services in OSN | Service Gateway | sg-fra-hub | Route Service Gateway.
 
-
 To define the route tables in the JSON configuration we use:
 
 ```
 "route_tables": {
-    "RT-00-HUB-VCN-KEY": {
+    "RT-00-HUB-VCN-INGRESS-KEY": {
         "display_name": "rt_00_hub_vcn",
-        "route_rules": {
-            "rt_hub_def_sn": {
-                "description": "Route outgoing traffic",
-                "destination": "0.0.0.0/0",
-                "destination_type": "CIDR_BLOCK",
-                "network_entity_id": "ocid1.privateip.oc1.eu-frankfurt-1.abtheljrtkns4sqduw6u44gshgx4hxl4e46tyhbd2clxm4zf7ugli5ekvnza"
-            },
-            "rt_hub_lb_sn": {
-                "description": "Route incoming traffic to Hub LB subnet",
-                "destination": "10.0.0.0/24",
-                "destination_type": "CIDR_BLOCK",
-                "network_entity_id": "ocid1.privateip.oc1.eu-frankfurt-1.abtheljrtkns4sqduw6u44gshgx4hxl4e46tyhbd2clxm4zf7ugli5ekvnza"
-            }
-        }
+        "route_rules": {}
     },
-    "RT-01-HUB-VCN-KEY": {
+    "RT-01-HUB-VCN-LB-KEY": {
         "display_name": "rt_01_hub_vcn",
         "route_rules": {
             "drg_route": {
                 "description": "Route for IPSec VPN",
                 "destination": "148.20.57.8/29",
                 "destination_type": "CIDR_BLOCK",
-                "network_entity_key": "DRG-FRANKFURT-HUB-KEY"
+                "network_entity_key": "DRG-FRA-HUB-KEY"
             },
             "internet_route": {
                 "description": "Route for internet access",
                 "destination": "0.0.0.0/0",
                 "destination_type": "CIDR_BLOCK",
-                "network_entity_key": "IG-FRANKFURT-HUB-KEY"
+                "network_entity_key": "IG-FRA-HUB-KEY"
             }
         }
     },
-    "RT-02-HUB-VCN-KEY": {
+    "RT-02-HUB-VCN-NFWNS-KEY": {
         "display_name": "rt_02_hub_vcn",
         "freeform_tags": null,
         "route_rules": {
@@ -230,23 +216,18 @@ To define the route tables in the JSON configuration we use:
             }
         }
     },
-    "RT-03-HUB-VCN-KEY": {
+    "RT-03-HUB-VCN-NFWEW-KEY": {
         "display_name": "rt_03_hub_vcn",
         "freeform_tags": null,
     },
-    "RT-04-HUB-VCN-KEY": {
+    "RT-04-HUB-VCN-NATGW-KEY": {
         "display_name": "rt_04_hub_vcn",
         "freeform_tags": null,
         "route_rules": {
-            "nat_route": {
-                "description": "Route for ngw",
-                "destination": "0.0.0.0/0",
-                "destination_type": "CIDR_BLOCK",
-                "network_entity_id": "ocid1.privateip.oc1.eu-frankfurt-1.abtheljrtkns4sqduw6u44gshgx4hxl4e46tyhbd2clxm4zf7ugli5ekvnza"
-            }
+            "nat_route": {}
         }
     },
-    "RT-05-HUB-VCN-KEY": {
+    "RT-05-HUB-VCN-OSN-KEY": {
         "display_name": "rt_05_hub_vcn",
         "freeform_tags": null,
         "route_rules": {
@@ -254,7 +235,7 @@ To define the route tables in the JSON configuration we use:
                 "description": "Route for sgw",
                 "destination": "all-services",
                 "destination_type": "SERVICE_CIDR_BLOCK",
-                "network_entity_key": "SG-FRANKFURT-HUB-KEY"
+                "network_entity_key": "SG-FRA-HUB-KEY"
             }
         }
     }
@@ -308,7 +289,7 @@ To define a default security list, you can use the following configuration examp
     ]
 },
 "security_lists": {
-    "SECLIST-01-HUB-VCN-KEY": {
+    "SL-01-HUB-VCN-KEY": {
         "display_name": "sl-01-hub-vcn",
         "egress_rules": [
             {
@@ -330,7 +311,7 @@ To define a default security list, you can use the following configuration examp
             }
         ]
     },
-    "SECLIST-02-HUB-VCN-KEY": {
+    "SL-02-HUB-VCN-KEY": {
         "display_name": "sl-02-hub-vcn",
         "egress_rules": [
             {
@@ -583,7 +564,7 @@ In our example, we use the Internet, NAT and Service Gateways as:
 ```
 "vcn_specific_gateways": {
     "internet_gateways": {
-        "IG-FRANKFURT-HUB-KEY": {
+        "IG-FRA-HUB-KEY": {
             "display_name": "ig_frankfurt_hub",
             "enabled": true
         }
@@ -592,11 +573,11 @@ In our example, we use the Internet, NAT and Service Gateways as:
         "NG-FRA-HUB-KEY": {
             "display_name": "ng_fra_hub",
             "enabled": true,
-            "route_table_key": "RT-04-HUB-VCN-KEY"
+            "route_table_key": "RT-04-HUB-VCN-NATGW-KEY"
         }
     },
     "service_gateways": {
-        "SG-FRANKFURT-HUB-KEY": {
+        "SG-FRA-HUB-KEY": {
             "display_name": "sg_frankfurt_hub",
             "services": "all-services"
         }
@@ -626,7 +607,7 @@ In our example, we use the Hub & Spoke network topology, to centralize the netwo
                     "network_details": {
                         "attached_resource_key": "VCN-FRA-HUB-KEY",
                         "type": "VCN",
-                        "route_table_key": "RT-00-HUB-VCN-KEY"
+                        "route_table_key": "RT-00-HUB-VCN-INGRESS-KEY"
                     }
                 }
             },
@@ -792,13 +773,13 @@ The configuration block looks like:
         "NFW-FRA-HUB-NS-KEY": {
             "display_name": "nfw-fra-hub-ns",
             "ipv4address": "192.168.1.10",
-            "subnet_key": "SN-FRANKFURT-HUB-FW-NS-KEY",
+            "subnet_key": "SN-FRA-HUB-FW-NS-KEY",
             "network_firewall_policy_key": "NFW-POLICY-FRA-HUB-NS-POL1-KEY"
         },
         "NFW-FRA-HUB-EW-KEY": {
             "display_name": "nfw-fra-hub-ew",
             "ipv4address": "192.168.2.10",
-            "subnet_key": "SN-FRANKFURT-HUB-FW-EW-KEY",
+            "subnet_key": "SN-FRA-HUB-FW-EW-KEY",
             "network_firewall_policy_key": "NFW-POLICY-FRA-HUB-EW-POL2-KEY"
             }
     },
@@ -1166,6 +1147,8 @@ The configuration block looks like:
     }
 },
 ```
+
+Remember that after running OP.02, it is needed that Central Operations Team runs their POST.OP.01.03 "Add OE DRG attachments and routing" to have a functional, and interconnected spokes with the Hub VCN.
 
 # License
 
