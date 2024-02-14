@@ -7,7 +7,6 @@
 [2.1 DRG Attachments and Routing](#2_1-drg-attachments-and-routing)</br>
 [2.2 VCNs Routing](#2_1-vcns-routing)</br>
 
-
 &nbsp; 
 
 ## **1. Summary**
@@ -52,7 +51,15 @@ For the creation of the DRG Attachments and routing, we've to update the configu
                     "network_details": {
                         "attached_resource_key": "VCN-FRA-HUB-KEY",
                         "type": "VCN",
-                        "route_table_key": "RT-00-HUB-VCN-KEY"
+                        "route_table_key": "RT-00-HUB-VCN-INGRESS-KEY"
+                    }
+                },
+                "DRGATT-FRA-HUB-VCN-FRA-OE01-CO-KEY": {
+                    "display_name": "drgatt-fra-hub-fra-oe01-co-vcn",
+                    "drg_route_table_key": "DRG-RT-FRA-SPOKES-KEY",
+                    "network_details": {
+                        "attached_resource_id": "<VCN vcn-fra-oe01-co OCID>",
+                        "type": "VCN"
                     }
                 },
                 "DRGATT-FRA-HUB-VCN-FRA-OE01-DEV-KEY": {
@@ -122,7 +129,7 @@ For the creation of the DRG Attachments and routing, we've to update the configu
 
 As you can see, we're updating the attachment section, where initially we used to have just the Hub VCN attachment (*"DRGATT-FRA-HUB-VCN-KEY"*), with the attachments for the OE01 VCNs for DEV, NP and P environments as *"DRGATT-FRA-HUB-VCN-FRA-OE01-DEV-KEY"*, *"DRGATT-FRA-HUB-VCN-FRA-OE01-NP-KEY"* and *"DRGATT-FRA-HUB-VCN-FRA-OE01-P-KEY"* keys. We've to replace the "attached_resource_id" with the corresponding value of the spoke VCN OCID. The OP.02 operation is run by the Central Operations Team, so the VCN OCID of the new spokes is an information available to this team. Thus, they can control what VCNs they attach to the hub and which don't. No other teams (OE/Project), must have IAM policies permissions to be able to create attachments for security reasons.
 
-**Notice** that in the Hub DRG Attachment (*"DRGATT-FRA-HUB-VCN-KEY"*), we're also configuring a route table for the VCN attachment, indicating that the VCN Route table "RT-00-HUB-VCN-KEY" will be used. As we'll see later in the VCNs Routing section, this route table is used to route the ingress traffic to the Hub VCN.
+**Notice** that in the Hub DRG Attachment (*"DRGATT-FRA-HUB-VCN-KEY"*), we're also configuring a route table for the VCN attachment, indicating that the VCN Route table "RT-00-HUB-VCN-INGRESS-KEY" will be used. As we'll see later in the VCNs Routing section, this route table is used to route the ingress traffic to the Hub VCN.
 
 Another important information to define in the attachments is the DRG route tables to use. As you can see we have a couple of DRG Route Tables (in blue in the diagram):
 
@@ -138,8 +145,8 @@ The changes in the VCN route tables configuration are:
 
 ```
 "route_tables": {
-    "RT-00-HUB-VCN-KEY": {
-        "display_name": "rt-00-hub-vcn",
+    "RT-00-HUB-VCN-INGRESS-KEY": {
+        "display_name": "rt-00-hub-vcn-ingress",
         "route_rules": {
             "rt_hub_def_sn": {
                 "description": "Route outgoing traffic",
@@ -153,6 +160,12 @@ The changes in the VCN route tables configuration are:
                 "destination_type": "CIDR_BLOCK",
                 "network_entity_id": "<NS PRIVATE IP OCID>"
             },
+            "rt_oe01_co_vcn": {
+                "description": "Route to spoke OE01 Common",
+                "destination": "172.168.0.0/23",
+                "destination_type": "CIDR_BLOCK",
+                "network_entity_id": "<EW PRIVATE IP OCID>"
+            },
             "rt_oe01_dev_vcn": {
                 "description": "Route to spoke OE01 Development",
                 "destination": "172.168.2.0/23",
@@ -173,16 +186,16 @@ The changes in the VCN route tables configuration are:
             }
         }
     },
-    "RT-01-HUB-VCN-KEY": {
-        "display_name": "rt-01-hub-vcn",
+    "RT-01-HUB-VCN-LB-KEY": {
+        "display_name": "rt-01-hub-vcn-lb",
         "route_rules": {
             "internet_route": {
                 "description": "Route for internet access",
                 "destination": "0.0.0.0/0",
                 "destination_type": "CIDR_BLOCK",
-                "network_entity_key": "IG-FRANKFURT-HUB-KEY"
+                "network_entity_key": "IG-FRA-HUB-KEY"
             },
-            "rt_oe01_dev_vcn": {
+            "rt-oe01-dev-vcn": {
                 "description": "Route to spoke OE01 Development",
                 "destination": "172.168.2.0/23",
                 "destination_type": "CIDR_BLOCK",
@@ -202,8 +215,8 @@ The changes in the VCN route tables configuration are:
             }
         }
     },
-    "RT-02-HUB-VCN-KEY": {
-        "display_name": "rt-02-hub-vcn",
+    "RT-02-HUB-VCN-NFWNS-KEY": {
+        "display_name": "rt-02-hub-vcn-nfwns",
         "freeform_tags": null,
         "route_rules": {
             "ngw_route": {
@@ -212,52 +225,64 @@ The changes in the VCN route tables configuration are:
                 "destination_type": "CIDR_BLOCK",
                 "network_entity_key": "NG-FRA-HUB-KEY"
             },
+            "rt_oe01_co_vcn": {
+                "description": "Route for North-South NFW to OE01 Common VCN",
+                "destination": "172.168.0.0/23",
+                "destination_type": "CIDR_BLOCK",
+                "network_entity_key": "DRG-FRA-HUB-KEY"
+            },
             "rt_oe01_dev_vcn": {
                 "description": "Route for North-South NFW to OE01 Dev VCN",
                 "destination": "172.168.2.0/23",
                 "destination_type": "CIDR_BLOCK",
-                "network_entity_key": "DRG-FRANKFURT-HUB-KEY"
+                "network_entity_key": "DRG-FRA-HUB-KEY"
             },
             "rt_oe01_np_vcn": {
                 "description": "Route for North-South NFW to OE01 Non-Prod VCN",
                 "destination": "172.168.4.0/23",
                 "destination_type": "CIDR_BLOCK",
-                "network_entity_key": "DRG-FRANKFURT-HUB-KEY"
+                "network_entity_key": "DRG-FRA-HUB-KEY"
             },
             "rt_oe01_p_vcn": {
                 "description": "Route for North-South NFW to OE01 Prod VCN",
                 "destination": "172.168.6.0/23",
                 "destination_type": "CIDR_BLOCK",
-                "network_entity_key": "DRG-FRANKFURT-HUB-KEY"
+                "network_entity_key": "DRG-FRA-HUB-KEY"
             }
         }
     },
-    "RT-03-HUB-VCN-KEY": {
-        "display_name": "rt-03-hub-vcn",
+    "RT-03-HUB-VCN-NFWEW-KEY": {
+        "display_name": "rt-03-hub-vcn-nfwew",
         "freeform_tags": null,
         "route_rules": {
+            "rt_oe01_co_vcn": {
+                "description": "Route for East-West NFW to OE01 Common VCN",
+                "destination": "172.168.0.0/23",
+                "destination_type": "CIDR_BLOCK",
+                "network_entity_key": "DRG-FRA-HUB-KEY"
+            },
             "rt_oe01_dev_vcn": {
                 "description": "Route for East-West NFW to OE01 Dev VCN",
                 "destination": "172.168.2.0/23",
                 "destination_type": "CIDR_BLOCK",
-                "network_entity_key": "DRG-FRANKFURT-HUB-KEY"
+                "network_entity_key": "DRG-FRA-HUB-KEY"
             },
             "rt_oe01_np_vcn": {
                 "description": "Route for East-West NFW to OE01 Non-Prod VCN",
                 "destination": "172.168.4.0/23",
                 "destination_type": "CIDR_BLOCK",
-                "network_entity_key": "DRG-FRANKFURT-HUB-KEY"
+                "network_entity_key": "DRG-FRA-HUB-KEY"
             },
             "rt_oe01_p_vcn": {
                 "description": "Route for East-West NFW to OE01 Prod VCN",
                 "destination": "172.168.6.0/23",
                 "destination_type": "CIDR_BLOCK",
-                "network_entity_key": "DRG-FRANKFURT-HUB-KEY"
+                "network_entity_key": "DRG-FRA-HUB-KEY"
             }
         }
     },
-    "RT-04-HUB-VCN-KEY": {
-        "display_name": "rt-04-hub-vcn",
+    "RT-04-HUB-VCN-NATGW-KEY": {
+        "display_name": "rt-04-hub-vcn-natgw",
         "freeform_tags": null,
         "route_rules": {
             "nat_route": {
@@ -265,6 +290,12 @@ The changes in the VCN route tables configuration are:
                 "destination": "0.0.0.0/0",
                 "destination_type": "CIDR_BLOCK",
                 "network_entity_id": "ocid1.privateip.oc1.eu-frankfurt-1.abtheljs227jcewruaz6sau2cmg3ursaikb7eog6m6zxxqxelgil56vokmoa"
+            },
+            "rt_oe01_co_vcn": {
+                "description": "Route for NGW to force traffic through NFW for OE01 Common VCN",
+                "destination": "172.168.0.0/23",
+                "destination_type": "CIDR_BLOCK",
+                "network_entity_id": "<NS PRIVATE IP OCID>"
             },
             "rt_oe01_dev_vcn": {
                 "description": "Route for NGW to force traffic through NFW for OE01 Dev VCN",
@@ -294,28 +325,28 @@ As you can see, we're updating the different route tables to add routing rules t
 
 In this way, let's revidw more information about each of the route tables:
 
-* **Hub VCN Ingress traffic**, called *RT-00-HUB-VCN-KEY*. This route table is used by the Hub DRG Attachment to route the ingress traffic. Basically says:
+* **Hub VCN Ingress traffic**, called *RT-00-HUB-VCN-INGRESS-KEY*. This route table is used by the Hub DRG Attachment to route the ingress traffic. Basically says:
   *  Any packet going to the Hub VCN LB subnet must go through the NS FW.
   
-  *  Any packet going to the OE01 spokes' CIDR blocks (172.168.2.0/23, 172.168.4.0/23 and 172.168.6.0/23), must go through the EW FW.
+  *  Any packet going to the OE01 spokes' CIDR blocks (172.168.0.0/23, 172.168.2.0/23, 172.168.4.0/23 and 172.168.6.0/23), must go through the EW FW.
   
   *  Any packet going to the internet, must go through the NS FW.
   
-* **Hub VCN LB subnet**, called *RT-01-HUB-VCN-KEY*. This route table is used by the Load Balancer subnet. Basically says:
+* **Hub VCN LB subnet**, called *RT-01-HUB-VCN-LB-KEY*. This route table is used by the Load Balancer subnet. Basically says:
   * Any packet going to the to the OE01 spokes' CIDR blocks (172.168.2.0/23, 172.168.4.0/23 and 172.168.6.0/23), must go through the NS FW.
   
   * Any packet going to the internet, must go through the Internet Gateway.
 
-* **Hub VCN NS subnet**, called *RT-02-HUB-VCN-KEY*. This route table is used by the North-South FW subnet. Basically says:
-  * Any packet going to the to the OE01 spokes' CIDR blocks (172.168.2.0/23, 172.168.4.0/23 and 172.168.6.0/23), must go through the DRG.
+* **Hub VCN NS subnet**, called *RT-02-HUB-VCN-NFWNS-KEY*. This route table is used by the North-South FW subnet. Basically says:
+  * Any packet going to the to the OE01 spokes' CIDR blocks (172.168.0.0/23, 172.168.2.0/23, 172.168.4.0/23 and 172.168.6.0/23), must go through the DRG.
   
   * Any packet going to the internet, must go through the NAT Gateway.
 
-* **Hub VCN EW subnet**, called *RT-03-HUB-VCN-KEY*. This route table is used by the East-West FW subnet. Basically says:
-  * Any packet going to the to the OE01 spokes' CIDR blocks (172.168.2.0/23, 172.168.4.0/23 and 172.168.6.0/23), must go through the DRG.
+* **Hub VCN EW subnet**, called *RT-03-HUB-VCN-NFWEW-KEY*. This route table is used by the East-West FW subnet. Basically says:
+  * Any packet going to the to the OE01 spokes' CIDR blocks (172.168.0.0/23, 172.168.2.0/23, 172.168.4.0/23 and 172.168.6.0/23), must go through the DRG.
 
-* **Hub VCN NAT GW**, called *RT-04-HUB-VCN-KEY*. This route table is used by the NAT Gateway. Basically says:
-  * Any packet going to the to the OE01 spokes' CIDR blocks (172.168.2.0/23, 172.168.4.0/23 and 172.168.6.0/23), must go through the NAT Gateway.
+* **Hub VCN NAT GW**, called *RT-04-HUB-VCN-NATGW-KEY*. This route table is used by the NAT Gateway. Basically says:
+  * Any packet going to the to the OE01 spokes' CIDR blocks (172.168.0.0/23, 172.168.2.0/23, 172.168.4.0/23 and 172.168.6.0/23), must go through the NAT Gateway.
 
 **NOTICE:** We've to update the route rules going to the EW FW with the corresponding FW Private IP OCID, replacing the "*EW PRIVATE IP OCID*", with the Private IP that we can get from the OP.01 state file or the apply output of the first OP.01 operation.
 
