@@ -1011,6 +1011,7 @@ variable "network_configuration" {
           network_firewalls = optional(map(object({
             availability_domain         = optional(number),
             compartment_id              = optional(string),
+            compartment_key             = optional(string),
             defined_tags                = optional(map(string)),
             display_name                = optional(string),
             freeform_tags               = optional(map(string)),
