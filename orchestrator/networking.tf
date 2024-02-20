@@ -1,10 +1,10 @@
 # ####################################################################################################### #
-# Copyright (c) 2023 Oracle and/or its affiliates,  All rights reserved.                                  #
+# Copyright (c) 2024 Oracle and/or its affiliates,  All rights reserved.                                  #
 # Licensed under the Universal Permissive License v 1.0 as shown at https: //oss.oracle.com/licenses/upl. #
 # Author: Cosmin Tudor                                                                                    #
 # Author email: cosmin.tudor@oracle.com                                                                   #
-# Last Modified: Tue Nov 21 2023                                                                          #
-# Modified by: Cosmin Tudor, email: cosmin.tudor@oracle.com                                               #
+# Last Modified: Tue Feb 20 2024                                                                          #
+# Modified by: Pablo Alonso, email: pablo.alonso@oracle.com                                               #
 # ####################################################################################################### #
 
 locals {
@@ -242,6 +242,7 @@ locals {
             network_security_groups = vcn_value.network_security_groups != null ? length(vcn_value.network_security_groups) > 0 ? {
               for nsg_key, nsg_value in vcn_value.network_security_groups : nsg_key => {
                 compartment_id = nsg_value.compartment_id != null ? nsg_value.compartment_id : nsg_value.compartment_key != null ? local.compartments[nsg_value.compartment_key].id : null
+                display_name   = nsg_value.display_name
                 defined_tags   = nsg_value.defined_tags
                 freeform_tags  = nsg_value.freeform_tags
                 ingress_rules  = nsg_value.ingress_rules
