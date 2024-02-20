@@ -3,8 +3,8 @@
 # Licensed under the Universal Permissive License v 1.0 as shown at https: //oss.oracle.com/licenses/upl. #
 # Author: Cosmin Tudor                                                                                    #
 # Author email: cosmin.tudor@oracle.com                                                                   #
-# Last Modified: Thu Nov 16 2023                                                                          #
-# Modified by: Cosmin Tudor, email: cosmin.tudor@oracle.com                                               #
+# Last Modified: Tue Feb 20 2024                                                                          #
+# Modified by: Pablo Alonso, email: pablo.alonso@oracle.com                                               #
 # ####################################################################################################### #
 
 provider "oci" {
@@ -14,6 +14,7 @@ provider "oci" {
   fingerprint          = var.fingerprint
   private_key_path     = var.private_key_path
   private_key_password = var.private_key_password
+  ignore_defined_tags  = ["Oracle-Tags.CreatedBy", "Oracle-Tags.CreatedOn"]
 }
 
 terraform {
