@@ -832,6 +832,7 @@ variable "network_configuration" {
 
         customer_premises_equipments = optional(map(object({
           compartment_id               = optional(string),
+          compartment_key              = optional(string),
           ip_address                   = string,
           defined_tags                 = optional(map(string)),
           display_name                 = optional(string),
@@ -842,6 +843,7 @@ variable "network_configuration" {
 
         ipsecs = optional(map(object({
           compartment_id            = optional(string),
+          compartment_key           = optional(string),
           cpe_id                    = optional(string),
           cpe_key                   = optional(string),
           drg_id                    = optional(string),
