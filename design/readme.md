@@ -65,18 +65,18 @@ If **cloud landing zones** are analogous to **airports**, the OCI Open LZ [Bluep
 
 This OCI Open LZ is presented with several design views built on top of each other, as an incremental and repeatable approach, that can be used and tailored by any customer or partner setting up an OCI landing zone. Each view is explored in a dedicated chapter:
 1.  The **Functional View** presents the fundamental organizational entities of the OCI Open LZ and how they relate to each other. 
-2.  The** Security View** presents the core building blocks of the tenancy organization, identity and access management, and security posture. 
+2.  The **Security View** presents the core building blocks of the tenancy organization, identity and access management, and security posture. 
 3.  The **Network View**, designed on top of the security, presents how network elements are structured and connected to communicate with each other. 
 4.  The **Operations View** presents the dynamic perspective of the OCI Open LZ, proposing a design for provisioning and changing the previous elements with a GitOps operating model, proposing a repository structure - with clear separation between configuration areas (for operations) and code areas (for developers) - ready for day 1 and day 2 operations. 
 5.  The **Runtime View** presents the OCI Open LZ operations artifacts to demonstrate how day 2 operations can run. These elements are ready to be run with a configurable IaC approach.
 
 &nbsp; 
 
-The OCI Open LZ and its views provide a consistent design to simplify the onboarding of OCI with an existing blueprint, that can be changed and tailored toward different objectives. Note the order in which these views are presented is itself a best practice, and it's crucial to reproduce the approach with lower efforts and less rework. Therefore, changing security elements will impact the network elements, and any change in these will impact operations. Any change operations will naturally impact the runtime of the OCI Open LZ.
+The OCI Open LZ and its views provide a consistent design to simplify the onboarding of OCI with an existing blueprint, that can be changed and tailored toward different objectives. Note the order in which these views are presented is itself a best practice, and it's crucial to reproduce the approach with lower efforts and less rework. Therefore, changing security elements will impact the network elements, and any change in these will impact operations. Any change in operations will naturally impact the runtime of the OCI Open LZ.
 
 &nbsp; 
 
-<img src="images/1_onboarding_areas.jpg" alt= “” width="800" height="value">
+<img src="images/1_onboarding_areas.jpg" alt= “” width="900" height="value">
 
 &nbsp; 
 
@@ -84,7 +84,7 @@ While the previous diagram presents the recommended steps of the journey to crea
 
 &nbsp; 
 
-<img src="images/1_oci_open_lz_layers.jpg" alt= “” width="300" height="value">
+<img src="images/1_oci_open_lz_layers.jpg" alt= “” width="500" height="value">
 
 &nbsp; 
 
@@ -96,16 +96,12 @@ Before proceeding, it’s highly recommended OCI foundational knowledge on its c
 &nbsp; 
 
 # **2. Functional View**
-This chapter presents the key entities of the OCI Open LZ and how they relate to each other. These entities are presented below in an Entity Relationship Diagram (ERD) format.
+This chapter presents the key entities of the OCI Open LZ and how they relate to each other. These entities are presented below in an Entity Relationship Diagram (ERD) format. All elements and relations are presented and described in detail in the [OCI Open LZ PDF - Functional View](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/design/OCI_Open_LZ.pdf). 
  
 &nbsp; 
 
-<img src="images/2_functional_view_erd.jpg" alt= “” width="800" height="value">
+<img src="images/2_functional_view_erd.jpg" alt= “” width="1000" height="value">
 
-&nbsp; 
-
-
-All the previous elements are presented and described in detail in the [OCI Open LZ PDF - Functional View](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/design/OCI_Open_LZ.pdf). 
 
 &nbsp; 
 &nbsp; 
@@ -124,7 +120,7 @@ The diagram below presents the tenancy structure for Level 1 and 2, separating t
 &nbsp; 
 
 
-<img src="images/3_security_view_tenancy_l1-l2.jpg" alt= “” width="800" height="value">
+<img src="images/3_security_view_tenancy_l1-l2.jpg" alt= “” width="1000" height="value">
 
 &nbsp; 
 
@@ -148,7 +144,7 @@ The following diagram presents an example of the central network components and 
 
 &nbsp; 
 
-<img src="images/4_network_view_structure.jpg" alt= “” width="800" height="value">
+<img src="images/4_network_view_structure.jpg" alt= “” width="1000" height="value">
 
 
 &nbsp; 
@@ -158,7 +154,7 @@ The OCI Open LZ has four network areas which are presented and described in the 
 
 &nbsp; 
 
-<img src="images/4_network_view_areas.jpg" alt= “” width="800" height="value">
+<img src="images/4_network_view_areas.jpg" alt= “” width="1000" height="value">
 
 
 &nbsp; 
@@ -173,14 +169,14 @@ In terms of connectivity, the following diagram presents how the OCI Open LZ con
 
 &nbsp; 
 
-<img src="images/4_network_view_connectivity.jpg" alt= “” width="800" height="value">
+<img src="images/4_network_view_connectivity.jpg" alt= “” width="1000" height="value">
 
 
 An example of North-South connectivity is presented in the diagram below.
 
 &nbsp; 
 
-<img src="images/4_network_view_connectivity_ns.jpg" alt= “” width="800" height="value">
+<img src="images/4_network_view_connectivity_ns.jpg" alt= “” width="1000" height="value">
 
 
 &nbsp; 
@@ -206,7 +202,7 @@ Cloud-native operations on cloud resources should be very near the development p
 
 &nbsp; 
 
-<img src="images/5_operations_view_gitops_value.jpg" alt= “” width="800" height="value">
+<img src="images/5_operations_view_gitops_value.jpg" alt= “” width="1000" height="value">
 
 
 &nbsp; 
@@ -227,7 +223,7 @@ The diagram below presents a runtime view of these elements, and the following t
 
 &nbsp; 
 
-<img src="images/5_operations_view_gitops_runtime_desc.jpg" alt= “” width="800" height="value">
+<img src="images/5_operations_view_gitops_runtime_desc.jpg" alt= “” width="1000" height="value">
 
 &nbsp; 
 
@@ -242,7 +238,7 @@ Five operations scenarios are identified in the OCI Open LZ. Find below the OP.0
 
 &nbsp; 
 
-<img src="images/5_operations_view_op02_manage_oe.jpg" alt= “” width="800" height="value">
+<img src="images/5_operations_view_op02_manage_oe.jpg" alt= “” width="1000" height="value">
 
 
 &nbsp; 
@@ -261,7 +257,7 @@ The following diagram presents a set of artifacts involved in this operating mod
 
 &nbsp; 
 
-<img src="images/5_operations_view_tech_op_model.jpg" alt= “” width="800" height="value">
+<img src="images/5_operations_view_tech_op_model.jpg" alt= “” width="1000" height="value">
 
 
 &nbsp; 
@@ -276,7 +272,7 @@ Find below an example of how an OE Repository will be structure. The first colum
 
 &nbsp; 
 
-<img src="images/5_operations_view_oe_repository.jpg" alt= “” width="800" height="value">
+<img src="images/5_operations_view_oe_repository.jpg" alt= “” width="1000" height="value">
 
 &nbsp; 
 
@@ -285,7 +281,7 @@ The diagram below presents a high-level example component model for the operatio
 
 &nbsp; 
 
-<img src="images/5_operations_view_modus_operandi.jpg" alt= “” width="800" height="value">
+<img src="images/5_operations_view_modus_operandi.jpg" alt= “” width="1000" height="value">
 
 &nbsp; 
 
