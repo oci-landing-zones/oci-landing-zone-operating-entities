@@ -1,6 +1,6 @@
-# **The Operating Entities Landing Zone – </br>OCI Open LZ**
+# **The OCI Open LZ [Blueprint](#)**
 
-## A Blueprint to Simplify the Onboarding of Organizations, Business Units, and Subsidiaries into OCI
+### A Blueprint to Simplify the Onboarding of Organizations, Business Units, and Subsidiaries into OCI
 
 &nbsp; 
 
@@ -172,6 +172,8 @@ In terms of connectivity, the following diagram presents how the OCI Open LZ con
 <img src="images/4_network_view_connectivity.jpg" alt= “” width="1000" height="value">
 
 
+&nbsp; 
+
 An example of North-South connectivity is presented in the diagram below.
 
 &nbsp; 
@@ -234,7 +236,24 @@ The objective of this section is to present the most significant elements that a
 2. **The Who**: The actors that are responsible for the execution of those operations scenarios.
 3. **The How**: How the operation scenario will be automated.
 
-Five operations scenarios are identified in the OCI Open LZ. Find below the OP.02 Manage OE example, which presents the objective, owner, pre-requirements, security and network resources, design diagram in the scope of the operation, IaC configurations, Terraform modules to be used, interlock, and frequency.
+&nbsp; 
+
+### 5.2.3 Cloud Operations Teams (Who)
+It's important to remember that the OCI Open LZ pattern has a distributed operating model with two types of teams: 
+1. **A central team (CT_OPS)** is responsible to create and operate the core landing zone resources, known as shared services, and onboarding Operating Entities (OE). 
+1. **The OEs operations teams (OE_OPS)** , there will be one per OE,  will have the autonomy to operate (create and change) their resources on top of standard pre-defined structures.
+These teams will operate the provisioning of resources for landing zone and OE-related workload tasks, and they will be members of multiple IAM groups to fulfill their tasks
+
+These teams will operate the provisioning of resources for landing zone and OE-related workload tasks, and they will be members of multiple IAM groups to fulfill their tasks.
+
+&nbsp; 
+
+### 5.2.3 Operations Scenarios
+The operations scenarios are one of the most important elements of this design, as they represent the use cases and its key operations activities on the OCI Open LZ that create or update resources. An operation scenario is normally triggered by a service request, on a ticketing system.
+
+An operations scenario in a more formal definition should be seen as an operational process, which is a set of correlated activities executed as one unit of work, with its own frequency. A scenario can contain one to several activities, and the level of automation may vary depending on each target system. Each operation scenario has also an owner, which will be responsible for its execution. The owner will be the operations team which has associated OCI Groups and policies that allow the management of those resources.
+
+Five operations scenarios are identified in the OCI Open LZ. Find below the **OP.02 Manage OE** example, which presents the objective, owner, pre-requirements, security and network resources, design diagram in the scope of the operation, IaC configurations, Terraform modules to be used, interlock, and frequency. This type of description will be the cloud operator execution sheet.
 
 &nbsp; 
 
@@ -266,9 +285,7 @@ Note that there will be two types of repositories:
 1. The **operations repositories** will contain only IaC configurations.
 2. The **code repository** will be used to run these configurations repeatedly. The lifecycle of this repository is out of the scope of this document
 
-This separation is crucial and is presented in detail with all the repositories and their structure in the [OCI Open LZ PDF - Operations View](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/design/OCI_Open_LZ.pdf). 
-
-Find below an example of how an OE Repository will be structure. The first column's color code matches the ERD's color code in the Functional View and the architecture diagrams presented in the Security View and Network View.
+This separation is crucial and is presented in detail with all the repositories and their structure in the [OCI Open LZ PDF - Operations View](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/design/OCI_Open_LZ.pdf). Find below an example of how an **OE Repository** will be structure. The first column's color code matches the ERD's color code in the Functional View and the architecture diagrams presented in the Security View and Network View.
 
 &nbsp; 
 
@@ -294,7 +311,7 @@ For a complete view of the operations design for the OCI Open LZ, and how to tai
 &nbsp; 
 
 # **6. Runtime View**
-This chapter presents **OCI Open LZ Runtime View**, i.e., the **implementation** for the **day two execution** of the **operations scenarios** introduced in the previous sections.
+This chapter presents the **implementation** for the **day two execution** of the **operations scenarios** identified in the previous sections.
 
 &nbsp; 
 
@@ -313,7 +330,7 @@ Note the distribution of operations between cloud operations teams is a design t
 Per OCI Open LZ Design, this team is responsible for managing the landing zone share resources and OEs network resources, and can execute the following operations:
 
 - [**OP.01 – Manage Shared Services:**](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op01_manage_shared_services/readme.md) Creates or changes the shared elements of the landing zone and applies posture management.
-- [**OP.02 – Manage OE:**](/examples/oci-open-lz/op02_manage_oes/oe01/readme.md) Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.
+- [**OP.02 – Manage OE:**](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op02_manage_oes/oe01/readme.md) Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.
   
 Each scenario has its **runtime configurations** ready for execution with **Terraform CLI** or **Oracle Resource Manager** (ORM).
 
@@ -323,8 +340,8 @@ Each scenario has its **runtime configurations** ready for execution with **Terr
 
 Per OCI Open LZ Design, these teams, one per OE, are responsible for managing the OE resources such as projects and PoC, and can execute the following operations:
 
-- [**OP.03 – Manage Department:**](/examples/oci-open-lz/op03_manage_department/readme.md) Creates and changes a new department structure to receive department projects.
-- [**OP.04 - Manage Project Environment:**](/examples/oci-open-lz/op04_manage_projects/readme.md) Creates or changes a project with the related environments and application layers.
+- [**OP.03 – Manage Department:**](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op03_manage_department/readme.md) Creates and changes a new department structure to receive department projects.
+- [**OP.04 - Manage Project Environment:**](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/examples/oci-open-lz/op04_manage_projects/readme.md) Creates or changes a project with the related environments and application layers.
 - **OP.05 – Manage PoC Project:** Creates or changes a PoC project in the OE Sandbox environment.
 
 Each scenario has its **runtime configurations** ready for execution with **Terraform CLI** or **Oracle Resource Manager** (ORM).
