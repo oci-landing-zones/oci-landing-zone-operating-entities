@@ -359,14 +359,3 @@ Licensed under the Universal Permissive License (UPL), Version 1.0.
 See [LICENSE](LICENSE) for more details.
 
 
-
---
---
-José Palmeiro | Landing Zones Leader
-Oracle EMEA
-
-+34 674 959 136
-
-linkedin.com/in/jpalmeiro
-
-
