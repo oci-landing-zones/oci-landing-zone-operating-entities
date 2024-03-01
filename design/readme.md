@@ -238,7 +238,7 @@ The objective of this section is to present the most significant elements that a
 
 &nbsp; 
 
-### 5.2.3 Cloud Operations Teams (Who)
+### 5.2.1 Cloud Operations Teams (Who)
 It's important to remember that the OCI Open LZ pattern has a distributed operating model with two types of teams: 
 1. **A central team (CT_OPS)** is responsible to create and operate the core landing zone resources, known as shared services, and onboarding Operating Entities (OE). 
 1. **The OEs operations teams (OE_OPS)** , there will be one per OE,  will have the autonomy to operate (create and change) their resources on top of standard pre-defined structures.
@@ -248,7 +248,7 @@ These teams will operate the provisioning of resources for landing zone and OE-r
 
 &nbsp; 
 
-### 5.2.3 Operations Scenarios
+### 5.2.2 Operations Scenarios
 The operations scenarios are one of the most important elements of this design, as they represent the use cases and its key operations activities on the OCI Open LZ that create or update resources. An operation scenario is normally triggered by a service request, on a ticketing system.
 
 An operations scenario in a more formal definition should be seen as an operational process, which is a set of correlated activities executed as one unit of work, with its own frequency. A scenario can contain one to several activities, and the level of automation may vary depending on each target system. Each operation scenario has also an owner, which will be responsible for its execution. The owner will be the operations team which has associated OCI Groups and policies that allow the management of those resources.
