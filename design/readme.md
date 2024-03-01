@@ -225,7 +225,7 @@ The diagram below presents a runtime view of these elements, and the following t
 
 &nbsp; 
 
-<img src="images/5_operations_view_gitops_runtime_desc.jpg" alt= “” width="1000" height="value">
+<img src="images/5_operations_view_gitops_runtime_desc.jpg" alt= “” width="800" height="value">
 
 &nbsp; 
 
