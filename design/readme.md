@@ -285,7 +285,7 @@ Note that there will be two types of repositories:
 1. The **operations repositories** will contain only IaC configurations.
 2. The **code repository** will be used to run these configurations repeatedly. The lifecycle of this repository is out of the scope of this document
 
-This separation is crucial and is presented in detail with all the repositories and their structure in the [OCI Open LZ PDF - Operations View](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/design/OCI_Open_LZ.pdf). Find below an example of how an **OE Repository** will be structure. The first column's color code matches the ERD's color code in the Functional View and the architecture diagrams presented in the Security View and Network View.
+This separation is crucial and is presented in detail with all the repositories and their structure in the [OCI Open LZ PDF - Operations View](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/design/OCI_Open_LZ.pdf). Find below an example of how an **OE Repository** can be structured. The first column's color code matches the ERD's color code in the Functional View and the architecture diagrams presented in the Security View and Network View.
 
 &nbsp; 
 
