@@ -174,16 +174,16 @@ In terms of connectivity, the following diagram presents how the OCI Open LZ con
 
 &nbsp; 
 
-An example of North-South connectivity is presented in the diagram below.
+An example of East-West connectivity is presented in the diagram below.
 
 &nbsp; 
 
-<img src="images/4_network_view_connectivity_ns.jpg" alt= “” width="1000" height="value">
+<img src="images/4_network_view_connectivity_ew.jpg" alt= “” width="1000" height="value">
 
 
 &nbsp; 
 
-For more details on the network design, including all the descriptions for each element, their security posture, the most significant traffic scenarios (e.g., North-South and East-West), and DNS, please refer to the [OCI Open LZ PDF - Network View](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/design/OCI_Open_LZ.pdf). 
+For more details on the network design including all the descriptions for each element, their security posture, the most significant traffic scenarios (e.g., North-South and East-West), and DNS, please refer to the [OCI Open LZ PDF - Network View](https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/master/design/OCI_Open_LZ.pdf). 
 
 
 &nbsp; 
