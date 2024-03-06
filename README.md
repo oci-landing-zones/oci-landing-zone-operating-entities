@@ -1,5 +1,7 @@
 # **The OCI Open LZ**
 
+### A Repository to Simplify the Onboarding and Running of OCI
+
 <img src="images/oci_open_lz.jpg" width="1200" height="value">
 
 &nbsp; 
@@ -7,10 +9,10 @@
 Welcome to the **OCI Open LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI. 
 
 The objective of the **OCI Open LZ** is to provide:
-1. **[A Blueprint](/design/readme.md):** A complete SecNetOps landing zone design, ready to onboard an enterprise organization and its functional divisions &ndash; identified as operating entities (OE) with their teams, departments, and projects.
+1. **[A Blueprint](/design/readme.md):** A complete SecNetOps landing zone design, ready to onboard an enterprise organization and its functional divisions &ndash; identified as **Op**erating **En**tities (OEs). You can use it directly, or use it to tailor your new landing zone.
 2. **[An Operating Model](/examples/oci-open-lz/readme.md):** a complete cloud-native / gitops runtime to simplify and scale day two operations, focusing on IaC configurations and not on code.
 3. **[Enablement](/examples/oci-learn-lz/readme.md):** to our customers, partners, independent software vendors (ISV), and the general IT community to create, configure, and run OCI landing zones with lower efforts and reduced timeframes.
-4. **[A Catalogue](/examples/readme.md)**: as the entry point to find more landing zones, related designs, and IaC configurations.
+4. **[A Catalogue](/examples/readme.md)**: as the entry point to find more landing zone variations, related designs, extensions, and IaC configurations.
    
 
 &nbsp; 
