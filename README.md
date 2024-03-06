@@ -2,6 +2,8 @@
 
 ### A Repository to Simplify the [Onboarding](#) and [Running](#) of OCI
 
+&nbsp; 
+
 <img src="images/oci_open_lz.jpg" width="1200" height="value">
 
 &nbsp; 
