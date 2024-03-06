@@ -1,6 +1,6 @@
-# **[The OCI Open LZ](#)**
+# **The OCI Open LZ]**
 
-### A Repository to Simplify the Onboarding and Running of OCI
+### A Repository to Simplify the [Onboarding](#) and [Running](#) of OCI
 
 <img src="images/oci_open_lz.jpg" width="1200" height="value">
 
