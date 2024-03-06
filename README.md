@@ -1,5 +1,9 @@
 # **The OCI Open LZ**
 
+### A Repository to Simplify the [Onboarding](#) and [Running](#) of OCI
+
+&nbsp; 
+
 <img src="images/oci_open_lz.jpg" width="1200" height="value">
 
 &nbsp; 
@@ -7,10 +11,10 @@
 Welcome to the **OCI Open LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI. 
 
 The objective of the **OCI Open LZ** is to provide:
-1. **[A Blueprint](/design/readme.md):** A complete SecNetOps landing zone design, ready to onboard an enterprise organization and its functional divisions &ndash; identified as operating entities (OE) with their teams, departments, and projects.
+1. **[A Blueprint](/design/readme.md):** A complete SecNetOps landing zone design, ready to onboard an enterprise organization and its functional divisions &ndash; identified as **Op**erating **En**tities (OEs). You can use it directly, or use it to tailor your new landing zone.
 2. **[An Operating Model](/examples/oci-open-lz/readme.md):** a complete cloud-native / gitops runtime to simplify and scale day two operations, focusing on IaC configurations and not on code.
 3. **[Enablement](/examples/oci-learn-lz/readme.md):** to our customers, partners, independent software vendors (ISV), and the general IT community to create, configure, and run OCI landing zones with lower efforts and reduced timeframes.
-4. **[A Catalogue](/examples/readme.md)**: as the entry point to find more landing zones, related designs, and IaC configurations.
+4. **[A Catalogue](/examples/readme.md)**: as the entry point to find more landing zone variations, related designs, extensions, and IaC configurations.
    
 
 &nbsp; 
@@ -26,7 +30,7 @@ This repository is the source of truth for the OCI Open LZ, where you can find a
 |---|---|---|---|
 | **1**| **PREPARE** | [5 Steps in 5'](https://www.youtube.com/watch?v=JWKRHfO4LnY&ab_channel=OracleLearning),</br>[A Blueprint to Onboard and Run OCI ](https://www.youtube.com/watch?v=xbKIxSERIxY) | These sessions discusses the differences between [standard](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/standard_landing_zones/standard_landing_zones.md) and [tailored landing zones](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/tailored_landing_zones/tailored_landing_zones.md), presenting the OCI Open LZ Blueprint tailored views and running a demo.
 | **2** | **ENABLE** | [OCI Learn LZ](/examples/oci-learn-lz/readme.md)| Use the OCI Learn LZ exercises to understand how to **design** and **configure** OCI Landing Zones. |
-| **3** | **DESIGN** | [OCI Open LZ PDF](/design/OCI_Open_LZ.pdf),</br>[ OCI Open LZ Draw.io ](/design/OCI_Open_LZ.drawio)   | Use the OCI Open LZ **blueprint** to design your functional, security, network, and operations view, with all the diagrams in a reusable format. Other **landing zone models** are also [available](/design/models/readme.md). |   
+| **3** | **DESIGN** | [OCI Open LZ Blueprint](/design/readme.md)  | Use the OCI Open LZ **blueprint** to design your functional, security, network, and operations view, with all the diagrams in a reusable format. Other **landing zone models** are also [available](/design/models/readme.md). |   
 | **4** | **CONFIGURE** | [OCI Open LZ Runtime View](/examples/oci-open-lz/readme.md) | Use the  OCI Open LZ runtime  **configurations** as your IaC templates. These configurations are easily adjustable to any other landing zone model and are run with [OCI Open LZ Terraform Orchestrator Module ](orchestrator/readme.md) on top of the [CIS  Landing Zone Enhanced Modules](https://www.ateam-oracle.com/post/cis-landing-zone-enhanced-modules). |                
 | **5** | **RUN** | [OCI Open LZ Terraform Orchestrator ](/orchestrator/readme.md) | Use the OCI Open LZ **orchestrator** to run an operation on several resource types into one consolidated execution. It supports **any OCI landing zone configuration**, including - but not limited to &ndash; the OCI Open LZ. </br>Use the **orchestrator** with your configurations or with the provided [operations examples](/examples/oci-open-lz/readme.md) using **Terraform CLI** or **Oracle Resource Manager (ORM)**.|
 
