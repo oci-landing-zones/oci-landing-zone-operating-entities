@@ -1,4 +1,4 @@
-# **OCI EBS LZ**
+# **EBS LZ Extension**
 
 **Table of Contents**
 
@@ -14,7 +14,7 @@
 
 Welcome to the **OCI Oracle E-Business Suite (EBS)**  Landing Zone.
 
-The OCI EBS LZ is a secure cloud environment, designed with best practices to simplify the onboarding of EBS workloads and enable the continuous operations of their cloud resources. This reference architecture provides a landing zone IaC **configuration** that meets the security guidance prescribed in the CIS Oracle Cloud Infrastructure Foundations Benchmark.
+The EBS LZ Extension is a secure cloud environment, designed with best practices to simplify the onboarding of EBS workloads and enable the continuous operations of their cloud resources. This reference architecture provides a landing zone IaC **configuration** that meets the security guidance prescribed in the CIS Oracle Cloud Infrastructure Foundations Benchmark.
 
 It's highly recommended to deploy this Landing Zone before migrating an on-premises Oracle EBS to OCI, as it sets a complete OCI foundation for its workloads. 
 
@@ -25,11 +25,11 @@ It's highly recommended to deploy this Landing Zone before migrating an on-premi
 
 |ID   |	DOMAIN | DESCRIPTION |
 |---|---|---|
-| **1** | **General** | - OCI OCI CIS LZ will be deployed as a foundation. </br>- The OCI EBS LZ will extend the OCI CIS LZ and accomodate EBS Workloads. </li> </ul> |
+| **1** | **General** | - OCI OCI CIS LZ will be deployed as a foundation. </br>- The EBS LZ Extension will extend the OCI CIS LZ and accomodate EBS Workloads. </li> </ul> |
 |**2** | **Tenancy Structure** |  Extend the standard landing zone compartment structure with additional compartments for EBS-related resources: </br>- Parent EBS compartment.</br>- EBS Management compartment for resources such as EBS Cloud Manager.</br>- EBS Non-Production environments compartment </br>- EBS Production environment compartment.
 |**3** | **Groups & Policies** | Additional groups and associated policies are deployed to manage EBS compartment resources. |
 |**4** | **Network Structure** | Additional VCNs and related elements will be added - to segregate EBS environments - as Spoke extensions to the OCI CIS LZ Hub. |
-|**5** |  **Runtime** | - There will be **three runtime operations** to deploy this landing zone: **(1)** The OCI CIS LZ will be used as an initial setup and **(2)** extended with the OCI EBS LZ Runtime configurations. Additional **(3)** manual configuration tasks are also required to complete the setup. </br> - Note that the **'Operation/(OP)**' column on the next sections identifies the three moment in time when OCI resources are created. <br>- For more details refer to the [Runtime](#5-runtime-view) section.
+|**5** |  **Runtime** | - There will be **three runtime operations** to deploy this landing zone: **(1)** The OCI CIS LZ will be used as an initial setup and **(2)** extended with the EBS LZ Extension Runtime configurations. Additional **(3)** manual configuration tasks are also required to complete the setup. </br> - Note that the **'Operation/(OP)**' column on the next sections identifies the three moment in time when OCI resources are created. <br>- For more details refer to the [Runtime](#5-runtime-view) section.
 
 
 &nbsp; 
@@ -40,7 +40,7 @@ It's highly recommended to deploy this Landing Zone before migrating an on-premi
 
 ### **3.1 Compartments**
 
-The OCI  EBS LZ  includes the following compartments:
+The EBS LZ Extension  includes the following compartments:
 &nbsp; 
 > [!NOTE]
 > Compartments help you organize and control access to your resources. A compartment is a collection of related resources (such as cloud networks, compute instances, or block volumes) that can be accessed only by those groups that have been given permission by an administrator in your organization.
@@ -71,7 +71,7 @@ The following table provides details on the compartments presented above, their 
 
 ### **3.2 Groups**
 
-The OCI EBS LZ  includes the following groups. 
+The EBS LZ Extension  includes the following groups. 
 
 &nbsp; 
 
@@ -127,7 +127,7 @@ The OCI  EBS LZ  includes the following dynamic groups:
 
 ### **3.4 Policies**
 
-The OCI EBS LZ includes the following policies:
+The EBS LZ Extension includes the following policies:
 
 &nbsp; 
 
@@ -162,7 +162,7 @@ The OCI EBS LZ includes the following policies:
 &nbsp; 
 
 
-The following diagram presents the network structure of the OCI EBS LZ.
+The following diagram presents the network structure of the EBS LZ Extension.
 
 &nbsp; 
 
@@ -390,23 +390,23 @@ The following table describes the proposed Service Gateways.
 
 &nbsp; 
 
-This chapter presents the OCI EBS LZ operations scenarios.
+This chapter presents the EBS LZ Extension operations scenarios.
 
- The operations scenarios are one of the most important elements of this design, as they represent the use cases and its key activities on the OCI EBS LZ that create or update resources.
+ The operations scenarios are one of the most important elements of this design, as they represent the use cases and its key activities on the EBS LZ Extension that create or update resources.
 
 An operation scenario is normally triggered by a service request, on a ticketing system. In a more formal definition, it should be seen as an operational process, which is a set of correlated activities executed as one unit of work, with its own frequency. The owner of each scenario will be the cloud operations team which has associated OCI Groups and Policies that allow the management of those resources.
 
 &nbsp; 
 
-The OCI EBS LZ has three operation scenarios described in the following table.
+The EBS LZ Extension has three operation scenarios described in the following table.
 
 &nbsp; 
 
 | OP. ID | OPERATION SCENARIOS DESCRIPTION | TIME EFFORTS | 
 |---|---|---| 
-| **[OP. ID.01](/examples/oci-ebs-lz/op01-deploy-CIS/readme.md)** | **Deploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services. | **< 1h** | 
-| **[OP. ID.02](/examples/oci-ebs-lz/op02-manage-ebs-lz-extension/readme.md)**| **Deploy EBS extension**. Include EBS network resources (Spokes VCNs, Table Routes, Security Lists) and IAM EBS resources (Groups, Policies). | **< 2h** excluding TF environment configuration | 
-| **[OP. ID.03](/examples/oci-ebs-lz/op03-manual-changes/readme.md)**| **Manual changes**. | **< 15m** | 
+| **[OP. ID.01](/examples/oci-lz-ext-ebs/op01-deploy-CIS/readme.md)** | **Deploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services. | **< 1h** | 
+| **[OP. ID.02](/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/readme.md)**| **Deploy EBS extension**. Include EBS network resources (Spokes VCNs, Table Routes, Security Lists) and IAM EBS resources (Groups, Policies). | **< 2h** excluding TF environment configuration | 
+| **[OP. ID.03](/examples/oci-lz-ext-ebs/op03-manual-changes/readme.md)**| **Manual changes**. | **< 15m** | 
  
 
 &nbsp; 
