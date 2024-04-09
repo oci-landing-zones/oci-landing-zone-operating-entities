@@ -12,7 +12,7 @@
 
 ## **1. Introduction**
 
-Welcome to the **OCI Oracle E-Business Suite (EBS)**  Landing Zone.
+Welcome to the **OCI EBS Landing Zone Extension**.
 
 The EBS LZ Extension is a secure cloud environment, designed with best practices to simplify the onboarding of EBS workloads and enable the continuous operations of their cloud resources. This reference architecture provides a landing zone IaC **configuration** that meets the security guidance prescribed in the CIS Oracle Cloud Infrastructure Foundations Benchmark.
 
