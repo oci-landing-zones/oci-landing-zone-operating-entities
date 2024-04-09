@@ -21,17 +21,17 @@
 | **OP. NAME** |  Manage EBS Landing Zone Extension | 
 | **OBJECTIVE** | Provision/change OCI EBS Landing Zone IAM and Network Extensions. |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists  |
-| **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
-| **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/json/ebs_network_rt_sl_v1.auto.tfvars.json) |
-| **PRE-ACTIVITIES** | Execute [OP.01. Deploy OCI CIS LZ](/examples/oci-ebs-lz/op01-deploy-CIS/readme.md)  |
-| **POST-ACTIVITIES** | Execute [OP.03 Manual Changes](/examples/oci-ebs-lz/op03-manual-changes/readme.md) |
+| **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/examples/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
+| **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](/examples/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/json/ebs_network_rt_sl_v1.auto.tfvars.json) |
+| **PRE-ACTIVITIES** | Execute [OP.01. Deploy OCI CIS LZ](/examples/oci-lz-ext-ebs/op01-deploy-CIS/readme.md)  |
+| **POST-ACTIVITIES** | Execute [OP.03 Manual Changes](/examples/oci-lz-ext-ebs/op03-manual-changes/readme.md) |
 | **RUN OPERATION** | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli). |
 
 &nbsp; 
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the Open LZ EBS extension IAM layer use the following JSON file: [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the Open LZ EBS extension IAM layer use the following JSON file: [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/examples/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file will cover the following three categories of resources described in the next sections.
 
@@ -643,10 +643,10 @@ Run terraform plan with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../examples/oci-ebs-lz/json/oci-credentials.tfvars.json \
--var-file ../examples/oci-ebs-lz/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
--var-file ../examples/oci-ebs-lz/json/ebs_network_rt_sl_v1.auto.tfvars.json \
--state ../examples/oci-ebs-lz/terraform.tfstate
+-var-file ../examples/oci-lz-ext-ebs/json/oci-credentials.tfvars.json \
+-var-file ../examples/oci-lz-ext-ebs/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
+-var-file ../examples/oci-lz-ext-ebs/json/ebs_network_rt_sl_v1.auto.tfvars.json \
+-state ../examples/oci-lz-ext-ebs/terraform.tfstate
 ```
 
 After the execution please analyze the output of the command above and check if it corresponds to your desired configuration.
@@ -663,10 +663,10 @@ Run terraform plan with the IAM and Network configuration. After  its execution 
 
 ```
 terraform apply \
--var-file ../examples/oci-ebs-lz/json/oci-credentials.tfvars.json \
--var-file ../examples/oci-ebs-lz/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
--var-file ../examples/oci-ebs-lz/json/ebs_network_rt_sl_v1.auto.tfvars.json \
--state ../examples/oci-ebs-lz/terraform.tfstate
+-var-file ../examples/oci-lz-ext-ebs/json/oci-credentials.tfvars.json \
+-var-file ../examples/oci-lz-ext-ebs/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
+-var-file ../examples/oci-lz-ext-ebs/json/ebs_network_rt_sl_v1.auto.tfvars.json \
+-state ../examples/oci-lz-ext-ebs/terraform.tfstate
 
 ```
 
@@ -701,7 +701,7 @@ Re-run the apply job.
 
 &nbsp; 
 
-You can proceed to [OP.03 Execute Manual Changes](/examples/oci-ebs-lz/op03-manual-changes/readme.md).
+You can proceed to [OP.03 Execute Manual Changes](/examples/oci-lz-ext-ebs/op03-manual-changes/readme.md).
 
 &nbsp; 
 
