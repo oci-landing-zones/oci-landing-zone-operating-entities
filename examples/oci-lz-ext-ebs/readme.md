@@ -25,7 +25,7 @@ It's highly recommended to deploy this Landing Zone before migrating an on-premi
 
 |ID   |	DOMAIN | DESCRIPTION |
 |---|---|---|
-| **1** | **General** | - OCI OCI CIS LZ will be deployed as a foundation. </br>- The EBS LZ Extension will extend the OCI CIS LZ and accomodate EBS Workloads. </li> </ul> |
+| **1** | **General** | - OCI CIS LZ will be deployed as a foundation. </br>- The EBS LZ Extension will extend the OCI CIS LZ and accomodate EBS Workloads. </li> </ul> |
 |**2** | **Tenancy Structure** |  Extend the standard landing zone compartment structure with additional compartments for EBS-related resources: </br>- Parent EBS compartment.</br>- EBS Management compartment for resources such as EBS Cloud Manager.</br>- EBS Non-Production environments compartment </br>- EBS Production environment compartment.
 |**3** | **Groups & Policies** | Additional groups and associated policies are deployed to manage EBS compartment resources. |
 |**4** | **Network Structure** | Additional VCNs and related elements will be added - to segregate EBS environments - as Spoke extensions to the OCI CIS LZ Hub. |
