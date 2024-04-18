@@ -55,7 +55,7 @@ The corresponding JSON configuration for the compartments topology described abo
 ...
     "compartments_configuration": {
         "enable_delete": "true",
-        "default_parent_ocid": "<OCID-COMPARTMENT-ROOT>",
+        "default_parent_id": "<OCID-COMPARTMENT-ROOT>",
         "compartments": {
             "CMP-OE01-KEY": {
                 "name": "cmp-oe1",
@@ -207,7 +207,7 @@ For an example of such configuration and for extended documentation please refer
 
 We provide here an example on how to setup the IAM policies for the design discused in the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf). Notice that these policies must be considered as an example on how to deploy the blueprint based on CIS separation of duties, but not as a prescribed configuration. We encourage you to review and adapt to your design.
 
-For this example, replace the compartment_ocid "<OCID-COMPARTMENT-ROOT>" value to your tenancy OCID.
+For this example, replace the compartment_id "<OCID-COMPARTMENT-ROOT>" value to your tenancy OCID.
 
 ```
 ...
@@ -217,7 +217,7 @@ For this example, replace the compartment_ocid "<OCID-COMPARTMENT-ROOT>" value t
             "PCY-OE01-ADMINISTRATION": {
                 "name": "pcy-oe01-administration",
                 "description": "POL.0E.01 Open LZ policy which allows the grp-oe01-admins group users to manage the compartment structure of the OE.",
-                "compartment_ocid": "<OCID-COMPARTMENT-ROOT>",
+                "compartment_id": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
                     "allow group grp-oe01-admins to use cloud-shell in compartment cmp-oe1",
                     "allow group grp-oe01-admins to manage policies in compartment cmp-oe1",
@@ -227,7 +227,7 @@ For this example, replace the compartment_ocid "<OCID-COMPARTMENT-ROOT>" value t
             "PCY-OE01-NETWORK-ADMINISTRATION": {
                 "name": "pcy-oe01-network-administration",
                 "description": "POL.0E.02 Open LZ policy which allows the grp-oe01-network-admins group users to manage NSGs in the OE network.",
-                "compartment_ocid": "<OCID-COMPARTMENT-ROOT>",
+                "compartment_id": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
                     "allow group grp-oe01-network-admins to use cloud-shell in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network",
                     "allow group grp-oe01-network-admins to read all-resources in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network",
@@ -265,9 +265,9 @@ For a better understanding on this configuration example, check the [OE01 networ
 
 | STEP |  ACTION |
 |---|---| 
-| **1** |  [![Deploy_To_OCI](../../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json"})  |
+| **1** |  [![Deploy_To_OCI](../../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json"})  |
 | **2** | Accept terms,  wait for the configuration to load. |
-| **3** | Set the working directory to “orm-facade”. | 
+| **3** | Set the working directory to “rms-facade”. | 
 | **4** | Set the stack name you prefer. | 
 | **5** |  Set the terraform version to 1.2.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next. Optionally,replace with your json/yaml config files. |
@@ -296,57 +296,70 @@ For referring to a specific module version, append *ref=\<version\>* to the *sou
 E.g.: 
 ```
 git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.0.0
-``````
+```
+
+### **5.3 Clone the orchestrator Git repo to your Machine**
+
+Cloning the latest version:
+```
+git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git
+```
+
+For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. 
+
+E.g.: 
+```
+git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git?ref=v1.0.0
+```
 
 &nbsp; 
 
-###  **5.2 Change the Directory to the Terraform Orchestrator Module**
+###  **5.4 Change the Directory to the Terraform Orchestrator Module**
 
-Change the directory to the [```terraform-oci-open-lz/orchestrator```](../../../../orchestrator/) terraform orchestrator module.
-
-&nbsp; 
-
- ### **5.3 Run ```terraform init```**
-
-Run terraform init to download all the required external terraform providers and terraform modules. See [command example](./tf_init_output_example.out) for more details on the expected output.
+Change the directory to the *terraform-oci-landing-zones-orchestrator* Terraform orchestrator module.
 
 &nbsp; 
 
- ### **5.4 Run ```terraform plan```**
+ ### **5.5 Run ```terraform init```**
+
+Run ```terraform init``` to download all the required external terraform providers and Terraform modules.
+
+&nbsp; 
+
+ ### **5.6 Run ```terraform plan```**
 
 Run ```terraform plan``` with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../examples/oci-open-lz/op02_manage_oes/oe01/oci-credentials.tfvars.json \
--var-file ../examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json \
--var-file ../examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json \
--state ../examples/oci-open-lz/op02_manage_oes/oe01/terraform.tfstate
+-var-file ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json \
+-var-file ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json \
+-state ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/terraform.tfstate
 ```
 
 After the execution please analyze the output of the command above and check if it corresponds to your desired configuration.
 
-Note that the ```terraform.tfstate``` file is generated in the configuration location and not in the terraform code location. This is the expected configuration as the terraform automation can support any number of configurations and the **state file** will belong to the configuration and not to the code.
+Note that the ```terraform.tfstate``` file is generated in the configuration location and not in the Terraform code location. This is the expected configuration as the Terraform automation can support any number of configurations and the **state file** will belong to the configuration and not to the code.
   
-The ideal scenario regarding the **state file** will be for each configuration to have a corresponding OCI Object Storage location for the state file. For more details on the Terraform state file recommended configuration please refer to the following [documentation](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/terraformUsingObjectStore.htm).
+The ideal scenario regarding the **state file** will be for each configuration to have a corresponding OCI Object Storage location for the state file. For more details on the Terraform state file recommended configuration please refer to the following [documentation](https://docs.oracle.com/iaas/Content/API/SDKDocs/terraformUsingObjectStore.htm).
 
 &nbsp; 
 
-### **5.5 Run ```terraform apply```**
+### **5.6 Run ```terraform apply```**
 
 Run ```terraform apply``` with the IAM and Network configuration. After its execution the configured resources will be provisioned or updated on OCI.
 
 ```
 terraform apply \
--var-file ../examples/oci-open-lz/op02_manage_oes/oe01/oci-credentials.tfvars.json \
--var-file ../examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json \
--var-file ../examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json \
--state ../examples/oci-open-lz/op02_manage_oes/oe01/terraform.tfstate
+-var-file ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json \
+-var-file ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json \
+-state ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/terraform.tfstate
 ```
 
-Depending on your JSON configuration configurations the output of the ```terraform apply``` should be identical or similar to this [example](./tf_apply_output_example.out).
-
 &nbsp; 
+
 
 # License
 

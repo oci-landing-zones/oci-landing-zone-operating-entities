@@ -98,7 +98,7 @@ policies_configuration:
       name: pcy-oe01-administration
       description: POL.0E.01 Open LZ policy which allows the grp-oe01-admins group
         users to manage the compartment structure of the OE.
-      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      compartment_id: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - allow group grp-oe01-admins to use cloud-shell in compartment cmp-oe1
       - allow group grp-oe01-admins to manage policies in compartment cmp-oe1
@@ -107,7 +107,7 @@ policies_configuration:
       name: pcy-oe01-network-administration
       description: POL.0E.02 Open LZ policy which allows the grp-oe01-network-admins
         group users to manage NSGs in the OE network.
-      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      compartment_id: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - allow group grp-oe01-network-admins to use cloud-shell in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network
       - allow group grp-oe01-network-admins to read all-resources in compartment cmp-oe1:cmp-oe01-common:cmp-oe01-common-network
