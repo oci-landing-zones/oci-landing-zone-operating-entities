@@ -53,7 +53,7 @@ The corresponding JSON configuration for the compartments topology described abo
     {
     "compartments_configuration": {
         "enable_delete": "true",
-        "default_parent_ocid": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
+        "default_parent_id": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
         "compartments": {
             "CMP-OE01-PROD-DEPT-A-KEY": {
                 "name": "cmp-oe1-p-deptA",
@@ -150,9 +150,9 @@ For an example of such configuration and for extended documentation please refer
 
 | STEP |  ACTION |
 |---|---| 
-| **1** |  [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op03_manage_department/open_lz_oe_01_prod_deptA_identity.auto.tfvars.json"})  |
+| **1** |  [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op03_manage_department/open_lz_oe_01_prod_deptA_identity.auto.tfvars.json"})  |
 | **2** | Accept terms,  wait for the configuration to load. |
-| **3** | Set the working directory to “orm-facade”. | 
+| **3** | Set the working directory to “rms-facade”. | 
 | **4** | Set the stack name you prefer. | 
 | **5** |  Set the terraform version to 1.2.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next. Optionally,replace with your json/yaml config files. |
@@ -170,60 +170,77 @@ For authenticating against the OCI tenancy terraform execute the following [inst
 
 &nbsp; 
 
-
 ### **4.2 Clone this Git repo to your Machine**
 
+Cloning the latest version:
+```
+git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git
+```
+
+For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. 
+
+E.g.: 
 ```
 git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.0.0
 ```
 
-For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value.
+### **4.3 Clone the orchestrator Git repo to your Machine**
+
+Cloning the latest version:
+```
+git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git
+```
+
+For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. 
+
+E.g.: 
+```
+git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git?ref=v1.0.0
+```
 
 &nbsp; 
 
-###  **4.3 Change the Directory to the Terraform Orchestrator Module**
+###  **4.4 Change the Directory to the Terraform Orchestrator Module**
 
- Change the directory to the [```terraform-oci-open-lz/orchestrator```](../../../orchestrator/) terraform orchestrator module.
-
-&nbsp; 
-
- ### **4.4 Run ```terraform init```**
-
-Run terraform init to download all the required external terraform providers and terraform modules. See [command example](./tf_init_output_example.out) for more details on the expected output.
+Change the directory to the *terraform-oci-landing-zones-orchestrator* Terraform orchestrator module.
 
 &nbsp; 
 
- ### **4.5 Run ```terraform plan```**
+ ### **4.5 Run ```terraform init```**
+
+Run ```terraform init``` to download all the required external terraform providers and Terraform modules.
+
+&nbsp; 
+
+ ### **4.6 Run ```terraform plan```**
 
 Run ```terraform plan``` with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../examples/oci-open-lz/op03_manage_department/oci-credentials.tfvars.json \
--var-file ../examples/oci-open-lz/op03_manage_department/oe01/open_lz_oe_01_identity.auto.tfvars.json \
--state ../examples/oci-open-lz/op03_manage_department/terraform.tfstate
+-var-file ../terraform-oci-open-lz/examples/oci-open-lz/op03_manage_department/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/examples/oci-open-lz/op03_manage_department/open_lz_oe_01_prod_deptA_identity.auto.tfvars.json \
+-state ../terraform-oci-open-lz/examples/oci-open-lz/op03_manage_department/terraform.tfstate
 ```
 
 After the execution please analyze the output of the command above and check if it corresponds to your desired configuration.
 
-Note that the ```terraform.tfstate``` file is generated in the configuration location and not in the terraform code location. This is the expected configuration as the terraform automation can support any number of configurations and the **state file** will belong to the configuration and not to the code.
+Note that the ```terraform.tfstate``` file is generated in the configuration location and not in the Terraform code location. This is the expected configuration as the Terraform automation can support any number of configurations and the **state file** will belong to the configuration and not to the code.
   
-The ideal scenario regarding the **state file** will be for each configuration to have a corresponding OCI Object Storage location for the state file. For more details on the Terraform state file recommended configuration please refer to the following [documentation](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/terraformUsingObjectStore.htm).
+The ideal scenario regarding the **state file** will be for each configuration to have a corresponding OCI Object Storage location for the state file. For more details on the Terraform state file recommended configuration please refer to the following [documentation](https://docs.oracle.com/iaas/Content/API/SDKDocs/terraformUsingObjectStore.htm).
 
 &nbsp; 
 
-### **4.6 Run ```terraform apply```**
+### **4.7 Run ```terraform apply```**
 
 Run ```terraform apply``` with the IAM and Network configuration. After its execution the configured resources will be provisioned or updated on OCI.
 
 ```
 terraform apply \
--var-file ../examples/oci-open-lz/op03_manage_department/oci-credentials.tfvars.json \
--var-file ../examples/oci-open-lz/op03_manage_department/open_lz_oe_01_identity.auto.tfvars.json \
--state ../examples/oci-open-lz/op03_manage_department/terraform.tfstate
+-var-file ../terraform-oci-open-lz/examples/oci-open-lz/op03_manage_department/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/examples/oci-open-lz/op03_manage_department/open_lz_oe_01_prod_deptA_identity.auto.tfvars.json \
+-state ../terraform-oci-open-lz/examples/oci-open-lz/op03_manage_department/terraform.tfstate
 ```
-
-Depending on your JSON configuration configurations the output of the ```terraform apply``` should be identical or similar to this [example](./tf_apply_output_example.out).
 
 &nbsp; 
 

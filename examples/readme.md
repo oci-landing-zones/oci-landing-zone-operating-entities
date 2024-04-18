@@ -12,6 +12,8 @@ The OCI Open LZ is much more than a blueprint, is a set of artifacts that can re
 
 Welcome to the **Open Catalogue**. 
 
+<span style="color:red">***NOTE: If you're upgrading your configurations from the OCI LZ Orchestrator version <1.4, check [this](upgrading-orchestrator.md) to follow the upgrade process.***</span>.
+
 &nbsp; 
 
 ## 1. Learning

@@ -53,7 +53,7 @@ The corresponding json configuration for the compartments topology described abo
 ...
     "compartments_configuration": {
         "enable_delete": "true",
-        "default_parent_ocid": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
+        "default_parent_id": "ocid1.compartment.oc1..aaaaaaaaxzexampleocid",
         "compartments": {
             "CMP-OE01-PROD-DEPT-A-PROJ1-PRD-KEY": {
                 "name": "cmp-oe01-p-deptA-proj1-prd",
@@ -202,9 +202,9 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 
 | STEP |  ACTION |
 |---|---| 
-| **1** |  [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json"}) |
+| **1** |  [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json"}) |
 | **2** | Accept terms,  wait for the configuration to load. |
-| **3** | Set the working directory to “orm-facade”. | 
+| **3** | Set the working directory to “rms-facade”. | 
 | **4** | Set the stack name you prefer. | 
 | **5** |  Set the terraform version to 1.2.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next. Optionally,replace with your json/yaml config files. |

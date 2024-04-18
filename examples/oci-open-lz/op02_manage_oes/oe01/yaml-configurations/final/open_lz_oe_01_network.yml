@@ -1,10 +1,10 @@
 ---
 network_configuration:
-  default_compartment_key: CMP-OE01-COMMON-NETWORK-KEY
+  default_compartment_id: CMP-OE01-COMMON-NETWORK-KEY
   default_enable_cis_checks: false
   network_configuration_categories:
     oe01:
-      category_compartment_key: CMP-OE01-COMMON-NETWORK-KEY
+      category_compartment_id: CMP-OE01-COMMON-NETWORK-KEY
       vcns:
         VCN-FRA-OE01-CO-KEY:
           block_nat_traffic: false
