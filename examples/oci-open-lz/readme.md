@@ -13,7 +13,7 @@
 
 This section presents **OCI Open LZ Runtime View**, i.e., the **day two execution** of the operations scenarios introduced in [OCI Open LZ Operations View](../../design/OCI_Open_LZ.pdf).
 
-<span style="color:red">***NOTE: If you're upgrading your configurations from the OCI LZ Orchestrator version <1.4, check [this](../upgrading-orchestrator.md) to follow the upgrade process.***</span>.
+<span style="color:red">***NOTE: If you're upgrading your configurations from the OCI LZ Orchestrator version <2.0.0, check [this](../upgrading-orchestrator.md) to follow the upgrade process.***</span>
 
 
 &nbsp; 
