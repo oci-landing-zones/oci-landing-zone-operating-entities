@@ -196,8 +196,6 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 &nbsp; 
 
 
-
-
 ## **4. Run with ORM**
 
 | STEP |  ACTION |
@@ -210,7 +208,6 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 | **6** | Accept the defaul configurations. Click Next. Optionally,replace with your json/yaml config files. |
 | **7** | Un-check run apply. Click Create. 
 
-&nbsp; 
 
 &nbsp; 
 
@@ -230,25 +227,12 @@ Cloning the latest version:
 git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git
 ```
 
-For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. 
-
-E.g.: 
-```
-git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.4
-```
 
 ### **5.3 Clone the orchestrator Git repo to your Machine**
 
 Cloning the latest version:
 ```
 git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git
-```
-
-For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. 
-
-E.g.: 
-```
-git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git?ref=v2.0.0
 ```
 
 &nbsp; 
@@ -296,7 +280,6 @@ terraform apply \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json \
 -state ../terraform-oci-open-lz/examples/oci-open-lz/op04_manage_projects/terraform.tfstate
 ```
-
 
 # License
 

@@ -291,25 +291,13 @@ Cloning the latest version:
 git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git
 ```
 
-For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. 
-
-E.g.: 
-```
-git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.4
-```
+&nbsp; 
 
 ### **5.3 Clone the orchestrator Git repo to your Machine**
 
 Cloning the latest version:
 ```
 git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git
-```
-
-For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. 
-
-E.g.: 
-```
-git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git?ref=v2.0.0
 ```
 
 &nbsp; 
