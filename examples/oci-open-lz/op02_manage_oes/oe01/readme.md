@@ -265,7 +265,7 @@ For a better understanding on this configuration example, check the [OE01 networ
 
 | STEP |  ACTION |
 |---|---| 
-| **1** |  [![Deploy_To_OCI](../../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json"})  |
+| **1** |  [![Deploy_To_OCI](../../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json"})  |
 | **2** | Accept terms,  wait for the configuration to load. |
 | **3** | Set the working directory to “rms-facade”. | 
 | **4** | Set the stack name you prefer. | 
@@ -295,7 +295,7 @@ For referring to a specific module version, append *ref=\<version\>* to the *sou
 
 E.g.: 
 ```
-git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.0.0
+git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git?ref=v1.4
 ```
 
 ### **5.3 Clone the orchestrator Git repo to your Machine**
@@ -309,7 +309,7 @@ For referring to a specific module version, append *ref=\<version\>* to the *sou
 
 E.g.: 
 ```
-git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git?ref=v1.0.0
+git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git?ref=v2.0.0
 ```
 
 &nbsp; 
