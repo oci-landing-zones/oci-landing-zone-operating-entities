@@ -57,7 +57,7 @@ Example of a compartment structure creation:
 ```
     "compartments_configuration": {
         "enable_delete": "true",
-        "default_parent_ocid": "<OCID-COMPARTMENT-ROOT>",
+        "default_parent_id": "<OCID-COMPARTMENT-ROOT>",
         "compartments": {
             "CMP-EBS-KEY": {
                 "name": "ebs-cmp",
@@ -644,10 +644,10 @@ Run ```terraform plan``` with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../examples/oci-lz-ext-ebs/json/oci-credentials.tfvars.json \
--var-file ../examples/oci-lz-ext-ebs/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
--var-file ../examples/oci-lz-ext-ebs/json/ebs_network_rt_sl_v1.auto.tfvars.json \
--state ../examples/oci-lz-ext-ebs/terraform.tfstate
+-var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
+-var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json \
+-state ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/terraform.tfstate
 ```
 
 After the execution please analyze the output of the command above and check if it corresponds to your desired configuration.
@@ -664,11 +664,10 @@ Run terraform plan with the IAM and Network configuration. After  its execution 
 
 ```
 terraform apply \
--var-file ../examples/oci-lz-ext-ebs/json/oci-credentials.tfvars.json \
--var-file ../examples/oci-lz-ext-ebs/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
--var-file ../examples/oci-lz-ext-ebs/json/ebs_network_rt_sl_v1.auto.tfvars.json \
--state ../examples/oci-lz-ext-ebs/terraform.tfstate
-
+-var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
+-var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json \
+-state ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/terraform.tfstate
 ```
 
 Depending on your json configuration configurations the output of the ```terraform apply``` should be identical or similar to this [example](./tf_apply_output_example.out).
