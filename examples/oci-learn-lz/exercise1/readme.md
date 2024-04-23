@@ -89,7 +89,7 @@ Your objective is to run your new configuration with ORM. The image below contai
 |---|---| 
 | **1** | Create a new ORM Stack: [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_solution.yml"}) |
 | **2** | Accept terms,  **wait** for the configuration to load. |
-| **3** | Set the working directory to “**orm-facade**”. | 
+| **3** | Set the working directory to “**rms-facade**”. | 
 | **4** | Set the stack **name** you prefer. | 
 | **5** | Set the terraform **version** to 1.2.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next.  |
