@@ -13,7 +13,7 @@
 
 Welcome to the **Open Learn LZ**, a set of **exercises** to learn how to **design**, **configure**, and **run** OCI landing zones. Its main objectives are: 
 1. Provide elementary landing zone **design** capabilities using draw.io.
-2. Create skills in **IaC configurations**, by configuring the OCI Learn LZ resources. You do not code OCI landing zones anymore, you configure them.
+2. Create skills in **IaC configurations**, by configuring the OCI Learn LZ resources. You do not code OCI landing zones anymore, you configure them. [OCI Landing Zones Orchestrator](https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator) is a generic Terraform module that orchestrates the creation of Landing Zone architectures expressed in a single or multiple configuration files, that can be JSON documents and YAML documents.
 3. Demonstrate a **cloud-native operating model** with versioned configurations and an automation engine - based on ORM.
 
 &nbsp; 
