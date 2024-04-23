@@ -92,11 +92,10 @@ Your objective is to run your new configuration with ORM. The image below contai
 | **3** | Set the working directory to “**rms-facade**”. | 
 | **4** | Set the stack **name** you prefer. | 
 | **5** | Set the terraform **version** to 1.2.x. Click Next. | 
-| **6** | Accept the default yaml configurations. Optionally, replace with the json config file. Click Next.  |
-| **7** | **Delete** the default configuration link and **paste** the new **git raw link** of your **oci_learn_lz_iam.yml** remote file. </br>**NOTE:** Don't forget to press enter or click on the "Add" pop-up after pasting. |
-| **8** | **Un-check** run apply. Click Create. |
-| **9** | Run Terraform **Plan** and review the output messages. |
-| **10** | Run Terraform **Apply** and review the created resources, they should match the design diagrams. |
+| **6** | **Delete** the default configuration link and **paste** the new **git raw link** of your **oci_learn_lz_iam.yml** remote file. </br>**NOTE:** Don't forget to press enter or click on the "Add" pop-up after pasting. |
+| **7** | **Un-check** run apply. Click Create. |
+| **8** | Run Terraform **Plan** and review the output messages. |
+| **9** | Run Terraform **Apply** and review the created resources, they should match the design diagrams. |
 
 &nbsp; 
 
