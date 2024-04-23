@@ -14,7 +14,9 @@
 
 Welcome to the **Open Learn LZ** Exercise #1. 
 
-The main objective is to **create**, **version**, and **run** the IaC configurations for the OCI Learn LZ Tenancy Structure.
+The main objective is to **create**, **version**, and **run** the IaC configurations for the OCI Learn LZ Tenancy Structure focusing on IaC configurations and not on code, The [OCI Landing Zones Orchestrator](https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator) is a generic Terraform module that orchestrates the creation of Landing Zone architectures expressed in a single or multiple configuration files, that can be JSON documents and YAML documents.
+
+In this example we use YAML configurations files, but JSON files examples are also provided.
 
 In this exercise, you will create the tenancy structure IaC configuration to include the target domains. Your IT Central Team colleagues already started this, **your mission is to finish the configuration.** 
 
@@ -81,6 +83,10 @@ Your objective is to update your configurations on the OCI-LEARN-LZ-OPS-REPO git
 ## 5. Run your Configuration with ORM
 
 Your objective is to run your new configuration with ORM. The image below contains the high-level automation mechanism, which is based on an ORM Stack that is linked to your versioned configuration file(s).
+
+The OCI Landing Zones Orchestrator is a generic Terraform module that orchestrates the creation of Landing Zone architectures expressed in a single or multiple configuration files, that can be JSON documents and YAML documents.
+
+In this example we use YAML configurations files, but JSON files examples are also provided.
 
 &nbsp; 
 
