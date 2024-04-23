@@ -89,7 +89,7 @@ Your objective is to update your ORM stack from exercise 1 with the network conf
 |---|---| 
 | **1** | Edit the ORM Stack created on Exercise #1. |
 | **2** | Don't change any value on the first screen. Click Next.  |
-| **3** | Add the new network configuration by copying and pasting the **public git raw url** of the **oci_learn_lz_network.yml**.   </br>**NOTE 1**: Do not delete the existing IAM configuration, this is an incremental operation on resources. </br>**NOTE 2**: Don't forget to press enter or click on the "Add" pop-up after pasting the network url.|
+| **3** | Add the new network configuration by copying and pasting the **public git raw url** of the **oci_learn_lz_network.yml**. Optionally, replace with the json network config file </br>**NOTE 1**: Do not delete the existing IAM configuration, this is an incremental operation on resources. </br>**NOTE 2**: Don't forget to press enter or click on the "Add" pop-up after pasting the network url.|
 | **4** | Run terraform Plan, and Terraform Apply |
 | **5** | Review the created resources, they should match the design diagrams. |
 
