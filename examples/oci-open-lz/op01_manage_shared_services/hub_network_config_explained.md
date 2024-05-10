@@ -35,11 +35,11 @@ A VCN example without the sub-elements, is:
 ```
 {
     "network_configuration": {
-        "default_compartment_key": "CMP-NETWORK-KEY",
+        "default_compartment_id": "CMP-NETWORK-KEY",
         "default_enable_cis_checks": false,
         "network_configuration_categories": {
             "shared": {
-                "category_compartment_key": "CMP-NETWORK-KEY",
+                "category_compartment_id": "CMP-NETWORK-KEY",
                 "vcns": {
                     "VCN-FRA-HUB-KEY": {
                         "block_nat_traffic": false,

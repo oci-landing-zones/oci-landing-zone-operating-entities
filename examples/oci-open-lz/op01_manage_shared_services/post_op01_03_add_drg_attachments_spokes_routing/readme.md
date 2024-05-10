@@ -22,7 +22,7 @@
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../../design/OCI_Open_LZ.pdf).|
 | **PRE-ACTIVITIES** | [OP.01 Shared Services](../readme.md) executed.</br>[OP.02 – Manage OE:](../../op02_manage_oes/oe01/readme.md).</br>[POST.OP01.02: Update routing with NFW Private IP](../post_op01_02_update_routing_nfw_ip/readme.md). |
 | **POST-ACTIVITIES** | N/A |
-| **RUN WITH ORM** | 1. [![Deploy_To_OCI](../../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json"})  </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “orm-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the default configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create.|
+| **RUN WITH ORM** | 1. [![Deploy_To_OCI](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json"})  </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “rms-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the default configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create.|
 | **CONFIG & RUN - TERRAFORM CLI** | Follow the steps mentioned in the [OP.01](../readme.md). |
 
 &nbsp; 
@@ -289,7 +289,7 @@ The changes in the VCN route tables configuration are:
                 "description": "Route for ngw",
                 "destination": "0.0.0.0/0",
                 "destination_type": "CIDR_BLOCK",
-                "network_entity_id": "ocid1.privateip.oc1.eu-frankfurt-1.abtheljs227jcewruaz6sau2cmg3ursaikb7eog6m6zxxqxelgil56vokmoa"
+                "network_entity_id": "<NS PRIVATE IP OCID>"
             },
             "rt_oe01_co_vcn": {
                 "description": "Route for NGW to force traffic through NFW for OE01 Common VCN",

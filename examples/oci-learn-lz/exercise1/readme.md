@@ -14,7 +14,9 @@
 
 Welcome to the **Open Learn LZ** Exercise #1. 
 
-The main objective is to **create**, **version**, and **run** the IaC configurations for the OCI Learn LZ Tenancy Structure.
+The main objective is to **create**, **version**, and **run** the IaC configurations for the OCI Learn LZ Tenancy Structure focusing on IaC configurations and not on code, The [OCI Landing Zones Orchestrator](https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator) is a generic Terraform module that orchestrates the creation of Landing Zone architectures expressed in a single or multiple configuration files, that can be JSON documents and YAML documents.
+
+In this example we use YAML configurations files, but JSON files examples are also provided.
 
 In this exercise, you will create the tenancy structure IaC configuration to include the target domains. Your IT Central Team colleagues already started this, **your mission is to finish the configuration.** 
 
@@ -82,21 +84,24 @@ Your objective is to update your configurations on the OCI-LEARN-LZ-OPS-REPO git
 
 Your objective is to run your new configuration with ORM. The image below contains the high-level automation mechanism, which is based on an ORM Stack that is linked to your versioned configuration file(s).
 
+The OCI Landing Zones Orchestrator is a generic Terraform module that orchestrates the creation of Landing Zone architectures expressed in a single or multiple configuration files, that can be JSON documents and YAML documents.
+
+In this example we use YAML configurations files, but JSON files examples are also provided.
+
 &nbsp; 
 
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---| 
-| **1** | Create a new ORM Stack: [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_solution.yml"}) |
+| **1** | Create a new ORM Stack: [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_solution.yml"}) |
 | **2** | Accept terms,  **wait** for the configuration to load. |
-| **3** | Set the working directory to “**orm-facade**”. | 
+| **3** | Set the working directory to “**rms-facade**”. | 
 | **4** | Set the stack **name** you prefer. | 
 | **5** | Set the terraform **version** to 1.2.x. Click Next. | 
-| **6** | Accept the defaul configurations. Click Next.  |
-| **7** | **Delete** the default configuration link and **paste** the new **git raw link** of your **oci_learn_lz_iam.yml** remote file. </br>**NOTE:** Don't forget to press enter or click on the "Add" pop-up after pasting. |
-| **8** | **Un-check** run apply. Click Create. |
-| **9** | Run Terraform **Plan** and review the output messages. |
-| **10** | Run Terraform **Apply** and review the created resources, they should match the design diagrams. |
+| **6** | **Delete** the default configuration link and **paste** the new **git raw link** of your **oci_learn_lz_iam.yml** remote file. </br>**NOTE:** Don't forget to press enter or click on the "Add" pop-up after pasting. |
+| **7** | **Un-check** run apply. Click Create. |
+| **8** | Run Terraform **Plan** and review the output messages. |
+| **9** | Run Terraform **Apply** and review the created resources, they should match the design diagrams. |
 
 &nbsp; 
 

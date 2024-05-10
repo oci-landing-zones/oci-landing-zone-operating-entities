@@ -10,7 +10,7 @@ network_configuration:
     vision-environment: vision
   network_configuration_categories:
     HUB:
-      category_compartment_key: CMP-NETWORK-KEY
+      category_compartment_id: CMP-NETWORK-KEY
       category_freeform_tags:
         vision-sub-environment: hub
       non_vcn_specific_gateways:
@@ -76,7 +76,7 @@ network_configuration:
               security_list_keys:
               - default_security_list
     SPOKE-CHANNELS:
-      category_compartment_key: CMP-CHANNELS-NETWORK-KEY
+      category_compartment_id: CMP-CHANNELS-NETWORK-KEY
       category_freeform_tags:
         vision-sub-environment: spokechannels
       vcns:
