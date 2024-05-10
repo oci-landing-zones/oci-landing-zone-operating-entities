@@ -20,7 +20,7 @@
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../../design/OCI_Open_LZ.pdf).|
 | **PRE-ACTIVITIES** | [OP.04 Manage Projects](../../op04_manage_projects/readme.md) executed. Specifict OE Project Team IAM Groups created.  |
 | **POST-ACTIVITIES** | N/A |
-| **RUN WITH ORM** | 1. [![Deploy_To_OCI](../../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-open-lz/archive/refs/heads/master.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json"})  </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “orm-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the default configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create.|
+| **RUN WITH ORM** | 1. [![Deploy_To_OCI](../../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json"})  </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “rms-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the default configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create.|
 | **CONFIG & RUN - TERRAFORM CLI** | Follow the steps mentioned in the [OP.02](../readme.md). |
 
 &nbsp; 
@@ -43,7 +43,7 @@ We'll add the new policy to the configuration as:
         "PCY-OE01-PROD-DEPTA-PROJ1-COMMON-NETWORK-POLICY": {
             "name": "pcy-oe01-prod-depta-proj1-app-common-network",
             "description": "Open LZ policy which allows the grp-pa-oe01-prod-deptA-proj1-prd-app-admins, grp-pa-oe01-prod-deptA-proj1-prd-db-admins and grp-pa-oe01-prod-deptA-proj1-prd-infra-admins user groups to access common networking resources in the OE.",
-            "compartment_ocid": "'<OCID-CMP-OE01-COMMON>'",
+            "compartment_id": "'<OCID-CMP-OE01-COMMON>'",
             "statements": [
                 "allow group grp-pa-oe01-prod-deptA-proj1-prd-app-admins,grp-pa-oe01-prod-deptA-proj1-prd-db-admins,grp-pa-oe01-prod-deptA-proj1-prd-infra-admins to read virtual-network-family in compartment cmp-oe01-common-network",
                 "allow group grp-pa-oe01-prod-deptA-proj1-prd-app-admins,grp-pa-oe01-prod-deptA-proj1-prd-db-admins,grp-pa-oe01-prod-deptA-proj1-prd-infra-admins to use subnets in compartment cmp-oe01-common-network",
