@@ -122,3 +122,4 @@ network_configuration:
               dhcp_options_key: default_dhcp_options
               display_name: sn-channels-np-common
               dns_label: snchnpcommon
+              ipv6cidr_blocks: []
