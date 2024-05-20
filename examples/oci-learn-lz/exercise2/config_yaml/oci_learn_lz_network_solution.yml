@@ -123,3 +123,4 @@ network_configuration:
               display_name: sn-channels-np-common
               dns_label: snchnpcommon
               ipv6cidr_blocks: []
+              prohibit_internet_ingress: true
