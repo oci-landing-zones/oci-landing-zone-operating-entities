@@ -185,7 +185,6 @@ network_configuration:
                   destination_type: SERVICE_CIDR_BLOCK
                   network_entity_key: SG-FRA-HUB-KEY
           default_security_list:
-            display_name: defseclist-fra-hub-vcn
             egress_rules: []
             ingress_rules:
             - stateless: false
