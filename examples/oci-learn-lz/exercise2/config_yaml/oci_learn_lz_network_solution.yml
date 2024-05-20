@@ -119,3 +119,4 @@ network_configuration:
           subnets:
             SUBNET-CH-KEY:
               cidr_block: 10.1.0.0/26
+              display_name: sn-channels-np-common
