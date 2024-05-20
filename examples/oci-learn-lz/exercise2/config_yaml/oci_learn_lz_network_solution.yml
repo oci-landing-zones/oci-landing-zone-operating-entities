@@ -126,3 +126,5 @@ network_configuration:
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
               route_table_key: SUBNET-CH-RT-KEY
+              security_list_keys:
+              - default_security_list
