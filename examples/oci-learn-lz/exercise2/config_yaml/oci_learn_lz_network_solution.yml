@@ -18,11 +18,6 @@ network_configuration:
           DRG-HUB-KEY:
             display_name: drg-fra-hub
             drg_attachments:
-              DRG-HUB-VCN-CH-ATTACH-KEY:
-                display_name: drg-hub-vcn-ch-attach
-                network_details:
-                  attached_resource_key: VCN-CHANNELS-KEY
-                  type: VCN
               DRG-HUB-VCN-H-ATTACH-KEY:
                 display_name: drg-hub-vcn-h-attach
                 network_details:
