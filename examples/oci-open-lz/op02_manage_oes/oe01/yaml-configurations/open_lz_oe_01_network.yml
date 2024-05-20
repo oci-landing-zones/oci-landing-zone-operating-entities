@@ -104,7 +104,6 @@ network_configuration:
                   destination_type: CIDR_BLOCK
                   network_entity_id: "<HUB DRG OCID>"
           default_security_list:
-            display_name: defsl_fra_oe01_co_vcn
             egress_rules: []
             ingress_rules:
             - stateless: false
@@ -293,7 +292,6 @@ network_configuration:
                   destination_type: CIDR_BLOCK
                   network_entity_id: "<HUB DRG OCID>"
           default_security_list:
-            display_name: defsl_fra_oe01_dev_vcn
             egress_rules: []
             ingress_rules:
             - stateless: false
@@ -482,7 +480,6 @@ network_configuration:
                   destination_type: CIDR_BLOCK
                   network_entity_id: "<HUB DRG OCID>"
           default_security_list:
-            display_name: defsl-fra-oe01-np-vcn
             egress_rules: []
             ingress_rules:
             - stateless: false
@@ -685,7 +682,6 @@ network_configuration:
                   destination_type: CIDR_BLOCK
                   network_entity_id: "<HUB DRG OCID>"
           default_security_list:
-            display_name: defsl-fra-oe01-p-vcn
             egress_rules: []
             ingress_rules:
             - stateless: false
@@ -869,7 +865,6 @@ network_configuration:
                   destination_type: SERVICE_CIDR_BLOCK
                   network_entity_key: SG-FRA-OE01-SB-KEY
           default_security_list:
-            display_name: defsl-fra-oe01-sb-vcn
             egress_rules: []
             ingress_rules:
             - stateless: false
