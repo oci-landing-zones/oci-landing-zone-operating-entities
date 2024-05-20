@@ -84,6 +84,28 @@ network_configuration:
           block_nat_traffic: false
           cidr_blocks:
           - 10.1.0.0/24
+          default_security_list:
+            egress_rules:
+            - description: egress to 0.0.0.0/0 over ALL protocols
+              dst: 0.0.0.0/0
+              dst_type: CIDR_BLOCK
+              protocol: ALL
+              stateless: false
+            ingress_rules:
+            - description: ingress from 0.0.0.0/0 over TCP22
+              dst_port_max: 22
+              dst_port_min: 22
+              protocol: TCP
+              src: 0.0.0.0/0
+              src_type: CIDR_BLOCK
+              stateless: false
+            - description: ingress from 0.0.0.0/0 over TCP443
+              dst_port_max: 443
+              dst_port_min: 443
+              protocol: TCP
+              src: 0.0.0.0/0
+              src_type: CIDR_BLOCK
+              stateless: false
           display_name: vcn-channels-np
           dns_label: vcnchannelsnp
           is_attach_drg: false
