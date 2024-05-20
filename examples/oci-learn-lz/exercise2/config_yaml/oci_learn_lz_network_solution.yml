@@ -18,6 +18,11 @@ network_configuration:
           DRG-HUB-KEY:
             display_name: drg-fra-hub
             drg_attachments:
+              DRG-HUB-VCN-CH-ATTACH-KEY:
+                display_name: drg-hub-vcn-ch-attach
+                network_details:
+                  attached_resource_key: VCN-CHANNELS-KEY
+                  type: VCN
               DRG-HUB-VCN-H-ATTACH-KEY:
                 display_name: drg-hub-vcn-h-attach
                 network_details:
@@ -68,5 +73,36 @@ network_configuration:
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
               route_table_key: SUBNET-HUB-RT-KEY
+              security_list_keys:
+              - default_security_list
+    SPOKE-CHANNELS:
+      category_compartment_id: CMP-CHANNELS-NETWORK-KEY
+      category_freeform_tags:
+        vision-sub-environment: spokechannels
+      vcns:
+        VCN-CHANNELS-KEY:
+          block_nat_traffic: false
+          cidr_blocks:
+          - 10.1.0.0/24
+          display_name: vcn-channels-np
+          dns_label: vcnchannelsnp
+          is_attach_drg: false
+          is_create_igw: false
+          is_ipv6enabled: false
+          is_oracle_gua_allocation_enabled: false
+          route_tables:
+            SUBNET-CH-RT-KEY:
+              display_name: subnet-channels-rt
+              route_rules: {}
+          subnets:
+            SUBNET-CH-KEY:
+              cidr_block: 10.1.0.0/26
+              dhcp_options_key: default_dhcp_options
+              display_name: sn-channels-np-common
+              dns_label: snchnpcommon
+              ipv6cidr_blocks: []
+              prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
+              route_table_key: SUBNET-CH-RT-KEY
               security_list_keys:
               - default_security_list
