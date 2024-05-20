@@ -125,3 +125,4 @@ network_configuration:
               ipv6cidr_blocks: []
               prohibit_internet_ingress: true
               prohibit_public_ip_on_vnic: true
+              route_table_key: SUBNET-CH-RT-KEY
