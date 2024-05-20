@@ -124,3 +124,4 @@ network_configuration:
               dns_label: snchnpcommon
               ipv6cidr_blocks: []
               prohibit_internet_ingress: true
+              prohibit_public_ip_on_vnic: true
