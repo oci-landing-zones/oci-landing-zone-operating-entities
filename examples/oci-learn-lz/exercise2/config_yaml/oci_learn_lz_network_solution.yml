@@ -119,4 +119,5 @@ network_configuration:
           subnets:
             SUBNET-CH-KEY:
               cidr_block: 10.1.0.0/26
+              dhcp_options_key: default_dhcp_options
               display_name: sn-channels-np-common
