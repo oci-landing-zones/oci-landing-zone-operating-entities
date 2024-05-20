@@ -32,7 +32,7 @@
             "cidr_blocks": [
               "10.0.0.0/24"
             ],
-            "default-security-list": {
+            "default_security_list": {
               "egress_rules": [
                 {
                   "description": "egress to 0.0.0.0/0 over ALL protocols",
