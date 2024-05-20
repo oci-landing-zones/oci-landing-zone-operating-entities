@@ -116,3 +116,6 @@ network_configuration:
             SUBNET-CH-RT-KEY:
               display_name: subnet-channels-rt
               route_rules: {}
+          subnets:
+            SUBNET-CH-KEY:
+              cidr_block: 10.1.0.0/26
