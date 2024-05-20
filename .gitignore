@@ -3,4 +3,4 @@
 **/*.tfstate*
 **/*.out
 **/.terraform/*
-**/*oci-credentials.tfvars.json
+**/*oci-credentials.tfvars.jsongit
