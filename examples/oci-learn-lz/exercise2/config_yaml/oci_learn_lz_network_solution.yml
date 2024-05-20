@@ -94,15 +94,3 @@ network_configuration:
             SUBNET-CH-RT-KEY:
               display_name: subnet-channels-rt
               route_rules: {}
-          subnets:
-            SUBNET-CH-KEY:
-              cidr_block: 10.1.0.0/26
-              dhcp_options_key: default_dhcp_options
-              display_name: sn-channels-np-common
-              dns_label: snchnpcommon
-              ipv6cidr_blocks: []
-              prohibit_internet_ingress: true
-              prohibit_public_ip_on_vnic: true
-              route_table_key: SUBNET-CH-RT-KEY
-              security_list_keys:
-              - default_security_list
