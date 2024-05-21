@@ -7,7 +7,7 @@ For authenticating against the OCI tenancy Terraform needs the following informa
 "private_key_path": "<path to the private key that matches the fingerprint above>",
 "tenancy_id": "<tenancy OCID>",
 "user_id": "<user OCID>",
-"home_region": "<home region>",
+"region": "<home region>",
 "private_key_password": "<private key pwd>"
 ```
 
@@ -31,7 +31,7 @@ The new, edited [oci-credentials.tfvars.json](shared/oci-credentials.tfvars.json
     "private_key_path": "~/.oci/oci_api_key.pem",
     "tenancy_ocid": "ocid1.tenancy.oc1....",
     "user_ocid": "ocid1.user.oc1....",
-    "home_region": "eu-frankfurt-1",
+    "region": "eu-frankfurt-1",
     "private_key_password": ""
 }
 ```

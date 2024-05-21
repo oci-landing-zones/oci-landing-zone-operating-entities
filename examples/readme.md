@@ -12,6 +12,8 @@ The OCI Open LZ is much more than a blueprint, is a set of artifacts that can re
 
 Welcome to the **Open Catalogue**. 
 
+<span style="color:red">***NOTE: If you're upgrading your configurations from the OCI LZ Orchestrator version <2.0.0, check [this](upgrading-orchestrator.md) to follow the upgrade process.***</span>
+
 &nbsp; 
 
 ## 1. Learning
@@ -55,7 +57,7 @@ A set of landing zones ready for specific workloads. Each flavor has a design wi
 
 | NAME | OBJECTIVE  | DESIGN | RUNTIME | 
 |---|---|---|---|
-| OCI EBS LZ | A ready-made landing zone for EBS with a complete design and IaC runtime. | [View](/examples/oci-ebs-lz/readme.md) | [View](/examples/oci-ebs-lz/op02-deploy-Open-EBS-pattern/readme.md) |
+| EBS LZ Extension | A ready-made landing zone for EBS with a complete design and IaC runtime. | [View](/examples/oci-lz-ext-ebs/readme.md) | [View](/examples/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/readme.md) |
 
 
 &nbsp; 
@@ -68,5 +70,5 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE) for more details.
 
