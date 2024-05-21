@@ -33,7 +33,7 @@ network_configuration:
           block_nat_traffic: false
           cidr_blocks:
           - 10.0.0.0/24
-          default-security-list:
+          default_security_list:
             egress_rules:
             - description: egress to 0.0.0.0/0 over ALL protocols
               dst: 0.0.0.0/0
@@ -84,7 +84,7 @@ network_configuration:
           block_nat_traffic: false
           cidr_blocks:
           - 10.1.0.0/24
-          default-security-list:
+          default_security_list:
             egress_rules:
             - description: egress to 0.0.0.0/0 over ALL protocols
               dst: 0.0.0.0/0
