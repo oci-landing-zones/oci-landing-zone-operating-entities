@@ -60,7 +60,7 @@ policies_configuration:
     PCY-SERVICES:
       name: pcy-services
       description: POL.00 Open LZ policy for all supported resources in the tenancy.
-      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      compartment_id: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - allow service cloudguard to read all-resources in tenancy
       - allow service cloudguard to use network-security-groups in tenancy
@@ -76,7 +76,7 @@ policies_configuration:
       name: pcy-iam-administration
       description: POL.01 Open LZ allows grp-iam-admins group users to manage IAM
         resoures in the tenancy.
-      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      compartment_id: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - allow group grp-iam-admins to inspect users in tenancy
       - allow group grp-iam-admins to manage users in tenancy where all {request.operation
@@ -106,7 +106,7 @@ policies_configuration:
       name: pcy-credential-administration
       description: POL.02 Open LZ policy which allows grp-credential-admins group
         users to manage user credentials of local users in the tenancy .
-      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      compartment_id: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - allow group grp-credential-admins to inspect users in tenancy
       - allow group grp-credential-admins to inspect groups in tenancy
@@ -121,7 +121,7 @@ policies_configuration:
       name: pcy-announcement-readers
       description: POL.03 Open LZ policy which allows grp-announcement-readers group
         users to read OCI announcements in the tenancy.
-      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      compartment_id: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - allow group grp-announcement-readers to read announcements in tenancy
       - allow group grp-announcement-readers to use cloud-shell in tenancy
@@ -129,7 +129,7 @@ policies_configuration:
       name: pcy-budget-administration
       description: POL.04 Open LZ policy which allows grp-budget-admins group users
         to manage all budget resources in the tenancy.
-      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      compartment_id: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - define tenancy usage-report as ocid1.tenancy.oc1..example
       - endorse group grp-budget-admins to read objects in tenancy usage-report
@@ -139,7 +139,7 @@ policies_configuration:
       name: pcy-auditing
       description: POL.05 Open LZ policy which allows grp-auditors group users to
         read all the resources in the tenancy.
-      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      compartment_id: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - allow group grp-auditors to inspect all-resources in tenancy
       - allow group grp-auditors to read instances in tenancy
@@ -162,7 +162,7 @@ policies_configuration:
       name: pcy-network-administration
       description: POL.06 Open LZ policy which allows grp-network-admins group users
         to manage all network resources in the compartment.
-      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      compartment_id: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - allow group grp-network-admins to use cloud-shell in tenancy
       - allow group grp-network-admins to read usage-budgets in tenancy
@@ -184,7 +184,7 @@ policies_configuration:
       name: pcy-security-administration
       description: POL.07 Open LZ policy which allows grp-security-admins group users
         to manage all security resources in the security compartment.
-      compartment_ocid: "<OCID-COMPARTMENT-ROOT>"
+      compartment_id: "<OCID-COMPARTMENT-ROOT>"
       statements:
       - allow group grp-security-admins to use cloud-shell in tenancy
       - allow group grp-security-admins to read usage-budgets in tenancy

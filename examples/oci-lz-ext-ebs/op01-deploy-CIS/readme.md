@@ -165,7 +165,7 @@ This section presents the Oracle Resource Manager steps with associated input. T
 
 &nbsp; 
 
-You can proceed to [OP.02 Manage EBS Landing Zone Extension](/examples/oci-ebs-lz/op02-manage-ebs-lz-extension/readme.md).
+You can proceed to [OP.02 Manage EBS Landing Zone Extension](/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/readme.md).
 
 &nbsp; 
 
@@ -175,4 +175,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE) for more details.

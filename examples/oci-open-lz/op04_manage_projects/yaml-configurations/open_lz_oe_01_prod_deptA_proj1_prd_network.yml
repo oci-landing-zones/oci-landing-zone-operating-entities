@@ -8,7 +8,7 @@ network_configuration:
           vcn_id: "<OCID-VCN-FRA-OE01-P>"
           network_security_groups:
             NSG-01-OE01-PROD-DEPT-A-PROJ1-PRD-APPS-KEY:
-              compartment_key: CMP-OE01-PROD-DEPT-A-PROJ1-PRD-APP-KEY
+              compartment_id: CMP-OE01-PROD-DEPT-A-PROJ1-PRD-APP-KEY
               display_name: nsg-oe01-deptA-proj1-prd-apps
               defined_tags: 
               freeform_tags: 
@@ -45,7 +45,7 @@ network_configuration:
                   src_type: CIDR_BLOCK
                   stateless: false
             NSG-01-OE01-PROD-DEPT-A-PROJ1-PRD-DB-KEY:
-              compartment_key: CMP-OE01-PROD-DEPT-A-PROJ1-PRD-APP-KEY
+              compartment_id: CMP-OE01-PROD-DEPT-A-PROJ1-PRD-APP-KEY
               display_name: nsg-oe01-deptA-proj1-prd-db
               defined_tags: 
               freeform_tags: 
@@ -75,7 +75,7 @@ network_configuration:
                   src_type: CIDR_BLOCK
                   stateless: false
             NSG-01-OE01-PROD-DEPT-A-PROJ1-PRD-INFRA-KEY:
-              compartment_key: CMP-OE01-PROD-DEPT-A-PROJ1-PRD-DB-KEY
+              compartment_id: CMP-OE01-PROD-DEPT-A-PROJ1-PRD-DB-KEY
               display_name: nsg-oe01-deptA-proj1-prd-db
               defined_tags: 
               freeform_tags: 
