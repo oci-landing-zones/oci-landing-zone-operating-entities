@@ -179,18 +179,18 @@ To update the configuration, follow these steps:
      * Drop the zip file that you've just downloaded in the *Drop a .zip file* rectangle.
      * In the *Working directory*, select the *terraform-oci-landing-zones-orchestrator-main/rms-facade*.
      * In the *Terraform version* dropdown list, select the "1.2.x" version. Confirm clicking in *Yes* button the Terraform version change dialog box when appears. This step should look like this:
-    ![ORM-Stack-information](./images/ORM-Stack-information.jpg)
+    ![ORM-Stack-information](../images/ORM-Stack-information.jpg)
      * Click *Next*.
    * ***Configure variables section***:
      * **Region**. Check that the region is the same as where you have the resources for this stack (might be different to where the stacks belongs.).
      * **Configuration source**. Select the source for your configuration files. If you were using before a public git repo or a public or pre-authenticated OCI Object Storage bucket, select *url*. Now you have the option to use private GitHub repos or private buckets. If you're planning to change to one of these repositories for your configuration, we recommend to do it in a second phase after everything is working fine with the new code to reduced the risks in the process.
      * **URL Sources**. Check that the URL Sources are correct for your existing configuration.
      * **Dependency Files**. The feature is new and optional. It is used to store a JSON files with the keys and OCIDs of some resources created in a previous operation (stack) so they can be used in this operation (stack). As with the configuration sources, we encorage to start using this feature after the upgrade of the previous orchestrator version. This step should look like this:
-    ![ORM-Configure-variables](./images/ORM-Configure-variables.jpg)
+    ![ORM-Configure-variables](../images/ORM-Configure-variables.jpg)
      * Click *Next*.
    * ***Review section***:
      * Just review that the stack information and the variables are correct, ensure that the *Run apply* is unmatched. This step should look like this:
-    ![ORM-Review](./images/ORM-Review.jpg)
+    ![ORM-Review](../images/ORM-Review.jpg)
      * Click *Next*.
 
 3. **Update the configuration files**. Ensure that you followed the section [2. Upgrading configuration](#2-upgrading-configuration) in this document and you uploaded the updated configuration files in the location configured in the stack (GitHub, OSS, other.).
