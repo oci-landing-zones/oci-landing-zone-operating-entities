@@ -4,7 +4,7 @@
 
 &nbsp; 
 
-<img src="commons/images/oci_open_lz.jpg" width="1200" height="value">
+<img src="images/oci_open_lz.jpg" width="1200" height="value">
 
 &nbsp; 
 
@@ -24,9 +24,9 @@ There are three blueprints available to onboard OCI. Choose the most suitable ac
 
 | BLUEPRINT | DIAGRAM | SIZE | OBJECTIVE   | ORGANIZATIONAL SCOPE | 
 |:--:|---|:-:|---|---|
-| [**One-OE**](/one-oe/readme.md) </br><span style="color:red">*-- new --*</span>| <img src="commons/images/one-oe_icon.jpg" width="80" height="value">| **M** | A new model to onboard **one** Operating Entity with its environments, platforms, and projects in **one tenancy**. | One Organization Unit, LoB, OpCo, or Department. 
-| [**Multi-OE**](/multi-oe/readme.md) | <img src="commons/images/multi-oe_icon.jpg" width="100" height="value">| **L** | Onboards **several** Operating Entities with a shared services model, with OE-dedicated environments, platforms, and projects sharing **one tenancy.** | Several Organization Units, LoBs, OpCos, or Departments. 
-| **Multi-Tenancy*** | <img src="commons/images/multi-tenancy_icon.jpg" width="150" height="value">| **X-XXL** | Uses the **One-OE** and **Multi-OE** to onboard all your organizations or customers into **several tenancies**, while **providing your** centralized services, shared services, managed services, cloud services, PaaS, or SaaS. | All Your Organizations, Organization Units, or Partners.
+| [**One-OE**](/one-oe/readme.md) </br><span style="color:red">*-- new --*</span>| <img src="images/one-oe_icon.jpg" width="80" height="value">| **M** | A new model to onboard **one** Operating Entity with its environments, platforms, and projects in **one tenancy**. | One Organization Unit, LoB, OpCo, or Department. 
+| [**Multi-OE**](/multi-oe/readme.md) | <img src="images/multi-oe_icon.jpg" width="100" height="value">| **L** | Onboards **several** Operating Entities with a shared services model, with OE-dedicated environments, platforms, and projects sharing **one tenancy.** | Several Organization Units, LoBs, OpCos, or Departments. 
+| **Multi-Tenancy*** | <img src="images/multi-tenancy_icon.jpg" width="150" height="value">| **X-XXL** | Uses the **One-OE** and **Multi-OE** to onboard all your organizations or customers into **several tenancies**, while **providing your** centralized services, shared services, managed services, cloud services, PaaS, or SaaS. | All Your Organizations, Organization Units, or Partners.
 
 
 (*) The multi-tenancy landing zone is available on demand. 

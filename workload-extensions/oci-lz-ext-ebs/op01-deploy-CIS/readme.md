@@ -23,7 +23,7 @@
 | **DETAILS** |  For more details refer to the [OCI CIS LandingZone QuickStart](https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart) |
 | **PRE-ACTIVITIES** | Review [CIS Overview](#2-CIS-EBS-Overview) |
 | **POST-ACTIVITIES** | OP.02 |
-| **RUN WITH ORM** | [![Deploy_To_OCI](../../../images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart/archive/refs/heads/main.zip)  </br>See section [3. ORM Configuration Options ](#3-ORM-Configuration-Options) for the values and [template](EBS_CIS.pdf) for further details. |
+| **RUN WITH ORM** | [![Deploy_To_OCI](/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart/archive/refs/heads/main.zip)  </br>See section [3. ORM Configuration Options ](#3-ORM-Configuration-Options) for the values and [template](EBS_CIS.pdf) for further details. |
 | **CONFIG & RUN - TERRAFORM CLI** | Use the [CIS OCI LZ GitHub Repository](https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart). |
 
 &nbsp; 
