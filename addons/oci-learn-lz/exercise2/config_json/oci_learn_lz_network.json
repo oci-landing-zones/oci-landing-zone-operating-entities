@@ -1,0 +1,96 @@
+{
+  "network_configuration": {
+    "default_enable_cis_checks": false,
+    "default_freeform_tags": {
+      "vision-environment": "vision"
+    },
+    "network_configuration_categories": {
+      "HUB": {
+        "category_compartment_id": "CMP-NETWORK-KEY",
+        "category_freeform_tags": {
+          "vision-sub-environment": "hub"
+        },
+        "non_vcn_specific_gateways": {
+          "dynamic_routing_gateways": {
+            "DRG-HUB-KEY": {
+              "display_name": "drg-fra-hub",
+              "drg_attachments": {
+                "DRG-HUB-VCN-H-ATTACH-KEY": {
+                  "display_name": "drg-hub-vcn-h-attach",
+                  "network_details": {
+                    "attached_resource_key": "VCN-HUB-KEY",
+                    "type": "VCN"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "vcns": {
+          "VCN-HUB-KEY": {
+            "block_nat_traffic": false,
+            "cidr_blocks": [
+              "10.0.0.0/24"
+            ],
+            "default_security_list": {
+              "egress_rules": [
+                {
+                  "description": "egress to 0.0.0.0/0 over ALL protocols",
+                  "dst": "0.0.0.0/0",
+                  "dst_type": "CIDR_BLOCK",
+                  "protocol": "ALL",
+                  "stateless": false
+                }
+              ],
+              "ingress_rules": [
+                {
+                  "description": "ingress from 0.0.0.0/0 over TCP22",
+                  "dst_port_max": 22,
+                  "dst_port_min": 22,
+                  "protocol": "TCP",
+                  "src": "0.0.0.0/0",
+                  "src_type": "CIDR_BLOCK",
+                  "stateless": false
+                },
+                {
+                  "description": "ingress from 0.0.0.0/0 over TCP443",
+                  "dst_port_max": 443,
+                  "dst_port_min": 443,
+                  "protocol": "TCP",
+                  "src": "0.0.0.0/0",
+                  "src_type": "CIDR_BLOCK",
+                  "stateless": false
+                }
+              ]
+            },
+            "display_name": "vcn-fra-hub",
+            "dns_label": "vcnfrahub",
+            "is_ipv6enabled": false,
+            "is_oracle_gua_allocation_enabled": false,
+            "route_tables": {
+              "SUBNET-HUB-RT-KEY": {
+                "display_name": "subnet-hub-rt",
+                "route_rules": {}
+              }
+            },
+            "subnets": {
+              "SUBNET-HUB-KEY": {
+                "cidr_block": "10.0.0.0/26",
+                "dhcp_options_key": "default_dhcp_options",
+                "display_name": "sn-fra-hub-fw",
+                "dns_label": "snfrahubfw",
+                "ipv6cidr_blocks": [],
+                "prohibit_internet_ingress": true,
+                "prohibit_public_ip_on_vnic": true,
+                "route_table_key": "SUBNET-HUB-RT-KEY",
+                "security_list_keys": [
+                  "default_security_list"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
