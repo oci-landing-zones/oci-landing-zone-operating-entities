@@ -4,7 +4,7 @@
 
 &nbsp; 
 
-Welcome to the **OCI Open LZ Workload Extenions**.  
+Welcome to the **OCI Open LZ Workload Extensions**.  
 
 A workload extension is an **OCI solution design ready to receive specific workloads** on top of a landing zone. Each of these extensions follows the [tailored landing zone approach](/landing-zones/tailored_landing_zones/tailored_landing_zones.md) and has a design and runtime, ready for deployment:
 
