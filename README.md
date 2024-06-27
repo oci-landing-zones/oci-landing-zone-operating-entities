@@ -18,19 +18,20 @@ The objective of the **OCI Open LZ** is to **increase OCI security and scalabili
 
 &nbsp; 
 
-## Blueprint Menu 
+## Select Your Blueprint
 
 There are three blueprints available to onboard OCI. Choose the most suitable according to your objectives, review the design, and run the model. 
 
 | BLUEPRINT | DIAGRAM | SIZE | OBJECTIVE   | ORGANIZATIONAL SCOPE | 
 |:--:|---|:-:|---|---|
-| [**One-OE**](/one-oe/readme.md) </br><span style="color:red">*-- new --*</span>| [<img src="images/one-oe_icon.jpg" width="80" height="value">](/one-oe/readme.md)| **M** | A new model to onboard **one** Operating Entity with its environments, platforms, and projects in **one tenancy**. | One Organization Unit, LoB, OpCo, or Department. 
-| [**Multi-OE**](/multi-oe/readme.md) | [<img src="images/multi-oe_icon.jpg" width="100" height="value">](/multi-oe/readme.md)| **L** | Onboards **several** Operating Entities with a shared services model, with OE-dedicated environments, platforms, and projects sharing **one tenancy.** | Several Organization Units, LoBs, OpCos, or Departments. 
-| **Multi-Tenancy*** | <img src="images/multi-tenancy_icon.jpg" width="150" height="value">| **X-XXL** | Uses the **One-OE** and **Multi-OE** to onboard all your organizations or customers into **several tenancies**, while **providing your** centralized services, shared services, managed services, cloud services, PaaS, or SaaS. | All Your Organizations, Organization Units, or Partners.
+| [**One-OE**](/one-oe/readme.md) </br><span style="color:red">*-- new --*</span>| [<img src="images/one-oe_icon.jpg" width="80" height="value">](/one-oe/readme.md)| **M** | A new model to onboard **one Operating Entit** with its environments, platforms, and projects in **one tenancy**.</br> [<img src="images/DeployToOCI_oneoff.svg"  height="25">](/one-oe/runtime/one-off/readme.md) | One OU, LoB, OpCo, or Department. 
+| [**Multi-OE**](/multi-oe/readme.md) | [<img src="images/multi-oe_icon.jpg" width="100" height="value">](/multi-oe/readme.md)| **L** | Onboards **several Operating Entities** with a shared services model, with OE-dedicated environments, platforms, and projects, sharing **one tenancy.** | Several OUs, LoBs, OpCos, or Departments. 
+| **Multi-Tenancy*** | <img src="images/multi-tenancy_icon.jpg" width="150" height="value">| **X-XXL** | Uses the **One-OE** and **Multi-OE** to onboard all your organizations or customers into **several tenancies**, while **providing your** centralized services, shared services, managed services, cloud services, PaaS, or SaaS. | All Your Organizations, OUs, Partners, or Customers.
 
 
 (*) The multi-tenancy landing zone is available on demand. 
 
+&nbsp; 
 
 Note these blueprints can be used directly as OCI [**Standard Landing Zones**](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/standard_landing_zones/readme.md) or as a guide or starting point for a [**Tailored Design**](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/tailored_landing_zones/readme.md). You can also extend your Landing Zone with ready-made pluggable [**Workload Extensions**](/workload-extensions/readme.md) to reduce your time-to-production with OCI best practices. 
 
