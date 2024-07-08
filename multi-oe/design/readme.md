@@ -19,7 +19,7 @@
 
 The OCI Open LZ is a set of public and open assets to onboard OCI, available in a dedicated [Git Repository](https://github.com/oracle-quickstart/terraform-oci-open-lz), containing a complete design **blueprint**, several **IaC** configuration **examples**, and **enablement** activities.
 
-This document is a subset of the OCI Open LZ, and it provides an executive summary of the design **blueprint**. The complete blueprint is presented in detail in the [PDF](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) format and supported by a [Drawio](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) containing all design diagrams, for reuse while tailoring new landing zones.
+This document is a subset of the OCI Open LZ, and it provides an executive summary of the **Multi-OE blueprint**. The complete blueprint is presented in detail in the [PDF](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) format and supported by a [Drawio](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) containing all design diagrams, for reuse while tailoring new landing zones.
 
 For more approaches and assets on OCI Landing Zones refer to the [OCI Landing Zone Framework](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/README.md).
 
@@ -42,7 +42,7 @@ Welcome to the **OCI Open LZ**, the **Op**erating **En**tities **L**anding **Z**
 
 &nbsp; 
 
-<img src="images/oci_open_lz_hl_design.jpg" alt= “” width="1200" height="value">
+<img src="images/oci_open_lz_hl_design.jpg" alt= “” width="1000" height="value">
 &nbsp; 
 
 | # | CHARECTERISTICS| DESCRIPTION   | 
@@ -67,7 +67,7 @@ This OCI Open LZ is presented with several design views built on top of each oth
 1.  The **Functional View** presents the fundamental organizational entities of the OCI Open LZ and how they relate to each other. 
 2.  The **Security View** presents the core building blocks of the tenancy organization, identity and access management, and security posture. 
 3.  The **Network View**, designed on top of the security, presents how network elements are structured and connected to communicate with each other. 
-4.  The **Operations View** presents the dynamic perspective of the OCI Open LZ, proposing a design for provisioning and changing the previous elements with a GitOps operating model, proposing a repository structure - with clear separation between configuration areas (for operations) and code areas (for developers) - ready for day 1 and day 2 operations. 
+4.  The **Operations View** presents the dynamic perspective of the OCI Open LZ, proposing a design for provisioning and changing the previous elements with a GitOps operating model, proposing a repository structure - with a clear separation between configuration areas (for operations) and code areas (for developers) - ready for day 1 and day 2 operations. 
 5.  The **Runtime View** presents the OCI Open LZ operations artifacts to demonstrate how day 2 operations can run. These elements are ready to be run with a configurable IaC approach.
 
 &nbsp; 
@@ -84,13 +84,13 @@ While the previous diagram presents the recommended steps of the journey to crea
 
 &nbsp; 
 
-<img src="images/1_oci_open_lz_layers.jpg" alt= “” width="500" height="value">
+<img src="../../images/1_oci_open_lz_layers.jpg" alt= “” width="350" height="value">
 
 &nbsp; 
 
-It's out of scope of the OCI Open LZ the workload elements as they can follow the same reference design and operating model, and the monitoring view, which will be added in the future as an incremental update.
+It's out of the scope the workload elements as they can follow the same reference design and operating model, and the monitoring view, which will be added in the future as an incremental update.
 
-Before proceeding, it’s highly recommended OCI foundational knowledge on its core services and resources, such as Compartments, Groups, Policies, DRG, VCNs, Subnets, Route tables, Security Lists, Network Security Groups, among others. For the operations view it’s recommended intermediate knowledge on version control systems, pipelines, and infrastructure-as-code (IaC).
+Before proceeding, it’s highly recommended OCI foundational knowledge for its core services and resources, such as Compartments, Groups, Policies, DRG, VCNs, Subnets, Route tables, Security Lists, Network Security Groups, among others. For the operations view it’s recommended intermediate knowledge of version control systems, pipelines, and infrastructure-as-code (IaC).
 
 &nbsp; 
 &nbsp; 
@@ -115,7 +115,7 @@ This chapter presents the following elements:
 
 &nbsp; 
 
-The diagram below presents the tenancy structure for Level 1 and 2, separating the shared resources area (in pale yellow) operated by the parent company, and the N possible operating entities areas (in blue tones), that each OE will be responsible for operating their resources on environments.
+The diagram below presents the tenancy structure for Levels 1 and 2, separating the shared resources area (in pale yellow) operated by the parent company, and the N possible operating entities areas (in blue tones), that each OE will be responsible for operating their resources on environments.
 
 &nbsp; 
 
@@ -134,7 +134,7 @@ For more details on the tenancy structure levels (L3-L5), related IAM with OCI G
 # **4. Network View**
 
 This chapter presents all the network elements of the OCI Open LZ, and it’s organized into five sections:
-1. **Network Structure** presents all the most-significant network components, their relations, and objectives.
+1. **Network Structure** presents all the most significant network components, their relations, and objectives.
 2. **Network Security** presents the network areas and their related security posture.
 3. **Network Connectivity** presents how the OCI Open LZ can be connected to on-premises and other cloud providers and describes the most significant network traffic (the network use cases) with a north-south and east-west pattern.
 4. **DNS** presents the naming resolution use cases and how DNS zones and records are solved to handle domain DNS queries.
@@ -193,8 +193,8 @@ For more details on the network design including all the descriptions for each e
 
 This chapter presents what cloud-native operations look like with the OCI Open LZ pattern and it's organized into four sections:
 1. **Cloud-Native Operations** presents an overview of what modern cloud operations look like. These concepts are used throughout this chapter and are key to building the target OCI Open LZ operating model and Runtime View.
-2. **Provisioning and Change** identifies the key OCI Open LZ operations building blocks, i.e., the operations scenarios (what), the responsible teams to execute them (who), and how to automate these operations (how).
-3. **Operating Model** builds on top he the previous section and presents the target operating model for the OCI Open LZ using a set of git repositories - that act as the single source of truth for operations. This section provides the operational controls required to operate at scale, as simple automation of operations scenarios described in Provisioning and Change section is not enough.
+2. **Provisioning and Change** identifies the key operations building blocks, i.e., the operations scenarios (what), the responsible teams to execute them (who), and how to automate these operations (how).
+3. **Operating Model** builds on top he the previous section and presents the target operating model for the OCI Open LZ using a set of git repositories - that act as the single source of truth for operations. This section provides the operational controls required to operate at scale, as simple automation of operations scenarios described in "Provisioning and Change" section is not enough.
 4. **Design Considerations** presents the design rationale to use when tailoring or extending this pattern.
 
 &nbsp; 
