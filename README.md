@@ -8,7 +8,7 @@
 
 &nbsp; 
 
-Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as **OCI Open LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI. 
+Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as **OCI [Open](#) LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI. 
 
 The objective of the **OCI Open LZ** is to **increase OCI security and scalability** while **reducing the design and implementation timelines, associated costs, and efforts** - with the following artifacts:
 1. **[Blueprints](#the-blueprints-menu)**: Complete landing zone **designs** with **100% declarative IaC runtime models**, ready to onboard organizations and their functional divisions &ndash; identified as **Op**erating **En**tities **(OEs)**. 
