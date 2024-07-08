@@ -17,7 +17,7 @@
 
 # **1. Introduction**
 
-The OCI Open LZ is a set of public and open assets to onboard OCI, available in a dedicated [Git Repository](https://github.com/oracle-quickstart/terraform-oci-open-lz), containing several design **blueprint**, **IaC** configuration **examples**, and **enablement** activities.
+The OCI Open LZ is a set of public and open assets to onboard OCI, available in a dedicated [Git Repository](https://github.com/oracle-quickstart/terraform-oci-open-lz), containing several design **blueprints**, **IaC** configuration **examples**, and **enablement** activities.
 
 This document is a subset of the OCI Open LZ, and it provides an executive summary of the **One-OE blueprint**. The complete blueprint will be available soon in detail in the PDF format and supported by a [Drawio](/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio) containing all design diagrams, for reuse while tailoring new landing zones.
 
@@ -28,7 +28,7 @@ For more approaches and assets on OCI Landing Zones refer to the [OCI Landing Zo
 ## **1.1 Purpose**
 The purpose of this document is to:
 
-1. Provide a **landing zone design** ready to **onboard one organization unit (OU)** with their teams, platforms, and projects. The OU will be identified as an **Operating Entitiy (OE)**, as there is an operating team (customer or partner) responsible for the management of a set of resources.
+1. Provide a **landing zone design** ready to **onboard one organization unit (OU)** with their teams, platforms, and projects. The OU will be identified as an **Operating Entity (OE)**, as there is an operating team (customer or partner) responsible for the management of a set of resources.
 2. Provide a **cloud-native operating model** to simplify and scale **day two operations**.
 3. **Enable customers, partners**, and the **general IT community** to **create their landing zones** with lower efforts through a comprehensive Oracle Cloud Infrastructure (OCI) reference architecture. To support this objective, all the architecture diagrams are provided in a reusable format.
 4. **Provide tailoring guidelines** to help adjust the model. This asset can be used directly, tailored, or used as inspiration to create a new one - as it is not a prescribed solution.
@@ -89,17 +89,17 @@ While the previous diagram presents the recommended steps of the journey to crea
 
 &nbsp; 
 
-<img src="../../multi-oe/images/1_oci_open_lz_layers.jpg" alt= “” width="400" height="value">
+<img src="../../images/1_oci_open_lz_layers.jpg" alt= “” width="350" height="value">
 
 &nbsp; 
 
-Before proceeding, it’s highly recommended OCI foundational knowledge on its core services and resources, such as Compartments, Groups, Policies, DRG, VCNs, Subnets, Route tables, Security Lists, Network Security Groups, among others. For the operations view it’s recommended intermediate knowledge on version control systems, pipelines, and infrastructure-as-code (IaC).
+Before proceeding, it’s highly recommended OCI foundational knowledge of its core services and resources, such as Compartments, Groups, Policies, DRG, VCNs, Subnets, Route tables, Security Lists, Network Security Groups, among others. For the operations view it’s recommended intermediate knowledge of version control systems, pipelines, and infrastructure-as-code (IaC).
 
 &nbsp; 
 &nbsp; 
 
 # **2. Functional View**
-The Landing Zone blueprint has a set of **functional elements** that are **key building blocks** used throughout this document – with same code color – and ultimately are used to aggregate and operate a set of OCI resources. These elements are presented in the following diagram it’s crucial to understand them to understand the whole design. All elements are presented in detail in the [OCI Open LZ One-OE Drawio - Functional Tabs](/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio).  
+The Landing Zone blueprint has a set of **functional elements** that are **key building blocks** used throughout this document – with the same code color – and ultimately are used to aggregate and operate a set of OCI resources. These elements are presented in the following diagram it’s crucial to understand them to understand the whole design. All elements are presented in detail in the [OCI Open LZ One-OE Drawio - Functional Tabs](/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio).  
 
 &nbsp; 
 
@@ -107,7 +107,7 @@ The Landing Zone blueprint has a set of **functional elements** that are **key b
 
 &nbsp; 
 
-The following diagram and table present the union between the personas and functional elements presented in the previous sections – in form of user stories. The user storied identified match the building blocks, having two common stories between different personas: Shared Services and Platforms. Functionally and technically, they are the same, but in different areas of the landing zone, with different scopes, and different ownership. 
+The following diagram and table present the union between the personas and functional elements presented in the previous sections – in the form of user stories. The user stories identified match the building blocks, having two common stories between different personas: Shared Services and Platforms. Functionally and technically, they are the same, but in different areas of the landing zone, with different scopes, and different ownership. 
  
 &nbsp; 
 
@@ -115,11 +115,11 @@ The following diagram and table present the union between the personas and funct
 
 &nbsp; 
 
-<img src="images/2_functional_view_user_stories_Table.jpg" alt= “” width="700" height="value">
+<img src="images/2_functional_view_user_stories_table.jpg" alt= “” width="700" height="value">
 
 &nbsp; 
 
-Note that the mapping of this blueprint stories and personas to the final cloud operations teams will vary and will depend on the customer operational reality. Each of these teams and possible sub-teams will also need to match OCI Groups described in the next chapter.
+Note that the mapping of the stories and personas to the final cloud operations teams will vary and will depend on the customer's operational reality. Each of these teams and possible sub-teams will also need to match OCI Groups described in the next chapter.
 
 &nbsp; 
 &nbsp; 
@@ -180,14 +180,14 @@ The **One-OE blueprint** proposes the **strongest security posture** using all O
 # **4. Network View**
 
 This chapter presents all the network elements of the OCI Open LZ One-OE Blueprint, and it’s organized into five sections:
-1. **Network Structure** presents all the most-significant network components, their relations, and objectives.
+1. **Network Structure** presents all the most significant network components, their relations, and objectives.
 2. **Network Security** presents the network areas and their related security posture.
 3. **Network Connectivity** presents how the landing zone can be connected to on-premises and other cloud providers and describes the most significant network traffic (the network use cases) with a north-south and east-west pattern.
 4. **DNS** presents the naming resolution use cases and how DNS zones and records are solved to handle domain DNS queries.
 
 &nbsp; 
 
-The following diagram and table presents the network structure of the One-OE blueprint. Note the network areas identified, **Hub**, **Platforms**, **Projects**, and **Sandbox**. Each of these areas will have its network security posture.
+The following diagram and table present the network structure of the One-OE blueprint. Note the network areas identified, **Hub**, **Platforms**, **Projects**, and **Sandbox**. Each of these areas will have its network security posture.
 
 &nbsp; 
 
