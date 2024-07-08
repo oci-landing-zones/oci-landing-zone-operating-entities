@@ -1,6 +1,6 @@
 # **The OCI Operating Entities Landing Zone** 
 
-###  The OCI Open LZ &mdash; Simplifying the [Onboarding](#) and [Running](#) of OCI
+### Simplifying the [Onboarding](#) and [Running](#) of OCI
 
 &nbsp; 
 
@@ -8,7 +8,7 @@
 
 &nbsp; 
 
-Welcome to the **OCI <ins>Op</ins>erating <ins>En</ins>tities Landing Zone**, also known as **OCI Open LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI. 
+Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as **OCI Open LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI. 
 
 The objective of the **OCI Open LZ** is to **increase OCI security and scalability** while **reducing the design and implementation timelines, associated costs, and efforts** - with the following artifacts:
 1. **[Blueprints](#the-blueprints-menu)**: Complete landing zone **designs** with **100% declarative IaC runtime models**, ready to onboard organizations and their functional divisions &ndash; identified as **Op**erating **En**tities **(OEs)**. 
@@ -24,7 +24,7 @@ There are three blueprints available to onboard OCI. Choose the most suitable ac
 
 | BLUEPRINT | DIAGRAM | SIZE | OBJECTIVE   | ORGANIZATIONAL SCOPE | 
 |:--:|---|:-:|---|---|
-| [**One-OE**](/one-oe/readme.md) </br><span style="color:red">*-- new --*</span>| [<img src="images/one-oe_icon.jpg" width="80" height="value">](/one-oe/readme.md)| **M** | A new model to onboard **one Operating Entit** with its environments, platforms, and projects in **one tenancy**.</br> [<img src="images/DeployToOCI_oneclick.svg"  height="25">](/one-oe/runtime/one-off/readme.md) | One OU, LoB, OpCo, or Department. 
+| [**One-OE**](/one-oe/readme.md) </br><span style="color:red">*-- new --*</span>| [<img src="images/one-oe_icon.jpg" width="80" height="value">](/one-oe/readme.md)| **M** | A new model to onboard **one Operating Entity** with its environments, platforms, and projects in **one tenancy**.</br> [<img src="images/DeployToOCI_oneclick.svg"  height="25">](/one-oe/runtime/one-click/readme.md) | One OU, LoB, OpCo, or Department. 
 | [**Multi-OE**](/multi-oe/readme.md) | [<img src="images/multi-oe_icon.jpg" width="100" height="value">](/multi-oe/readme.md)| **L** | Onboards **several Operating Entities** with a shared services model, with OE-dedicated environments, platforms, and projects, sharing **one tenancy.** | Several OUs, LoBs, OpCos, or Departments. 
 | **Multi-Tenancy*** | <img src="images/multi-tenancy_icon.jpg" width="150" height="value">| **X-XXL** | Uses the **One-OE** and **Multi-OE** to onboard all your organizations or customers into **several tenancies**, while **providing your** centralized services, shared services, managed services, cloud services, PaaS, or SaaS. | All Your Organizations, OUs, Partners, or Customers.
 
