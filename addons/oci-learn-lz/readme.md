@@ -1,4 +1,4 @@
-# **OCI Learn LZ**
+# **The OCI Open LZ &ndash; [OCI Learn LZ](#)**
 
 **Table of Contents**
 
@@ -11,9 +11,9 @@
 
 ## 1. Introduction
 
-Welcome to the **Open Learn LZ**, a set of **exercises** to learn how to **design**, **configure**, and **run** OCI landing zones. Its main objectives are: 
+Welcome to the **OCI Learn LZ**, a set of **exercises** to learn how to **design**, **configure**, and **run** OCI landing zones. Its main objectives are: 
 1. Provide elementary landing zone **design** capabilities using draw.io.
-2. Create skills in **IaC configurations**, by configuring the OCI Learn LZ resources. You do not code OCI landing zones anymore, you configure them. [OCI Landing Zones Orchestrator](https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator) is a generic Terraform module that orchestrates the creation of Landing Zone architectures expressed in a single or multiple configuration files, that can be JSON documents and YAML documents.
+2. Create skills in **IaC configurations**, by configuring the OCI Learn LZ resources. You do not code OCI landing zones anymore, you configure them. [OCI Landing Zones Orchestrator](https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator) is a generic Terraform module that orchestrates the creation of Landing Zone architectures expressed in single or multiple configuration files, which can be JSON documents and YAML documents.
 3. Demonstrate a **cloud-native operating model** with versioned configurations and an automation engine - based on ORM.
 
 &nbsp; 
@@ -22,7 +22,7 @@ Welcome to the **Open Learn LZ**, a set of **exercises** to learn how to **desig
 ### 2.1 Have an OCI Account
 Anyone can run the OCI-Learn-LZ exercises. If you don't have an OCI Paid Account, to execute the exercises you will need and [OCI Free Tier](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier.htm) account.
 
-**Note** that an OCI Free Tier account after a predefined time or initial credits consumed, is automatically limited to use Always Free resources - if not upgraded. If this is your case, you need to free all VCNs resources as exercise 2 will use two VCNs which is the limit of the always free model.
+**Note** that an OCI Free Tier account after a predefined time or initial credits consumed, is automatically limited to use Always Free resources - if not upgraded. If this is your case, you need to free all VCNs resources as exercise 2 will use two VCNs which is the limit of the always-free model.
 
 
 &nbsp; 
@@ -80,7 +80,7 @@ If we can compare Landing Zones to airports: The OCI Learn LZ is an airport with
 
 ## 4. Exercises 
 
-The OCI Learn LZ has a set of exercises that are presented in the form of **(1) design diagrams** (in draw.io format), and a set of **(2) IaC configurations** (in yaml format) that match these designs. The objective is that you **complete** these exercises and **(3) run the new configurations** with a dedicated ORM Stack. This ORM Stack will use your configurations as input to the [CIS  Landing Zone Modules](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/commons/oci_landingzones_iac.md) and create the OCI Resources. The diagram below presents this flow.
+The OCI Learn LZ has a set of exercises that are presented in the form of **(1) design diagrams** (in draw.io format), and a set of **(2) IaC configurations** (in YAML format) that match these designs. The objective is that you **complete** these exercises and **(3) run the new configurations** with a dedicated ORM Stack. This ORM Stack will use your configurations as input to the [CIS  Landing Zone Modules](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/commons/oci_landingzones_iac.md) and create the OCI Resources. The diagram below presents this flow.
 
 &nbsp; 
 

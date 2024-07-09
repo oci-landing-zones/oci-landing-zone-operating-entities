@@ -1,7 +1,5 @@
 # **The OCI Open LZ &ndash; [Workload Extensions](#)**
 
-### Simplifying the Onboarding of Organizations, Business Units, and Subsidiaries into OCI
-
 &nbsp; 
 
 Welcome to the **OCI Open LZ Workload Extensions**.  
