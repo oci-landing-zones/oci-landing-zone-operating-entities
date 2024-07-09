@@ -46,8 +46,8 @@ The following activities are proposed as guidance to understand the overall **OC
 
 | # | ACTIVITY | ASSETS| DESCRIPTION   | 
 |---|---|---|---|
-| **1**| **PREPARE** | [EMEA OCI Landing Zones Vdeo](https://www.linkedin.com/feed/update/urn:li:activity:7206600588216659968/)| Understand OCI Landing Zones, approach, and strategy in 13 minutes.
-| **2**| **PREPARE** | [EMEA OCI Landing Zones Git](https://github.com/oracle-devrel/technology-engineering/tree/main/landing-zones)| Review standard landing zones, tailored landing zones, and workload extensions concepts.
+| **1**| **PREPARE** | [EMEA OCI Landing Zones - Video](https://www.linkedin.com/feed/update/urn:li:activity:7206600588216659968/)| Understand OCI Landing Zones, **approach**, and **strategy** in **13 minutes**.
+| **2**| **PREPARE** | [EMEA OCI Landing Zones - Git](https://github.com/oracle-devrel/technology-engineering/tree/main/landing-zones)| Review standard landing zones, tailored landing zones, and workload extensions concepts.
 | **3** | **ENABLE** | [OCI Learn LZ](/addons/oci-learn-lz/readme.md)| Use the OCI Learn LZ exercises to understand how to **design** and **configure** OCI Landing Zones. |
 | **4** | **SELECT** | [OCI Open LZ Blueprints](/README.md#the-blueprints-menu)| Select you prefered blueprint from the options above. |
 | **4** | **DESIGN** | [One-OE](/one-oe/readme.md) </br> [Multi-OE](/multi-oe/readme.md)| Use the selected OCI Open LZ **blueprint** to design - in drawio - your functional, security, network, and operations view, with all the diagrams in a reusable format. |   
