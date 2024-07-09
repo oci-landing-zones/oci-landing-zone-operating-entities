@@ -15,7 +15,7 @@ This model onboards **one Operating Entity (OE)** with its **environments**, **p
 | **DESIGN** | md | One-OE High Level Design Overview | [View](/one-oe/design/readme.md) |
 | **DESIGN** | drawio | One-OE Detailed Design Diagrams | [View](/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio) |
 | **DESIGN** | pdf | One-OE Detailed Design Document | Available Soon |
-| **RUNTIME** | json | **One-click Deployment** for one-off **declarative** IaC deployments or exploration purpose. |  [Run](/one-oe/runtime/one-off/readme.md) |
+| **RUNTIME** | json | **One-click Deployment** for one-off or simple **declarative** IaC deployments. |  [Run](/one-oe/runtime/one-click/readme.md) |
 | **RUNTIME** | json | **Decoupled Deployment** for advanced and distributed **declarative** IaC operations. |  Available Soon |
 
 
