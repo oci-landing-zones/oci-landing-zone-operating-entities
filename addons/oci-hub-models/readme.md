@@ -4,10 +4,12 @@
 
 &nbsp; 
 
-
+### The Menu
 Welcome to the **OCI Network Hub Model [Addon](#)**, a set of **comprehensible** and well-**documented** network options with a complete **design** and IaC **runtime**. Each of the models presented can be used in any OCI Open LZ Blueprint, or with your tailored landing zone.
 
 &nbsp; 
+
+### The Hub Menu
 
 |  |  |  |   | |
 |:-:|:-:|:-:|:-:|:-:|
@@ -21,6 +23,22 @@ Welcome to the **OCI Network Hub Model [Addon](#)**, a set of **comprehensible**
 &nbsp; 
 
 **NS** = North-South   | **EW** = East-West |  **AP** = Active - Passive | **AA** = Active - Active
+
+&nbsp; 
+
+### Guidance on Model A or B
+
+Find below a quick comparison between the two OCI Native Hub models.
+
+|  |  |  |   | |
+|:-:|:-:|:-:|:-:|:-:|
+| **MODEL A** | **MODEL B**|
+| **Two Firewalls**: Public for Inbound and Private for Outbound/EW traffic inspection | **Single Firewall** for NS (Inbound/Outbound) and East-West traffic inspection
+| **Segmentation of the network traffic** and **higher throughput rate** | Throughput rate of a single OCI Network Firewall
+| **Visibility into the source of the Inbound traffic** on the Public Firewall | **No visibility into the source of the Inbound traffic**, as the source is Public LB
+| **Higher cost**: 2 x price of the OCI Network Firewall | **Lower cost**
+
+&nbsp; 
 
 &nbsp; 
 
