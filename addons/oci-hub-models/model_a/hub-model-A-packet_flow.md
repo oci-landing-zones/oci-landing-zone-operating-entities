@@ -1,6 +1,25 @@
 # OCI Open LZ - [Hub Model A](#)
 
-## Network packet flow animation
+
+## Overview
+TO BE COMPLETED - ADD A TABLE WITH CHARACTERISTICS
+
+
+| |  |
+|---|---| 
+| **ID** | MODEL A | 
+| **DESCRIPTION** | 
+| **DETAILED DESCRIPTION** | View [Network Packet Flow](#network-packet-flow)|
+| **OCI RESOURCES SCOPE** | |
+| **IAC CONFIGURATION** | [oci_open_lz_one-oe_network.auto.tfvars.json](oci_open_lz_one-oe_network.auto.tfvars.json) |
+| **TERRAFORM MODULES**| [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) |
+| **DEPLOY WITH ORM** | |
+
+
+
+&nbsp; 
+
+## Network Packet Flow 
 
 The purpose of this document is to illustrate, through explanatory animations, the journey of a request packet (shown as a red rectangle) and a response packet (shown as a blue rectangle), along with the corresponding routing rules in each routing table (RT), for Inbound-Outbound (north-south) and East-West network traffic, within a **Hub Model A** and Spoke VCNs.
 
