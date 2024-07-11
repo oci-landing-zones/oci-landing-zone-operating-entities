@@ -30,11 +30,11 @@ This document provides an in-depth exploration of the various **OCI Network Hub 
 - **AA** = Active - Active
 - **AP** = Active - Passive
 - **cmp** = Compartment
-- **AD(1,2,3)** = Availability Domain
-- **vnc** = Virtual Cloud Network
+- **AD** = Availability Domain
+- **vcn** = Virtual Cloud Network
 - **sn** = Subnet
  
- ### Legend:
+ #### Legend:
 <img src="images/oci_hub_models_legend.jpg" width="150" height="value"> 
 
 
