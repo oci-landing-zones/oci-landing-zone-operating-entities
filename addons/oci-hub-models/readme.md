@@ -14,7 +14,7 @@ This document provides an in-depth exploration of the various **OCI Network Hub 
 
 ### The Hub Menu
 
-| [**HUB A**]((/addons/oci-hub-models/hub_a/readme.md)) | **HUB B** | **HUB C**  | **HUB D**  | 
+| [**HUB A**](/addons/oci-hub-models/hub_a/readme.md) | **HUB B** | **HUB C**  | **HUB D**  | 
 |:-:|:-:|:-:|:-:|
 | **OCI Native FW Hub** - 2 Firewalls| **OCI Native FW Hub** - 1  Firewall |  OCI Hub with **3rd Party FW** - AA | OCI Hub with **3rd Party FW** - AP |
 | [<img src="hub_a/images/hub_a_design.png" width="278" height="">](/addons/oci-hub-models/hub_a/readme.md) | <img src="hub_b/images/hub_b_design.png" width="280" height=""> | <img src="hub_c/images/hub_c_design.png" width="280" height=""> |  <img src="hub_d/images/hub_d_design.png" width="280" height=""> | 
