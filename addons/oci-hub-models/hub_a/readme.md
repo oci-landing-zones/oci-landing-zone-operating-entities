@@ -19,7 +19,7 @@ TO BE COMPLETED - ADD A TABLE WITH CHARACTERISTICS
 | **TERRAFORM MODULES**| [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) |
 | **DEPLOY WITH ORM** | |
 
-### **[1. Hub A](#)**
+### **[Hub A](#)**
 
 <img src="images/hub_a_design.png" width="250" height="value">
 
