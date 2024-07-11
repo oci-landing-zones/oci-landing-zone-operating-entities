@@ -16,7 +16,7 @@ This document provides an in-depth exploration of the various **OCI Network Hub 
 
 | [**HUB A**](/addons/oci-hub-models/hub_a/readme.md): **OCI Native FW Hub** - Two Firewalls | [**HUB B**](/addons/oci-hub-models/hub_b/readme.md): **OCI Native FW Hub** - One  Firewall | **HUB C**: OCI Hub with **3rd Party FW** - AA | **HUB D**: OCI Hub with **3rd Party FW** - AP | 
 |:-:|:-:|:-:|:-:|
-| [<img src="hub_a/images/hub_a_design.png" width="278" height="">](/addons/oci-hub-models/hub_a/readme.md) | [<img src="hub_b/images/hub_b_design.png" width="280" height="">](/addons/oci-hub-models/hub_b/readme.md) | <img src="hub_c/images/hub_c_design.png" width="280" height=""> |  <img src="hub_d/images/hub_d_design.png" width="280" height=""> | 
+| <img src="hub_a/images/hub_a_design.png" width="278" height=""> | <img src="hub_b/images/hub_b_design.png" width="280" height=""> | <img src="hub_c/images/hub_c_design.png" width="280" height=""> |  <img src="hub_d/images/hub_d_design.png" width="280" height=""> | 
 | View [Details](/addons/oci-hub-models/hub_a/readme.md)  | View [Details](/addons/oci-hub-models/hub_b/readme.md) | |
 | View [Packet Flow Animation](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md)  | | |
 
