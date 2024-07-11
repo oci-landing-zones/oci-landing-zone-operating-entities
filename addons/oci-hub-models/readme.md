@@ -7,17 +7,25 @@
 ### Overview
 Welcome to the **OCI Network Hub Model [Addon](#)**, a set of **comprehensible** and well-**documented** network options with a complete **design** and IaC **runtime**. Each of the models presented can be used in any OCI Open LZ Blueprint, or with your tailored landing zone.
 
+This document aims to provide an in-depth exploration of the various OCI Open Landing Zone Hub models within a Hub & Spoke architecture. It will cover the components, specifications, and considerations of each model to facilitate the selection of the most suitable option for different scenarios and requirements. Additionally, it includes packet flow animations to illustrate the journey of network packets within these models, enhancing understanding through visual representation.
+
+
 &nbsp; 
 
 ### The Hub Menu
 
-| **MODEL A** | **MODEL B**| **MODEL C**  | **MODEL D**  | 
+| **HUB A** | **HUB B**| **HUB C**  | **HUB D**  | 
 |:-:|:-:|:-:|:-:|
-| Native Hub with 2 Firewalls - NS + EW| Native Hub with 1 Common Firewall | Hub with 3rd Party Firewall - AP | Hub with 3rd Party Firewall - AA | 
-| [<img src="model_a/images/hub_model_A_design.jpg" width="250" height="value">](/addons/oci-hub-models/model_a/hub-model-A-packet_flow.md) | <img src="model_b/images/hub_model_B_design.jpg" width="250" height="value"> | <img src="model_c/images/hub_model_C_design.jpg" width="250" height="value"> | <img src="model_d/images/hub_model_D_design.jpg" width="250" height="value"> | 
+| **OCI Native FW Hub** - 2 Firewalls| **OCI Native FW Hub** - 1  Firewall |  OCI Hub with **3rd Party FW** - HA | OCI Hub with **3rd Party FW** - AP |
+| [<img src="hub_a/images/hub_a_design.jpg" width="250" height="">](/addons/oci-hub-models/hub_a/readme.md) | <img src="hub_b/images/hub_model_B_design.jpg" width="250" height=""> | <img src="hub_c/images/hub_c_design.jpg" width="250" height=""> |  <img src="hub_d/images/hub_d_design.jpg" width="250" height=""> | 
+| View [Details](/addons/oci-hub-models/hub_a/readme.md)  | | |
+| View [Packet Flow Animation](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md)  | | |
 
 
-**NS** = North-South   | **EW** = East-West |  **AP** = Active - Passive | **AA** = Active - Active
+
+&nbsp; 
+
+**FW** = Firewall  | **AA** = Active - Active | **AP** = Active - Passive  
 
 <img src="images/oci_hub_models_legend.jpg" width="150" height="value"> 
 
@@ -25,18 +33,7 @@ Welcome to the **OCI Network Hub Model [Addon](#)**, a set of **comprehensible**
 
 &nbsp; 
 
-### Guidance on Model A or B
 
-Find below a quick comparison between the two OCI Native Hub models.
-
-| **MODEL A** | **MODEL B**|
-|:-:|:-:|
-| **Two Firewalls**: Public for Inbound and Private for Outbound/EW traffic inspection | **Single Firewall** for NS (Inbound/Outbound) and East-West traffic inspection
-| **Segmentation of the network traffic** and **higher throughput rate** | Throughput rate of a single OCI Network Firewall
-| **Visibility into the source of the Inbound traffic** on the Public Firewall | **No visibility into the source of the Inbound traffic**, as the source is Public LB
-| **Higher cost**: 2 x price of the OCI Network Firewall | **Lower cost**
-
-&nbsp; 
 
 &nbsp; 
 
