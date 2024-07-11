@@ -4,7 +4,7 @@
 
 &nbsp; 
 
-### The Menu
+### Overview
 Welcome to the **OCI Network Hub Model [Addon](#)**, a set of **comprehensible** and well-**documented** network options with a complete **design** and IaC **runtime**. Each of the models presented can be used in any OCI Open LZ Blueprint, or with your tailored landing zone.
 
 &nbsp; 
