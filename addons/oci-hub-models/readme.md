@@ -25,8 +25,16 @@ This document provides an in-depth exploration of the various **OCI Network Hub 
 
 &nbsp; 
 
-**FW** = Firewall  | **AA** = Active - Active | **AP** = Active - Passive  
-
+#### Abbreviations:
+- **FW** = Firewall
+- **AA** = Active - Active
+- **AP** = Active - Passive
+- **cmp** = Compartment
+- **AD(1,2,3)** = Availability Domain
+- **vnc** = Virtual Cloud Network
+- **sn** = Subnet
+ 
+ ### Legend:
 <img src="images/oci_hub_models_legend.jpg" width="150" height="value"> 
 
 
