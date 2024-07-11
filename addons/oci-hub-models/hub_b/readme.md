@@ -38,7 +38,7 @@ TO BE COMPLETED - ADD A TABLE WITH CHARACTERISTICS
 - Segmentation of the network traffic and higher throughput rate.
 - Visibility into the source of the inbound traffic on the **DMZ-FW**.
 - SSL Decryption Policy configuration on **DMZ-FW** to allow inspect SSL traffic before sending it to the Public Load Balancer.
-- Higher cost compared to the **[Hub Model B](/addons/oci-hub-models/hub_b/readme.md)**: 2 x price of the OCI Network Firewall.
+- Higher cost compared to the **[Hub Model B](#)**: 2 x price of the OCI Network Firewall.
 <br>
 
 #### Hub & Spoke architecture diagram with corresponding routing tables and routing rules:
