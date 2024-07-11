@@ -17,7 +17,7 @@ This document aims to provide an in-depth exploration of the various OCI Open La
 | **HUB A** | **HUB B**| **HUB C**  | **HUB D**  | 
 |:-:|:-:|:-:|:-:|
 | **OCI Native FW Hub** - 2 Firewalls| **OCI Native FW Hub** - 1  Firewall |  OCI Hub with **3rd Party FW** - HA | OCI Hub with **3rd Party FW** - AP |
-| [<img src="hub_a/images/hub_a_design.jpg" width="250" height="">](/addons/oci-hub-models/hub_a/readme.md) | <img src="hub_b/images/hub_model_B_design.jpg" width="250" height=""> | <img src="hub_c/images/hub_c_design.jpg" width="250" height=""> |  <img src="hub_d/images/hub_d_design.jpg" width="250" height=""> | 
+| [<img src="hub_a/images/hub_a_design.jpg" width="280" height="">](/addons/oci-hub-models/hub_a/readme.md) | <img src="hub_b/images/hub_model_B_design.jpg" width="280" height=""> | <img src="hub_c/images/hub_c_design.jpg" width="280" height=""> |  <img src="hub_d/images/hub_d_design.jpg" width="280" height=""> | 
 | View [Details](/addons/oci-hub-models/hub_a/readme.md)  | | |
 | View [Packet Flow Animation](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md)  | | |
 
