@@ -14,7 +14,7 @@ The purpose of this document is to illustrate, through explanatory animations, t
 &nbsp; 
 <img src="images/hub_b_inbound.gif" width="600" height="value">
 
-A user on the Internet attempting to access *a1.example.com*, which is hosted on **VM-A**, located behind a Public Load Balancer. After DNS resolution, the user's request targets the Load Balancer's public IP address. The packet then enters the Hub VCN via Internet Gateway, and successfully reaches the public IP of the Load Balancer. A Load Balancer then tries to forward the packet to the appropriate backend VM, based on its policy rules. But at first it will be ispected by **NFW-hub** (OCI Network Firewall).
+A user on the Internet attempting to access *a1.example.com*, which is hosted on **VM-A**, located behind a Public Load Balancer. After DNS resolution, the user's request targets the Load Balancer's public IP address. The packet then enters the Hub VCN via Internet Gateway, and successfully reaches the public IP of the Load Balancer. A Load Balancer then tries to forward the packet to the appropriate backend VM, based on its policy rules. But at first it will be inspected by **NFW-hub** (OCI Network Firewall).
 
 &nbsp; 
 
