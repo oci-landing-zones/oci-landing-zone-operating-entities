@@ -13,7 +13,12 @@
 #### The main components of a **Hub B**:
 - VCN (Virtual Cloud Network)
 - One Public subnet (depicted in green)
+    1. public-subnet for Public Load Balancers
 - Four Private subnets (depicted in dark-orange)
+    1. private-subnet for OCI Network Firewall
+    2. private-subnet for managment workloads
+    3. private-subnet for logs
+    4. private-subnet for DNS (OCI Forwarders, Listeners)
 - Internet Gateway
 - NAT Gateway
 - Service Gateway
@@ -36,6 +41,8 @@
 
 #### Legend:
 <img src="images/oci_hub_models_legend.png" width="200" height="value">
+
+&nbsp;
 
 Note: the CIDR ranges presented in the architecture diagram are for documentation purposes only, and should be aligned for each specific use case.
 
