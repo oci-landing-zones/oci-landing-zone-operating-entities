@@ -38,9 +38,11 @@ TO BE COMPLETED - ADD A TABLE WITH CHARACTERISTICS
 - Single Firewall for North-South (Inbound/Outbound) and East-West traffic inspection.
 - Throughput rate of a single OCI Network Firewall.
 - No visibility into the source of the Inbound traffic, as the source is Public Load Balancer.
-- Low cost compared to the **[Hub Model A](/addons/oci-hub-models/hub_a/readme.md)**
+- Low cost compared to the **[Hub A](/addons/oci-hub-models/hub_a/readme.md)** model.
 <br>
 
 #### Hub & Spoke architecture diagram with corresponding routing tables and routing rules:
 
 <img src="images/hub_b_routing.png" width="900" height="value">
+
+Note: the CIDR ranges presented in the architecture diagram are for documentation purposes only, and should be aligned for each specific use case.
