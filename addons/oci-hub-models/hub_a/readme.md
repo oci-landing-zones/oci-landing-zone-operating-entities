@@ -4,7 +4,7 @@
 &nbsp; 
 
 ### Overview
-**Hub A** consist of two OCI Network Firewalls (next-generation managed network firewall and intrusion detection and prevention service). One is intended for inbound and the second one for the inter spoke communication, outbound as well as for on-prem traffic inspection. 
+**Hub A** consist of two OCI Network Firewalls (next-generation managed network firewall and intrusion detection and prevention service). One is intended for inbound and the second one for the inter spoke communication, outbound as well as for on-prem traffic control and inspection. 
 
 <img src="images/hub_a_design.png" width="250" height="value">
 
@@ -39,7 +39,7 @@
 &nbsp;
 
  #### Legend:
-<img src="images/oci_hub_models_legend.png" width="150" height="value">
+<img src="images/oci_hub_models_legend.png" width="200" height="value">
 
 &nbsp;
 

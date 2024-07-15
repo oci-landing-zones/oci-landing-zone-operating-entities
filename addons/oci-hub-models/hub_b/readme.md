@@ -1,25 +1,12 @@
 # OCI Open LZ - [Hub B](#)
-## The OCI Native FW Hub - 1 Firewall
+## Hub with One OCI Network Firewall
 
 &nbsp; 
 
 ### Overview
-TO BE COMPLETED - ADD A TABLE WITH CHARACTERISTICS
+**Hub B** consist of one OCI Network Firewalls (next-generation managed network firewall and intrusion detection and prevention service) for inbound, outbound, as well as for inter spoke and on-prem traffic control and inspection.
 
 &nbsp; 
-
-
-| |  |
-|---|---| 
-| **ID** | MODEL B| 
-| **DESCRIPTION** | 
-| **DETAILED DESCRIPTION** | View [Network Packet Flow](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md)|
-| **OCI RESOURCES SCOPE** | |
-| **IAC CONFIGURATION** | [oci_open_lz_one-oe_network.auto.tfvars.json](oci_open_lz_one-oe_network.auto.tfvars.json) |
-| **TERRAFORM MODULES**| [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) |
-| **DEPLOY WITH ORM** | |
-
-###  **[Hub B:](#)**
 
 <img src="images/hub_b_design.png" width="250" height="value">
 
@@ -45,4 +32,21 @@ TO BE COMPLETED - ADD A TABLE WITH CHARACTERISTICS
 
 <img src="images/hub_b_routing.png" width="900" height="value">
 
+&nbsp;
+
+#### Legend:
+<img src="images/oci_hub_models_legend.png" width="200" height="value">
+
 Note: the CIDR ranges presented in the architecture diagram are for documentation purposes only, and should be aligned for each specific use case.
+
+&nbsp;
+
+| |  |
+|---|---| 
+| **ID** | Hub B | 
+| **DESCRIPTION** | 
+| **DETAILED DESCRIPTION** | TBU |
+| **OCI RESOURCES SCOPE** | |
+| **IAC CONFIGURATION** | [oci_open_lz_one-oe_network.auto.tfvars.json](oci_open_lz_one-oe_network.auto.tfvars.json) |
+| **TERRAFORM MODULES**| [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) |
+| **DEPLOY WITH ORM** | |
