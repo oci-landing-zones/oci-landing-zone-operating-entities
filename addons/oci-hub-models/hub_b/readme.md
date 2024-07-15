@@ -46,6 +46,8 @@
 
 Note: the CIDR ranges presented in the architecture diagram are for documentation purposes only, and should be aligned for each specific use case.
 
+For comprehensive understanding of how network packets flow within **Hub B** and Spoke VCNs refer to the [Network packet flow animation - Hub B](/hub-b-packet_flow.md).
+
 &nbsp;
 
 | |  |
@@ -57,3 +59,14 @@ Note: the CIDR ranges presented in the architecture diagram are for documentatio
 | **IAC CONFIGURATION** | [oci_open_lz_one-oe_network.auto.tfvars.json](oci_open_lz_one-oe_network.auto.tfvars.json) |
 | **TERRAFORM MODULES**| [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) |
 | **DEPLOY WITH ORM** | |
+
+
+&nbsp; 
+
+# License
+
+Copyright (c) 2024 Oracle and/or its affiliates.
+
+Licensed under the Universal Permissive License (UPL), Version 1.0.
+
+See [LICENSE](LICENSE) for more details.
