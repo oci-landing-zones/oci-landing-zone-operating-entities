@@ -40,7 +40,7 @@
 
 &nbsp;
 
-### 3. Considerations
+### 3. Specifications and Considerations
 - Single Firewall: handles North-South (Inbound/Outbound) and East-West traffic inspection.
 - Throughput rate: specifies the capacity of a single OCI Network Firewall.
 - Visibility limitations: no visibility into the source of Inbound traffic, as the OCI Network Firewall only sees traffic coming from the Public Load Balancer.
@@ -50,9 +50,13 @@
 
 ### 4. Routing
 
+The following diagram presents a Hub & Spoke architecture diagram with corresponding routing tables and routing rules.
+
 <img src="images/hub_b_routing.png" width="900" height="value">
 
 &nbsp;
+
+#### Legend:
 
 <img src="images/oci_hub_models_legend.png" width="200" height="value">
 
@@ -60,15 +64,14 @@
 
 Note: The CIDR ranges shown in the architecture diagram are for illustrative purposes only and should be adjusted to align with each specific use case.
 
-For comprehensive understanding of how network packets flow within **Hub B** and Spoke VCNs refer to the [Network packet flow animation - Hub B](/addons/oci-hub-models/hub_b/hub-b-packet_flow.md).
+For a comprehensive understanding of how network packets flow within **Hub B** and Spoke VCNs refer to the [Network packet flow animation - Hub B](/addons/oci-hub-models/hub_b/hub-b-packet_flow.md).
 
 &nbsp;
 
 
 ### 5. Automation
 
-Use the [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) Terraform modules. As a example comnfiguration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/one-oe/runtime/one-click/oci_open_lz_one-oe_network.auto.tfvars.json).
-
+For automating this Hub model use the [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) Terraform modules. As an example configuration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/one-oe/runtime/one-click/oci_open_lz_one-oe_network.auto.tfvars.json).
 
 
 &nbsp; 
