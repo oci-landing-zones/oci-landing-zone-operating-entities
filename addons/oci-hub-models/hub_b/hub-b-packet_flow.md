@@ -14,7 +14,7 @@ The purpose of this document is to illustrate, through explanatory animations, t
 &nbsp; 
 <img src="images/hub_b_inbound.gif" width="600" height="value">
 
-A user on the Internet attempting to access *a1.example.com*, which is hosted on **VM-A**, located behind a Public Load Balancer. After DNS resolution, the user's request targets the Load Balancer's public IP address. The packet then enters the Hub VCN via Internet Gateway, and successfully reaches the public IP of the Load Balancer. A Load Balancer then tries to forward the packet to the appropriate backend VM, based on its policy rules. But at first it will be inspected by **NFW-hub** (OCI Network Firewall).
+A user on the Internet attempting to access *a1.example.com*, which is hosted on **VM-A**, located behind a Public Load Balancer. After DNS resolution, the user's request targets the Load Balancer's public IP address. The packet then enters the Hub VCN via Internet Gateway, and successfully reaches the Load Balancer. A Load Balancer then tries to forward the packet to the appropriate backend VM, in this case VM-A1, based on its policy rules, but at first packet will be routed by route rule in **RT: vcn-hub-lb** to the **NFW-hub** (OCI Network Firewall) for the inspection and control.
 
 &nbsp; 
 
@@ -25,7 +25,7 @@ A user on the Internet attempting to access *a1.example.com*, which is hosted on
 &nbsp; 
 <img src="images/hub_b_outbound.gif" width="600" height="value">
 
-**VM-A** initiates a communication to the Internet. The packet traverses through the Dynamic Routing Gateway (DRG) and is forced by the VCN route table: **vcn-hub-ingress** to pass through a **NFW-hub-int**. After inspection, the **NFW-hub-int** uses **RT: vcn-hub-subnet-int** to route the packet to the NAT Gateway. The response packet from the Internet is then forced by the route rule in the **RT: vcn-hub-natgw** (a route table associated with a NAT gateway) to pass through the private IP address of the **NFW-hub-int** for inspection, and then through the DRG back to **VM-A**.
+**VM-A1** initiates a communication to the Internet. The packet traverses through the Dynamic Routing Gateway (DRG) and is forced by the VCN route table: **vcn-hub-ingress** to pass through a **NFW-hub**. After inspection, the **NFW-hub** uses **RT: vcn-hub-fw** to route the packet to the NAT Gateway. The response packet from the Internet is then forced by the route rule in the **RT: vcn-natgw-hub** (a route table associated with a NAT gateway) to pass through the private IP address of the **NFW-hub** for inspection, and then through the DRG back to **VM-A1**.
 
 &nbsp; 
 
@@ -36,7 +36,7 @@ A user on the Internet attempting to access *a1.example.com*, which is hosted on
 &nbsp; 
 <img src="images/hub_b_east_west.gif" width="600" height="value">
 
-**VM-A** initiates a communication with **VM-B**. The packet goes through the Dynamic Routing Gateway (DRG) and is forced by the VCN **RT: vcn-hub-ingress** to pass through a **NFW-hub-int**. After inspection, the **NFW-hub-int** uses **RT: vcn-hub-subnet-int** to route the packet back to the DRG and then to the **vcn-spoke-B**. The response packet follows similar flow to get back to the **VM-A**.
+**VM-A1** initiates a communication with **VM-B1**. The packet goes through the Dynamic Routing Gateway (DRG) and is forced by the VCN **RT: vcn-hub-ingress** to pass through a **NFW-hub**. After inspection, the **NFW-hub** uses **RT: vcn-hub-fw** to route the packet back to the DRG and then to the **vcn-spoke-B**. The response packet follows similar flow to get back to the **VM-A1**.
 
 
 
