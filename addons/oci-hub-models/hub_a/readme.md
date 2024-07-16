@@ -62,7 +62,8 @@ The following diagram presents a Hub & Spoke architecture diagram with correspon
 
 &nbsp;
 
-Note: The CIDR ranges shown in the architecture diagram are for illustrative purposes only and should be adjusted to align with each specific use case.
+> [!NOTE]
+> The CIDR ranges shown in the architecture diagram are for illustrative purposes only and should be adjusted to align with each specific use case.
 
 For a comprehensive understanding of how network packets flow within **Hub A** and Spoke VCNs refer to the [Network packet flow animation - Hub A](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md).
 
