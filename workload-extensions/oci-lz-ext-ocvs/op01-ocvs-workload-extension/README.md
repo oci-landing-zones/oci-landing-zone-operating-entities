@@ -1,4 +1,4 @@
-# OP.02 - Manage OCVS Landing Zone Extension <!-- omit from toc -->
+# OP.01 - Manage OCVS Landing Zone Extension <!-- omit from toc -->
 
 ## **Table of Contents** <!-- omit from toc -->
 
@@ -24,24 +24,24 @@
 
 |                           |                                                                                                                                                                |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **OP. ID**                | OP.02                                                                                                                                                          |
+| **OP. ID**                | OP.01                                                                                                                                                          |
 | **OP. NAME**              | OCVS Landing Zone Extension                                                                                                                                    |
 | **OBJECTIVE**             | Provision OCI OCVS Landing Zone IAM and Network Extensions.                                                                                                    |
 | **TARGET RESOURCES**      | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists                                                     |
-| **IAM CONFIGURATION**     | [oci_open_lz_one-oe_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json) |
-| **NETWORK CONFIGURATION** | [oci_open_lz_one-oe_network.auto.tfvars.json](/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json)   |
-| **PRE-ACTIVITIES**        | Execute [OP.01. Deploy OneOE LZ](/workload-extensions/oci-lz-ext-ocvs/op01-deploy-oneoe)                                                                       |
-| **POST-ACTIVITIES**       | Execute [OP.03 Manual Changes](/workload-extensions/oci-lz-ext-ocvs/op03-ocvs-setup)                                                                           |
+| **IAM CONFIGURATION**     | [oci_open_lz_one-oe_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json) |
+| **NETWORK CONFIGURATION** | [oci_open_lz_one-oe_network.auto.tfvars.json](/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json)   |
+| **PRE-ACTIVITIES**        | Execute [OP.00. Deploy OneOE LZ](../../../one-oe/)                                                                      |
+| **POST-ACTIVITIES**       | Execute [OP.02 Manual Changes](/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-setup)                                                                           |
 | **RUN OPERATION**         | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli).                                                                                  |
 
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the OneOE Landing Zone OCVS extension Identity Layer use the following JSON file: [oci_open_lz_one-oe_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the OneOE Landing Zone OCVS extension Identity Layer use the following JSON file: [oci_open_lz_one-oe_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file covers three categories of resources described in the next sections.
 
-This configuration file requires changes to reference the OCIDs of the OneOE Landing Zone resources which were deployed in OP01.
+This configuration file requires changes to reference the OCIDs of the OneOE Landing Zone resources which were deployed in [OP.00. Deploy OneOE LZ](../../../one-oe/) step.
 Search for the values indicated below and replace with the correct OCIDs:
 
 | Resource                  | OCID Text to Replace              | Description                        |
@@ -80,15 +80,15 @@ For customizations see the full [policy resource documentation](https://github.c
 
 ## **3. Setup Network Configuration**
 
-For configuring and running the OneOE LZ OCVS extension Network layer use the following JSON file: [oci_open_lz_one-oe_network.auto.tfvars.json](/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json)
+For configuring and running the OneOE LZ OCVS extension Network layer use the following JSON file: [oci_open_lz_one-oe_network.auto.tfvars.json](/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json)
 
-This configuration file will require changes to the resources to reference the OCIDs of the OneOE Landing Zone which were deployed in OP01.
+This configuration file will require changes to the resources to reference the OCIDs of the OneOE Landing Zone.
 Search for the values indicated below and replace with the correct OCIDs:
 
 | Resource                 | OCID Text to Replace             | Description                                                      |
 | ------------------------ | -------------------------------- | ---------------------------------------------------------------- |
-| Prod Network Compartment | \<OCID-COMPARTMENT-PROD-NETWORK> | The OCID of the Prod Network Compartment deployed in step OP.01. |
-| Hub DRG                  | \<OCID-DRG-HUB>                  | The OCID of the DRG in Hub deployed in step OP.01.               |
+| Prod Network Compartment | \<OCID-COMPARTMENT-PROD-NETWORK> | The OCID of the Prod Network Compartment deployed in step OP.00. |
+| Hub DRG                  | \<OCID-DRG-HUB>                  | The OCID of the DRG in Hub deployed in step OP.00.               |
 | Hub DRG Route Table      | \<OCID-DRG-HUB-ROUTE-TABLE>      | The OCID of Route table in DRG                                   |
 
 This configuration covers the following networking diagram. 
@@ -101,7 +101,7 @@ The network layer covers the following resources:
 
 1. Spoke VCN - one Spoke VCN for OCVS platform
 2. Subnets - one Subnet for Load Balancers
-3. Gateways - NAT for Internet access, and Service Gateway to access OCI services
+3. Gateway - Service Gateway to access OCI services
 4. Security List - Security list for Load Balancers allowing all ingress/egress
 5. Route Tables - One for Service Gateway, and a default route for routing all trafic through the central hub
 6. DRG Attachment - Connect spoke with the central Hub
@@ -110,7 +110,7 @@ The network layer covers the following resources:
 
 | STEP  | ACTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | [![Deploy_To_OCI](/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json"}) |
+| **1** | [![Deploy_To_OCI](/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json"}) |
 | **2** | Accept terms,  wait for the configuration to load.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | **3** | Set the working directory to “orm-facade”.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | **4** | Set the stack name you prefer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -138,10 +138,9 @@ Run ```terraform init``` to download all the required external terraform provide
 Run ```terraform plan``` with the IAM and Network configuration.
 ```
 terraform plan \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci-credentials.tfvars.json \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json \
--state ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/terraform.tfstate
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json \
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json
 ```
 
 After the execution please analyze the output of the command above and check if it corresponds to your desired configuration.
@@ -154,12 +153,11 @@ The ideal scenario regarding the **state file** will be for each configuration t
 Run terraform plan with the IAM and Network configuration. After  its execution the configured resources will be provisioned or updated on OCI.
 ```
 terraform apply \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci-credentials.tfvars.json \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json \
--state ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/terraform.tfstate
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json \
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json
 ```
-You can proceed to [OP.03 OCVS Set-up](../op03-ocvs-setup/).
+You can proceed to [OP.02 OCVS Set-up](../op02-ocvs-setup/).
 
 # License <!-- omit from toc -->
 
