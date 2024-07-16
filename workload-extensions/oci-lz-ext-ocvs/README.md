@@ -13,8 +13,7 @@
   - [**4.4 Security Lists (SLs)**](#44-security-lists-sls)
   - [**4.5 Gateways**](#45-gateways)
     - [**4.5.1 Dynamic Routing Gateway (DRGs) Attachments**](#451-dynamic-routing-gateway-drgs-attachments)
-    - [**4.5.2 NAT Gateway (NGs)**](#452-nat-gateway-ngs)
-    - [**4.5.3 Service Gateway (SGs)**](#453-service-gateway-sgs)
+    - [**4.5.2 Service Gateway (SGs)**](#452-service-gateway-sgs)
 - [**5. Runtime View**](#5-runtime-view)
 ## **1. Introduction**
 Welcome to the **OCVS Landing Zone Extension**.
@@ -25,7 +24,7 @@ The OCVS Landing Zone (LZ) Extension is a secure cloud environment, designed wit
 ## **2. Design Overview**
 | ID    | DOMAIN                | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ----- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | **General**           | - [OneOE](../../one-oe/) LZ deployed as a foundation. </br>- The OCVS LZ Extension will extend the OneOE LZ and add OCVS Workloads example. </li> </ul>                                                                                                                                                                                                                                                                                                                                                                |
+| **1** | **General**           | - [OneOE](../../one-oe/) LZ deployed as a foundation. </br>- The OCVS LZ Extension will extend the OneOE LZ and add OCVS Workloads example. </li> </ul>                                                                                                                                                                                                                                                                                                                                                           |
 | **2** | **Tenancy Structure** | Extend the standard landing zone compartment structure with additional compartments for OCVS-related resources: </br>- Parent OCVS compartment.</br>- OCVS Load Balancer.</br>- Software defined data center (SDDC).                                                                                                                                                                                                                                                                                              |
 | **3** | **Groups & Policies** | Additional groups and associated policies are deployed to manage OCVS compartment resources.                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | **4** | **Network Structure** | Additional VCNs and related elements will be added - to segregate OCVS deployment as a Spoke extensions to the OneOZ LZ Hub.                                                                                                                                                                                                                                                                                                                                                                                      |
@@ -46,9 +45,9 @@ The following table provides details on the compartments presented above, their 
 
 | ID     | OP    | LEVEL | NAME                     | OBJECTIVES                                     |
 | ------ | ----- | ----- | ------------------------ | ---------------------------------------------- |
-| CMP.00 | OP#02 | 0     | cmp-lzp-p-platform-ocvs  | Parent for all OCVS resources                  |
-| CMP.01 | OP#02 | 1     | cmp-p-platform-ocvs-lb   | Holds OCVS Load Balancers                      |
-| CMP.02 | OP#02 | 1     | cmp-p-platform-ocvs-sddc | Contains software defined datacenter resources |
+| CMP.00 | OP#01 | 0     | cmp-lzp-p-platform-ocvs  | Parent for all OCVS resources                  |
+| CMP.01 | OP#01 | 1     | cmp-p-platform-ocvs-lb   | Holds OCVS Load Balancers                      |
+| CMP.02 | OP#01 | 1     | cmp-p-platform-ocvs-sddc | Contains software defined datacenter resources |
 
 ### **3.2 Groups**
 The OCVS LZ Extension includes the following groups. 
@@ -58,7 +57,7 @@ The OCVS LZ Extension includes the following groups.
 
 | ID     | OP    | NAME                       | OBJECTIVES                                  |
 | ------ | ----- | -------------------------- | ------------------------------------------- |
-| GRP.00 | OP#02 | grp-p-platform-ocvs-admins | Group for managing VMWare related resources |
+| GRP.00 | OP#01 | grp-p-platform-ocvs-admins | Group for managing VMWare related resources |
 
 ### **3.4 Policies**
 The OCVS LZ Extension includes the following policies:
@@ -68,7 +67,7 @@ The OCVS LZ Extension includes the following policies:
 
 | ID     | OP    | NAME                       | OBJECTIVES                                                                                                     |
 | ------ | ----- | -------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| POL.00 | OP#02 | pcy-p-platform-ocvs-admins | Policy granting permissions for administering OCVS related resources to the *grp-p-platform-ocvs-admins* group |
+| POL.00 | OP#01 | pcy-p-platform-ocvs-admins | Policy granting permissions for administering OCVS related resources to the *grp-p-platform-ocvs-admins* group |
 
 
 ## **4. Network View**
@@ -84,7 +83,7 @@ The following table describes the deployed VCNs.
 
 | ID     | OP    | NAME           | OBJECTIVES                         |
 | ------ | ----- | -------------- | ---------------------------------- |
-| VCN.00 | OP#02 | vcn-fra-p-ocvs | Spoke VCN dedicated to OCVS set-up |
+| VCN.00 | OP#01 | vcn-fra-p-ocvs | Spoke VCN dedicated to OCVS set-up |
 
 ### **4.2 Subnets**
 The following table describes the deployed Subnets.
@@ -93,11 +92,11 @@ The following table describes the deployed Subnets.
 > You can segment a VCN into subnets, which can be scoped to a region or to an availability domain. Each subnet consists of a contiguous range of addresses that don't overlap with the other subnets in the VCN. You can change the size of a subnet after creation. A subnet can be public or private.
 
 > [!IMPORTANT]  
-> OCVS utlizies VLANs instead of subnets. VLANs are set-up in [OP.03](./op03-ocvs-setup/)
+> OCVS utlizies VLANs instead of subnets. VLANs are set-up in [OP.02](./op02-ocvs-setup/)
 
 | ID    | OP    | NAME             | OBJECTIVES                |
 | ----- | ----- | ---------------- | ------------------------- |
-| SN.00 | OP#02 | sn-fra-p-ocvs-lb | OCVS Load Balancer subnet |
+| SN.00 | OP#01 | sn-fra-p-ocvs-lb | OCVS Load Balancer subnet |
 
 
 ### **4.3 Route Tables (RTs)**
@@ -108,7 +107,7 @@ The following table describes the deployed Route Tables.
  
 | ID    | OP    | NAME               | OBJECTIVES                            |
 | ----- | ----- | ------------------ | ------------------------------------- |
-| RT.00 | OP#02 | rt-01-p-ocvs-vcn-l | OCVS Load Balancer subnet route table |
+| RT.00 | OP#01 | rt-01-p-ocvs-vcn-l | OCVS Load Balancer subnet route table |
 
 ### **4.4 Security Lists (SLs)**
 The following table describes the deployed Security Lists (SLs).
@@ -118,7 +117,7 @@ The following table describes the deployed Security Lists (SLs).
 
 | ID    | OP    | NAME                | OBJECTIVES                              |
 | ----- | ----- | ------------------- | --------------------------------------- |
-| SL.00 | OP#02 | sl-01-p-ocvs-vcn-lb | OCVS Load Balancer subnet security list |
+| SL.00 | OP#01 | sl-01-p-ocvs-vcn-lb | OCVS Load Balancer subnet security list |
 
 ### **4.5 Gateways**
 #### **4.5.1 Dynamic Routing Gateway (DRGs) Attachments**
@@ -132,19 +131,7 @@ The following tables describe the deployed DRG Attachments.
 | DRGA.00 | OP#02 | ocvs-vcn-p-drg-attachment | DRG Attachment for the OCVS spoke to the hub |
 
 
-
-#### **4.5.2 NAT Gateway (NGs)**
-The following table describes the deployed NAT Gateways.
-
-> [!NOTE]
-> NAT gateway gives private subnet access to the Internet without assigning the host a public IP address. It only enables outbound connections to the private subnets like performing patches, updates, or just resources that need general internet connectivity outbound.
-
-| ID    | OP    | NAME          | OBJECTIVES                   |
-| ----- | ----- | ------------- | ---------------------------- |
-| NG.00 | OP#02 | ng-fra-p-ocvs | NAT Gateway in the OCVS VCN. |
-
-
-#### **4.5.3 Service Gateway (SGs)**
+#### **4.5.2 Service Gateway (SGs)**
 The following table describes the proposed Service Gateways.
 
 > [!NOTE]
@@ -152,7 +139,7 @@ The following table describes the proposed Service Gateways.
 
 | ID    | OP    | NAME          | OBJECTIVES           |
 | ----- | ----- | ------------- | -------------------- |
-| SG.00 | OP#02 | sg-fra-p-ocvs | SG in the OCVSS VCN. |
+| SG.00 | OP#01 | sg-fra-p-ocvs | SG in the OCVSS VCN. |
 
 
 ## **5. Runtime View**
@@ -166,15 +153,16 @@ An operation scenario is normally triggered by a service request, on a ticketing
 
 
 
-The EBS LZ Extension has three operation scenarios described in the following table.
+The OCVS LZ Extension has three operation scenarios described in the following table.
 
 
 
-| OP. ID                                           | OPERATION SCENARIOS DESCRIPTION                                                                                                                  | TIME EFFORTS |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ |
-| **[OP. ID.01](./op01-deploy-oneoe/)**            | **Deploy OneOE LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services.         | **< 1h**     |
-| **[OP. ID.02](./op02-ocvs-workload-extension/)** | **Deploy OCVS extension**. Include OCVS network resources (Spokes VCNs, Table Routes, Security Lists) and IAM OCVS resources (Groups, Policies). | **< 30m**   |
-| **[OP. ID.03](./op03-ocvs-setup/)**              | **Manual changes**.                                                                                                                              | **< 15m**    |
+| OP. ID                                           | OPERATION SCENARIOS DESCRIPTION                                                                                                                  | TIME EFFORTS                          |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------- |
+| **[OP. ID.00](../../one-oe/)**                   | **Deploy OneOE LZ**. Cover Core network resources (Hub VCN), Core IAM resources (compartments, group, policies), and security services.          | **< 1h**                              |
+| **[OP. ID.01](./op01-ocvs-workload-extension/)** | **Deploy OCVS extension**. Include OCVS network resources (Spokes VCNs, Table Routes, Security Lists) and IAM OCVS resources (Groups, Policies). | **< 30m**                             |
+| **[OP. ID.02](./op02-ocvs-setup/)**              | **OCVS Setup**                                                                                                                                   | **< 15m** (excluding deployment time) |
+| **[OP. ID.03](./op03-postop-lb/)**               | **Provision LB for OCVS (optional) Cleanup**                                                                                                     | **< 15m**                             |
 
 
 # License <!-- omit from toc -->
