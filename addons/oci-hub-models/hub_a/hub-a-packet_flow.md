@@ -2,8 +2,8 @@
 
 &nbsp; 
 
-
-The purpose of this document is to illustrate, through explanatory animations, the journey of a request packet (shown as a red rectangle) and a response packet (shown as a blue rectangle), along with the corresponding routing rules in each routing table (RT), for Inbound-Outbound (north-south) and East-West network traffic, within a **Hub A** and Spoke VCNs.
+### Overview
+The purpose of this document is to illustrate, through explanatory animations, the journey of a request packet (shown as a red rectangle) and a response packet (shown as a blue rectangle), along with the corresponding routing rules in each routing table (RT), for Inbound-Outbound (North-South) and East-West network traffic, within a **Hub A** and Spoke VCNs.
 
 &nbsp; 
 

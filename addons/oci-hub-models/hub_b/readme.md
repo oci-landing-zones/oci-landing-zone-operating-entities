@@ -4,7 +4,7 @@
 &nbsp; 
 
 ### Overview
-**Hub B** features a single OCI Network Firewall, a next-generation managed network firewall and an intrusion detection and prevention service. This firewall handles inbound, outbound, and East-West traffic control and inspection, ensuring comprehensive network security and monitoring across all traffic flows.
+**Hub B** features a single OCI Network Firewall, a next-generation managed network firewall and an intrusion detection and prevention service. This firewall handles Inbound, Outbound, and East-West traffic control and inspection, ensuring comprehensive network security and monitoring across all traffic flows.
 
 
 &nbsp; 
@@ -19,7 +19,7 @@
     1. private-subnet for OCI Network Firewall
     2. private-subnet for managment workloads
     3. private-subnet for logs
-    4. private-subnet for DNS (OCI Forwarders, Listeners)
+    4. private-subnet for DNS (for OCI DNS resolver endpoints)
 - Internet Gateway
 - NAT Gateway
 - Service Gateway
@@ -28,9 +28,9 @@
 
 
 #### Specifications and considerations:
-- Single Firewall: handles North-South (inbound/outbound) and East-West traffic inspection.
+- Single Firewall: handles North-South (Inbound/Outbound) and East-West traffic inspection.
 - Throughput rate: specifies the capacity of a single OCI Network Firewall.
-- Visibility limitations: no visibility into the source of inbound traffic, as the OCI Network Firewall only sees traffic coming from the Public Load Balancer.
+- Visibility limitations: no visibility into the source of Inbound traffic, as the OCI Network Firewall only sees traffic coming from the Public Load Balancer.
 - Cost Efficiency: lower cost compared to the **[Hub A](/addons/oci-hub-models/hub_a/readme.md)** model.
 <br>
 
@@ -54,12 +54,12 @@ For comprehensive understanding of how network packets flow within **Hub B** and
 | |  |
 |---|---| 
 | **ID** | Hub B | 
-| **DESCRIPTION** | 
-| **DETAILED DESCRIPTION** | TBU |
-| **OCI RESOURCES SCOPE** | |
+| **DESCRIPTION** | Hub with One OCI Network Firewall | 
+| **DETAILED DESCRIPTION** | View [Network Packet Flow](/addons/oci-hub-models/hub_b/hub-b-packet_flow.md) |
+| **OCI RESOURCES SCOPE** | ? |
 | **IAC CONFIGURATION** | [oci_open_lz_one-oe_network.auto.tfvars.json](oci_open_lz_one-oe_network.auto.tfvars.json) |
 | **TERRAFORM MODULES**| [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) |
-| **DEPLOY WITH ORM** | |
+| **DEPLOY WITH ORM** | TBU |
 
 
 &nbsp; 
