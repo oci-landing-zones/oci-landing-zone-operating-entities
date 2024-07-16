@@ -28,10 +28,10 @@
 
 
 #### Specifications and considerations:
-- Single Firewall: Handles North-South (Inbound/Outbound) and East-West traffic inspection.
-- Throughput Rate: Specifies the capacity of a single OCI Network Firewall.
-- Visibility Limitations: No visibility into the source of inbound traffic, as the OCI Network Firewall only sees traffic coming from the Public Load Balancer.
-- Cost Efficiency: Lower cost compared to the **[Hub A](/addons/oci-hub-models/hub_a/readme.md)** model.
+- Single Firewall: handles North-South (inbound/outbound) and East-West traffic inspection.
+- Throughput rate: specifies the capacity of a single OCI Network Firewall.
+- Visibility limitations: no visibility into the source of inbound traffic, as the OCI Network Firewall only sees traffic coming from the Public Load Balancer.
+- Cost Efficiency: lower cost compared to the **[Hub A](/addons/oci-hub-models/hub_a/readme.md)** model.
 <br>
 
 #### Hub & Spoke architecture diagram with corresponding routing tables and routing rules:
@@ -45,7 +45,7 @@
 
 &nbsp;
 
-Note: the CIDR ranges presented in the architecture diagram are for documentation purposes only, and should be aligned for each specific use case.
+Note: The CIDR ranges shown in the architecture diagram are for illustrative purposes only and should be adjusted to align with each specific use case.
 
 For comprehensive understanding of how network packets flow within **Hub B** and Spoke VCNs refer to the [Network packet flow animation - Hub B](/addons/oci-hub-models/hub_b/hub-b-packet_flow.md).
 

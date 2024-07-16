@@ -4,7 +4,9 @@
 &nbsp; 
 
 ### Overview
-**Hub A** consist of two OCI Network Firewalls (next-generation managed network firewall and intrusion detection and prevention service). One is intended for inbound and the second one for the inter spoke communication, outbound as well as for on-prem traffic control and inspection. 
+**Hub A** is equipped with two OCI Network Firewalls - a next-generation managed network firewall and an intrusion detection and prevention service. 
+The first firewall is dedicated to inbound traffic, while the second is responsible for outbound and East-West traffic control and inspection.
+
 
 <img src="images/hub_a_design.png" width="250" height="value">
 
@@ -26,8 +28,8 @@
 - Public Load Balancer (LBaaS)
 
 #### Specifications and considerations:
-- Segmentation of the network traffic and higher throughput rate.
-- Visibility into the source of the inbound traffic on the **DMZ-FW**.
+- Segmentation of network traffic and increased throughput: ensures efficient traffic management and higher data transfer rates.
+- Visibility into Inbound traffic source on **DMZ-FW**: enables detailed control over traffic entering the Hub VCN.
 - SSL Decryption Policy configuration on **DMZ-FW** to allow inspect SSL traffic before sending it to the Public Load Balancer (note: even though **DMZ-FW** is in a public subnet, it hasn't public interface, it has only single private interface with private IP address).
 - Higher cost compared to the **[Hub B](/addons/oci-hub-models/hub_b/readme.md)** model: 2 x price of the OCI Network Firewall.
 <br>
