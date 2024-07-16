@@ -19,7 +19,7 @@ This document provides an in-depth exploration of the various **OCI Network Hub 
 | [<img src="hub_a/images/hub_a_design.png" width="275" height="">](/addons/oci-hub-models/hub_a/readme.md) | [<img src="hub_b/images/hub_b_design.png" width="275" height="">](/addons/oci-hub-models/hub_b/readme.md) | <img src="hub_c/images/hub_c_design.png" width="280" height=""> |  <img src="hub_d/images/hub_d_design.png" width="280" height=""> | 
 | Hub with Two **OCI Network Firewalls** | Hub with One **OCI Network Firewall** | Hub with **3rd Party FW** - AA | Hub with **3rd Party FW** - AP |
 | [Overview and routing](/addons/oci-hub-models/hub_a/readme.md)  | [Overview and routing](/addons/oci-hub-models/hub_b/readme.md) | TBU | TBU |
-| [Packet Flow Animation](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md) | [Packet Flow Animation](/addons/oci-hub-models/hub_b/hub-b-packet_flow.md) | TBU | |
+| [Packet flow animation](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md) | [Packet flow animation](/addons/oci-hub-models/hub_b/hub-b-packet_flow.md) | TBU | |
 
 
 
