@@ -39,7 +39,7 @@ The first firewall is dedicated to inbound traffic, while the second is responsi
 
 &nbsp;
 
-### 3. Considerations
+### 3. Specifications and Considerations
 - Segmentation of network traffic and increased throughput: ensures efficient traffic management and higher data transfer rates.
 - Visibility into Inbound traffic source on **DMZ-FW**: enables detailed control over traffic entering the Hub VCN.
 - SSL Decryption Policy configuration on **DMZ-FW** to allow inspect SSL traffic before sending it to the Public Load Balancer.
@@ -50,9 +50,13 @@ The first firewall is dedicated to inbound traffic, while the second is responsi
 
 ### 4. Routing
 
+The following diagram presents a Hub & Spoke architecture diagram with corresponding routing tables and routing rules.
+
 <img src="images/hub_a_routing.png" width="900" height="value">
 
 &nbsp;
+
+#### Legend:
 
 <img src="images/oci_hub_models_legend.png" width="200" height="value">
 
@@ -60,13 +64,13 @@ The first firewall is dedicated to inbound traffic, while the second is responsi
 
 Note: The CIDR ranges shown in the architecture diagram are for illustrative purposes only and should be adjusted to align with each specific use case.
 
-For comprehensive understanding of how network packets flow within **Hub A** and Spoke VCNs refer to the [Network packet flow animation - Hub A](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md).
+For a comprehensive understanding of how network packets flow within **Hub A** and Spoke VCNs refer to the [Network packet flow animation - Hub A](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md).
 
 &nbsp;
 
 ### 5. Automation
 
-Use the [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) Terraform modules. As a example comnfiguration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/one-oe/runtime/one-click/oci_open_lz_one-oe_network.auto.tfvars.json).
+For automating this Hub model use the [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) Terraform modules. As an example configuration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/one-oe/runtime/one-click/oci_open_lz_one-oe_network.auto.tfvars.json).
 
 
 
