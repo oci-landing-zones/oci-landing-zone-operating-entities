@@ -12,9 +12,9 @@
 
 #### The main components of a **Hub B**:
 - VCN (Virtual Cloud Network)
-- One Public subnet (depicted in green)
+- One regional public subnet (depicted in green)
     1. public-subnet for Public Load Balancers
-- Four Private subnets (depicted in dark-orange)
+- Four regional private subnets (depicted in dark-orange)
     1. private-subnet for OCI Network Firewall
     2. private-subnet for managment workloads
     3. private-subnet for logs

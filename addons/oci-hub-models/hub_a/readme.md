@@ -10,10 +10,10 @@
 
 #### The main components of a **Hub A**:
 - VCN (Virtual Cloud Network)
-- Two Public subnets (depicted in green)
+- Two regional public subnets (depicted in green)
     1. public-subnet for DMZ/external OCI Network Firewall
     2. public-subnet for Public Load Balancers
-- Four Private subnets (depicted in dark-orange)
+- Four regional private subnets (depicted in dark-orange)
     1. private-subnet for Internal OCI Network Firewall
     2. private-subnet for managment workloads
     3. private-subnet for logs
