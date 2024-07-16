@@ -43,7 +43,7 @@
 
 &nbsp;
 
-Note: the CIDR ranges presented in the architecture diagram are for documentation purposes only, and should be aligned for each specific use case.
+Note: The CIDR ranges shown in the architecture diagram are for illustrative purposes only and should be adjusted to align with each specific use case.
 
 For comprehensive understanding of how network packets flow within **Hub A** and Spoke VCNs refer to the [Network packet flow animation - Hub A](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md).
 

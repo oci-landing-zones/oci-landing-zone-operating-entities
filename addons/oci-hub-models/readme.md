@@ -9,7 +9,6 @@ Welcome to the **OCI Network Hub Model [Addon](#)**, a set of **comprehensible O
 
 This document provides an in-depth exploration of the various **OCI Network Hub models** within a **Hub & Spoke architecture**. It covers the components, specifications, and considerations of each model to facilitate the selection of the most suitable option for different scenarios and requirements. Additionally, it includes **packet flow animations** to illustrate the journey of network packets within these models, enhancing understanding through **visual representation**.
 
-
 &nbsp; 
 
 ### The Hub Menu

@@ -4,7 +4,8 @@
 &nbsp; 
 
 ### Overview
-**Hub B** consist of one OCI Network Firewalls (next-generation managed network firewall and intrusion detection and prevention service) for inbound, outbound, as well as for inter spoke and on-prem traffic control and inspection.
+**Hub B** features a single OCI Network Firewall, a next-generation managed network firewall and an intrusion detection and prevention service. This firewall handles inbound, outbound, and East-West traffic control and inspection, ensuring comprehensive network security and monitoring across all traffic flows.
+
 
 &nbsp; 
 
@@ -27,10 +28,10 @@
 
 
 #### Specifications and considerations:
-- Single Firewall for North-South (Inbound/Outbound) and East-West traffic inspection.
-- Throughput rate of a single OCI Network Firewall.
-- No visibility into the source of the Inbound traffic, as the source is Public Load Balancer.
-- Low cost compared to the **[Hub A](/addons/oci-hub-models/hub_a/readme.md)** model.
+- Single Firewall: Handles North-South (Inbound/Outbound) and East-West traffic inspection.
+- Throughput Rate: Specifies the capacity of a single OCI Network Firewall.
+- Visibility Limitations: No visibility into the source of inbound traffic, as the OCI Network Firewall only sees traffic coming from the Public Load Balancer.
+- Cost Efficiency: Lower cost compared to the **[Hub A](/addons/oci-hub-models/hub_a/readme.md)** model.
 <br>
 
 #### Hub & Spoke architecture diagram with corresponding routing tables and routing rules:
