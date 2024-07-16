@@ -1,7 +1,17 @@
 # OCI Open LZ - [Hub B](#)
-## Hub with One OCI Network Firewall
+## A Hub with One OCI Network Firewall
 
 &nbsp; 
+
+**Table of Contents**
+
+[1. Overview](#1-overview)</br>
+[2. Components](#2-components)</br>
+[3. Considerations](#3-considerations)</br>
+[4. Routing](#4-routing)</br>
+[5. Automation](#5-automation)</br>
+
+&nbsp;
 
 ### Overview
 **Hub B** features a single OCI Network Firewall, a next-generation managed network firewall and an intrusion detection and prevention service. This firewall handles Inbound, Outbound, and East-West traffic control and inspection, ensuring comprehensive network security and monitoring across all traffic flows.
@@ -11,7 +21,9 @@
 
 <img src="images/hub_b_design.png" width="250" height="value">
 
-#### The main components of a **Hub B**:
+&nbsp;
+
+###  2. Components
 - VCN (Virtual Cloud Network)
 - One regional public subnet (depicted in green)
     1. public-subnet for Public Load Balancers
@@ -26,21 +38,22 @@
 - Public Load Balancer (LBaaS)
 - **OCI-FW** - OCI Network Firewall: responsible for Inbound/Outbound (North-South) and East-West network traffic control and inspection.
 
+&nbsp;
 
-#### Specifications and considerations:
+### 3. Considerations
 - Single Firewall: handles North-South (Inbound/Outbound) and East-West traffic inspection.
 - Throughput rate: specifies the capacity of a single OCI Network Firewall.
 - Visibility limitations: no visibility into the source of Inbound traffic, as the OCI Network Firewall only sees traffic coming from the Public Load Balancer.
 - Cost Efficiency: lower cost compared to the **[Hub A](/addons/oci-hub-models/hub_a/readme.md)** model.
-<br>
 
-#### Hub & Spoke architecture diagram with corresponding routing tables and routing rules:
+&nbsp;
+
+### 4. Routing
 
 <img src="images/hub_b_routing.png" width="900" height="value">
 
 &nbsp;
 
-#### Legend:
 <img src="images/oci_hub_models_legend.png" width="200" height="value">
 
 &nbsp;
@@ -51,15 +64,11 @@ For comprehensive understanding of how network packets flow within **Hub B** and
 
 &nbsp;
 
-| |  |
-|---|---| 
-| **ID** | Hub B | 
-| **DESCRIPTION** | Hub with One OCI Network Firewall | 
-| **DETAILED DESCRIPTION** | View [Network Packet Flow](/addons/oci-hub-models/hub_b/hub-b-packet_flow.md) |
-| **OCI RESOURCES SCOPE** | ? |
-| **IAC CONFIGURATION** | [oci_open_lz_one-oe_network.auto.tfvars.json](oci_open_lz_one-oe_network.auto.tfvars.json) |
-| **TERRAFORM MODULES**| [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) |
-| **DEPLOY WITH ORM** | TBU |
+
+### 5. Automation
+
+Use the [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) Terraform modules. As a example comnfiguration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/one-oe/runtime/one-click/oci_open_lz_one-oe_network.auto.tfvars.json).
+
 
 
 &nbsp; 
