@@ -13,7 +13,7 @@ Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as 
 The objective of the **OCI Open LZ** is to **increase OCI security and scalability** while **reducing the design and implementation timelines, associated costs, and efforts** - with the following artifacts:
 1. **[Blueprints](#select-your-blueprint)**: Complete landing zone **designs** with **100% declarative IaC runtime models**, ready to onboard organizations and their functional divisions &ndash; identified as **Op**erating **En**tities **(OEs)**. 
 2. **[Workloads Extensions](/workload-extensions/readme.md)**: for reducing your time-to-production with ready-made designs and pre-built IaC configurations on common workloads.
-3. **[Enablement Activities](#enablement-activities):** for our customers, partners, independent software vendors (ISV), and the general IT community to create, configure, and run OCI landing zones with best practices and lower efforts.
+3. **[Add-ons](/addons/readme.md):** to help our customers, partners, independent software vendors (ISV), and the general IT community to create, configure, and run OCI landing zones with best practices and lower efforts.
 
 
 &nbsp; 
@@ -37,7 +37,7 @@ Note these blueprints can be used directly as OCI [**Standard Landing Zones**](h
 
 &nbsp; 
 
-## Enablement Activities
+## Where Do You Start
 
 The following activities are proposed as guidance to understand the overall **OCI landing zone strategy** and **create your OCI-tailored landing zone**.
 
@@ -50,7 +50,7 @@ The following activities are proposed as guidance to understand the overall **OC
 | **2**| **PREPARE** | [EMEA OCI Landing Zones - Git](https://github.com/oracle-devrel/technology-engineering/tree/main/landing-zones)| Review standard landing zones, tailored landing zones, and workload extensions concepts.
 | **3** | **ENABLE** | [OCI Learn LZ](/addons/oci-learn-lz/readme.md)| Use the OCI Learn LZ exercises to understand how to **design** and **configure** OCI Landing Zones. |
 | **4** | **SELECT** | [OCI Open LZ Blueprints](/README.md#the-blueprints-menu)| Select you prefered blueprint from the options above. |
-| **4** | **DESIGN** | [One-OE](/one-oe/readme.md) </br> [Multi-OE](/multi-oe/readme.md)| Use the selected OCI Open LZ **blueprint** to design - in drawio - your functional, security, network, and operations view, with all the diagrams in a reusable format. |   
+| **4** | **DESIGN** | [One-OE](/one-oe/readme.md) </br> [Multi-OE](/multi-oe/readme.md) </br> [Network Hubs](/addons/oci-hub-models/readme.md) | Use the selected OCI Open LZ **blueprint** to design - in drawio - your functional, security, network, and operations view, with all the diagrams in a reusable format. For network use our **Hub Menu** to select your prefered topology. |   
 | **5** | **CONFIGURE** |[Declarative IaC](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/commons/oci_landingzones_iac.md) | Learn about the OCI IaC declarative approach and use the OCI Open LZ runtime **configurations** as your IaC templates. These configurations are easily adjustable to any other landing zone model. |                
 | **6** | **RUN** |[One-OE](/one-oe/readme.md) </br> [Multi-OE](/multi-oe/readme.md) | Run your configurations using **Terraform CLI** or **Oracle Resource Manager (ORM)** as described in the blueprint runtimes documentation. |
 | **7** | **EXTEND** | [Workload Extensions](/workload-extensions/readme.md) | Extend your Landing Zone wit ready-made pluggable workload extensions to reduce your time-to-production with OCI best practices. |
