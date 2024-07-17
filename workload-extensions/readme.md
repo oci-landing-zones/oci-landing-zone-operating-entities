@@ -16,7 +16,7 @@ Find below the list of available workload landing zones and our backlog. Be free
 
 &nbsp; 
 
-| WORKLOAD  | CONTENT | DESCRIPTION |
+| WORKLOAD  | DESCRIPTION | CONTENT |
 |---|---|---|
 | **EBS**| An EBS Landing Zone Extension. | [**Public**](/workload-extensions/oci-lz-ext-ebs/readme.md) |
 | **OKE** | An OKE Landing Zone Extension. | On Demand | 
