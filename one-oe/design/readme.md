@@ -202,7 +202,7 @@ The following diagram and table present the network structure of the One-OE blue
 
 &nbsp; 
 
-There are several possible **hub models** that can be used and they are described in the [OCI Open LZ One-OE Drawio - Network Tabs](/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio). The One-OE Blueprint uses **Hub Model A** for **Network Area 1,** and it's depicted below in **structure** and **routing**. 
+There are several possible **hub models** that can be used and they are described in the [OCI Open LZ One-OE Drawio - Network Tabs](/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio). The One-OE Blueprint uses **[Hub Model A](/addons/oci-hub-models/hub_a/readme.md)** for **Network Area 1,** and it's depicted below in **structure** and **routing**. 
 
 &nbsp; 
 
