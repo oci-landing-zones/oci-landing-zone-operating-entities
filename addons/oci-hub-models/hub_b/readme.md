@@ -7,7 +7,7 @@
 
 [1. Overview](#1-overview)</br>
 [2. Components](#2-components)</br>
-[3. Considerations](#3-considerations)</br>
+[3. Specifications and Considerations](#3-specifications-and-considerations)</br>
 [4. Routing](#4-routing)</br>
 [5. Automation](#5-automation)</br>
 
