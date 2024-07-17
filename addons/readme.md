@@ -10,8 +10,8 @@ An **add-on** is an **asset** that simplifies the onboarding and running OCI wit
 
 | ADD-ON  | DESCRIPTION | CONTENT |
 |---|---|---|
-| **OCI Learn LZ**| A Landing Zone **training** to learn how to design and run a Landing Zone without code. | [**Public**](/addons/oci-learn-lz/readme.md) |
-| **OCI Hub Models** | A well-documented set of **OCI Network Hub topologies** that can be applicable to any landing zone or OCI deployment. |  [**Public**](/addons/oci-hub-models/readme.md) | 
+| **[OCI Learn LZ](/addons/oci-learn-lz/readme.md)**| A Landing Zone **training** to learn how to design and run a Landing Zone without code. | Public |
+| **[OCI Network Hubs](/addons/oci-hub-models/readme.md)** | A well-documented set of **OCI Network Hub topologies** that can be applicable to any landing zone or OCI deployment. | Public | 
 
 
 

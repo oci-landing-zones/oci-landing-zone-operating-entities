@@ -12,8 +12,8 @@ Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as 
 
 The objective of the **OCI Open LZ** is to **increase OCI security and scalability** while **reducing the design and implementation timelines, associated costs, and efforts** - with the following artifacts:
 1. **[Blueprints](#select-your-blueprint)**: Complete landing zone **designs** with **100% declarative IaC runtime models**, ready to onboard organizations and their functional divisions &ndash; identified as **Op**erating **En**tities **(OEs)**. 
-2. **[Workloads Extensions](/workload-extensions/readme.md)**: for reducing your time-to-production with ready-made designs and pre-built IaC configurations on common workloads.
-3. **[Add-ons](/addons/readme.md):** to help our customers, partners, independent software vendors (ISV), and the general IT community to create, configure, and run OCI landing zones with best practices and lower efforts.
+2. **[Workloads Extensions](/workload-extensions/readme.md)**: for r**educing your time-to-production** with ready-made designs and pre-built IaC configurations on common **workloads**.
+3. **[Add-ons](/addons/readme.md):** to help our customers, partners, and the general IT community to create, configure, and run OCI landing zones with **best practices** and **lower efforts**.
 
 
 &nbsp; 
@@ -29,7 +29,7 @@ There are three blueprints available to onboard OCI. Choose the most suitable ac
 | **Multi-Tenancy*** | <img src="images/multi-tenancy_icon.jpg" width="150" height="value">| **X-XXL** | Uses the **One-OE** and **Multi-OE** to onboard all your organizations or customers into **several tenancies**, while **providing your** centralized services, shared services, managed services, cloud services, PaaS, or SaaS. | All Your Organizations, OUs, Partners, or Customers.
 
 
-(*) The multi-tenancy landing zone is available on demand. 
+(*) The multi-tenancy landing zone is available on demand, and it's applicable to all OCI flavors (Public, DRCC, Alloy, etc.)
 
 &nbsp; 
 
