@@ -404,9 +404,9 @@ The EBS LZ Extension has three operation scenarios described in the following ta
 
 | OP. ID | OPERATION SCENARIOS DESCRIPTION | TIME EFFORTS | 
 |---|---|---| 
-| **[OP. ID.01](/examples/oci-lz-ext-ebs/op01-deploy-CIS/readme.md)** | **Deploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services. | **< 1h** | 
-| **[OP. ID.02](/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/readme.md)**| **Deploy EBS extension**. Include EBS network resources (Spokes VCNs, Table Routes, Security Lists) and IAM EBS resources (Groups, Policies). | **< 2h** excluding TF environment configuration | 
-| **[OP. ID.03](/examples/oci-lz-ext-ebs/op03-manual-changes/readme.md)**| **Manual changes**. | **< 15m** | 
+| **[OP. ID.01](/workload-extensions/oci-lz-ext-ebs/op01-deploy-CIS/readme.md)** | **Deploy CIS OCI LZ**. Cover Core network resources ( hub VCN), Core IAM resources (compartments, group, policies), and security services. | **< 1h** | 
+| **[OP. ID.02](/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/readme.md)**| **Deploy EBS extension**. Include EBS network resources (Spokes VCNs, Table Routes, Security Lists) and IAM EBS resources (Groups, Policies). | **< 2h** excluding TF environment configuration | 
+| **[OP. ID.03](/workload-extensions/oci-lz-ext-ebs/op03-manual-changes/readme.md)**| **Manual changes**. | **< 15m** | 
  
 
 &nbsp; 

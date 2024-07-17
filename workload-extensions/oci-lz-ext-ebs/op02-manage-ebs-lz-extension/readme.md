@@ -21,10 +21,10 @@
 | **OP. NAME** |  Manage EBS Landing Zone Extension | 
 | **OBJECTIVE** | Provision/change OCI EBS Landing Zone IAM and Network Extensions. |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists  |
-| **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/examples/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
-| **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](/examples/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/json/ebs_network_rt_sl_v1.auto.tfvars.json) |
-| **PRE-ACTIVITIES** | Execute [OP.01. Deploy OCI CIS LZ](/examples/oci-lz-ext-ebs/op01-deploy-CIS/readme.md)  |
-| **POST-ACTIVITIES** | Execute [OP.03 Manual Changes](/examples/oci-lz-ext-ebs/op03-manual-changes/readme.md) |
+| **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/workload-extensions/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
+| **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](/workload-extensions/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/json/ebs_network_rt_sl_v1.auto.tfvars.json) |
+| **PRE-ACTIVITIES** | Execute [OP.01. Deploy OCI CIS LZ](/workload-extensions/oci-lz-ext-ebs/op01-deploy-CIS/readme.md)  |
+| **POST-ACTIVITIES** | Execute [OP.03 Manual Changes](/workload-extensions/oci-lz-ext-ebs//op03-manual-changes/readme.md) |
 | **RUN OPERATION** | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli). |
 
 &nbsp; 
