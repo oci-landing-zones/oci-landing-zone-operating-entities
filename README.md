@@ -19,14 +19,14 @@ The objective of the OCI Open LZ is to increase OCI security and scalability whi
 
 This repository is the source of truth for the OCI Open LZ and includes the following components:
 
-# | Directory | Description 
------------- | ------------ | ------------- 
-**1** | **[`blueprints/`](blueprints/)** | **Choose** your OCI landing zone blueprint - with design and IaC - to onboard and run OCI. 
-1.1 |[`blueprints/one-oe/`](blueprints/one-oe/) | **(M)** Onboard **[One](/one-oe/readme.md) Operating Entity** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI_oneclick.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-click/readme.md)
-1.2 |[`blueprints/multi-oe/`](blueprints/multi-oe/) | **(L)** Onboards **[Multiple](/multi-oe/readme.md) Operating Entities** with a shared services model and OE-dedicated resources, sharing **one tenancy**. 
-1.3 |[`blueprints/multi-tenancy/`](blueprints/) | **(XL)** Uses the **One-OE** and **Multi-OE** to onboard all your organizations or customers into **several tenancies**. 
-**2** |**[`addons/`](addons/)** | **Complement** your landing zone with add-ons to run OCI with best practices and lower efforts. (e.g., [Network Hubs](/addons/oci-hub-models/readme.md), [...](/addons/readme.md))
-**3** |**[`workload-extensions/`](workload-extensions/)** | **Extend** you landing zone with pluggable workloads extensions - including design and IaC. (e.g., [EBS](/workload-extensions/oci-lz-ext-ebs/readme.md), [OCVS](/workload-extensions/oci-lz-ext-ocvs/README.md), [...](/workload-extensions/readme.md)).
+| # | Directory | Description |
+|------------ | ------------ | ------------- |
+| **1** | **[`blueprints/`](blueprints/)** | **Choose** your OCI landing zone blueprint - with design and IaC - to onboard and run OCI. |
+| 1.1 |[`blueprints/one-oe/`](blueprints/one-oe/) | **(M)** Onboard **[One](/one-oe/readme.md) Operating Entity** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI_oneclick.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-click/readme.md)|
+| 1.2 |[`blueprints/multi-oe/`](blueprints/multi-oe/) | **(L)** Onboards **[Multiple](/multi-oe/readme.md) Operating Entities** with a shared services model and OE-dedicated resources, sharing **one tenancy**. |
+| 1.3 |[`blueprints/multi-tenancy/`](blueprints/) | **(XL)** Uses the **One-OE** and **Multi-OE** to onboard all your organizations or customers into **several tenancies**. 
+**2** |**[`addons/`](addons/)** | **Complement** your landing zone with add-ons to run OCI with best practices and lower efforts. (e.g., [Network Hubs](/addons/oci-hub-models/readme.md), [...](/addons/readme.md))|
+| **3** |**[`workload-extensions/`](workload-extensions/)** | **Extend** you landing zone with pluggable workloads extensions - including design and IaC. (e.g., [EBS](/workload-extensions/oci-lz-ext-ebs/readme.md), [OCVS](/workload-extensions/oci-lz-ext-ocvs/README.md), [...](/workload-extensions/readme.md)).|
 
 &nbsp; 
 
