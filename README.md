@@ -8,9 +8,9 @@
 
 &nbsp; 
 
-Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as **OCI [Open](#) LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI. 
+Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as **OCI [Open](#) LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI for organizations and their functional divisions &ndash; identified as OCI [**Op**](#)erating [**En**](#)tities **(OEs)**. 
 
-The objective of the OCI Open LZ is to increase OCI security and scalability while reducing the design and implementation timelines, associated costs, and efforts - with complete landing zone **designs** and **declarative IaC** runtime, ready to onboard organizations and their functional divisions &ndash; identified as OCI [**Op**](#)erating [**En**](#)tities **(OEs)**. 
+The OCI Open LZ enables a future-proof OCI, with complete security and scalability, while reducing design and implementation timelines, associated costs, and efforts - with OCI Landing Zone blueprints, complete designs, and declarative IaC runtimes.
 
 &nbsp; 
 
@@ -19,7 +19,7 @@ The objective of the OCI Open LZ is to increase OCI security and scalability whi
 
 This repository is the source of truth for the OCI Open LZ and includes the following components:
 
-| # | Directory &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| Description |
+| # | Directory &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  | Description |
 |------------------------ | ------------ | ------------- |
 | **1** | **[`blueprints/`](blueprints/)** | **Choose** your OCI landing zone blueprint - with design and IaC - to onboard and run OCI. |
 | 1.1 |[`blueprints/one-oe/`](blueprints/one-oe/) | **(M)** Onboard **[One](/one-oe/readme.md) Operating Entity** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI_oneclick.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-click/readme.md)|
