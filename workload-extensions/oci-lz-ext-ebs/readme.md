@@ -1,4 +1,9 @@
-# **EBS LZ Extension**
+
+# **[EBS Landing Zone Extension](#)**
+## **An OCI Open LZ [Workload Extensions](#) to Reduce Your Time-to-Production**
+ <img src="../../commons/images/icon_ebs.jpg" height="70">
+
+&nbsp; 
 
 **Table of Contents**
 

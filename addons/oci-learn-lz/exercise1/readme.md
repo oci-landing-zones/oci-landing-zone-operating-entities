@@ -30,11 +30,11 @@ Your objective is to review the initial tenancy structure created by your team, 
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
-| 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "SEC - EXERCISE #1" |
+| 1 | Open the [Drawio design](../OCI_Learn_LZ.drawio) file, and select tab "SEC - EXERCISE #1" |
 | 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layer is disabled. |
 | 3 | Review the tenancy structure design that is already created. The image below presents it. |
-| 4 | Review configurations. First review what is [possible to configure](/examples/oci-learn-lz/exercise1/diagrams/oci_iam_config_all_variables.jpg) and then review the [exercise specific configurations](/examples/oci-learn-lz/exercise1/diagrams/oci_iam_config_exercise_variables.jpg) scope. These views are also available on the draw.io tabs. |
-| 5 | Copy the configuration file [oci_learn_lz_iam.yml](/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise1.
+| 4 | Review configurations. First review what is [possible to configure](diagrams/oci_iam_config_all_variables.jpg) and then review the [exercise specific configurations](diagrams/oci_iam_config_exercise_variables.jpg) scope. These views are also available on the draw.io tabs. |
+| 5 | Copy the configuration file [oci_learn_lz_iam.yml](config_yaml/oci_learn_lz_iam.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise1.
 | 6 | Review the tenancy structure configuration in you **local**  **oci_learn_lz_iam.yml** file. |
 
 
@@ -52,7 +52,7 @@ Your objective is to update the tenancy structure with a missing application **c
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
-| 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "SEC - EXERCISE #1" |
+| 1 | Open the [Drawio design](../OCI_Learn_LZ.drawio) file, and select tab "SEC - EXERCISE #1" |
 | 2 | Enable the Layer "STEP 2 - EXERCISE". Make sure the STEP 1 layer is enabled. |
 | 3 | Review the target tenancy structure design with the two domains. The image below presents it. |
 | 4 | Update the tenancy structure IaC configuration with the new changes in your **local oci_learn_lz_iam.yml** file. |
@@ -93,7 +93,7 @@ In this example we use YAML configurations files, but JSON files examples are al
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---| 
-| **1** | Create a new ORM Stack: [![Deploy_To_OCI](/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_solution.yml"}) |
+| **1** | Create a new ORM Stack: [![Deploy_To_OCI](../../../commons//images/DeployToOCI.jpg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/addons/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_solution.yml"}) |
 | **2** | Accept terms,  **wait** for the configuration to load. |
 | **3** | Set the working directory to “**rms-facade**”. | 
 | **4** | Set the stack **name** you prefer. | 
