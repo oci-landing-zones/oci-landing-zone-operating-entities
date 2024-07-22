@@ -4,6 +4,7 @@
 - [**2. Compartments**](#2-compartments)
 - [**3. Network**](#3-network)
 
+&nbsp; 
 
 ## **1. Summary**
 
@@ -15,6 +16,8 @@
 | **TARGET RESOURCES** | VCN, Load Balancer                      |
 
 This is an optional post deployment operation to provision a Load Balancer Subnet for the OCVS with predefined routing and security rules. Load Balancer subnet can be used for creating Load Balancer for exposing parts of the OCVS either internally or externally.
+
+&nbsp; 
 
 ## **2. Compartments**
 Provision ocvs-lb compartment by modifying the `oci_open_lz_one-oe_identity.auto.tfvars.json` file to add following in the OCVS children:
@@ -28,6 +31,8 @@ Provision ocvs-lb compartment by modifying the `oci_open_lz_one-oe_identity.auto
     }
 }
 ```
+
+&nbsp; 
 
 ## **3. Network**
 Provision LB subnet, routes, security lists by modifing the `oci_open_lz_one-oe_identity.auto.tfvars.json` file to add following parts of configuration.
@@ -93,6 +98,9 @@ Subnets to path `network_configuration.network_configuration_categories["VCN-FRA
     ]
 }
 ```
+
+&nbsp; 
+&nbsp; 
 
 # License <!-- omit from toc -->
 

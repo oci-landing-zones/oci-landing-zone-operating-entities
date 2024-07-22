@@ -3,6 +3,7 @@
 - [**1. Summary**](#1-summary)
 - [**2. OCVS Deployment**](#2-ocvs-deployment)
 
+&nbsp; 
 
 ## **1. Summary**
 
@@ -12,6 +13,8 @@
 | **OP. NAME**         | OCVS Set-up                                           |
 | **OBJECTIVE**        | Provision OCI OCVS on top of Landing Zone Extensions. |
 | **TARGET RESOURCES** | OCVS                                                  |
+
+&nbsp; 
 
 ## **2. OCVS Deployment**
 1. Navigate to [Software-Defined Data Centers](https://cloud.oracle.com/vmware/sddcs/create) as part of VMWare service in OCI. 
@@ -23,6 +26,9 @@
 7. Provide desired CIDR range for the Cluster Network
 8. Review and finish the set-up
    
+&nbsp; 
+&nbsp; 
+
 # License <!-- omit from toc -->
 
 Copyright (c) 2024 Oracle and/or its affiliates.
