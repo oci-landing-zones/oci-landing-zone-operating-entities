@@ -19,7 +19,7 @@ The objective of the OCI Open LZ is to increase OCI security and scalability whi
 
 This repository is the source of truth for the OCI Open LZ and includes the following components:
 
-| # | Directory &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | Description |
+| # | Directory &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | Description |
 |------------------------ | ------------ | ------------- |
 | **1** | **[`blueprints/`](blueprints/)** | **Choose** your OCI landing zone blueprint - with design and IaC - to onboard and run OCI. |
 | 1.1 |[`blueprints/one-oe/`](blueprints/one-oe/) | **(M)** Onboard **[One](/one-oe/readme.md) Operating Entity** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI_oneclick.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-click/readme.md)|
@@ -40,14 +40,14 @@ As general guidance, it's recommended to start with the order of the table above
 The OCI Open LZ uses a declarative Infrastructure-as-Code (IaC) that is explained [here](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/commons/oci_landingzones_iac.md) and distributed into several repositories.
 
 
-Name         | Description
------------- | -------------
-[OCI Landing Zones Orchestrator][oci-lz-orchestrator] | Provides the ability to declare and relate several resource from the modules below into one consolidated operation (i.e., one plan/apply).
-[OCI Landing Zones IAM][oci-lz-iam] | Provides the ability to declare Compartments, Groups, Policies, Dynamic Groups, etc.
-[OCI Landing Zones Network][oci-lz-network]| Provides the ability to declare all OCI Core Network Resources for any network topology.
-[OCI Landing Zones Security][oci-lz-security] | Provides the ability to declare OCI Security Resources (e.g., Cloud Guard, VSS, Security Zones, Vaults, etc.).
-[OCI Landing Zones Observability][oci-lz-observability] | Provides the ability to declare OCI monitoring resources (e.g., Logging, Events, Alarms, Notifications, etc.).
-[OCI Landing Zones Governance][oci-lz-governance] | Provides the ability to declare OCI Tagging.
+| Name   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;       | Description
+| ------------ | -------------
+| [OCI Landing Zones Orchestrator][oci-lz-orchestrator] | Provides the ability to declare and relate several resource from the modules below into one consolidated operation (i.e., one plan/apply).
+| [OCI Landing Zones IAM][oci-lz-iam] | Provides the ability to declare Compartments, Groups, Policies, Dynamic Groups, etc.
+| [OCI Landing Zones Network][oci-lz-network]| Provides the ability to declare all OCI Core Network Resources for any network topology.
+| [OCI Landing Zones Security][oci-lz-security] | Provides the ability to declare OCI Security Resources (e.g., Cloud Guard, VSS, Security Zones, Vaults, etc.).
+| [OCI Landing Zones Observability][oci-lz-observability] | Provides the ability to declare OCI monitoring resources (e.g., Logging, Events, Alarms, Notifications, etc.).
+| [OCI Landing Zones Governance][oci-lz-governance] | Provides the ability to declare OCI Tagging.
 
 
 &nbsp; 
