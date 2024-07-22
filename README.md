@@ -8,9 +8,7 @@
 
 &nbsp; 
 
-Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as **OCI [Open](#) LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI for organizations and their functional divisions &ndash; identified as OCI [**Op**](#)erating [**En**](#)tities **(OEs)**. 
-
-The OCI Open LZ enables a future-proof OCI, with complete security and scalability, while reducing design and implementation timelines, associated costs, and efforts - with OCI Landing Zone blueprints, complete designs, and declarative IaC runtimes.
+Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as **OCI [Open](#) LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI for organizations and their functional divisions &ndash; identified as  [**Op**](#)erating [**En**](#)tities **(OEs)**. The OCI Open LZ provides complete OCI blueprints, including designs and declarative IaC, reducing design and implementation timelines, associated costs, and efforts - while enabling a future-proof OCI with complete security and scalability.
 
 &nbsp; 
 
@@ -42,7 +40,7 @@ The OCI Open LZ uses a declarative Infrastructure-as-Code (IaC) that is explaine
 
 | Name   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;       | Description
 | ------------ | -------------
-| [OCI Landing Zones Orchestrator][oci-lz-orchestrator] | Provides the ability to declare and relate several resource from the modules below into one consolidated operation (i.e., one plan/apply).
+| [OCI Landing Zones Orchestrator][oci-lz-orchestrator] | Provides the ability to declare and relate resource into one consolidated operation (i.e., one plan/apply).
 | [OCI Landing Zones IAM][oci-lz-iam] | Provides the ability to declare Compartments, Groups, Policies, Dynamic Groups, etc.
 | [OCI Landing Zones Network][oci-lz-network]| Provides the ability to declare all OCI Core Network Resources for any network topology.
 | [OCI Landing Zones Security][oci-lz-security] | Provides the ability to declare OCI Security Resources (e.g., Cloud Guard, VSS, Security Zones, Vaults, etc.).
