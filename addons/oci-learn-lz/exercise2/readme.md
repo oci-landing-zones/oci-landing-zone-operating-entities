@@ -28,11 +28,11 @@ Your objective is to review the initial network structure created by your team, 
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
-| 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
+| 1 | Open the [Drawio design](/addons/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
 | 2 | Enable the Layer "STEP 1 - TEMPLATE". Make sure the STEP 2 layer is disabled. |
 | 3 | Review the network structure design that is already created. The image below presents it. |
-| 4 | Review configurations. First review what is [possible to configure](/examples/oci-learn-lz/exercise2/diagrams/oci_network_config_all_variables.jpg) and then review the [exercise specific configurations](/examples/oci-learn-lz/exercise2/diagrams/oci_network_config_exercise_variables.jpg) scope. These views are also available on the draw.io tabs. |
-| 5 | Copy the configuration file [oci_learn_lz_network.yml](/examples/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise2.
+| 4 | Review configurations. First review what is [possible to configure](/addons/oci-learn-lz/exercise2/diagrams/oci_network_config_all_variables.jpg) and then review the [exercise specific configurations](/addons/oci-learn-lz/exercise2/diagrams/oci_network_config_exercise_variables.jpg) scope. These views are also available on the draw.io tabs. |
+| 5 | Copy the configuration file [oci_learn_lz_network.yml](/addons/oci-learn-lz/exercise2/config_yaml/oci_learn_lz_network.yml) to your **local** OCI-LEARN-LZ-OPS-REPO/oci-open-lz/exercise2.
 | 6 | Review the network structure configuration in you **local**  **oci_learn_lz_network.yml** file. |
 
 &nbsp; 
@@ -49,7 +49,7 @@ Your objective is to update the network structure and add the network elements f
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---|
-| 1 | Open the [Drawio design](/examples/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
+| 1 | Open the [Drawio design](/addons/oci-learn-lz/OCI_Learn_LZ.drawio) file, and select tab "NET - EXERCISE #2" |
 | 2 | Enable the Layer "STEP 2 - EXERCISE". Make sure the STEP 1 layer is enabled. |
 | 3 | Review the target network structure design for the domain. The image below presents it. |
 | 4 | **Update** the network structure IaC configuration with the new changes in your **local oci_learn_lz_network.yml** file. Add the following elements:  <br></br>**1. Create a new IaC Network Category** for the **Domain Channel**, and make sure this category is associated to right compartment.</br><br>**2. Create a new VNC** inside the Channel Domain Category, adding the CIDR block, VCN name, default security list, one subnet, and a subnet route table (without routing rules).<br></br>**3.** **Create the DRG Attachment** for the new VCN at the Hub level. <br> <br>**Hint**: You can use the HUB configuration as a template.|

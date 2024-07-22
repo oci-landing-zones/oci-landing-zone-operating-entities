@@ -19,7 +19,7 @@
 
 The OCI Open LZ is a set of public and open assets to onboard OCI, available in a dedicated [Git Repository](https://github.com/oracle-quickstart/terraform-oci-open-lz), containing a complete design **blueprint**, several **IaC** configuration **examples**, and **enablement** activities.
 
-This document is a subset of the OCI Open LZ, and it provides an executive summary of the **Multi-OE blueprint**. The complete blueprint is presented in detail in the [PDF](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) format and supported by a [Drawio](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) containing all design diagrams, for reuse while tailoring new landing zones.
+This document is a subset of the OCI Open LZ, and it provides an executive summary of the **Multi-OE blueprint**. The complete blueprint is presented in detail in the [PDF](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) format and supported by a [Drawio](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) containing all design diagrams, for reuse while tailoring new landing zones.
 
 For more approaches and assets on OCI Landing Zones refer to the [OCI Landing Zone Framework](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/README.md).
 
@@ -84,7 +84,7 @@ While the previous diagram presents the recommended steps of the journey to crea
 
 &nbsp; 
 
-<img src="../../images/1_oci_open_lz_layers.jpg" alt= “” width="350" height="value">
+<img src="../../../commons/images/1_oci_open_lz_layers.jpg" alt= “” width="350" height="value">
 
 &nbsp; 
 
@@ -96,7 +96,7 @@ Before proceeding, it’s highly recommended OCI foundational knowledge for its 
 &nbsp; 
 
 # **2. Functional View**
-This chapter presents the key entities of the OCI Open LZ and how they relate to each other. These entities are presented below in an Entity Relationship Diagram (ERD) format. All elements and relations are presented and described in detail in the [OCI Open LZ PDF - Functional View](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
+This chapter presents the key entities of the OCI Open LZ and how they relate to each other. These entities are presented below in an Entity Relationship Diagram (ERD) format. All elements and relations are presented and described in detail in the [OCI Open LZ PDF - Functional View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
  
 &nbsp; 
 
@@ -125,7 +125,7 @@ The diagram below presents the tenancy structure for Levels 1 and 2, separating 
 &nbsp; 
 
 
-For more details on the tenancy structure levels (L3-L5), related IAM with OCI Groups and Policies, and security posture applied refer to the [OCI Open LZ PDF - Security View](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
+For more details on the tenancy structure levels (L3-L5), related IAM with OCI Groups and Policies, and security posture applied refer to the [OCI Open LZ PDF - Security View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
 
 
 &nbsp; 
@@ -165,7 +165,7 @@ The OCI Open LZ has four network areas which are presented and described in the 
 &nbsp; 
 
 
-In terms of connectivity, the following diagram presents how the OCI Open LZ connects with on-premises and/or other cloud service providers. 
+In terms of connectivity, the following diagram presents how the blueprint connects with on-premises and/or other cloud service providers. 
 
 &nbsp; 
 
@@ -183,7 +183,7 @@ An example of East-West connectivity is presented in the diagram below.
 
 &nbsp; 
 
-For more details on the network design including all the descriptions for each element, their security posture, the most significant traffic scenarios (e.g., North-South and East-West), and DNS, please refer to the [OCI Open LZ PDF - Network View](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
+For more details on the network design including all the descriptions for each element, their security posture, the most significant traffic scenarios (e.g., North-South and East-West), and DNS, please refer to the [OCI Open LZ PDF - Network View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
 
 
 &nbsp; 
@@ -204,7 +204,7 @@ Cloud-native operations on cloud resources should be very near the development p
 
 &nbsp; 
 
-<img src="images/5_operations_view_gitops_value.jpg" alt= “” width="1000" height="value">
+<img src="images/5_operations_view_gitops_value.jpg" alt= “” width="800" height="value">
 
 
 &nbsp; 
@@ -262,7 +262,7 @@ Five operations scenarios are identified in the OCI Open LZ. Find below the **OP
 
 &nbsp; 
 
-For more details on the actors/teams and remaining operation scenarios, please refer to the [OCI Open LZ PDF - Operations View](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
+For more details on the actors/teams and remaining operation scenarios, please refer to the [OCI Open LZ PDF - Operations View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
 
 &nbsp; 
 
@@ -285,7 +285,7 @@ Note that there will be two types of repositories:
 1. The **operations repositories** will contain only IaC configurations.
 2. The **code repository** will be used to run these configurations repeatedly. The lifecycle of this repository is out of the scope of this document
 
-This separation is crucial and is presented in detail with all the repositories and their structure in the [OCI Open LZ PDF - Operations View](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). Find below an example of how an **OE Repository** can be structured. The first column's color code matches the ERD's color code in the Functional View and the architecture diagrams presented in the Security View and Network View.
+This separation is crucial and is presented in detail with all the repositories and their structure in the [OCI Open LZ PDF - Operations View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). Find below an example of how an **OE Repository** can be structured. The first column's color code matches the ERD's color code in the Functional View and the architecture diagrams presented in the Security View and Network View.
 
 &nbsp; 
 
@@ -305,7 +305,7 @@ The diagram below presents a high-level example component model for the operatio
 As stated at the beginning of the chapter, this approach upholds the principle that **Git is the only source of truth**. The operation scenarios executed on the system are stored in Git such that authorized readers can view the entire audit trail of changes. All changes to the desired state will be fully traceable with commits associated with committer information, commit IDs, and time stamps. This means that **the OCI Open LZ infrastructure is a set of versioned artifacts** and can be audited using the standards of software development and delivery.
 
 
-For a complete view of the operations design for the OCI Open LZ, and how to tailor a GitOps operating model to your needs, please refer to the [OCI Open LZ PDF - Operations View](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
+For a complete view of the operations design for the OCI Open LZ, and how to tailor a GitOps operating model to your needs, please refer to the [OCI Open LZ PDF - Operations View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
 
 &nbsp; 
 &nbsp; 
@@ -329,8 +329,8 @@ Note the distribution of operations between cloud operations teams is a design t
 
 Per OCI Open LZ Design, this team is responsible for managing the landing zone share resources and OEs network resources, and can execute the following operations:
 
-- [**OP.01 – Manage Shared Services:**](/multi-oe/runtime/op01_manage_shared_services/readme.md) Creates or changes the shared elements of the landing zone and applies posture management.
-- [**OP.02 – Manage OE:**](/multi-oe/runtime/op02_manage_oes/oe01/readme.md) Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.
+- [**OP.01 – Manage Shared Services:**](/blueprints/multi-oe/runtime/op01_manage_shared_services/readme.md) Creates or changes the shared elements of the landing zone and applies posture management.
+- [**OP.02 – Manage OE:**](/blueprints/multi-oe/runtime/op02_manage_oes/oe01/readme.md) Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.
   
 Each scenario has its **runtime configurations** ready for execution with **Terraform CLI** or **Oracle Resource Manager** (ORM).
 
@@ -340,8 +340,8 @@ Each scenario has its **runtime configurations** ready for execution with **Terr
 
 Per OCI Open LZ Design, these teams, one per OE, are responsible for managing the OE resources such as projects and PoC, and can execute the following operations:
 
-- [**OP.03 – Manage Department:**](/multi-oe/runtime/op03_manage_department/readme.md) Creates and changes a new department structure to receive department projects.
-- [**OP.04 - Manage Project Environment:**](/multi-oe/runtime/op04_manage_projects/readme.md) Creates or changes a project with the related environments and application layers.
+- [**OP.03 – Manage Department:**](/blueprints/multi-oe/runtime/op03_manage_department/readme.md) Creates and changes a new department structure to receive department projects.
+- [**OP.04 - Manage Project Environment:**](/blueprints/multi-oe/runtime/op04_manage_projects/readme.md) Creates or changes a project with the related environments and application layers.
 - **OP.05 – Manage PoC Project:** Creates or changes a PoC project in the OE Sandbox environment.
 
 Each scenario has its **runtime configurations** ready for execution with **Terraform CLI** or **Oracle Resource Manager** (ORM).
