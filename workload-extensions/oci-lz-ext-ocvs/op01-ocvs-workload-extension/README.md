@@ -18,6 +18,7 @@
   - [**5.6 Run ```terraform plan```**](#56-run-terraform-plan)
   - [**5.7 Run ```terraform apply```**](#57-run-terraform-apply)
 
+&nbsp; 
 
 
 ## **1. Summary**
@@ -35,6 +36,8 @@
 | **RUN OPERATION**         | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli).                                                                                  |
 
 
+&nbsp; 
+
 ## **2. Setup IAM Configuration**
 
 For configuring and running the OneOE Landing Zone OCVS extension Identity Layer use the following JSON file: [oci_open_lz_one-oe_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
@@ -48,17 +51,23 @@ Search for the values indicated below and replace with the correct OCIDs:
 | ------------------------- | --------------------------------- | ---------------------------------- |
 | Prod Platform Compartment | \<OCID-COMPARTMENT-PROD-PLATFORM> | The prod platform compartment OCID |
 
+&nbsp; 
+
 ###  **2.1. Compartments**
 
 The diagram below identifies the compartments in the scope of this operation.
 
-![Diagram](../diagrams/compartments.png)
+<img src="../diagrams/compartments.png" width="1000" height="value">
+
+&nbsp; 
 
 The OCVS extension provisions 3 compartments. Parent OCVS platform compartment is created as an *example* in the platform compartment inside the **production environment**. The other 2 compartments LB and SDDC are created as nested children in the OCVS comparmetn.
 
 OneOE Landing Zones defines multiple instances of platform compartment. Platform comparment is created **for each environement**, and **one shared** platform for resources spanning multiple environments. 
 
 Using this extension requires choosing the right platform for the use cases. Extension can be modified to provision multiple instances of the delpoyment. For customizations see the full [compartment resource documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/compartments).
+
+&nbsp; 
 
 ### **2.2 Groups**
 As part of the deployment the following groups are created in the [Default Identity Domain](https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm):
@@ -67,6 +76,8 @@ As part of the deployment the following groups are created in the [Default Ident
 | grp-p-platform-ocvs-admins | Members of the group are able to administer OCVS and accompained services |
 
 For customizations see the full [group resoruce documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/groups)
+
+&nbsp; 
 
 ### **2.3 Policies**
 As part of the deploymnet the following policies are created:
@@ -77,6 +88,8 @@ As part of the deploymnet the following policies are created:
 Policies contain compartment paths. The paths can change based on the modification in the previous [Compartments](#21-compartments) section. The paths need to be updated following the OCI [Policies and Compartment hierarchy](https://docs.oracle.com/en-us/iaas/Content/Identity/Concepts/policies.htm#hierarchy).
 
 For customizations see the full [policy resource documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies)
+
+&nbsp; 
 
 ## **3. Setup Network Configuration**
 
@@ -93,7 +106,11 @@ Search for the values indicated below and replace with the correct OCIDs:
 
 This configuration covers the following networking diagram. 
 
-![Network Diagram](../diagrams/network.png)
+&nbsp; 
+
+<img src="../diagrams/network.png" width="1000" height="value">
+
+&nbsp; 
 
 For customization of the pre-defined setup please refer to the [Networking documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) for documentation and examples.
 
@@ -106,6 +123,8 @@ The network layer covers the following resources:
 5. Route Tables - One for Service Gateway, and a default route for routing all trafic through the central hub
 6. DRG Attachment - Connect spoke with the central Hub
 
+&nbsp; 
+
 ## **4. Run with ORM**
 
 | STEP  | ACTION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -117,6 +136,8 @@ The network layer covers the following resources:
 | **5** | Set the terraform version to 1.2.x. Click Next.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | **6** | Update with the links to your IAM and Network configurations (OCI Object Storage is recommended) Click Next.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | **7** | Un-check run apply. Click Create.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+
+&nbsp; 
 
 ## **5. Run with Terraform CLI**
 ### **5.1 Setup Terraform Authentication**
@@ -158,6 +179,10 @@ terraform apply \
 -var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json
 ```
 You can proceed to [OP.02 OCVS Set-up](../op02-ocvs-setup/).
+
+&nbsp; 
+
+&nbsp; 
 
 # License <!-- omit from toc -->
 
