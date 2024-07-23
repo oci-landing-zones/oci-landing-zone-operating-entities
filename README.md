@@ -19,7 +19,7 @@ The OCI Open LZ provides complete OCI blueprints, including designs and declara
 
 This repository is the source of truth for the OCI Open LZ and includes three main components and several blueprint shapes/sizes:
 
-| # | Directory &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  | Description |
+| # | <div style="width:290px">Directory</div>| Description |
 |:----------------------: | ------------ | ------------- |
 | **1** | **[`blueprints/`](blueprints/)** | **Choose** your OCI landing zone blueprint - with design and IaC - to onboard and run OCI. |
 | [M] |[`blueprints/one-oe/`](blueprints/one-oe/) |  Onboards **[One](/one-oe/readme.md) OE** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI_oneclick.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-click/readme.md)|
