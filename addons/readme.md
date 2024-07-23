@@ -9,7 +9,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 &nbsp; 
 
 | # |  | Add-on   | Description | Status |
-|:--:|---|---|-|---|
+|:--:|---|:--:|-|---|
 | 1 | <img src="oci-learn-lz/diagrams/oci_learn_lz_icon.svg" height="25" align="center"> | **[OCI Learn LZ](/addons/oci-learn-lz/readme.md)**| A Landing Zone **training** to learn how to design and run a Landing Zone without code. | [Available](/addons/oci-learn-lz/readme.md) |
 | 2 | <img src="oci-hub-models/images/oci_hub_models_icon.svg" height="25" align="center"> | **[OCI Network Hubs](/addons/oci-hub-models/readme.md)** | A set of **OCI Network Hub topologies** applicable to any landing zone or OCI deployment. | [Available](/addons/oci-hub-models/readme.md) | 
 
