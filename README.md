@@ -8,21 +8,23 @@
 
 &nbsp; 
 
-Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as **OCI [Open](#) LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI for organizations and their functional divisions &ndash; identified as  [**Op**](#)**erating** [**En**](#)**tities** **(OEs)**. The OCI Open LZ provides complete OCI blueprints, including designs and declarative IaC, reducing design and implementation timelines, associated costs, and efforts - while enabling a future-proof OCI with complete security and scalability.
+Welcome to the **OCI [Op](#)erating [En](#)tities Landing Zone**, also known as **OCI [Open](#) LZ**, a set of open assets and best practices to simplify the onboarding and running of OCI for organizations and their functional divisions &ndash; identified as  [**Op**](#)**erating** [**En**](#)**tities** **(OEs)**. 
+
+The OCI Open LZ provides complete OCI blueprints, including designs and declarative IaC, reducing design and implementation timelines, associated costs, and efforts - while enabling a future-proof OCI with complete security and scalability.
 
 &nbsp; 
 
 
 ## Repository Structure
 
-This repository is the source of truth for the OCI Open LZ and includes three main components:
+This repository is the source of truth for the OCI Open LZ and includes three main components and several blueprint shapes/sizes:
 
 | # | Directory &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  | Description |
-|------------------------ | ------------ | ------------- |
+|:----------------------: | ------------ | ------------- |
 | **1** | **[`blueprints/`](blueprints/)** | **Choose** your OCI landing zone blueprint - with design and IaC - to onboard and run OCI. |
-|  |[`blueprints/one-oe/`](blueprints/one-oe/) | **[M]** Onboards **[One](/one-oe/readme.md) OE** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI_oneclick.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-click/readme.md)|
-|  |[`blueprints/multi-oe/`](blueprints/multi-oe/) | **[L]** Onboards **[Multiple](/multi-oe/readme.md) OEs** with a shared services model and OE-dedicated resources, sharing **one tenancy**. |
-| |[`blueprints/multi-tenancy/`](blueprints/) | **[XL]** Uses the **One-OE** and **Multi-OE** to onboard all your organizations or customers into **several tenancies**. 
+| [M] |[`blueprints/one-oe/`](blueprints/one-oe/) |  Onboards **[One](/one-oe/readme.md) OE** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI_oneclick.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-click/readme.md)|
+| [L] |[`blueprints/multi-oe/`](blueprints/multi-oe/) | Onboards **[Multiple](/multi-oe/readme.md) OEs** with a shared services model and OE-dedicated resources, sharing **one tenancy**. |
+| [XL] |[`blueprints/multi-tenancy/`](blueprints/) | Uses the **One-OE** and **Multi-OE** to onboard all your organizations or customers into **several tenancies**. 
 **2** |**[`addons/`](addons/)** | **Complement** your landing zone with add-ons to run OCI with best practices and lower efforts. (e.g., [Network Hubs](/addons/oci-hub-models/readme.md), [...](/addons/readme.md))|
 | **3** |**[`workload-extensions/`](workload-extensions/)** | **Extend** you landing zone with pluggable workloads extensions - including design and IaC. (e.g., [EBS](/workload-extensions/oci-lz-ext-ebs/readme.md), [OCVS](/workload-extensions/oci-lz-ext-ocvs/README.md), [...](/workload-extensions/readme.md)).|
 
@@ -35,7 +37,7 @@ As general guidance, it's recommended to start with the order of the table above
 
 ## Related Repositories
 
-The OCI Open LZ uses a declarative Infrastructure-as-Code (IaC) that is explained [here](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/commons/oci_landingzones_iac.md) and distributed into several repositories.
+The OCI Open LZ uses a [declarative Infrastructure-as-Code (IaC)](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/commons/oci_landingzones_iac.md) approach that is distributed into several repositories.
 
 
 | Name   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;       | Description
