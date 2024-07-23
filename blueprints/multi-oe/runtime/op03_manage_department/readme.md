@@ -19,9 +19,9 @@
 | **OBJECTIVE** | Creates and changes a department structure within an OE environment. |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br> |
 | **IAM CONFIG**| [open_lz_oe_01_prod_DEP_A_identity.auto.tfvars.json](open_lz_oe_01_prod_dep_a_identity.auto.tfvars.json)|
-| **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) |
-| **DETAILS** |  For more details refer to the  [OCI Open LZ Multi-OE Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
-| **PRE-ACTIVITIES** | An Operating Entity onboarded with [OP.02 Manage Operating Entity (OE)](/multi-oe/runtime/op02_manage_oes/oe01/readme.md). |
+| **TERRAFORM MODULES**| [CIS Landing Zone IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) |
+| **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
+| **PRE-ACTIVITIES** | An Operating Entity onboarded with [OP.02 Manage Operating Entity (OE)](/blueprints/multi-oe/runtime/op02_manage_oes/oe01/readme.md). |
 | **POST-ACTIVITIES** | The execution of this operation by the OE Ops Team creates the department in an specific OE environment. Replicate for other existing OE environments where the department should belong to. |
 | **RUN OPERATION** | Use [ORM](#3-run-with-orm) or use [Terraform CLI](#4-run-with-terraform-cli). |
 

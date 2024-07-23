@@ -32,8 +32,8 @@ Note the distribution of operations between cloud operations teams is a design t
 
 Per OCI Open LZ Design, this team is responsible for managing the landing zone share resources and OEs network resources, and can execute the following operations:
 
-- [**OP.01 – Manage Shared Services:**](/multi-oe/runtime/op01_manage_shared_services/readme.md) Creates or changes the shared elements of the landing zone and applies posture management.
-- [**OP.02 – Manage OE:**](/multi-oe/runtime/op02_manage_oes/oe01/readme.md) Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.
+- [**OP.01 – Manage Shared Services:**](/blueprints/multi-oe/runtime/op01_manage_shared_services/readme.md) Creates or changes the shared elements of the landing zone and applies posture management.
+- [**OP.02 – Manage OE:**](/blueprints/multi-oe/runtime/op02_manage_oes/oe01/readme.md) Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources.
   
 Each scenario has its **runtime configurations** ready for execution with **Terraform CLI** or **Oracle Resource Manager** (ORM).
 
@@ -43,8 +43,8 @@ Each scenario has its **runtime configurations** ready for execution with **Terr
 
 Per OCI Open LZ Design, these teams, one per OE, are responsible for managing the OE resources such as projects and PoC, and can execute the following operations:
 
-- [**OP.03 – Manage Department:**](/multi-oe/runtime/op03_manage_department/readme.md) Creates and changes a new department structure to receive department projects.
-- [**OP.04 - Manage Project Environment:**](/multi-oe/runtime/op04_manage_projects/readme.md) Creates or changes a project with the related environments and application layers.
+- [**OP.03 – Manage Department:**](/blueprints/multi-oe/runtime/op03_manage_department/readme.md) Creates and changes a new department structure to receive department projects.
+- [**OP.04 - Manage Project Environment:**](/blueprints/multi-oe/runtime/op04_manage_projects/readme.md) Creates or changes a project with the related environments and application layers.
 - **OP.05 – Manage PoC Project:** Creates or changes a PoC project in the OE Sandbox environment.
 
 Each scenario has its **runtime configurations** ready for execution with **Terraform CLI** or **Oracle Resource Manager** (ORM).

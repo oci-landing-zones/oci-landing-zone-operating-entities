@@ -21,7 +21,7 @@
 | **IAM CONFIG**| [open_lz_shared_identity.auto.tfvars.json](open_lz_shared_identity.auto.tfvars.json))|
 | **NETWORK CONFIG** |[open_lz_shared_network.auto.tfvars.json](open_lz_shared_network.auto.tfvars.json) |
 | **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
+| **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | -- |
 | **POST-ACTIVITIES** | [**POST.OP.01.01**](post_op01_01_update_dynamic_groups/readme.md) Update the dynamic group membership with the OCID of the security compartment.</br>[**POST.OP01.02**](post_op01_02_update_routing_nfw_ip) Update routing with NFW Private IP.</br>[**POST.OP01.03**](post_op01_03_add_drg_attachments_spokes_routing/readme.md) After each OP.02 OE on-boarding, add the DRG attachments and RT.</br>[**POST.OP.01.04**](post_op01_04_update_iam_policies_project_team/readme.md) After the on-boarding of a new OE project, update IAM policies to give access to the OE Project Team to shared security resources.</br>[**POST.OP.01.05**](post_op01_05_update_hub_lb_new_apps/readme.md) Update HUB LB with OEs Internet facing applications information.</br> |
 | **RUN WITH ORM** | 1. [<img src="/commons/images/DeployToOCI.svg"  height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json"})  </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “rms-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the default configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create.|
@@ -85,7 +85,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **2.2 Groups**
 
-Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ Multi-OE Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
 
 ```
 ...
@@ -134,7 +134,7 @@ For an example of such a configuration and for extended documentation please ref
 
 ### **2.3 Dynamic Groups**
 
-Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ Multi-OE Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
 
 ```
 ...
@@ -162,7 +162,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.4 Policies**
 
-Find below an example of how to setup the IAM policies for the design discussed in the [OCI Open LZ Multi-OE Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). Notice that these policies must be considered as an example of how to deploy the blueprint based on CIS separation of duties, but not as a prescribed configuration. We encourage you to review and adapt to your design.
+Find below an example of how to setup the IAM policies for the design discussed in the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). Notice that these policies must be considered as an example of how to deploy the blueprint based on CIS separation of duties, but not as a prescribed configuration. We encourage you to review and adapt to your design.
 
 For this example, replace the compartment_id "<OCID-COMPARTMENT-ROOT>" value to your tenancy OCID.
 

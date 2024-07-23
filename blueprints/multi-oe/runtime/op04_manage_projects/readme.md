@@ -21,7 +21,7 @@
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: NSG  |
 | **IAM CONFIGURATION**| [open_lz_oe_01_prod_deptA_proj1_prd_identity.auto.tfvars.json](open_lz_oe_01_prod_deptA_proj1_prd_identity.auto.tfvars.json)|
 | **NETWORK CONFIGURATION** |[open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json](open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json) |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../design/OCI_Open_LZ.pdf) |
+| **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). |
 | **PRE-ACTIVITIES** | - OP.02 (Network updates) </br>- OP.03 (Create Department) |
 | **POST-ACTIVITIES** | N/A |
 | **RUN OPERATION** | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli). |
