@@ -1,4 +1,4 @@
-# **OCI Open LZ &ndash; [One-OE Blueprint](#) &ndash; one-stack Deployment**
+# **OCI Open LZ &ndash; [One-OE Blueprint](#) &ndash; One-Stack Deployment**
 
 
 
@@ -8,7 +8,7 @@
 
 | |  |
 |---|---| 
-| **OPERATION** | OP.00 one-stack Deployment | 
+| **OPERATION** | OP.00 One-Stack Deployment | 
 | **TARGET RESOURCES**  </br></br><img src="../../../../commons/images/icon_oci.jpg" width="32">| Creates a **One-OE Landing Zone** in **one execution** with the following resources: </br> - One **Landing Zone Environment** (production). </br>- [**Network Hub A**](/addons/oci-hub-models/hub_a/readme.md).</br>- Three **Workload Environments** (prod, uat, dev) and related Spoke Networks.</br>- Setups a **strong security posture** with  Security Zones and Cloud Guard.</br>- Setups **monitoring** with Events, Alarms Logging, and Notifications.</br>- One sample **Project** and a sample **Platform** areas.</br>For more details refer to the high level [documentation](/blueprints/one-oe/design/readme.md) and the [drawio](/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio).|
 | **INPUT CONFIGURATIONS** </br></br><img src="../../../../commons/images/icon_json.jpg" width="30">|**IAM**: [oci_open_lz_one-oe_iam.auto.tfvars.json](oci_open_lz_one-oe_iam.auto.tfvars.json)</br>**Network**: [oci_open_lz_one-oe_network.auto.tfvars.json](oci_open_lz_one-oe_network.auto.tfvars.json)</br>**Security**: [oci_open_lz_one-oe_security.auto.tfvars.json](oci_open_lz_one-oe_security.auto.tfvars.json)</br>**Obervability**: [oci_open_lz_one-oe_observability.auto.tfvars.json](oci_open_lz_one-oe_observability.auto.tfvars.json)</br> |
 | **TERRAFORM MODULES** </br></br><img src="../../../../commons/images/icon_terraform.jpg" width="32">| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking), [CIS Security](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-security), [CIS Observability](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-observability)  |OCI_Open_LZ_One-OE-Blueprint.drawio).|
