@@ -21,7 +21,7 @@ This repository is the source of truth for the OCI Open LZ and includes three ma
 
 | # | Directory | Description |
 |:----------------------: | ------------ | ------------- |
-| **1** | **[`blueprints/`](blueprints/)** | **Select** the OCI landing zone blueprint - with design and IaC - to onboard and run OCI. |
+| **1** | **[`blueprints/`](blueprints/)** | **Select** the most suitable OCI landing zone blueprint to onboard and run OCI. |
 | <img src="commons/images/size_m.svg" width="23" align="center"> |&nbsp; &nbsp; [`one-oe/`](blueprints/one-oe/) |  Onboards **[One](/one-oe/readme.md) OE** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-click/readme.md)|
 |  <img src="commons/images/size_l.svg" width="23" align="center"> |&nbsp; &nbsp; [`multi-oe/`](blueprints/multi-oe/) |  Onboards **[Multiple](/multi-oe/readme.md) OEs** with a shared services and OE-dedicated resources, sharing **one tenancy**. |
 | <img src="commons/images/size_xl.svg" width="23" align="center">  |&nbsp; &nbsp; [`multi-tenancy/`](blueprints/) | Uses One-OE and Multi-OE to onboards all your organizations or customers into **several tenancies**.
