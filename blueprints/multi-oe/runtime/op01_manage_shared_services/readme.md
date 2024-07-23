@@ -18,9 +18,9 @@
 | **OP. NAME** | Manage Operating Entity | 
 | **OBJECTIVE** | Onboards or changes an OE, creating the OE structures that will be used by the OE to create resources. |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: VCN, Subnets, SL, RT, DRG Attachments, Service/Internet Gateways. |
-| **IAM CONFIG**| [open_lz_shared_identity.auto.tfvars.json](open_lz_shared_identity.auto.tfvars.json))|
+| **IAM CONFIG**| [open_lz_shared_identity.auto.tfvars.json](open_lz_shared_identity.auto.tfvars.json)|
 | **NETWORK CONFIG** |[open_lz_shared_network.auto.tfvars.json](open_lz_shared_network.auto.tfvars.json) |
-| **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
+| **TERRAFORM MODULES**| [CIS Landing Zone IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Landing Zone Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | -- |
 | **POST-ACTIVITIES** | [**POST.OP.01.01**](post_op01_01_update_dynamic_groups/readme.md) Update the dynamic group membership with the OCID of the security compartment.</br>[**POST.OP01.02**](post_op01_02_update_routing_nfw_ip) Update routing with NFW Private IP.</br>[**POST.OP01.03**](post_op01_03_add_drg_attachments_spokes_routing/readme.md) After each OP.02 OE on-boarding, add the DRG attachments and RT.</br>[**POST.OP.01.04**](post_op01_04_update_iam_policies_project_team/readme.md) After the on-boarding of a new OE project, update IAM policies to give access to the OE Project Team to shared security resources.</br>[**POST.OP.01.05**](post_op01_05_update_hub_lb_new_apps/readme.md) Update HUB LB with OEs Internet facing applications information.</br> |
