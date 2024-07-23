@@ -40,14 +40,14 @@ As general guidance, it's recommended to start with the order of the table above
 The OCI Open LZ uses a [declarative Infrastructure-as-Code (IaC)](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/commons/oci_landingzones_iac.md) approach that is distributed into several repositories.
 
 
-| Name   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;       | Description
+| Name        | Description / Scope
 | ------------ | -------------
-| [OCI Landing Zones Orchestrator][oci-lz-orchestrator] | Provides the ability to declare and relate resource into one consolidated operation (i.e., one plan/apply).
-| [OCI Landing Zones IAM][oci-lz-iam] | Provides the ability to declare Compartments, Groups, Policies, Dynamic Groups, etc.
-| [OCI Landing Zones Network][oci-lz-network]| Provides the ability to declare all OCI Core Network Resources for any network topology.
-| [OCI Landing Zones Security][oci-lz-security] | Provides the ability to declare OCI Security Resources (e.g., Cloud Guard, VSS, Security Zones, Vaults, etc.).
-| [OCI Landing Zones Observability][oci-lz-observability] | Provides the ability to declare OCI monitoring resources (e.g., Logging, Events, Alarms, Notifications, etc.).
-| [OCI Landing Zones Governance][oci-lz-governance] | Provides the ability to declare OCI Tagging.
+| [OCI Landing Zones Orchestrator][oci-lz-orchestrator] | Relates several OCI resource into one consolidated operation (i.e., one plan/apply).
+| [OCI Landing Zones IAM][oci-lz-iam] | Covers OCI Compartments, Groups, Policies, Dynamic Groups, etc.
+| [OCI Landing Zones Network][oci-lz-network]| Covers all OCI Core Network Resources for any network topology.
+| [OCI Landing Zones Security][oci-lz-security] |Covers OCI Security Resources (e.g., Cloud Guard, VSS, Security Zones, Vaults, etc.).
+| [OCI Landing Zones Observability][oci-lz-observability] | Covers OCI Monitoring resources (e.g., Logging, Events, Alarms, Notifications, etc.).
+| [OCI Landing Zones Governance][oci-lz-governance] | Covers OCI Tagging.
 
 
 &nbsp; 
