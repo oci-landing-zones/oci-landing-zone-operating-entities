@@ -17,7 +17,7 @@ The OCI Open LZ provides complete OCI blueprints, including designs and declara
 
 ## Repository Structure
 
-This repository is the source of truth for the OCI Operating Entities Landing Zone and includes three types of assets (blueprints, add-ons, and workload extensions) and three blueprint sizes (M, L, and XL):
+This repository is the source of truth for the OCI Open LZ and includes three types of assets (blueprints, add-ons, and workload extensions) and three blueprint sizes (M, L, and XL):
 
 | # | Directory | Description |
 |:----------------------: | ------------ | ------------- |
