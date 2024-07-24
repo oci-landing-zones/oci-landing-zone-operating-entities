@@ -35,6 +35,8 @@
 | **POST-ACTIVITIES**       | Execute [OP.02 Manual Changes](/workload-extensions/oci-lz-ext-ocvs/op02-ocvs-setup)                                                                           |
 | **RUN OPERATION**         | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli).                                                                                  |
 
+The visualitzation of the set-up process including OCVS set-up is available below.
+<img src="../content/ocvs.gif" width="1000" height="auto">
 
 &nbsp; 
 
@@ -57,7 +59,7 @@ Search for the values indicated below and replace with the correct OCIDs:
 
 The diagram below identifies the compartments in the scope of this operation.
 
-<img src="../diagrams/compartments.png" width="1000" height="value">
+<img src="../content/compartments.png" width="1000" height="auto">
 
 &nbsp; 
 
@@ -108,7 +110,7 @@ This configuration covers the following networking diagram.
 
 &nbsp; 
 
-<img src="../diagrams/network.png" width="1000" height="value">
+<img src="../content/network.png" width="1000" height="auto">
 
 &nbsp; 
 
