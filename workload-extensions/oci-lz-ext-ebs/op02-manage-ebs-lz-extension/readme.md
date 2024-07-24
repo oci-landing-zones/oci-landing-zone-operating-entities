@@ -21,17 +21,17 @@
 | **OP. NAME** |  Manage EBS Landing Zone Extension | 
 | **OBJECTIVE** | Provision/change OCI EBS Landing Zone IAM and Network Extensions. |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists  |
-| **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/examples/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
-| **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](/examples/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/json/ebs_network_rt_sl_v1.auto.tfvars.json) |
-| **PRE-ACTIVITIES** | Execute [OP.01. Deploy OCI CIS LZ](/examples/oci-lz-ext-ebs/op01-deploy-CIS/readme.md)  |
-| **POST-ACTIVITIES** | Execute [OP.03 Manual Changes](/examples/oci-lz-ext-ebs/op03-manual-changes/readme.md) |
+| **IAM CONFIGURATION**| [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json)|
+| **NETWORK CONFIGURATION** |[ebs_network_rt_sl_v1.auto.tfvars.json](/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json) |
+| **PRE-ACTIVITIES** | Execute [OP.01. Deploy OCI CIS LZ](/workload-extensions/oci-lz-ext-ebs/op01-deploy-CIS/readme.md)  |
+| **POST-ACTIVITIES** | Execute [OP.03 Manual Changes](/workload-extensions/oci-lz-ext-ebs/op03-manual-changes/readme.md) |
 | **RUN OPERATION** | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli). |
 
 &nbsp; 
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the Open LZ EBS extension IAM layer use the following JSON file: [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/examples/oci-lz-ext-ebs/op02-deploy-Open-EBS-pattern/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the Open LZ EBS extension IAM layer use the following JSON file: [ebs_identity_cmp_grp_pl_v1.auto.tfvars.json](/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file will cover the following three categories of resources described in the next sections.
 
@@ -296,7 +296,7 @@ For an example of such configuration and for extended documentation please refer
 ## **3. Setup Network Configuration**
 
 
-For configuring and running the Open LZ EBS extension Network layer use the following JSON file: [ebs_network_rt_sl_v1.auto.tfvars.json](ebs_network_rt_sl_v1.auto.tfvars.json)
+For configuring and running the Open LZ EBS extension Network layer use the following JSON file: [ebs_network_rt_sl_v1.auto.tfvars.json](/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json)
 
 This configuration file will require changes to the resources to reference the OCIDs of the CIS Landing Zone which were deployed in OP01.
 Search for the values indicated below and replace with the correct OCIDs:
@@ -588,7 +588,7 @@ Example of a DRG attachment creation:
 
 | STEP |  ACTION |
 |---|---| 
-| **1** | [![Deploy_To_OCI](/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json"}) |
+| **1** | [![Deploy_To_OCI](../../../commons/images/DeployToOCI.jpg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json"}) |
 | **2** | Accept terms,  wait for the configuration to load. |
 | **3** | Set the working directory to “orm-facade”. | 
 | **4** | Set the stack name you prefer. | 
@@ -644,10 +644,10 @@ Run ```terraform plan``` with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/oci-credentials.tfvars.json \
--var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
--var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json \
--state ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/terraform.tfstate
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json \
+-state ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/terraform.tfstate
 ```
 
 After the execution please analyze the output of the command above and check if it corresponds to your desired configuration.
@@ -664,10 +664,10 @@ Run terraform plan with the IAM and Network configuration. After  its execution 
 
 ```
 terraform apply \
--var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/oci-credentials.tfvars.json \
--var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
--var-file ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json \
--state ../terraform-oci-open-lz/examples/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/terraform.tfstate
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
+-var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json \
+-state ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/terraform.tfstate
 ```
 
 Depending on your json configuration configurations the output of the ```terraform apply``` should be identical or similar to this [example](./tf_apply_output_example.out).

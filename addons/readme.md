@@ -4,14 +4,14 @@
 
 Welcome to the **OCI Open LZ Addons**.  
 
-An **add-on** is an **asset** that simplifies the onboarding and running OCI with landing zones. There are several possible flavors which can range from training practices to a tangible solution design or IaC. Find below the list of landing zone add-ons available.
+An **add-on** is Landing Zone complementary element, or mechanisms that provide a specific capability to the overall landing zone environment. It can be in form of solutions designs, documentation, IaC configurations, etc.  Find below the list of landing zone add-ons available.
 
 &nbsp; 
 
-| ADD-ON  | DESCRIPTION | CONTENT |
-|---|---|---|
-| **[OCI Learn LZ](/addons/oci-learn-lz/readme.md)**| A Landing Zone **training** to learn how to design and run a Landing Zone without code. | Public |
-| **[OCI Network Hubs](/addons/oci-hub-models/readme.md)** | A well-documented set of **OCI Network Hub topologies** that can be applicable to any landing zone or OCI deployment. | Public | 
+| # |  Add-on   | Description | Status |
+|:--:|--|-|---|
+| 1 | <img src="oci-learn-lz/diagrams/oci_learn_lz_icon.svg" height="26" align="center"> &nbsp;   **[OCI Learn LZ](/addons/oci-learn-lz/readme.md)**| A Landing Zone **training** to learn how to design and run a Landing Zone without code. | [Available](/addons/oci-learn-lz/readme.md) |
+| 2 | <img src="oci-hub-models/images/oci_hub_models_icon.svg" height="25" align="center"> &nbsp; **[OCI Network Hubs](/addons/oci-hub-models/readme.md)** | A set of **OCI Network Hub topologies** applicable to any landing zone or OCI deployment. | [Available](/addons/oci-hub-models/readme.md) | 
 
 
 
