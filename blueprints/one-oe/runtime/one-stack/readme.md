@@ -29,7 +29,6 @@ You will find that we extend the configuration in further points in this section
 | **INPUT CONFIGURATIONS** </br></br><img src="../../../../commons/images/icon_json.jpg" width="30">|**IAM**: [oci_open_lz_one-oe_iam.auto.tfvars.json](oci_open_lz_one-oe_iam.auto.tfvars.json)</br>**Network**: [oci_open_lz_one-oe_network.auto.tfvars.json](oci_open_lz_one-oe_network.auto.tfvars.json)</br>**Security**: [oci_open_lz_one-oe_security.auto.tfvars.json](oci_open_lz_one-oe_security.auto.tfvars.json)</br>**Observability**: [oci_open_lz_one-oe_observability.auto.tfvars.json](oci_open_lz_one-oe_observability.auto.tfvars.json)</br> |
 | **TERRAFORM MODULES** </br></br><img src="../../../../commons/images/icon_terraform.jpg" width="32">| [CIS  Landing Zone IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) </br>[CIS Landing Zone Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)</br> [CIS Landing Zone  Security](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-security)</br> [CIS  Landing Zone Observability](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-observability)  |OCI_Open_LZ_One-OE-Blueprint.drawio).|
 | **DEPLOY  STACK**  </br> </br><img src="../../../../commons/images/icon_orm.jpg" width="40">| </br>[<img src="../../../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_network.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security.auto.tfvars.json"})  </br> And follow these steps:</br>1. Accept terms,  wait for the configuration to load. </br>2. Set the working directory to “rms-facade”. </br>3. Set the stack name you prefer.</br>4. Set the terraform version to 1.2.x. Click Next. </br>5. Accept the default files. Click Next. Optionally, replace with your json/yaml config files. </br>6. Un-check run apply. Click Create. </br> </br> |
-| **UPDATE  STACK**  </br></br><img src="../../../../commons/images/icon_orm.jpg" width="40">| </br> Once the base ORM stack and all landing zone elements are created, you can update the existing stack with new addon capabilities (Security Zones 3, 4, and 5, and Network Flow Logs), using the files below:  </br>**Security**: [oci_open_lz_one-oe_security_addon_sz345.auto.tfvars.json]()</br>**Observability:** [oci_open_lz_one-oe_observability_addon_flowlogs.auto.tfvars.json]() </br></br>Note that this update action is required due to existing limitations with terraform dependency grapth while creating these resources. It will be removed once these limitations are solved.| 
 
 &nbsp; 
 
@@ -65,7 +64,24 @@ To replace your configuration with another Security JSON file including the addi
 
 ## 5. Known issues
 
-### 5.1. Can not delete a compartment that it is still associated to a Security Zone.
+### 5.1. Compartment OCID not found in the Compartment Tree.
+
+
+It's been observed that a race condition might be occur while creating the compartments structure, where the apply will fail with an error like the following:
+
+```
+Error: 400-InvalidParameter, Ocid 'ocid1.compartment.oc1...' not found in Compartment Tree!
+
+Suggestion: Please update the parameter(s) in the Terraform config as per error message Ocid 'ocid1.compartment.oc1...' not found in Compartment Tree!
+```
+
+You can just re-apply the config to finish with the deployment of the stack.
+
+We're working on that to see if we can avoid this race condition situation.
+
+&nbsp; 
+
+### 5.2. Can not delete a compartment that it is still associated to a Security Zone.
 
 While destroying your stack you might see the following error:
 
