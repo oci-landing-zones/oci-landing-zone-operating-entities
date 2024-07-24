@@ -30,7 +30,7 @@ This repository is the source of truth for the OCI Operating Entities Landing Zo
 
 &nbsp; 
 
-As general guidance, it's recommended to start with the order of the table above. The first step is choosing the right **blueprint** shape and size (M, L, or XL). Complementary, review the network **add-ons** to update the design. After the Landing Zone is set, extend it with **workload extensions**. You can also use the [OCI-tailored Landing Zone approach](https://github.com/oracle-devrel/technology-engineering/tree/main/landing-zones/tailored_landing_zones) to support the creation of your landing zone.
+As general guidance, it's recommended to start with the order of the table above. The first step is choosing the right **blueprint** shape and size (M, L, or XL). Complementary, review the network **add-ons** to update the design. After the Landing Zone is set, extend it with **workload extensions**. You can also use the [OCI-tailored Landing Zone approach](https://github.com/oracle-devrel/technology-engineering/tree/main/landing-zones/tailored_landing_zones) for further guidance on the creation of your landing zone.
 
 
 &nbsp; 
