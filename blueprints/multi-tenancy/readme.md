@@ -6,7 +6,7 @@
 
 Welcome to the **OCI Open LZ Multi-Tenancy Blueprint**. 
 
-This model onboards all **Operating Entities (OEs)** in **several tenancies**, and provides **central control** with dedicated tenancies for shared services and connectivity hubs. It fits **large organizational scopes**, and it's ideal for OCI DRCC, Alloy, or large Public Cloud deployments. Find below the assets available to guide your design and deployment activities.
+This model onboards all **Operating Entities (OEs)** in **several tenancies**, and provides **central control** with dedicated tenancies for shared services and connectivity. It fits **large organizational scopes** on any OCI Realm, and it's ideal for **OCI DRCC**, **Alloy**, or large **Public** Cloud deployments. Find below the assets to guide your design and deployment activities.
 
 
 &nbsp; 
