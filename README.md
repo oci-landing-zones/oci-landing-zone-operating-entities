@@ -17,20 +17,20 @@ The OCI Open LZ provides complete OCI blueprints, including designs and declara
 
 ## Repository Structure
 
-This repository is the source of truth for the OCI Open LZ and includes three main components and several blueprint shapes/sizes:
+This repository is the source of truth for the OCI Operating Entities Landing Zone and includes three types of assets (blueprints, add-ons, and workload extensions) and three blueprint sizes (M, L, and XL):
 
 | # | Directory | Description |
 |:----------------------: | ------------ | ------------- |
 | **1** | **[`blueprints/`](blueprints/)** | **Select** the most suitable OCI landing zone blueprint to onboard and run OCI. |
 | <img src="commons/images/size_m.svg" width="23" align="center"> |...[`one-oe/`](blueprints/one-oe/) |  Onboards **[One](/blueprints/one-oe/readme.md) OE** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-stack/readme.md)|
-|  <img src="commons/images/size_l.svg" width="23" align="center"> |...[`multi-oe/`](blueprints/multi-oe/) |  Onboards **[Multiple](/blueprints/multi-oe/readme.md) OEs** with a shared services and OE-dedicated resources, sharing **one tenancy**. |
+|  <img src="commons/images/size_l.svg" width="23" align="center"> |...[`multi-oe/`](blueprints/multi-oe/) |  Onboards **[Multiple](/blueprints/multi-oe/readme.md) OEs** with shared services and OE-dedicated resources, sharing **one tenancy**. |
 | <img src="commons/images/size_xl.svg" width="23" align="center">  |...[`multi-tenancy/`](blueprints/multi-tenancy/) | Uses One-OE and Multi-OE to onboard all your organizations or customers into **several tenancies**.
 **2** |**[`addons/`](addons/)** | **Complement** your landing zone with add-ons to run OCI with best practices. (e.g., [Network Hubs](/addons/oci-hub-models/readme.md))|
-| **3** |**[`workload-extensions/`](workload-extensions/)** | **Extend** your landing zone with pluggable workloads extensions (e.g., [EBS](/workload-extensions/oci-lz-ext-ebs/readme.md), [OCVS](/workload-extensions/oci-lz-ext-ocvs/README.md), [...](/workload-extensions/readme.md)).|
+| **3** |**[`workload-extensions/`](workload-extensions/)** | **Extend** your landing zone with pluggable workload extensions (e.g., [EBS](/workload-extensions/oci-lz-ext-ebs/readme.md), [OCVS](/workload-extensions/oci-lz-ext-ocvs/README.md), [...](/workload-extensions/readme.md)).|
 
 &nbsp; 
 
-As general guidance, it's recommended to start with the order of the table above. The first step is choosing the right **blueprint** shape and size (M, L, or XL). Complementary, review the network **add-ons** to update the design. After the Landing Zone is set, extend it with **workload extensions**. This [guidance](https://github.com/oracle-devrel/technology-engineering/tree/main/landing-zones/tailored_landing_zones) is also availabe to support creation of your **OCI-tailored landing zone**.
+As general guidance, it's recommended to start with the order of the table above. The first step is choosing the right **blueprint** shape and size (M, L, or XL). Complementary, review the network **add-ons** to update the design. After the Landing Zone is set, extend it with **workload extensions**. You can also use the [OCI-tailored Landing Zone approach](https://github.com/oracle-devrel/technology-engineering/tree/main/landing-zones/tailored_landing_zones) to support the creation of your landing zone.
 
 
 &nbsp; 
