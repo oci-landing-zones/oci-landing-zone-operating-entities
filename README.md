@@ -24,7 +24,7 @@ This repository is the source of truth for the OCI Open LZ and includes three ma
 | **1** | **[`blueprints/`](blueprints/)** | **Select** the most suitable OCI landing zone blueprint to onboard and run OCI. |
 | <img src="commons/images/size_m.svg" width="23" align="center"> |...[`one-oe/`](blueprints/one-oe/) |  Onboards **[One](/blueprints/one-oe/readme.md) OE** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-stack/readme.md)|
 |  <img src="commons/images/size_l.svg" width="23" align="center"> |...[`multi-oe/`](blueprints/multi-oe/) |  Onboards **[Multiple](/blueprints/multi-oe/readme.md) OEs** with a shared services and OE-dedicated resources, sharing **one tenancy**. |
-| <img src="commons/images/size_xl.svg" width="23" align="center">  |...[`multi-tenancy/`](blueprints/) | Uses One-OE and Multi-OE to onboard all your organizations or customers into **several tenancies**.
+| <img src="commons/images/size_xl.svg" width="23" align="center">  |...[`multi-tenancy/`](blueprints/multi-tenancy/) | Uses One-OE and Multi-OE to onboard all your organizations or customers into **several tenancies**.
 **2** |**[`addons/`](addons/)** | **Complement** your landing zone with add-ons to run OCI with best practices. (e.g., [Network Hubs](/addons/oci-hub-models/readme.md))|
 | **3** |**[`workload-extensions/`](workload-extensions/)** | **Extend** your landing zone with pluggable workloads extensions (e.g., [EBS](/workload-extensions/oci-lz-ext-ebs/readme.md), [OCVS](/workload-extensions/oci-lz-ext-ocvs/README.md), [...](/workload-extensions/readme.md)).|
 
