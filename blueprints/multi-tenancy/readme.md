@@ -13,7 +13,7 @@ This model onboards all **Operating Entities (OEs)** in **several tenancies**, a
 
 | # | Description | Format   | Status |  
 |---|---|:-:|---|
-| 1 | High-level Design - MD | <img src="../../commons/images/icon_md.jpg" width="45">  |  *Available Soon* |
+| 1 | High-level Design - MD | <img src="../../commons/images/icon_md_grayed.jpg" width="45">  |  *Available Soon* |
 | 2 | High-level Design - Drawio | <img src="../../commons/images/icon_drawio.jpg" width="30"> | *Available On Demand*
 | 3 | High-level Design - PDF | <img src="../../commons/images/icon_pdf_grayed.jpg" width="30"> | *Not Available* |
 | 4 | Multi-stack deployment for distributed IaC operations - Terraform + JSON |  <img src="../../commons/images/icon_terraform.jpg" width="32"><img src="../../commons/images/icon_json.jpg" width="30">  | *Available On Demand* |
