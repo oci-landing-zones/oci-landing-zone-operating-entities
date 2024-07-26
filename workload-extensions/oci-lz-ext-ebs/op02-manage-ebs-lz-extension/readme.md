@@ -588,7 +588,7 @@ Example of a DRG attachment creation:
 
 | STEP |  ACTION |
 |---|---| 
-| **1** | [![Deploy_To_OCI](../../../commons/images/DeployToOCI.jpg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json"}) |
+| **1** | [![Deploy_To_OCI](/commons/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json"}) |
 | **2** | Accept terms,  wait for the configuration to load. |
 | **3** | Set the working directory to “orm-facade”. | 
 | **4** | Set the stack name you prefer. | 
@@ -670,8 +670,6 @@ terraform apply \
 -state ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/terraform.tfstate
 ```
 
-Depending on your json configuration configurations the output of the ```terraform apply``` should be identical or similar to this [example](./tf_apply_output_example.out).
-
 ## **6. Known Issues**
 
 ### **6.1 ```Policy error```**
@@ -701,7 +699,7 @@ Re-run the apply job.
 
 &nbsp; 
 
-You can proceed to [OP.03 Execute Manual Changes](/examples/oci-lz-ext-ebs/op03-manual-changes/readme.md).
+You can proceed to [OP.03 Execute Manual Changes](../op03-manual-changes/).
 
 &nbsp; 
 

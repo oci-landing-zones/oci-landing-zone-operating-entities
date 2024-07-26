@@ -3,9 +3,9 @@
 ## **Table of Contents**
 
 [1. Summary](#1-summary)</br>
-[2. Network Configuration changes](#2-iam-configuration-changes)</br>
-[2.1 DRG Attachments and Routing](#2_1-drg-attachments-and-routing)</br>
-[2.2 VCNs Routing](#2_1-vcns-routing)</br>
+[2. Network Configuration changes](#2-network-configuration-changes)</br>
+[2.1 DRG Attachments and Routing](#21-drg-attachments-and-routing)</br>
+[2.2 VCNs Routing](#22-vcns-routing)</br>
 
 &nbsp; 
 
@@ -358,4 +358,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE)for more details.

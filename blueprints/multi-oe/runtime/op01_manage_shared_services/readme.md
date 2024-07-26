@@ -386,7 +386,7 @@ For a better understanding on this configuration example, check the [Hub network
 
 ### **5.1. Setup Terraform Authentication**
 
-For authenticating against the OCI tenancy terraform execute the following [instructions](/examples/oci-open-lz/common_terraform_authentication.md).
+For authenticating against the OCI tenancy terraform execute the following [instructions](/commons/content/terraform_authentication.md).
 
 &nbsp; 
 
@@ -424,7 +424,7 @@ Run ```terraform plan``` with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../terraform-oci-open-lz/examples/oci-open-lz/op01_manage_shared_services/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json \
 -state ../terraform-oci-open-lz/examples/oci-open-lz/op01_manage_shared_services/terraform.tfstate
@@ -444,7 +444,7 @@ Run ```terraform apply``` with the IAM and Network configuration. After its exec
 
 ```
 terraform apply \
--var-file ../terraform-oci-open-lz/examples/oci-open-lz/op01_manage_shared_services/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json \
 -state ../terraform-oci-open-lz/examples/oci-open-lz/op01_manage_shared_services/terraform.tfstate
@@ -460,4 +460,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE) for more details.

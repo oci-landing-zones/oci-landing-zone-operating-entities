@@ -3,9 +3,7 @@
 ## **Table of Contents**
 
 [1. Summary](#1-summary)</br>
-[2. Network Configuration changes](#2-iam-configuration-changes)</br>
-[2.1 DRG Attachments and Routing](#2_1-drg-attachments-and-routing)</br>
-[2.2 VCNs Routing](#2_1-vcns-routing)</br>
+[2. Network Configuration changes](#2-network-configuration-changes)</br>
 
 
 &nbsp; 
@@ -38,7 +36,7 @@ In this example both applications used as backend the same OE01 load balancer (t
 
 The summary of the example can be seen in the following diagram:
 
-![Diagram](../diagrams/OCI_Open_LZ-OPS%20-%20SharedInfrastructure_Network_POST.OP01.05.jpg)
+![Diagram](../diagrams/OCI_Open_LZ-OPS-SharedInfrastructure_Network_POST.OP01.05.jpg)
 
 The Load Balancer configuration would have the following characteristics:
 
@@ -183,4 +181,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE)for more details.

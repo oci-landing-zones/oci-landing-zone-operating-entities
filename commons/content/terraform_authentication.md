@@ -20,11 +20,11 @@ The information above can be collected from the OCI  Console by following the in
 - Copy your **OCI user account OCID** (OCI Console > Identity > Users).
 - Copy the required **API key fingerprint** and **private key path** (below).
 - Fill in the full path to the SSH public and private keys (this can be used when creating new instances)
-  - See https://docs.oracle.com/iias/Content/GSG/Tasks/creatingkeys.htm for directions on how to **create this key pair**.
+  - See https://docs.oracle.com/en/learn/generate_ssh_keys/index.html for directions on how to **create this key pair**.
 
-You'll need to make a local (same folder location) copy of the [oci-credentials.tfvars.json.template](shared/oci-credentials.tfvars.json.template) to [oci-credentials.tfvars.json](oci-credentials.tfvars.json.template) and edit the newly created file to provide the collected values above.
+You'll need to make a local (same folder location) copy of the [oci-credentials.tfvars.json.template](./oci-credentials.tfvars.json.template) to [oci-credentials.tfvars.json](./oci-credentials.tfvars.json.template) and edit the newly created file to provide the collected values above.
 
-The new, edited [oci-credentials.tfvars.json](shared/oci-credentials.tfvars.json.template) file should look similar to the below:
+The new, edited [oci-credentials.tfvars.json](./oci-credentials.tfvars.json.template) file should look similar to the below:
 ```
 {
     "fingerprint": "25:84:69:40:2f:5b:d1:25:0f:eb:f3:41:ee:cb:16:03",

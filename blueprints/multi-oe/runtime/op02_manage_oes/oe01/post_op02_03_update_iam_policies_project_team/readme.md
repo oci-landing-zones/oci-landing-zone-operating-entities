@@ -17,8 +17,8 @@
 | **TARGET RESOURCES** | - **Security**: Policies. |
 | **IAM CONFIG**| [open_lz_oe_01_identity.auto.tfvars.json](open_lz_oe_01_identity.auto.tfvars.json)|
 | **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../../design/OCI_Open_LZ.pdf).|
-| **PRE-ACTIVITIES** | [OP.04 Manage Projects](../../op04_manage_projects/readme.md) executed. Specifict OE Project Team IAM Groups created.  |
+| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
+| **PRE-ACTIVITIES** | [OP.04 Manage Projects](../../../op04_manage_projects) executed. Specifict OE Project Team IAM Groups created.  |
 | **POST-ACTIVITIES** | N/A |
 | **RUN WITH ORM** | 1. [<img src="/commons/images/DeployToOCI.svg"  height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json"})  </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “rms-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the default configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create.|
 | **CONFIG & RUN - TERRAFORM CLI** | Follow the steps mentioned in the [OP.02](../readme.md). |
@@ -27,7 +27,7 @@
 
 ## **2. IAM Configuration Changes**
 
-With the execution of [OP.04 Manage Projects](../../op04_manage_projects/readme.md), the IAM groups for specific project and layer teams are created, like the ones referenced in the Open LZ design (GRP.OE.03 & GRP.OE.04). These groups manages resources for OE01, Prod environment, Department A, Project 1, application or DB layers.
+With the execution of [OP.04 Manage Projects](../../../op04_manage_projects), the IAM groups for specific project and layer teams are created, like the ones referenced in the Open LZ design (GRP.OE.03 & GRP.OE.04). These groups manages resources for OE01, Prod environment, Department A, Project 1, application or DB layers.
 
 These groups needs to get access to some shared elements, like the OE networking elements in the OE common network compartment.
 
@@ -64,4 +64,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE) for more details.

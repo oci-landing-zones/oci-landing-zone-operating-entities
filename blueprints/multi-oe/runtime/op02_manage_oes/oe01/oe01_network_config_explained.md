@@ -3,13 +3,13 @@
 ## **Table of Contents**
 
 [1. Introduction](#1-introduction)</br>
-[2. Hub VCN](#2-Hub-vcn)</br>
+[2. Hub VCN](#2-oe-vcns)</br>
 [3. Subnets](#3-subnets)</br>
 [4. Route Tables](#4-route-tables)</br>
 [5. Security Lists](#5-security-lists) </br>
 [6. Network Security Groups](#6-network-security-groups) </br>
 [7. VCN gateways](#7-vcn-gateways) </br>
-[8. Load Balancer](#9-load-balancer) </br>
+[8. Load Balancer](#8-load-balancer) </br>
 
 &nbsp; 
 
@@ -1155,4 +1155,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE)for more details.

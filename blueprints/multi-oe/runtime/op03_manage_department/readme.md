@@ -18,7 +18,7 @@
 | **OP. NAME** | Manage Department | 
 | **OBJECTIVE** | Creates and changes a department structure within an OE environment. |
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br> |
-| **IAM CONFIG**| [open_lz_oe_01_prod_DEP_A_identity.auto.tfvars.json](open_lz_oe_01_prod_dep_a_identity.auto.tfvars.json)|
+| **IAM CONFIG**| [open_lz_oe_01_prod_DEP_A_identity.auto.tfvars.json](./open_lz_oe_01_prod_deptA_identity.auto.tfvars.json)|
 | **TERRAFORM MODULES**| [CIS Landing Zone IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | An Operating Entity onboarded with [OP.02 Manage Operating Entity (OE)](/blueprints/multi-oe/runtime/op02_manage_oes/oe01/readme.md). |
@@ -87,7 +87,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **2.2 Groups**
 
-The [OCI Open LZ Multi-OE Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides explanation of the possible separation of duties with the different tenancy structure levels. The department structure is optional.
+The [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides explanation of the possible separation of duties with the different tenancy structure levels. The department structure is optional.
 
 Meanwhile, you can proceed by updating with the desired groups, or use the empty groups configuration looks like in the example below:
 
@@ -106,7 +106,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.3 Dynamic Groups**
 
-The [OCI Open LZ Multi-OE [Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) explains the possible separation of duties with the different tenancy structure levels. It is not specified for the departments any configuration.
+The [OCI Open LZ Multi-OE [Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) explains the possible separation of duties with the different tenancy structure levels. It is not specified for the departments any configuration.
 
 Meanwhile, you can proceed by updating with the desired dynamic groups, or use the empty groups configuration looks like in the example below:
 
@@ -125,7 +125,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.4 Policies**
 
-The [OCI Open LZ Multi-OE Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides full explanation of the possible separation of duties with the different tenancy structure levels. It is not specified for the departments any configuration.
+The [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides full explanation of the possible separation of duties with the different tenancy structure levels. It is not specified for the departments any configuration.
 
 Meanwhile, you can proceed by updating with the desired policies, or use the following example:
 
@@ -166,7 +166,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **4.1. Setup Terraform Authentication**
 
-For authenticating against the OCI tenancy terraform execute the following [instructions](/examples/oci-open-lz/common_terraform_authentication.md).
+For authenticating against the OCI tenancy terraform execute the following [instructions](/commons/content/terraform_authentication.md).
 
 &nbsp; 
 
@@ -206,7 +206,7 @@ Run ```terraform plan``` with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../terraform-oci-open-lz/examples/oci-open-lz/op03_manage_department/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op03_manage_department/open_lz_oe_01_prod_deptA_identity.auto.tfvars.json \
 -state ../terraform-oci-open-lz/examples/oci-open-lz/op03_manage_department/terraform.tfstate
 ```
@@ -238,4 +238,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE) for more details.

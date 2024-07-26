@@ -24,7 +24,7 @@
 | **IAM CONFIG**| [open_lz_oe_01_identity.auto.tfvars.json](open_lz_oe_01_identity.auto.tfvars.json)|
 | **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](open_lz_oe_01_network.auto.tfvars.json) |
 | **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](../../../../design/OCI_Open_LZ.pdf).|
+| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | [OP.01 Shared Services](../../op01_manage_shared_services/readme.md) executed. Update network config with OCID of the hub. |
 | **POST-ACTIVITIES** | **POST.OP02.01** The first execution of this operation by the Central IT team requires the hand-over to the target OE Operations team the OCIDs for their OE core resources</br> [**POST.OP.02.02**](./post_op02_02_update_dynamic_groups/readme.md) Update the dynamic group instance.compartment.ocid with the OCID of the compartment of the dynamic groups members.</br> [**POST.OP.03.03**](./post_op02_03_update_iam_policies_project_team/readme.md) After the on-boarding of a new OE project, update IAM policies to give access to the OE Project Team to shared networking resources.|
 | **RUN OPERATION** | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli). |
@@ -152,7 +152,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **2.2 Groups**
 
-Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ Multi-OE Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
 
 ```
 ...
@@ -179,7 +179,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.3 Dynamic Groups**
 
-Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the  [OCI Open LZ Multi-OE Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the  [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
 
 ```
 ...
@@ -204,7 +204,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.4 Policies**
 
-We provide here an example of how to setup the IAM policies for the design discussed in the  [OCI Open LZ Multi-OE Design document](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). Notice that these policies must be considered as an example of how to deploy the blueprint based on CIS separation of duties, but not as a prescribed configuration. We encourage you to review and adapt to your design.
+We provide here an example of how to setup the IAM policies for the design discussed in the  [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). Notice that these policies must be considered as an example of how to deploy the blueprint based on CIS separation of duties, but not as a prescribed configuration. We encourage you to review and adapt to your design.
 
 For this example, replace the compartment_id "<OCID-COMPARTMENT-ROOT>" value to your tenancy OCID.
 
@@ -279,7 +279,7 @@ For a better understanding on this configuration example, check the [OE01 networ
 
 ### **5.1. Setup Terraform Authentication**
 
-For authenticating against the OCI tenancy terraform execute the following [instructions](/examples/oci-open-lz/common_terraform_authentication.md).
+For authenticating against the OCI tenancy terraform execute the following [instructions](/commons/content/terraform_authentication.md).
 
 &nbsp; 
 
@@ -339,7 +339,7 @@ Run ```terraform apply``` with the IAM and Network configuration. After its exec
 
 ```
 terraform apply \
--var-file ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json \
 -state ../terraform-oci-open-lz/examples/oci-open-lz/op02_manage_oes/oe01/terraform.tfstate
@@ -354,4 +354,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE) for more details.
