@@ -143,7 +143,7 @@ The network layer covers the following resources:
 
 ## **5. Run with Terraform CLI**
 ### **5.1 Setup Terraform Authentication**
-For authenticating against the OCI tenancy terraform execute the following [instructions](common_terraform_authentication.md).
+For authenticating against the OCI tenancy terraform execute the following [instructions](/commons/content/terraform_authentication.md).
 ### **5.2 Clone this Git repo to your Machine**
 ```
 git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git
@@ -161,7 +161,7 @@ Run ```terraform init``` to download all the required external terraform provide
 Run ```terraform plan``` with the IAM and Network configuration.
 ```
 terraform plan \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
 -var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json \
 -var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json
 ```
@@ -176,7 +176,7 @@ The ideal scenario regarding the **state file** will be for each configuration t
 Run terraform plan with the IAM and Network configuration. After  its execution the configured resources will be provisioned or updated on OCI.
 ```
 terraform apply \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
 -var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_identity.auto.tfvars.json \
 -var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ocvs/op01-ocvs-workload-extension/oci_open_lz_one-oe_network.auto.tfvars.json
 ```

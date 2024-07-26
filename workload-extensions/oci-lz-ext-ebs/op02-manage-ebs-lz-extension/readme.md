@@ -604,7 +604,7 @@ Example of a DRG attachment creation:
 
 ### **5.1 Setup Terraform Authentication**
 
-For authenticating against the OCI tenancy terraform execute the following [instructions](common_terraform_authentication.md).
+For authenticating against the OCI tenancy terraform execute the following [instructions](/commons/content/terraform_authentication.md).
 
 
 &nbsp; 
@@ -644,7 +644,7 @@ Run ```terraform plan``` with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
 -var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json \
 -var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json \
 -state ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/terraform.tfstate
