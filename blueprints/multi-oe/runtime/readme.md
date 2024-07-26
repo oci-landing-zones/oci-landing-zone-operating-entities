@@ -11,9 +11,9 @@
 
 ## 1. Introduction
 
-This section presents **OCI Open LZ Runtime View**, i.e., the **day two execution** of the operations scenarios introduced in [OCI Open LZ Operations View](/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
+This section presents **OCI Open LZ Runtime View**, i.e., the **day two execution** of the operations scenarios introduced in [OCI Open LZ Operations View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
 
-<span style="color:red">NOTE: If you're upgrading your configurations from the OCI LZ Orchestrator version <2.0.0, please review the [guidance](/multi-oe/runtime/upgrading-orchestrator.md) for upgrading.</span>
+<span style="color:red">NOTE: If you're upgrading your configurations from the OCI LZ Orchestrator version <2.0.0, please review the [guidance](/blueprints/multi-oe/runtime/upgrading-orchestrator.md) for upgrading.</span>
 
 
 &nbsp; 
@@ -58,4 +58,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE) for more details.

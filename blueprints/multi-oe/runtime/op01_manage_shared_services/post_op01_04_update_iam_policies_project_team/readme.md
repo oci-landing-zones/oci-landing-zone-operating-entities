@@ -3,7 +3,7 @@
 ## **Table of Contents**
 
 [1. Summary](#1-summary)</br>
-[2. Setup IAM Configuration](#2-setup-iam-configuration)</br>
+[2. Setup IAM Configuration](#2-iam-configuration-changes)</br>
 
 &nbsp; 
 
@@ -64,4 +64,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE)for more details.

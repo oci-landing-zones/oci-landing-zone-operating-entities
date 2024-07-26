@@ -3,7 +3,7 @@
 ## **Table of Contents**
 
 [1. Introduction](#1-introduction)</br>
-[2. Hub VCN](#2-Hub-vcn)</br>
+[2. Hub VCN](#2-hub-vcn)</br>
 [3. Subnets](#3-subnets)</br>
 [4. Route Tables](#4-route-tables)</br>
 [5. Security Lists](#5-security-lists) </br>
@@ -1156,4 +1156,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE) for more details.

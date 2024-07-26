@@ -109,7 +109,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **2.2 Groups**
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Groups topology, from the shared infrastructure configuration example this is not yet covered.
+Although the [OCI Open LZ design document](../../design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides full coverage for shared infrastructure OCI IAM Groups topology, from the shared infrastructure configuration example this is not yet covered.
 
 Meanwhile, you can proceed by updating with the desired groups, or use the empty groups configuration looks like in the example below:
 
@@ -140,7 +140,7 @@ For an example of such configuration and for extended documentation please refer
 ### **2.3 Dynamic Groups**
 
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Dynamic Groups topology, from the shared infrastructure configuration example this is not yet covered.
+Although the [OCI Open LZ design document](../../design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides full coverage for shared infrastructure OCI IAM Dynamic Groups topology, from the shared infrastructure configuration example this is not yet covered.
 
 Meanwhile, you can proceed by updating with the desired dynamic groups, or use the empty groups configuration looks like in the example below:
 
@@ -159,7 +159,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.4 Policies**
 
-Although the [OCI Open LZ design document](../../../design/OCI_Open_LZ.pdf) provides full coverage for shared infrastructure OCI IAM Policies topology, from the shared infrastructure configuration example this is not yet covered.
+Although the [OCI Open LZ design document](../../design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides full coverage for shared infrastructure OCI IAM Policies topology, from the shared infrastructure configuration example this is not yet covered.
 
 Meanwhile, you can proceed by updating with the desired policies, or use the following example:
 
@@ -216,7 +216,7 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 
 ### **5.1. Setup Terraform Authentication**
 
-For authenticating against the OCI tenancy terraform execute the following [instructions](/examples/oci-open-lz/common_terraform_authentication.md).
+For authenticating against the OCI tenancy terraform execute the following [instructions](/commons/content/terraform_authentication.md).
 
 &nbsp; 
 
@@ -255,7 +255,7 @@ Run terraform plan with the IAM and Network configuration.
 
 ```
 terraform plan \
--var-file ../terraform-oci-open-lz/examples/oci-open-lz/op04_manage_projects/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_identity.auto.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json \
 -state ../terraform-oci-open-lz/examples/oci-open-lz/op04_manage_projects/terraform.tfstate
@@ -275,7 +275,7 @@ Run terraform plan with the IAM and Network configuration. After  its execution 
 
 ```
 terraform apply \
--var-file ../terraform-oci-open-lz/examples/oci-open-lz/op04_manage_projects/oci-credentials.tfvars.json \
+-var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_identity.auto.tfvars.json \
 -var-file ../terraform-oci-open-lz/examples/oci-open-lz/op04_manage_projects/open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json \
 -state ../terraform-oci-open-lz/examples/oci-open-lz/op04_manage_projects/terraform.tfstate
@@ -287,4 +287,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE) for more details.

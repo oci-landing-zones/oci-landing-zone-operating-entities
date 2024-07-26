@@ -200,7 +200,7 @@ This chapter presents what cloud-native operations look like with the OCI Open L
 &nbsp; 
 ## **5.1 Cloud-Native Operations**
 
-Cloud-native operations on cloud resources should be very near the development practices, and therefore the target operating model, for dev or ops, should be identical, or very similar, centered on **version control repositories**. This approach upholds the principle that **the repository is the only source of truth**. In the operations world, this is known as GitOps (a concept created by [Weaveworks](https://www.weave.works/blog/gitops-operations-by-pull-request)), due to the popularity of GitHub, and it requires the desired state or operation on the system to be stored such that authorized readers can view the entire audit trail of changes. All changes to the desired state are fully traceable commits associated with committer information, commit IDs, and time stamps. This means that **the infrastructure is now a set of versioned artifacts** and can be audited using the standards of software development and delivery. Find in the table below some examples of why choose this operating model.
+Cloud-native operations on cloud resources should be very near the development practices, and therefore the target operating model, for dev or ops, should be identical, or very similar, centered on **version control repositories**. This approach upholds the principle that **the repository is the only source of truth**. In the operations world, this is known as GitOps (a concept created by [Weaveworks](https://medium.com/weaveworks/gitops-operations-by-pull-request-14e8b659b058)), due to the popularity of GitHub, and it requires the desired state or operation on the system to be stored such that authorized readers can view the entire audit trail of changes. All changes to the desired state are fully traceable commits associated with committer information, commit IDs, and time stamps. This means that **the infrastructure is now a set of versioned artifacts** and can be audited using the standards of software development and delivery. Find in the table below some examples of why choose this operating model.
 
 &nbsp; 
 
@@ -356,6 +356,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
-
-
+See [LICENSE](/LICENSE) for more details.
