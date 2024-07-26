@@ -54,7 +54,7 @@ The OCVS LZ Extension  includes the following compartments:
 > [!NOTE]
 > Compartments help you organize and control access to your resources. A compartment is a collection of related resources (such as cloud networks, compute instances, or block volumes) that can be accessed only by those groups that have been given permission by an administrator in your organization.
 
-<img src="diagrams/compartments.png" width="1000" height="value">
+<img src="content/compartments.png" width="1000" height="auto">
 
 &nbsp; 
 
@@ -96,7 +96,7 @@ The OCVS LZ Extension includes the following policies:
 The following diagram presents the network structure of the OCVS LZ Extension.
 
 
-<img src="diagrams/network.png" width="1000" height="value">
+<img src="content/network.png" width="1000" height="auto">
 
 &nbsp; 
 
