@@ -25,7 +25,7 @@
 6. Select create new subnet and VLANs.
 7. Provide desired CIDR range for the Cluster Network
 8. Review and finish the set-up
-   
+
 &nbsp; 
 &nbsp; 
 
