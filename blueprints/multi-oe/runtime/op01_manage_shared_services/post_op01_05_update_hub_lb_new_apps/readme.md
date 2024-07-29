@@ -3,9 +3,7 @@
 ## **Table of Contents**
 
 [1. Summary](#1-summary)</br>
-[2. Network Configuration changes](#2-iam-configuration-changes)</br>
-[2.1 DRG Attachments and Routing](#2_1-drg-attachments-and-routing)</br>
-[2.2 VCNs Routing](#2_1-vcns-routing)</br>
+[2. Network Configuration changes](#2-network-configuration-changes)</br>
 
 
 &nbsp; 
@@ -18,12 +16,12 @@
 | **OP. NAME** | Update Hub LB with new OEs Internet facing apps | 
 | **OBJECTIVE** | Publish OEs apps in the Hub Load Balancer to make them accesible. |
 | **TARGET RESOURCES** | - **Networking**: Hub Load Balancer. |
-| **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](open_lz_oe_01_network.auto.tfvars.json) |
+| **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](../final_configs_after_postops/open_lz_shared_network.auto.tfvars.json) |
 | **TERRAFORM MODULES**| [CIS Landing Zone Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | [OP.04 Manage Project](../../op04_manage_projects/readme.md). |
 | **POST-ACTIVITIES** | N/A |
-| **RUN WITH ORM** | 1. [<img src="/commons/images/DeployToOCI.svg"  height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json"})  </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “rms-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the default configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create.|
+| **RUN WITH ORM** | 1. [<img src="../../../../../commons/images/DeployToOCI.svg"  height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json"})  </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “rms-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the default configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create.|
 | **CONFIG & RUN - TERRAFORM CLI** | Follow the steps mentioned in the [OP.01](../readme.md). |
 
 &nbsp; 
@@ -38,7 +36,7 @@ In this example both applications used as backend the same OE01 load balancer (t
 
 The summary of the example can be seen in the following diagram:
 
-![Diagram](../diagrams/OCI_Open_LZ-OPS%20-%20SharedInfrastructure_Network_POST.OP01.05.jpg)
+![Diagram](../diagrams/OCI_Open_LZ-OPS-SharedInfrastructure_Network_POST.OP01.05.jpg)
 
 The Load Balancer configuration would have the following characteristics:
 
@@ -183,4 +181,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE)for more details.

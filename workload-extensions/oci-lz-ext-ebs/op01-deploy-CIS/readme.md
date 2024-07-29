@@ -5,8 +5,8 @@
 ## **Table of Contents**
 
 [1. Summary](#1-summary)</br>
-[2. CIS EBS Overview ](#2-CIS-EBS-Overview)</br>
-[3. ORM Configuration Options ](#3-ORM-Configuration-Options)</br>
+[2. CIS EBS Overview ](#2-cis-oci-lz-overview)</br>
+[3. ORM Configuration Options ](#3-orm-configuration-options)</br>
 
 
 
@@ -21,9 +21,9 @@
 | **OBJECTIVE** | Deploy Network and Security core resources for an EBS LZ using CIS LZ solution |
 | **TARGET RESOURCES** | - **Security**: Core Compartments, Groups, Policies, OCI Security services </br>- **Network**: Hub VCN, subnets, SL, NSG |
 | **DETAILS** |  For more details refer to the [OCI CIS LandingZone QuickStart](https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart) |
-| **PRE-ACTIVITIES** | Review [CIS Overview](#2-CIS-EBS-Overview) |
+| **PRE-ACTIVITIES** | Review [CIS Overview](#2-cis-oci-lz-overview) |
 | **POST-ACTIVITIES** | [OP.02](/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/readme.md) |
-| **RUN WITH ORM** | [![Deploy_To_OCI](../../../commons/images/DeployToOCI.jpg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart/archive/refs/heads/main.zip)  </br>See section [3. ORM Configuration Options ](#3-ORM-Configuration-Options) for the values and [template](EBS_CIS.pdf) for further details. |
+| **RUN WITH ORM** | [![Deploy_To_OCI](/commons/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart/archive/refs/heads/main.zip)  </br>See section [3. ORM Configuration Options ](#3-orm-configuration-options) for the values and [template](EBS_CIS.pdf) for further details. |
 | **CONFIG & RUN - TERRAFORM CLI** | Use the [CIS OCI LZ GitHub Repository](https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart). |
 
 &nbsp; 
