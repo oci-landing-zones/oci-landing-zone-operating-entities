@@ -3,9 +3,9 @@
 ## **Table of Contents**
 
 [1. Summary](#1-summary)</br>
-[2. Network Configuration changes](#2-iam-configuration-changes)</br>
-[2.1 DRG Attachments and Routing](#2_1-drg-attachments-and-routing)</br>
-[2.2 VCNs Routing](#2_1-vcns-routing)</br>
+[2. Network Configuration changes](#2-network-configuration-changes)</br>
+[2.1 DRG Attachments and Routing](#21-drg-attachments-and-routing)</br>
+[2.2 VCNs Routing](#22-vcns-routing)</br>
 
 &nbsp; 
 
@@ -17,12 +17,12 @@
 | **OP. NAME** | Add OE DRG Attachments, DRG and VCN routing | 
 | **OBJECTIVE** | After on-boarding a new OE, we add the DRG attachments to the new OE VCNs and update the Hub VCN routing to make the communications possible. |
 | **TARGET RESOURCES** | - **Networking**: DRG Attachments, DRG Routing and VCN Routing. |
-| **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](open_lz_oe_01_network.auto.tfvars.json) |
+| **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](../final_configs_after_postops/open_lz_shared_network.auto.tfvars.json) |
 | **TERRAFORM MODULES**| [CIS Landing Zone Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | [OP.01 Shared Services](../readme.md) executed.</br>[OP.02 – Manage OE:](../../op02_manage_oes/oe01/readme.md).</br>[POST.OP01.02: Update routing with NFW Private IP](../post_op01_02_update_routing_nfw_ip/readme.md). |
 | **POST-ACTIVITIES** | N/A |
-| **RUN WITH ORM** | 1. [<img src="/commons/images/DeployToOCI.svg"  height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json"})  </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “rms-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the default configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create.|
+| **RUN WITH ORM** | 1. [<img src="../../../../../commons/images/DeployToOCI.svg"  height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op01_manage_shared_services/open_lz_shared_network.auto.tfvars.json"})  </br>2. Accept terms,  wait for the configuration to load. </br>3. Set the working directory to “rms-facade”. </br>4. Set the stack name you prefer.</br>5. Set the terraform version to 1.2.x. Click Next. </br>6. Accept the default configurations. Click Next. Optionally, replace with your json/yaml config files. </br>8. Un-check run apply. Click Create.|
 | **CONFIG & RUN - TERRAFORM CLI** | Follow the steps mentioned in the [OP.01](../readme.md). |
 
 &nbsp; 
@@ -358,4 +358,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE)for more details.

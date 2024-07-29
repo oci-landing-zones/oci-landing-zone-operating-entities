@@ -8,7 +8,7 @@
 **Table of Contents**
 
 [1. Introduction](#1-introduction)</br>
-[2. Design Decisions](#2-design-decisions)</br>
+[2. Design Decisions](#2-design-overview)</br>
 [3. Security View](#3-security-view)</br>
 [4. Network View](#4-network-view)</br>
 [5. Runtime View](#5-runtime-view)</br>

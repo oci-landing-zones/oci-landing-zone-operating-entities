@@ -4,7 +4,7 @@
 
 Welcome to the **OCI Open LZ Workload Extensions**.  
 
-A workload extension is a tangible and **self-contained** set of resources with a clear functional scope, **pluggable** to a Landing Zone. They have a design and an implementation ready to receive a specific workloads on top of a landing zone. Each of these extensions follows the [tailored landing zone approach](/landing-zones/tailored_landing_zones/tailored_landing_zones.md) and is ready for deployment:
+A workload extension is a tangible and **self-contained** set of resources with a clear functional scope, **pluggable** to a Landing Zone. They have a design and an implementation ready to receive a specific workloads on top of a landing zone. Each of these extensions follows the [tailored landing zone approach](https://github.com/oracle-devrel/technology-engineering/tree/main/landing-zones/tailored_landing_zones) and is ready for deployment:
 
 - In terms of **design**, each solution will contain the security, network, and runtime views. 
 
@@ -18,8 +18,8 @@ Find below the list of available workload landing zones and our backlog. Be free
 
 | # |  Workload  | Description | Status |
 |:--:|:--:|---|---|
-| 1 | [<img src="../commons/images/icon_ebs.jpg" height="25" align="center">](/workload-extensions/oci-lz-ext-ebs/readme.md)| An **EBS** Landing Zone Extension. | [Available]((/workload-extensions/oci-lz-ext-ebs/readme.md)) |
-| 2 | [<img src="../commons/images/icon_ocvs.jpg" height="25" align="center">](/workload-extensions/oci-lz-ext-ocvs/README.md) | An **OCVS** Landing Zone Extension. | [Available]((/workload-extensions/oci-lz-ext-ocvs/README.md)) |
+| 1 | [<img src="../commons/images/icon_ebs.jpg" height="25" align="center">](/workload-extensions/oci-lz-ext-ebs/readme.md)| An **EBS** Landing Zone Extension. | [Available](/workload-extensions/oci-lz-ext-ebs/readme.md) |
+| 2 | [<img src="../commons/images/icon_ocvs.jpg" height="25" align="center">](/workload-extensions/oci-lz-ext-ocvs/README.md) | An **OCVS** Landing Zone Extension. | [Available](/workload-extensions/oci-lz-ext-ocvs/README.md) |
 | 3 | **OCI OKE** | An **OKE** Landing Zone Extension. | Available On Demand | 
 | 4 | **OCI ExaCS** | An **ExaCS** Landing Zone Extension. | Available On Demand | 
 | 5 | **ExaCC** | An **ExaCC** Landing Zone Extension. | Available On Demand | 
@@ -35,4 +35,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE) for more details.

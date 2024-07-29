@@ -6,7 +6,7 @@
 [2. View Initial Design and Configuration](#2-view-the-initial-configuration)</br>
 [3. Complete the Configuration](#3-complete-the-configuration)</br>
 [4. Version the Configuration](#4-version-your-configuration)</br>
-[5. Run the Configuration](#5-run-your-configuration-with-orm)</br>
+[5. Run the Configuration](#5-update-and-run-your-orm-stack)</br>
 
 &nbsp; 
 
@@ -114,5 +114,4 @@ Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
-
+See [LICENSE](/LICENSE)for more details.
