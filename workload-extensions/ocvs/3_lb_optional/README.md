@@ -1,4 +1,4 @@
-# OP.03 - Post-op Load Balancer (optional) <!-- omit from toc -->
+# Load Balancer Network set-up (optional) <!-- omit from toc -->
 ## **Table of Contents** <!-- omit from toc -->
 - [**1. Summary**](#1-summary)
 - [**2. Compartments**](#2-compartments)
@@ -10,17 +10,16 @@
 
 |                      |                                         |
 | -------------------- | --------------------------------------- |
-| **OP. ID**           | OP.3                                    |
-| **OP. NAME**         | Post-op Load Balancer (optional)        |
+| **NAME**             | Load Balancer set-up (optional)        |
 | **OBJECTIVE**        | Provision Load Balancer subnet for OCVS |
 | **TARGET RESOURCES** | VCN, Load Balancer                      |
 
-This is an optional post deployment operation to provision a Load Balancer Subnet for the OCVS with predefined routing and security rules. Load Balancer subnet can be used for creating Load Balancer for exposing parts of the OCVS either internally or externally.
+This is an optional post deployment operation to provision a Load Balancer Subnet for the OCVS service with a predefined routing and security rules. Load Balancer subnet can be used for creating Load Balancer for exposing parts of the OCVS either internally or externally.
 
 &nbsp; 
 
 ## **2. Compartments**
-Provision ocvs-lb compartment by modifying the `oci_open_lz_one-oe_identity.auto.tfvars.json` file to add following in the OCVS children:
+Provision ocvs-lb compartment by modifying the `identity.auto.tfvars.json` file to add following in the OCVS children:
 ```json
 "CMP-P-PLATFORM-OCVS-LB-KEY": {
     "name": "cmp-p-platform-ocvs-lb",
@@ -35,7 +34,7 @@ Provision ocvs-lb compartment by modifying the `oci_open_lz_one-oe_identity.auto
 &nbsp; 
 
 ## **3. Network**
-Provision LB subnet, routes, security lists by modifing the `oci_open_lz_one-oe_identity.auto.tfvars.json` file to add following parts of configuration.
+Provision LB subnet, routes, security lists by modifing the `network.auto.tfvars.json` file to add following parts of configuration.
 
 Route table to path `network_configuration.network_configuration_categories["VCN-FRA-P-OCVS-KEY"].route_tables`
 ```json
