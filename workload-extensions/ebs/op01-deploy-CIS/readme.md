@@ -22,7 +22,7 @@
 | **TARGET RESOURCES** | - **Security**: Core Compartments, Groups, Policies, OCI Security services </br>- **Network**: Hub VCN, subnets, SL, NSG |
 | **DETAILS** |  For more details refer to the [OCI CIS LandingZone QuickStart](https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart) |
 | **PRE-ACTIVITIES** | Review [CIS Overview](#2-cis-oci-lz-overview) |
-| **POST-ACTIVITIES** | [OP.02](/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/readme.md) |
+| **POST-ACTIVITIES** | [OP.02](/workload-extensions/ebs/op02-manage-ebs-lz-extension/readme.md) |
 | **RUN WITH ORM** | [![Deploy_To_OCI](/commons/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart/archive/refs/heads/main.zip)  </br>See section [3. ORM Configuration Options ](#3-orm-configuration-options) for the values and [template](EBS_CIS.pdf) for further details. |
 | **CONFIG & RUN - TERRAFORM CLI** | Use the [CIS OCI LZ GitHub Repository](https://github.com/oracle-quickstart/oci-cis-landingzone-quickstart). |
 
@@ -165,7 +165,7 @@ This section presents the Oracle Resource Manager steps with associated input. T
 
 &nbsp; 
 
-You can proceed to [OP.02 Manage EBS Landing Zone Extension](/workload-extensions/oci-lz-ext-ebs/op02-manage-ebs-lz-extension/readme.md).
+You can proceed to [OP.02 Manage EBS Landing Zone Extension](/workload-extensions/ebs/op02-manage-ebs-lz-extension/readme.md).
 
 &nbsp; 
 

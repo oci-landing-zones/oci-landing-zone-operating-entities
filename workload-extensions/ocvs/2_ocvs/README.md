@@ -1,4 +1,4 @@
-# OP.02 - OCVS Set-up <!-- omit from toc -->
+# OCVS Service Set-up <!-- omit from toc -->
 ## **Table of Contents** <!-- omit from toc -->
 - [**1. Summary**](#1-summary)
 - [**2. OCVS Deployment**](#2-ocvs-deployment)
@@ -9,10 +9,9 @@
 
 |                      |                                                       |
 | -------------------- | ----------------------------------------------------- |
-| **OP. ID**           | OP.02                                                 |
-| **OP. NAME**         | OCVS Set-up                                           |
+| **NAME**             | OCVS services Set-up                                  |
 | **OBJECTIVE**        | Provision OCI OCVS on top of Landing Zone Extensions. |
-| **TARGET RESOURCES** | OCVS                                                  |
+| **TARGET RESOURCES** | OCVS Software Defined Data Center (SDDC)              |
 
 &nbsp; 
 
@@ -25,6 +24,8 @@
 6. Select create new subnet and VLANs.
 7. Provide desired CIDR range for the Cluster Network
 8. Review and finish the set-up
+
+You can now continue with optional LB network deployment in [Step 3](./../3_lb_optional)
 
 &nbsp; 
 &nbsp; 

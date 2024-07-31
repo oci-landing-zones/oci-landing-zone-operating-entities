@@ -18,15 +18,14 @@ Find below the list of available workload landing zones and our backlog. Be free
 
 | # |  Workload  | Description | Status |
 |:--:|:--:|---|---|
-| 1 | [<img src="../commons/images/icon_ebs.jpg" height="25" align="center">](/workload-extensions/oci-lz-ext-ebs/readme.md)| An **EBS** Landing Zone Extension. | [Available](/workload-extensions/oci-lz-ext-ebs/readme.md) |
-| 2 | [<img src="../commons/images/icon_ocvs.jpg" height="25" align="center">](/workload-extensions/oci-lz-ext-ocvs/README.md) | An **OCVS** Landing Zone Extension. | [Available](/workload-extensions/oci-lz-ext-ocvs/README.md) |
+| 1 | [<img src="../commons/images/icon_ebs.jpg" height="25" align="center">](./ebs/)| An **EBS** Landing Zone Extension. | [Available](./ebs/) |
+| 2 | [<img src="../commons/images/icon_ocvs.jpg" height="25" align="center">](./ocvs) | An **OCVS** Landing Zone Extension. | [Available](./ocvs/) |
 | 3 | **OCI OKE** | An **OKE** Landing Zone Extension. | Available On Demand | 
 | 4 | **OCI ExaCS** | An **ExaCS** Landing Zone Extension. | Available On Demand | 
 | 5 | **ExaCC** | An **ExaCC** Landing Zone Extension. | Available On Demand | 
 
 
 &nbsp; 
-
 &nbsp; 
 
 # License
