@@ -17,7 +17,7 @@ The OCVS Landing Zone (LZ) Extension is a secure cloud environment, designed wit
 This workload extension uses the [One-OE](/blueprints/one-oe/readme.md) Blueprint as the reference Landing Zone and guides the deployment of OCVS on top of it.
 
 <video autoplay muted loop controls>
-  <source src="content/ocvs.mp4" type="video/mp4">
+  <source src="workload-extensions/ocvs/content/ocvs.mp4" type="video/mp4">
     Your browser does not support the video tag.
 </video> 
 
