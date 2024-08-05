@@ -18,7 +18,7 @@ This workload extension uses the [One-OE](/blueprints/one-oe/readme.md) Blueprin
 
 
 <video autoplay muted loop controls src="https://github.com/user-attachments/assets/fe404302-91a3-4b51-99a6-25a7727feeef"></video>
-
+<video autoplay muted loop controls src="https://fr3elochwkkt.objectstorage.eu-frankfurt-1.oci.customer-oci.com/n/fr3elochwkkt/b/bucket-20240805-1323/o/ocvs_gif.mp4"></video>
 
 
 &nbsp;
