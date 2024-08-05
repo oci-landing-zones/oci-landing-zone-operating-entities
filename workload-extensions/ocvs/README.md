@@ -19,6 +19,10 @@ This workload extension uses the [One-OE](/blueprints/one-oe/readme.md) Blueprin
 https://github.com/user-attachments/assets/1e35d564-0fbf-4674-8d1c-43c69c900d22
 
 
+
+https://github.com/user-attachments/assets/2946f743-c19a-49b0-a065-8916ccb1b253
+
+
 &nbsp;
 
 ## **3. Deployment**                              
