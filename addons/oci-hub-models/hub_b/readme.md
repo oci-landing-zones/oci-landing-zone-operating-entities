@@ -67,7 +67,7 @@ For a comprehensive understanding of how network packets flow within **Hub B** a
 &nbsp;
 
 > [!NOTE]
-> The CIDR ranges shown in the architecture diagram are for illustrative purposes only and should be adjusted to align with each specific use case.
+> *The CIDR ranges shown in the architecture diagram are for illustrative purposes only and should be adjusted to align with each specific use case.*
 
 &nbsp;
 

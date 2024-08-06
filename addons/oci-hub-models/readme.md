@@ -13,22 +13,19 @@ This document provides an in-depth exploration of the various **OCI Network Hub 
 
 ### The Hub Menu
 
-| [**HUB A**](/addons/oci-hub-models/hub_a/readme.md) | [**HUB B**](/addons/oci-hub-models/hub_b/readme.md) | **HUB C**  | **HUB D**  | 
+| [**HUB A**](/addons/oci-hub-models/hub_a/readme.md) | [**HUB B**](/addons/oci-hub-models/hub_b/readme.md) | [**HUB C**](/addons/oci-hub-models/hub_c/readme.md)  | **HUB D**  | 
 |:-:|:-:|:-:|:-:|
-| [<img src="hub_a/images/hub_a_design.png" width="277" height="">](/addons/oci-hub-models/hub_a/readme.md) | [<img src="hub_b/images/hub_b_design.png" width="274" height="">](/addons/oci-hub-models/hub_b/readme.md) | <img src="hub_c/images/hub_c_design.png" width="280" height=""> |  <img src="hub_d/images/hub_d_design.png" width="280" height=""> | 
+| [<img src="hub_a/images/hub_a_design.png" width="300" height="">](/addons/oci-hub-models/hub_a/readme.md) | [<img src="hub_b/images/hub_b_design.png" width="300" height="">](/addons/oci-hub-models/hub_b/readme.md) | [<img src="hub_c/images/hub_c_design.png" width="315" height="">](/addons/oci-hub-models/hub_c/readme.md) | <img src="hub_d/images/hub_d_design.png" width="315" height=""> | 
 | Hub with Two **OCI Network Firewalls** | Hub with One **OCI Network Firewall** | Hub with **3rd Party FW** - AA | Hub with **3rd Party FW** - AP |
-| [Overview and Routing](/addons/oci-hub-models/hub_a/readme.md)  | [Overview and Routing](/addons/oci-hub-models/hub_b/readme.md) | Soon | -- |
-| [Packet Flow Animation](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md) | [Packet Flow Animation](/addons/oci-hub-models/hub_b/hub-b-packet_flow.md) | Soon | -- |
-
-
-
+| [Overview and Routing](/addons/oci-hub-models/hub_a/readme.md)  | [Overview and Routing](/addons/oci-hub-models/hub_b/readme.md) | [Overview and Routing](/addons/oci-hub-models/hub_c/readme.md) | -- |
+| [Packet Flow Animation](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md) | [Packet Flow Animation](/addons/oci-hub-models/hub_b/hub-b-packet_flow.md) | [Packet Flow Animation](/addons/oci-hub-models/hub_c/hub-c-packet_flow.md) | -- |
 
 &nbsp; 
 
 #### Abbreviations:
 - **FW** = Firewall
-- **AA** = Active - Active
-- **AP** = Active - Passive
+- **AA** = Active/Active
+- **AP** = Active/Passive
 - **cmp** = Compartment
 - **AD** = Availability Domain
 - **vcn** = Virtual Cloud Network
