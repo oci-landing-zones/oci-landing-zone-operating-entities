@@ -17,7 +17,7 @@ The OCVS Landing Zone (LZ) Extension is a secure cloud environment, designed wit
 This workload extension uses the [One-OE](/blueprints/one-oe/readme.md) Blueprint as the reference Landing Zone and guides the deployment of OCVS on top of it.
 
 
-<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/workload-extensions/ocvs/ocvs.gif">
+<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/workload-extensions/ocvs/ocvs.gif" width="1000" height="auto">
 
 
 &nbsp;
