@@ -1,1 +1,3 @@
-/workload-extensions/oci-lz-ext-ocvs/ @hrvolapeter
+/workload-extensions/ocvs/ @hrvolapeter
+/workload-extensions/ebs/ @rphibbert
+/addons/oci-hub-models/ @vavardan
