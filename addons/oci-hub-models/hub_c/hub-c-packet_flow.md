@@ -68,7 +68,7 @@ For more information on [OCI Network Load Balancer and Symmetric hashing](https:
 - Source: Internet
 - Destination: 192.168.10.10 
 
-<img src="https://github.com/vavardan/hub_spoke_assets/blob/main/hub_c_inbound.gif" width="600" />
+<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/oci-hub-models/hub_c/hub_c_inbound.gif" width="600" />
 
 A user from the Internet attempts to access *a.example.com*, which is hosted on **VM-A** behind a Public Load Balancer. Upon DNS resolution, the user's request targets the Load Balancer's public IP address. The packet then enters the Hub VCN via Internet Gateway, which has an associated VCN route table **RT: vcn-hub-igw** (Gateway Ingress Routing). The route rule defined in this VCN route table forces the packet to go through a private IP address of the **NLB-Untrust** network load balancer. **NLB-Untrust** selects one of the backend Firewalls and uses symmetric hashing to calculate the same hash for packets in both, forward and return directions. After control and inspection the firewall routes the packet to the public load balancer, based on its internal static routes ([*Table 1*](#Third-Party-Network-Firewall-configuration)) and VCN implicit local route. The Load Balancer then attempts to forward the packet to the appropriate backend VM (in this case to **VM-A**), based on its routing policy rules.
 
@@ -78,7 +78,7 @@ A user from the Internet attempts to access *a.example.com*, which is hosted on 
 - Source: 192.168.10.10
 - Destination: Internet
   
-<img src="https://github.com/vavardan/hub_spoke_assets/blob/main/hub_c_outbound.gif" width="600" />
+<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/oci-hub-models/hub_c/hub_c_outbound.gif" width="600" />
 
 **VM-A** initiates a communication to the Internet. The packet traverses through the Dynamic Routing Gateway (DRG) and is forced by the VCN route table - **RT: vcn-hub-ingress** to choose as the next-hop **NLB-Trust**. Then it selects one of the backend firewalls and uses symmetric hashing to calculate the same hash for packets in both, forward and return directions. After inpection, firewall does a NAT and routes the packet via vNIC1 to the Internet Gateway, based on its internal static routes ([*Table 1*](#Third-Party-Network-Firewall-configuration)) and VCN route table - **RT: vcn-hub-subnet-untrust**.
 
@@ -88,7 +88,7 @@ A user from the Internet attempts to access *a.example.com*, which is hosted on 
 - Source: 192.168.10.10
 - Destination: 192.168.20.20 
 
-<img src="https://github.com/vavardan/hub_spoke_assets/blob/main/hub_c_east_west.gif" width="600" />
+<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/oci-hub-models/hub_c/hub_c_east_west.gif" width="600" />
 
 **VM-A** initiates a communication with **VM-B**. The packet goes through the Dynamic Routing Gateway (DRG) and and is forced by the VCN route table - **RT: vcn-hub-ingress** to choose as the next-hop **NLB-Trust**. Then it selects one of the backend firewalls and uses symmetric hashing to calculate the same hash for packets in both, forward and return directions. Firewall ispects the packet and routes it back to the DRG, based on its internal static routes ([*Table 1*](#Third-Party-Network-Firewall-configuration)) and VCN route table - **RT: vcn-hub-subnet-trust**, which is assosiated with **subnet-hub-trust** subnet. The response packet follows a similar flow to get back to the **VM-A**.
 

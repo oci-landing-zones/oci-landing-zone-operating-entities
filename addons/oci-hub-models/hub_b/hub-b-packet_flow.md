@@ -11,7 +11,7 @@ The purpose of this document is to illustrate, through explanatory animations, t
 - Source: Internet
 - Destination: 192.168.10.10 
 
-<img src="https://github.com/vavardan/hub_spoke_assets/blob/main/hub_b_inbound.gif" width="600" />
+<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/oci-hub-models/hub_b/hub_b_inbound.gif" width="600" />
 
 A user from the Internet attempts to access *a1.example.com*, which is hosted on **VM-A1** behind a Public Load Balancer. Upon DNS resolution, the user's request targets the Load Balancer's public IP address. The packet enters the Hub VCN via the Internet Gateway and successfully reaches the Load Balancer. The Load Balancer then attempts to forward the packet to the appropriate backend VM (**VM-A1** in this case), based on its policy rules. However, the packet is first routed by the route rule in **RT: vcn-hub-lb** to the **NFW-hub** (OCI Network Firewall) for inspection and control.
 
@@ -21,7 +21,7 @@ A user from the Internet attempts to access *a1.example.com*, which is hosted on
 - Source: 192.168.10.10
 - Destination: Internet
   
-<img src="https://github.com/vavardan/hub_spoke_assets/blob/main/hub_b_outbound.gif" width="600" />
+<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/oci-hub-models/hub_b/hub_b_outbound.gif" width="600" />
 
 **VM-A1** initiates a communication to the Internet. The packet traverses through the Dynamic Routing Gateway (DRG) and is forced by the VCN route table: **vcn-hub-ingress** to pass through a **NFW-hub**. After inspection, the **NFW-hub** uses **RT: vcn-hub-fw** to route the packet to the NAT Gateway. The response packet from the Internet is then forced by the route rule in the **RT: vcn-natgw-hub** (a route table associated with a NAT gateway) to pass through the private IP address of the **NFW-hub** for inspection, and then through the DRG back to **VM-A1**.
 
@@ -31,7 +31,7 @@ A user from the Internet attempts to access *a1.example.com*, which is hosted on
 - Source: 192.168.10.10
 - Destination: 192.168.20.20 
 
-<img src="https://github.com/vavardan/hub_spoke_assets/blob/main/hub_b_east_west.gif" width="600" />
+<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/oci-hub-models/hub_b/hub_b_east_west.gif" width="600" />
 
 **VM-A1** initiates a communication with **VM-B1**. The packet goes through the Dynamic Routing Gateway (DRG) and is forced by the VCN **RT: vcn-hub-ingress** to pass through a **NFW-hub**. After inspection, the **NFW-hub** uses **RT: vcn-hub-fw** to route the packet back to the DRG and then to the **vcn-spoke-B**. The response packet follows similar flow to get back to the **VM-A1**.
 
