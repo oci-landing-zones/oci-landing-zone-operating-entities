@@ -1,0 +1,6 @@
+.DS_Store
+**/*.drawio.bkp
+**/*.tfstate*
+**/*.out
+**/.terraform/*
+**/*oci-credentials.tfvars.json
