@@ -1,0 +1,57 @@
+{
+    "budgets_configuration" : {
+        "budgets" : {
+            "ROOT-BUDGET" : {
+                "name" : "isv-root-budget",
+                "description" : "Tenancy level budget.",
+                "amount" : 50000,
+                "alert_rule" : {
+                    "threshold_value" : 80,
+                    "recipients" : "email.address@example.com",
+                    "message" : "Actual spending goes above 80% of configured budget."
+                }
+            },
+            "MGMT-PLANE-BUDGET" : {
+                "name" : "isv-mgmt-plane-budget",
+                "description" : "Management Plane budget.",
+                "amount" : 10000,
+                "target" : {
+                    "values" : ["MGMT-PLANE-CMP"]
+                },
+                "alert_rule" : {
+                    "threshold_value" : 80,
+                    "recipients" : "email.address@example.com",
+                    "message" : "Actual spending goes above 80% of configured budget."
+                }
+            },
+            "CUSTOMERS-BUDGET" : {
+                "name" : "isv-customers-budget",
+                "description" : "Customers budget.",
+                "amount" : 20000,
+                "target" : {
+                    "type" : "COMPARTMENT",
+                    "values" : ["CUSTOMERS-CMP"]
+                },
+                "alert_rule" : {
+                    "threshold_value" : 80,
+                    "recipients" : "email.address@example.com",
+                    "message" : "Actual spending goes above 80% of configured budget."
+                }
+            },
+            "SNOWFLAKE-CUSTOMERS-BUDGET" : {
+                "name" : "isv-snowflake-customers-budget",
+                "description" : "Snowflake customers budget.",
+                "amount" : 20000,
+                "target" : {
+                    "type" : "COMPARTMENT",
+                    "values" : ["SNOWFLAKE-CUSTOMERS-CMP"]
+                },
+                "alert_rule" : {
+                    "threshold_value" : 80,
+                    "recipients" : "email.address@example.com",
+                    "message" : "Actual spending goes above 80% of configured budget."
+                }
+            }   
+        }    
+    }
+}
