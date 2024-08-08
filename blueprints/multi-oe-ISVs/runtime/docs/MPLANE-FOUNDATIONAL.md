@@ -21,7 +21,7 @@ Management plane administrators.
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[bootstrap.json](../../runtime/mgmt-plane/bootstrap/bootstrap.json), [iam_config.json](../../runtime/mgmt-plane/iam/iam_config.json), [budgets_config.json](../../runtime/mgmt-plane/governance/budgets_config.json), [cloud_guard_config.json](../../runtime/mgmt-plane/security/cloud_guard_config.json)\*, [security_zones_config.json](../../runtime/mgmt-plane/security/security_zones_config.json), [scanning_config.json](../../runtime/mgmt-plane/security/scanning_config.json), [observability_config.json](../../runtime/mgmt-plane/observability/observability_config.json) | None | iam/output/compartments_output.json
+[bootstrap.json](../mgmt-plane/bootstrap/bootstrap.json), [iam_config.json](../mgmt-plane/iam/iam_config.json), [budgets_config.json](../mgmt-plane/governance/budgets_config.json), [cloud_guard_config.json](../mgmt-plane/security/cloud_guard_config.json)\*, [security_zones_config.json](../mgmt-plane/security/security_zones_config.json), [scanning_config.json](../mgmt-plane/security/scanning_config.json), [observability_config.json](../mgmt-plane/observability/observability_config.json) | None | iam/output/compartments_output.json
 
 \* cloud_guard_config.json is not automatically included in the stack below. When creating the stack, add *https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/multi-oe-ISVs/runtime/mgmt-plane/security/cloud_guard_config.json* to the set of configuration files only if a Cloud Guard target does not exist in the Root compartment.
 
@@ -33,4 +33,4 @@ Click the button to create the stack with all variables pre-filled:
 
 ### What Gets Deployed
 
-![isv-pod-architecture-mgmt-plane-foundational](../images/foundational.png)
+![isv-pod-architecture-mgmt-plane-foundational](../../design/images/foundational.png)

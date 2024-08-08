@@ -25,7 +25,7 @@ This stack is executed in different stages with a **PROGRESSIVELY UPDATED single
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_initial_config.json](../../runtime/mgmt-plane/network/network_initial_config.json), [flow_logs_config.json](../../runtime/mgmt-plane/network/flow_logs_config.json) | iam/output/compartments_output.json | network/output/network_output.json
+[network_initial_config.json](../mgmt-plane/network/network_initial_config.json), [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json) | iam/output/compartments_output.json | network/output/network_output.json
 
 #### Stack Creation
 
@@ -37,7 +37,7 @@ Click the button to create the stack with all variables pre-filled.
 
 The resources in red color are added.
 
-![isv-pod-architecture-mgmt-plane-network-initial](../images/mgmt-plane-network-initial.png)
+![isv-pod-architecture-mgmt-plane-network-initial](../../design/images/mgmt-plane-network-initial.png)
 
 
 ### <a name="stage2">Network Stack 2nd Stage</a>
@@ -50,7 +50,7 @@ This stage updates the initial network configuration with route rules to the Net
 
 Specifically:
 
-**THESE CONFIGURATION SNIPPETS ARE SHOWN HERE FOR CLARITY PURPOSES. THEY ARE ALL ALREADY ADDED IN [network_post_firewall_config.json](../../runtime/mgmt-plane/network/network_post_firewall_config.json).**
+**THESE CONFIGURATION SNIPPETS ARE SHOWN HERE FOR CLARITY PURPOSES. THEY ARE ALL ALREADY ADDED IN [network_post_firewall_config.json](../mgmt-plane/network/network_post_firewall_config.json).**
 
 1. A new route table **IS ADDED** for routing any traffic to the Network Load Balancer.
 ```
@@ -184,13 +184,13 @@ In order to update the initial network configuration, edit the existing network 
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_post_firewall_config.json](../../runtime/mgmt-plane/network/network_post_firewall_config.json), [flow_logs_config.json](../../runtime/mgmt-plane/network/flow_logs_config.json) | iam/output/compartments_output.json, firewall/output/nlbs_output.json  | network/output/network_output.json
+[network_post_firewall_config.json](../mgmt-plane/network/network_post_firewall_config.json), [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json) | iam/output/compartments_output.json, firewall/output/nlbs_output.json  | network/output/network_output.json
 
 #### What Gets Deployed
 
 The resources in red color are added.
 
-![isv-pod-architecture-mgmt-plane-network-post-firewall](../images/mgmt-plane-network-post-firewall.png)
+![isv-pod-architecture-mgmt-plane-network-post-firewall](../../design/images/mgmt-plane-network-post-firewall.png)
 
 
 ### <a name="stage3">Network Stack 3rd Stage</a>
@@ -201,7 +201,7 @@ At this stage, the Central Hub VCN is updated for routing traffic to the newly a
 
 Specifically:
 
-**THESE CONFIGURATION SNIPPETS ARE SHOWN HERE FOR CLARITY PURPOSES. THEY ARE ALL ALREADY ADDED IN [network_post_each_customer_config.json](../../runtime/mgmt-plane/network/network_post_each_customer_config.json)**
+**THESE CONFIGURATION SNIPPETS ARE SHOWN HERE FOR CLARITY PURPOSES. THEY ARE ALL ALREADY ADDED IN [network_post_each_customer_config.json](../mgmt-plane/network/network_post_each_customer_config.json)**
 
 1. A new route rule **IS ADDED** to the Indoor subnet route table. This enforces routing through the DRG for any traffic that leaves the subnet destined to the newly added customer VCN.
 
@@ -236,7 +236,7 @@ In order to update the current network configuration, edit the existing network 
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_post_each_customer_config.json](../../runtime/mgmt-plane/network/network_post_each_customer_config.json), [flow_logs_config.json](../../runtime/mgmt-plane/network/flow_logs_config.json) | iam/output/compartments_output.json, firewall/output/nlbs_output.json, customer1/output/network_output.json  | network/output/network_output.json
+[network_post_each_customer_config.json](../mgmt-plane/network/network_post_each_customer_config.json), [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json) | iam/output/compartments_output.json, firewall/output/nlbs_output.json, customer1/output/network_output.json  | network/output/network_output.json
 
 #### What Gets Deployed
 
