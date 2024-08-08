@@ -191,7 +191,7 @@ For configuring the OCI Open LZ OE01 Project environment Network layer open and 
 
 You can customize this json configuration to fit your exact OCI Networking topology. This terraform automation is extremely versatible and can support any type of network topology. 
 
-For complete documentation and a larger set of examples on configuring an OCI networking topology using this json terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) documentation and examples.
+For complete documentation and a larger set of examples on configuring an OCI networking topology using this json terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oci-landing-zones/terraform-oci-modules-networking) documentation and examples.
 
 &nbsp; 
 

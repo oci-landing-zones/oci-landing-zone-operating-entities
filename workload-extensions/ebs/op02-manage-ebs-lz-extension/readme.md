@@ -318,7 +318,7 @@ This configuration covers the following networking diagram.
 
 ![Network Diagram](./diagrams/Network.png)
 
-For complete documentation and a larger set of examples on configuring an OCI networking topology using this json terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) documentation and examples.
+For complete documentation and a larger set of examples on configuring an OCI networking topology using this json terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oci-landing-zones/terraform-oci-modules-networking) documentation and examples.
 
 The network layer covers the next resources:
 

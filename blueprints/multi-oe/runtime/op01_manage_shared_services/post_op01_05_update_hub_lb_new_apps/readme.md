@@ -17,7 +17,7 @@
 | **OBJECTIVE** | Publish OEs apps in the Hub Load Balancer to make them accesible. |
 | **TARGET RESOURCES** | - **Networking**: Hub Load Balancer. |
 | **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](../final_configs_after_postops/open_lz_shared_network.auto.tfvars.json) |
-| **TERRAFORM MODULES**| [CIS Landing Zone Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
+| **TERRAFORM MODULES**| [CIS Landing Zone Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | [OP.04 Manage Project](../../op04_manage_projects/readme.md). |
 | **POST-ACTIVITIES** | N/A |

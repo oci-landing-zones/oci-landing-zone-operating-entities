@@ -74,7 +74,7 @@ See [LICENSE](/LICENSE.txt) for more details.
 
 [oci-lz-orchestrator]: https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator
 [oci-lz-iam]: https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam
-[oci-lz-network]: https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking
-[oci-lz-security]: https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-security
-[oci-lz-observability]: https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-observability
-[oci-lz-governance]: https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-governance
+[oci-lz-network]: https://github.com/oci-landing-zones/terraform-oci-modules-networking
+[oci-lz-security]: https://github.com/oci-landing-zones/terraform-oci-modules-security
+[oci-lz-observability]: https://github.com/oci-landing-zones/terraform-oci-modules-observability
+[oci-lz-governance]: https://github.com/oci-landing-zones/terraform-oci-modules-governance
