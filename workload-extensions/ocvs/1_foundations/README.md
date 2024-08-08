@@ -105,7 +105,7 @@ This configuration covers the following networking diagram.
 
 &nbsp; 
 
-For customization of the pre-defined setup please refer to the [Networking documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) for documentation and examples.
+For customization of the pre-defined setup please refer to the [Networking documentation](https://github.com/oci-landing-zones/terraform-oci-modules-networking) for documentation and examples.
 
 The network layer covers the following resources:
 

@@ -18,7 +18,7 @@
 | **OBJECTIVE** | After on-boarding a new OE, we add the DRG attachments to the new OE VCNs and update the Hub VCN routing to make the communications possible. |
 | **TARGET RESOURCES** | - **Networking**: DRG Attachments, DRG Routing and VCN Routing. |
 | **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](../final_configs_after_postops/open_lz_shared_network.auto.tfvars.json) |
-| **TERRAFORM MODULES**| [CIS Landing Zone Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
+| **TERRAFORM MODULES**| [CIS Landing Zone Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | [OP.01 Shared Services](../readme.md) executed.</br>[OP.02 – Manage OE:](../../op02_manage_oes/oe01/readme.md).</br>[POST.OP01.02: Update routing with NFW Private IP](../post_op01_02_update_routing_nfw_ip/readme.md). |
 | **POST-ACTIVITIES** | N/A |

@@ -16,7 +16,7 @@
 | **OBJECTIVE** | After a new OCI Network Firewall is deployed, an update in Hub routing tables is needed to force some routes to passthrough the NFW private IP OCID. |
 | **TARGET RESOURCES** | - **Networking**: Routing Tables. |
 | **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](../final_configs_after_postops/open_lz_shared_network.auto.tfvars.json) |
-| **TERRAFORM MODULES**| [CIS Landing Zone Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
+| **TERRAFORM MODULES**| [CIS Landing Zone Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | [OP.01 Shared Services](../readme.md) executed. |
 | **POST-ACTIVITIES** | N/A |

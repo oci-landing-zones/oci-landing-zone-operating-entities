@@ -78,7 +78,7 @@ For a comprehensive understanding of how network packets flow within **Hub C** a
 
 ### 5. Automation
 
-For automating this Hub model use the [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) Terraform modules. As an example configuration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/one-oe/runtime/one-click/oci_open_lz_one-oe_network.auto.tfvars.json).
+For automating this Hub model use the [CIS Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking) Terraform modules. As an example configuration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/one-oe/runtime/one-click/oci_open_lz_one-oe_network.auto.tfvars.json).
 
 
 &nbsp; 
