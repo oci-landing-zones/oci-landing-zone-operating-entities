@@ -19,7 +19,7 @@ Management plane network administrators.
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[firewall_config.json](../../runtime/mgmt-plane/firewall/firewall_config.json) | iam/output/compartments_output.json, network/output/network_output.json  | firewall/output/instances_output.json
+[firewall_config.json](../mgmt-plane/firewall/firewall_config.json) | iam/output/compartments_output.json, network/output/network_output.json  | firewall/output/instances_output.json
 
 ### Stack Creation
 
@@ -29,4 +29,4 @@ Input Configuration Files | Input Dependency Files | Generated Output
 
 The resources in red color are added.
 
-![isv-pod-architecture-mgmt-plane-firewall](../images/mgmt-plane-firewall.png)
+![isv-pod-architecture-mgmt-plane-firewall](../../design/images/mgmt-plane-firewall.png)

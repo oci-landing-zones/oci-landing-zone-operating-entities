@@ -29,4 +29,4 @@ Input Configuration Files | Input Dependency Files | Generated Output
 
 The resources in red color are added.
 
-![isv-pod-architecture-customer-1](../images/customer1.png)
+![isv-pod-architecture-customer-1](../../design/images/customer1.png)
