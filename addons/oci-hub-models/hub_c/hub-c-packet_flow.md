@@ -36,7 +36,7 @@ The firewalls have been configured with the following static route rules:
 | Network | Description | Gateway | Description | Interface |
 | --- | --- | --- | --- | --- |
 | 0.0.0.0/0 | To the Internet   | 10.0.0.1 | Default Gateway of Untrust subnet | vNIC 1 |
-| 10.0.2.0/24 | CIDR of LBaaS subnet | 10.0.0.1 | Default Gateway of Trust subnet | vNIC 1 |
+| 10.0.2.0/24 | CIDR of LBaaS subnet | 10.0.0.1 | Default Gateway of Untrust subnet | vNIC 1 |
 | 192.168.10.0/24 | CIDR of VCN Spoke A | 10.0.1.1 | Default Gateway of Trust subnet | vNIC 2 |
 | 192.168.20.0/24 | CIDR of VCN Spoke B | 10.0.1.1 | Default Gateway of Trust subnet | vNIC 2 |
 
@@ -90,7 +90,7 @@ A user from the Internet attempts to access *a.example.com*, which is hosted on 
 
 <img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/oci-hub-models/hub_c/hub_c_east_west.gif" width="600" />
 
-**VM-A** initiates a communication with **VM-B**. The packet goes through the Dynamic Routing Gateway (DRG) and and is forced by the VCN route table - **RT: vcn-hub-ingress** to choose as the next-hop **NLB-Trust**. Then it selects one of the backend firewalls and uses symmetric hashing to calculate the same hash for packets in both, forward and return directions. The firewall inspects the packet and routes it back to the DRG, based on its internal static routes ([*Table 1*](#Third-Party-Network-Firewall-configuration)) and VCN route table - **RT: vcn-hub-subnet-trust**, which is associated with **subnet-hub-trust** subnet. The response packet follows a similar flow to get back to the **VM-A**.
+**VM-A** initiates a communication with **VM-B**. The packet goes through the Dynamic Routing Gateway (DRG) and is forced by the VCN route table - **RT: vcn-hub-ingress** to choose as the next-hop **NLB-Trust**. Then it selects one of the backend firewalls and uses symmetric hashing to calculate the same hash for packets in both, forward and return directions. The firewall inspects the packet and routes it back to the DRG, based on its internal static routes ([*Table 1*](#Third-Party-Network-Firewall-configuration)) and VCN route table - **RT: vcn-hub-subnet-trust**, which is associated with **subnet-hub-trust** subnet. The response packet follows a similar flow to get back to the **VM-A**.
 
 &nbsp; 
 
