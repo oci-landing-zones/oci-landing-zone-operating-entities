@@ -1,0 +1,20 @@
+{
+    "logging_configuration" : {
+
+        "default_compartment_id" : "SHARED-LOGGING-CMP",
+        
+        "log_groups" : {
+            "VCN-FLOW-LOG-GROUP" : {
+                "name" : "vcn-flow-log-group"
+            }
+        },
+    
+        "flow_logs" : {
+            "VCN-FLOW-LOGS" : {
+                "log_group_id" : "VCN-FLOW-LOG-GROUP",
+                "target_compartment_ids" : ["SHARED-NETWORK-CMP"],
+                "target_resource_type" : "vcn"
+            }
+        }
+    }
+}  
