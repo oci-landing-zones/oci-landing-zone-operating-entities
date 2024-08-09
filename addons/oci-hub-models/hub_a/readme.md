@@ -27,7 +27,7 @@ The first firewall is dedicated to inbound traffic, while the second is responsi
     2. public-subnet for Public Load Balancers
 - Four regional private subnets (depicted in dark-orange)
     1. private-subnet for Internal OCI Network Firewall
-    2. private-subnet for managment workloads
+    2. private-subnet for management workloads
     3. private-subnet for logs
     4. private-subnet for DNS (for OCI DNS resolver endpoints)
 - Internet Gateway
