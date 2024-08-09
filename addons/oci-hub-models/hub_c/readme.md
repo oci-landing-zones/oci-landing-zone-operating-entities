@@ -32,7 +32,7 @@
     2. public-subnet for Load Balancer (LBaaS)
 - Four regional private subnets (depicted in dark-orange)
     1. private-subnet for Internal Network Load Balancer (NLB-Trust) and the internal interfaces of the firewalls (vNIC2)
-    2. private-subnet for managment workloads (depending on the 3rd-party firewall vendor, additional interfaces may be created here, such as a management network interfaces)
+    2. private-subnet for management workloads (depending on the 3rd-party firewall vendor, additional interfaces may be created here, such as a management network interfaces)
     3. private-subnet for logs
     4. private-subnet for DNS (for OCI DNS resolver endpoints)
 - Internet Gateway
@@ -78,7 +78,7 @@ For a comprehensive understanding of how network packets flow within **Hub C** a
 
 ### 5. Automation
 
-For automating this Hub model use the [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) Terraform modules. As an example configuration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/one-oe/runtime/one-click/oci_open_lz_one-oe_network.auto.tfvars.json).
+For automating this Hub model use the [CIS Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking) Terraform modules. As an example configuration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/one-oe/runtime/one-click/oci_open_lz_one-oe_network.auto.tfvars.json).
 
 
 &nbsp; 

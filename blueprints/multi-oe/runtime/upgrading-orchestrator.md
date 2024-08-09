@@ -172,7 +172,7 @@ Here you have the details to backup the different elements:
 
 To update the configuration, follow these steps:
 
-1. **Download the new orchestrator**. Access [this](https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/heads/main.zip) link and download in the new repository contents in your computer.
+1. **Download the new orchestrator**. Access [this](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/heads/main.zip) link and download in the new repository contents in your computer.
    
 2. **Edit the stack**. On your stack, click on the *Edit* button and click on *Edit stack*. 
    * ***Stack information section***:

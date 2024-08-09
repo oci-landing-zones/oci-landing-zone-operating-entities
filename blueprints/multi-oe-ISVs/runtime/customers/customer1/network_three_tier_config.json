@@ -1,0 +1,209 @@
+{
+    "network_configuration" : {
+      "default_enable_cis_checks" : true,
+      "default_compartment_id" : "CUSTOMER-1-CMP",
+  
+      "network_configuration_categories" : {
+        "production" : {
+          "vcns" : {
+            "THREE-TIER-VCN" : {
+              "display_name"                     : "three-tier-vcn",
+              "is_ipv6enabled"                   : false,
+              "is_oracle_gua_allocation_enabled" : false,
+              "cidr_blocks"                      : ["10.0.0.0/25"],
+              "dns_label"                        : "threetiervcn",
+              "block_nat_traffic"                : false,
+  
+              "subnets" : {
+                "THREE-TIER-VCN-WEB-SUBNET" : {
+                  "cidr_block"                 : "10.0.0.0/27",
+                  "dhcp_options_key"           : "default_dhcp_options",
+                  "display_name"               : "web-subnet",
+                  "dns_label"                  : "web",
+                  "ipv6cidr_blocks"            : [],
+                  "prohibit_internet_ingress"  : true,
+                  "prohibit_public_ip_on_vnic" : true,
+                  "route_table_key"            : "THREE-TIER-VCN-WEB-SUBNET-ROUTE",
+                  "security_list_keys"         : ["THREE-TIER-VCN-SL"]
+                },
+                "THREE-TIER-VCN-APP-SUBNET" : {
+                  "cidr_block"                 : "10.0.0.32/27",
+                  "dhcp_options_key"           : "default_dhcp_options",
+                  "display_name"               : "app-subnet",
+                  "dns_label"                  : "app",
+                  "ipv6cidr_blocks"            : [],
+                  "prohibit_internet_ingress"  : true,
+                  "prohibit_public_ip_on_vnic" : true,
+                  "route_table_key"            : "THREE-TIER-VCN-APP-SUBNET-ROUTE",
+                  "security_list_keys"         : ["THREE-TIER-VCN-SL"]
+                },
+                "THREE-TIER-VCN-DB-SUBNET" : {
+                  "cidr_block"                 : "10.0.0.64/27",
+                  "dhcp_options_key"           : "default_dhcp_options",
+                  "display_name"               : "db-subnet",
+                  "dns_label"                  : "db",
+                  "ipv6cidr_blocks"            : [],
+                  "prohibit_internet_ingress"  : true,
+                  "prohibit_public_ip_on_vnic" : true,
+                  "route_table_key"            : "THREE-TIER-VCN-DB-SUBNET-ROUTE",
+                  "security_list_keys"         : ["THREE-TIER-VCN-SL"]
+                }
+              },
+  
+              "security_lists" : {
+                "THREE-TIER-VCN-SL" : {
+                  "display_name" : "basic-sl",
+                  "ingress_rules" : [
+                    {
+                      "description"  : "Ingress on UDP type 3 code 4.",
+                      "stateless"    : false,
+                      "protocol"     : "UDP",
+                      "src"          : "0.0.0.0/0",
+                      "src_type"     : "CIDR_BLOCK",
+                      "icmp_type"    : 3,
+                      "icmp_code"    : 4
+                    }
+                  ],
+                  "egress_rules" : []
+                }
+              },
+  
+              "route_tables" : {
+                "THREE-TIER-VCN-WEB-SUBNET-ROUTE" : {
+                  "display_name" : "web-subnet-route-table",
+                  "route_rules" : {
+                    "DRG-RULE" : {
+                      "network_entity_key" : "CENTRAL-HUB-DRG",
+                      "description"        : "To DRG.",
+                      "destination"        : "0.0.0.0/0",
+                      "destination_type"   : "CIDR_BLOCK"
+                    }
+                  }
+                },
+                "THREE-TIER-VCN-APP-SUBNET-ROUTE" : {
+                  "display_name" : "app-subnet-route-table",
+                  "route_rules" : {
+                    "DRG-RULE" : {
+                      "network_entity_key" : "CENTRAL-HUB-DRG",
+                      "description"        : "To DRG.",
+                      "destination"        : "0.0.0.0/0",
+                      "destination_type"   : "CIDR_BLOCK"
+                    }
+                  }
+                },
+                "THREE-TIER-VCN-DB-SUBNET-ROUTE" : {
+                  "display_name" : "db-subnet-route-table",
+                  "route_rules" : {
+                    "DRG-RULE" : {
+                      "network_entity_key" : "CENTRAL-HUB-DRG",
+                      "description"        : "To DRG.",
+                      "destination"        : "0.0.0.0/0",
+                      "destination_type"   : "CIDR_BLOCK"
+                    }
+                  }
+                }
+              },
+  
+              "network_security_groups" : {
+                "THREE-TIER-VCN-BASTION-NSG" : {
+                  "display_name" : "bastion-nsg",
+                  "ingress_rules" : {
+                    "FROM-ON-PREM-SSH" : {
+                      "description"  : "Ingress from on-prem on SSH port 22.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "189.6.81.101/32",
+                      "src_type"     : "CIDR_BLOCK",
+                      "dst_port_min" : 22,
+                      "dst_port_max" : 22
+                    }
+                  }
+                },
+                "THREE-TIER-VCN-LBR-NSG" : {
+                  "display_name" : "lbr-nsg",
+                  "ingress_rules" : {
+                    "FROM-ANYWHERE-HTTPS" : {
+                      "description"  : "Ingress from 0.0.0.0/0 on HTTP port 443.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "0.0.0.0/0",
+                      "src_type"     : "CIDR_BLOCK",
+                      "dst_port_min" : 443,
+                      "dst_port_max" : 443
+                    }
+                  },
+                  "egress_rules" : {
+                    "TO-APP-NSG" : {
+                      "description" : "Egress to App NSG.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "THREE-TIER-VCN-APP-NSG",
+                      "dst_type"    : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min": 80,
+                      "dst_port_max": 80
+                    }
+                  }
+                },
+                "THREE-TIER-VCN-APP-NSG" : {
+                  "display_name" : "app-nsg",
+                  "ingress_rules" : {
+                    "FROM-LBR-NSG" : {
+                      "description"  : "Ingress from LBR NSG",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "THREE-TIER-VCN-LBR-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 80,
+                      "dst_port_max" : 80
+                    }
+                  }, 
+                  "egress_rules" : {
+                    "TO-DB-NSG" : {
+                      "description"  : "Egress to DB NSG",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "dst"          : "THREE-TIER-VCN-DB-NSG",
+                      "dst_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 1521,
+                      "dst_port_max" : 1522
+                    }
+                  }
+                },
+                "THREE-TIER-VCN-DB-NSG" : {
+                  "display_name" : "db-nsg",
+                  "ingress_rules" : {
+                    "FROM-APP-NSG" : {
+                      "description"  : "Ingress from App NSG",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "THREE-TIER-VCN-APP-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 1521,
+                      "dst_port_max" : 1522
+                    }
+                  }
+                }
+              }
+            }
+          },
+  
+          "non_vcn_specific_gateways" : {
+            "inject_into_existing_drgs" : {
+              "CUSTOMER-1-CENTRAL-HUB-DRG-INJECT" : {
+                "drg_id" : "CENTRAL-HUB-DRG",
+                "drg_attachments" : {
+                  "CUSTOMER-1-THREE-TIER-VCN-ATTACH" : {
+                    "display_name" : "customer1-three-tier-vcn-attachment",
+                    "network_details" : {
+                      "attached_resource_key" : "THREE-TIER-VCN",
+                      "type" : "VCN"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }  
+}
