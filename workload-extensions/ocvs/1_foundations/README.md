@@ -15,7 +15,7 @@
 
 ## **1. Summary**
 
-<a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.3.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
+<a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
 
 *Use the link above to run this extension by adding the updated configuration*
 
@@ -105,7 +105,7 @@ This configuration covers the following networking diagram.
 
 &nbsp; 
 
-For customization of the pre-defined setup please refer to the [Networking documentation](https://github.com/oci-landing-zones/terraform-oci-modules-networking) for documentation and examples.
+For customization of the pre-defined setup please refer to the [Networking documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) for documentation and examples.
 
 The network layer covers the following resources:
 
@@ -120,7 +120,7 @@ The network layer covers the following resources:
 &nbsp; 
 
 ## **4. Deploy**
-<a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.3.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
+<a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
 
 Use the link above to deploy using [Oracle Resource Manager (ORM)](/commons/content/orm.md) or use [Terraform CLI](/commons/content/terraform.md)
 

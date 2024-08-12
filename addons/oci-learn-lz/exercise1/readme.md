@@ -14,7 +14,7 @@
 
 Welcome to the **Open Learn LZ** Exercise #1. 
 
-The main objective is to **create**, **version**, and **run** the IaC configurations for the OCI Learn LZ Tenancy Structure focusing on IaC configurations and not on code, The [OCI Landing Zones Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator) is a generic Terraform module that orchestrates the creation of Landing Zone architectures expressed in a single or multiple configuration files, that can be JSON documents and YAML documents.
+The main objective is to **create**, **version**, and **run** the IaC configurations for the OCI Learn LZ Tenancy Structure focusing on IaC configurations and not on code, The [OCI Landing Zones Orchestrator](https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator) is a generic Terraform module that orchestrates the creation of Landing Zone architectures expressed in a single or multiple configuration files, that can be JSON documents and YAML documents.
 
 In this example we use YAML configurations files, but JSON files examples are also provided.
 
@@ -93,7 +93,7 @@ In this example we use YAML configurations files, but JSON files examples are al
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---| 
-| **1** | Create a new ORM Stack: [![Deploy_To_OCI](/commons/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.3.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/addons/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_solution.yml"}) |
+| **1** | Create a new ORM Stack: [![Deploy_To_OCI](/commons/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/addons/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_solution.yml"}) |
 | **2** | Accept terms,  **wait** for the configuration to load. |
 | **3** | Set the working directory to “**rms-facade**”. | 
 | **4** | Set the stack **name** you prefer. | 

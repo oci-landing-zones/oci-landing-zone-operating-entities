@@ -27,7 +27,7 @@ The first firewall is dedicated to inbound traffic, while the second is responsi
     2. public-subnet for Public Load Balancers
 - Four regional private subnets (depicted in dark-orange)
     1. private-subnet for Internal OCI Network Firewall
-    2. private-subnet for management workloads
+    2. private-subnet for managment workloads
     3. private-subnet for logs
     4. private-subnet for DNS (for OCI DNS resolver endpoints)
 - Internet Gateway
@@ -73,7 +73,7 @@ For a comprehensive understanding of how network packets flow within **Hub A** a
 
 ### 5. Automation
 
-For automating this Hub model use the [CIS Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking) Terraform modules. As an example configuration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_network.auto.tfvars.json).
+For automating this Hub model use the [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) Terraform modules. As an example configuration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_network.auto.tfvars.json).
 
 
 

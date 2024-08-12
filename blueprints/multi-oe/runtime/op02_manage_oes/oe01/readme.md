@@ -23,7 +23,7 @@
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: VCN, Subnets, SL and RT. |
 | **IAM CONFIG**| [open_lz_oe_01_identity.auto.tfvars.json](open_lz_oe_01_identity.auto.tfvars.json)|
 | **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](open_lz_oe_01_network.auto.tfvars.json) |
-| **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking)  |
+| **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)  |
 | **DETAILS** |  For more details refer to the [OCI Open LZ Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | [OP.01 Shared Services](../../op01_manage_shared_services/readme.md) executed. Update network config with OCID of the hub. |
 | **POST-ACTIVITIES** | **POST.OP02.01** The first execution of this operation by the Central IT team requires the hand-over to the target OE Operations team the OCIDs for their OE core resources</br> [**POST.OP.02.02**](./post_op02_02_update_dynamic_groups/readme.md) Update the dynamic group instance.compartment.ocid with the OCID of the compartment of the dynamic groups members.</br> [**POST.OP.03.03**](./post_op02_03_update_iam_policies_project_team/readme.md) After the on-boarding of a new OE project, update IAM policies to give access to the OE Project Team to shared networking resources.|
@@ -254,7 +254,7 @@ For configuring the OCI Open LZ Shared Infrastructure Network layer open and edi
 
 You can customize this JSON configuration to fit your exact OCI Networking topology. This terraform automation is extremely versatile and can support any type of network topology. 
 
-For complete documentation and a larger set of examples on configuring an OCI networking topology using this JSON terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oci-landing-zones/terraform-oci-modules-networking) documentation and examples.
+For complete documentation and a larger set of examples on configuring an OCI networking topology using this JSON terraform automation approach please refer to the [OCI CIS Terraform Networking Module](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) documentation and examples.
 
 For a better understanding on this configuration example, check the [OE01 network configuration explained](oe01_network_config_explained.md) page.
 
@@ -264,7 +264,7 @@ For a better understanding on this configuration example, check the [OE01 networ
 
 | STEP |  ACTION |
 |---|---| 
-| **1** |  [<img src="../../../../../commons/images/DeployToOCI.svg"  height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.3.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json"})  |
+| **1** |  [<img src="../../../../../commons/images/DeployToOCI.svg"  height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_identity.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/examples/oci-open-lz/op02_manage_oes/oe01/open_lz_oe_01_network.auto.tfvars.json"})  |
 | **2** | Accept terms,  wait for the configuration to load. |
 | **3** | Set the working directory to “rms-facade”. | 
 | **4** | Set the stack name you prefer. | 
