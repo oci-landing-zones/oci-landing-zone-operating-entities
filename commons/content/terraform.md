@@ -16,15 +16,15 @@
 For authenticating against the OCI tenancy terraform execute the following [instructions](/commons/content/terraform_authentication.md).
 ### **2 Clone this Git repo to your Machine**
 ```
-git clone git@github.com:oracle-quickstart/terraform-oci-open-lz.git
+git clone git@github.com:oci-landing-zones/terraform-oci-open-lz.git
 ```
 ### **3 Clone the orchestrator Git repo to your Machine**
 Cloning the latest version:
 ```
-git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git
+git clone git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git
 ```
 ###  **4 Change the Directory to the Terraform Orchestrator Module**
-Change the directory to the *terraform-oci-landing-zones-orchestrator* Terraform orchestrator module.
+Change the directory to the *terraform-oci-modules-orchestrator* Terraform orchestrator module.
 ### **5 Run ```terraform init```**
 Run ```terraform init``` to download all the required external terraform providers and Terraform modules.
 ### **6 Run ```terraform plan```**
