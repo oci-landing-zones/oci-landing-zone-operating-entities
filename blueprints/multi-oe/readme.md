@@ -19,7 +19,7 @@ Find below the guides to your design and deployment activities.
 
 &nbsp;
 
-| # | Description | Format   | Generic </br>Model v1 | Generic</br>Model v2 | SaaS </br>Model
+| # | Description | Format   | Generic</br>Model&nbsp;v1 | Generic</br>Model&nbsp;v2 | SaaS </br>Model
 |---|---|:-:|:-:|:-:|:-:|
 | 1 | High-level Design - MD | <img src="../../commons/images/icon_md.jpg" width="45">  |  [Available](/blueprints/multi-oe/generic_v1/design/readme.md) | *Available Soon* | [Available](/blueprints/multi-oe/saas/design/readme.md)
 | 2 | High-level Design - Drawio | <img src="../../commons/images/icon_drawio.jpg" width="30"> | [Available](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) | [Available](/blueprints/multi-oe/generic_v2/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) | [Available](/blueprints/multi-oe/saas/design/OCI_Open_LZ_Multi-OE_SaaS_Blueprint.drawio) |
