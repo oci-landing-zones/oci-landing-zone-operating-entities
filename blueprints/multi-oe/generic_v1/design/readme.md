@@ -45,7 +45,7 @@ Welcome to the **OCI Open LZ**, the **Op**erating **En**tities **L**anding **Z**
 <img src="images/oci_open_lz_hl_design.jpg" alt= “” width="1000" height="value">
 &nbsp; 
 
-| # | CHARECTERISTICS| DESCRIPTION   | 
+| # | CHARACTERISTICS| DESCRIPTION   | 
 |---|---|---|
 | 1 | **Enterprise Organization / Horizontal Scaling**| The OCI Open LZ is designed to simplify the OCI onboarding of an enterprise organization, and its Operating Entities (OE) with their teams, departments, and projects.
 | 2 | **Project-Driven Structure / Vertical Scaling** | The OCI Open LZ is ready to onboard several projects and environments, as a base for their related workloads.
