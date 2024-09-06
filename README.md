@@ -49,21 +49,23 @@ The OCI Open LZ uses a [declarative Infrastructure-as-Code (IaC)](https://github
 | [OCI Landing Zones Observability][oci-lz-observability] | Covers OCI Monitoring resources (e.g., Logging, Events, Alarms, Notifications, etc.).
 | [OCI Landing Zones Governance][oci-lz-governance] | Covers OCI Tagging.
 
+&nbsp; 
+
 ## Contributing
 
-*If your project has specific contribution requirements, update the CONTRIBUTING.md file to ensure those requirements are clearly explained*
 
 This project welcomes contributions from the community. Before submitting a pull request, please [review our contribution guide](./CONTRIBUTING.md)
 
+&nbsp; 
 ## Security
 
 Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
 
 &nbsp; 
 
-&nbsp; 
 
-# License
+
+## License
 
 Copyright (c) 2024 Oracle and/or its affiliates.
 

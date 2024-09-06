@@ -28,8 +28,6 @@ Find below the guides to your design and deployment activities.
 
 
 
-&nbsp; 
-
 
 
 &nbsp; 
