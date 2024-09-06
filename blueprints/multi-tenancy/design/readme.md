@@ -1,6 +1,6 @@
 # **The OCI Open LZ &ndash; Multi-Tenancy [Blueprint](#)**
 
-### A Blueprint to Simplify the Onboarding of Organizations, Business Units, and Subsidiaries into OCI
+### A Blueprint to Simplify the Onboarding of All Your Organizations, Business Units, and Subsidiaries into OCI
 
 &nbsp; 
 
@@ -47,16 +47,17 @@ The OCI Multi-Tenancy Landing Zone, is a secure cloud environment, designed with
 
 &nbsp; 
 
+&nbsp; 
+
 | # | CHARACTERISTICS| DESCRIPTION   | 
 |---|---|---|
-| 1 | **Two Entity Types** | There are two types of entities in this blueprint, the ones that provide central shared services to their customers and the customers themselves. The former is a Central Operating Entity (OE) and the latter are organization, customers, or partners OEs.
-| 2 | **Central Operating Entity**| This type of entity provides central shared services to all OEs customers and their tenancies. The Connectivity Hub (CH) is an example of this type of services, where all OEs can be connected to the CH, which will control network traffic in and out of OCI.
-| 3 | **Customer Operating Entities**| An Operating Entities is responsible for the operation of their Tenancy. Note that a customer in this case can be seen as a organization, brand, partner, LoB, Departments, etc. It's teams, and even their possible OE "customers" with their workloads, will be deplopyed and run in a standard and homologated landing zone blueprint.
-| 4 | **Blueprints Catalog** | This element provides a pre-defined set of Landing Zones Blueprints. Each OE can choose the most suitable blueprint available on a catalog of standard blueprints. In this case the One-OE or Multi-OE Blueprints are used, but on a customer scenario these options can be adjusted to any other Landing Zone blueprints. It is recommented that all tenancies follow a blueprint standard, but there might be some cases described below where this can be difficult to enforce.
-| 5 | **Tenancy Types** | There will be available several tenancy types for each Blueprint, such as centrally connected, unconnected, managed or unmanaged, which are flavours of blueprints in terms of security, network, and operations. At onboarding type, each Customer OE has to choose the Landing Zone Blueprint and its Tenancy Type.
-| 6 | **Secure Onboarding** | .
-| 7 | **Cloud Native Operating Model** | The Landing Zone blueprint can be operated with a complete GitOps operating model on day two, using control version repositories as the single source of truth for operations and code. The OCI Open LZ uses a 100% declarative Infrastructure as Code (IaC) approach, with IaC configurations on git-versioned repositories.
-| 8 | **Automation Patterns** | The Landing Zone blueprint has a set of operations scenarios for provisioning and changing resources, providing the building blocks to design and automate any other repeatable operations.
+| 1 | **Two Operating Entity Types** | There are two types of entities in this blueprint, the ones that provide central shared services to their clients and the clients themselves. The former is a Central Operating Entity (OE) which is nornally part of a central IT responsibility, while  the latter are organization, LoBs, brands, products, or partners teams that will use OCI with their tenancies.
+| 2 | **Central Operating Entity** | This type of entity provides central shared services to all OEs customers and their tenancies. A central OE is normally a central team that controls and governs the OCI Multi-Tenancy. Examples of these services can be the Connectivity Hub (CH), where all OEs tenancies can be connected to the CH, which will control network traffic in and out of OCI.
+| 3 | **Client Operating Entities**|  A client OE can be seen as a organization, brand, partner, LoB, Departments, etc. that will use OCI in the customer organization. Each Client OE will have its dedicated tenancy. Their teams, and even their possible internal "customers" with their workloads, will be onboard and run OCI in a standard and homologated landing zone blueprint.
+| 4 | **Blueprints Catalog** | This element provides a pre-defined and homologated set of Landing Zones Blueprints. Each Client OE can choose the most suitable blueprint available on a catalog of standard blueprints. In the Multi-Tenancy Blueprint the One-OE or Multi-OE Blueprints are used, but on a customer scenario these options can be adjusted to any other Landing Zone Blueprints. It is recommented that all tenancies follow a blueprint standard, to reduce governance and operational cost, and avoid unsecured tenancies that can pose a treath to the Multi-Tenancy construct. 
+| 5 | **Secure Onboarding** | This blueprint proposes a high-level workflow to guide the secure onboarding of each Client OE into OCI, from the tenancy activation to the landing zone creation.
+| 6 | **Cloud Native Operating Model** | The Landing Zone blueprint can be operated with a complete GitOps operating model on day two, using control version repositories as the single source of truth for operations and code. The OCI Open LZ uses a 100% declarative Infrastructure as Code (IaC) approach, with IaC configurations on git-versioned repositories.
+| 7 | **Automation Patterns** | The Landing Zone blueprint has a set of operations scenarios for provisioning and changing resources, providing the building blocks to design and automate any other repeatable operations.
 
 &nbsp; 
 
@@ -83,7 +84,26 @@ Before proceeding, it’s highly recommended OCI foundational knowledge of its c
 
 # **2. Functional View**
 
-This chapter will be added soon.
+## 2.1 User Stories
+
+&nbsp; 
+
+## 2.2 Blueprint Catalogue
+
+
+ **Tenancy Types**: As part of the Blueprints Catalog, there will be available several tenancy types flavors for each Blueprint, such as centrally connected, unconnected, managed or unmanaged, which are the same blueprints with minor design diferences in terms of security, network, and operations. At onboarding type, each Client OE has to choose the Landing Zone Blueprint and its Tenancy Type.
+
+&nbsp; 
+
+## 2.3 Tenancy Models
+
+&nbsp; 
+
+## 2.4 Secure Onboarding
+
+&nbsp; 
+
+## 2.6 DRCC & Alloy
 
 &nbsp; 
 &nbsp; 
