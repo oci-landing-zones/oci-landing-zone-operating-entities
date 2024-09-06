@@ -49,25 +49,24 @@ The OCI Multi-Tenancy Landing Zone, is a secure cloud environment, designed with
 
 | # | CHARACTERISTICS| DESCRIPTION   | 
 |---|---|---|
-| 1 | **Two Entity Types** | There are two types of entities in this blueprint, the ones that provide shared services to their customers (Operating Entities - OEs), and the OEs themselves. 
-| 1 | **Central Shared Services Tenancies**| This type of tenancy is used for central shared services to all OEs tenancies. The Connectivity Hub (CH) is an example of this type of services. All OEs tenancies can be connected to the CH, which will control network traffic in and out of OCI.
-| 1 | **Operating Entities </br>Tenancies**| Operating Entities tenancies can choose between a catalog of standard blueprints, according to their needs. In this case the One-OE or Multi-OE Blueprints are used, but on a customer scenario these options can be adjusted to any other Landing Zone blueprint. It is recommented that all tenancies follow a blueprint standard, but there are some cases described below where this cannot be enforced.
-| 2 | **Project-Driven Structure / Vertical Scaling** | The Landing Zone blueprint is ready to onboard several types of in form of Projects and Platforms. Platforms can be cross-environment or dedicated to an environment.
-| 3 | **Multi-Cloud / Multi-Region** | The Landing Zone blueprint can exist in several OCI regions and be connected to other landing zones in other CSPs. It can also participate in a Multi-tenancy Landing Zone.
-| 4 | **Segregation of Duties**  | The Landing Zone blueprint elements are segregated in terms of identity and access management. There is a segregation of resources for shared services elements and environments. Each of these elements and sub-elements can have dedicated owners.
-| 5 | **Isolation of Resources**| The Landing Zone blueprint has an isolation of resources at the network level in the different tenancies and among tenancies. The network structure is organized by environments (production and non-production) and resources in those environments are isolated at the platform or project level, with their own security posture.
-| 6 | **Cloud Native Operating Model** | The Landing Zone blueprint can be operated with a complete GitOps operating model on day two, using control version repositories as the single source of truth for operations and code. The OCI Open LZ uses a 100% declarative Infrastructure as Code (IaC) approach, with IaC configurations on git-versioned repositories.
-| 7 | **Automation Patterns** | The Landing Zone blueprint has a set of operations scenarios for provisioning and changing resources, providing the building blocks to design and automate any other repeatable operations.
+| 1 | **Two Entity Types** | There are two types of entities in this blueprint, the ones that provide central shared services to their customers and the customers themselves. The former is a Central Operating Entity (OE) and the latter are organization, customers, or partners OEs.
+| 2 | **Central Operating Entity**| This type of entity provides central shared services to all OEs customers and their tenancies. The Connectivity Hub (CH) is an example of this type of services, where all OEs can be connected to the CH, which will control network traffic in and out of OCI.
+| 3 | **Customer Operating Entities**| An Operating Entities is responsible for the operation of their Tenancy. Note that a customer in this case can be seen as a organization, brand, partner, LoB, Departments, etc. It's teams, and even their possible OE "customers" with their workloads, will be deplopyed and run in a standard and homologated landing zone blueprint.
+| 4 | **Blueprints Catalog** | This element provides a pre-defined set of Landing Zones Blueprints. Each OE can choose the most suitable blueprint available on a catalog of standard blueprints. In this case the One-OE or Multi-OE Blueprints are used, but on a customer scenario these options can be adjusted to any other Landing Zone blueprints. It is recommented that all tenancies follow a blueprint standard, but there might be some cases described below where this can be difficult to enforce.
+| 5 | **Tenancy Types** | There will be available several tenancy types for each Blueprint, such as centrally connected, unconnected, managed or unmanaged, which are flavours of blueprints in terms of security, network, and operations. At onboarding type, each Customer OE has to choose the Landing Zone Blueprint and its Tenancy Type.
+| 6 | **Secure Onboarding** | .
+| 7 | **Cloud Native Operating Model** | The Landing Zone blueprint can be operated with a complete GitOps operating model on day two, using control version repositories as the single source of truth for operations and code. The OCI Open LZ uses a 100% declarative Infrastructure as Code (IaC) approach, with IaC configurations on git-versioned repositories.
+| 8 | **Automation Patterns** | The Landing Zone blueprint has a set of operations scenarios for provisioning and changing resources, providing the building blocks to design and automate any other repeatable operations.
 
 &nbsp; 
 
-If **cloud landing zones** are analogous to **airports**, the OCI Open LZ [One-OE Blueprint](#) is a highly secure and scalable airport with the possibility of having different terminals (Environments) with dedicated security posture (domestic, international, etc.) and potentially operated by different teams, where communication between those terminals, inside or outside the airport, is highly controlled and secured. 
+If **cloud landing zones** are analogous to **airports**, the OCI Open LZ [Multi-Tenancy Blueprint](#) is a connected set of highly secure and scalable airports providing service to a country, covering a set of areas (Tenancies) where each has the possibility of having different terminals (Environments) with dedicated security posture (domestic, international, etc.) and potentially operated by different teams, where communication between those terminals and airports is highly controlled and secured. 
 
 &nbsp; 
 
 ## **1.3 Scope and Organization**
 
-This One-OE Blueprint is presented with several design views built on top of each other, as an incremental and repeatable approach, that can be used and tailored by any customer or partner setting up an OCI Landing Zone. Each view is explored in a dedicated chapter:
+This Multi-Tenancy Blueprint is presented with several design views built on top of each other, as an incremental and repeatable approach, that can be used and tailored by any customer or partner setting up an OCI Landing Zone. Each view is explored in a dedicated chapter:
 1.	The **Functional View** presents the key concepts and user stories used in the design. 
 2.	The **Security View** presents the core building blocks of the tenancy organization and security design. 
 3.	The **Network View**, designed on top of the security, presents how network elements are structured, segregated, and connected to communicate with each other. 
@@ -83,27 +82,8 @@ Before proceeding, it’s highly recommended OCI foundational knowledge of its c
 &nbsp; 
 
 # **2. Functional View**
-The Landing Zone blueprint has a set of **functional elements** that are **key building blocks** used throughout this document – with the same code color – and ultimately are used to aggregate and operate a set of OCI resources. These elements are presented in the following diagram it’s crucial to understand them to understand the whole design. All elements are presented in detail in the [OCI Open LZ One-OE Drawio - Functional Tabs](/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio).  
 
-&nbsp; 
-
-<img src="images/2_functional_view_building_blocks.jpg" alt= “” width="1000" height="value">
-
-&nbsp; 
-
-The following diagram and table present the union between the personas and functional elements presented in the previous sections – in the form of user stories. The user stories identified match the building blocks, having two common stories between different personas: Shared Services and Platforms. Functionally and technically, they are the same, but in different areas of the landing zone, with different scopes, and different ownership. 
- 
-&nbsp; 
-
-<img src="images/2_functional_view_user_stories.jpg" alt= “” width="1000" height="value">
-
-&nbsp; 
-
-<img src="images/2_functional_view_user_stories_table.jpg" alt= “” width="700" height="value">
-
-&nbsp; 
-
-Note that the mapping of the stories and personas to the final cloud operations teams will vary and will depend on the customer's operational reality. Each of these teams and possible sub-teams will also need to match OCI Groups described in the next chapter.
+This chapter will be added soon.
 
 &nbsp; 
 &nbsp; 
