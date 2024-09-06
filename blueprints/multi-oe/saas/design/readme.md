@@ -90,7 +90,7 @@ The ISV Customers comaprtment (light blue) holds the different dedicated compart
 
 &nbsp; 
 
-# 3. Posture Management
+## 2.3 Posture Management
 
 **Oracle Cloud Guard:** activity, configuration, and threat detector recipes are defined at the tenancy level to examine your resources for security weaknesses and to monitor operators and users for risky activities.
 
@@ -104,6 +104,6 @@ The ISV Customers comaprtment (light blue) holds the different dedicated compart
 
 &nbsp; 
 
-## 4. Runtime View
-This chapter presents the **implementation** for the **day two execution** of this model, and is exaplained [here](/blueprints/multi-oe/saas/runtime/readme.md).
+# 4. Runtime View
+This chapter is presented [here](/blueprints/multi-oe/saas/runtime/readme.md) and guides the **deployment** activities for the **day two execution** of this model.
 
