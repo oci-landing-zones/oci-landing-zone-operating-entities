@@ -89,7 +89,7 @@ While the previous diagram presents the recommended steps of the journey to crea
 
 &nbsp; 
 
-<img src="../../images/1_oci_open_lz_layers.jpg" alt= “” width="350" height="value">
+<img src="/commons/images/1_oci_open_lz_layers.jpg" alt= “” width="350" height="value">
 
 &nbsp; 
 
