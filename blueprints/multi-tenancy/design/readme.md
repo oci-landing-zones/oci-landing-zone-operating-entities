@@ -8,9 +8,9 @@
 
 [1. Introduction](#1-introduction)</br>
 [2. Multi-Tenancy Epics](#2-multi-tenancy-epics)</br>
-[3. Onboarding a Client OE](#3-epic-1---onboarding-a-client-oe)</br>
-[4. Offboarding a Client OE](#4-epic-2---offboarding-a-client-oe)</br>
-[5. Change Client-OE Tenancy Type](#5-epic-3---change-client-oe-tenancy-type)</br>
+[3. Epic 1 - Onboarding a Client OE](#3-epic-1---onboarding-a-client-oe)</br>
+[4. Epic 2 - Offboarding a Client OE](#4-epic-2---offboarding-a-client-oe)</br>
+[5. Epic 3 - Change Client-OE Tenancy Type](#5-epic-3---change-client-oe-tenancy-type)</br>
 
 &nbsp; 
 
@@ -25,7 +25,7 @@ This document is a subset of the OCI Open LZ, and it provides an executive summa
 ## **1.1 Purpose**
 
 The purpose of this document is to:
-1. Provide a **multitenancy design** ready to onboard organization units (OU) and its functional divisions with their teams and projects. These OUs will be identified as **Client Operating Entities (OE)**, as there is an operating team (customer or partner) responsible for managing a set of resources.
+1. Provide a **multi-tenancy design** ready to onboard organization units (OU) and its functional divisions with their teams and projects. These OUs will be identified as **Client Operating Entities (OE)**, as there is an operating team (customer or partner) responsible for managing a set of resources.
 2. Present the repeatable **onboarding design** of **Client Operating Entities** into their tenancies, leveraging central and shared services - managed by a **Central Operating Entity**.
 3. **Enable customers, partners**, and the **general IT community** to **create landing zones** with lower efforts through a comprehensive Oracle Cloud Infrastructure (OCI) reference architecture. To support this objective, all the architecture diagrams are provided in a reusable format.
 4. **Provide tailoring guidelines** to help adjust the model. This asset can be used directly, tailored, or used as inspiration to create a new one - as it is not a prescribed solution.
