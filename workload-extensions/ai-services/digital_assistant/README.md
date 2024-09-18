@@ -1,4 +1,4 @@
-# Manage AI Service Digital Assistant Landing Zone Extension <!-- omit from toc -->
+# Digital Assistant Workload Extension <!-- omit from toc -->
 
 ## **Table of Contents** <!-- omit from toc -->
 
@@ -8,6 +8,13 @@
   - [**2.2 Groups**](#22-groups)
   - [**2.3 Policies**](#23-policies)
 - [**3. Setup Network Configuration**](#3-setup-network-configuration)
+  - [**3.1 VCNs**](#31-vcns)
+  - [**3.2 Subnets**](#32-subnets)
+  - [**3.3 Route Tables (RTs)**](#33-route-tables-rts)
+  - [**3.4 Security Lists (SLs)**](#34-security-lists-sls)
+  - [**3.5 Gateways**](#35-gateways)
+    - [**3.5.1 Dynamic Routing Gateway (DRGs) Attachments**](#351-dynamic-routing-gateway-drgs-attachments)
+    - [**3.5.2 Service Gateway (SGs)**](#352-service-gateway-sgs)
 - [**4. Run with ORM**](#4-run-with-orm)
 - [**5. Run with Terraform CLI**](#5-run-with-terraform-cli)
   - [**5.1 Setup Terraform Authentication**](#51-setup-terraform-authentication)
@@ -25,7 +32,7 @@
 
 |                           |                                                                                                                                                                |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **DEPLOYMENT NAME**              | Digital Assistant Landing Zone Extension                                                                                                                                    |
+| **DEPLOYMENT NAME**              | Digital Assistant Landing Zone Workload Extension                                                                                                                                    |
 | **OBJECTIVE**             | Provision OCI Digital Assistant Landing Zone IAM and Network Extensions.                                                                                                    |
 | **TARGET RESOURCES**      | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists                                                     |
 | **IAM CONFIGURATION**     | [digital_assistant_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/digital_assistant/digital_assistant_identity.auto.tfvars.json) |

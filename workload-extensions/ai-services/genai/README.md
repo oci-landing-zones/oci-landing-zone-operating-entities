@@ -1,4 +1,4 @@
-# Manage GENAI Landing Zone Extension <!-- omit from toc -->
+# Generative AI Workload Extension <!-- omit from toc -->
 
 ## **Table of Contents** <!-- omit from toc -->
 
@@ -7,15 +7,15 @@
   - [**2.1. Compartments**](#21-compartments)
   - [**2.2 Groups**](#22-groups)
   - [**2.3 Policies**](#23-policies)
-- [**3. Run with ORM**](#4-run-with-orm)
-- [**4. Run with Terraform CLI**](#5-run-with-terraform-cli)
-  - [**4.1 Setup Terraform Authentication**](#51-setup-terraform-authentication)
-  - [**4.2 Clone this Git repo to your Machine**](#52-clone-this-git-repo-to-your-machine)
-  - [**4.3 Clone the orchestrator Git repo to your Machine**](#53-clone-the-orchestrator-git-repo-to-your-machine)
-  - [**4.4 Change the Directory to the Terraform Orchestrator Module**](#54-change-the-directory-to-the-terraform-orchestrator-module)
-  - [**4.5 Run ```terraform init```**](#55-run-terraform-init)
-  - [**4.6 Run ```terraform plan```**](#56-run-terraform-plan)
-  - [**4.7 Run ```terraform apply```**](#57-run-terraform-apply)
+- [**3. Run with ORM**](#3-run-with-orm)
+- [**4. Run with Terraform CLI**](#4-run-with-terraform-cli)
+  - [**4.1 Setup Terraform Authentication**](#41-setup-terraform-authentication)
+  - [**4.2 Clone this Git repo to your Machine**](#42-clone-this-git-repo-to-your-machine)
+  - [**4.3 Clone the orchestrator Git repo to your Machine**](#43-clone-the-orchestrator-git-repo-to-your-machine)
+  - [**4.4 Change the Directory to the Terraform Orchestrator Module**](#44-change-the-directory-to-the-terraform-orchestrator-module)
+  - [**4.5 Run ```terraform init```**](#45-run-terraform-init)
+  - [**4.6 Run ```terraform plan```**](#46-run-terraform-plan)
+  - [**4.7 Run ```terraform apply```**](#47-run-terraform-apply)
 
 &nbsp; 
 
@@ -24,7 +24,7 @@
 
 |                           |                                                                                                                                                                |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **DEPLOYMENT NAME**              | GENAI Landing Zone Extension                                                                                                                                    |
+| **DEPLOYMENT NAME**              | GenAI Landing Zone Workload Extension                                                                                                                                    |
 | **OBJECTIVE**             | Provision OCI GENAI Landing Zone IAM Extensions.                                                                                                    |
 | **TARGET RESOURCES**      | **Security**: Compartments, Groups, Policies</br>                                                      |
 | **IAM CONFIGURATION**     | [genai_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/genai/genai_identity.auto.tfvars.json) |
