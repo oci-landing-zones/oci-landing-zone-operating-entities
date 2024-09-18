@@ -1,5 +1,5 @@
 # **[AI Services Landing Zone Extension](#)**   <!-- omit from toc -->
-## **An OCI Open LZ [Workload Extensions](#) to Reduce Your Time-to-Production**  <!-- omit from toc -->
+## **An OCI Open LZ [Workload Extensions](#) to Expand Your Value with Artificial Intelligence**  <!-- omit from toc -->
 
  <img src="diagrams/ai.png" height="50">
 

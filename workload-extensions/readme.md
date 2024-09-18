@@ -18,11 +18,12 @@ Find below the list of available workload landing zones and our backlog. Be free
 
 | # |  Workload  | Description | Status |
 |:--:|:--:|---|---|
-| 1 | [<img src="../commons/images/icon_ebs.jpg" height="25" align="center">](./ebs/)| An **EBS** Landing Zone Extension. | [Available](./ebs/) |
-| 2 | [<img src="../commons/images/icon_ocvs.jpg" height="25" align="center">](./ocvs) | An **OCVS** Landing Zone Extension. | [Available](./ocvs/) |
-| 3 | **OCI OKE** | An **OKE** Landing Zone Extension. | Available On Demand | 
-| 4 | **OCI ExaCS** | An **ExaCS** Landing Zone Extension. | Available On Demand | 
-| 5 | **ExaCC** | An **ExaCC** Landing Zone Extension. | Available On Demand | 
+| 1 | [<img src="../commons/images/icon_ebs.jpg" height="40" align="center">](./ebs/)| A Pluggable **EBS** Landing Zone Workload. | [Available](./ebs/) |
+| 2 | [<img src="../commons/images/icon_ocvs.jpg" height="30" align="center">](./ocvs) | A Pluggable  **OCVS** Landing Zone Workload. | [Available](./ocvs/) |
+| 3 | [<img src="./ai-services/diagrams/ai.png" height="30" align="center">](./ai-services) | A Pluggable **AI** Landing Zone Workload. |  [Available](./ai-services/) | 
+| 4 | **OCI OKE** | A Pluggable  **OKE** Landing Zone Extension. | Available On Demand | 
+| 5 | **OCI ExaCS** | A Pluggable  **ExaCS** Landing Zone Extension. | Available On Demand | 
+| 6 | **ExaCC** | A Pluggable  **ExaCC** Landing Zone Extension. | Available On Demand | 
 
 
 &nbsp; 
