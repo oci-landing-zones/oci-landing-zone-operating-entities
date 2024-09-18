@@ -28,7 +28,7 @@
 | **OBJECTIVE**             | Provision OCI Vision Service Landing Zone IAM Extensions.                                                                                                    |
 | **TARGET RESOURCES**      | **Security**: Compartments, Groups, Policies</br>                                                      |
 | **IAM CONFIGURATION**     | [vision_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/vision/vision_identity.auto.tfvars.json) |
-| **PRE-ACTIVITIES**        | Execute [Deploy OneOE LZ](../../.. one-oe/)                                                                                                                                              
+| **PRE-ACTIVITIES**        | Execute [Deploy One-OE LZ](../../../one-oe/)                                                                                                                                              
 | **RUN OPERATION**         | Use [ORM](#3-run-with-orm) or use [Terraform CLI](#4-run-with-terraform-cli).                                                                                  |
 
 
