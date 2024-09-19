@@ -35,9 +35,9 @@
 | **DEPLOYMENT NAME**              | Digital Assistant Landing Zone Workload Extension                                                                                                                                    |
 | **OBJECTIVE**             | Provision OCI Digital Assistant Landing Zone IAM and Network Extensions.                                                                                                    |
 | **TARGET RESOURCES**      | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists                                                     |
-| **IAM CONFIGURATION**     | [digital_assistant_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/digital_assistant/digital_assistant_identity.auto.tfvars.json) |
-| **NETWORK CONFIGURATION** | [digital_assistant_network.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/digital_assistant/digital_assistant_network.auto.tfvars.json)   |
-| **PRE-ACTIVITIES**        | Execute [Deploy One-OE LZ](../../blueprints/one-oe/)                                                                      |
+| **IAM CONFIGURATION**     | [digital_assistant_identity.auto.tfvars.json](/workload-extensions/ai-services/digital_assistant/digital_assistant_identity.auto.tfvars.json) |
+| **NETWORK CONFIGURATION** | [digital_assistant_network.auto.tfvars.json](/workload-extensions/ai-services/digital_assistant/digital_assistant_network.auto.tfvars.json)   |
+| **PRE-ACTIVITIES**        | Execute [Deploy One-OE LZ](../../../blueprints/one-oe/)                                                                      |
 | **RUN OPERATION**         | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli).                                                                                  |
 
 
