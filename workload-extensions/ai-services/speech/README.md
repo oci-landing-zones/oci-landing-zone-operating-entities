@@ -27,8 +27,8 @@
 | **DEPLOYMENT NAME**              | Speech Landing Zone Workload Extension                                                                                                                                    |
 | **OBJECTIVE**             | Provision OCI Speech Service Landing Zone IAM Extensions.                                                                                                    |
 | **TARGET RESOURCES**      | **Security**: Compartments, Groups, Policies</br>                                                      |
-| **IAM CONFIGURATION**     | [speech_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/speech/speech_identity.auto.tfvars.json) |
-| **PRE-ACTIVITIES**        | Execute [Deploy OneOE LZ](../../../one-oe/)                                                                                                                                              
+| **IAM CONFIGURATION**     | [speech_identity.auto.tfvars.json](/workload-extensions/ai-services/speech/speech_identity.auto.tfvars.json) |
+| **PRE-ACTIVITIES**        | Execute [Deploy One-OE LZ](../../../blueprints/one-oe/)                                                                                                                                              
 | **RUN OPERATION**         | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli).                                                                                  |
 
 
@@ -37,11 +37,11 @@
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the OneOE Landing Zone speech services extension Identity Layer use the following JSON file: [speech_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/speech/speech_identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the One-OE Landing Zone speech services extension Identity Layer use the following JSON file: [speech_identity.auto.tfvars.json](/workload-extensions/ai-services/speech/speech_identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file covers three categories of resources described in the next sections.
 
-This configuration file requires changes to reference the OCIDs of the OneOE Landing Zone resources which were deployed in [Deploy OneOE LZ](../../../one-oe/) step.
+This configuration file requires changes to reference the OCIDs of the One-OE Landing Zone resources which were deployed in [Deploy One-OE LZ](../../../blueprints/one-oe/) step.
 Search for the values indicated below and replace with the correct OCIDs:
 
 | Resource                  | OCID Text to Replace              | Description                        |
@@ -60,7 +60,7 @@ The diagram below identifies the compartments in the scope of this operation.
 
 The speech service extension provisions a single compartment under the production project area.
 
-OneOE Landing Zones defines multiple instances of platform compartment. Platform comparment is created **for each environement**, and **one shared** platform for resources spanning multiple environments. 
+One-OE Landing Zones defines multiple instances of platform compartment. Platform comparment is created **for each environement**, and **one shared** platform for resources spanning multiple environments. 
 
 Using this extension requires choosing the right platform for the use cases. Extension can be modified to provision multiple instances of the delpoyment. For customizations see the full [compartment resource documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/compartments).
 
@@ -123,7 +123,7 @@ Run ```terraform plan``` with the IAM and Network configuration.
 ```
 terraform plan \
 -var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ai-services/speech/speech_identity.auto.tfvars.json
+-var-file ../terraform-oci-open-lz/workload-extensions/ai-services/speech/speech_identity.auto.tfvars.json
 ```
 
 After the execution please analyze the output of the command above and check if it corresponds to your desired configuration.
@@ -137,7 +137,7 @@ Run terraform plan with the IAM and Network configuration. After  its execution 
 ```
 terraform apply \
 -var-file ../terraform-oci-open-lz/commons/content/oci-credentials.tfvars.json \
--var-file ../terraform-oci-open-lz/workload-extensions/oci-lz-ext-ai-services/speech/speech_identity.auto.tfvars.json
+-var-file ../terraform-oci-open-lz/workload-extensions/ai-services/speech/speech_identity.auto.tfvars.json
 ```
 
 
