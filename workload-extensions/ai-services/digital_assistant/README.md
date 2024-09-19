@@ -18,7 +18,7 @@
 - [**4. Run with ORM**](#4-run-with-orm)
 - [**5. Run with Terraform CLI**](#5-run-with-terraform-cli)
   - [**5.1 Setup Terraform Authentication**](#51-setup-terraform-authentication)
-  - [**5.2 Clone this Git repo to your Machine**](#52-clone-this-git-repo-to-your-machine)
+  - [**5.2 Cl this Git repo to your Machine**](#52-clone-this-git-repo-to-your-machine)
   - [**5.3 Clone the orchestrator Git repo to your Machine**](#53-clone-the-orchestrator-git-repo-to-your-machine)
   - [**5.4 Change the Directory to the Terraform Orchestrator Module**](#54-change-the-directory-to-the-terraform-orchestrator-module)
   - [**5.5 Run ```terraform init```**](#55-run-terraform-init)
@@ -37,7 +37,7 @@
 | **TARGET RESOURCES**      | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists                                                     |
 | **IAM CONFIGURATION**     | [digital_assistant_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/digital_assistant/digital_assistant_identity.auto.tfvars.json) |
 | **NETWORK CONFIGURATION** | [digital_assistant_network.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/digital_assistant/digital_assistant_network.auto.tfvars.json)   |
-| **PRE-ACTIVITIES**        | Execute [Deploy OneOE LZ](../../../one-oe/)                                                                      |
+| **PRE-ACTIVITIES**        | Execute [Deploy One-OE LZ](../../blueprints/one-oe/)                                                                      |
 | **RUN OPERATION**         | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli).                                                                                  |
 
 
@@ -46,9 +46,9 @@
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the OneOE Landing Zone Digital Assistant extension Identity Layer use the following JSON file: [digital_assistant_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/digital_assistant/digital_assistant_identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the One-OE Landing Zone Digital Assistant extension Identity Layer use the following JSON file: [digital_assistant_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/digital_assistant/digital_assistant_identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
-This configuration file requires changes to reference the OCIDs of the OneOE Landing Zone resources which were deployed in [Deploy OneOE LZ](../../../one-oe/) step.
+This configuration file requires changes to reference the OCIDs of the OneOE Landing Zone resources which were deployed in [Deploy OneOE LZ](../../blueprints/one-oe/) step.
 Search for the values indicated below and replace with the correct OCIDs:
 
 | Resource                  | OCID Text to Replace              | Description                        |
