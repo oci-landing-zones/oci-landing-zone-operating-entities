@@ -48,7 +48,7 @@
 
 For configuring and running the One-OE Landing Zone Digital Assistant extension Identity Layer use the following JSON file: [digital_assistant_identity.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/digital_assistant/digital_assistant_identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
-This configuration file requires changes to reference the OCIDs of the OneOE Landing Zone resources which were deployed in [Deploy OneOE LZ](../../blueprints/one-oe/) step.
+This configuration file requires changes to reference the OCIDs of the One-OE Landing Zone resources which were deployed in [Deploy One-OE LZ](../../blueprints/one-oe/) step.
 Search for the values indicated below and replace with the correct OCIDs:
 
 | Resource                  | OCID Text to Replace              | Description                        |
@@ -101,9 +101,9 @@ For customizations see the full [policy resource documentation](https://github.c
 
 ## **3. Setup Network Configuration**
 
-For configuring and running the OneOE LZ Digital Assistant extension Network layer use the following JSON file: [digital_assistant_network.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/digital_assistant/digital_assistant_network.auto.tfvars.json)
+For configuring and running the One-OE LZ Digital Assistant extension Network layer use the following JSON file: [digital_assistant_network.auto.tfvars.json](/workload-extensions/oci-lz-ext-ai-services/digital_assistant/digital_assistant_network.auto.tfvars.json)
 
-This configuration file will require changes to the resources to reference the OCIDs of the OneOE Landing Zone.
+This configuration file will require changes to the resources to reference the OCIDs of the One-OE Landing Zone.
 Search for the values indicated below and replace with the correct OCIDs:
 
 | Resource                 | OCID Text to Replace             | Description                                                      |
