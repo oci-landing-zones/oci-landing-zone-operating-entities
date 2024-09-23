@@ -1,12 +1,12 @@
-# **The OCI Open LZ &ndash; [Multi-OE Blueprint](#)**
+# **The OCI Open LZ &ndash; [Multi-OE Blueprints](#)**
 
 ### Simplifying the Onboarding of Organizations, Business Units, and Subsidiaries into OCI
 
 &nbsp; 
 
-Welcome to the **OCI Open LZ Multi-OE Blueprint**. 
+Welcome to the **OCI Open LZ Multi-OE Blueprints**. 
 
-This blueprint helps onboards **several** **Operating Entities (OE)** with shared services and dedicated **environments**, **platforms**, and **projects** for each OE, in **one tenancy**. 
+These blueprints helps onboards **several** **Operating Entities (OE)** with shared services and dedicated **environments**, **platforms**, and **projects** for each OE, in **one tenancy**. 
 
 There are two models available:
 1. **Generic Model**: It fits any organizational scope, with several Organization Units - such as LoBs, OpCos, Departments, Products, Brands, or Partners - in one tenancy. It can be used directly or tailored. **Note this model will be updated to version 2 soon**, matching the [One-OE](/blueprints/one-oe/runtime/) and [Multi-Tenancy Blueprint](/blueprints/multi-tenancy/readme.md) elements, with the same design and IaC building blocks such as Landing Zone Environment and Platforms. Reach out to review the new model before its published. 
