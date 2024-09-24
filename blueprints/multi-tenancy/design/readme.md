@@ -59,7 +59,7 @@ The OCI Multi-Tenancy Landing Zone is a secure cloud environment, designed with 
 
 &nbsp; 
 
-If **cloud landing zones** are analogous to **airports**, the OCI Open LZ [Multi-Tenancy Blueprint](#) is a connected set of highly secure and scalable airports providing service to a country, covering a set of areas (Tenancies) where each has the possibility of having different terminals (Environments) with dedicated security posture (domestic, international, etc.) and potentially operated by different teams, where communication between those terminals and airports is highly controlled and secured. 
+If **cloud landing zones** are analogous to **airports**, the OCI Open LZ [Multi-Tenancy Blueprint](#) is a connected set of highly secure and scalable airports (Tenancies) providing service to a country or region, where each airport can have different terminals (Environments) with dedicated security posture (domestic, international, etc.) and potentially operated by different teams, where communication between those terminals and airports is highly controlled and secured. 
 
 &nbsp; 
 
@@ -147,7 +147,7 @@ The **Central OE is responsible for the Catalog**, which is a conceptual element
 
 The **Client OE will have to make two decisions** and use the blueprint IaC later in [(E1.S4) Create OCI Landing Zone](#34-create-oci-landing-zone). 
 
-1. **Decide on The Blueprint**: The first decision is about the blueprint model. In this example, we would have the One-OE and Multi-OE blueprints. The criteria for choosing Multi-OE would be if this Clien OE would also onboard several of its sub-organizations (e.g., Departments, Products, etc.), otherwise, it would choose the One-OE which is a simpler model. The content of each catalog (number and type blueprint) can change from customer to customer, depending on their objectives, making it possible to have *N* or just one blueprint available. </br></br>
+1. **Decide on The Blueprint**: The first decision is about the blueprint model. In this example, we would have the [One-OE](/blueprints/one-oe/) and [Multi-OE](/blueprints/multi-oe/) blueprints. The criteria for choosing [Multi-OE](/blueprints/multi-oe/) would be if this Client OE would also onboard several of its sub-organizations (e.g., Departments, Products, etc.), otherwise, it would choose the [One-OE](/blueprints/one-oe/) which is a simpler model. The content of each catalog (number and type blueprint) can change from customer to customer, depending on their objectives, making it possible to have *N* or just one blueprint available. </br></br>
 2. **Decide on the Tenancy Type**: For the second decision it is important to introduce **two concepts that can be combined** (described in the diagram above in step 2 with blue tones): </br>
    </br> a. **Connectivity**: A tenancy can be **connected** to the Central OE tenancies to consume shared services and have north-south and east-west traffic control, or be **unconnected**, handling their own connectivity needs without leveraging shared elements in the multi-tenancy. </br>
    </br> b. **Management**: A tenancy can be **managed** by the Central OE team, for cases where the Client OE doesn't have the skills or capacity to do so, or **unmanaged**, where the Client OE is fully responsible for the management and operations of their own tenancy.   
