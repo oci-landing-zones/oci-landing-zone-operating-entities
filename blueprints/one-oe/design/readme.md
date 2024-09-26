@@ -51,7 +51,7 @@ The following diagram presents its seven key characteristics.
 
 &nbsp; 
 
-| # | CHARECTERISTICS| DESCRIPTION   | 
+| # | CHARACTERISTICS| DESCRIPTION   | 
 |---|---|---|
 | 1 | **Enterprise Organization / Horizontal Scaling**| The Landing Zone blueprint is designed to simplify the OCI onboarding of an enterprise organization and its workload environments, with their teams, platforms, and projects.
 | 2 | **Project-Driven Structure / Vertical Scaling** | The Landing Zone blueprint is ready to onboard several types of in form of Projects and Platforms. Platforms can be cross-environment or dedicated to an environment.
@@ -89,7 +89,7 @@ While the previous diagram presents the recommended steps of the journey to crea
 
 &nbsp; 
 
-<img src="../../images/1_oci_open_lz_layers.jpg" alt= “” width="350" height="value">
+<img src="/commons/images/1_oci_open_lz_layers.jpg" alt= “” width="350" height="value">
 
 &nbsp; 
 
@@ -227,7 +227,7 @@ For more details on the network design refer to the [OCI Open LZ One-OE Drawio -
 This chapter will be added soon.
 
 &nbsp; 
-&nbsp; v
+&nbsp; 
 
 # **6. Runtime View**
 This chapter will be added soon.

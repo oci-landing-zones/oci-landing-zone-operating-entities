@@ -25,8 +25,8 @@ This repository is the source of truth for the OCI Open LZ and includes three ty
 | <img src="commons/images/size_m.svg" width="23" align="center"> |...[`one-oe/`](blueprints/one-oe/) |  Onboards **[One](/blueprints/one-oe/readme.md) OE** with its environments, platforms, and projects in **one tenancy**. [<img src="commons/images/DeployToOCI.svg"  height="22" align="center">](/blueprints/one-oe/runtime/one-stack/readme.md)|
 |  <img src="commons/images/size_l.svg" width="23" align="center"> |...[`multi-oe/`](blueprints/multi-oe/) |  Onboards **[Multiple](/blueprints/multi-oe/readme.md) OEs** with shared services and OE-dedicated resources, sharing **one tenancy**. |
 | <img src="commons/images/size_xl.svg" width="23" align="center">  |...[`multi-tenancy/`](blueprints/multi-tenancy/) | Uses One-OE and Multi-OE to onboard all your organizations or customers into **several tenancies**.
-**2** |**[`addons/`](addons/)** | **Complement** your landing zone with add-ons to run OCI with best practices. (e.g., [Network Hubs](/addons/oci-hub-models/readme.md))|
-| **3** |**[`workload-extensions/`](workload-extensions/)** | **Extend** your landing zone with pluggable workload extensions (e.g., [EBS](/workload-extensions/ebs/readme.md), [OCVS](/workload-extensions/oci-lz-ext-ocvs/README.md), [...](/workload-extensions/readme.md)).|
+**2** |**[`addons/`](addons/)** | **Complement** your blueprint to run OCI with **best practices**. (e.g., [**Network Hubs**](/addons/oci-hub-models/readme.md), [**OAG**](/addons/oci-oag/README.md))|
+| **3** |**[`workload-extensions/`](workload-extensions/)** | **Extend** your landing zone with pluggable **workloads** (e.g., [**EBS**](/workload-extensions/ebs/readme.md), [**OCVS**](/workload-extensions/oci-lz-ext-ocvs/README.md), [**AI**](/workload-extensions/ai-services/) [...](/workload-extensions/readme.md)).|
 
 &nbsp; 
 
@@ -49,21 +49,23 @@ The OCI Open LZ uses a [declarative Infrastructure-as-Code (IaC)](https://github
 | [OCI Landing Zones Observability][oci-lz-observability] | Covers OCI Monitoring resources (e.g., Logging, Events, Alarms, Notifications, etc.).
 | [OCI Landing Zones Governance][oci-lz-governance] | Covers OCI Tagging.
 
+&nbsp; 
+
 ## Contributing
 
-*If your project has specific contribution requirements, update the CONTRIBUTING.md file to ensure those requirements are clearly explained*
 
 This project welcomes contributions from the community. Before submitting a pull request, please [review our contribution guide](./CONTRIBUTING.md)
 
+&nbsp; 
 ## Security
 
 Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
 
 &nbsp; 
 
-&nbsp; 
 
-# License
+
+## License
 
 Copyright (c) 2024 Oracle and/or its affiliates.
 
