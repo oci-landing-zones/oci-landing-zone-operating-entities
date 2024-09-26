@@ -1,6 +1,6 @@
 
 # **[Oracle Access Governance for OCI](#)**
-## **An OCI Operating Entities LZ [Addon](#) for Oracle Access Governance (OAG)**
+## **An OCI Open LZ [Addon](#) for Oracle Access Governance (OAG)**
 
 &nbsp; 
 

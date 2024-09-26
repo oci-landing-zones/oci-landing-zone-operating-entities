@@ -12,7 +12,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 |:--:|--|-|---|
 | 1 | <img src="oci-learn-lz/diagrams/oci_learn_lz_icon.svg" height="26" align="center"> &nbsp;   **[OCI Learn LZ](/addons/oci-learn-lz/readme.md)**| A Landing Zone **training** to learn how to design and run a Landing Zone without code. | [Available](/addons/oci-learn-lz/readme.md) |
 | 2 | <img src="oci-hub-models/images/oci_hub_models_icon.svg" height="25" align="center"> &nbsp; **[OCI Network Hubs](/addons/oci-hub-models/readme.md)** | A set of **OCI Network Hub topologies** applicable to any landing zone or OCI deployment. | [Available](/addons/oci-hub-models/readme.md) | 
-| 3 | <img src="oci-oag/images/oci_oag_icon.svg" height="25" align="center"> &nbsp; **[OCI Access Governance](/addons/oci-oag/README.md)** | Guidelines to increase the **security governance** of your Landing Zones with OAG. | [Available](/addons/oci-oag/README.md) | 
+| 3 | <img src="oci-oag/images/oci_oag_icon.svg" height="25" align="center"> &nbsp; **[Oracle Access Governance](/addons/oci-oag/README.md)** | Guidelines to increase the **security governance** of your Landing Zones with OAG. | [Available](/addons/oci-oag/README.md) | 
 
 
 
