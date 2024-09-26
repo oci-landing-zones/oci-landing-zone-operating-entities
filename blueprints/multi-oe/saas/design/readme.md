@@ -30,7 +30,7 @@ This chapter presents the following elements:
 
 ## 2.1 Tenancy Structure
 
-The following architecture diagram depicts a single tenancy blueprint, separating the management plane (red color) from the customer plane (blue and grey) compartments. [Click here](design/images/SaaS-pod-architecture_v2.drawio) to download the drawio version.
+The following architecture diagram depicts a single tenancy blueprint, separating the management plane (red color) from the customer plane (blue and grey) compartments. [Click here](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/multi-oe/saas/OCI_Open_LZ_Multi-OE_SaaS_Blueprint.drawio) to download the drawio version.
 
 &nbsp; 
 
