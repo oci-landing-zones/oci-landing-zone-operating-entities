@@ -89,6 +89,9 @@ Organizations can use the following core OCI services to implement a comprehensi
 - **The Identity and Access Management (IAM)** - provides centralized access control and identity
 - **The Audit service logs** - provides visibility into all actions performed in the cloud.
 - **Cloud Guard and Security Zones** - work together to define and enforce security policies, and take corrective action when issues are detected.
+- **Vulnerability scanning**
+
+The OCI Sovereign Landing Zone meets the security guidelines outlined in the CIS Oracle Cloud Infrastructure Foundations Benchmark v2.0.0. For more details on the certification, visit [CIS Security](https://www.cisecurity.org/benchmark/oracle_cloud)
 
 ### IAM
 Identity and Access Managment in OCI is controlled by a few key resources:
@@ -108,7 +111,7 @@ To learn more about the IAM design (Security Layer) of our landing zones, we rec
 
 
 ### Audit Service logs
-For different legal requlations it might be required to keep access logs for a certain period of time. One-OE out of box sets-up empty bucket for storing logs. This bucket can be additionaly configured with [Data Retention Rules](https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/usingretentionrules.htm) that can be modified to a specific period as required. Data Retention Rules provide attestation that files haven't been modified since creation and prevents their removal until retention period expires. This means even an attacker that would gain Administrator rights wouldn't be able to tamper with the logs for the duration of the retention period.
+For different legal requlations it might be required to keep access logs for a certain period of time. OCI Sovereign Landing zones out of box sets-up empty bucket for storing logs. This bucket can be additionaly configured with [Data Retention Rules](https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/usingretentionrules.htm) that can be modified to a specific period as required. Data Retention Rules provide attestation that files haven't been modified since creation and prevents their removal until retention period expires. This means even an attacker that would gain Administrator rights wouldn't be able to tamper with the logs for the duration of the retention period.
 
 For pricing information about Object Storage see [Object Storage Pricing](https://www.oracle.com/cloud/storage/pricing/)
 
