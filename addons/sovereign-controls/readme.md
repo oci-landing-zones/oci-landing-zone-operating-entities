@@ -116,7 +116,7 @@ For different legal requlations it might be required to keep access logs for a c
 For pricing information about Object Storage see [Object Storage Pricing](https://www.oracle.com/cloud/storage/pricing/)
 
 ### Cloud Guard and Security Zones
-Cloud Guard is a security posture management service. It allows to set-up preemptive and remedial actions if security policies are violated. One-OE comes with pre-configured Cloud Guard for common rules and implements Security zones to implement parts of CIS security controls.
+Cloud Guard is a security posture management service. It allows to set-up preemptive and remedial actions if security policies are violated. OCI Sovereign Landing zones comes with pre-configured Cloud Guard for common rules and implements Security zones to implement parts of CIS security controls.
 
 Security Zones are set-up by default in all Standard Landing Zones without requiring modifications for Sovereign Landing Zone addon.
 
