@@ -99,11 +99,13 @@ Identity and Access Managment in OCI is controlled by a few key resources:
 <p align="center" width="100%">
     <img width="30%" src="https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/sovereign-lz/addons/sovereign-controls/content/User-cmp-policies.png">
 </p>
-These resources are key building blocks in the standard [One-OE landing zone](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/one-oe/). One-OE landing zone has been designed with CIS standard as a guiding principle and is compiant with CIS out of box.
 
-OCI IAM by default enforces MFA for the local accounts.
+These resources serve as key building blocks in our Sovereign landing zone, enabling the segregation of duties, resource isolation, and budget control, including billing management. This allows our customers to start their cloud journey with a set of best practices that can be deployed with minimal effort.
 
-In One-OE we include concepts as Segregation of duties and Isolation of resources. These [security controls](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/one-oe/design#12-vision) allow customer to start a cloud journey with a set of best practices that can be deployed within a few minutes.
+For all Oracle customers, particularly sovereign ones, it is important to know that Oracle has recently implemented a policy requiring multifactor authentication (MFA) for logging into the Oracle Cloud Console, as part of its ongoing efforts to enhance security.
+
+To learn more about the IAM design (Security Layer) of our landing zones, we recommend reviewing our [blueprint](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
+
 
 ### Audit Service logs
 For different legal requlations it might be required to keep access logs for a certain period of time. One-OE out of box sets-up empty bucket for storing logs. This bucket can be additionaly configured with [Data Retention Rules](https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/usingretentionrules.htm) that can be modified to a specific period as required. Data Retention Rules provide attestation that files haven't been modified since creation and prevents their removal until retention period expires. This means even an attacker that would gain Administrator rights wouldn't be able to tamper with the logs for the duration of the retention period.
