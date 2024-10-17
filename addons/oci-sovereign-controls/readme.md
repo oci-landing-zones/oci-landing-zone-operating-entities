@@ -134,17 +134,14 @@ https://www.oracle.com/security/cloud-security/cloud-guard/instance-security/
 ## Principle 4. Encryption
 In OCI, data encryption is applied at various stages of the data lifecycle - at rest, in transit, and in use.
 
-**Data at rest:** <br />
-Data encryption at rest in OCI is enabled by default across all storage services, including block, object, and file storage, as well as Oracle's platform services. This automatic encryption ensures data protection without requiring user intervention - Oracle manages the encryption keys by default, simplifying security for users.
+**Data at rest**: Data encryption at rest in OCI is enabled by default across all storage services, including block, object, and file storage, as well as Oracle's platform services. This automatic encryption ensures data protection without requiring user intervention - Oracle manages the encryption keys by default, simplifying security for users.
 However, for enhanced security and to meet stricter regulatory requirements, the Sovereign add-on leverages OCI Private Vault: a customer-managed encryption service, a single-tenant, dedicated partition within a Hardware Security Module (HSM). Additionally, customers have the flexibility to provision a fully dedicated HSM appliance (dedicated KMS) or integrate third-party key management solutions, allowing for the use of externally managed encryption keys.
 
-**Data in transit:** <br />
-All control plane data in transit is encrypted using Transport Layer Security (TLS) 1.2 or later, ensuring that data transmitted across the network is securely encrypted and never sent in plaintext. Additionally, all data transmitted between availability domains and regions within OCI is protected using MACsec.
+**Data in transit**: All control plane data in transit is encrypted using Transport Layer Security (TLS) 1.2 or later, ensuring that data transmitted across the network is securely encrypted and never sent in plaintext. Additionally, all data transmitted between availability domains and regions within OCI is protected using MACsec.
 Customers utilizing FastConnect for private connections between their on-premises data centers and OCI can also enable MACsec encryption to secure this traffic.
 While Oracle manages in-transit encryption for control plane components, customers are responsible for implementing encryption for any in-transit data associated with their custom components or applications.
 
-**Data in use:** <br />
-OCI’s confidential computing ensures that data remains encrypted and secure even during processing. It encrypts and isolates in-use data and the applications processing that data at the hardware level.
+**Data in use**: OCI’s confidential computing ensures that data remains encrypted and secure even during processing. It encrypts and isolates in-use data and the applications processing that data at the hardware level.
 A confidential instance is a compute virtual machine (VM) or bare metal instance where both the data and the application processing the data are encrypted and isolated while the application processes the data, preventing unauthorized access or modification of either the data or the application.
 
 &nbsp;
