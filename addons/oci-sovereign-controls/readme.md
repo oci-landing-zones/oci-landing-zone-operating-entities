@@ -158,11 +158,12 @@ OCI Key Management Service (KMS) offers the following levels of key storage opti
 Both Vault options (Virtual Vault and Virtual Private Vault) allow you to create encryption keys stored in one of the following ways:
   * **Software-Protected**: Cryptographic operations and key storage occur on a bare metal server, with keys secured at rest using a root key from the HSM.
   * **HSM-Protected**: All cryptographic operations and key storage are performed within the HSM.
-  For more information please refer to the [OCI Vault FAQ](https://www.oracle.com/security/cloud-security/key-management/faq/) and [Key Management Pricelist](https://www.oracle.com/security/cloud-    security/pricing/#key-management)
 
 **1.3 Dedicated KMS**: Dedicated KMS provides a single-tenant HSM partition as a service, offering a fully isolated environment for key storage and management. The main distinction from Private Vault   is the level of control over the HSM partitions.
 
 **2. External Key Storage Options**: OCI External KMS allows you to use your own third-party key management system to protect data in OCI services. You retain control over the keys and HSMs outside of OCI, managing their administration and security. Master Encryption Keys (MEKs) are always stored outside of OCI. EKMS provides a separation between key management and encrypted resources in OCI.For more information, visit: [Oracle Sovereign Cloud Solutions - OCI External KMS](https://blogs.oracle.com/cloud-infrastructure/post/oracle-sovereign-cloud-solutions-oci-external-kms)
+
+For more information please refer to the [OCI Vault FAQ](https://www.oracle.com/security/cloud-security/key-management/faq/) and [Key Management Pricelist](https://www.oracle.com/security/cloud-security/pricing/#key-management)
 
 From a sovereignty point of view it is recommended to have customer managed keys stored on an external key storage. In order not to incur any cost. The Sovereign Landing Zone uses the **Virtual Vault: customer-managed software encryption keys** option, but we do recommend you consider options with HSM storage or external key storage based on the regulation requirements.
 
