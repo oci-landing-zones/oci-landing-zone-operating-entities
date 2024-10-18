@@ -121,13 +121,13 @@ Oracle Cloud Infrastructure (OCI) Vulnerability Scanning Service gives teams the
 
 Vulnerability scanning fully supports Oracle Linux, CentOS, Ubuntu with partial support for Windows. In case of large number of Windows instances it's recommended to use additional endpoint security solution. Vulnerability scanning uses NVD, OVAL, CIS as sources for common vulnerabilities. It's not recommend to use Vulnerability Scanning in Virtual Machine DB Systems as they are closely monitored by other services which contain custom patches for high performance and availability instead follow [Updating DB Systems](https://docs.oracle.com/iaas/dbcs/doc/update-db-system.html) guide.
 
-Vulnerability scanning service is deployed in Sovereign Landing zone without requiring any further modifications.
+The vulnerability scanning service is deployed in the Sovereign Landing zone without requiring any further modifications.
 
 ## Principle 4. Encryption
 In OCI, data encryption is applied at all stages of the data lifecycle - at rest, in transit, and in use.
 
 **Data at rest**: Data encryption at rest in OCI is enabled by default across all storage services, including block, object, and file storage, as well as Oracle's platform services. This automatic process ensures data encryption without requiring user intervention. Then Oracle provides customer with complete freedom of choice for key management:
-- for customers who don't want to deal with key management process, Oracle completely manages the encryption keys simplifying security for users.
+- for customers who don't want to deal with a key management process, Oracle completely manages the encryption keys simplifying security for users.
 - for enhanced control and to meet stricter regulatory requirements, customers can entirely manage keys and their lifecycle, and choose where keys are stored, you can refer to the next paragraph for the details.
 
 **Data in transit**: All control plane data in transit is encrypted using Transport Layer Security (TLS) 1.2 or later, ensuring that data transmitted across the network is securely encrypted and never sent in plaintext. Additionally, all data transmitted between availability domains and regions within OCI is protected using MACsec.
@@ -149,18 +149,18 @@ Oracle Cloud Infrastructure (OCI) offers key management options in the following
 
 OCI Key Management Service (KMS) offers the following levels of key storage options:
 
-**1. Internal Key Storage Options**: your choice of software vault, shared HSM vault or private HSM vault.
+**1. Internal Key Storage Options**:
 
 **1.1 Virtual Vault**: Virtual Vault is a multi-tenant encryption service where your keys are stored in HSM partitions shared with other customers. It is the default encryption service in Vault.
 
 **1.2 Virtual Private Vault**: Private Vault is a single-tenant encryption service that stores keys in a private HSM partition with isolated cores specifically for your tenancy.
 
-Both Vault options (Virtual Vault and Private Vault) allow you to create encryption keys stored in one of the following ways:
-* **Software-Protected**: Cryptographic operations and key storage occur on a bare metal server, with keys secured at rest using a root key from the HSM.
-* **HSM-Protected**: All cryptographic operations and key storage are performed within the HSM.
-For more information please refer to the [OCI Vault FAQ](https://www.oracle.com/security/cloud-security/key-management/faq/) and [Key Management Pricelist](https://www.oracle.com/security/cloud-security/pricing/#key-management)
+Both Vault options (Virtual Vault and Virtual Private Vault) allow you to create encryption keys stored in one of the following ways:
+  * **Software-Protected**: Cryptographic operations and key storage occur on a bare metal server, with keys secured at rest using a root key from the HSM.
+  * **HSM-Protected**: All cryptographic operations and key storage are performed within the HSM.
+  For more information please refer to the [OCI Vault FAQ](https://www.oracle.com/security/cloud-security/key-management/faq/) and [Key Management Pricelist](https://www.oracle.com/security/cloud-    security/pricing/#key-management)
 
-**1.3 Dedicated KMS**: Dedicated KMS provides a single-tenant HSM partition as a service, offering a fully isolated environment for key storage and management. The main distinction from Private Vault is the level of control over the HSM partitions.
+**1.3 Dedicated KMS**: Dedicated KMS provides a single-tenant HSM partition as a service, offering a fully isolated environment for key storage and management. The main distinction from Private Vault   is the level of control over the HSM partitions.
 
 **2. External Key Storage Options**: OCI External KMS allows you to use your own third-party key management system to protect data in OCI services. You retain control over the keys and HSMs outside of OCI, managing their administration and security. Master Encryption Keys (MEKs) are always stored outside of OCI. EKMS provides a separation between key management and encrypted resources in OCI.For more information, visit: [Oracle Sovereign Cloud Solutions - OCI External KMS](https://blogs.oracle.com/cloud-infrastructure/post/oracle-sovereign-cloud-solutions-oci-external-kms)
 
