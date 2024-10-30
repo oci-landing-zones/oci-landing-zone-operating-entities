@@ -8,16 +8,16 @@
 - [4. Security Zones](#3-security-zones)
 
 ## Summary
-This guide covers implementation of principles outlined in the [Sovereign Controls add-on](./readme.md) document. As an example we're going to implement restrictions for a German customer using EU Sovereign Cloud and who wants to restrict data to the `eu-frankfurt-2` region. However, configuration files can be modified to specifically fit the sovereign requirements of any customer.
+This guide covers the implementation of the principles outlined in the [Sovereign Controls add-on](./readme.md) document. As an example, we are going to implement restrictions for a German customer using EU Sovereign Cloud who wants to restrict data to the `eu-frankfurt-2` region. However, configuration files can be modified to specifically fit the sovereign requirements of any customer.
 
 ## Requirements
-Sovereign Landing Zone is built on top of the [One-OE](../../blueprints/one-oe/) Landing Zone. One-OE is a single operating-entity landing zone utilizing Oracle best practices for deployments in commercial regions. Sovereign Landing Zone takes One-OE a step further and modifies it to requirements of customers for Sovereign regulations, either in EU Sovereign Cloud regions or any other OCI deployment models 
+Sovereign add-ons can be configured on top of any [OCI landing zone model](https://blogs.oracle.com/cloud-infrastructure/post/new-standardized-oci-landing-zones-framework). In this example, the Sovereign Landing Zone is built on top of the One-OE Landing Zone.[One-OE](../../blueprints/one-oe/) is a single operating-entity landing zone utilizing Oracle best practices for deployments in commercial regions. The Sovereign Landing Zone takes One-OE a step further and modifies it to meet the requirements of customers for sovereign regulations, either in EU Sovereign Cloud regions or any other OCI deployment models.
 
 ## IAM Layer
 You can find configuration examples for groups, policies, and quotas in [identity.auto.tfvars.json](./identity_svrgn.auto.tfvars.json) file.
 
 ## 1. Groups
-If a certain user group needs to be restricted to provisioning resources in a specific region, it's recommended to create a region-specific group. As IAM Groups are global resources, we denote the region specificity using a naming convention, e.g., `grp-${region}-security-admins`. You can see an example configuration in the [identity.auto.tfvars.json](./identity.auto.tfvars.json) file, section `groups_configuration`. These groups can either extend the default groups provided by a landing zone or replace them if only a specific region is required.
+If a certain user group needs to be restricted to provisioning resources in a specific region, it's recommended to create a region-specific group. As IAM groups are global resources, we denote the region specificity using a naming convention, e.g., `grp-${region}-security-admins`. You can see an example configuration in the [identity.auto.tfvars.json](./identity.auto.tfvars.json) file, section `groups_configuration`. These groups can either extend the default groups provided by a landing zone or replace them if only a specific region is required.
 
 > [!WARNING]
 > Groups and policies controlling access permissions to IAM need to be always applied in the [Home Region](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingregions.htm#The) otherwise they have no effect.
@@ -29,7 +29,7 @@ Allow group grp-str-security-admins to manage all-resources in tenancy where req
 ```
 
 ## 3. Quota Policies
-Use Quota Policies in Oracle Cloud Infrastructure to control resource creation based on a region within Compartments/Tenancy. Quota Policies limit the number of resources that can be created in a Compartment/Tenancy based on the region. In this example the customer wants to make sure there's no quota available in the regions other than `eu-frankfurt-2` region.
+Use Quota Policies in Oracle Cloud Infrastructure to control resource creation based on a region within compartments/tenancy. Quota Policies limit the number of resources that can be created in a Compartment/Tenancy based on the region. In this example the customer wants to ensure there is no quota available in the regions other than `eu-frankfurt-2` region.
 ```
 zero compute-core quota /*/ in tenancy where request.region != 'eu-frankfurt-2'
 zero database quota /*/ in tenancy where request.region != 'eu-frankfurt-2'
@@ -48,9 +48,9 @@ Additionally for a multi-Tenancy set-up [Governance Rules](https://docs.oracle.c
 You can find configuration examples for security zones in [security.auto.tfvars.json](./security_svrgn.auto.tfvars.json) file.
 
 ## 4. Security Zones
-OCI Sovereign Landing Zone proposes strong security posture using all OCI capabilities, including Security Zones. Security Zones apply a security strategy to OCI cloud compartments and prevent actions that could undermine customers’ security posture. Security Zones policies can be applied to various types of cloud infrastructure (network, compute, storage, databases, etc.) to ensure the security of cloud resources and prevent security miss-configurations. Users determine which policies are appropriate for their needs by defining custom policy sets for each security zone.
+OCI Sovereign Landing Zone proposes a strong security posture using all OCI capabilities, including Security Zones. Security Zones apply a security strategy to OCI cloud compartments and prevent actions that could undermine customers’ security posture. Security Zones policies can be applied to various types of cloud infrastructure (network, compute, storage, databases, etc.) to ensure the security of cloud resources and prevent security misconfigurations. Users determine which policies are appropriate for their needs by defining custom policy sets for each security zone.
 
-The Sovereign Landing Zone implements the same configuration outlined in the [One-OE blueprint](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/design). It includes five recipes that serve as examples of best practices. Security zones are defined using various OCIDs from security zone policies, which are tied to specific realms. For sovereign realms, you must use the appropriate OCID, as the generic configuration is not valid. Refer to the provided example for the correct configuration
+The Sovereign Landing Zone implements the same configuration outlined in the [One-OE blueprint](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/design). It includes five recipes that serve as examples of best practices. Security zones are defined using various OCIDs from security zones policies, which are tied to specific realms. For sovereign realms, you must use the appropriate OCID, as the generic configuration is not valid. Refer to the provided example for the correct configuration
 ```
 "SZ-RCP-LZP-03-SHARED-NETWORK-KEY": {
                 "name": "sz-rcp-lzp-03-shared-network",
