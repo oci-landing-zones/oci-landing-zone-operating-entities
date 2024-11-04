@@ -57,7 +57,7 @@ Additionally, for a multi-tenancy setup, the [Governance Rules](https://docs.ora
 
 
 ## Principle 2. Isolation
-Oracle Cloud offering is, at a high level segregated into two components: the Control Plane and the Data Plane. The Control Plane is managed by Oracle and is used for managing and orchestrating underlying infrastructure using Console or APIs. The Control Planes ensures logical separation between different customers.The Data Plane results from user configuration of services in the Control Plane and defines virtual resources like Networking, Databases, and Compute instances.
+Oracle Cloud offering is, at a high level segregated into two components: the Control Plane and the Data Plane. The Control Plane is managed by Oracle and is used for managing and orchestrating underlying infrastructure using Console or APIs. The Control Plane ensures logical separation between different customers. The Data Plane results from user configuration of services in the Control Plane and defines virtual resources like Networking, Databases, and Compute instances.
 
 An organization should have the assurance that its data remains in the physical and logical environments that it has selected.
 
@@ -94,8 +94,8 @@ The OCI Sovereign Landing Zone meets the security guidelines outlined in the CIS
 
 ### IAM
 Identity and Access Management in OCI is controlled by:
-- **Compartments** are logical separation of resources and can be nested.
-- **Groups** are collections of users within Identity Domain.
+- **Compartments** are logical separations of resources and can be nested.
+- **Groups** are collections of users within the Identity Domain.
 - **Policies** bind permissions to a group in a specific compartment.
 
 <p align="center" width="100%">
@@ -114,7 +114,7 @@ For different legal regulations, it might be required to keep access logs for a 
 For pricing information about Object Storage see [Object Storage Pricing](https://www.oracle.com/cloud/storage/pricing/).
 
 ### Cloud Guard and Security Zones
-Cloud Guard is a security posture management service. It allows you to set up preemptive and remedial actions if security policies are violated. The Sovereign Landing Zone comes with pre-configured Cloud Guard for common rules and implements Security Zones to enforce parts of the CIS security controls.
+Cloud Guard is a security posture management service. It allows you to set up preemptive and remedial actions if security policies are violated. The Sovereign Landing Zone comes with a pre-configured Cloud Guard for common rules and implements Security Zones to enforce parts of the CIS security controls.
 
 The following [recipes](./recipes.md) are part of the Sovereign Landing Zone and can be used in Security Zones.
 
