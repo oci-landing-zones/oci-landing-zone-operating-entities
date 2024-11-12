@@ -6,7 +6,7 @@
 Welcome to the **OCI Landing Zone Subnetting Guide**, it provides an example of subnetting for our primary Landing Zone models: ONE-OE, Multi-OE, and Multi-Tenancy. It was developed to ensure network consistency across all our assets, enabling the deployment of any of our Landing Zone models, including potential landing zone extension plug-ins.
 &nbsp; 
 
-Each customer has unique requirements, so the first step is always to review their landing zone design and agree on the appropriate subnetting approach. This blueprint serves as a proof of concept (POC) for small to medium-sized customers or as a template to guide the creation of a customized subnetting design.
+Each customer has unique requirements, so the first step is always to review their landing zone design and agree on the appropriate subnetting approach. This blueprint can be use as a proof of concept (POC) for small to medium-sized customers or as a template to guide the creation of a customized subnetting design.
 
 Subnetting is a crucial aspect of networking in cloud environments. It involves dividing a larger address space into smaller, manageable subnetworks.
 
