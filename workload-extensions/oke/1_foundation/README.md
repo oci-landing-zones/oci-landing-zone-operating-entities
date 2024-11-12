@@ -34,7 +34,7 @@
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the One-OE Landing Zone OKE extension Identity Layer use the following JSON file: [identity.auto.tfvars.json](./identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the One-OE Landing Zone OKE extension Identity Layer use the following JSON file: [oci_oke_lzext_identity.auto.tfvars.json](./oci_oke_lzext_identity.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file covers three categories of resources described in the next sections.
 
@@ -190,7 +190,7 @@ The OKE Cluster requires specific subnets. You can review all these requirements
 
 <img src="../content/ProdNetwork.png" width="1000" height="auto">
 
-For configuring and running the One-OELZ OKE extension Network layer use the following JSON file: [network.auto.tfvars.json](./network.auto.tfvars.json)
+For configuring and running the One-OELZ OKE extension Network layer use the following JSON file: [oci_oke_lzext_network.auto.tfvars.json](./oci_oke_lzext_network.auto.tfvars.json)
 
 >**_JSON FILE REQUIRED CHANGES_**
 >If ONE-OE is used as the baseline Landing Zone with output saving enabled, running this OKE extension with the added dependencies will automatically match the keys with the correct OCIDs. Therefore, you can skip this section. If you are using the CIS Landing Zone or another core Landing Zone, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
