@@ -26,8 +26,9 @@
 | **NAME**                | OKE Landing Zone Extension set-up                                                                                                    |
 | **OBJECTIVE**           | Provision Identity and Network                                                                               |
 | **TARGET RESOURCES**    | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists                 |
-| **PREREQUISITES**       | The [One-OE](../../../blueprints/one-oe/) Blueprint deployed as a foundation. We recommend saving the stack outputs in the same bucket or GitHub repository where the one-off JSON files are stored. The saved file can then be used as a reference for future operations.                                                        |
-| **CONFIGURATION FILES** | - [oci_open_lz_hub_a_iam.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_iam.auto.tfvars.json)  </br> - [oci_open_lz_hub_a_network_light.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json)|
+| **PREREQUISITES**       | The [One-OE](../../../blueprints/one-oe/) Blueprint deployed as a foundation. We recommend saving the stack outputs in the same bucket or GitHub repository where the one-off JSON files are stored. The saved file can then be used as a reference for future operations. 
+[oci_open_lz_hub_a_iam.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_iam.auto.tfvars.json)  </br> - [oci_open_lz_hub_a_network_light.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json) |
+| **CONFIGURATION FILES** | - [iam.auto.tfvars.json]()  </br> - [network.auto.tfvars.json]()|
 | **DEPLOYMENT**          | Use [Oracle Resource Manager (ORM)](/commons/content/orm.md) or [Terraform CLI](/commons/content/terraform.md).            |
 
 &nbsp; 
