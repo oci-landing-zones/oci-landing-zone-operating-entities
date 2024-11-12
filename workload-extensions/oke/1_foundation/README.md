@@ -25,16 +25,16 @@
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | **NAME**                | OKE Landing Zone Extension set-up                                                                                                    |
 | **OBJECTIVE**           | Provision Identity and Network                                                                               |
-| **TARGET RESOURCES**    | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists                 |
-| **PREREQUISITES**       | The [One-OE](../../../blueprints/one-oe/) Blueprint deployed as a foundation. We recommend saving the stack outputs in the same bucket or GitHub repository where the one-off JSON files are stored. The saved file can then be used as a reference for future operations. </br> -[oci_open_lz_hub_a_iam.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_iam.auto.tfvars.json)</br> -[oci_open_lz_hub_a_network_light.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json) |
-| **CONFIGURATION FILES** | - [oci_oke_lzext_identity.auto.tfvars.json](./oci_oke_lzext_identity.auto.tfvars.json)  </br> - [oci_oke_lzext_network.auto.tfvars.json](./oci_oke_lzext_network.auto.tfvars.json)|
+| **TARGET RESOURCES**    | - **Identity**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists                 |
+| **PREREQUISITES**       | The [One-OE](../../../blueprints/one-oe/) Blueprint deployed as a foundation. For this example we used: **IAM & Network layer Hub A** </br> -[oci_open_lz_hub_a_iam.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_iam.auto.tfvars.json)</br> -[oci_open_lz_hub_a_network_light.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json)</br> **Security & Observability layers CIS v1**</br>[oci_open_lz_one-oe_security_cisl1.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json)</br>[oci_open_lz_one-oe_security_cisl1.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json)</br>**Note**: We recommend saving the stack outputs in the same bucket or GitHub repository where the one-off JSON files are stored. The saved file can then be used as a reference for future operations. |
+| **CONFIGURATION FILES** | - [oke_identity.auto.tfvars.json](./oci_oke_lzext_identity.auto.tfvars.json)  </br> - [oke_network.auto.tfvars.json](./oke_network.auto.tfvars.json)|
 | **DEPLOYMENT**          | Use [Oracle Resource Manager (ORM)](/commons/content/orm.md) or [Terraform CLI](/commons/content/terraform.md).            |
 
 &nbsp; 
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the One-OE Landing Zone OKE extension Identity Layer use the following JSON file: [oci_oke_lzext_identity.auto.tfvars.json](./oci_oke_lzext_identity.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the One-OE Landing Zone OKE extension Identity Layer use the following JSON file: [oke_identity.auto.tfvars.json](./oke_identity.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file covers three categories of resources described in the next sections.
 
@@ -58,10 +58,10 @@ For simplicity, we will use single landing zone environment option in this templ
 
 &nbsp;
 
-**JSON FILE REQUIRED CHANGES**
-If ONE-OE is used as the baseline Landing Zone with output saving enabled, running this OKE extension with the added dependencies will automatically match the keys with the correct OCIDs. No changes to the JSON file are needed. Therefore, you can skip this section.
-
-If you are using the CIS Landing Zone or another OCI Landing Zone option, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
+>**JSON FILE REQUIRED CHANGES**
+>If ONE-OE is used as the baseline Landing Zone with output saving enabled, running this OKE extension with the added dependencies will automatically match the keys with the correct OCIDs. No changes to the JSON file are needed. Therefore, you can skip this section.
+>
+>If you are using the CIS Landing Zone or another OCI Landing Zone option, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
 
 | Resource         | Section          | Replace with OCIDs              | Description                        |
 | ------------------------- | ------| --------------------------------- | ---------------------------------- |
@@ -171,9 +171,10 @@ As part of the deployment the following policies are created:
 | pcy-p-oke-secrets| The **pcy-p-oke-secrets** is an example of a recommended policy to allow applications running on the cluster to be authenticated with OCI through InstancePrincipal, for example to grant access to secrets. To read more about his check this [article](https://vaibhav-sonavane.medium.com/use-instance-principal-to-access-secrets-6c4aee1bfea4) or the [official documentation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm?source=post_page-----6c4aee1bfea4--------------------------------)| -  | - | -    |
 
 
-For a detailed review of OKE policies, please refer to the official OKE documentation [here](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpolicyconfig.htm#Policy_Configuration_for_Cluster_Creation_and_Deployment).
 
 Additional policies may be required for using [Capacity Reservations](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengmakingcapacityreservations.htm) or if you choose to [manage the master encryption key yourself](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengencryptingdata.htm). These policies are not included in this example, make sure to add them if they apply to your use case.
+For a detailed review of OKE policies, please refer to the official OKE documentation [here](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpolicyconfig.htm#Policy_Configuration_for_Cluster_Creation_and_Deployment).
+
 
 > [!NOTE]
 >For extended documentation regarding policies refer to the [Identity & Access Management CIS Terraform module policies examples](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies/examples) and [policy resource documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies)
@@ -190,7 +191,7 @@ The OKE Cluster requires specific subnets. You can review all these requirements
 
 <img src="../content/ProdNetwork.png" width="1000" height="auto">
 
-For configuring and running the One-OELZ OKE extension Network layer use the following JSON file: [oci_oke_lzext_network.auto.tfvars.json](./oci_oke_lzext_network.auto.tfvars.json)
+For configuring and running the OKE LZ extension Network layer use the following JSON file: [oke_network.auto.tfvars.json](./oke_network.auto.tfvars.json)
 
 >**_JSON FILE REQUIRED CHANGES_**
 >If ONE-OE is used as the baseline Landing Zone with output saving enabled, running this OKE extension with the added dependencies will automatically match the keys with the correct OCIDs. Therefore, you can skip this section. If you are using the CIS Landing Zone or another core Landing Zone, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
@@ -215,9 +216,9 @@ The network layer covers the following resources:
 4. Service Gateway - Service Gateway for access OCI services
 5. Nat Gateway
 6. Security List - allowing all ingress/egress
-7. Route Tables.
-8. DRG Attachments - Connect spokes with the central Hub
-9. Route tables ONE-OE Hub VCN updates (Covered in OP 3)
+7. NSGs.
+8. Route Tables.
+9. DRG Attachments - Connect spokes with the central Hub
 
 
 For customization of the pre-defined setup please refer to the [Networking documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) for documentation and examples.
