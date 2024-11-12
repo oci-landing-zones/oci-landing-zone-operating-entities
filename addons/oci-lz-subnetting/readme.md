@@ -1,7 +1,6 @@
 # **[OCI Landing Zone Subnetting Guide](#)**
 ## **An OCI Open LZ [Addon](#) to Increase and Tailor Your Network Security**
 
-&nbsp; 
 
 ### Overview
 Welcome to the **OCI Landing Zone Subnetting Guide**, it provides an example of subnetting for our primary Landing Zone models: ONE-OE, Multi-OE, and Multi-Tenancy. It was developed to ensure network consistency across all our assets, enabling the deployment of any of our Landing Zone models, including potential landing zone extension plug-ins.
@@ -11,7 +10,9 @@ Each customer has unique requirements, so the first step is always to review the
 
 &nbsp; 
 Subnetting is a crucial aspect of networking in cloud environments. It involves dividing a larger address space into smaller, manageable subnetworks.
+
 In our OCI Landing Zone models, network isolation is achieved in between environments and entities. A landing zone provides a structured, secure framework for deploying and managing cloud resources, and it typically includes network segmentation, access controls, and policies that help enforce isolation and security.
+
 In a typical landing zone, environments like development, testing, staging, and production each have their own Virtual Cloud Networks (VCNs). Within each VCN, subnets are created to organize and allocate addresses to individual resources (such as virtual machines, databases, or other services). Subnets serve as a core mechanism within VCNs to control network traffic through Security Lists (SLs), Network Security Groups (NSGs), or Zipper (ZPR).
 When designing cloud subnets, carefully consider the specific purpose each subnet should serve. Well-planned subnets support efficient resource management, security, and operational clarity across your cloud architecture.
 
