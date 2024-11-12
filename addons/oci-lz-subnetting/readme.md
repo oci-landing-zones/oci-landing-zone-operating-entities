@@ -21,5 +21,5 @@ When designing cloud subnets, carefully consider the specific purpose each subne
 - Provides a complete subnetting example that can be used as guidance for customers and partners
 
 &nbsp; 
-> [!NOTE]Note:
+> [!NOTE]
 >It is crucial to avoid overlapping IP address ranges with on-premises or multicloud environments. Overlapping IPs can lead to several issues, such as routing conflicts, connectivity problems, network security risks, and increased management complexity. To prevent these challenges, it is essential to plan IP address spaces carefully in advance and ensure that each cloud provider's address ranges are distinct.
