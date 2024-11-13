@@ -15,7 +15,8 @@
   - [**3.4 Security Lists (SLs)**](#34-security-lists-sls)
   - [**3.5 Gateways**](#35-gateways)
     - [**3.5.1 Dynamic Routing Gateway (DRGs) Attachments**](#351-dynamic-routing-gateway-drgs-attachments)
-    - [**3.5.2 Service Gateway (SGs)**](#352-service-gateway-sgs)
+    - [**3.5.2 Service Gateway**](#352-service-gateway)
+    - [**3.5.3 NAT Gateway**](#353-nat-gateway)
 - [**4. Deploy**](#4-deploy)
 
 
@@ -26,7 +27,7 @@
 | **NAME**                | OKE Landing Zone Extension set-up                                                                                                    |
 | **OBJECTIVE**           | Provision Identity and Network                                                                               |
 | **TARGET RESOURCES**    | - **Identity**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists                 |
-| **PREREQUISITES**       | The [One-OE](../../../blueprints/one-oe/) Blueprint deployed as a foundation. For this example we used: **Network layer Hub A** </br> [oci_open_lz_hub_a_network_light.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json)</br> **IAM, Security & Observability layers.(CIS v1)**</br>[oci_open_lz_one-oe_iam.auto.tfvars.jso](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json)</br>[oci_open_lz_one-oe_security_cisl1.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json)</br>[oci_open_lz_one-oe_security_cisl1.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json)</br>**Note**: We recommend saving the stack outputs in the same bucket or GitHub repository where the one-off JSON files are stored. The saved file can then be used as a reference for future operations. |
+| **PREREQUISITES**       | The [One-OE](../../../blueprints/one-oe/) Blueprint deployed as a foundation. For this example we used: **Network layer Hub A** </br> [oci_open_lz_hub_a_network_light.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json)</br> **IAM, Security & Observability layers.(CIS v1)**</br>[oci_open_lz_one-oe_iam.auto.tfvars.jso](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json)</br>[oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json)</br>[oci_open_lz_one-oe_security_cisl1.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json)</br>**Note**: We recommend saving the stack outputs in the same bucket or GitHub repository where the one-off JSON files are stored. The saved file can then be used as a reference for future operations. |
 | **CONFIGURATION FILES** | - [oke_identity.auto.tfvars.json](./oci_oke_lzext_identity.auto.tfvars.json)  </br> - [oke_network.auto.tfvars.json](./oke_network.auto.tfvars.json)|
 | **DEPLOYMENT**          | Use [Oracle Resource Manager (ORM)](/commons/content/orm.md) or [Terraform CLI](/commons/content/terraform.md).            |
 
@@ -59,15 +60,16 @@ For simplicity, we will use single landing zone environment option in this templ
 &nbsp;
 
 >**JSON FILE REQUIRED CHANGES**
+>
 >If ONE-OE is used as the baseline Landing Zone with output saving enabled, running this OKE extension with the added dependencies will automatically match the keys with the correct OCIDs. No changes to the JSON file are needed. Therefore, you can skip this section.
 >
 >If you are using the CIS Landing Zone or another OCI Landing Zone option, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
-
-| Resource         | Section          | Replace with OCIDs              | Description                        |
-| ------------------------- | ------| --------------------------------- | ---------------------------------- |
-| cmp-lzp-p-platform |  compartments| CMP-LZP-P-PLATFORM-KEY | The Prod platforms compartment OCID in Prod Env |
-| cmp-lzp-d-platform | compartments| CMP-LZP-PP-PLATFORM-KEY| The Pre-prod platforms compartment OCID  in Preprod Env |
-| cmp-lzp-platform |compartments | CMP-LZP-PLATFORM-KEY| The Shared platforms compartment OCID |
+>
+>| Resource         | Section          | Replace with OCIDs              | Description                        |
+>| ------------------------- | ------| --------------------------------- | ---------------------------------- |
+>| cmp-lzp-p-platform |  compartments| CMP-LZP-P-PLATFORM-KEY | The Prod platforms compartment OCID in Prod Env |
+>| cmp-lzp-d-platform | compartments| CMP-LZP-PP-PLATFORM-KEY| The Pre-prod platforms compartment OCID  in Preprod Env |
+>| cmp-lzp-platform |compartments | CMP-LZP-PLATFORM-KEY| The Shared platforms compartment OCID |
 
 
 
@@ -139,20 +141,25 @@ To check all the steps for managing RBAC visit [documentation](https://docs.orac
 
 ### **3.4 Dynamic groups**
 
-The OKE LZ Extension includes the following dynamic groups as examples:
+The OKE LZ Extension includes the following dynamic group as an example:
 
-* **dg-lzp-prod-platform-oke** for authenticating all instances of the Prod OKE cluster against OCI. See [OCI documentation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm) for details.
-* **dg-lzp-sec-fun-dynamic-group** to enable a function to access another Oracle Cloud Infrastructure resource. To read more about this go [here](https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionsaccessingociresources.htm).
+* **dg-lzp-p-platform-oke** for authenticating all instances of the Prod OKE cluster against OCI.
+* **dg-lzp-pp-platform-oke** for authenticating all instances of the Pre-prod OKE cluster against OCI.
 
-TODO:
-- why is there Oracle Function as example in OKE?
+See [OCI documentation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm) for reference.
+
+TO DO:
+
+https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contenggrantingworkloadaccesstoresources.htm
+
 
 > [!NOTE]
 > For extended documentation regarding dynamic groups please refer to the [Identity & Access Management CIS Terraform module dynamic groups example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/dynamic-groups/examples/vision/input.auto.tfvars.template).
 
->**_JSON FILE REQUIRED Dynamic Groups CHANGES_**
->**NOTE:**
->Run the dynamic groups as defined. The matching rules have associated OCIDs that cannot be referenced using the dependencies feature. After the first apply job, you need to update the CMP-LZP-SECURITY-KEY and CMP-LZP-PLATFORM-KEY attributes with the correct OCIDs, and then run a second apply job.
+> **_JSON FILE REQUIRED Dynamic Groups CHANGES_**
+>
+> **NOTE:**
+> Run the dynamic groups as defined. The matching rules have associated OCIDs that cannot be referenced using the dependencies feature. After the first apply job, you need to update the CMP-LZP-P-PLATFORM-KEY and CMP-LZP-PP-PLATFORM-KEY attributes with the correct OCIDs, and then run a second apply job.
 
 
 ### **2.3 Policies**
@@ -168,7 +175,8 @@ As part of the deployment the following policies are created:
 | pcy-pp-platform-oke-rbac-admin-role | Grants group **pcy-pp-platform-oke-rbac-admin-role** permissions. | -  | OKE |  -  |
 | pcy-pp-platform-oke-rbac-view-role | Grants group **pcy-pp-platform-oke-rbac-view-role** permissions. | -  | OKE |  -   |
 | pcy-root-oke-hybrid | The **pcy-p-platform-oke-hybrid** policy is an example of an additional IAM policy required when a cluster and its related resources reside in separate compartments.To use the OCI VCN-Native Pod Networking CNI plugin on top a LZ deployment, where a cluster's related resources (such as node pools, VCN, and VCN resources) are in a different compartment to the cluster itself, you must include this [policy](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-OCI_CNI_plugin.htm). If you are deploying the flannel option this specific policy is not needed.| instances  | private-ips ,network-security-groups | -    |
-| pcy-p-oke-secrets| The **pcy-p-oke-secrets** is an example of a recommended policy to allow applications running on the cluster to be authenticated with OCI through InstancePrincipal, for example to grant access to secrets. To read more about his check this [article](https://vaibhav-sonavane.medium.com/use-instance-principal-to-access-secrets-6c4aee1bfea4) or the [official documentation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm?source=post_page-----6c4aee1bfea4--------------------------------)| -  | - | -    |
+| pcy-p-platform-oke-secrets| The **pcy-p-platform-oke-secrets** is an example of a recommended policy to allow applications running on the cluster to be authenticated with OCI through InstancePrincipal, for example to grant access to secrets. To read more about his check this [article](https://vaibhav-sonavane.medium.com/use-instance-principal-to-access-secrets-6c4aee1bfea4) or the [official documentation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm?source=post_page-----6c4aee1bfea4--------------------------------)| -  | - | -    |
+| pcy-pp-platform-oke-secrets| The **pcy-pp-platform-oke-secrets** is an example of a recommended policy to allow applications running on the cluster to be authenticated with OCI through InstancePrincipal, for example to grant access to secrets. To read more about his check this [article](https://vaibhav-sonavane.medium.com/use-instance-principal-to-access-secrets-6c4aee1bfea4) or the [official documentation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm?source=post_page-----6c4aee1bfea4--------------------------------)| -  | - | -    |
 
 
 
@@ -181,8 +189,10 @@ For a detailed review of OKE policies, please refer to the official OKE document
 
 
 >**_JSON FILE REQUIRED Policies CHANGES_**
+>
 >**NOTE:**
->Policies contain compartment paths. The paths can change based on the modification in the previous [Compartments](#21-compartments) section. The paths need to be updated following the OCI [Policies and Compartment hierarchy](https://docs.oracle.com/en-us/iaas/Content/Identity/Concepts/policies.htm#hierarchy).
+>Policies contain compartment paths. 
+>The paths can change based on the modification in the previous [Compartments](#21-compartments) section. The paths need to be updated following the OCI [Policies and Compartment hierarchy](https://docs.oracle.com/en-us/iaas/Content/Identity/Concepts/policies.htm#hierarchy).
 
 
 ## **3. Setup Network Configuration**
@@ -194,8 +204,9 @@ The OKE Cluster requires specific subnets. You can review all these requirements
 For configuring and running the OKE LZ extension Network layer use the following JSON file: [oke_network.auto.tfvars.json](./oke_network.auto.tfvars.json)
 
 >**_JSON FILE REQUIRED CHANGES_**
+>
 >If ONE-OE is used as the baseline Landing Zone with output saving enabled, running this OKE extension with the added dependencies will automatically match the keys with the correct OCIDs. Therefore, you can skip this section. If you are using the CIS Landing Zone or another core Landing Zone, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
-
+>
 >| Resource                 | Replace with OCIDs              | Description                                                    |
 >| ------------------------ | -------------------------------- | -------------------------------------------------------------- |
 >| Prod Network Compartment | CMP-LZP-P-NETWORK-KEY | The OCID of the Prod Network Compartment |
@@ -303,16 +314,28 @@ The following tables describe the deployed DRG Attachments.
 | DRGA.00 |  drgatt-vcn-fra-lzp-m-platform-oke | DRG Attachment for the OKE Mgt spoke to the hub 
 
 
-#### **3.5.2 Service Gateway (SGs)**
+#### **3.5.2 Service Gateway**
 
 
 The following table describes the proposed Service Gateways added for each environment OKE platform:
 
 | ID    |  NAME          | OBJECTIVES           |
 | ----- |  ------------- | -------------------- |
-| SG.00 |  sg-fra-p-ocvs | SG in OKE Prod VCN. |
-| SG.00 |  sg-fra-pp-ocvs | SG in OKE Pre-prod VCN. |
-| SG.00 |  sg-fra-m-ocvs | SG in OKE Mgt VCN. |
+| SGW.00 |  sgw-fra-p-oke | SGW OKE Prod VCN. |
+| SGW.00 |  sgw-fra-pp-oke | SGW OKE Pre-prod VCN. |
+| SGW.00 |  sgw-fra-m-oke | SGW OKE Mgt VCN. |
+
+
+#### **3.5.3 NAT Gateway**
+
+
+The following table describes the proposed Nat Gateways added for each environment OKE platform:
+
+| ID    |  NAME          | OBJECTIVES           |
+| ----- |  ------------- | -------------------- |
+| NGW.00 |  ngw-fra-p-oke | NGW in OKE Prod VCN. |
+| NGW.00 |  ngw-fra-pp-oke | NGW in OKE Pre-prod VCN. |
+| NGW.00 |  ngw-fra-m-oke | NGW in OKE Mgt VCN. |
 
 
 
