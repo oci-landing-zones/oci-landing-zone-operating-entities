@@ -1,5 +1,5 @@
 # **[OCI Landing Zone Subnetting Guide](#)**
-## **An OCI Open LZ Addon to Increase and Tailor Your Network Security**
+## **An OCI Open LZ Addon to Tailor and Optimize Your Network Subnetting**
 
 
 ### Overview
