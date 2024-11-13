@@ -321,9 +321,9 @@ The following table describes the proposed Service Gateways added for each envir
 
 | ID    |  NAME          | OBJECTIVES           |
 | ----- |  ------------- | -------------------- |
-| SGW.00 |  sgw-fra-p-oke | SGW OKE Prod VCN. |
-| SGW.00 |  sgw-fra-pp-oke | SGW OKE Pre-prod VCN. |
-| SGW.00 |  sgw-fra-m-oke | SGW OKE Mgt VCN. |
+| SGW.00 |  sgw-fra-lzp-p-oke | SGW OKE Prod VCN. |
+| SGW.00 |  sgw-fra-lzp-pp-oke | SGW OKE Pre-prod VCN. |
+| SGW.00 |  sgw-fra-lzp-m-oke | SGW OKE Mgt VCN. |
 
 
 #### **3.5.3 NAT Gateway**
@@ -333,9 +333,9 @@ The following table describes the proposed Nat Gateways added for each environme
 
 | ID    |  NAME          | OBJECTIVES           |
 | ----- |  ------------- | -------------------- |
-| NGW.00 |  ngw-fra-p-oke | NGW in OKE Prod VCN. |
-| NGW.00 |  ngw-fra-pp-oke | NGW in OKE Pre-prod VCN. |
-| NGW.00 |  ngw-fra-m-oke | NGW in OKE Mgt VCN. |
+| NGW.00 |  ngw-fra-lzp-p-oke  | NGW in OKE Prod VCN. |
+| NGW.00 |  ngw-fra-lzp-pp-oke | NGW in OKE Pre-prod VCN. |
+| NGW.00 |  ngw-fra-lzp-m-oke | NGW in OKE Mgt VCN. |
 
 
 
