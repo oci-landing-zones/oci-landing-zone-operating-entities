@@ -23,9 +23,8 @@ For this Demo we are going to use Cloud Shell. See the full module documentation
 
 [![Open in Code Editor](https://raw.githubusercontent.com/oracle-devrel/oci-code-editor-samples/main/images/open-in-code-editor.png)](https://cloud.oracle.com/?region=home&cs_repo_url=https://github.com/oci-landing-zones/oci-landing-zone-operating-entities.git&cs_branch=master&cs_readme_path=workload-extensions/oke/2_oke/README.md&cs_open_ce=false)
 
-2. `$ git clone git@github.com:oci-landing-zones/oci-landing-zone-operating-entities.git`
-3. `$ cd oci-landing-zone-operating-entities/workload-extensions/oke/2_oke/oke_lz_tf`
-4. Change the **KEYS values** for the respective **OCIDs** in the oke.tf file 
+2. `$ cd oci-landing-zone-operating-entities/workload-extensions/oke/2_oke/oke_lz_tf`
+3. Change the **KEYS values** for the respective **OCIDs** in the oke.tf file 
 
 | Placeholder | Description |
 | --- | --- |
