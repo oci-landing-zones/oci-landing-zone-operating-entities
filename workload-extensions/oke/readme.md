@@ -16,7 +16,7 @@ This workload extension uses the [One-OE](https://github.com/oracle-quickstart/t
 
 ## **3. Deployment**
 
-There are four deployment steps to provision OKE landing zone extension:
+These are the required steps to provision the OKE landing zone extension:
 
  1. The [One-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe) LZ is a requirement and needs to be deployed before continuing, in this example we are choosing One-Stack Deployment with CIS Level 2 Security Controls. Any other OCI landing zone, such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime), can be deployed as a baseline landing zone.
  2. Deploy the **foundation infrastructure**. Follow the guide in [Step 1](/1_foundation/)
