@@ -18,7 +18,7 @@ The next Diagram shows the routing included in the [ONE-OE Hub A Deployment (Lig
 The next Diagram shows  rounting included in the OKE Ext LZ:
 <img src="../../content/Routing_OKE_ext.png" width="1000" height="auto">
 
-The next steps are to add the firewall and update the corresponding routes. To accomplish this, we need to follow the steps outlined in the [Hub B Deployment (Light Version - No Cost)](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/addons/oci-hub-models/hub_b/readme.md)	
+The next steps are to add the firewall and update the corresponding routes. To accomplish this, we need to follow the steps outlined in the [Hub A Deployment (Light Version - No Cost)](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/addons/oci-hub-models/hub_a/readme.md)	
 
 For demo purposes, we will deploy a dummy VM instead of a firewall. If needed, the steps to deploy the firewall are also provided on the previous page
 
