@@ -26,7 +26,9 @@ For demo purposes, we will deploy a dummy VM instead of a firewall. If needed, t
 
 **b.** Identify the Private IP OCID of your firewalls following these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/howto_identify_private_ip_ocid_vm_vnic.md)
 
-**c.** Update the POST network JSON configuration [**oci_open_lz_hub_b_network_light_post.auto.tfvars.json**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json) and replace the "DMZ FW PRIVATE IP OCID" with the OCID of the Public DMZ Firewall Private IP OCID identified in the previous steps. You can use the find & replace of the IDE of your choice.
+**c.**
+Update the POST network JSON configuration [**oci_open_lz_hub_b_network_light_post.auto.tfvars.json**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json)  and replace the "DMZ FW PRIVATE IP OCID" with the OCID of the Public DMZ Firewall Private IP OCID identified in the previous steps. You can use the find & replace of the IDE of your choice.
+
 You can see the customized file for this OKE template here.
 
 **d.** Edit the ORM stack and replace the original Network JSON configuration file with the new one **oci_open_lz_hub_b_network_light_post.auto.tfvars.json**
