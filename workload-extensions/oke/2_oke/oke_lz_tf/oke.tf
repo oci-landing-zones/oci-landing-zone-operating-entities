@@ -87,6 +87,10 @@ module "oke" {
 
   # Operator
   create_operator = false
+
+  providers = {
+    oci.home = oci.home
+  }
 }
 
 resource "oci_containerengine_addon" "oke_cert_manager" {
