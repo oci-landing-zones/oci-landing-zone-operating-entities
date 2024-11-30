@@ -1,0 +1,22 @@
+name: File size check
+on: [pull_request]
+jobs:
+  File-Size:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 2
+    - name: check size
+      shell: bash
+      run: |
+        CHANGED=`git diff --name-only -r HEAD^1 HEAD`
+        FAIL=0
+        while IFS= read -r line; do
+            SIZE=`find -maxdepth 1 -name "$line" -size +2M`
+            if [ "$SIZE" ]; then
+              echo -n "File too large: " `du -h $line`
+              FAIL=1
+            fi
+        done <<< "$CHANGED"
+        exit $FAIL
