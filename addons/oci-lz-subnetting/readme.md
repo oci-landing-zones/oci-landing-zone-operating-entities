@@ -63,11 +63,11 @@ OCI is assigned with a big CIDR block. We need to split the given CIDR block to 
 | | | | | |
 |---|---|---|---|---|
 | **Section** | **Bits** | **Available** | **Use** | **Example** |
-| **1.** Tenancies/OEs | 4 | Up to 8 tenants/OEs with 2 Landing Zone Environments | Available dedicated tenancies for Operating Entities or Operating Entities within the same tenancy | OE1 - 10.0.0.0/15 |
-| **2.** Environments | 2 | Up to 4 environments | We reserve for the Shared Services and the workload environments: Production, Non-Production and DR | OE1 LZ Production Shared Services - 10.0.0.0/18
-| **3.** VCNs | 3 | Up to 8 VCNs | Shared services or workload environments can have up to 8 VCNs, as the Hub, shared VCN for projects or platforms | OE1 LZ Production, Shared Services Hub - 10.0.0.0/21 |
-| **4.** Subnets | 3 | Up to 8 Subnets | Subnets within a VCN. Depending on the use you might have more or less subnets or reserved for future use. | OE1 LZ Production, Shared Services Hub, FW DMZ Subnet - 10.0.0.0/24 |
-| **5.** Resources | 8 | Up to 256 IPs | We have 252 usable IPs after not considering the network, broadcast and default gateways IPs | 10.0.0.2 to 10.0.0.254 |
+| </br><img src="./content/1.jpg" align="center"> </br></br> **Tenancies/OEs** | 4 | Up to 8 tenants/OEs with 2 Landing Zone Environments | Available dedicated tenancies for Operating Entities or Operating Entities within the same tenancy | OE1 - 10.0.0.0/15 |
+| </br><img src="./content/2.jpg" align="center"> </br></br> **Environments** | 2 | Up to 4 environments | We reserve for the Shared Services and the workload environments: Production, Non-Production and DR | OE1 LZ Production Shared Services - 10.0.0.0/18
+| </br><img src="./content/3.jpg" align="center"> </br></br> **VCNs** | 3 | Up to 8 VCNs | Shared services or workload environments can have up to 8 VCNs, as the Hub, shared VCN for projects or platforms | OE1 LZ Production, Shared Services Hub - 10.0.0.0/21 |
+| </br><img src="./content/4.jpg" align="center"> </br></br> **Subnets** | 3 | Up to 8 Subnets | Subnets within a VCN. Depending on the use you might have more or less subnets or reserved for future use. | OE1 LZ Production, Shared Services Hub, FW DMZ Subnet - 10.0.0.0/24 |
+| </br><img src="./content/1.jpg" align="center"> </br></br> **Resources** | 8 | Up to 256 IPs | We have 252 usable IPs after not considering the network, broadcast and default gateways IPs | 10.0.0.2 to 10.0.0.254 |
 
 For more examples or see the complete IP subnetting check the available Open LZ subnetting excel file [**here**](./content/OpenLZ_Network_Subnetting.xlsx).
 
