@@ -9,7 +9,7 @@ Welcome to the **OCI Landing Zone Subnetting Guide**.
 
 This guide provides guidelines on designing network subnetting, which can be used or inspired to set up your OCI networking. We use this model in our Landing Zone blueprints: [One-OE](../../blueprints/one-oe/readme.md), [Multi-OE](../../blueprints/multi-oe/readme.md), and [Multi-Tenancy](../../blueprints/multi-tenancy/readme.md). 
 
-It has been developed to ensure network consistency across all our assets, enabling the deployment of any of our Landing Zone models, including potential landing zone workload extensions. To facilitate sharing with customers and partners, the example is provided in an Excel file, accessible [**here**]([./content/OpenLZ_Network_Subnetting.xlsx](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/addons/oci-lz-subnetting/content/OpenLZ_Network_Subnetting.xlsx)).
+It has been developed to ensure network consistency across all our assets, enabling the deployment of any of our Landing Zone models, including potential landing zone workload extensions. To facilitate sharing with customers and partners, the example is provided in an Excel file, accessible [**here**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/addons/oci-lz-subnetting/content/OpenLZ_Network_Subnetting.xlsx).
 
 &nbsp; 
 
