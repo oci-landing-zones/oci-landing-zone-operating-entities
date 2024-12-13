@@ -1,4 +1,5 @@
 /workload-extensions/ocvs/ @hrvolapeter
 /workload-extensions/ebs/ @rphibbert
+/workload-extensions/oke/ @paolajuarezgomez
 /addons/oci-hub-models/ @vavardan
 /addons/oci-sovereign-controls/ @vavardan @hrvolapeter @paolajuarezgomez
