@@ -2,3 +2,4 @@
 /workload-extensions/ebs/ @rphibbert
 /addons/oci-hub-models/ @vavardan
 /addons/oci-sovereign-controls/ @vavardan @hrvolapeter @paolajuarezgomez
+/addons/oci-lz-subnetting/ @paolajuarezgomez @paalonso
