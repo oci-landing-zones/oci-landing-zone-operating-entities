@@ -75,7 +75,22 @@ In the configuration variables page:
 
 First, execute a plan job (1) to review all the resources that Terraform will create. Once verified, proceed to run the apply job (2) to initiate the deployment.
 
-<img src="../content/ORMJobs.png" width="1000" height="auto">
+<img src="../content/ORMJobs.png" width="500" height="auto">
+
+After deployment, you can visit your bucket to check the new files created using the output option.
+
+<img src="../content/output.png" width="1000" height="auto">
+
+Example of compartment_output.json
+
+```
+{"compartments":
+{
+"CMP-LANDINGZONE-P-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-NETWORK-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-P-NETWORK-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-P-PLATFORM-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-P-PROJ1-APP-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-P-PROJ1-DB-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-P-PROJ1-INFRA-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-P-PROJ1-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-P-PROJECTS-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-P-SECURITY-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-PLATFORM-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-PP-NETWORK-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-PP-PLATFORM-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-PP-PROJ1-APP-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-PP-PROJ1-DB-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-PP-PROJ1-INFRA-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-PP-PROJ1-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-PP-PROJECTS-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-PP-SECURITY-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-PREPROD-KEY":{"id":"ocid1.compartment.oc1..xxx"},
+"CMP-LZP-PROD-KEY":{"id":"ocid1.compartment.oc1..xxx"},"CMP-LZP-SECURITY-KEY":{"id":"ocid1.compartment.oc1..xxx"}
+}
+}
+```
 
 # License <!-- omit from toc -->
 
