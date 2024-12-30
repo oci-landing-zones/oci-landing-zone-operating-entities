@@ -21,11 +21,9 @@ These are the required steps to provision the OKE landing zone extension:
  2. Deploy the **foundation infrastructure**. Follow the guide in [Step 1](/1_foundation/)
  3. Create **OKE clusters** in [Step 2](2_oke/)
 
-&nbsp;
-
 ## Acknowledgments <!-- omit from toc -->
 * **Authors**: *Paola Juárez* (Landing Zones Specialist) 
-* **Contributors**: *Peter Hrvola* (Landing Zones Specialist),*Bala Sunil* (Landing Zones Specialist), *Alberto Campagna* ( Application Development DevOps Specialist) 
+* **Contributors**: *Peter Hrvola* (Landing Zones Specialist), *Bala Sunil* (Landing Zones Specialist), *Alberto Campagna* ( Application Development DevOps Specialist) 
 &nbsp;
 
 ## License <!-- omit from toc -->
