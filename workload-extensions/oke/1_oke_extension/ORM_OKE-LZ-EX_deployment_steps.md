@@ -1,6 +1,6 @@
-# ORM Deployment Steps <!-- omit from toc -->
+# Op2.ORM OKE LZ EXT Deployment Steps <!-- omit from toc -->
 
-
+If you have deploy the core/foundation Landing zone (op1) with ORM and the output feature enable run and extension will be a very simple  operation, no changes are required.
 
 ## **Using Output and Dependencies features with ORM**
 
