@@ -27,7 +27,6 @@ Find below the list of available workload landing zones and our backlog. Be free
 
 
 &nbsp; 
-&nbsp; 
 
 # License
 
