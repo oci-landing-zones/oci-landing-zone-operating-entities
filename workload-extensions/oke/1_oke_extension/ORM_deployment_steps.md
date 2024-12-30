@@ -6,11 +6,6 @@
 
 Our Landing Zone extensions are designed to integrate seamlessly with our core Landing Zone models, such as ONE-OE or Multi-OE. We onboard a LZ extension as an additional operation performed after the initial deployment of the core Landing Zone.
 
-**Example**:
-* **OP1**: ONE-OE deployment
-* **OP2**: OKE LZ extension
-
-
 When you press the provided magic button, a new ORM stack is created. Follow these steps:
 1. Accept terms, wait for the configuration to load.
 2. Set the working directory to “rms-facade”.
@@ -64,7 +59,7 @@ In the configuration variables page:
 
 1. Review the region selected for the deployment.
 2. Set the configuration source to OCI bucket.
-3. Enter the name of the bucket created in the previous step
+3. Enter the name of the bucket created in the previous step.
 4. Remove the default files in the Configuration Files section and upload the four new updated files to the bucket.
 5. In the Output Files section, click 'Save Output' and specify a folder where the output files will be saved.
 6. Click next.
