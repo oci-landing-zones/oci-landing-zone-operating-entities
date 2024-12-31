@@ -16,6 +16,7 @@
   - [**3.5 Gateways**](#35-gateways)
     - [**3.5.1 Dynamic Routing Gateway (DRGs) Attachments**](#351-dynamic-routing-gateway-drgs-attachments)
     - [**3.5.2 Service Gateway**](#352-service-gateway)
+- [**4. JSON files Required Changes**](#4-json-files-required-changes)
 - [**4. Deploy**](#4-deploy)
 
 
@@ -34,12 +35,11 @@
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the One-OE Landing Zone OKE extension Identity Layer use the following JSON file: [oke_identity.auto.tfvars.json](./oke_identity.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the One-OE Landing Zone OKE extension IAM Layer use the following JSON file: [oke_identity.auto.tfvars.json](./oke_identity.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file covers three categories of resources described in the next sections.
 
 ###  **2.1. Compartments**
-
 
 The OKE LZ extension provisions three **compartments**: two dedicated to managing environments, such as PROD and PRE-PROD, and a third compartment for management purposes.
 
@@ -47,29 +47,8 @@ New OKE compartments will be added as platform in each One-OE LZ environment, fo
 
 <img src="../content/One-OE-LZP.png" width="1000" height="value">
 
-The following diagram covers deployment with 2 Landing zone environments.
-
-<img src="../content/One-OE-LZPLZNP.png" width="1000" height="value">
-
-For simplicity, we will use single landing zone environment option in this template.
-
 > [!NOTE]
 > For extended documentation regarding compartment definition please refer to the [Identity & Access Management CIS Terraform module compartment example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/compartments/examples/vision/input.auto.tfvars.template).
-
-&nbsp;
-
->**JSON FILE REQUIRED CHANGES**
->
->If ONE-OE is used as the baseline Landing Zone with output saving enabled, running this OKE extension with the added dependencies will automatically match the keys with the correct OCIDs. No changes to the JSON file are needed. Therefore, you can skip this section.
->
->If you are using the CIS Landing Zone or another OCI Landing Zone option, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
->
->| Resource         | Section          | Replace with OCIDs              | Description                        |
->| ------------------------- | ------| --------------------------------- | ---------------------------------- |
->| cmp-lzp-p-platform |  compartments| CMP-LZP-P-PLATFORM-KEY | The Prod platforms compartment OCID in Prod Env |
->| cmp-lzp-d-platform | compartments| CMP-LZP-PP-PLATFORM-KEY| The Pre-prod platforms compartment OCID  in Preprod Env |
->| cmp-lzp-platform |compartments | CMP-LZP-PLATFORM-KEY| The Shared platforms compartment OCID |
-
 
 
 ### **2.2 Groups**
@@ -155,11 +134,6 @@ https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contenggrantingworkload
 > [!NOTE]
 > For extended documentation regarding dynamic groups please refer to the [Identity & Access Management CIS Terraform module dynamic groups example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/dynamic-groups/examples/vision/input.auto.tfvars.template).
 
-> **_JSON FILE REQUIRED Dynamic Groups CHANGES_**
->
-> **NOTE:**
-> Run the dynamic groups as defined. The matching rules have associated OCIDs that cannot be referenced using the dependencies feature. After the first apply job, you need to update the CMP-LZP-P-PLATFORM-KEY and CMP-LZP-PP-PLATFORM-KEY attributes with the correct OCIDs, and then run a second apply job.
-
 
 ### **2.3 Policies**
 
@@ -177,21 +151,12 @@ As part of the deployment the following policies are created:
 | pcy-p-platform-oke-secrets| The **pcy-p-platform-oke-secrets** is an example of a recommended policy to allow applications running on the cluster to be authenticated with OCI through InstancePrincipal, for example to grant access to secrets. To read more about his check this [article](https://vaibhav-sonavane.medium.com/use-instance-principal-to-access-secrets-6c4aee1bfea4) or the [official documentation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm?source=post_page-----6c4aee1bfea4--------------------------------)| -  | - | -    |
 | pcy-pp-platform-oke-secrets| The **pcy-pp-platform-oke-secrets** is an example of a recommended policy to allow applications running on the cluster to be authenticated with OCI through InstancePrincipal, for example to grant access to secrets. To read more about his check this [article](https://vaibhav-sonavane.medium.com/use-instance-principal-to-access-secrets-6c4aee1bfea4) or the [official documentation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm?source=post_page-----6c4aee1bfea4--------------------------------)| -  | - | -    |
 
-
-
 Additional policies may be required for using [Capacity Reservations](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengmakingcapacityreservations.htm) or if you choose to [manage the master encryption key yourself](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengencryptingdata.htm). These policies are not included in this example, make sure to add them if they apply to your use case.
 For a detailed review of OKE policies, please refer to the official OKE documentation [here](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpolicyconfig.htm#Policy_Configuration_for_Cluster_Creation_and_Deployment).
 
 
 > [!NOTE]
 >For extended documentation regarding policies refer to the [Identity & Access Management CIS Terraform module policies examples](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies/examples) and [policy resource documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies)
-
-
->**_JSON FILE REQUIRED Policies CHANGES_**
->
->**NOTE:**
->Policies contain compartment paths. 
->The paths can change based on the modification in the previous [Compartments](#21-compartments) section. The paths need to be updated following the OCI [Policies and Compartment hierarchy](https://docs.oracle.com/en-us/iaas/Content/Identity/Concepts/policies.htm#hierarchy).
 
 
 ## **3. Setup Network Configuration**
@@ -202,37 +167,23 @@ The OKE Cluster requires specific subnets. You can review all these requirements
 
 For configuring and running the OKE LZ extension Network layer use the following JSON file: [oke_network.auto.tfvars.json](./oke_network.auto.tfvars.json)
 
->**_JSON FILE REQUIRED CHANGES_**
->
->If ONE-OE is used as the baseline Landing Zone with output saving enabled, running this OKE extension with the added dependencies will automatically match the keys with the correct OCIDs. Therefore, you can skip this section. If you are using the CIS Landing Zone or another core Landing Zone, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
->
->| Resource                 | Replace with OCIDs              | Description                                                    |
->| ------------------------ | -------------------------------- | -------------------------------------------------------------- |
->| Prod Network Compartment | CMP-LZP-P-NETWORK-KEY | The OCID of the Prod Network Compartment |
->| Pre-prod Network Compartment | CMP-LZP-PP-NETWORK-KEY |  The OCID of the Pre-prod Network Compartment  |
->| Mgt Network Compartment | CMP-LZP-NETWORK-KEY |  The OCID of the Network Compartment |
->| Hub DRG                  | DRG-FRA-LZP-HUB-KEY                 | The OCID of the DRG in Hub deployed by One-OE LZ             |
->| Hub DRG Route Table      | OCID-DRG-HUB-ROUTE-TABLE      | The OCID of Route table in DRG                                 |
-
-
 Our OKE LZ extension will deploy the necessary core resources for both the Production and Pre-production environments included in the ONE-OE blueprint. This example is based on the OCI VCN-Native Pod Networking CNI scenario. Some adjustments would be required for a Flannel setup.
 
 <img src="../content/Network.png" width="1000" height="auto">
 
+
 The network layer covers the following resources:
+1. Hub VCN for traffic inspection purposes, centralized DNS service, Internet Gateway, and NAT Gateway.
 1. Spoke management VCN for OKE management purposes.
 2. Spokes VNCs for each environment - one Spoke Pre-prod OKE VCN and one Spoke Prod OKE VCN
 3. Subnets - OKE required subnets; like cp,workers,pods,lb,database,fss and bastion subnet.
-4. Service Gateway - Service Gateway for access OCI services
-5. Nat Gateway
-6. Security List - allowing all ingress/egress
-7. NSGs.
-8. Route Tables.
-9. DRG Attachments - Connect spokes with the central Hub
-
+4. Service Gateway - Service Gateway for access OCI services in all VCNs
+1. Security List - allowing all ingress/egress
+2. NSGs.
+3. Route Tables.
+4. DRG Attachments - Connect spokes with the central Hub
 
 For customization of the pre-defined setup please refer to the [Networking documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) for documentation and examples.
-&nbsp; 
 
 ### **3.1 VCNs**
 
@@ -325,15 +276,38 @@ The following table describes the proposed Service Gateways added for each envir
 | SGW.00 |  sgw-fra-lzp-m-oke | SGW OKE Mgt VCN. |
 
 
+## **4. JSON files Required Changes**
+
+If ONE-OE is used as the foundation Landing Zone with output saving enabled, running this OKE extension with the added dependencies will automatically match the keys with the correct OCIDs. No changes to the JSON file are needed. Therefore, you can skip this section and move to point 5.
+
+If you are using the CIS Landing Zone or another OCI Landing Zone option, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
+
+| Resource         | Section          | Replace with OCIDs              | Description                        |
+| ------------------------- | ------| --------------------------------- | ---------------------------------- |
+| cmp-lzp-p-platform |  compartments| CMP-LZP-P-PLATFORM-KEY | The Prod platforms compartment OCID in Prod Env |
+| cmp-lzp-d-platform | compartments| CMP-LZP-PP-PLATFORM-KEY| The Pre-prod platforms compartment OCID  in Preprod Env |
+| cmp-lzp-platform |compartments | CMP-LZP-PLATFORM-KEY| The Shared platforms compartment OCID |
+| Prod Network Compartment | Network| CMP-LZP-P-NETWORK-KEY | The OCID of the Prod Network Compartment |
+| Pre-prod Network Compartment | Network| CMP-LZP-PP-NETWORK-KEY |  The OCID of the Pre-prod Network Compartment  |
+| Mgt Network Compartment |  Network| CMP-LZP-NETWORK-KEY |  The OCID of the Network Compartment |
+| Hub DRG                  | Network| DRG-FRA-LZP-HUB-KEY                 | The OCID of the DRG in Hub deployed by One-OE LZ             |
+| Hub DRG Route Table      | Network| OCID-DRG-HUB-ROUTE-TABLE      | The OCID of Route table in DRG  |
+
+**NOTE:**
+Policies contain compartment paths. 
+The paths can change based on the modification in the previous [Compartments](#21-compartments) section. The paths need to be updated following the OCI [Policies and Compartment hierarchy](https://docs.oracle.com/en-us/iaas/Content/Identity/Concepts/policies.htm#hierarchy).
+
+
 ## **4. Deploy**
-<a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.0.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
 
-Use the link above to deploy using [Oracle Resource Manager (ORM)](/../../../commons/content/orm.md) or use [Terraform CLI](../../../commons/content/terraform.md)
+Use the magic button provided in the summary section to deploy the OKE LZ extension using [Oracle Resource Manager (ORM)](/../../../commons/content/orm.md) or use [Terraform CLI](../../../commons/content/terraform.md).
 
-This operation creates a default routing configuration. To complete the network layer setup, you need to deploy the firewalls and update the routing in the hub; all these steps are defined in this [POST operation](../1_oke_extension/1.1_Network_post_updates/readme.md). Once completed, everything will be ready for onboarding an OKE cluster.
+This operation creates a default routing configuration. To complete the network layer setup, deploy the firewalls and update the routing in the hub to prepare for deploying the OKE cluster. All these steps are defined in this [POST operation](../1_oke_extension/1.1_Network_post_updates/readme.md). Once completed, everything will be ready for onboarding an OKE cluster.
+
+**NOTE:**
+**Dynamic groups matching rules** have associated OCIDs that cannot be referenced using the dependencies feature. After the first apply job, you need to update the CMP-LZP-P-PLATFORM-KEY and CMP-LZP-PP-PLATFORM-KEY attributes with the correct OCIDs, and then run a second apply job.
 
 You can now proceed with [Step 2](../2_oke/).
-
 
 &nbsp;
 
