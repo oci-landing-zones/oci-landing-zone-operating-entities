@@ -35,7 +35,7 @@
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the One-OE Landing Zone OKE extension IAM Layer use the following JSON file: [oke_identity.auto.tfvars.json](./oke_identity.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the One-OE Landing Zone OKE extension IAM Layer use the following JSON file: [oci_oke_lz_ext_iam.auto.tfvars.json](./oci_oke_lz_ext_iam.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file covers three categories of resources described in the next sections.
 
@@ -165,7 +165,7 @@ The OKE Cluster requires specific subnets. You can review all these requirements
 
 <img src="../content/ProdNetwork.png" width="1000" height="auto">
 
-For configuring and running the OKE LZ extension Network layer use the following JSON file: [oke_network.auto.tfvars.json](./oke_network.auto.tfvars.json)
+For configuring and running the OKE LZ extension Network layer use the following JSON file: [oci_oke_lz_ext_network.auto.tfvars.json](./oci_oke_lz_ext_network.auto.tfvars.json).
 
 Our OKE LZ extension will deploy the necessary core resources for both the Production and Pre-production environments included in the ONE-OE blueprint. This example is based on the OCI VCN-Native Pod Networking CNI scenario. Some adjustments would be required for a Flannel setup.
 
