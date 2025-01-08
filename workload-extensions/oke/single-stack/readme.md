@@ -1,7 +1,7 @@
 # **[OKE Landing Zone Extension](#)**   <!-- omit from toc -->
 ## **An OCI Open LZ [Workload Extensions](#) to Reduce Your Time-to-Production** <!-- omit from toc -->
 
- <img src="../../commons/images/icon_oke.jpg" height="100">
+ <img src="../../../commons/images/icon_oke.jpg" height="100">
 &nbsp; 
 
 ## **1. Introduction**
@@ -22,11 +22,6 @@ These are the required steps to provision the OKE landing zone extension:
  2. Deploy the **base infrastructure** from the [Step 1 - OKE Extension](1_oke_extension/) guide.
  3. Create **OKE cluster** in [Step 2 - OKE cluster creation](2_oke/).
 
-&nbsp;
-
-## Acknowledgments <!-- omit from toc -->
-* **Authors**: *Paola Juárez* (Landing Zones Specialist) and *Alberto Campagna* ( Application Development DevOps Specialist) 
-* **Contributors**: *Peter Hrvola* (Landing Zones Specialist)
 &nbsp;
 
 ## License <!-- omit from toc -->

@@ -1,7 +1,7 @@
 # **[OKE Landing Zone Extension](#)**   <!-- omit from toc -->
 ## **An OCI Open LZ [Workload Extensions](#) to Reduce Your Time-to-Production**  <!-- omit from toc -->
 
- <img src="../../commons/images/icon_oke.jpg" height="100">
+ <img src="../../../commons/images/icon_oke.jpg" height="100">
 
 ## **1. Introduction**
 Welcome to the **OKE Landing Zone Extension**.
