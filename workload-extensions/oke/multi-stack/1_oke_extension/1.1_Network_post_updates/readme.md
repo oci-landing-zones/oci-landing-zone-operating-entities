@@ -42,7 +42,17 @@ You can use the find & replace of the IDE of your choice.
 
 **d.** Edit the ORM stack (op01) and replace the original Network JSON configuration file with the new **oci_oke_lz_ext_open_lz_post_hub_a_network_light.auto.tfvars** updated file.
 
-**e.** Run Plan & Apply.
+**e.** Run Plan & Apply in OP1.
+
+This is the diagram that show the Network after adding the post OP1 configuration:
+
+<img src="../../content/PostOP1.png" width="1000" height="auto">
+
+Now that the spokes are attached to the hub, you can update their routing by adding a rule to the DRG.
+
+**f.** Edit the ORM stack (op02) and replace the original Network JSON configuration file with the new **oci_oke_lz_ext_post_network.auto.tfvars** updated file.
+
+**g.** Run Plan & Apply in OP2.
 
 This is the diagram that show the final Network configuration:
 
