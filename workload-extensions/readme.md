@@ -22,8 +22,8 @@ Find below the list of available workload landing zones and our backlog. Be free
 | 2 | [<img src="../commons/images/icon_ocvs.jpg" height="30" align="center">](./ocvs) | A Pluggable  **OCVS** Landing Zone Workload. | [Available](./ocvs/) |
 | 3 | [<img src="./ai-services/diagrams/ai.png" height="30" align="center">](./ai-services) | A Pluggable **AI** Landing Zone Workload. |  [Available](./ai-services/) | 
 | 4 | **OCI OKE** | A Pluggable  **OKE** Landing Zone Extension. | Available On Demand | 
-| 5 | **OCI ExaCS** | A Pluggable  **ExaCS** Landing Zone Extension. | Available On Demand | 
-| 6 | **ExaCC** | A Pluggable  **ExaCC** Landing Zone Extension. | Available On Demand | 
+| 5 | [<img src="../commons/images/icon_exacc.jpg" height="30" align="center">](./exacc) | A Pluggable **ExaDB-C@C** Landing Zone Extension. | [Available](./exacc/) | 
+| 6 | **OCI ExaCS** | A Pluggable  **ExaCS** Landing Zone Extension. | Available On Demand | 
 
 
 &nbsp; 
