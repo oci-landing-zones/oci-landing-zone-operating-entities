@@ -588,7 +588,7 @@ Example of a DRG attachment creation:
 
 | STEP |  ACTION |
 |---|---| 
-| **1** | [![Deploy_To_OCI](/commons/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.3.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json"}) |
+| **1** | [![Deploy_To_OCI](/commons/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/ebs/op02-manage-ebs-lz-extension/json/ebs_identity_cmp_grp_pl_v1.auto.tfvars.json,https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/workload-extensions/ebs/op02-manage-ebs-lz-extension/json/ebs_network_rt_sl_v1.auto.tfvars.json"}) |
 | **2** | Accept terms,  wait for the configuration to load. |
 | **3** | Set the working directory to “orm-facade”. | 
 | **4** | Set the stack name you prefer. | 
@@ -705,7 +705,7 @@ You can proceed to [OP.03 Execute Manual Changes](../op03-manual-changes/).
 
 # License
 
-Copyright (c) 2024 Oracle and/or its affiliates.
+Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 

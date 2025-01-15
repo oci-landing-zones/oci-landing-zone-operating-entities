@@ -103,7 +103,7 @@ Subnets to path `network_configuration.network_configuration_categories["VCN-FRA
 
 # License <!-- omit from toc -->
 
-Copyright (c) 2024 Oracle and/or its affiliates.
+Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
