@@ -3,7 +3,6 @@
 
 &nbsp; 
 
-
 | | | |
 |---|---|---| 
 | **OPERATION** | **One-Stack Deployment with CIS Level 1 Security Controls** | **One-Stack Deployment with CIS Level 2 Security Controls** | 
