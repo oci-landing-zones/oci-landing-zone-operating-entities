@@ -26,7 +26,7 @@ This repository is the source of truth for the OCI Open LZ and includes three ty
 |  <img src="commons/images/size_l.svg" width="23" align="center"> |...[`multi-oe/`](blueprints/multi-oe/) |  Onboards **[Multiple](/blueprints/multi-oe/readme.md) OEs** with shared services and OE-dedicated resources, sharing **one tenancy**. |
 | <img src="commons/images/size_xl.svg" width="23" align="center">  |...[`multi-tenancy/`](blueprints/multi-tenancy/) | Uses One-OE and Multi-OE to onboard all your organizations or customers into **several tenancies**.
 **2** |**[`addons/`](addons/)** | **Complement** your blueprint to run OCI with **best practices**. (e.g., [**Network Hubs**](/addons/oci-hub-models/readme.md), [**OAG**](/addons/oci-oag/README.md))|
-| **3** |**[`workload-extensions/`](workload-extensions/)** | **Extend** your landing zone with pluggable **workloads** (e.g., [**EBS**](/workload-extensions/ebs/readme.md), [**OCVS**](/workload-extensions/oci-lz-ext-ocvs/README.md), [**AI**](/workload-extensions/ai-services/) [...](/workload-extensions/readme.md)).|
+| **3** |**[`workload-extensions/`](workload-extensions/)** | **Extend** your landing zone with pluggable **workloads** (e.g., [**EBS**](/workload-extensions/ebs), [**OCVS**](/workload-extensions/ocvs), [**AI**](/workload-extensions/ai-services/) [...](/workload-extensions)).|
 
 &nbsp; 
 

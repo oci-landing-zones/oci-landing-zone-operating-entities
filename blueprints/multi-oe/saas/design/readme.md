@@ -6,9 +6,9 @@
 
 **Table of Contents**
 
-[1. Introduction](#1-introduction)</br>
-[2. Security View](#3-security-view)</br>
-[3. Runtime View](#6-runtime-view)
+- [1. Introduction](#1-introduction)
+- [2. Security View](#2-security-view)
+- [3. Runtime View](#3-runtime-view)
 
 &nbsp; 
 
@@ -104,6 +104,6 @@ The ISV Customers comaprtment (light blue) holds the different dedicated compart
 
 &nbsp; 
 
-# 4. Runtime View
+# 3. Runtime View
 This chapter is presented [here](/blueprints/multi-oe/saas/runtime/readme.md) and guides the **deployment** activities for the **day two execution** of this model.
 

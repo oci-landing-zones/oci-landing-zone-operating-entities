@@ -5,7 +5,7 @@
 - [1. Groups](#1-groups)
 - [2. Policies](#2-policies)
 - [3. Quota Policies](#3-quota-policies)
-- [4. Security Zones](#3-security-zones)
+- [4. Security Zones](#4-security-zones)
 
 ## Summary
 This guide covers the implementation of the principles outlined in the [Sovereign Controls add-on](./readme.md) document. As an example, we are going to implement restrictions for a German customer using EU Sovereign Cloud who wants to restrict data to the `eu-frankfurt-2` region. However, configuration files can be modified to specifically fit the sovereign requirements of any customer.
@@ -14,7 +14,7 @@ This guide covers the implementation of the principles outlined in the [Sovereig
 Sovereign add-ons can be configured on top of any [OCI landing zone model](https://blogs.oracle.com/cloud-infrastructure/post/new-standardized-oci-landing-zones-framework). In this example, the Sovereign Landing Zone is built on top of the One-OE Landing Zone.[One-OE](../../blueprints/one-oe/) is a single operating-entity landing zone utilizing Oracle best practices for deployments in commercial regions. The Sovereign Landing Zone takes One-OE a step further and modifies it to meet the requirements of customers for sovereign regulations, either in EU Sovereign Cloud regions or any other OCI deployment models.
 
 ## IAM Layer
-You can find configuration examples for groups, policies, and quotas in [identity.auto.tfvars.json](./identity_svrgn.auto.tfvars.json) file.
+You can find configuration examples for groups, policies, and quotas in [identity.auto.tfvars.json](./identity.auto.tfvars.json) file.
 
 ## 1. Groups
 If a certain user group needs to be restricted to provisioning resources in a specific region, it's recommended to create a region-specific group. As IAM groups are global resources, we denote the region specificity using a naming convention, e.g., `grp-${region}-security-admins`. You can see an example configuration in the [identity.auto.tfvars.json](./identity.auto.tfvars.json) file, section `groups_configuration`. These groups can either extend the default groups provided by a landing zone or replace them if only a specific region is required.
@@ -45,12 +45,12 @@ Additionally for a multi-tenancy set-up [Governance Rules](https://docs.oracle.c
 
 ## Security Layer
 
-You can find configuration examples for security zones in [security.auto.tfvars.json](./security_svrgn.auto.tfvars.json) file.
+You can find configuration examples for security zones in [security.auto.tfvars.json](./security.auto.tfvars.json) file.
 
 ## 4. Security Zones
 OCI Sovereign Landing Zone proposes a strong security posture using all OCI capabilities, including Security Zones. Security Zones apply a security strategy to OCI cloud compartments and prevent actions that could undermine customers’ security posture. Security Zones policies can be applied to various types of cloud infrastructure (network, compute, storage, databases, etc.) to ensure the security of cloud resources and prevent security misconfigurations. Users determine which policies are appropriate for their needs by defining custom policy sets for each security zone.
 
-The Sovereign Landing Zone implements the same configuration outlined in the [One-OE blueprint](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/design). It includes five recipes that serve as examples of best practices. Security zones are defined using policy OCIDs, which are tied to specific realms. For sovereign realms, you must use the appropriate OCID, as the generic configuration is not valid. Refer to the provided example for the correct configuration.
+The Sovereign Landing Zone implements the same configuration outlined in the [One-OE blueprint](/blueprints/one-oe/design). It includes five recipes that serve as examples of best practices. Security zones are defined using policy OCIDs, which are tied to specific realms. For sovereign realms, you must use the appropriate OCID, as the generic configuration is not valid. Refer to the provided example for the correct configuration.
 ```
 "SZ-RCP-LZP-03-SHARED-NETWORK-KEY": {
                 "name": "sz-rcp-lzp-03-shared-network",

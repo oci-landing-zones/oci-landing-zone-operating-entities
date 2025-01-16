@@ -29,7 +29,7 @@
 | **TARGET RESOURCES**      | **Security**: Compartments, Groups, Policies</br>                                                      |
 | **IAM CONFIGURATION**     | [language_identity.auto.tfvars.json](/workload-extensions/ai-services/language/language_identity.auto.tfvars.json) |
 | **PRE-ACTIVITIES**        | Execute [Deploy One-OE LZ](../../../blueprints/one-oe/)                                                                                                                                              
-| **RUN OPERATION**         | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli).                                                                                  |
+| **RUN OPERATION**         | Use [ORM](#3-run-with-orm) or use [Terraform CLI](#4-run-with-terraform-cli).                                                                                  |
 
 
 
@@ -151,4 +151,4 @@ Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](/LICENSE) for more details.
+See [LICENSE](/LICENSE.txt) for more details.

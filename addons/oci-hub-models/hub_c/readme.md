@@ -5,15 +5,15 @@
 
 **Table of Contents**
 
-[1. Overview](#1-overview)</br>
-[2. Components](#2-components)</br>
-[3. Specifications and Considerations](#3-specifications-and-considerations)</br>
-[4. Routing](#4-routing)</br>
-[5. Automation](#5-automation)</br>
+- [1. Overview](#1-overview)
+- [2. Components](#2-components)
+- [3. Specifications and Considerations](#3-specifications-and-considerations)
+- [4. Routing](#4-routing)
+- [5. Automation](#5-automation)
 
 &nbsp;
 
-### Overview
+### 1. Overview
 **Hub C** features third-party network firewalls configured in an Active/Active design, paired with OCI private Network Load Balancers operating in transparent mode with symmetric hashing to ensure packet flow symmetry. These firewalls manage both Inbound/Outbound (North-South) and East-West traffic, providing thorough control and inspection.
 
 &nbsp; 
@@ -89,4 +89,4 @@ Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+See [LICENSE](/LICENSE.txt) for more details.
