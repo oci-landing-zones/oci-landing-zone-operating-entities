@@ -15,7 +15,7 @@
 
 ## **1. Summary**
 
-<a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.3.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
+<a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
 
 *Use the link above to run this extension by adding the updated configuration*
 
@@ -120,7 +120,7 @@ The network layer covers the following resources:
 &nbsp; 
 
 ## **4. Deploy**
-<a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.3.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
+<a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
 
 Use the link above to deploy using [Oracle Resource Manager (ORM)](/commons/content/orm.md) or use [Terraform CLI](/commons/content/terraform.md)
 
@@ -132,7 +132,7 @@ You can now proceed with [Step 2](./../2_ocvs/README.md).
 
 # License <!-- omit from toc -->
 
-Copyright (c) 2024 Oracle and/or its affiliates.
+Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 

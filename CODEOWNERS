@@ -6,3 +6,4 @@
 /blueprints/one-oe/runtime/ @paalonso
 /blueprints/multi-oe/generic_v1/runtime/ @paalonso
 /blueprints/multi-oe/saas/runtime/ @paalonso
+/workload-extensions/exacc/ @paalonso
