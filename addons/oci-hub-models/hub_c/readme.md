@@ -85,7 +85,7 @@ For automating this Hub model use the [CIS Network](https://github.com/oci-landi
 
 # License
 
-Copyright (c) 2024 Oracle and/or its affiliates.
+Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
