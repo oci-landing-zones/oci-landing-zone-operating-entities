@@ -97,7 +97,7 @@ In this example we use YAML configurations files, but JSON files examples are al
 | **2** | Accept terms,  **wait** for the configuration to load. |
 | **3** | Set the working directory to “**rms-facade**”. | 
 | **4** | Set the stack **name** you prefer. | 
-| **5** | Set the terraform **version** to 1.2.x. Click Next. | 
+| **5** | Set the terraform **version** to 1.5.x. Click Next. | 
 | **6** | **Delete** the default configuration link and **paste** the new **git raw link** of your **oci_learn_lz_iam.yml** remote file. </br>**NOTE:** Don't forget to press enter or click on the "Add" pop-up after pasting. |
 | **7** | **Un-check** run apply. Click Create. |
 | **8** | Run Terraform **Plan** and review the output messages. |
