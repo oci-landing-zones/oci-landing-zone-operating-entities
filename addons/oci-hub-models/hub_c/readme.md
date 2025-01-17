@@ -5,11 +5,15 @@
 
 **Table of Contents**
 
-- [1. Overview](#1-overview)
-- [2. Components](#2-components)
-- [3. Specifications and Considerations](#3-specifications-and-considerations)
-- [4. Routing](#4-routing)
-- [5. Automation](#5-automation)
+- [OCI Open LZ - Hub C](#oci-open-lz---hub-c)
+  - [A Hub with 3rd Party FW - Active/Active](#a-hub-with-3rd-party-fw---activeactive)
+    - [1. Overview](#1-overview)
+    - [2. Components](#2-components)
+    - [3. Specifications and Considerations](#3-specifications-and-considerations)
+    - [4. Routing](#4-routing)
+      - [Legend:](#legend)
+    - [5. Automation](#5-automation)
+- [License](#license)
 
 &nbsp;
 
@@ -78,7 +82,7 @@ For a comprehensive understanding of how network packets flow within **Hub C** a
 
 ### 5. Automation
 
-For automating this Hub model use the [CIS Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking) Terraform modules. As an example configuration please refer to [oci_open_lz_one-oe_network.auto.tfvars.json](/one-oe/runtime/one-click/oci_open_lz_one-oe_network.auto.tfvars.json).
+For automating this Hub model use the [OCI LZ Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking) Terraform modules. As an example configuration please refer to [oci_open_lz_hub_a_network_light.auto.tfvars.json](../hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json).
 
 
 &nbsp; 
