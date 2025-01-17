@@ -19,7 +19,7 @@
 
 The OCI Open LZ is a set of public and open assets to onboard OCI, available in a dedicated [Git Repository](https://github.com/oracle-quickstart/terraform-oci-open-lz), containing a complete design **blueprint**, several **IaC** configuration **examples**, and **enablement** activities.
 
-This document is a subset of the OCI Open LZ, and it provides an executive summary of the **Multi-OE blueprint**. The complete blueprint is presented in detail in the [PDF](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) format and supported by a [Drawio](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) containing all design diagrams, for reuse while tailoring new landing zones.
+This document is a subset of the OCI Open LZ, and it provides an executive summary of the **Multi-OE blueprint**. The complete blueprint is presented in detail in the [PDF](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) format and supported by a [Drawio](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) containing all design diagrams, for reuse while tailoring new landing zones.
 
 For more approaches and assets on OCI Landing Zones refer to the [OCI Landing Zone Framework](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/README.md).
 
@@ -96,7 +96,7 @@ Before proceeding, it’s highly recommended OCI foundational knowledge for its 
 &nbsp; 
 
 # **2. Functional View**
-This chapter presents the key entities of the OCI Open LZ and how they relate to each other. These entities are presented below in an Entity Relationship Diagram (ERD) format. All elements and relations are presented and described in detail in the [OCI Open LZ PDF - Functional View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
+This chapter presents the key entities of the OCI Open LZ and how they relate to each other. These entities are presented below in an Entity Relationship Diagram (ERD) format. All elements and relations are presented and described in detail in the [OCI Open LZ PDF - Functional View](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
  
 &nbsp; 
 
@@ -125,7 +125,7 @@ The diagram below presents the tenancy structure for Levels 1 and 2, separating 
 &nbsp; 
 
 
-For more details on the tenancy structure levels (L3-L5), related IAM with OCI Groups and Policies, and security posture applied refer to the [OCI Open LZ PDF - Security View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
+For more details on the tenancy structure levels (L3-L5), related IAM with OCI Groups and Policies, and security posture applied refer to the [OCI Open LZ PDF - Security View](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
 
 
 &nbsp; 
@@ -183,7 +183,7 @@ An example of East-West connectivity is presented in the diagram below.
 
 &nbsp; 
 
-For more details on the network design including all the descriptions for each element, their security posture, the most significant traffic scenarios (e.g., North-South and East-West), and DNS, please refer to the [OCI Open LZ PDF - Network View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
+For more details on the network design including all the descriptions for each element, their security posture, the most significant traffic scenarios (e.g., North-South and East-West), and DNS, please refer to the [OCI Open LZ PDF - Network View](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
 
 
 &nbsp; 
@@ -262,7 +262,7 @@ Five operations scenarios are identified in the OCI Open LZ. Find below the **OP
 
 &nbsp; 
 
-For more details on the actors/teams and remaining operation scenarios, please refer to the [OCI Open LZ PDF - Operations View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
+For more details on the actors/teams and remaining operation scenarios, please refer to the [OCI Open LZ PDF - Operations View](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). 
 
 &nbsp; 
 
@@ -285,7 +285,7 @@ Note that there will be two types of repositories:
 1. The **operations repositories** will contain only IaC configurations.
 2. The **code repository** will be used to run these configurations repeatedly. The lifecycle of this repository is out of the scope of this document
 
-This separation is crucial and is presented in detail with all the repositories and their structure in the [OCI Open LZ PDF - Operations View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). Find below an example of how an **OE Repository** can be structured. The first column's color code matches the ERD's color code in the Functional View and the architecture diagrams presented in the Security View and Network View.
+This separation is crucial and is presented in detail with all the repositories and their structure in the [OCI Open LZ PDF - Operations View](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). Find below an example of how an **OE Repository** can be structured. The first column's color code matches the ERD's color code in the Functional View and the architecture diagrams presented in the Security View and Network View.
 
 &nbsp; 
 
@@ -305,7 +305,7 @@ The diagram below presents a high-level example component model for the operatio
 As stated at the beginning of the chapter, this approach upholds the principle that **Git is the only source of truth**. The operation scenarios executed on the system are stored in Git such that authorized readers can view the entire audit trail of changes. All changes to the desired state will be fully traceable with commits associated with committer information, commit IDs, and time stamps. This means that **the OCI Open LZ infrastructure is a set of versioned artifacts** and can be audited using the standards of software development and delivery.
 
 
-For a complete view of the operations design for the OCI Open LZ, and how to tailor a GitOps operating model to your needs, please refer to the [OCI Open LZ PDF - Operations View](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
+For a complete view of the operations design for the OCI Open LZ, and how to tailor a GitOps operating model to your needs, please refer to the [OCI Open LZ PDF - Operations View](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
 
 &nbsp; 
 &nbsp; 
