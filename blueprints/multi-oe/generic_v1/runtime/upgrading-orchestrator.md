@@ -178,7 +178,7 @@ To update the configuration, follow these steps:
    * ***Stack information section***:
      * Drop the zip file that you've just downloaded in the *Drop a .zip file* rectangle.
      * In the *Working directory*, select the *terraform-oci-landing-zones-orchestrator-main/rms-facade*.
-     * In the *Terraform version* dropdown list, select the "1.2.x" version. Confirm clicking in *Yes* button the Terraform version change dialog box when appears. This step should look like this:
+     * In the *Terraform version* dropdown list, select the "1.5.x" version. Confirm clicking in *Yes* button the Terraform version change dialog box when appears. This step should look like this:
     ![ORM-Stack-information](/commons/images/ORM-Stack-information.jpg)
      * Click *Next*.
    * ***Configure variables section***:

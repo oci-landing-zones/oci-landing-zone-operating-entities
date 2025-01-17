@@ -20,8 +20,8 @@
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br> |
 | **IAM CONFIG**| [open_lz_oe_01_prod_DEP_A_identity.auto.tfvars.json](./open_lz_oe_01_prod_deptA_identity.auto.tfvars.json)|
 | **TERRAFORM MODULES**| [CIS Landing Zone IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
-| **PRE-ACTIVITIES** | An Operating Entity onboarded with [OP.02 Manage Operating Entity (OE)](/blueprints/multi-oe/runtime/op02_manage_oes/oe01/readme.md). |
+| **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
+| **PRE-ACTIVITIES** | An Operating Entity onboarded with [OP.02 Manage Operating Entity (OE)](/blueprints/multi-oe/generic_v1/runtime/op02_manage_oes/oe01/readme.md). |
 | **POST-ACTIVITIES** | The execution of this operation by the OE Ops Team creates the department in an specific OE environment. Replicate for other existing OE environments where the department should belong to. |
 | **RUN OPERATION** | Use [ORM](#3-run-with-orm) or use [Terraform CLI](#4-run-with-terraform-cli). |
 
@@ -87,7 +87,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **2.2 Groups**
 
-The [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides explanation of the possible separation of duties with the different tenancy structure levels. The department structure is optional.
+The [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides explanation of the possible separation of duties with the different tenancy structure levels. The department structure is optional.
 
 Meanwhile, you can proceed by updating with the desired groups, or use the empty groups configuration looks like in the example below:
 
@@ -106,7 +106,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.3 Dynamic Groups**
 
-The [OCI Open LZ Multi-OE [Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) explains the possible separation of duties with the different tenancy structure levels. It is not specified for the departments any configuration.
+The [OCI Open LZ Multi-OE [Design document](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) explains the possible separation of duties with the different tenancy structure levels. It is not specified for the departments any configuration.
 
 Meanwhile, you can proceed by updating with the desired dynamic groups, or use the empty groups configuration looks like in the example below:
 
@@ -125,7 +125,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.4 Policies**
 
-The [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides full explanation of the possible separation of duties with the different tenancy structure levels. It is not specified for the departments any configuration.
+The [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) provides full explanation of the possible separation of duties with the different tenancy structure levels. It is not specified for the departments any configuration.
 
 Meanwhile, you can proceed by updating with the desired policies, or use the following example:
 
@@ -154,7 +154,7 @@ For an example of such configuration and for extended documentation please refer
 | **2** | Accept terms,  wait for the configuration to load. |
 | **3** | Set the working directory to “rms-facade”. | 
 | **4** | Set the stack name you prefer. | 
-| **5** |  Set the terraform version to 1.2.x. Click Next. | 
+| **5** |  Set the terraform version to 1.5.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next. Optionally,replace with your json/yaml config files. |
 | **7** | Un-check run apply. Click Create. 
 

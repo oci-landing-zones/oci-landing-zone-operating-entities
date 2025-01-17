@@ -24,7 +24,7 @@
 | **IAM CONFIG**| [open_lz_oe_01_identity.auto.tfvars.json](open_lz_oe_01_identity.auto.tfvars.json)|
 | **NETWORK CONFIG** |[open_lz_oe_01_network.auto.tfvars.json](open_lz_oe_01_network.auto.tfvars.json) |
 | **TERRAFORM MODULES**| [CIS IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam), [CIS Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking)  |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
+| **DETAILS** |  For more details refer to the [OCI Open LZ Design document](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).|
 | **PRE-ACTIVITIES** | [OP.01 Shared Services](../../op01_manage_shared_services/readme.md) executed. Update network config with OCID of the hub. |
 | **POST-ACTIVITIES** | **POST.OP02.01** The first execution of this operation by the Central IT team requires the hand-over to the target OE Operations team the OCIDs for their OE core resources</br> [**POST.OP.02.02**](./post_op02_02_update_dynamic_groups/readme.md) Update the dynamic group instance.compartment.ocid with the OCID of the compartment of the dynamic groups members.</br> [**POST.OP.03.03**](./post_op02_03_update_iam_policies_project_team/readme.md) After the on-boarding of a new OE project, update IAM policies to give access to the OE Project Team to shared networking resources.|
 | **RUN OPERATION** | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli). |
@@ -152,7 +152,7 @@ For extended documentation please refer to the [Identity & Access Management CIS
 
 ### **2.2 Groups**
 
-Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
 
 ```
 ...
@@ -179,7 +179,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.3 Dynamic Groups**
 
-Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the  [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
+Here we have an example of the shared infrastructure OCI IAM Groups topology configuration as seen in the  [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf).
 
 ```
 ...
@@ -204,7 +204,7 @@ For an example of such configuration and for extended documentation please refer
 
 ### **2.4 Policies**
 
-We provide here an example of how to setup the IAM policies for the design discussed in the  [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). Notice that these policies must be considered as an example of how to deploy the blueprint based on CIS separation of duties, but not as a prescribed configuration. We encourage you to review and adapt to your design.
+We provide here an example of how to setup the IAM policies for the design discussed in the  [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). Notice that these policies must be considered as an example of how to deploy the blueprint based on CIS separation of duties, but not as a prescribed configuration. We encourage you to review and adapt to your design.
 
 For this example, replace the compartment_id "<OCID-COMPARTMENT-ROOT>" value to your tenancy OCID.
 
@@ -268,7 +268,7 @@ For a better understanding on this configuration example, check the [OE01 networ
 | **2** | Accept terms,  wait for the configuration to load. |
 | **3** | Set the working directory to “rms-facade”. | 
 | **4** | Set the stack name you prefer. | 
-| **5** |  Set the terraform version to 1.2.x. Click Next. | 
+| **5** |  Set the terraform version to 1.5.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next. Optionally,replace with your json/yaml config files. |
 | **7** | Un-check run apply. Click Create. 
 

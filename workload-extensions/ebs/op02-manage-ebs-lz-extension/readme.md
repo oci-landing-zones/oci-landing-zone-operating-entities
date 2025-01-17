@@ -592,7 +592,7 @@ Example of a DRG attachment creation:
 | **2** | Accept terms,  wait for the configuration to load. |
 | **3** | Set the working directory to “orm-facade”. | 
 | **4** | Set the stack name you prefer. | 
-| **5** | Set the terraform version to 1.2.x. Click Next. | 
+| **5** | Set the terraform version to 1.5.x. Click Next. | 
 | **6** | Update with the links to your IAM and Network configurations. Click Next. |
 | **7** | Un-check run apply. Click Create. 
 

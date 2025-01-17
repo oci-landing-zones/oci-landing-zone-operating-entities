@@ -27,9 +27,9 @@
 | **DEPLOYMENT NAME**              | GenAI Landing Zone Workload Extension                                                                                                                                    |
 | **OBJECTIVE**             | Provision OCI GENAI Landing Zone IAM Extensions.                                                                                                    |
 | **TARGET RESOURCES**      | **Security**: Compartments, Groups, Policies</br>                                                      |
-| **IAM CONFIGURATION**     | [genai_identity.auto.tfvars.json](/workload-extensions/ai-services/genai/genai_identity.auto.tfvars.json) |
+| **IAM CONFIGURATION**     | [genai_identity.auto.tfvars.json](/workload-extensions/ai-services/genai/oci_open_lz_one-oe_identity.auto.tfvars.json) |
 | **PRE-ACTIVITIES**        | Execute [Deploy One-OE LZ](../../../blueprints/one-oe/)                                                                                                                                              
-| **RUN OPERATION**         | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli).                                                                                  |
+| **RUN OPERATION**         | Use [ORM](#3-run-with-orm) or use [Terraform CLI](#4-run-with-terraform-cli).                                                                                  |
 
 
 
@@ -37,7 +37,7 @@
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the One-OE Landing Zone Genai extension Identity Layer use the following JSON file: [genai_identity.auto.tfvars.json](/workload-extensions/ai-services/genai/genai_identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the One-OE Landing Zone Genai extension Identity Layer use the following JSON file: [genai_identity.auto.tfvars.json](/workload-extensions/ai-services/genai/oci_open_lz_one-oe_identity.auto.tfvars.json) You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file covers three categories of resources described in the next sections.
 
@@ -102,7 +102,7 @@ For customizations see the full [policy resource documentation](https://github.c
 | **2** | Accept terms,  wait for the configuration to load.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | **3** | Set the working directory to “orm-facade”.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | **4** | Set the stack name you prefer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| **5** | Set the terraform version to 1.2.x. Click Next.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **5** | Set the terraform version to 1.5.x. Click Next.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | **6** | Update with the links to your IAM and Network configurations (OCI Object Storage is recommended) Click Next.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | **7** | Un-check run apply. Click Create.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
@@ -157,4 +157,4 @@ Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](/LICENSE) for more details.
+See [LICENSE](/LICENSE.txt) for more details.

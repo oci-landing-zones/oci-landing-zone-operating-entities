@@ -21,7 +21,7 @@
 | **TARGET RESOURCES** | - **Security**: Compartments, Groups, Policies</br>- **Network**: NSG  |
 | **IAM CONFIGURATION**| [open_lz_oe_01_prod_deptA_proj1_prd_identity.auto.tfvars.json](open_lz_oe_01_prod_deptA_proj1_prd_identity.auto.tfvars.json)|
 | **NETWORK CONFIGURATION** |[open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json](open_lz_oe_01_prod_deptA_proj1_prd_network.auto.tfvars.json) |
-| **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). |
+| **DETAILS** |  For more details refer to the [OCI Open LZ Multi-OE Design document](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf). |
 | **PRE-ACTIVITIES** | - OP.02 (Network updates) </br>- OP.03 (Create Department) |
 | **POST-ACTIVITIES** | N/A |
 | **RUN OPERATION** | Use [ORM](#4-run-with-orm) or use [Terraform CLI](#5-run-with-terraform-cli). |
@@ -204,7 +204,7 @@ For complete documentation and a larger set of examples on configuring an OCI ne
 | **2** | Accept terms,  wait for the configuration to load. |
 | **3** | Set the working directory to “rms-facade”. | 
 | **4** | Set the stack name you prefer. | 
-| **5** |  Set the terraform version to 1.2.x. Click Next. | 
+| **5** |  Set the terraform version to 1.5.x. Click Next. | 
 | **6** | Accept the defaul configurations. Click Next. Optionally,replace with your json/yaml config files. |
 | **7** | Un-check run apply. Click Create. 
 
