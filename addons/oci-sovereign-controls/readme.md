@@ -34,7 +34,7 @@ Within a realm, policies and quotas can be utilized to limit resource usage in o
 ### Policies
 Policies can be used to restrict permissions to a specific region by limiting access to resources in other regions. Here's an example of a limit policy for the eu-frankfurt-2 (for short, STR) region, which is the OCI EU Sovereign Cloud Germany Central region.
 ```
-Allow group str-admins to manage all-resources in tenancy where request.region = 'str'
+Allow group grp-str-auditors to view all-resources in tenancy where request.region = 'str'
 ```
 A policy limit like this can be applied to any required policy. Note that IAM-related permissions always need to be assigned in the Home Region. If it’s necessary to manage multiple segregated locations with different regulations, it’s recommended to consider using a child tenancy to set up different boundaries.
 
