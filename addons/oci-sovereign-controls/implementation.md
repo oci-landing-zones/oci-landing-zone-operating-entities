@@ -25,7 +25,7 @@ If a certain user group needs to be restricted to provisioning resources in a sp
 ## 2. Policies
 Policies are applied to region-specific groups created in the previous step. All policies in the Sovereign Landing Zone add-on use the same permissions as in [One-OE](../../blueprints/one-oe) LZ, but with the addition of a condition to limit the permission to a specific region e.g.
 ```
-Allow group grp-str-security-admins to manage all-resources in tenancy where request.region = 'str'
+Allow group grp-str-auditors to view all-resources in tenancy where request.region = 'str'
 ```
 
 ## 3. Quota Policies
