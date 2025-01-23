@@ -1,27 +1,27 @@
 module "oke" {
   source         = "oracle-terraform-modules/oke/oci"
   version        = "5.1.8"
-  compartment_id = "<CMP-PLATFORM-OKE-KEY>"
+  compartment_id = "<CMP-PLATFORM-OKE-OCID>"
   # IAM - Policies
   create_iam_autoscaler_policy = "never"
   create_iam_kms_policy        = "never"
   create_iam_operator_policy   = "never"
   create_iam_worker_policy     = "never"
   # Network module - VCN
-  vcn_id = "<VCN-OKE-KEY>"
+  vcn_id = "<VCN-OKE-OCID>"
   subnets = {
-    cp      = { id = "<SN-CP-KEY>" }
-    int_lb  = { id = "<SN-PRIV-LB-KEY>" }
-    workers = { id = "<SN-WORKERS-KEY>" }
-    pods    = { id = "<SN-PODS-KEY>" }
+    cp      = { id = "<SN-CP-OCID>" }
+    int_lb  = { id = "<SN-PRIV-LB-OCID>" }
+    workers = { id = "<SN-WORKERS-OCID>" }
+    pods    = { id = "<SN-PODS-OCID>" }
   }
   nsgs = {
-    cp      = { id = "<NSG-CP-KEY>" }
-    int_lb  = { id = "<NSG-INT-LB-KEY>" }
-    workers = { id = "<NSG-WORKERS-KEY>" }
-    pods    = { id = "<NSG-PODS-KEY>" }
+    cp      = { id = "<NSG-CP-OCID>" }
+    int_lb  = { id = "<NSG-INT-LB-OCID>" }
+    workers = { id = "<NSG-WORKERS-OCID>" }
+    pods    = { id = "<NSG-PODS-OCID>" }
   }
-  network_compartment_id            = "<CMP-NETWORK-KEY>"
+  network_compartment_id            = "<CMP-NETWORK-OCID>"
   assign_public_ip_to_control_plane = false
   assign_dns                        = true
   create_vcn                        = false
@@ -56,8 +56,9 @@ module "oke" {
   # Workers
   worker_pool_mode  = "node-pool"
   worker_pool_size  = 1
-  worker_image_type = "custom"
-  worker_image_id   = "Oracle-Linux-8.9-2024.05.29-0-OKE-1.29.1-707"
+  worker_image_type = "oke"
+  worker_image_os = "Oracle Linux"
+  worker_image_os_version = "8.8"
   worker_cloud_init = [
     {
       content      = <<-EOT

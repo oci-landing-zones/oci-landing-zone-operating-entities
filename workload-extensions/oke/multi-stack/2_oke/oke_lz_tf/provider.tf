@@ -11,3 +11,8 @@ terraform {
 provider "oci" {
   region = var.region
 }
+
+provider "oci" {
+  region = var.region
+  alias  = "home"
+}
