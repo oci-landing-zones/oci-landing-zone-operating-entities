@@ -1,9 +1,6 @@
-# OP.1.1 - Firewall and RT updates <!-- omit from toc -->
-## **Table of Contents** <!-- omit from toc -->
-- [**1. Routing**](#1-routing)
+# Firewalls and RT updates <!-- omit from toc -->
 
-
-## **1. Routing**
+## **Routing**
 
 In all of our OCI Landing Zone models, we recommend implementing a Hub-and-Spoke network architecture. This approach enables you to deploy a firewall in the hub for traffic inspection, ensuring enhanced security. To save time in the design phase with our customers, we have included four hub models. You can choose to use either our OCI native firewall or a third-party solution, such as Fortinet or Palo Alto. Explore the four models [here](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models).
 

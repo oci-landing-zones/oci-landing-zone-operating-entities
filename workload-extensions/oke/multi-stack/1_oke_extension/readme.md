@@ -318,9 +318,9 @@ Use the magic button provided in the summary section to deploy the OKE LZ extens
 This operation creates a default routing configuration. To complete the network layer setup, deploy the firewalls and update the routing in the hub to prepare for deploying the OKE cluster. All these steps are defined in this [POST operation](../1_oke_extension/1.1_Network_post_updates/readme.md). Once completed, everything will be ready for onboarding an OKE cluster.
 
 **NOTE:**
-**Dynamic groups matching rules** have associated OCIDs that cannot be referenced using the dependencies feature. After the first apply job, you need to update the CMP-LZP-P-PLATFORM-KEY and CMP-LZP-PP-PLATFORM-KEY attributes with the correct OCIDs, and then run a second apply job.
+**Dynamic groups matching rules** have associated OCIDs that cannot be referenced using the dependencies feature. After the first apply job, you need to update the CMP-PLATFORM-PROD-KEY and CMP-SECURITY-KEY attributes with the correct OCIDs, and then run a second apply job.
 
-You can now proceed with [Step 2](../2_oke/).
+You can now proceed and create the [OKE Cluster](../2_oke/).
 
 &nbsp;
 
