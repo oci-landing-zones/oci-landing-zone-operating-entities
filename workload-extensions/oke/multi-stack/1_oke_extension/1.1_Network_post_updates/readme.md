@@ -2,7 +2,6 @@
 ## **Table of Contents** <!-- omit from toc -->
 - [**1. Routing**](#1-routing)
 
-&nbsp; 
 
 ## **1. Routing**
 
@@ -40,19 +39,19 @@ For this OKE LZ EXT we provided a [customized Json file](../oci_oke_lz_ext_open_
 
 You can use the find & replace of the IDE of your choice.
 
-**d.** Edit the ORM stack (op01) and replace the original Network JSON configuration file with the new **oci_oke_lz_ext_open_lz_post_hub_a_network_light.auto.tfvars** updated file.
+**d.** Edit the ORM stack (STEP1) and replace the original Network JSON configuration file with the new **oci_oke_lz_ext_open_lz_post_hub_a_network_light.auto.tfvars** updated file.
 
-**e.** Run Plan & Apply in OP1.
+**e.** Run Plan & Apply to populate the new changes.
 
-This is the diagram that show the Network after adding the post OP1 configuration:
+This is the diagram that show the Network after adding the post STEP1 configuration:
 
-<img src="../../content/PostOP1.png" width="1000" height="auto">
+<img src="../../content/PostSTEP1.png" width="1000" height="auto">
 
 Now that the spokes are attached to the hub, you can update their routing by adding a rule to the DRG.
 
-**f.** Edit the ORM stack (op02) and replace the original Network JSON configuration file with the new **oci_oke_lz_ext_post_network.auto.tfvars** updated file.
+**f.** Edit the ORM stack (STEP2) and replace the original Network JSON configuration file with the new **oci_oke_lz_ext_network_npn_post.auto.tfvars** updated file.
 
-**g.** Run Plan & Apply in OP2.
+**g.** Run Plan & Apply to populate the new changes.
 
 This is the diagram that show the final Network configuration:
 

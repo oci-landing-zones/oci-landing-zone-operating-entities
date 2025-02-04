@@ -28,7 +28,7 @@
 | **OBJECTIVE**           | Provision Identity and Network                                                                               |
 | **TARGET RESOURCES**    | - **Identity**: Compartments, Groups, Dynamic groups and Policies </br>- **Network**: Spoke VCNs, Route tables, Security Lists, NSGs                 |
 | **PREREQUISITES**       | The [One-OE](../../../../blueprints/one-oe/) Blueprint deployed as a foundation. </br> For this example we have used: </br> [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json"}) </br>**Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_ONE-OE_deployment_steps.md).|
-| **CONFIGURATION FILES** | - [oci_oke_lz_ext_iam.auto.tfvars.json](./oci_oke_lz_ext_iam.auto.tfvars.json)  </br> - [oci_oke_lz_ext_network.auto.tfvars.json](./oci_oke_lz_ext_network.auto.tfvars.json)|
+| **CONFIGURATION FILES** | - [oci_oke_lz_ext_iam.auto.tfvars.json](./oci_oke_lz_ext_iam.auto.tfvars.json)  </br> - [oci_oke_lz_ext_network_npn.auto.tfvars.json](./oci_oke_lz_ext_network_npn.auto.tfvars.json)|
 | **DEPLOYMENT**          | [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/oke/workload-extensions/oke/multi-stack/1_oke_extension/oke_identity.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/oke/workload-extensions/oke/multi-stack/1_oke_extension/oke_network.auto.tfvars.json"}) </br> **Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_OKE-LZ-EXT_deployment_steps.md). [Terraform CLI](/commons/content/terraform.md)  can be also used.           |
 
 &nbsp; 
@@ -161,27 +161,37 @@ For a detailed review of OKE policies, please refer to the official OKE document
 
 ## **3. Setup Network Configuration**
 
-The OKE Cluster requires specific subnets. You can review all these requirements in the [OKE documentation](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengnetworkconfig.htm)
+The OKE Cluster requires specific subnets. You can review all these requirements in the [OKE documentation](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengnetworkconfig.htm).
 
-<img src="../content/ProdNetwork.png" width="1000" height="auto">
+By default we recommend to use native pod networking ([NPN](https://blogs.oracle.com/cloud-infrastructure/post/announcing-vcn-native-pod-networking-for-kubernetes-in-oci)).That provide more flexibility, more granular security, and consistent performance.
 
-For configuring and running the OKE LZ extension Network layer use the following JSON file: [oci_oke_lz_ext_network.auto.tfvars.json](./oci_oke_lz_ext_network.auto.tfvars.json).
+<img src="../content/ProdNetwork_NPN.png" width="1000" height="auto">
 
-Our OKE LZ extension will deploy the necessary core resources for both the Production and Pre-production environments included in the ONE-OE blueprint. This example is based on the OCI VCN-Native Pod Networking CNI scenario. Some adjustments would be required for a Flannel setup.
+For configuring and running the OKE LZ extension NPN Network layer use the following JSON file: [oci_oke_lz_ext_network_npn.auto.tfvars.json](./oci_oke_lz_ext_network_npn.auto.tfvars.json).
+
+
+If you choose to use Flannel, the diagram will be almost identical, except it will not include the pod subnet.
+
+<img src="../content/ProdNetwork_FLANNEL.png" width="1000" height="auto">
+
+For configuring and running the OKE LZ extension Network layer use the following JSON file: [oci_oke_lz_ext_network_flannel.auto.tfvars.json](./oci_oke_lz_ext_network_flannel.auto.tfvars.json).
+
+
+Our OKE LZ extension will deploy the necessary core resources for both the Production and Pre-production environments included in the ONE-OE blueprint. This example is based on the OCI VCN-Native Pod Networking CNI scenario. You should make a few adjustments and select the appropriate files for a Flannel setup.
 
 <img src="../content/Network.png" width="1000" height="auto">
 
 
 The network layer covers the following resources:
 1. Hub VCN for traffic inspection purposes, centralized DNS service, Internet Gateway, and NAT Gateway.
-1. Spoke management VCN for OKE management purposes.
-2. Spokes VNCs for each environment - one Spoke Pre-prod OKE VCN and one Spoke Prod OKE VCN
-3. Subnets - OKE required subnets; like cp,workers,pods,lb,database,fss and bastion subnet.
-4. Service Gateway - Service Gateway for access OCI services in all VCNs
-1. Security List - allowing all ingress/egress
-2. NSGs.
-3. Route Tables.
-4. DRG Attachments - Connect spokes with the central Hub
+2. Spoke management VCN for OKE management purposes.
+3. Spokes VNCs for each environment - one Spoke Pre-prod OKE VCN and one Spoke Prod OKE VCN
+4. Subnets - OKE required subnets; like cp,workers,pods,lb,database,fss and bastion subnet.
+5. Service Gateway - Service Gateway for access OCI services in all VCNs
+6. Security List - allowing all ingress/egress
+7. NSGs.
+8. Route Tables.
+9. DRG Attachments - Connect spokes with the central Hub
 
 In this asset, we use reserved CIDR blocks for the different VCNs, but this can be customized. To learn more about managing your OCI subnetting, we recommend checking this [asset](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/LZ_Subnetting/addons/oci-lz-subnetting).
 

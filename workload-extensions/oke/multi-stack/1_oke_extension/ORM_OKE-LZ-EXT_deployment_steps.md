@@ -1,4 +1,4 @@
-# Op2. ORM OKE LZ EXT Deployment Steps <!-- omit from toc -->
+# STEP2. ORM OKE LZ EXT Deployment Steps <!-- omit from toc -->
 
 If you deployed the 'Core LZ' in the initial operation using ORM and following the ONE-OE LZ model with the output feature enabled, deploying and running a LZ extension will be straightforward and require no additional changes.
 
