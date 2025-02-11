@@ -1,6 +1,6 @@
 {
   "network_configuration" : {
-    "default_enable_cis_checks" : true,
+    "default_enable_cis_checks" : false,
     "default_compartment_id" : "SHARED-NETWORK-CMP",
 
     "network_configuration_categories" : {
@@ -16,20 +16,20 @@
 
             "subnets" : {
               "LBR-SUB" : {
-                "cidr_block"                 : "192.168.0.0/28",
+                "cidr_block"                 : "192.168.0.0/29",
                 "dhcp_options_key"           : "default_dhcp_options",
-                "display_name"               : "lbr-sub",
+                "display_name"               : "lbr-subnet",
                 "dns_label"                  : "lbr",
                 "ipv6cidr_blocks"            : [],
                 "prohibit_internet_ingress"  : false,
                 "prohibit_public_ip_on_vnic" : false,
                 "route_table_key"            : "LBR-SUB-ROUTE",
-                "security_list_keys"         : ["CENTRAL-HUB-VCN-SL"]
+                "security_list_keys"         : []
               },
               "OUTDOOR-SUB" : {
-                "cidr_block"                 : "192.168.0.16/28",
+                "cidr_block"                 : "192.168.0.8/29",
                 "dhcp_options_key"           : "default_dhcp_options",
-                "display_name"               : "outdoor-sub",
+                "display_name"               : "outdoor-subnet",
                 "dns_label"                  : "outdoor",
                 "ipv6cidr_blocks"            : [],
                 "prohibit_internet_ingress"  : true,
@@ -38,9 +38,9 @@
                 "security_list_keys"         : ["CENTRAL-HUB-VCN-SL"]
               },
               "INDOOR-SUB" : {
-                "cidr_block"                 : "192.168.0.32/28",
+                "cidr_block"                 : "192.168.0.16/29",
                 "dhcp_options_key"           : "default_dhcp_options",
-                "display_name"               : "indoor-sub",
+                "display_name"               : "indoor-subnet",
                 "dns_label"                  : "indoor",
                 "ipv6cidr_blocks"            : [],
                 "prohibit_internet_ingress"  : true,
@@ -49,15 +49,26 @@
                 "security_list_keys"         : ["CENTRAL-HUB-VCN-SL"]
               },
               "MGMT-SUB" : {
-                "cidr_block"                 : "192.168.0.48/28",
+                "cidr_block"                 : "192.168.0.24/29",
                 "dhcp_options_key"           : "default_dhcp_options",
-                "display_name"               : "mgmt-sub",
+                "display_name"               : "mgmt-subnet",
                 "dns_label"                  : "mgmt",
                 "ipv6cidr_blocks"            : [],
                 "prohibit_internet_ingress"  : true,
                 "prohibit_public_ip_on_vnic" : true,
                 "route_table_key"            : "MGMT-SUB-ROUTE",
                 "security_list_keys"         : ["MGMT-SUB-SL"]
+              },
+              "JUMP-HOST-SUB" : {
+                "cidr_block"                 : "192.168.0.32/29",
+                "dhcp_options_key"           : "default_dhcp_options",
+                "display_name"               : "jump-host-subnet",
+                "dns_label"                  : "jumphost",
+                "ipv6cidr_blocks"            : [],
+                "prohibit_internet_ingress"  : true,
+                "prohibit_public_ip_on_vnic" : true,
+                "route_table_key"            : "JUMP-HOST-SUB-ROUTE",
+                "security_list_keys"         : ["JUMP-HOST-SUB-SL"]
               }
             },
 
@@ -68,7 +79,7 @@
                   {
                     "description"  : "Ingress on UDP type 3 code 4.",
                     "stateless"    : false,
-                    "protocol"     : "UDP",
+                    "protocol"     : "ICMP",
                     "src"          : "0.0.0.0/0",
                     "src_type"     : "CIDR_BLOCK",
                     "icmp_type"    : 3,
@@ -78,12 +89,12 @@
                 "egress_rules" : []
               },
               "MGMT-SUB-SL" : {
-                "display_name" : "mgmt-sub-sl",
+                "display_name" : "mgmt-subnet-sl",
                 "ingress_rules" : [
                   {
                     "description"  : "Ingress on UDP type 3 code 4.",
                     "stateless"    : false,
-                    "protocol"     : "UDP",
+                    "protocol"     : "ICMP",
                     "src"          : "0.0.0.0/0",
                     "src_type"     : "CIDR_BLOCK",
                     "icmp_type"    : 3,
@@ -92,10 +103,10 @@
                 ],
                 "egress_rules" : [
                   {
-                    "description"  : "Egress to Mgmt subnet on SSH port. Required by Bastion port forwarding session.",
+                    "description"  : "Egress to Mgmt subnet on SSH port. Required by Bastion service session.",
                     "stateless"    : false,
                     "protocol"     : "TCP",
-                    "dst"          : "192.168.0.48/28",
+                    "dst"          : "192.168.0.24/29",
                     "dst_type"     : "CIDR_BLOCK",
                     "dst_port_min" : "22",
                     "dst_port_max" : "22"
@@ -104,7 +115,41 @@
                     "description"  : "Egress to Mgmt subnet on HTTP port. Required by Bastion port forwarding session.",
                     "stateless"    : false,
                     "protocol"     : "TCP",
-                    "dst"          : "192.168.0.48/28",
+                    "dst"          : "192.168.0.24/29",
+                    "dst_type"     : "CIDR_BLOCK",
+                    "dst_port_min" : "443",
+                    "dst_port_max" : "443"
+                  }
+                ]
+              },
+              "JUMP-HOST-SUB-SL" : {
+                "display_name" : "jump-host-subnet-sl",
+                "ingress_rules" : [
+                  {
+                    "description"  : "Ingress on UDP type 3 code 4.",
+                    "stateless"    : false,
+                    "protocol"     : "ICMP",
+                    "src"          : "0.0.0.0/0",
+                    "src_type"     : "CIDR_BLOCK",
+                    "icmp_type"    : 3,
+                    "icmp_code"    : 4
+                  }
+                ],
+                "egress_rules" : [
+                  {
+                    "description"  : "Egress to Jump Host subnet on SSH port. Required by Bastion service session.",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "dst"          : "192.168.0.32/29",
+                    "dst_type"     : "CIDR_BLOCK",
+                    "dst_port_min" : "22",
+                    "dst_port_max" : "22"
+                  },
+                  {
+                    "description"  : "Egress to Jump Host subnet on HTTP port. Required by Bastion port forwarding session.",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "dst"          : "192.168.0.32/29",
                     "dst_type"     : "CIDR_BLOCK",
                     "dst_port_min" : "443",
                     "dst_port_max" : "443"
@@ -115,70 +160,78 @@
 
             "route_tables" : {
               "LBR-SUB-ROUTE" : {
-                "display_name" : "lbr-sub-route",
+                "display_name" : "lbr-subnet-route-table",
                 "route_rules" : {
                   "INTERNET-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-VCN-IGW",
-                    "description"        : "To Internet.",
+                    "description"        : "All traffic goes to Internet Gateway.",
                     "destination"        : "0.0.0.0/0",
                     "destination_type"   : "CIDR_BLOCK"
                   }
                 }
               },
               "OUTDOOR-SUB-ROUTE" : {
-                "display_name" : "outdoor-sub-route",
+                "display_name" : "outdoor-subnet-route-table",
                 "route_rules" : {
-                  "OSN-RULE" : {
-                    "network_entity_key" : "CENTRAL-HUB-VCN-SGW",
-                    "description"        : "To Oracle Services Network.",
-                    "destination"        : "all-services",
-                    "destination_type"   : "SERVICE_CIDR_BLOCK"
-                  },
-                  "NATGW-RULE" : {
+                  "TO-ANYWHERE-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-VCN-NATGW",
-                    "description"        : "To Internet.",
+                    "description"        : "All traffic goes to NAT Gateway",
                     "destination"        : "0.0.0.0/0",
                     "destination_type"   : "CIDR_BLOCK"
                   }
                 }
               },
               "INDOOR-SUB-ROUTE" : {
-                "display_name" : "indoor-sub-route",
+                "display_name" : "indoor-subnet-route-table",
                 "route_rules" : {
                   "TO-OSN-RULE" : {
-                    "description"        : "To Oracle Services Network.",
+                    "description"        : "Traffic destined to Oracle Services Network goes to Service Gateway.",
                     "destination"        : "all-services",
                     "destination_type"   : "SERVICE_CIDR_BLOCK",
                     "network_entity_key" : "CENTRAL-HUB-VCN-SGW"
                   },
-                  "TO-SECURITY-VCN-RULE" : {
-                    "description"       : "To DRG.",
-                    "destination"       : "192.168.0.64/26",
-                    "destination_type"  : "CIDR_BLOCK",
-                    "network_entity_key" : "CENTRAL-HUB-DRG"
-                  },
-                  "TO-SHARED-SERVICES-VCN-RULE" : {
-                    "description"       : "To DRG.",
-                    "destination"       : "192.168.0.128/26",
-                    "destination_type"  : "CIDR_BLOCK",
-                    "network_entity_key" : "CENTRAL-HUB-DRG"
+                  "TO-ANYWHERE-RULE" : {
+                    "network_entity_key" : "CENTRAL-HUB-DRG",
+                    "description"        : "All remaining traffic goes to DRG.",
+                    "destination"        : "0.0.0.0/0",
+                    "destination_type"   : "CIDR_BLOCK"
                   }
-          
-
                 }
               },
               "MGMT-SUB-ROUTE" : {
-                "display_name" : "sgw-natgw-route",
+                "display_name" : "mgmt-subnet-route-table",
                 "route_rules" : {
-                  "OSN-RULE" : {
-                    "network_entity_key" : "CENTRAL-HUB-VCN-SGW",
-                    "description"        : "To Oracle Services Network.",
-                    "destination"        : "all-services",
-                    "destination_type"   : "SERVICE_CIDR_BLOCK"
-                  },
-                  "NATGW-RULE" : {
+                  "TO-ANYWHERE-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-VCN-NATGW",
-                    "description"        : "To Internet.",
+                    "description"        : "All traffic goes to NAT Gateway",
+                    "destination"        : "0.0.0.0/0",
+                    "destination_type"   : "CIDR_BLOCK"
+                  }
+                }
+              },
+              "JUMP-HOST-SUB-ROUTE" : {
+                "display_name" : "jump-host-subnet-route-table",
+                "route_rules" : {
+                  "TO-OSN-RULE" : {
+                    "description"        : "Traffic destined to Oracle Services Network goes to Service Gateway.",
+                    "destination"        : "all-services",
+                    "destination_type"   : "SERVICE_CIDR_BLOCK",
+                    "network_entity_key" : "CENTRAL-HUB-VCN-SGW"
+                  },
+                  "TO-ANYWHERE-RULE" : {
+                    "network_entity_key" : "CENTRAL-HUB-DRG",
+                    "description"        : "All remaining traffic goes to DRG.",
+                    "destination"        : "0.0.0.0/0",
+                    "destination_type"   : "CIDR_BLOCK"
+                  }  
+                }
+              },
+              "SERVICE-GATEWAY-ROUTE" : {
+                "display_name" : "service-gateway-route-table",
+                "route_rules" : {
+                  "TO-ANYWHERE-RULE" : {
+                    "network_entity_key" : "CENTRAL-HUB-DRG",
+                    "description"        : "All traffic goes to DRG.",
                     "destination"        : "0.0.0.0/0",
                     "destination_type"   : "CIDR_BLOCK"
                   }
@@ -189,11 +242,11 @@
             },
 
             "network_security_groups" : {
-              "OUTDOOR-NLB-NSG" : {
-                "display_name" : "outdoor-nlb-nsg",
+              "LBR-NSG" : {
+                "display_name" : "lbr-nsg",
                 "ingress_rules" : {
                   "FROM-ANYWHERE-HTTPS" : {
-                    "description"  : "Ingress from 0.0.0.0/0 on HTTPS port 443.",
+                    "description"  : "Ingress from anywhere over HTTPS port 443.",
                     "stateless"    : false,
                     "protocol"     : "TCP",
                     "src"          : "0.0.0.0/0",
@@ -203,32 +256,8 @@
                   }
                 },
                 "egress_rules" : {
-                  "TO-OUTDOOR-FW-NSG" : {
-                    "description" : "Egress to Outdoor Firewall NSG.",
-                    "stateless"   : false,
-                    "protocol"    : "TCP",
-                    "dst"         : "OUTDOOR-FW-NSG",
-                    "dst_type"    : "NETWORK_SECURITY_GROUP"
-                  }
-                }
-              },
-
-              "OUTDOOR-FW-NSG" : {
-                "display_name" : "outdoor-fw-nsg",
-                "ingress_rules" : {
-                  "FROM-LBR-NSG" : {
-                    "description"  : "Ingress from Outdoor NLB NSG",
-                    "stateless"    : false,
-                    "protocol"     : "TCP",
-                    "src"          : "OUTDOOR-NLB-NSG",
-                    "src_type"     : "NETWORK_SECURITY_GROUP",
-                    "dst_port_min" : 80,
-                    "dst_port_max" : 80 
-                  }
-                },  
-                "egress_rules" : {
                   "TO-ANYWHERE" : {
-                    "description" : "Egress to anywhere over TCP",
+                    "description" : "Egress to anywhere.",
                     "stateless"   : false,
                     "protocol"    : "TCP",
                     "dst"         : "0.0.0.0/0",
@@ -236,90 +265,114 @@
                   }
                 }
               },
-              
+              "OUTDOOR-NLB-NSG" : {
+                "display_name" : "outdoor-nlb-nsg",
+                "ingress_rules" : {
+                  "FROM-LBR-NSG" : {
+                    "description"  : "Ingress from LBR NSG.",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "src"          : "LBR-NSG",
+                    "src_type"     : "NETWORK_SECURITY_GROUP"
+                  }
+                },
+                "egress_rules" : {
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
+                    "stateless"   : false,
+                    "protocol"    : "TCP",
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
+                  }
+                }
+              },
+              "OUTDOOR-FW-NSG" : {
+                "display_name" : "outdoor-fw-nsg",
+                "ingress_rules" : {
+                  "FROM-OUTDOOR-NSG" : {
+                    "description"  : "Ingress from Outdoor NLB NSG (for health checks).",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "src"          : "OUTDOOR-NLB-NSG",
+                    "src_type"     : "NETWORK_SECURITY_GROUP"
+                  },
+                  "FROM-LBR-NSG" : {
+                    "description"  : "Ingress from LBR NSG.",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "src"          : "LBR-NSG",
+                    "src_type"     : "NETWORK_SECURITY_GROUP"
+                  }
+                },  
+                "egress_rules" : {
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
+                    "stateless"   : false,
+                    "protocol"    : "TCP",
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
+                  }
+                }
+              },
               "INDOOR-NLB-NSG" : {
                 "display_name" : "indoor-nlb-nsg",
                 "ingress_rules" : {
                   "FROM-ANYWHERE" : {
-                    "description"  : "Ingress from anywhere over TCP",
+                    "description"  : "Ingress from anywhere.",
                     "stateless"    : false,
-                    "protocol"     : "TCP",
+                    "protocol"     : "ALL",
                     "src"          : "0.0.0.0/0",
-                    "src_type"     : "CIDR_BLOCK",
-                    "dst_port_min" : 80,
-                    "dst_port_max" : 80 
-                  }
-                },  
-                "egress_rules" : {
-                  "TO-INDOOR-FW-NSG" : {
-                    "description" : "Egress to Indoor Firewall NSG",
-                    "stateless"   : false,
-                    "protocol"    : "TCP",
-                    "dst"         : "INDOOR-FW-NSG",
-                    "dst_type"    : "NETWORK_SECURITY_GROUP"
-                  }
-                }
-              },
-
-              "INDOOR-FW-NSG" : {
-                "display_name" : "indoor-fw-nsg",
-                "ingress_rules" : {
-                  "FROM-NLB-NSG" : {
-                    "description"  : "Ingress from Indoor NLB NSG",
-                    "stateless"    : false,
-                    "protocol"     : "TCP",
-                    "src"          : "INDOOR-NLB-NSG",
-                    "src_type"     : "NETWORK_SECURITY_GROUP",
-                    "dst_port_min" : 80,
-                    "dst_port_max" : 80 
+                    "src_type"     : "CIDR_BLOCK"
                   }
                 },  
                 "egress_rules" : {
                   "TO-ANYWHERE" : {
-                    "description" : "Egress to anywhere over TCP",
+                    "description" : "Egress to anywhere.",
                     "stateless"   : false,
-                    "protocol"    : "TCP",
+                    "protocol"    : "ALL",
                     "dst"         : "0.0.0.0/0",
                     "dst_type"    : "CIDR_BLOCK"
                   }
                 }
               },
-
+              "INDOOR-FW-NSG" : {
+                "display_name" : "indoor-fw-nsg",
+                "ingress_rules" : {
+                  "FROM-ANYWHERE" : {
+                    "description"  : "Ingress from anywhere.",
+                    "stateless"    : false,
+                    "protocol"     : "ALL",
+                    "src"          : "0.0.0.0/0",
+                    "src_type"     : "CIDR_BLOCK"
+                  }
+                },  
+                "egress_rules" : {
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
+                    "stateless"   : false,
+                    "protocol"    : "ALL",
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
+                  }
+                }
+              },
               "MGMT-NSG" : {
                 "display_name" : "mgmt-nsg",
                 "ingress_rules" : {
-                  "FROM-EXTERNAL-HTTP" : {
-                    "description"  : "Ingress from external address to HTTP port. Allows inbound access for on-prem IP addresses.",
+                  "FROM-JUMP-HOST-NSG-SSH" : {
+                    "description"  : "Ingress from Jump Host NSG to SSH port. Required by hosts deployed in the Jump Host NSG.",
                     "stateless"    : false,
                     "protocol"     : "TCP",
-                    "src"          : "189.6.81.101/32",
-                    "src_type"     : "CIDR_BLOCK",
-                    "dst_port_min" : 443,
-                    "dst_port_max" : 443
-                  },
-                  "FROM-EXTERNAL-SSH" : {
-                    "description"  : "Ingress from external address to SSH port. Allows inbound access for on-prem IP addresses.",
-                    "stateless"    : false,
-                    "protocol"     : "TCP",
-                    "src"          : "189.6.81.101/32",
-                    "src_type"     : "CIDR_BLOCK",
-                    "dst_port_min" : 22,
-                    "dst_port_max" : 22
-                  },
-                  "FROM-BASTION-NSG-SSH" : {
-                    "description"  : "Ingress from bastion NSG to SSH port. Required by hosts deployed in the bastion NSG.",
-                    "stateless"    : false,
-                    "protocol"     : "TCP",
-                    "src"          : "BASTION-NSG",
+                    "src"          : "JUMP-HOST-NSG",
                     "src_type"     : "NETWORK_SECURITY_GROUP",
                     "dst_port_min" : 22,
                     "dst_port_max" : 22
                   },
                   "FROM-MGMT-SUBNET-SSH" : {
-                    "description"  : "Ingress from Mgmt subnet to SSH port. Required by Bastion port forwarding session.",
+                    "description"  : "Ingress from Mgmt subnet to SSH port. Required by Bastion service session.",
                     "stateless"    : false,
                     "protocol"     : "TCP",
-                    "src"          : "192.168.0.48/28",
+                    "src"          : "192.168.0.24/29",
                     "src_type"     : "CIDR_BLOCK",
                     "dst_port_min" : 22,
                     "dst_port_max" : 22
@@ -328,36 +381,42 @@
                     "description"  : "Ingress from Mgmt subnet to HTTP port. Required by Bastion port forwarding session.",
                     "stateless"    : false,
                     "protocol"     : "TCP",
-                    "src"          : "192.168.0.48/28",
+                    "src"          : "192.168.0.24/29",
                     "src_type"     : "CIDR_BLOCK",
                     "dst_port_min" : 443,
                     "dst_port_max" : 443
                   }
-                }
-              },
-
-              "BASTION-NSG" : {
-                "display_name" : "bastion-nsg",
-                "ingress_rules" : {
-                  "FROM-EXTERNAL-SSH" : {
-                    "description"  : "Ingress from external address to SSH port",
+                },
+                "egress_rules" : {
+                  "TO-ANYWHERE" : {
+                    "description"  : "Egress to anywhere",
                     "stateless"    : false,
                     "protocol"     : "TCP",
-                    "src"          : "189.6.81.101/32",
+                    "dst"          : "0.0.0.0/0",
+                    "dst_type"     : "CIDR_BLOCK"
+                  }
+                }
+              },
+              "JUMP-HOST-NSG" : {
+                "display_name" : "jump-host-nsg",
+                "ingress_rules" : {
+                  "FROM-JUMP-HOST-SUBNET-SSH" : {
+                    "description"  : "Ingress from Jump Host subnet to SSH port. Required by Bastion service session.",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "src"          : "192.168.0.32/29",
                     "src_type"     : "CIDR_BLOCK",
                     "dst_port_min" : 22,
                     "dst_port_max" : 22
                   }
                 },
                 "egress_rules" : {
-                  "TO-MGMT-NSG-SSH" : {
-                    "description"  : "Egress to Mgmt NSG",
+                  "TO-ANYWHERE" : {
+                    "description"  : "Egress to anywhere",
                     "stateless"    : false,
                     "protocol"     : "TCP",
-                    "dst"          : "MGMT-NSG",
-                    "dst_type"     : "NETWORK_SECURITY_GROUP",
-                    "dst_port_min" : 22,
-                    "dst_port_max" : 22
+                    "dst"          : "0.0.0.0/0",
+                    "dst_type"     : "CIDR_BLOCK"
                   }
                 }
               }
@@ -379,7 +438,8 @@
               "service_gateways" : {
                 "CENTRAL-HUB-VCN-SGW" : {
                   "display_name" : "central-hub-vcn-sgw",
-                  "services" : "all-services"
+                  "services" : "all-services",
+                  "route_table_key" : "SERVICE-GATEWAY-ROUTE"
                 }
               }
             }
@@ -397,7 +457,7 @@
               "SECURITY-VCN-FRONT-SUB" : {
                 "cidr_block"                 : "192.168.0.64/28",
                 "dhcp_options_key"           : "default_dhcp_options",
-                "display_name"               : "front-sub",
+                "display_name"               : "front-subnet",
                 "dns_label"                  : "front",
                 "ipv6cidr_blocks"            : [],
                 "prohibit_internet_ingress"  : true,
@@ -408,7 +468,7 @@
               "SECURITY-VCN-MID-SUB" : {
                 "cidr_block"                 : "192.168.0.80/28",
                 "dhcp_options_key"           : "default_dhcp_options",
-                "display_name"               : "mid-sub",
+                "display_name"               : "mid-subnet",
                 "dns_label"                  : "mid",
                 "ipv6cidr_blocks"            : [],
                 "prohibit_internet_ingress"  : true,
@@ -419,7 +479,7 @@
               "SECURITY-VCN-BACK-SUB" : {
                 "cidr_block"                 : "192.168.0.96/28",
                 "dhcp_options_key"           : "default_dhcp_options",
-                "display_name"               : "back-sub",
+                "display_name"               : "back-subnet",
                 "dns_label"                  : "back",
                 "ipv6cidr_blocks"            : [],
                 "prohibit_internet_ingress"  : true,
@@ -449,10 +509,8 @@
 
             "route_tables" : {
               "SECURITY-VCN-FRONT-SUB-ROUTE" : {
-                "display_name" : "front-sub-route",
+                "display_name" : "front-subnet-route-table",
                 "route_rules" : {
-                  
-
                   "DRG-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-DRG",
                     "description"        : "To DRG.",
@@ -462,10 +520,8 @@
                 }
               },
               "SECURITY-VCN-MID-SUB-ROUTE" : {
-                "display_name" : "mid-sub-route",
+                "display_name" : "mid-subnet-route-table",
                 "route_rules" : {
-                  
-
                   "DRG-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-DRG",
                     "description"        : "To DRG.",
@@ -475,10 +531,8 @@
                 }
               },
               "SECURITY-VCN-BACK-SUB-ROUTE" : {
-                "display_name" : "back-sub-route",
+                "display_name" : "back-subnet-route-table",
                 "route_rules" : {
-                  
-
                   "DRG-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-DRG",
                     "description"        : "To DRG.",
@@ -501,35 +555,18 @@
                     "src_type"     : "CIDR_BLOCK",
                     "dst_port_min" : 80,
                     "dst_port_max" : 80
-                  },
-                  "FROM-ON-PREM-SSH" : {
-                    "description"  : "Ingress from on-prem on SSH port 22.",
-                    "stateless"    : false,
-                    "protocol"     : "TCP",
-                    "src"          : "189.6.81.101/32",
-                    "src_type"     : "CIDR_BLOCK",
-                    "dst_port_min" : 22,
-                    "dst_port_max" : 22
                   }
                 },
                 "egress_rules" : {
-                  "TO-MID-NSG" : {
-                    "description" : "Egress to Mid NSG.",
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
                     "stateless"   : false,
                     "protocol"    : "TCP",
-                    "dst"         : "SECURITY-VCN-MID-NSG",
-                    "dst_type"    : "NETWORK_SECURITY_GROUP"
-                  },
-                  "TO-OSN" : {
-                    "description" : "Egress to Oracle Services Network.",
-                    "stateless"   : false,
-                    "protocol"    : "TCP",
-                    "dst"         : "all-services",
-                    "dst_type"    : "SERVICE_CIDR_BLOCK"
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
                   }
                 }
               },
-
               "SECURITY-VCN-MID-NSG" : {
                 "display_name" : "mid-nsg",
                 "ingress_rules" : {
@@ -541,39 +578,22 @@
                     "src_type"     : "NETWORK_SECURITY_GROUP",
                     "dst_port_min" : 80,
                     "dst_port_max" : 80
-                  },
-                  "FROM-ON-PREM-SSH" : {
-                    "description"  : "Ingress from on-prem on SSH port 22.",
-                    "stateless"    : false,
-                    "protocol"     : "TCP",
-                    "src"          : "189.6.81.101/32",
-                    "src_type"     : "CIDR_BLOCK",
-                    "dst_port_min" : 22,
-                    "dst_port_max" : 22
                   }
                 }, 
                 "egress_rules" : {
-                  "TO-BACK-NSG" : {
-                    "description" : "Egress to Back NSG",
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
                     "stateless"   : false,
                     "protocol"    : "TCP",
-                    "dst"         : "SECURITY-VCN-BACK-NSG",
-                    "dst_type"    : "NETWORK_SECURITY_GROUP"
-                  },
-                  "TO-OSN" : {
-                    "description" : "Egress to Oracle Services Network.",
-                    "stateless"   : false,
-                    "protocol"    : "TCP",
-                    "dst"         : "all-services",
-                    "dst_type"    : "SERVICE_CIDR_BLOCK"
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
                   }
                 }
               },
-
               "SECURITY-VCN-BACK-NSG" : {
                 "display_name" : "back-nsg",
                 "ingress_rules" : {
-                  "FROM-OUTDOOR-NSG" : {
+                  "FROM-MID-NSG" : {
                     "description"  : "Ingress from Mid NSG",
                     "stateless"    : false,
                     "protocol"     : "TCP",
@@ -581,24 +601,38 @@
                     "src_type"     : "NETWORK_SECURITY_GROUP",
                     "dst_port_min" : 1521,
                     "dst_port_max" : 1521
-                  },
-                  "FROM-ON-PREM-SSH" : {
-                    "description"  : "Ingress from on-prem on SSH port 22.",
+                  }
+                },  
+                "egress_rules" : {
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
+                    "stateless"   : false,
+                    "protocol"    : "TCP",
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
+                  }
+                }
+              },
+              "SECURITY-VCN-JUMP-HOST-INGRESS-NSG" : {
+                "display_name" : "jump-host-ingress-nsg",
+                "ingress_rules" : {
+                  "FROM-JUMP-HOST-SUBNET-SSH" : {
+                    "description"  : "Ingress from Jump Host subnet in Central Hub VCN.",
                     "stateless"    : false,
                     "protocol"     : "TCP",
-                    "src"          : "189.6.81.101/32",
+                    "src"          : "192.168.0.56/29",
                     "src_type"     : "CIDR_BLOCK",
                     "dst_port_min" : 22,
                     "dst_port_max" : 22
                   }
                 },  
                 "egress_rules" : {
-                  "TO-OSN" : {
-                    "description" : "Egress to Oracle Services Network.",
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
                     "stateless"   : false,
                     "protocol"    : "TCP",
-                    "dst"         : "all-services",
-                    "dst_type"    : "SERVICE_CIDR_BLOCK"
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
                   }
                 }
               }
@@ -617,7 +651,7 @@
               "SHARED-SERVICES-VCN-FRONT-SUB" : {
                 "cidr_block"                 : "192.168.0.128/28",
                 "dhcp_options_key"           : "default_dhcp_options",
-                "display_name"               : "front-sub",
+                "display_name"               : "front-subnet",
                 "dns_label"                  : "front",
                 "ipv6cidr_blocks"            : [],
                 "prohibit_internet_ingress"  : true,
@@ -628,7 +662,7 @@
               "SHARED-SERVICES-VCN-MID-SUB" : {
                 "cidr_block"                 : "192.168.0.144/28",
                 "dhcp_options_key"           : "default_dhcp_options",
-                "display_name"               : "mid-sub",
+                "display_name"               : "mid-subnet",
                 "dns_label"                  : "mid",
                 "ipv6cidr_blocks"            : [],
                 "prohibit_internet_ingress"  : true,
@@ -639,7 +673,7 @@
               "SHARED-SERVICES-VCN-BACK-SUB" : {
                 "cidr_block"                 : "192.168.0.160/28",
                 "dhcp_options_key"           : "default_dhcp_options",
-                "display_name"               : "back-sub",
+                "display_name"               : "back-subnet",
                 "dns_label"                  : "back",
                 "ipv6cidr_blocks"            : [],
                 "prohibit_internet_ingress"  : true,
@@ -669,10 +703,8 @@
 
             "route_tables" : {
               "SHARED-SERVICES-VCN-FRONT-SUB-ROUTE" : {
-                "display_name" : "front-sub-route",
+                "display_name" : "front-subnet-route-table",
                 "route_rules" : {
-                  
-
                   "DRG-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-DRG",
                     "description"        : "To DRG.",
@@ -682,10 +714,8 @@
                 }
               },
               "SHARED-SERVICES-VCN-MID-SUB-ROUTE" : {
-                "display_name" : "mid-sub-route",
+                "display_name" : "mid-subnet-route-table",
                 "route_rules" : {
-                  
-
                   "DRG-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-DRG",
                     "description"        : "To DRG.",
@@ -695,10 +725,8 @@
                 }
               },
               "SHARED-SERVICES-VCN-BACK-SUB-ROUTE" : {
-                "display_name" : "back-sub-route",
+                "display_name" : "back-subnet-route-table",
                 "route_rules" : {
-                 
-
                   "DRG-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-DRG",
                     "description"        : "To DRG.",
@@ -721,35 +749,18 @@
                     "src_type"     : "CIDR_BLOCK",
                     "dst_port_min" : 80,
                     "dst_port_max" : 80
-                  },
-                  "FROM-ON-PREM-SSH" : {
-                    "description"  : "Ingress from on-prem on SSH port 22.",
-                    "stateless"    : false,
-                    "protocol"     : "TCP",
-                    "src"          : "189.6.81.101/32",
-                    "src_type"     : "CIDR_BLOCK",
-                    "dst_port_min" : 22,
-                    "dst_port_max" : 22
                   }
                 },
                 "egress_rules" : {
-                  "TO-MID-NSG" : {
-                    "description" : "Egress to Mid NSG.",
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
                     "stateless"   : false,
                     "protocol"    : "TCP",
-                    "dst"         : "SHARED-SERVICES-VCN-MID-NSG",
-                    "dst_type"    : "NETWORK_SECURITY_GROUP"
-                  },
-                  "TO-OSN" : {
-                    "description" : "Egress to Oracle Services Network.",
-                    "stateless"   : false,
-                    "protocol"    : "TCP",
-                    "dst"         : "all-services",
-                    "dst_type"    : "SERVICE_CIDR_BLOCK"
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
                   }
                 }
               },
-
               "SHARED-SERVICES-VCN-MID-NSG" : {
                 "display_name" : "mid-nsg",
                 "ingress_rules" : {
@@ -761,35 +772,18 @@
                     "src_type"     : "NETWORK_SECURITY_GROUP",
                     "dst_port_min" : 80,
                     "dst_port_max" : 80
-                  },
-                  "FROM-ON-PREM-SSH" : {
-                    "description"  : "Ingress from on-prem on SSH port 22.",
-                    "stateless"    : false,
-                    "protocol"     : "TCP",
-                    "src"          : "189.6.81.101/32",
-                    "src_type"     : "CIDR_BLOCK",
-                    "dst_port_min" : 22,
-                    "dst_port_max" : 22
                   }
                 },  
                 "egress_rules" : {
-                  "TO-BACK-NSG" : {
-                    "description" : "Egress to Back NSG",
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
                     "stateless"   : false,
                     "protocol"    : "TCP",
-                    "dst"         : "SHARED-SERVICES-VCN-BACK-NSG",
-                    "dst_type"    : "NETWORK_SECURITY_GROUP"
-                  },
-                  "TO-OSN" : {
-                    "description" : "Egress to Oracle Services Network.",
-                    "stateless"   : false,
-                    "protocol"    : "TCP",
-                    "dst"         : "all-services",
-                    "dst_type"    : "SERVICE_CIDR_BLOCK"
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
                   }
                 }
               },
-
               "SHARED-SERVICES-VCN-BACK-NSG" : {
                 "display_name" : "back-nsg",
                 "ingress_rules" : {
@@ -801,24 +795,38 @@
                     "src_type"     : "NETWORK_SECURITY_GROUP",
                     "dst_port_min" : 1521,
                     "dst_port_max" : 1521
-                  },
-                  "FROM-ON-PREM-SSH" : {
-                    "description"  : "Ingress from on-prem on SSH port 22.",
+                  }
+                },  
+                "egress_rules" : {
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
+                    "stateless"   : false,
+                    "protocol"    : "TCP",
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
+                  }
+                }
+              },
+              "SHARED-SERVICES-VCN-JUMP-HOST-INGRESS-NSG" : {
+                "display_name" : "jump-host-ingress-nsg",
+                "ingress_rules" : {
+                  "FROM-JUMP-HOST-SUBNET-SSH" : {
+                    "description"  : "Ingress from Jump Host subnet in Central Hub VCN.",
                     "stateless"    : false,
                     "protocol"     : "TCP",
-                    "src"          : "189.6.81.101/32",
+                    "src"          : "192.168.0.56/29",
                     "src_type"     : "CIDR_BLOCK",
                     "dst_port_min" : 22,
                     "dst_port_max" : 22
                   }
                 },  
                 "egress_rules" : {
-                  "TO-OSN" : {
-                    "description" : "Egress to Oracle Services Network.",
+                  "TO-ANYWHERE" : {
+                    "description" : "Egress to anywhere.",
                     "stateless"   : false,
                     "protocol"    : "TCP",
-                    "dst"         : "all-services",
-                    "dst_type"    : "SERVICE_CIDR_BLOCK"
+                    "dst"         : "0.0.0.0/0",
+                    "dst_type"    : "CIDR_BLOCK"
                   }
                 }
               }
@@ -826,13 +834,113 @@
           }
         },
 
-        "non_vcn_specific_gateways" : {
+       "non_vcn_specific_gateways" : {
           "dynamic_routing_gateways" : {
             "CENTRAL-HUB-DRG" : {
-              "display_name" : "central-hub-drg"
-
-
-            
+              "display_name" : "central-hub-drg",
+              "drg_attachments" : {
+                "CENTRAL-HUB-VCN-ATTACH" : {
+                  "display_name" : "central-hub-vcn-attachment",
+                  "drg_route_table_key" : "HUB-VCN-DRG-ROUTE",
+                  "network_details" : {
+                    "attached_resource_key" : "CENTRAL-HUB-VCN",
+                    "type" : "VCN"
+                  }
+                },
+                "SECURITY-VCN-ATTACH" : {
+                  "display_name" : "security-vcn-attachment",
+                  "drg_route_table_key" : "SECURITY-VCN-DRG-ROUTE",
+                  "network_details" : {
+                    "attached_resource_key" : "SECURITY-VCN",
+                    "type" : "VCN"
+                  }
+                },
+                "SHARED-SERVICES-VCN-ATTACH" : {
+                  "display_name" : "shared-services-vcn-attachment",
+                  "drg_route_table_key" : "SHARED-SERVICES-VCN-DRG-ROUTE",
+                  "network_details" : {
+                    "attached_resource_key" : "SHARED-SERVICES-VCN",
+                    "type" : "VCN"
+                  }
+                }
+              },
+              "drg_route_tables" : {
+                "HUB-VCN-DRG-ROUTE" : { 
+                  "display_name" : "central-hub-drg-route-table",
+                  "import_drg_route_distribution_key" : "HUB-IMPORT-ROUTE-DISTRIBUTION"
+                },
+                "SECURITY-VCN-DRG-ROUTE" : { 
+                  "display_name" : "security-vcn-drg-route-table",
+                  "import_drg_route_distribution_key" : "SECURITY-VCN-IMPORT-ROUTE-DISTRIBUTION"
+                },
+                "SHARED-SERVICES-VCN-DRG-ROUTE" : { 
+                  "display_name" : "shared-services-vcn-drg-route-table",
+                  "import_drg_route_distribution_key" : "SHARED-SERVICES-VCN-IMPORT-ROUTE-DISTRIBUTION"
+                }
+              },
+              "drg_route_distributions" : {
+                "HUB-IMPORT-ROUTE-DISTRIBUTION" : {
+                  "display_name" : "central-hub-vcn-route-distribution",
+                  "distribution_type" : "IMPORT",
+                  "statements" : {
+                    "MATCH-ALL-STMT" : {
+                      "action" : "ACCEPT",
+                      "priority" : 1,
+                      "match_criteria" : {
+                        "match_type" : "MATCH_ALL"
+                      }
+                    }   
+                  }
+                },
+                "SECURITY-VCN-IMPORT-ROUTE-DISTRIBUTION" : {
+                  "display_name" : "security-vcn-route-distribution",
+                  "distribution_type" : "IMPORT",
+                  "statements" : {
+                    "SECURITY-VCN-TO-CENTRAL-HUB-VCN-STMT" : {
+                      "action" : "ACCEPT",
+                      "priority" : 1,
+                      "match_criteria" : {
+                        "match_type" : "DRG_ATTACHMENT_ID",
+                        "attachment_type" : "VCN",
+                        "drg_attachment_key" : "CENTRAL-HUB-VCN-ATTACH"
+                      }
+                    },
+                    "SECURITY-VCN-TO-SHARED-SERVICES-VCN-STMT" : {
+                      "action" : "ACCEPT",
+                      "priority" : 2,
+                      "match_criteria" : {
+                        "match_type" : "DRG_ATTACHMENT_ID",
+                        "attachment_type" : "VCN",
+                        "drg_attachment_key" : "SHARED-SERVICES-VCN-ATTACH"
+                      }
+                    }
+                  }
+                },
+                "SHARED-SERVICES-VCN-IMPORT-ROUTE-DISTRIBUTION" : {
+                  "display_name" : "shared-services-vcn-route-distribution",
+                  "distribution_type" : "IMPORT",
+                  "statements" : {
+                    "SHARED-SERVICES-VCN-TO-CENTRAL-HUB-VCN-STMT" : {
+                      "action" : "ACCEPT",
+                      "priority" : 1,
+                      "match_criteria" : {
+                        "match_type" : "DRG_ATTACHMENT_ID",
+                        "attachment_type" : "VCN",
+                        "drg_attachment_key" : "CENTRAL-HUB-VCN-ATTACH"
+                      }
+                    },
+                    "SHARED-SERVICES-VCN-TO-SECURITY-VCN-STMT" : {
+                      "action" : "ACCEPT",
+                      "priority" : 2,
+                      "match_criteria" : {
+                        "match_type" : "DRG_ATTACHMENT_ID",
+                        "attachment_type" : "VCN",
+                        "drg_attachment_key" : "SECURITY-VCN-ATTACH"
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }

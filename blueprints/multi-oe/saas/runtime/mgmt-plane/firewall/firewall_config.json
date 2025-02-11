@@ -10,9 +10,8 @@
           "memory" : 56,
           "ocpus" : 4
         },
-        "image" : {
-          "name" : "Palo Alto Networks VM-Series Next Generation Firewall",
-          "publisher_name" : "Palo Alto Networks"
+        "marketplace_image" : {
+          "name" : "Palo Alto Networks VM-Series Next Generation Firewall"
         },
         "placement" : {
           "availability_domain" : 1,
@@ -56,9 +55,8 @@
           "memory" : 56,
           "ocpus" : 4
         },
-        "image" : {
-          "name" : "Palo Alto Networks VM-Series Next Generation Firewall",
-          "publisher_name" : "Palo Alto Networks"
+        "marketplace_image" : {
+          "name" : "Palo Alto Networks VM-Series Next Generation Firewall"
         },
         "placement" : {
           "availability_domain" : 2,
@@ -94,28 +92,6 @@
           "encrypt_in_transit_on_instance_create" : null,
           "encrypt_in_transit_on_instance_update" : null
         }
-      },
-      "BASTION-HOST" : {
-        "name" : "bastion-host",
-        "shape" : "VM.Standard.E4.Flex",
-        "image" : {
-          "name" : "Oracle Linux 7 STIG",
-          "publisher_name" : "Oracle Linux"
-        },
-        "boot_volume" : {
-          "size" : 60,
-          "preserve_on_instance_deletion" : false
-        },
-        "networking" : {
-          "assign_public_ip" : true,
-          "hostname " : "bastion-host",
-          "subnet_id" : "LBR-SUB",
-          "network_security_groups" : ["BASTION-NSG"]
-        },
-        "encryption" : {
-          "encrypt_in_transit_on_instance_create" : null,
-          "encrypt_in_transit_on_instance_update" : null
-        }
       }
     }
   },
@@ -126,27 +102,27 @@
         "display_name" : "isv-indoor-nlb",
         "is_private" : true,
         "subnet_id" : "INDOOR-SUB",
+        "network_security_group_ids" : ["INDOOR-NLB-NSG"],
+        "enable_symmetric_hashing" : true,
         "listeners" : {
           "LISTENER-1" : {
-            "port" : 80,
-            "protocol" : "TCP",
+            "port" : 0,
+            "protocol" : "ANY",
             "backend_set" : {
               "name" : "default-backend-set",
               "health_checker" : {
-                "protocol" : "HTTP",
-                "port" : 80,
-                "return_code" : 200,
-                "url_path" : "/php/login.php"
+                "protocol" : "TCP",
+                "port" : 22
               },
               "backends" : {
                 "BACKEND-1" : {
                   "name" : "backend-1",
-                  "port" : 80,
+                  "port" : 0,
                   "ip_address" : "PANF-1.INDOOR"
                 },
                 "BACKEND-2" : {
                   "name" : "backend-2",
-                  "port" : 80,
+                  "port" : 0,
                   "ip_address" : "PANF-2.INDOOR"
                 }
               }
@@ -157,28 +133,27 @@
       "OUTDOOR-NLB" : {
         "display_name" : "isv-outdoor-nlb",
         "is_private" : true,
-        "subnet_id" : "LBR-SUB",
+        "subnet_id" : "OUTDOOR-SUB",
+        "network_security_group_ids" : ["OUTDOOR-NLB-NSG"],
         "listeners" : {
           "LISTENER-1" : {
-            "port" : 80,
-            "protocol" : "TCP",
+            "port" : 0,
+            "protocol" : "ANY",
             "backend_set" : {
               "name" : "default-backend-set",
               "health_checker" : {
-                "protocol" : "HTTP",
-                "port" : 80,
-                "return_code" : 200,
-                "url_path" : "/php/login.php"
+                "protocol" : "TCP",
+                "port" : 22
               },
               "backends" : {
                 "BACKEND-1" : {
                   "name" : "backend-1",
-                  "port" : 80,
+                  "port" : 0,
                   "ip_address" : "PANF-1.OUTDOOR"
                 },
                 "BACKEND-2" : {
                   "name" : "backend-2",
-                  "port" : 80,
+                  "port" : 0,
                   "ip_address" : "PANF-2.OUTDOOR"
                 }
               }
