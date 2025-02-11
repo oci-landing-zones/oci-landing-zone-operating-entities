@@ -82,7 +82,7 @@ These animations illustrate the DNS query and response within Hub & Spoke, and c
    ⓶ **Default Private View** - The default private view contains a DNS record for the database, so the resolver retrieves the record.
 - The Prod VCN resolver returns the DNS response to **web01-p**.
 
-<img src="images/withinspoke.gif" width="800" />
+<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/addons/oci-private-dns/withinspoke.gif" width="800" />
 
 &nbsp;
 
