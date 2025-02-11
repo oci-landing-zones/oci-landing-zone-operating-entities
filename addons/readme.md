@@ -14,7 +14,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 | 2 | <img src="oci-hub-models/images/oci_hub_models_icon.svg" height="25" align="center"> &nbsp; **[OCI Network Hubs](/addons/oci-hub-models/readme.md)** | A set of **OCI Network Hub topologies** applicable to any landing zone or OCI deployment. | [Available](/addons/oci-hub-models/readme.md) | 
 | 3 | <img src="oci-oag/images/oci_oag_icon.svg" height="25" align="center"> &nbsp; **[Oracle Access Governance](/addons/oci-oag/README.md)** | Guidelines to increase the **security governance** of your Landing Zones with OAG. | [Available](/addons/oci-oag/README.md) | 
 | 4 | **[OCI Sovereign Controls](./oci-sovereign-controls/)**                                                                                                      | A set of **OCI Sovereign Controls** applicable to any OCI LZ deployment.                                   | [Available](./oci-sovereign-controls/)            |
-| 5 | <img src="oci-private-dns/images/oci-private-dns_icon.png" height="25" align="center"> &nbsp; **[OCI Private DNS](/addons/oci-private-dns/readme.md)** | A set of **OCI Private DNS configurations** applicable to any landing zone or OCI deployment. | [Available](/addons/oci-private-dns/readme.md) |
+| 5 | <img src="oci-private-dns/images/oci-private-dns_icon.png" height="25" align="center"> &nbsp; **[OCI Private DNS](/addons/oci-private-dns/README.md)** | A set of **OCI Private DNS configurations** applicable to any landing zone or OCI deployment. | [Available](/addons/oci-private-dns/README.md) |
 
 &nbsp; 
 
