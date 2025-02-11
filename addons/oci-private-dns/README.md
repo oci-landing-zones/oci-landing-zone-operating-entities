@@ -94,7 +94,7 @@ These animations illustrate the DNS query and response within Hub & Spoke, and c
    ⓷ **Forwarding Rules** – The resolver identifies a forwarding rule for **oraclevcn.com**, directing the query to the **hub_dns_listener** through the **p_dns_forwarder** in the Prod Spoke VCN.
 - The Hub VCN Resolver has all DNS data/records from the **Associated Private views**, processes the query and returns the DNS response to **web01-p** in the Prod Spoke VCN.
 
-<img src="images/spoke2spoke.gif" width="800" />
+<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/addons/oci-private-dns/spoke2spoke.gif" width="800" />
 
 &nbsp;
 
@@ -129,7 +129,7 @@ Configuration details:
     ⓷ **Forwarding Rules** - A rule for **vcnprodregion2.oraclevcn.com** is found, forwarding the DNS query to **hub_dns_listener-2** via **hub_dns_forwarder-1**. Which then sends it to the Hub VCN Resolver in Region-2. 
 - Hub VCN Resolver in Region-2 has the required DNS records from all the **Associated Private views**, and returns the IP address of **web02-p** as the DNS response.
 
-<img src="images/multi-region.gif" width="1000" />
+<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/addons/oci-private-dns/multi-region.gif" width="1000" />
 
 &nbsp;
 
