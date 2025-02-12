@@ -28,9 +28,9 @@ Following the guidelines explained here reduces the overall management complexit
  
 ## Approaches
 
-* ### **Global Approach** ( Recommended)
-
 There are some limits in the number of [PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) that can be created per region. It depends on the database type configured. Check documentation [here](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99).
+
+* ### **Global Approach** ( Recommended)
 
 As a general approach, the Landing Zone uses a hub VCN, which is designed to centralize services such as load balancers, firewalls, DNS, and more.
 
