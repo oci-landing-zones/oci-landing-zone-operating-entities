@@ -10,16 +10,16 @@
 - [OCI Private DNS resources](#OCI-Private-DNS-resources)</br>
 - [VCN DNS Resolver processing order](#VCN-DNS-Resolver-processing-order)</br>
 - [Single-Region: Private DNS configuration view](#1-Single-Region-Private-DNS-configuration-view)</br>
-  - [Single-Region: Private DNS animation](#Single-Region-Private-DNS-animation)</br>
+  - [Single-Region: DNS query animation](#11Single-Region-DNS-query-animation)</br>
 - [Multi-Region: Private DNS configuration view](#2-Multi-Region-Private-DNS-configuration-view)</br>
-  - [Multi-Region: Private DNS animation](#Multi-Region-Private-DNS-animation)
+  - [Multi-Region: DNS query animation](#21-Multi-Region-DNS-query-animation)
 
 &nbsp;
 
 ## **Overview**
 This configuration enables centralized management of private DNS zones within a Hub VCN, controlled by a central network team. All DNS configurations, including zone creation and record updates, are streamlined through a single management plane. This ensures consistency, simplifies administration and eliminates the complexity of managing DNS across multiple environments and OCI regions.
 
-This document provides configuration views for the following use cases:</br>
+This document provides configuration views for the following use cases:
 - Single-Region: Private DNS configuration view and animation for a Hub and Spoke architecture within one OCI region.
 - Multi-Region: Private DNS configuration view and animation for a setup where Hub & Spoke VCNs are connected via Remote Peering Connection (RPC).
 
@@ -30,11 +30,11 @@ This document provides configuration views for the following use cases:</br>
 
 | Resource | Description |
 | - | - |
-| VCN Resolver | Each VCN has a dedicated DNS resolver that processes and responds to DNS queries within the VCN. By default, it listens on 169.254.169.254 and operates based on its configured settings. |
+| [VCN Resolver](https://docs.oracle.com/en-us/iaas/Content/DNS/Tasks/privatedns.htm#private-dns__resources) | Each VCN has a dedicated DNS resolver that processes and responds to DNS queries within the VCN. By default, it listens on 169.254.169.254 and operates based on its configured settings. |
 | Private Zones | Private zones contain DNS data only accessible from within a VCN, such as private IP addresses. |
 | Private Views | A private DNS view is a collection of Private Zones, and these are:<br>• **Default Private View** - a dedicated/default view for VCN Resolver.<br>• **Associated Private Views** - the private views from other VCNs, added into VCN Resolver. |
-| Resolver Endpoints | There are two types of endpoints:<br>• **Listening endpoint** - allows the DNS Resolver to answer DNS queries coming from outside the VCN, such as on-prem systems and other resolvers.<br>• **Forwarding endpoint** - allows the DNS resolver to query a remote DNS as defined in the Forwarding rules. |
-| Forwarding Rules | Rules are used to answer queries that aren't answered by a resolver's views and the queries that match the rule condition will be handled by the rule. If no rules match, the query will be resolved from Internet DNS. |
+| [Resolver Endpoints](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/dns-topic-resolver_endpoints.htm) | There are two types of endpoints:<br>• **Listening endpoint** - allows the DNS Resolver to answer DNS queries coming from outside the VCN, such as on-prem systems and other resolvers.<br>• **Forwarding endpoint** - allows the DNS resolver to query a remote DNS as defined in the Forwarding rules. |
+| [Forwarding Rules](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/dns-topic-resolver_rules.htm) | Rules are used to answer queries that aren't answered by a resolver's views and the queries that match the rule condition will be handled by the rule. If no rules match, the query will be resolved from Internet DNS. |
 
 &nbsp;
 
@@ -47,7 +47,7 @@ After an answer is provided, no further items are evaluated, even if the answer 
 
 &nbsp;
 
-## **1. Single-Region: Private DNS configuration view**
+## 1. Single-Region: Private DNS configuration view
 &nbsp;
 Configuration details:
   - Hub VCN consists of the following resources and components: 
@@ -71,7 +71,7 @@ In addition to the above configuration, the following setup includes forwarding 
 
 &nbsp;
 
-## Single-Region: Private DNS animation
+### 1.1 Single-Region: DNS query animation
 
 These animations illustrate the DNS query and response within Hub & Spoke, and covers the following scenarios:
 
@@ -98,7 +98,7 @@ These animations illustrate the DNS query and response within Hub & Spoke, and c
 
 &nbsp;
 
-## **2. Multi-Region: Private DNS configuration view**
+## 2. Multi-Region: Private DNS configuration view
 Configuration details:
   - Each Hub VCN in a given region consists of the following resources and components:
     - Forwarding (**hub_dns_forwarder-1 and 2**) and Listening (**hub_dns_listener-1 and 2**) endpoints.
@@ -115,7 +115,7 @@ Configuration details:
 
 &nbsp;
 
-## Multi-Region: Private DNS animation
+### 2.1 Multi-Region: DNS query animation
 **Spoke to Spoke DNS Resolution across different regions:**
 
 - The **web01-p.ssnpweb.vcnprodregion1.oraclevcn.com** in Spoke VCN (Region-1) performs *nslookup* to get an IP address of the **web02-p.ssnpweb.vcnprodregion2.oraclevcn.com** located in Region-2 inside Prod VCN.
