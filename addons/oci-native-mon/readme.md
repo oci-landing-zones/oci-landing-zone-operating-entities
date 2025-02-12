@@ -54,7 +54,7 @@ To enable Database Management, you need to deploy a [DM PE](https://docs.oracle.
 The private endpoint is a representation of Database Management in the VCN. 
 
 > [!WARNING]  
-> You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Database Management documentation](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99) and [Operations Insights documentation](https://docs.oracle.com/en-us/iaas/operations-insights/doc/create-private-endpoint.html).
+> You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Database Management documentation](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99).
 > 
 
 ### **Autonomous** 
@@ -102,6 +102,9 @@ To enable Operation Insight, you need to deploy a [OPSI PE](https://docs.oracle.
 The private endpoint is a representation of Operation Insight in the VCN. 
  
 Private endpoints must be created in each service, private endpoints created in other services will not appear in the Ops Insights private endpoint list page. However Database Management endpoints can be converted to Ops Insights endpoints.
+
+> [!WARNING]  
+> You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Operations Insights documentation](https://docs.oracle.com/en-us/iaas/operations-insights/doc/create-private-endpoint.html).
 
 
 ### **Autonomous**
