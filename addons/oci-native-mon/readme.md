@@ -60,13 +60,13 @@ The private endpoint is a representation of Database Management in the VCN.
 The DM PE needs visibility with the ATP PE.
 
 
-* In a **global approach**, the DM PE will be placed in the logs subnet in the hub and should be assigned to the nsg-fra-lzp-hub-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-mon-db1 NSGs.
+* In a **global approach**, the DM PE will be placed in the logs subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-dm-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-dm-pe-db1 NSGs.
 In this case, a Shared Observability platform compartment, a global observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
 <img src="./content/DM_Global.png" height="300" align="center">
 
 &nbsp; 
 
-* In a **local approach**, both PEs will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-db1 NSGs will allow communication between them.
+* In a **local approach**, both PEs will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-dm-pe-db1 NSGs will allow communication between them.
 In this case, a dedicated Prod Observability platform compartment, a dedicated Prod observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSG.
 <img src="./content/DM_Local.png" height="300" align="center">
   
@@ -82,12 +82,14 @@ The DM PE needs visibility with the EXACS SCAN listeners.
 * In a Local approach both PE will reside in the same db subnet and the xxx nsgs will allow the comunication between them.
 * In a Global approach, the DM PE will be place in the logs subnet in the hub and should be asiggned to the xxx nsgs. The database will be placed in the db subnet assigned to the xxx nsgs.
 
+### **EXACC** 
+TBC
 
 ### **MySQL DB** 
-
+TBC
 
 ### **External Databases** 
-
+TBC
 
 &nbsp; 
 
