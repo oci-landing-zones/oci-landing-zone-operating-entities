@@ -28,11 +28,19 @@ Input Configuration Files | Input Dependency Files | Generated Output
 
 [![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/blueprints/multi-oe/saas/runtime/runtime/mgmt-plane/firewall/firewall_config.json","url_dependency_source_oci_bucket":"isv-terraform-runtime-bucket","url_dependency_source":"ocibucket","url_dependency_source_oci_objects":"iam/output/compartments_output.json,network/output/network_output.json","save_output":true,"oci_object_prefix":"firewall/output"})
 
-In the Resource Manager Service (RMS) **Create stack** screen that shows up, make sure to select *terraform-oci-modules-orchestrator-main/rms-facade* in the **Working directory** drop down, as shown in the image below. 
+In the Resource Manager Service (RMS) **Create stack - Stack Information** screen that shows up, check the *I have reviewed and accept the Oracle Terms of Use* box, make sure to select *terraform-oci-modules-orchestrator-main/rms-facade* in the **Working directory** drop down, as shown in the image below. 
 
-[![Working_directory](../../design/images/orchestrator-working-dir.png)]
+![Working_directory](../../design/images/orchestrator-working-dir.png)
 
-Follow the RMS workflow to complete the stack creation. Within the stack, perform a plan, followed by an apply.
+Give the stack a meaningful name in the *Name* field (*isv-saas-firewall*, for instance), and follow the RMS workflow to complete the stack creation. 
+
+The **Create stack - Configure variables** screen shows the variables pre-filled.
+
+In the final **Create stack - Review** screen, make sure to uncheck the *Run Apply* button, so you have a chance to inspect the Terraform plan output.
+
+![Run_Apply_Disabled](../../design/images/orchestrator-run-apply-disabled.png)
+
+Within the stack, perform a *Plan*, inspect its output, and finally run an *Apply* to actually deploy the resources.
 
 ### What Gets Deployed
 
