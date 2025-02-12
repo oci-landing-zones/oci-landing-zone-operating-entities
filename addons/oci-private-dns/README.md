@@ -10,7 +10,7 @@
 - [OCI Private DNS resources](#OCI-Private-DNS-resources)</br>
 - [VCN DNS Resolver processing order](#VCN-DNS-Resolver-processing-order)</br>
 - [Single-Region: Private DNS configuration view](#1-Single-Region-Private-DNS-configuration-view)</br>
-  - [Single-Region: DNS query animation](#11Single-Region-DNS-query-animation)</br>
+  - [Single-Region: DNS query animation](#11-Single-Region-DNS-query-animation)</br>
 - [Multi-Region: Private DNS configuration view](#2-Multi-Region-Private-DNS-configuration-view)</br>
   - [Multi-Region: DNS query animation](#21-Multi-Region-DNS-query-animation)
 
@@ -31,8 +31,8 @@ This document provides configuration views for the following use cases:
 | Resource | Description |
 | - | - |
 | [VCN Resolver](https://docs.oracle.com/en-us/iaas/Content/DNS/Tasks/privatedns.htm#private-dns__resources) | Each VCN has a dedicated DNS resolver that processes and responds to DNS queries within the VCN. By default, it listens on 169.254.169.254 and operates based on its configured settings. |
-| Private Zones | Private zones contain DNS data only accessible from within a VCN, such as private IP addresses. |
-| Private Views | A private DNS view is a collection of Private Zones, and these are:<br>• **Default Private View** - a dedicated/default view for VCN Resolver.<br>• **Associated Private Views** - the private views from other VCNs, added into VCN Resolver. |
+| [Private Zones](https://docs.oracle.com/en-us/iaas/Content/DNS/Tasks/privatedns.htm#private-dns__resources) | Private zones contain DNS data only accessible from within a VCN, such as private IP addresses. |
+| [Private Views](https://docs.oracle.com/en-us/iaas/Content/DNS/Tasks/privatedns.htm#private-dns__resources) | A private DNS view is a collection of Private Zones, and these are:<br>• **Default Private View** - a dedicated/default view for VCN Resolver.<br>• **Associated Private Views** - the private views from other VCNs, added into VCN Resolver. |
 | [Resolver Endpoints](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/dns-topic-resolver_endpoints.htm) | There are two types of endpoints:<br>• **Listening endpoint** - allows the DNS Resolver to answer DNS queries coming from outside the VCN, such as on-prem systems and other resolvers.<br>• **Forwarding endpoint** - allows the DNS resolver to query a remote DNS as defined in the Forwarding rules. |
 | [Forwarding Rules](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/dns-topic-resolver_rules.htm) | Rules are used to answer queries that aren't answered by a resolver's views and the queries that match the rule condition will be handled by the rule. If no rules match, the query will be resolved from Internet DNS. |
 
