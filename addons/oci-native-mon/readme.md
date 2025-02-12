@@ -9,7 +9,9 @@ Welcome to the **OCI Landing Zone Native Observability Services**.
 
 This guide provides the necessary configuration steps to enable OCI Observability native services, including **Database Management**, **Operations Insights**, and **Logging Analytics**.
 
-**Database Management service** offers a comprehensive set of database performance monitoring and management features. Diagnostics & Management enables you to monitor and manage Oracle databases, HeatWave and External MySQL DB systems, and infrastructure components such as DB system components and Exadata storage servers in multi-cloud and hybrid deployments.
+**Database Management service** (DM) offers a comprehensive set of database performance monitoring and management features. Diagnostics & Management enables you to monitor and manage Oracle databases, HeatWave and External MySQL DB systems, and infrastructure components such as DB system components and Exadata storage servers in multi-cloud and hybrid deployments.
+
+**Ops Insights** (OPSI) provides comprehensive information about the resource use and capacity of databases and hosts. Use this service to analyze CPU and storage resources, forecast capacity issues, and proactively identify SQL performance issues across a database fleet.
 
 &nbsp; 
 
@@ -108,13 +110,13 @@ The OPSI  PE needs visibility with the ATP PE.
 
 * In a **global approach**, the OPSI PE will be placed in the logs subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-dm-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-dm-pe-db1 NSGs.
 In this case, a Shared Observability platform compartment, a global observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
-<img src="./content/DM_Global.png" height="300" align="center">
+<img src="./content/OPSI_Global.png" height="300" align="center">
 
 &nbsp; 
 
 * In a **local approach**, both PEs will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
 In this case, a dedicated Prod Observability platform compartment, a dedicated Prod observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSG.
-<img src="./content/DM_Local.png" height="300" align="center">
+<img src="./content/OPSI_Local.png" height="300" align="center">
   
 Private endpoints will be placed in the observability compartments, accessing the required subnets.
 
