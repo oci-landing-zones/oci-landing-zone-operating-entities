@@ -161,11 +161,11 @@ This template includes all cmp, groups, policies and NSGs needed for enabling Da
 
 Step 1. Deploy ONE-OE landing Zone. You can follow nexts [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack)
 
-<img src="./content/ONE-OE.png" height="300" align="center">
+<img src="./content/ONE-OE.png" height="800" align="center">
 
 Step 2. Enable Observability adding the Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](./AddOnImplementation.md).
 
-<img src="./content/OBS_ADDON.png" height="300" align="center">
+<img src="./content/OBS_ADDON.png" height="800" align="center">
 
 > [!NOTE]  
 >ATP PEs are created during databases creation and are not included in the Landing Zone add-on.
