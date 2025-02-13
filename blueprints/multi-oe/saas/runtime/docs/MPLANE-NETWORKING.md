@@ -32,7 +32,11 @@ This stack is executed in two different stages with a **PROGRESSIVELY UPDATED in
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_initial_config.json](../mgmt-plane/network/network_initial_config.json), [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json), [bastion_service_config.json](../mgmt-plane/network/bastion_service_config.json), [jump_host_config.json](../mgmt-plane/network/jump_host_config.json) | iam/output/compartments_output.json | network/output/network_output.json
+[network_initial_config.json](../mgmt-plane/network/network_initial_config.json), [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json), [bastion_service_config.json](../mgmt-plane/network/bastion_service_config.json)*, [jump_host_config.json](../mgmt-plane/network/jump_host_config.json)** | iam/output/compartments_output.json | network/output/network_output.json
+
+\* in a real deployment, make sure to replace the value in *cidr_block_allow_list* attribute (192.168.0.0/32) by the IP addresses allowed to connect to OCI Bastion service. Be as much specific as possible.
+
+\*\* in a real deployment, make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
 
 #### Stack Creation
 

@@ -35,11 +35,12 @@ The configuration files are organized in different folders, according to the bro
         - [network_post_firewall_config.json](mgmt-plane/network/network_post_firewall_config.json), adding the DRG ingress route table for the central hub VCN. This configuration is to be executed after the Firewall appliance and OCI Network Load Balancer are provisioned.
         - [flow_logs_config.json](mgmt-plane/network/flow_logs_config.json), with flow logs configuration for all VCNs in the mgmt plane.
         - [jump_host_config.json](mgmt-plane/network/jump_host_config.json), with a jump host configuration, defining a central SSH client to any hosts that are eventually deployed.
-            - **IMPORTANT:** Make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
+            - **IMPORTANT:** in a real deployment, make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
         - [bastion_service_config.json](mgmt-plane/network/bastion_service_config.json), with OCI Bastion service configuration, defining a secure access path to the jump host. 
-            - **IMPORTANT:** Make sure to replace the value in *cidr_block_allow_list* attribute (192.168.0.0/32) by the IP addresses allowed to connect to OCI Bastion service. Be as much specific as possible.
+            - **IMPORTANT:** in a real deployment, make sure to replace the value in *cidr_block_allow_list* attribute (192.168.0.0/32) by the IP addresses allowed to connect to OCI Bastion service. Be as much specific as possible.
             - **IMPORTANT:** the configuration does not deploy any Bastion Service sessions. Those are expected to be created manually afterwards.
     - firewall: [firewall_config.json](mgmt-plane/firewall/firewall_config.json), with firewall appliance and OCI Network Load Balancer configurations.
+        - **IMPORTANT:** in a real deployment, make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
 
 - customers: a top level folder for each customer configuration.
     - customer1: [compartments_config.json](customers/customer1/ccompartments_config.json), [budgets_config.json](customers/customer1/budgets_config.json), [network_three_tier_config.json](customers/customer1/network_three_tier_config.json), [network_oke_config.json](customers/customer1/network_oke_config.json) with sample resources configurations for one customer, including IAM, budget and networking (supporting traditional three tier apps or Kubernetes-based apps), respectively. Use these files as templates to onboard other customers.

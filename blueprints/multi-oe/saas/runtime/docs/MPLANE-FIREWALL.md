@@ -22,7 +22,9 @@ Management plane network administrators.
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[firewall_config.json](../mgmt-plane/firewall/firewall_config.json) | iam/output/compartments_output.json, network/output/network_output.json  | firewall/output/instances_output.json
+[firewall_config.json](../mgmt-plane/firewall/firewall_config.json)* | iam/output/compartments_output.json, network/output/network_output.json  | firewall/output/instances_output.json
+
+\* in a real deployment, make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
 
 ### Stack Creation
 
