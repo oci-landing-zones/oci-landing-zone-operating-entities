@@ -9,10 +9,11 @@ Welcome to the **OCI Landing Zone Native Observability Services**.
 
 This guide provides the necessary configuration steps to enable OCI Observability native services, including **Database Management**, **Operations Insights**, and **Logging Analytics**.
 
-**Database Management service** (DM) offers a comprehensive set of database performance monitoring and management features. Diagnostics & Management enables you to monitor and manage Oracle databases, HeatWave and External MySQL DB systems, and infrastructure components such as DB system components and Exadata storage servers in multi-cloud and hybrid deployments.
+* **Database Management service** (DM) offers a comprehensive set of database performance monitoring and management features. Diagnostics & Management enables you to monitor and manage Oracle databases, HeatWave and External MySQL DB systems, and infrastructure components such as DB system components and Exadata storage servers in multi-cloud and hybrid deployments.
 
-**Ops Insights** (OPSI) provides comprehensive information about the resource use and capacity of databases and hosts. Use this service to analyze CPU and storage resources, forecast capacity issues, and proactively identify SQL performance issues across a database fleet.
+* **Ops Insights** (OPSI) provides comprehensive information about the resource use and capacity of databases and hosts. Use this service to analyze CPU and storage resources, forecast capacity issues, and proactively identify SQL performance issues across a database fleet.
 
+* **Logging Analytics** is a machine learning-based cloud service that monitors, aggregates, indexes, and analyzes all log data from on-premises and multicloud environments. Enabling users to search, explore, and correlate this data to troubleshoot and resolve problems faster and derive insights to make better operational decisions.
 &nbsp; 
 
 ### Benefits of this asset
@@ -23,7 +24,6 @@ Following the guidelines explained here reduces the overall management complexit
 * Extend your LZ with dedicated Observability compartments.
 * Add the proper Observability groups.
 * Add the required policies per each service.
-
 &nbsp; 
  
 ## Approaches
@@ -48,7 +48,6 @@ We recommend deploying the PE in the Logs Subnets, configure the routing and ena
 In specific cases where the customer has a single environment and minimal use of Private Endpoints (PEs), or where there is no Hub, a local approach can be adopted.
 
 In this case, a dedicated DM PE can be deployed in the same subnet as the database to be configured. To enable communication between the DB PE and ATP PE, we will also use another NSG, which is included in this add-on.
-
 &nbsp; 
 
 
@@ -83,11 +82,15 @@ During the process of enabling Database Management in the Autonomous Database, t
 > To review the Oracle documentation for enabling Database Management, click [here](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html)
 
 ### **EXACS** 
+
 The DM PE needs visibility with the EXACS SCAN listeners.
 * In a Local approach both PE will reside in the same db subnet and the xxx nsgs will allow the comunication between them.
+* 
 * In a Global approach, the DM PE will be place in the mon subnet in the hub and should be asiggned to the xxx nsgs. The database will be placed in the db subnet assigned to the xxx nsgs.
 
 ### **EXACC**
+
+For EXACC, we only have the option of a global approach. We deployed the PE in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models
 
 <img src="./content/EXACC_DM.png" height="300" align="center">
 
@@ -96,12 +99,12 @@ The DM PE needs visibility with the EXACS SCAN listeners.
 TBC
 
 ### **External Databases** 
-TBC
+<img src="./content/EXTERNAL_DM_OPSI.png" height="300" align="center">
+
 
 &nbsp; 
 
 ## Operation Insight Database scenarios
-
 
 To enable Operation Insight, you need to deploy a [OPSI PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Operation Insights Private Endpoint), which must have access to the database that needs to be configured.
 
@@ -115,7 +118,7 @@ Private endpoints must be created in each service, private endpoints created in 
 
 ### **Autonomous**
  
-The OPSI  PE needs visibility with the ATP PE.
+The OPSI PE needs visibility with the ATP PE.
 
 * In a **global approach**, the OPSI PE will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-dm-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-dm-pe-db1 NSGs.
 In this case, a Shared Observability platform compartment, a global observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
@@ -139,9 +142,19 @@ During the process of enabling OPSI  in the Autonomous Database, the user and pa
 
 ### **EXACC**
 
+For EXACC, we only have the option of a global approach. We deployed the PE in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models
+
 <img src="./content/EXACC_OPSI.png" height="300" align="center">
 
 
+## Logging Analytics scenarios
+
+### **VM (DB)**
+
+<img src="./content/LOGGINGA.png" height="300" align="center">
+
+
+## Add-on Implementation
 
 
 # License
