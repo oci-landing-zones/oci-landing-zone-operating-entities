@@ -1,6 +1,5 @@
 {
   "network_configuration" : {
-    "default_enable_cis_checks" : false,
     "default_compartment_id" : "SHARED-NETWORK-CMP",
 
     "network_configuration_categories" : {
@@ -317,11 +316,25 @@
               "INDOOR-NLB-NSG" : {
                 "display_name" : "indoor-nlb-nsg",
                 "ingress_rules" : {
-                  "FROM-ANYWHERE" : {
-                    "description"  : "Ingress from anywhere.",
+                  "FROM-SECURITY-VCN" : {
+                    "description"  : "Ingress from Mgmt Plane Security VCN.",
                     "stateless"    : false,
                     "protocol"     : "ALL",
-                    "src"          : "0.0.0.0/0",
+                    "src"          : "192.168.0.64/26",
+                    "src_type"     : "CIDR_BLOCK"
+                  },
+                  "FROM-SHARED-SERVICES-VCN" : {
+                    "description"  : "Ingress from Mgmt Plane Shared Services VCN.",
+                    "stateless"    : false,
+                    "protocol"     : "ALL",
+                    "src"          : "192.168.0.128/26",
+                    "src_type"     : "CIDR_BLOCK"
+                  },
+                  "FROM-CUSTOMER-VCNS" : {
+                    "description"  : "Overall ingress from customer VCNs.",
+                    "stateless"    : false,
+                    "protocol"     : "ALL",
+                    "src"          : "10.0.0.0/16",
                     "src_type"     : "CIDR_BLOCK"
                   }
                 },  
@@ -338,11 +351,25 @@
               "INDOOR-FW-NSG" : {
                 "display_name" : "indoor-fw-nsg",
                 "ingress_rules" : {
-                  "FROM-ANYWHERE" : {
-                    "description"  : "Ingress from anywhere.",
+                  "FROM-SECURITY-VCN" : {
+                    "description"  : "Ingress from Mgmt Plane Security VCN.",
                     "stateless"    : false,
                     "protocol"     : "ALL",
-                    "src"          : "0.0.0.0/0",
+                    "src"          : "192.168.0.64/26",
+                    "src_type"     : "CIDR_BLOCK"
+                  },
+                  "FROM-SHARED-SERVICES-VCN" : {
+                    "description"  : "Ingress from Mgmt Plane Shared Services VCN.",
+                    "stateless"    : false,
+                    "protocol"     : "ALL",
+                    "src"          : "192.168.0.128/26",
+                    "src_type"     : "CIDR_BLOCK"
+                  },
+                  "FROM-CUSTOMER-VCNS" : {
+                    "description"  : "Overall ingress from customer VCNs.",
+                    "stateless"    : false,
+                    "protocol"     : "ALL",
+                    "src"          : "10.0.0.0/16",
                     "src_type"     : "CIDR_BLOCK"
                   }
                 },  

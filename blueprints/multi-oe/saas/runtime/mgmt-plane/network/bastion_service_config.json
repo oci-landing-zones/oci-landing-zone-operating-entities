@@ -1,11 +1,10 @@
 {
     "bastions_configuration" : {
-        "enable_cidr_check" : false,
         "bastions" : { 
             "JUMP-HOST-SUBNET-BASTION" : {
                 "compartment_id" : "SHARED-NETWORK-CMP",
                 "subnet_id" : "JUMP-HOST-SUB",
-                "cidr_block_allow_list" : ["0.0.0.0/0"],
+                "cidr_block_allow_list" : ["192.168.0.0/32"],
                 "name" : "jump-host-subnet-bastion"
             }
         }

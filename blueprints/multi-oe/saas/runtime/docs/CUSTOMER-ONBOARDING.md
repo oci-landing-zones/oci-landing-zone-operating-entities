@@ -2,11 +2,18 @@
 
 A stack that deploys IAM, budget and network configuration for a single customer. It initiates the onboarding process of a customer into the tenancy. Each customer is expected to have its own stack.
 
+The sample customer VCNs are pre-configured with the following CIDR ranges: 
+
+- **three-tier-vcn**: 10.0.0.0/26
+- **oke-vcn**: 10.0.1.0/24
+
+The *three-tier-vcn* can be changed in configuration file [network_three_tier_config.json](../customers/customer1/network_three_tier_config.json), while *oke-vcn* can be changed in [network_oke_config.json](../customers/customer1/network_oke_config.json).
+
 ### Typically Deployed By
 
 Customers administrators.
 
-### Deployment Sequence
+### Overall Deployment Sequence
 
 1. [Mgmt Plane Foundational - IAM, Logging, Governance](./MPLANE-FOUNDATIONAL.md)
 2. [Mgmt Plane Networking 1st stage - Mgmt Plane VCNs](./MPLANE-NETWORKING.md#stage1)

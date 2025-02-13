@@ -2,11 +2,19 @@
 
 The network stack manages the management plane networking configuration, including all the routing to customer VCNs.
 
+The mgmt plane template VCNs are pre-configured with the following CIDR ranges:
+
+- **central-hub-vcn**: 192.168.0.0/26
+- **security-vcn**: 192.168.0.64/26
+- **shared-services-vcn**: 192.168.0.128/26
+
+The CIDR ranges can be changed in configuration files [network_initial_config.json](../mgmt-plane/network/network_initial_config.json) and [network_post_firewall_config.json](../mgmt-plane/network/network_post_firewall_config.json).
+
 ### Typically Deployed By
 
 Management plane network administrators.
 
-### Deployment Sequence
+### Overall Deployment Sequence
 
 This stack is executed in two different stages with a **PROGRESSIVELY UPDATED input configuration file**.
 

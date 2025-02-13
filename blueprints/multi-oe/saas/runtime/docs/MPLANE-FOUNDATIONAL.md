@@ -1,12 +1,12 @@
 ## Management Plane Foundational Stack Deployment
 
-It assembles bootstrap, IAM, governance, security and observability configuration files in a single stack. 
+It assembles IAM, governance, security and observability configuration files in a single stack. 
 
 ### Typically Deployed By
 
 Management plane administrators.
 
-### Deployment Sequence
+### Overall Deployment Sequence
 
 1. **Mgmt Plane Foundational - IAM, Logging, Governance (this stack)**
 2. [Mgmt Plane Networking 1st stage - Mgmt Plane VCNs](./MPLANE-NETWORKING.md#stage1)

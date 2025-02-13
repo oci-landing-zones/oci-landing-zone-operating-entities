@@ -8,7 +8,7 @@ The marketplace image deployed is the latest available version of "Palo Alto Net
 
 Management plane network administrators.
 
-### Deployment Sequence
+### Overall Deployment Sequence
 
 1. [Mgmt Plane Foundational - IAM, Logging, Governance](./MPLANE-FOUNDATIONAL.md)
 2. [Mgmt Plane Networking 1st stage - Mgmt Plane VCNs](./MPLANE-NETWORKING.md#stage1)
