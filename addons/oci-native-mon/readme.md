@@ -159,16 +159,24 @@ For EXACC, we only have the option of a global approach. We deployed the PE in t
 Example how to extend Observability in a Landing Zone for ATP.
 This template includes all cmp, groups, policies and NSGs needed for enabling Database Management, Operations Insights and Logging Analytics.
 
-Step 1. (Prerequisite) Deploy ONE-OE landing Zone. You can follow nexts [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack)
+**Step 1**. (Prerequisite) Deploy ONE-OE landing Zone. You can follow nexts [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
 
 <img src="./content/ONE-OE.png" height="800" align="center">
 
-Step 2. Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](./AddOnImplementation.md).
+&nbsp; 
 
-<img src="./content/OBS_ADDON.png" height="800" align="center">
+**Step 2**. Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](./AddOnImplementation.md).
+
+After running step2, Databases can be created and you can deploy the DM & OPSI PEs:
+
+Using Global PE Approach:
+<img src="./content/OBS_ADDON_GLOBAL.png" height="800" align="center">
+
+Using Local PE Approach:
+<img src="./content/OBS_ADDON_LOCAL.png" height="800" align="center">
 
 > [!NOTE]  
->ATP PEs are created during databases creation and are not included in the Landing Zone add-on.
+> ATP PEs are created during databases creation and are not included in the Landing Zone add-on.
 
 
 
