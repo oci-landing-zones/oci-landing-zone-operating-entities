@@ -5,7 +5,7 @@
     "instances" : {
       "PANF-1" : {
         "name"  : "panf-1",
-        "shape" : "VM.Standard1.4",
+        "shape" : "VM.Standard2.4",
         "marketplace_image" : {
           "name" : "Palo Alto Networks VM-Series Next Generation Firewall"
         },
@@ -46,7 +46,7 @@
       },
       "PANF-2" : {
         "name" : "panf-2",
-        "shape" : "VM.Standard1.4",
+        "shape" : "VM.Standard2.4",
         "marketplace_image" : {
           "name" : "Palo Alto Networks VM-Series Next Generation Firewall"
         },
