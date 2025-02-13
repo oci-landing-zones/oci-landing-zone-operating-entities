@@ -20,7 +20,7 @@ Management plane administrators.
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[bootstrap.json](../mgmt-plane/bootstrap/bootstrap.json), [iam_config.json](../mgmt-plane/iam/iam_config.json), [budgets_config.json](../mgmt-plane/governance/budgets_config.json), [cloud_guard_config.json](../mgmt-plane/security/cloud_guard_config.json), [security_zones_config.json](../mgmt-plane/security/security_zones_config.json), [scanning_config.json](../mgmt-plane/security/scanning_config.json), [observability_config.json](../mgmt-plane/observability/observability_config.json) | None | iam/output/compartments_output.json
+[bootstrap.json](../mgmt-plane/bootstrap/bootstrap.json) <br> [iam_config.json](../mgmt-plane/iam/iam_config.json) <br> [budgets_config.json](../mgmt-plane/governance/budgets_config.json) <br> [cloud_guard_config.json](../mgmt-plane/security/cloud_guard_config.json) <br> [security_zones_config.json](../mgmt-plane/security/security_zones_config.json) <br> [scanning_config.json](../mgmt-plane/security/scanning_config.json) <br> [observability_config.json](../mgmt-plane/observability/observability_config.json) | None | iam/output/compartments_output.json
 
 ### Stack Creation
 

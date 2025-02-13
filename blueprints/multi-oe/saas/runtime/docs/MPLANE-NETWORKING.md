@@ -32,7 +32,7 @@ This stack is executed in two different stages with a **PROGRESSIVELY UPDATED in
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_initial_config.json](../mgmt-plane/network/network_initial_config.json), [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json), [bastion_service_config.json](../mgmt-plane/network/bastion_service_config.json)*, [jump_host_config.json](../mgmt-plane/network/jump_host_config.json)** | iam/output/compartments_output.json | network/output/network_output.json
+[network_initial_config.json](../mgmt-plane/network/network_initial_config.json) <br> [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json) <br> [bastion_service_config.json](../mgmt-plane/network/bastion_service_config.json)* <br> [jump_host_config.json](../mgmt-plane/network/jump_host_config.json)** | iam/output/compartments_output.json | network/output/network_output.json
 
 \* in a real deployment, make sure to replace the value in *cidr_block_allow_list* attribute (192.168.0.0/32) by the IP addresses allowed to connect to OCI Bastion service. Be as much specific as possible.
 
@@ -139,7 +139,7 @@ In order to update the initial network configuration, edit the existing network 
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_post_firewall_config.json](../mgmt-plane/network/network_post_firewall_config.json) (new file, replacing *network_initial_config.json*), [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json) (unchanged), [bastion_service_config.json](../mgmt-plane/network/bastion_service_config.json) (unchanged), [jump_host_config.json](../mgmt-plane/network/jump_host_config.json) (unchanged) | iam/output/compartments_output.json (unchanged), firewall/output/nlbs_output.json (new file, containing the references to NLB OCIDs)  | network/output/network_output.json
+[network_post_firewall_config.json](../mgmt-plane/network/network_post_firewall_config.json) (**must be added, replacing *network_initial_config.json***) <br> [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json) (unchanged) <br> [bastion_service_config.json](../mgmt-plane/network/bastion_service_config.json) (unchanged) <br> [jump_host_config.json](../mgmt-plane/network/jump_host_config.json) (unchanged) | iam/output/compartments_output.json (unchanged) <br> firewall/output/nlbs_output.json (**must be added. It brings in the references to NLB OCIDs**)  | network/output/network_output.json
 
 #### What Gets Deployed
 

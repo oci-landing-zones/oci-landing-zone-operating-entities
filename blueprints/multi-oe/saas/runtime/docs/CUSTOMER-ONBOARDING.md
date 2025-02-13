@@ -25,7 +25,7 @@ Customers administrators.
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[compartments_config.json](../customers/customer1/compartments_config.json), [budgets_config.json](../customers/customer1/budgets_config.json), [network_three_tier_config.json](../customers/customer1/network_three_tier_config.json), [network_oke_config.json](../customers/customer1/network_oke_config.json)* | iam/output/compartments_output.json, network/output/network_output.json  | customer1/output/compartments_output.json, customer1/output/network_output.json
+[compartments_config.json](../customers/customer1/compartments_config.json) <br> [budgets_config.json](../customers/customer1/budgets_config.json) <br> [network_three_tier_config.json](../customers/customer1/network_three_tier_config.json) <br> [network_oke_config.json](../customers/customer1/network_oke_config.json)* | iam/output/compartments_output.json, network/output/network_output.json  | customer1/output/compartments_output.json, customer1/output/network_output.json
 
 * *network_oke_config.json* contains the network declaration for a VCN suited to OKE deployments. It is not included automatically in the stack creation below. If the customer application is Kubernetes-based, replace *network_three_tier_config.json* with *network_oke_config.json*.
 
