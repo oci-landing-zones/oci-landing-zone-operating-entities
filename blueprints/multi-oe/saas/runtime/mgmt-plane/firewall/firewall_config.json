@@ -5,11 +5,7 @@
     "instances" : {
       "PANF-1" : {
         "name"  : "panf-1",
-        "shape" : "VM.Optimized3.Flex",
-        "flex_shape_settings" : {
-          "memory" : 56,
-          "ocpus" : 4
-        },
+        "shape" : "VM.Standard1.4",
         "marketplace_image" : {
           "name" : "Palo Alto Networks VM-Series Next Generation Firewall"
         },
@@ -50,11 +46,7 @@
       },
       "PANF-2" : {
         "name" : "panf-2",
-        "shape" : "VM.Optimized3.Flex",
-        "flex_shape_settings" : {
-          "memory" : 56,
-          "ocpus" : 4
-        },
+        "shape" : "VM.Standard1.4",
         "marketplace_image" : {
           "name" : "Palo Alto Networks VM-Series Next Generation Firewall"
         },
