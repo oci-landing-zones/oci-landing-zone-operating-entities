@@ -73,7 +73,7 @@ The [OCI Landing Zones Orchestrator](https://github.com/oci-landing-zones/terraf
 
 Next we show how to deploy the blueprint with the Orchestrator per the stacks defined above. 
 
-**IMPORTANT: For demonstrations purposes, the pre-configured stacks pull the configuration files from their public URLs in this repository. For real deployments, users should taylor the configuration files, store and pull them from a private repository, like a private OCI bucket or a private GitHub repository.**  
+**IMPORTANT: For demonstrations purposes, the pre-configured stacks pull the configuration files from their public URLs in this repository. For real deployments, users should taylor the configuration files, store them and have the Orchestrator pulling them from a private repository, like a private OCI bucket or a private GitHub repository.**  
 
 #### Management Plane
 The following stacks are executed once each. After stack #4, the management plane network is ready to onboard customers.
