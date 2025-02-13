@@ -28,7 +28,11 @@ Following the guidelines explained here reduces the overall management complexit
  
 ## Approaches
 
-There are some limits in the number of [PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) that can be created per region. It depends on the database type configured. Check documentation [here](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99).
+For security reasons, Observability Services should be configured with private access, ensuring no traffic traverses the internet.
+For Database Management and Operations Insights, we will use Private Endpoints.
+
+There are limits on the number of Private Endpoints [PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) that can be created per region. It depends on the database type configured.
+Because of this, we can take two different approaches:
 
 * ### **Global Approach** ( Recommended)
 
