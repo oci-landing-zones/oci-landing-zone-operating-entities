@@ -48,4 +48,6 @@ Within the stack, perform a *Plan*, inspect its output, and finally run an *Appl
 
 The resources in red color are added.
 
+**IMPORTANT**: the firewall instances are NOT bootstrapped/configured in the automation.
+
 ![isv-pod-architecture-mgmt-plane-firewall](../../design/images/mgmt-plane-firewall.png)
