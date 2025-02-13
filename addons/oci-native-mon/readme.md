@@ -67,13 +67,13 @@ The DM PE needs visibility with the ATP PE.
 
 * In a **global approach**, the DM PE will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-mon-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-mon-pe-db1 NSGs.
 In this case, a Shared Observability platform compartment, a global observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
-<img src="./content/DM_GLOBAL.png" height="300" align="center">
+<img src="./content/ATP_DM_GLOBAL.png" height="300" align="center">
 
 &nbsp; 
 
 * In a **local approach**, both PEs will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
 In this case, a dedicated Prod Observability platform compartment, a dedicated Prod observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSG.
-<img src="./content/DM_LOCAL.png" height="300" align="center">
+<img src="./content/ATP_DM_LOCAL.png" height="300" align="center">
   
 Private endpoints will be placed in the observability compartments, accessing the required subnets.
 
@@ -87,8 +87,10 @@ The DM PE needs visibility with the EXACS SCAN listeners.
 * In a Local approach both PE will reside in the same db subnet and the xxx nsgs will allow the comunication between them.
 * In a Global approach, the DM PE will be place in the mon subnet in the hub and should be asiggned to the xxx nsgs. The database will be placed in the db subnet assigned to the xxx nsgs.
 
-### **EXACC** 
-TBC
+### **EXACC**
+
+<img src="./content/EXACC_DM.png" height="300" align="center">
+
 
 ### **MySQL DB** 
 TBC
@@ -117,13 +119,13 @@ The OPSI  PE needs visibility with the ATP PE.
 
 * In a **global approach**, the OPSI PE will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-dm-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-dm-pe-db1 NSGs.
 In this case, a Shared Observability platform compartment, a global observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
-<img src="./content/OPSI_GLOBAL.png" height="300" align="center">
+<img src="./content/ATP_OPSI_GLOBAL.png" height="300" align="center">
 
 &nbsp; 
 
 * In a **local approach**, both PEs will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
 In this case, a dedicated Prod Observability platform compartment, a dedicated Prod observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSG.
-<img src="./content/OPSI_LOCAL.png" height="300" align="center">
+<img src="./content/ATP_OPSI_LOCAL.png" height="300" align="center">
   
 Private endpoints will be placed in the observability compartments, accessing the required subnets.
 
@@ -134,6 +136,11 @@ During the process of enabling OPSI  in the Autonomous Database, the user and pa
 
 > [!WARNING]  
 >Dedicated Autonomous databases still require a special DNS proxy enabled private endpoint.
+
+### **EXACC**
+
+<img src="./content/EXACC_OPSI.png" height="300" align="center">
+
 
 
 
