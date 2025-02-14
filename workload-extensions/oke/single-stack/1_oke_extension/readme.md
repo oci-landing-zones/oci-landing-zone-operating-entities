@@ -25,7 +25,7 @@
 | **NAME**                | OKE Landing Zone Extension set-up                                                                                                    |
 | **OBJECTIVE**           | Provision Identity and Network                                                                               |
 | **TARGET RESOURCES**    | - **Identity**: Compartments, Groups, Policies </br>- **Network**: Spoke VCNs, Route tables, Security Lists, NSGs                 |
-| **PREREQUISITES**       | The [One-OE](../../../blueprints/one-oe/) Blueprint deployed as a foundation. </br> For this example we used:</br></br>  **Network layer Hub A light** </br> [oci_open_lz_hub_a_network_light_post.auto.tfvars.json](../../../addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light_post.auto.tfvars.json)</br></br> **IAM, Security, Observability**</br>[oci_open_lz_one-oe_iam.auto.tfvars.jso](../../../blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json)</br>[oci_open_lz_one-oe_security.auto.tfvars.json](../../../blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security.auto.tfvars.json)</br>[oci_open_lz_one-oe_observability.auto.tfvars.json](../../../blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability.auto.tfvars.json)</br> </br> <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.3.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a> |
+| **PREREQUISITES**       | The [One-OE](/blueprints/one-oe/) Blueprint deployed as a foundation. </br> For this example we used:</br></br>  **Network layer Hub A light** </br> [oci_open_lz_hub_a_network_light_post.auto.tfvars.json](/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light_post.auto.tfvars.json)</br></br> **IAM, Security, Observability**</br>[oci_open_lz_one-oe_iam.auto.tfvars.jso](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json)</br>[oci_open_lz_one-oe_security_cisl1.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json)</br>[oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json)</br> </br> <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.3.zip'><img src="/commons/images/DeployToOCI.svg" height="30"></a> |
 | **CONFIGURATION FILES** | [oke_identity.auto.tfvars.json](./oke_identity.auto.tfvars.json)  </br> [oke_network.auto.tfvars.json](./oke_network.auto.tfvars.json)|
 | **DEPLOYMENT**          | Use [Oracle Resource Manager (ORM)](/commons/content/orm.md) or [Terraform CLI](/commons/content/terraform.md).            |
 
@@ -235,7 +235,7 @@ The following table describes the proposed Service Gateways added for each envir
 ## **4. Deploy**
 <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.2.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
 
-Use the link above to deploy using [Oracle Resource Manager (ORM)](../../../commons/content/orm.md) or use [Terraform CLI](../../../commons/content/terraform.md)
+Use the link above to deploy using [Oracle Resource Manager (ORM)](/commons/content/orm.md) or use [Terraform CLI](/commons/content/terraform.md)
 
 After successful deploymenyou need to update the routing in the hub as defined in [POST operation 1.1](../1_oke_extension/1.1_Network_post_updates/readme.md). Once completed, everything will be ready for deploying OKE cluster.
 
@@ -249,4 +249,4 @@ Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](/LICENSE) for more details.
+See [LICENSE](/LICENSE.txt) for more details.
