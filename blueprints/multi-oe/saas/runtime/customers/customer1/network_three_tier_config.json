@@ -10,54 +10,54 @@
               "display_name"                     : "three-tier-vcn",
               "is_ipv6enabled"                   : false,
               "is_oracle_gua_allocation_enabled" : false,
-              "cidr_blocks"                      : ["10.0.0.0/25"],
+              "cidr_blocks"                      : ["10.0.0.0/26"], 
               "dns_label"                        : "threetiervcn",
               "block_nat_traffic"                : false,
   
               "subnets" : {
                 "THREE-TIER-VCN-WEB-SUBNET" : {
-                  "cidr_block"                 : "10.0.0.0/27",
+                  "cidr_block"                 : "10.0.0.32/29",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "web-subnet",
                   "dns_label"                  : "web",
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
                   "prohibit_public_ip_on_vnic" : true,
-                  "route_table_key"            : "THREE-TIER-VCN-WEB-SUBNET-ROUTE",
+                  "route_table_key"            : "THREE-TIER-VCN-ROUTE",
                   "security_list_keys"         : ["THREE-TIER-VCN-SL"]
                 },
                 "THREE-TIER-VCN-APP-SUBNET" : {
-                  "cidr_block"                 : "10.0.0.32/27",
+                  "cidr_block"                 : "10.0.0.0/27",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "app-subnet",
                   "dns_label"                  : "app",
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
                   "prohibit_public_ip_on_vnic" : true,
-                  "route_table_key"            : "THREE-TIER-VCN-APP-SUBNET-ROUTE",
+                  "route_table_key"            : "THREE-TIER-VCN-ROUTE",
                   "security_list_keys"         : ["THREE-TIER-VCN-SL"]
                 },
                 "THREE-TIER-VCN-DB-SUBNET" : {
-                  "cidr_block"                 : "10.0.0.64/27",
+                  "cidr_block"                 : "10.0.0.40/29",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "db-subnet",
                   "dns_label"                  : "db",
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
                   "prohibit_public_ip_on_vnic" : true,
-                  "route_table_key"            : "THREE-TIER-VCN-DB-SUBNET-ROUTE",
+                  "route_table_key"            : "THREE-TIER-VCN-ROUTE",
                   "security_list_keys"         : ["THREE-TIER-VCN-SL"]
                 }
               },
   
               "security_lists" : {
                 "THREE-TIER-VCN-SL" : {
-                  "display_name" : "basic-sl",
+                  "display_name" : "basic-security-list",
                   "ingress_rules" : [
                     {
                       "description"  : "Ingress on UDP type 3 code 4.",
                       "stateless"    : false,
-                      "protocol"     : "UDP",
+                      "protocol"     : "ICMP",
                       "src"          : "0.0.0.0/0",
                       "src_type"     : "CIDR_BLOCK",
                       "icmp_type"    : 3,
@@ -69,34 +69,12 @@
               },
   
               "route_tables" : {
-                "THREE-TIER-VCN-WEB-SUBNET-ROUTE" : {
-                  "display_name" : "web-subnet-route-table",
+                "THREE-TIER-VCN-ROUTE" : {
+                  "display_name" : "generic-route-table",
                   "route_rules" : {
                     "DRG-RULE" : {
                       "network_entity_key" : "CENTRAL-HUB-DRG",
-                      "description"        : "To DRG.",
-                      "destination"        : "0.0.0.0/0",
-                      "destination_type"   : "CIDR_BLOCK"
-                    }
-                  }
-                },
-                "THREE-TIER-VCN-APP-SUBNET-ROUTE" : {
-                  "display_name" : "app-subnet-route-table",
-                  "route_rules" : {
-                    "DRG-RULE" : {
-                      "network_entity_key" : "CENTRAL-HUB-DRG",
-                      "description"        : "To DRG.",
-                      "destination"        : "0.0.0.0/0",
-                      "destination_type"   : "CIDR_BLOCK"
-                    }
-                  }
-                },
-                "THREE-TIER-VCN-DB-SUBNET-ROUTE" : {
-                  "display_name" : "db-subnet-route-table",
-                  "route_rules" : {
-                    "DRG-RULE" : {
-                      "network_entity_key" : "CENTRAL-HUB-DRG",
-                      "description"        : "To DRG.",
+                      "description"        : "All traffic goes to DRG.",
                       "destination"        : "0.0.0.0/0",
                       "destination_type"   : "CIDR_BLOCK"
                     }
@@ -105,14 +83,14 @@
               },
   
               "network_security_groups" : {
-                "THREE-TIER-VCN-BASTION-NSG" : {
-                  "display_name" : "bastion-nsg",
+                "THREE-TIER-VCN-JUMP-HOST-NSG" : {
+                  "display_name" : "jump-host-nsg",
                   "ingress_rules" : {
                     "FROM-ON-PREM-SSH" : {
-                      "description"  : "Ingress from on-prem on SSH port 22.",
+                      "description"  : "Ingress from Central Hub VCN's Bastion subnet.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
-                      "src"          : "189.6.81.101/32",
+                      "src"          : "192.168.0.32/29",
                       "src_type"     : "CIDR_BLOCK",
                       "dst_port_min" : 22,
                       "dst_port_max" : 22
@@ -133,14 +111,12 @@
                     }
                   },
                   "egress_rules" : {
-                    "TO-APP-NSG" : {
-                      "description" : "Egress to App NSG.",
+                    "TO-ANYWHERE" : {
+                      "description" : "Egress to anywhere.",
                       "stateless"   : false,
                       "protocol"    : "TCP",
-                      "dst"         : "THREE-TIER-VCN-APP-NSG",
-                      "dst_type"    : "NETWORK_SECURITY_GROUP",
-                      "dst_port_min": 80,
-                      "dst_port_max": 80
+                      "dst"         : "0.0.0.0/0",
+                      "dst_type"    : "CIDR_BLOCK"
                     }
                   }
                 },
@@ -158,14 +134,12 @@
                     }
                   }, 
                   "egress_rules" : {
-                    "TO-DB-NSG" : {
-                      "description"  : "Egress to DB NSG",
-                      "stateless"    : false,
-                      "protocol"     : "TCP",
-                      "dst"          : "THREE-TIER-VCN-DB-NSG",
-                      "dst_type"     : "NETWORK_SECURITY_GROUP",
-                      "dst_port_min" : 1521,
-                      "dst_port_max" : 1522
+                    "TO-ANYWHERE" : {
+                      "description" : "Egress to anywhere.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "0.0.0.0/0",
+                      "dst_type"    : "CIDR_BLOCK"
                     }
                   }
                 },
@@ -181,6 +155,15 @@
                       "dst_port_min" : 1521,
                       "dst_port_max" : 1522
                     }
+                  },
+                  "egress_rules" : {
+                    "TO-ANYWHERE" : {
+                      "description" : "Egress to anywhere.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "0.0.0.0/0",
+                      "dst_type"    : "CIDR_BLOCK"
+                    }
                   }
                 }
               }
@@ -189,16 +172,39 @@
   
           "non_vcn_specific_gateways" : {
             "inject_into_existing_drgs" : {
-              "CUSTOMER-1-CENTRAL-HUB-DRG-INJECT" : {
+              "CUSTOMER-1-THREE-TIER-CENTRAL-HUB-DRG-INJECT" : {
                 "drg_id" : "CENTRAL-HUB-DRG",
                 "drg_attachments" : {
                   "CUSTOMER-1-THREE-TIER-VCN-ATTACH" : {
                     "display_name" : "customer1-three-tier-vcn-attachment",
+                    "drg_route_table_key" : "CUSTOMER-1-THREE-TIER-VCN-DRG-ROUTE",
                     "network_details" : {
                       "attached_resource_key" : "THREE-TIER-VCN",
                       "type" : "VCN"
                     }
                   }
+                },
+                "drg_route_tables" : {
+                  "CUSTOMER-1-THREE-TIER-VCN-DRG-ROUTE" : { 
+                    "display_name" : "customer1-three-tier-drg-route-table",
+                    "import_drg_route_distribution_key" : "CUSTOMER-1-THREE-TIER-VCN-IMPORT-ROUTE-DISTRIBUTION"
+                  }
+                },
+                "drg_route_distributions" : {
+                  "CUSTOMER-1-THREE-TIER-VCN-IMPORT-ROUTE-DISTRIBUTION" : {
+                    "display_name" : "customer1-three-tier-vcn-route-distribution",
+                    "distribution_type" : "IMPORT",
+                    "statements" : {
+                      "CUSTOMER-1-THREE-TIER-VCN-TO-CENTRAL-HUB-VCN-STMT" : {
+                        "action" : "ACCEPT",
+                        "priority" : 1,
+                        "match_criteria" : {
+                          "match_type" : "DRG_ATTACHMENT_ID",
+                          "attachment_type" : "VCN",
+                          "drg_attachment_key" : "CENTRAL-HUB-VCN-ATTACH"
+                        }
+                      }
+                    }  
                 }
               }
             }
@@ -206,4 +212,5 @@
         }
       }
     }  
+  }  
 }
