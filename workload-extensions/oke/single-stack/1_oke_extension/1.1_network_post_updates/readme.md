@@ -8,14 +8,14 @@ Model A offers two options:
 - **Light Version** (No Cost) - testing purposes, without a firewall
 - **Complete Version** (Paid) - includes deployment of two OCI Network Firewalls.
 
-Follow the steps to configure version of [Hub Model A](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/oke/workload-extensions/oke/1_oke_extension). After Hub has been configured we need to perform modification to OKE environments to establish routing between Hub and Spoke VCN. In the diagram below we can see expected routing for OKE extension both for prod and uat clusters.
+Follow the steps to configure version of [Hub Model A](/addons/oci-hub-models/hub_a). After Hub has been configured we need to perform modification to OKE environments to establish routing between Hub and Spoke VCN. In the diagram below we can see expected routing for OKE extension both for prod and uat clusters.
 
 <img src="../../content/net-routing.png" width="1000" height="auto">
 
 To connect OKE clusters as a spoke to the hub, we need to perform the following steps for each of the clusters:
 
-- **1.** Identify the Private IP OCID of your firewalls. [Light version steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/howto_identify_private_ip_ocid_vm_vnic.md) or [Complete version steps](../../../../commons/content/howto_identify_private_ip_ocid_network_firewall.md).
-- **2.** You'll need to update Hub routing to the cluster network (spoke VCN). For an example of fully configured Hub A - Light model see the POST network JSON configuration [**oci_open_lz_hub_b_network_light_post.auto.tfvars.json**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json):
+- **1.** Identify the Private IP OCID of your firewalls. [Light version steps](/commons/content/howto_identify_private_ip_ocid_vm_vnic.md) or [Complete version steps](/commons/content/howto_identify_private_ip_ocid_network_firewall.md).
+- **2.** You'll need to update Hub routing to the cluster network (spoke VCN). For an example of fully configured Hub A - Light model see the POST network JSON configuration [**oci_open_lz_hub_a_network_light_post.auto.tfvars.json**](/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light_post.auto.tfvars.json):
   - **2.1** Add route entry for the destination of cluster network range (10.0.80.0/21 in our example) to route tables: rt-\<region>-hub-natgw,  rt-\<region>-hub-ingress. And next hop as OCID of the respective Firewall IP from the step 1. 
   - **2.2** Add route entry for the destination of cluster network range (10.0.80.0/21 in our example) to route tables:  rt-\<region>-hub-lb,  rt-\<region>-hub-internal,  rt-\<region>-hub-mgmt. And next hop as Hub DRG.
   - **2.3.** Create DRG Attachment to the cluster network using the drg_route_table_key "DRGRT-FRA-LZP-SPOKES-KEY". After the attachment is created DRG will automatically import routes from the spokes to the DRG Route Table.
@@ -31,4 +31,4 @@ Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](/LICENSE) for more details.
+See [LICENSE](/LICENSE.txt) for more details.
