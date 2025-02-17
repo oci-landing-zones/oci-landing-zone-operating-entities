@@ -47,7 +47,7 @@ As a general approach, the Landing Zone uses a hub VCN, which is designed to cen
 
 The global approach involves deploying a "Global" Private Endpoint (PE) that can be used across all databases in different projects, environments, or entities.
 
-We recommend deploying the PE in the Logs Subnets, configure the routing and enabling communication using Network Security Groups (NSGs), which are included in this add-on.
+We recommend deploying the PEs in the Monitoring Subnet (mon sn), configure the routing and enabling communication using Network Security Groups (NSGs), which are included in this add-on.
 
 
 * ### **Local Approach**
