@@ -110,7 +110,7 @@ During the process of enabling Database Management or Operation Insights in an A
 
 ### **4.2 EXACS** (Database management, Operation Insights and logging Analytics)
 
-Database Management offers comprehensive performance diagnostics and management features for EXACS Oracle Databases. With the added functionality of Ops Insights, you can:
+Database Management provides comprehensive performance diagnostics and management for EXACS Oracle Databases. Additionally, with the added capabilities of Ops Insights, you can:
 
 * Analyze resource usage across cloud databases
 * Forecast future resource demands, including CPU, memory, and storage, based on historical trends
