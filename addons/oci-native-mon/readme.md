@@ -160,13 +160,13 @@ TBC
 
 &nbsp; 
 
-### **VM Databases** (Database management, Operation Insights and logging Analytics)
+### **4.5 VM Databases** (Database management, Operation Insights and logging Analytics)
 
 TBC
 
 &nbsp; 
 
-### **VM** (Operation Insights and logging Analytics)
+### **4.6 VM** (Operation Insights and logging Analytics)
 
 TBC
 
@@ -190,9 +190,11 @@ This template includes all cmp, groups, policies and NSGs needed for enabling Da
 After running step2, Databases can be created and you can deploy the DM & OPSI PEs:
 
 Using Global PE Approach:
+
 <img src="./content/OBS_ADDON_GLOBAL.png" height="800" align="center">
 
 Using Local PE Approach:
+
 <img src="./content/OBS_ADDON_LOCAL.png" height="800" align="center">
 
 > [!NOTE]  
