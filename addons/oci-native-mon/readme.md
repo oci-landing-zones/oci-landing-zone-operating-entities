@@ -83,7 +83,7 @@ The private endpoint is a representation of OCI O&M Services in the VCN.
 
 DM PE and OPSI PE needs visibility with the ATP PE.
 
-* In a **global approach**, the PEs will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-mon-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-mon-pe-db1 NSGs.
+* In a **global approach**, PEs will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-mon-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-mon-pe-db1 NSGs.
   
 In this case, a Shared Observability platform compartment, groups and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
 <img src="./content/ATP_GLOBAL.png" height="300" align="center">
@@ -110,25 +110,35 @@ During the process of enabling Database Management or Operation Insights in an A
 
 ### **4.2 EXACS** (Database management, Operation Insights and logging Analytics)
 
-The DM PE needs visibility with the EXACS SCAN listeners.
+Database Management offers comprehensive performance diagnostics and management features for EXACS Oracle Databases. With the added functionality of Ops Insights, you can:
 
-* In a Global approach, the DM/OPSI PE will be place in the mon subnet in the hub and should be asiggned to the xxx nsgs. The database will be placed in the db subnet assigned to the xxx nsgs.
+* Analyze resource usage across cloud databases
+* Forecast future resource demands, including CPU, memory, and storage, based on historical trends
+* Compare SQL performance across databases and identify common patterns
+* Monitor ASM disk group usage
+* Analyze storage server (cell) I/O and throughput
+
+The DM/OPSI PEs will need visibility with the EXACS SCAN listeners.
+
+* In a Global approach, the DM/OPSI PEs will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-mon-pe NSGs. EXACS resides in database client subnet (sn-<region>-p-projs-db) and has to be assigned to the nsg-lzp-p-projects-mon-pe-db NSGs.
+<img src="./content/EXACS_GLOBAL.png" height="300" align="center">
+
   
-* In a Local approach DM/OPSI PE will reside in the db subnet and the xxx nsgs will allow the comunication between them and the SCAN Listeners.
+* In a Local approach DM/OPSI PEs and the VM cluster will reside in the same database client subnet(sn-<region>-p-projs-db), and the nsg-lzp-p-projects-mon-pe-db NSGs will allow communication between them.
+<img src="./content/EXACS_LOCAL.png" height="300" align="center">
   
 
+> [!NOTE]  
+> To review the Oracle documentation for enabling Database Management and Operation Insights click [here](https://docs.public.content.oci.oraclecloud.com/en-us/iaas/exadatacloud/doc/observability-and-management-for-exacs.html).
+> 
 
+&nbsp; 
 
 ### **4.3 EXACC** (Database management, Operation Insights and logging Analytics)
-
 
 For EXACC, we only have the option of a global approach. We deployed the DM/OPSI PEs in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models.
 
 <img src="./content/EXACC.png" height="300" align="center">
-
-
-
-&nbsp; 
 
 > [!NOTE]  
 > This asset primarily focuses on enabling Native Observability services within the Landing Zone. However, when addressing EXACC workloads, it is also essential to consider events and alarms. These aspects are covered in our EXACC Landing Zone extension, which can be found [here](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/workload-extensions/exacc).
@@ -142,6 +152,7 @@ For EXACC, we only have the option of a global approach. We deployed the DM/OPSI
 >* Example Production Project Alarms.
 >* Example Pre-Production Project Alarms.
 
+&nbsp; 
 
 ### **4.4 External Databases** (Database management, Operation Insights and logging Analytics)
 
