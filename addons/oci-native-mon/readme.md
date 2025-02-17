@@ -54,7 +54,7 @@ We recommend deploying the PEs in the Monitoring Subnet (mon sn), configure the 
 
 In specific cases where the customer has a single environment and minimal use of Private Endpoints (PEs), or where there is no Hub, a local approach can be adopted.
 
-In this case, a dedicated DM PE can be deployed in the same subnet as the database to be configured. To enable communication between the DB PE and ATP PE, we will also use another NSG, which is included in this add-on.
+In this case, a dedicated PEs can be deployed in the same subnet as the database to be configured. To enable communication between the DM/OPSI PE and ATP PE, we will also use another NSG, which is included in this add-on.
 &nbsp; 
 
 
@@ -69,9 +69,9 @@ In this asset, we provide two example Observability roles:
 <img src="./content/ROLES.png" height="300" align="center">
 
 
-## 4. Database Options
+## 4. Services.
 
-### **4.1 Autonomous** 
+### **4.1 Autonomous database**  (Database management & Operation Insights)
 
 To enable **Database Management** or **Operation Insight** for Autonomous you need to deploy Private Endpoints which must have access to the database that needs to be configured.
 To check the documentation you can use these links: [DM PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Database Management Private Endpoint). or [OPSI PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Operation Insights Private Endpoint).
@@ -108,7 +108,7 @@ During the process of enabling Database Management or Operation Insights in an A
 &nbsp; 
 
 
-### **4.2 EXACS** 
+### **4.2 EXACS** (Database management, Operation Insights and logging Analytics)
 
 The DM PE needs visibility with the EXACS SCAN listeners.
 * In a Local approach both PE will reside in the same db subnet and the xxx nsgs will allow the comunication between them.
@@ -116,7 +116,7 @@ The DM PE needs visibility with the EXACS SCAN listeners.
 * In a Global approach, the DM PE will be place in the mon subnet in the hub and should be asiggned to the xxx nsgs. The database will be placed in the db subnet assigned to the xxx nsgs.
 
 
-### **4.3 EXACC** 
+### **4.3 EXACC** (Database management, Operation Insights and logging Analytics)
 
 
 For EXACC, we only have the option of a global approach. We deployed the PE in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models
@@ -146,15 +146,21 @@ For EXACC, we only have the option of a global approach. We deployed the PE in t
 >* Example Pre-Production Project Alarms.
 
 
-### **4.4 External Databases** 
+### **4.4 External Databases** (Database management, Operation Insights and logging Analytics)
 
 <img src="./content/EXTERNAL_DM_OPSI.png" height="300" align="center">
 
 &nbsp; 
 
-### **VM Databases** 
+### **VM Databases** (Database management, Operation Insights and logging Analytics)
 
 <img src="./content/LOGGINGA.png" height="300" align="center">
+
+&nbsp; 
+
+### **VM** (Operation Insights and logging Analytics)
+
+TBC
 
 &nbsp; 
 
