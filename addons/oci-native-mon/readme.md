@@ -58,7 +58,7 @@ In this case, a dedicated PEs can be deployed in the same subnet as the database
 &nbsp; 
 
 
-## 3.4 Roles
+## 3.2 Roles
 
 In this asset, we provide two example Observability roles:
 
@@ -69,7 +69,7 @@ In this asset, we provide two example Observability roles:
 <img src="./content/ROLES.png" height="300" align="center">
 
 
-## 4. Services.
+## 4. Scenarios.
 
 ### **4.1 Autonomous database**  (Database management & Operation Insights)
 
