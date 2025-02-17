@@ -145,13 +145,13 @@ For EXACC, we only have the option of a global approach. We deployed the DM/OPSI
 
 ### **4.4 External Databases** (Database management, Operation Insights and logging Analytics)
 
-<img src="./content/EXTERNAL_DM_OPSI.png" height="300" align="center">
+TBC
 
 &nbsp; 
 
 ### **VM Databases** (Database management, Operation Insights and logging Analytics)
 
-<img src="./content/LOGGINGA.png" height="300" align="center">
+TBC
 
 &nbsp; 
 
