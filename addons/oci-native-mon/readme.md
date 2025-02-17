@@ -84,14 +84,15 @@ The private endpoint is a representation of OCI O&M Services in the VCN.
 DM PE and OPSI PE needs visibility with the ATP PE.
 
 * In a **global approach**, the PEs will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-mon-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-mon-pe-db1 NSGs.
-In this case, a Shared Observability platform compartment, a global observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
+  
+In this case, a Shared Observability platform compartment, groups and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
 <img src="./content/ATP_GLOBAL.png" height="300" align="center">
 
 &nbsp; 
 
-* In a **local approach**, both PEs will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
-In this case, a dedicated Prod Observability platform compartment, a dedicated Prod observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSG.
-<img src="./content/ATP_LOCAL.png" height="300" align="center">
+* In a **local approach**, DM/OPS PEs and ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
+  
+In this case, a Prod Observability platform compartment, groups and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.<img src="./content/ATP_LOCAL.png" height="300" align="center">
   
 Private endpoints will be placed in the observability compartments, accessing the required subnets.
 
