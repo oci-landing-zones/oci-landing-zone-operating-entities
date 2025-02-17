@@ -3,7 +3,7 @@
 
 &nbsp; 
 
-### Overview
+### 1. Overview
 
 Welcome to the **OCI Landing Zone Native Observability Services**. 
 
@@ -16,7 +16,7 @@ This guide provides the necessary configuration steps to enable OCI Observabilit
 * **Logging Analytics** is a machine learning-based cloud service that monitors, aggregates, indexes, and analyzes all log data from on-premises and multicloud environments. Enabling users to search, explore, and correlate this data to troubleshoot and resolve problems faster and derive insights to make better operational decisions.
 &nbsp; 
 
-### Benefits of this asset
+### 2. Benefits of this asset
 
 Following the guidelines explained here reduces the overall management complexity and will help you with:
 
@@ -26,9 +26,16 @@ Following the guidelines explained here reduces the overall management complexit
 * Add the required policies per each service.
 &nbsp; 
  
-## Approaches
+## 3. Approaches
 
-For security reasons, Observability Services should be configured with private access, ensuring no traffic traverses the internet.
+## 3.1 Private Endpoints  
+
+For enhanced security, Observability Services should be configured with private access. Some of the key benefits of OCI Private Endpoints include:
+* **Security**: By avoiding the public internet, Private Endpoints significantly reduce the risk of data breaches and unauthorized access.
+* **Compliance**: Helps meet regulatory requirements by ensuring data remains within designated boundaries.
+* **Performance**: Provides low-latency connections ideal for performance-sensitive applications.
+* **Cost Savings**: Reduces the need for additional networking resources like VPNs or dedicated connections.
+
 For Database Management and Operations Insights, we will use Private Endpoints.
 
 There are limits on the number of Private Endpoints [PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) that can be created per region. It depends on the database type configured.
@@ -51,50 +58,80 @@ In this case, a dedicated DM PE can be deployed in the same subnet as the databa
 &nbsp; 
 
 
-## Database Management Database scenarios
+## 3.4 Roles
 
-To enable Database Management, you need to deploy a [DM PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Database Management Private Endpoint), which must have access to the database that needs to be configured.
-The private endpoint is a representation of Database Management in the VCN. 
+In this asset, we provide two example Observability roles:
+
+* **Global Observability Team**: A general team responsible for managing all Operations and Maintenance (O&M) services, as well as DM/OPSI private endpoints across the organization.
+
+* **Production Observability Team**: A specialized team focused on managing all O&M services and DM/OPSI private endpoints within the production environment.
+
+<img src="./content/ROLES.png" height="300" align="center">
+
+
+## 4. Database Options
+
+### **4.1 Autonomous** 
+
+To enable **Database Management** or **Operation Insight** for Autonomous you need to deploy Private Endpoints which must have access to the database that needs to be configured.
+To check the documentation you can use these links: [DM PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Database Management Private Endpoint). or [OPSI PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Operation Insights Private Endpoint).
+
+The private endpoint is a representation of OCI O&M Services in the VCN. 
 
 > [!WARNING]  
-> You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Database Management documentation](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99).
-> 
+> You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Database Management documentation](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99) or [Operations Insights documentation](https://docs.oracle.com/en-us/iaas/operations-insights/doc/create-private-endpoint.html).
 
-### **Autonomous** 
+DM PE and OPSI PE needs visibility with the ATP PE.
 
-The DM PE needs visibility with the ATP PE.
-
-* In a **global approach**, the DM PE will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-mon-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-mon-pe-db1 NSGs.
+* In a **global approach**, the PEs will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-mon-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-mon-pe-db1 NSGs.
 In this case, a Shared Observability platform compartment, a global observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
-<img src="./content/ATP_DM_GLOBAL.png" height="300" align="center">
+<img src="./content/ATP_GLOBAL.png" height="300" align="center">
 
 &nbsp; 
 
 * In a **local approach**, both PEs will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
 In this case, a dedicated Prod Observability platform compartment, a dedicated Prod observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSG.
-<img src="./content/ATP_DM_LOCAL.png" height="300" align="center">
+<img src="./content/ATP_LOCAL.png" height="300" align="center">
   
 Private endpoints will be placed in the observability compartments, accessing the required subnets.
 
-During the process of enabling Database Management in the Autonomous Database, the user and password will be required. These credentials must be stored as secrets in a Vault within the specific security compartment (the shared security compartment in the global approach, or the dedicated environment security compartment in the local approach). All necessary policies to access the secret are already included in the add-on.
+During the process of enabling Database Management or Operation Insights in an Autonomous Database, the user and password will be required. These credentials must be stored as secrets in a Vault within the specific security compartment (the shared security compartment in the global approach, or the dedicated environment security compartment in the local approach). All necessary policies to access the secret are already included in the add-on.
 
 > [!NOTE]  
-> To review the Oracle documentation for enabling Database Management, click [here](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html)
+> To review the Oracle documentation for enabling Database Management, click [here](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
+> 
+> To review the Oracle documentation for enabling Operation Insights, click [here](https://docs.oracle.com/en-us/iaas/operations-insights/doc/autonomous-database-full-feature-support.html#GUID-27B9ABB0-BBC4-4F7D-9EC7-40EF09F8726B).
+> 
+> For OPSI Dedicated Autonomous databases require a special DNS proxy enabled private endpoint.
 
-### **EXACS** 
+&nbsp; 
+
+
+### **4.2 EXACS** 
 
 The DM PE needs visibility with the EXACS SCAN listeners.
 * In a Local approach both PE will reside in the same db subnet and the xxx nsgs will allow the comunication between them.
 * 
 * In a Global approach, the DM PE will be place in the mon subnet in the hub and should be asiggned to the xxx nsgs. The database will be placed in the db subnet assigned to the xxx nsgs.
 
-### **EXACC**
+
+### **4.3 EXACC** 
+
 
 For EXACC, we only have the option of a global approach. We deployed the PE in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models
 
 <img src="./content/EXACC_DM.png" height="300" align="center">
 
+For EXACC, we only have the option of a global approach. We deployed the PE in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models
+
+<img src="./content/EXACC_OPSI.png" height="300" align="center">
+
+
+<img src="./content/EXACC_LA.png" height="300" align="center">
+
+
 &nbsp; 
+
 > [!NOTE]  
 > This asset primarily focuses on enabling Native Observability services within the Landing Zone. However, when addressing EXACC workloads, it is also essential to consider events and alarms. These aspects are covered in our EXACC Landing Zone extension, which can be found [here](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/workload-extensions/exacc).
 >
@@ -108,66 +145,21 @@ For EXACC, we only have the option of a global approach. We deployed the PE in t
 >* Example Pre-Production Project Alarms.
 
 
-### **External Databases** 
+### **4.4 External Databases** 
+
 <img src="./content/EXTERNAL_DM_OPSI.png" height="300" align="center">
 
-
 &nbsp; 
 
-## Operation Insight Database scenarios
-
-To enable Operation Insight, you need to deploy a [OPSI PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Operation Insights Private Endpoint), which must have access to the database that needs to be configured.
-The private endpoint is a representation of Operation Insight in the VCN. 
-Private endpoints must be created in each service, private endpoints created in other services will not appear in the Ops Insights private endpoint list page. However Database Management endpoints can be converted to Ops Insights endpoints.
-
-> [!WARNING]  
-> You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Operations Insights documentation](https://docs.oracle.com/en-us/iaas/operations-insights/doc/create-private-endpoint.html).
-
-
-### **Autonomous**
- 
-The OPSI PE needs visibility with the ATP PE.
-
-* In a **global approach**, the OPSI PE will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-dm-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-dm-pe-db1 NSGs.
-In this case, a Shared Observability platform compartment, a global observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
-<img src="./content/ATP_OPSI_GLOBAL.png" height="300" align="center">
-
-&nbsp; 
-
-* In a **local approach**, both PEs will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
-In this case, a dedicated Prod Observability platform compartment, a dedicated Prod observability group, and the necessary policies to manage native observability will be included among with the previous mentioned NSG.
-<img src="./content/ATP_OPSI_LOCAL.png" height="300" align="center">
-  
-Private endpoints will be placed in the observability compartments, accessing the required subnets.
-
-During the process of enabling OPSI  in the Autonomous Database, the user and password will be required. These credentials must be stored as secrets in a Vault within the specific security compartment (the shared security compartment in the global approach, or the dedicated environment security compartment in the local approach). All necessary policies to access the secret are already included in the add-on.
-
-> [!NOTE]  
-> To review the Oracle documentation for enabling Operation Insights, click [here](https://docs.oracle.com/en-us/iaas/operations-insights/doc/autonomous-database-full-feature-support.html#GUID-27B9ABB0-BBC4-4F7D-9EC7-40EF09F8726B)
-
-> [!WARNING]  
->Dedicated Autonomous databases still require a special DNS proxy enabled private endpoint.
-
-### **EXACC**
-
-For EXACC, we only have the option of a global approach. We deployed the PE in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models
-
-<img src="./content/EXACC_OPSI.png" height="300" align="center">
-
-
-## Logging Analytics scenarios
-
-### **VM (DB)**
+### **VM Databases** 
 
 <img src="./content/LOGGINGA.png" height="300" align="center">
 
+&nbsp; 
 
-### **EXACC**
+## 5. Add-on Implementation
 
-<img src="./content/EXACC_LA.png" height="300" align="center">
-
-
-## Add-on Implementation
+## 5.1 Autonomous Implementation
 
 Example how to extend Observability in a Landing Zone for ATP.
 This template includes all cmp, groups, policies and NSGs needed for enabling Database Management, Operations Insights and Logging Analytics.
