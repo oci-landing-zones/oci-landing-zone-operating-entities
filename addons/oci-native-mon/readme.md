@@ -111,24 +111,21 @@ During the process of enabling Database Management or Operation Insights in an A
 ### **4.2 EXACS** (Database management, Operation Insights and logging Analytics)
 
 The DM PE needs visibility with the EXACS SCAN listeners.
-* In a Local approach both PE will reside in the same db subnet and the xxx nsgs will allow the comunication between them.
-* 
-* In a Global approach, the DM PE will be place in the mon subnet in the hub and should be asiggned to the xxx nsgs. The database will be placed in the db subnet assigned to the xxx nsgs.
+
+* In a Global approach, the DM/OPSI PE will be place in the mon subnet in the hub and should be asiggned to the xxx nsgs. The database will be placed in the db subnet assigned to the xxx nsgs.
+  
+* In a Local approach DM/OPSI PE will reside in the db subnet and the xxx nsgs will allow the comunication between them and the SCAN Listeners.
+  
+
 
 
 ### **4.3 EXACC** (Database management, Operation Insights and logging Analytics)
 
 
-For EXACC, we only have the option of a global approach. We deployed the PE in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models
+For EXACC, we only have the option of a global approach. We deployed the DM/OPSI PEs in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models.
 
-<img src="./content/EXACC_DM.png" height="300" align="center">
+<img src="./content/EXACC.png" height="300" align="center">
 
-For EXACC, we only have the option of a global approach. We deployed the PE in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models
-
-<img src="./content/EXACC_OPSI.png" height="300" align="center">
-
-
-<img src="./content/EXACC_LA.png" height="300" align="center">
 
 
 &nbsp; 
