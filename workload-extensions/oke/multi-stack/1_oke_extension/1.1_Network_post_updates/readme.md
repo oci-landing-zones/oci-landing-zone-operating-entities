@@ -46,7 +46,7 @@ This is the diagram that show the Network after adding the post STEP1 configurat
 
 Now that the spokes are attached to the hub, you can update their routing by adding a rule to the DRG.
 
-**f.** Edit the ORM stack (STEP2) and replace the original Network JSON configuration file with the new **oci_oke_lz_ext_network_npn_post.auto.tfvars** updated file.
+**f.** Update file **oci_oke_lz_ext_network_npn_post.auto.tfvars** adding your DRG OCID and edit the ORM stack (STEP2) replacing the original Network JSON configuration with the updated file.
 
 **g.** Run Plan & Apply to populate the new changes.
 
