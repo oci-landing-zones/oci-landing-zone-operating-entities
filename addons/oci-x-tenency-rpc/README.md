@@ -106,11 +106,11 @@ Configuration details:
 The expectation is to have the **One-OE Landing Zone:** [One-OE Landing Zone Repository](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in both tenancies: Primary/Shared Hub and Child/Spoke. This ensures a structured and automated approach to configuring cross-tenancy networking.
 
 #### Configuration Update & Execution in Primary/Shared Hub Tenancy
-*** Step 1: Add the RPC IAM Policy (Acceptor) *** :- Update the IAM JSON configuration with the Acceptor policy in the Primary/Shared Hub tenancy.
+**Step 1: Add the RPC IAM Policy (Acceptor)** :- Update the IAM JSON configuration with the Acceptor policy in the Primary/Shared Hub tenancy.
 
-*** Step 2: Add the Remote Peering Connection (RPC) Block *** :- Modify the network JSON configuration of the Primary/Shared Hub tenancy by adding the RPC block under the DRG section.
+**Step 2: Add the Remote Peering Connection (RPC) Block** :- Modify the network JSON configuration of the Primary/Shared Hub tenancy by adding the RPC block under the DRG section.
 
-*** Step 3: Execute the Terraform Deployment ***
+**Step 3: Execute the Terraform Deployment**
 - Plan and validate the newly added IAM policy & RPC configuration.
 - Apply the changes.
 - Collect the RPC OCID upon successful deployment.
