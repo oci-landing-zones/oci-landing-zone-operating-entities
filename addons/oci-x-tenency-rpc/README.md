@@ -20,12 +20,9 @@ This document provides configuration views for the following use cases:
 | [Remote Peering Connection (RPC)](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-rpc-create.htm#drg-rpc-create) | A Remote Peering Connection (RPC) must be created in both tenancies to establish connectivity between them. This involves configuring a dynamic routing gateway (DRG) in each tenancy and setting up the necessary peerings. |
 
 
-&nbsp;
-
 ### OCI X Tenancy RPC Setup
 This guide outlines steps to configure a cross-tenancy Remote Peering Connection (RPC) in OCI, enabling secure and seamless network connectivity between tenancies for distributed workloads.
 
-&nbsp;
 
 ## 1. Multi-Tenancy-RPC
 &nbsp;
@@ -39,7 +36,7 @@ Configuration details:
 
 <img src="images/x-tenancy.png" width="900" height="value">
 
-&nbsp;
+
 
 #### IAM Policy Syntax for Primary/Shared Hub Tenancy
 
