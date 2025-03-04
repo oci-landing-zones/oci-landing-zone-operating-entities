@@ -1,6 +1,6 @@
 
 # **[OCI Cross Tenancy Remote Peering Connection](#)**
-## **An OCI Open LZ [Addon](#) to setup the cross tenancy remote peering conection uisng IaC**
+## **An OCI Open LZ [Addon](#) to setup the cross tenancy remote peering conection using IaC**
 &nbsp;
 ## **Overview**
 The IaC-driven configuration enables connectivity between two regions in same tenancy and across multiple tenancies, managed by a central network team. It includes all necessary RPC configurations, such as policy creation, RPC setup, and connection establishment. This approach ensures consistency, simplifying administration and reducing complexity in managing RPC across OCI tenancies.
@@ -21,7 +21,7 @@ This document provides configuration views for the following use cases:
 
 
 ### OCI X Tenancy RPC Setup
-This guide outlines steps to configure a cross-tenancy Remote Peering Connection (RPC) in OCI, enabling secure and seamless network connectivity between tenancies for distributed workloads.
+This guide details steps to set up a Remote Peering Connection (RPC) in OCI, ensuring secure, seamless network connectivity across tenancies and multi-region setups for distributed workloads.
 
 
 ## 1. Multi-Tenancy-RPC
@@ -116,9 +116,6 @@ The expectation is to have the [One-OE Landing Zone](https://github.com/oci-land
 >Refer to the hub_network.auto.tfvars.json and oe1_iam.network.tfvars.json files for the complete networking configuration sample template based on One-OE.
 
 &nbsp;
-
-### OCI Single-Tenancy RPC Setup
-This guide details steps to set up a remote peering connection between two regions in a single tenancy, ensuring secure, seamless connectivity for distributed workloads.
 
 ## 2. Single Tenancy Multi-Region
 Configuration details:
