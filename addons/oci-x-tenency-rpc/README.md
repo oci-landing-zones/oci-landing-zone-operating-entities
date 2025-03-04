@@ -1,9 +1,7 @@
 
 # **[OCI Cross Tenancy Remote Peering Connection](#)**
 ## **An OCI Open LZ [Addon](#) to setup the cross tenancy remote peering conection uisng IaC**
-
 &nbsp;
-
 ## **Overview**
 The IaC-driven configuration enables connectivity between two regions in same tenancy and across multiple tenancies, managed by a central network team. It includes all necessary RPC configurations, such as policy creation, RPC setup, and connection establishment. This approach ensures consistency, simplifying administration and reducing complexity in managing RPC across OCI tenancies.
 
