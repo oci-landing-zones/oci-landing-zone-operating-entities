@@ -48,19 +48,43 @@ Configuration details:
 #### IAM Policy Syntax for Primary/Shared Hub Tenancy
 
 ```
-Define group requestorGroup as <requestor-group-ocid>
-Define tenancy Requestor as <requestorTenancyOcid>
-Define compartment acceptorCompartment as id <acceptorCompartmentOcid>
-Admit group requestorGroup of tenancy Requestor to manage remote-peering-to in compartment <acceptorCompartment>
+"policies_configuration": {
+        "enable_cis_benchmark_checks": "false",
+        "supplied_policies": {
+            "PCY-RPC-ACCEPTOR": {
+                "name": "pcy-rpc-acceptor",
+                "description": "Open LZ policy for aaccepting RPC connections in the tenancy.",
+                "compartment_id": "TENANCY-ROOT",
+                "statements": [
+                    "Define group requestorGroup as ocid1.group.oc1..aaaaa...u5scwsqczu7xf67jozkkbl3hj...kjzqq5gxll4ppiwgtq",
+                    "Define tenancy Requestor as ocid1.tenancy.oc1..aaaaaaaatvskd4rq2srf5santd4....kskkoueyqx....shsxart4535oeq",
+                    "Define compartment acceptorCompartment as ocid1.compartment.oc1..aaaampuojexo4zj....a4u2idgqbyd3ndzyp....3mtxz2z2uq",
+                    "Admit group requestorGroup of tenancy Requestor to manage remote-peering-to in compartment cmp-landingzone-rpc:cmp-lzp-network"
+                ]
+            }
+        }
+    }
 ```
 
 #### IAM Policy Syntax for Child/Spoke Tenancy
 ```
-Define group requestorGroup as <requestorGroupOcid>
-Define compartment requestorCompartment as id <requestorCompartmentOcid>
-Define tenancy Acceptor as <AcceptorTenancyOcid>
-Allow group requestorGroup to manage remote-peering-from in compartment requestorCompartment
-Endorse group requestorGroup to manage remote-peering-to in tenancy Acceptor
+"policies_configuration": {
+        "enable_cis_benchmark_checks": "false",
+        "supplied_policies": {
+            "PCY-RPC-REQUESTOR": {
+                "name": "pcy-rpc-requester",
+                "description": "Open LZ policy for aaccepting RPC connections in the tenancy.",
+                "compartment_id": "TENANCY-ROOT",
+                "statements": [
+                    "Define group requestorGroup as ocid1.group.oc1..aaaaaaaaw...zkkbl3hjsnq...xll4ppiwgtq",
+                    "Define compartment requestorCompartment as ocid1.compartment.oc1..aaaaaaaack6q...7jmuupbtq23zwx...djhlffoya3ypsphprk5q",
+                    "Define tenancy Acceptor as ocid1.tenancy.oc1..aaaaaaaaval...gouqsvea6opiyo...g5c7sggk2pcvbxq",
+                    "Allow group requestorGroup to manage remote-peering-from in compartment cmp-landingzone-rpc:cmp-lzp-network",
+                    "Endorse group requestorGroup to manage remote-peering-to in tenancy Acceptor"
+                ]
+            }
+        }
+    }
 ```
 
 &nbsp; 
