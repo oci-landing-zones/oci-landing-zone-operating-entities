@@ -117,13 +117,48 @@ The expectation is to have the **One-OE Landing Zone:** [One-OE Landing Zone Rep
 
 ***Step 2: Add the Remote Peering Connection (RPC) Block*** :- Modify the network JSON config of the Child/Spoke tenancy by adding the RPC block under the **DRG** section. Set the `peer_id` parameter to the RPC OCID collected from the Primary/Shared Hub tenancy.
 
-***Step 3: Execute the Terraform Deployment*** :- `Plan` and `Apply` the newly added IAM policy & RPC configuration.Collect the RPC OCID upon successful deployment. Verify the deployment is successful and that the RPC is established.
+***Step 3: Execute the Terraform Deployment*** :- `Plan` and `Apply` the newly added IAM policy & RPC configuration. Verify the deployment is successful and that the RPC is established.
 
 > [!IMPORTANT]
 > Ensure that the user performing Terraform automation belongs to the group specified in the RPC policy. Otherwise, the connection will not establish. From a One-OE standpoint, this group should be `grp-lzp-network-admins`.
 
 &nbsp;
 
+### OCI Single-Tenancy RPC Setup
+This guide provides instructions to establish a remote peering connection between two regions within a single tenancy, ensuring secure and seamless connectivity for distributed workloads.
+
+&nbsp;
+
+## 1. Single Tenancy Multi-Region
+Configuration details:
+  - Region A & Region B conisits of the following resources.
+    - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
+
+
+&nbsp;
+
+### Steps to Set Up Cross-Tenancy RPC
+The expectation is to have the [One-OE Landing Zone Repository](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in both tenancies: Primary/Shared Hub and Child/Spoke. This ensures a structured and automated approach to configuring cross-tenancy networking.
+
+#### Configuration Update & Execution in Region A
+***Step 1: Add the Remote Peering Connection (RPC) Block*** :- Modify the network JSON config of Region A by adding the RPC block under the DRG section.
+
+***Step 3: Execute the Terraform Deployment*** :- `Plan` and `Apply` the newly added RPC configuration.Collect the RPC OCID upon successful deployment.
+
+#### Configuration Update & Execution in Region B
+***Step 2: Add the Remote Peering Connection (RPC) Block*** :- Modify the network JSON config of Region B by adding the RPC block under the **DRG** section. Set the `peer_id` parameter to the RPC OCID collected from the Region A.
+
+***Step 3: Execute the Terraform Deployment*** :- `Plan` and `Apply` the newly added RPC configuration. Verify the deployment is successful and that the RPC is established.
+
+> [!NOTE]
+> Since this is within the same tenancy across multiple regions, no additional IAM policy is required to administer and enforce the connection.
+
+&nbsp;
+
+#### Summary
+
+
+&nbsp;
 #### License
 Copyright (c) 2025 Oracle and/or its affiliates.
 
