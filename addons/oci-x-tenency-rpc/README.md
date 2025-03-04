@@ -80,7 +80,6 @@ Configuration details:
     }
 ```
 
-&nbsp;
 
 > [!NOTE]
 > Collect the following required OCIDs from both tenancies to configure the necessary policies in each tenancy. The Child/Spoke tenancy acts as the requester, while the Hub tenancy serves as the acceptor, approving RPC requests from the Child/Spoke tenancies.
@@ -93,7 +92,7 @@ Configuration details:
 >
 > For more details, refer to the [OCI Cross Tenancy RPC Policy Documentation](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-iam.htm#scenario_m__IAM_cross-tenancy). 
 
-&nbsp;
+
 
 ### Steps to Set Up Cross-Tenancy RPC
 The expectation is to have the [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in both tenancies: Primary/Shared Hub and Child/Spoke. This ensures a structured and automated approach to configuring cross-tenancy networking.
@@ -116,19 +115,16 @@ The expectation is to have the [One-OE Landing Zone](https://github.com/oci-land
 > Ensure that the user performing Terraform automation belongs to the group specified in the RPC policy. Otherwise, the connection will not establish. From a One-OE standpoint, this group should be `grp-lzp-network-admins`.
 >Refer to the hub_network.auto.tfvars.json and oe1_iam.network.tfvars.json files for the complete networking configuration sample template based on One-OE.
 
+&nbsp;
 
 ### OCI Single-Tenancy RPC Setup
 This guide details steps to set up a remote peering connection between two regions in a single tenancy, ensuring secure, seamless connectivity for distributed workloads.
-
-&nbsp;
 
 ## 2. Single Tenancy Multi-Region
 Configuration details:
   - Region A & Region B conisits of the following resources.
     - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
 
-
-&nbsp;
 
 ### Steps to Set Up Multi-Region RPC
 The expectation is to have the [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in the tenancy. This ensures a structured and automated approach to configuring cross-region networking.
