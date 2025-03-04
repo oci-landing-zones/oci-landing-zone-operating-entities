@@ -1,13 +1,11 @@
 
-# **[OCI Cross Tenancy Remote Peering Connection configuration](#)**
+# **[OCI Cross Tenancy Remote Peering Connection](#)**
 ## **An OCI Open LZ [Addon](#) to setup the cross tenancy remote peering conection uisng IaC**
-
-&nbsp; 
 
 &nbsp;
 
 ## **Overview**
-This configuration enables to establish connectivity between two regions in same tenancy and across multiple tenancies, managed by a central network team. It includes all necessary RPC configurations, such as policy creation, RPC setup, and connection establishment. This approach ensures consistency, simplifies administration, and eliminates the complexity of managing RPC across multiple OCI tenancies.
+The IaC-driven configuration enables connectivity between two regions in same tenancy and across multiple tenancies, managed by a central network team. It includes all necessary RPC configurations, such as policy creation, RPC setup, and connection establishment. This approach ensures consistency, simplifying administration and reducing complexity in managing RPC across OCI tenancies.
 
 This document provides configuration views for the following use cases:
 - Multi-Tenancy-RPC: Establishes a remote peering connection between the same or different regions across multiple tenancies.
@@ -27,7 +25,7 @@ This document provides configuration views for the following use cases:
 &nbsp;
 
 ### OCI X Tenancy RPC Setup
-This guide provides step-by-step instructions for setting up a cross-tenancy Remote Peering Connection (RPC) in OCI. By following this guide, organizations can securely establish network connectivity between multiple tenancies, enabling seamless interconnectivity for distributed workloads. 
+This guide outlines steps to configure a cross-tenancy Remote Peering Connection (RPC) in OCI, enabling secure and seamless network connectivity between tenancies for distributed workloads.
 
 &nbsp;
 
@@ -96,14 +94,14 @@ Configuration details:
 >- `acceptorCompartment` (Hub Tenancy) → OCID of the compartment where the RPC is established.
 >- `Acceptor` Tenancy → OCID of the Shared/Hub tenancy.
 > 
-> Refer to the iam_hub.auto.tfvars.json and iam_oe1.auto.tfvars.json files for the complete IAM (Compartments, Groups & Policies) configuration sample template based on One-OE.
+> Refer to the hub_iam.auto.tfvars.json and oe1_iam.auto.tfvars.json files for the complete IAM (Compartments, Groups & Policies) configuration sample template based on One-OE.
 >
 > For more details, refer to the [OCI Cross Tenancy RPC Policy Documentation](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-iam.htm#scenario_m__IAM_cross-tenancy). 
 
 &nbsp;
 
 ### Steps to Set Up Cross-Tenancy RPC
-The expectation is to have the **One-OE Landing Zone:** [One-OE Landing Zone Repository](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in both tenancies: Primary/Shared Hub and Child/Spoke. This ensures a structured and automated approach to configuring cross-tenancy networking.
+The expectation is to have the [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in both tenancies: Primary/Shared Hub and Child/Spoke. This ensures a structured and automated approach to configuring cross-tenancy networking.
 
 #### Configuration Update & Execution in Primary/Shared Hub Tenancy
 ***Step 1: Add the RPC IAM Policy (Acceptor)*** :- Update the IAM JSON config with the Acceptor policy in the Primary/Shared Hub tenancy.
@@ -121,15 +119,15 @@ The expectation is to have the **One-OE Landing Zone:** [One-OE Landing Zone Rep
 
 > [!IMPORTANT]
 > Ensure that the user performing Terraform automation belongs to the group specified in the RPC policy. Otherwise, the connection will not establish. From a One-OE standpoint, this group should be `grp-lzp-network-admins`.
+>Refer to the hub_network.auto.tfvars.json and oe1_iam.network.tfvars.json files for the complete networking configuration sample template based on One-OE.
 
-&nbsp;
 
 ### OCI Single-Tenancy RPC Setup
-This guide provides instructions to establish a remote peering connection between two regions within a single tenancy, ensuring secure and seamless connectivity for distributed workloads.
+This guide details steps to set up a remote peering connection between two regions in a single tenancy, ensuring secure, seamless connectivity for distributed workloads.
 
 &nbsp;
 
-## 1. Single Tenancy Multi-Region
+## 2. Single Tenancy Multi-Region
 Configuration details:
   - Region A & Region B conisits of the following resources.
     - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
@@ -137,26 +135,26 @@ Configuration details:
 
 &nbsp;
 
-### Steps to Set Up Cross-Tenancy RPC
-The expectation is to have the [One-OE Landing Zone Repository](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in both tenancies: Primary/Shared Hub and Child/Spoke. This ensures a structured and automated approach to configuring cross-tenancy networking.
+### Steps to Set Up Multi-Region RPC
+The expectation is to have the [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in the tenancy. This ensures a structured and automated approach to configuring cross-region networking.
 
 #### Configuration Update & Execution in Region A
 ***Step 1: Add the Remote Peering Connection (RPC) Block*** :- Modify the network JSON config of Region A by adding the RPC block under the DRG section.
 
-***Step 3: Execute the Terraform Deployment*** :- `Plan` and `Apply` the newly added RPC configuration.Collect the RPC OCID upon successful deployment.
+***Step 2: Execute the Terraform Deployment*** :- `Plan` and `Apply` the newly added RPC configuration.Collect the RPC OCID upon successful deployment.
 
 #### Configuration Update & Execution in Region B
-***Step 2: Add the Remote Peering Connection (RPC) Block*** :- Modify the network JSON config of Region B by adding the RPC block under the **DRG** section. Set the `peer_id` parameter to the RPC OCID collected from the Region A.
+***Step 1: Add the Remote Peering Connection (RPC) Block*** :- Modify the network JSON config of Region B by adding the RPC block under the **DRG** section. Set the `peer_id` parameter to the RPC OCID collected from the Region A.
 
-***Step 3: Execute the Terraform Deployment*** :- `Plan` and `Apply` the newly added RPC configuration. Verify the deployment is successful and that the RPC is established.
+***Step 2: Execute the Terraform Deployment*** :- `Plan` and `Apply` the newly added RPC configuration. Verify the deployment is successful and that the RPC is established.
 
 > [!NOTE]
-> Since this is within the same tenancy across multiple regions, no additional IAM policy is required to administer and enforce the connection.
+> Since this is within the same tenancy across multiple regions, no additional RPC IAM policy is required to administer and enforce the connection.
 
 &nbsp;
 
 #### Summary
-
+This addon enhances the OCI [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) with IaC-driven Remote Peering Connections (RPC) for two use cases: Multi-Tenancy-RPC, linking tenancies across regions, and Single-Tenancy-RPC, connecting regions within a tenancy. It automates IAM policies, DRGs, and RPC setup for secure, scalable, and centralized network management in OCI.
 
 &nbsp;
 #### License
