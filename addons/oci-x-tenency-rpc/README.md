@@ -87,7 +87,19 @@ Configuration details:
     }
 ```
 
-&nbsp; 
+&nbsp;
+
+> [!NOTE]
+> Collect the following required OCIDs from both tenancies to configure the necessary policies in each tenancy. The Child/Spoke tenancy acts as the requester, while the Hub tenancy serves as the acceptor, approving RPC requests from the Child/Spoke tenancies.
+>- `requestorGroup` (Child/Spoke Tenancy) → OCID of the network administrator group.
+>- `Requestor` Tenancy → OCID of the Child/Spoke tenancy.
+>- `acceptorCompartment` (Hub Tenancy) → OCID of the compartment where the RPC is established.
+>- `Acceptor` Tenancy → OCID of the Shared/Hub tenancy.
+> 
+> Refer to the iam_hub.auto.tfvars.json and iam_oe1.auto.tfvars.json files for the complete IAM (Compartments, Groups & Policies) configuration sample template based on One-OE.
+> Note that the animations are visual representations designed to simplify the understanding of DNS behavior and do not necessarily reflect the internal implementation of OCI.
+
+&nbsp;
 
 #### License
 Copyright (c) 2025 Oracle and/or its affiliates.
