@@ -119,10 +119,10 @@ The expectation is to have the **One-OE Landing Zone:** [One-OE Landing Zone Rep
 
 ***Step 3: Execute the Terraform Deployment*** :- `Plan` and `Apply` the newly added IAM policy & RPC configuration.Collect the RPC OCID upon successful deployment. Verify the deployment is successful and that the RPC is established.
 
-&nbsp;
+> [!IMPORTANT]
+> Ensure that the user performing Terraform automation belongs to the group specified in the RPC policy. Otherwise, the connection will not establish. From a One-OE standpoint, this group should be `grp-lzp-network-admins`.
 
-> [!NOTE]
-> Ensure that the user performing Terraform automation belongs to the group specified in the RPC policy; otherwise, the connection will not establish. From a One-OE standpoint, this group should be `grp-lzp-network-admins`.
+&nbsp;
 
 #### License
 Copyright (c) 2025 Oracle and/or its affiliates.
