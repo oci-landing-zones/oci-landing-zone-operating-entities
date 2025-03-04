@@ -102,6 +102,40 @@ Configuration details:
 
 &nbsp;
 
+### Steps to Set Up Cross-Tenancy RPC
+The expectation is to have the **One-OE Landing Zone:** [One-OE Landing Zone Repository](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in both tenancies: Primary/Shared Hub and Child/Spoke. This ensures a structured and automated approach to configuring cross-tenancy networking.
+
+#### Configuration Update & Execution in Primary/Shared Hub Tenancy
+##### Step 1: Add the RPC IAM Policy (Acceptor)
+Update the IAM JSON configuration with the Acceptor policy in the Primary/Shared Hub tenancy.
+
+##### Step 2: Add the Remote Peering Connection (RPC) Block
+Modify the network JSON configuration of the Primary/Shared Hub tenancy by adding the RPC block under the DRG section.
+
+##### Step 3: Execute the Terraform Deployment
+- Plan and validate the newly added IAM policy & RPC configuration.
+- Apply the changes.
+- Collect the RPC OCID upon successful deployment.
+
+#### Configuration Update & Execution in Child/Spoke Tenancy
+##### Step 1: Add the RPC IAM Policy (Requestor)
+Update the IAM JSON configuration with the Requestor policy in the Child/Spoke tenancy.
+
+##### Step 2: Add the Remote Peering Connection (RPC) Block
+Modify the network JSON configuration of the Child/Spoke tenancy by adding the RPC block under the **DRG** section.
+
+Set the `peer_id` parameter to the RPC OCID collected from the Primary/Shared Hub tenancy.
+
+### Step 3: Execute the Terraform Deployment
+- Plan and validate the newly added IAM policy & RPC configuration.
+- Apply the changes.
+- Verify the deployment is successful and that the RPC is established.
+
+&nbsp;
+
+> [!NOTE]
+> Ensure that the user performing Terraform automation belongs to the group specified in the RPC policy; otherwise, the connection will not establish. From a One-OE standpoint, this group should be `grp-lzp-network-admins`.
+
 #### License
 Copyright (c) 2025 Oracle and/or its affiliates.
 
