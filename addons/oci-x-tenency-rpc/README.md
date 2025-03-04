@@ -97,7 +97,8 @@ Configuration details:
 >- `Acceptor` Tenancy → OCID of the Shared/Hub tenancy.
 > 
 > Refer to the iam_hub.auto.tfvars.json and iam_oe1.auto.tfvars.json files for the complete IAM (Compartments, Groups & Policies) configuration sample template based on One-OE.
-> Note that the animations are visual representations designed to simplify the understanding of DNS behavior and do not necessarily reflect the internal implementation of OCI.
+>
+> For more details, refer to the [OCI Cross Tenancy RPC Policy Documentation](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-iam.htm#scenario_m__IAM_cross-tenancy). 
 
 &nbsp;
 
