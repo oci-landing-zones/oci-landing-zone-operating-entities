@@ -112,9 +112,7 @@ The expectation is to have the [One-OE Landing Zone](https://github.com/oci-land
 ***Step 3: Execute the Terraform Deployment*** :- `Plan` and `Apply` the newly added IAM policy & RPC configuration. Verify the deployment is successful and that the RPC is established.
 
 > [!IMPORTANT]
-<div style="color: red;">
 >Ensure that the user performing Terraform automation belongs to the group specified in the RPC policy. Otherwise, the connection will not establish. From a One-OE standpoint, this group should be `grp-lzp-network-admins`.
-</div>
 >
 > Refer to the hub_network.auto.tfvars.json and oe1_iam.network.tfvars.json files for the complete networking configuration sample template based on One-OE.
 
