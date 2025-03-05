@@ -149,7 +149,7 @@ Modify the network JSON config of Region B by adding the RPC block under the **D
 `Plan` and `Apply` the newly added RPC configuration. Verify the deployment is successful and that the RPC is established.
 
 > [!NOTE]
-> Since this is within the same tenancy across multiple regions, no additional RPC IAM policy is required to administer and enforce the connection.
+> Since this is within the same tenancy across multiple regions, no additional RPC IAM policy is required to administer and establish the connection.
 
 &nbsp;
 
