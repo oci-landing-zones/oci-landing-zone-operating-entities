@@ -129,6 +129,7 @@ Configuration details:
   - The Region A & Region B comprises the following resources.
     - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
 
+<img src="images/s-tenancy.png" width="900" height="value">
 
 ### Steps to Set Up Multi-Region RPC
 The expectation is to have the [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in the tenancy. This ensures a structured and automated approach to configuring cross-region networking.
