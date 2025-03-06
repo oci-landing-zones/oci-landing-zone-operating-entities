@@ -1,9 +1,9 @@
 
-# **[OCI Cross Tenancy Remote Peering Connection](#)**
-## **An OCI Open LZ [Addon](#) to setup the cross tenancy remote peering conection using IaC**
+# **[OCI Remote Peering Connections](#)**
+## **An OCI Open LZ [Addon](#) for Remote Peering Across Regions and Tenancies using IaC**
 &nbsp;
 ## **Overview**
-The IaC-driven configuration enables connectivity between two regions in same tenancy and across multiple tenancies, managed by a central network team. It includes all necessary RPC configurations, such as policy creation, RPC setup, and connection establishment. This approach ensures consistency, simplifying administration and reducing complexity in managing RPC across OCI tenancies.
+The IaC-driven configuration enables connectivity between two regions in same tenancy and across multiple tenancies. It includes all necessary RPC configurations, such as IAM policies, RPC setup, and connection establishment. This approach ensures consistency, simplifying administration and reducing complexity in managing RPC across OCI regions and tenancies.
 
 This document provides configuration views for the following use cases:
 - Multi-Tenancy-RPC: Establishes a remote peering connection between the same or different regions across multiple tenancies.
@@ -27,18 +27,18 @@ This guide details steps to set up a Remote Peering Connection (RPC) in OCI, ens
 ## 1. Multi-Tenancy-RPC
 &nbsp;
 Configuration details:
-  - The Primary/Shared Hub tenancy comprises the following resources and components:
+  - The Connectivity Hub tenancy comprises the following resources and components:
     - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
     - IAM policy (Acceptor) statements to accept the remote peering connection from other/spoke tenancy. 
-  - The Child/Spoke Tenancy comprises the following resources and components
+  - The Child/OE Tenancy comprises the following resources and components
     - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
-    - IAM policy (Requestor) statements to request the remote peering connection to the Primary/Shared Hub tenancy. 
+    - IAM policy (Requestor) statements to request the remote peering connection to the Connectivity Hub tenancy. 
 
 <img src="images/x-tenancy.png" width="900" height="value">
 
 
 
-#### IAM Policy Syntax for Primary/Shared Hub Tenancy
+#### IAM Policy Syntax for Connectivity Hub Tenancy
 
 ```
 "policies_configuration": {
@@ -59,7 +59,7 @@ Configuration details:
     }
 ```
 
-#### IAM Policy Syntax for Child/Spoke Tenancy
+#### IAM Policy Syntax for Child/OE Tenancy
 ```
 "policies_configuration": {
         "enable_cis_benchmark_checks": "false",
@@ -82,9 +82,9 @@ Configuration details:
 
 
 > [!NOTE]
-> Collect the following required OCIDs from both tenancies to configure the necessary policies in each tenancy. The Child/Spoke tenancy acts as the requester, while the Hub tenancy serves as the acceptor, approving RPC requests from the Child/Spoke tenancies.
->- `requestorGroup` (Child/Spoke Tenancy) → OCID of the network administrator group.
->- `Requestor` Tenancy → OCID of the Child/Spoke tenancy.
+> Collect the following required OCIDs from both tenancies to configure the necessary policies in each tenancy. The Child/OE tenancy acts as the requester, while the Hub tenancy serves as the acceptor, approving RPC requests from the Child/OE tenancies.
+>- `requestorGroup` (Child/OE Tenancy) → OCID of the network administrator group.
+>- `Requestor` Tenancy → OCID of the Child/OE tenancy.
 >- `acceptorCompartment` (Hub Tenancy) → OCID of the compartment where the RPC is established.
 >- `Acceptor` Tenancy → OCID of the Shared/Hub tenancy.
 > 
@@ -95,24 +95,24 @@ Configuration details:
 
 
 ### Steps to Set Up Cross-Tenancy RPC
-The expectation is to have the [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in both tenancies: Primary/Shared Hub and Child/Spoke. This ensures a structured and automated approach to configuring cross-tenancy networking.
+The expectation is to have the [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in both tenancies: Connectivity Hub and Child/OE. This ensures a structured and automated approach to configuring cross-tenancy networking.
 
-#### Configuration Update & Execution in Primary/Shared Hub Tenancy
+#### Configuration Update & Execution in Connectivity Hub Tenancy
 ***Step 1: Add the RPC IAM Policy (Acceptor)***<br>
-Update the IAM JSON config with the Acceptor policy in the Primary/Shared Hub tenancy.
+Update the IAM JSON config with the Acceptor policy in the Connectivity Hub tenancy.
 
 ***Step 2: Add the Remote Peering Connection (RPC) Block***<br>
-Modify the network JSON config of the Primary/Shared Hub tenancy by adding the RPC block under the DRG section.
+Modify the network JSON config of the Connectivity Hub tenancy by adding the RPC block under the DRG section.
 
 ***Step 3: Execute the Terraform Deployment***<br>
 `Plan` and `Apply` the newly added IAM policy & RPC configuration.Collect the RPC OCID upon successful deployment.
 
-#### Configuration Update & Execution in Child/Spoke Tenancy
+#### Configuration Update & Execution in Child/OE Tenancy
 ***Step 1: Add the RPC IAM Policy (Requestor)***<br>
-Update the IAM JSON config with the Requestor policy in the Child/Spoke tenancy.
+Update the IAM JSON config with the Requestor policy in the Child/OE tenancy.
 
 ***Step 2: Add the Remote Peering Connection (RPC) Block***<br>
-Modify the network JSON config of the Child/Spoke tenancy by adding the RPC block under the **DRG** section. Set the `peer_id` parameter to the RPC OCID collected from the Primary/Shared Hub tenancy.
+Modify the network JSON config of the Child/OE tenancy by adding the RPC block under the **DRG** section. Set the `peer_id` parameter to the RPC OCID collected from the Connectivity Hub tenancy.
 
 ***Step 3: Execute the Terraform Deployment***<br>
 `Plan` and `Apply` the newly added IAM policy & RPC configuration. Verify the deployment is successful and that the RPC is established.
