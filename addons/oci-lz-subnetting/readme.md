@@ -69,7 +69,7 @@ OCI is assigned with a big CIDR block. We need to split the given CIDR block to 
 | </br><img src="./content/4.jpg" align="center"> </br></br> **Subnets** | 3 | Up to 8 Subnets | Subnets within a VCN. Depending on the use you might have more or less subnets or reserved for future use. | OE1 LZ Production, Shared Services Hub, FW DMZ Subnet - 10.0.0.0/24 |
 | </br><img src="./content/5.jpg" align="center"> </br></br> **Resources** | 8 | Up to 256 IPs | We have 252 usable IPs after not considering the network, broadcast and default gateways IPs | 10.0.0.2 to 10.0.0.254 |
 
-For more examples or see the complete IP subnetting check the available Open LZ subnetting excel file [**here**]([./content/OpenLZ_Network_Subnetting.xlsx](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/addons/oci-lz-subnetting/content/OpenLZ_Network_Subnetting.xlsx).
+For more examples or see the complete IP subnetting check the available Open LZ subnetting excel file [**here**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/addons/oci-lz-subnetting/content/OpenLZ_Network_Subnetting.xlsx).
 
 &nbsp; 
 
