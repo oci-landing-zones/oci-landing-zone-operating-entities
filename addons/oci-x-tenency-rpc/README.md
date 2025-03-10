@@ -95,7 +95,7 @@ Configuration details:
 
 
 ### Steps to Set Up Cross-Tenancy RPC
-The expectation is to have the [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in both tenancies: Connectivity Hub and Child/OE. This ensures a structured and automated approach to configuring cross-tenancy networking.
+Any of the Landing Zone [Blueprints](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints) can be deployed across both tenancies Connectivity Hub and Child/OE to establish a structured and automated framework for configuring cross-tenancy networking.
 
 #### Configuration Update & Execution in Connectivity Hub Tenancy
 ***Step 1: Add the RPC IAM Policy (Acceptor)***<br>
@@ -132,7 +132,7 @@ Configuration details:
 <img src="images/s-tenancy.png" width="900" height="value">
 
 ### Steps to Set Up Multi-Region RPC
-The expectation is to have the [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) deployed in the tenancy. This ensures a structured and automated approach to configuring cross-region networking.
+Any of the Landing Zone [Blueprints](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints) can be deployed across both tenancies Connectivity Hub and Child/OE to establish a structured and automated framework for configuring cross-tenancy networking.
 
 #### Configuration Update & Execution in Region A
 ***Step 1: Add the Remote Peering Connection (RPC) Block*** <br>
