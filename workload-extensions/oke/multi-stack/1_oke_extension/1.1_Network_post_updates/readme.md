@@ -11,7 +11,7 @@ Model A offer two options: a **Light Version** (No Cost), where a virtual machin
 The next Diagram shows the routing included in the [ONE-OE Hub A Deployment (Light Version - No Cost)](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/addons/oci-hub-models/hub_b/readme.md):
 <img src="../../content/Routing_ONE-OE_HubA.png" width="1000" height="auto">
 
-The next Diagram shows  rounting included in the OKE Ext LZ:
+The next Diagram shows the routing included in the OKE Ext LZ:
 <img src="../../content/Routing_OKE_ext.png" width="1000" height="auto">
 
 The next steps are to add the firewall and update the corresponding routes. To accomplish this, we need to follow the steps outlined in the [Hub A Deployment (Light Version - No Cost)](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/addons/oci-hub-models/hub_a/readme.md)
@@ -53,6 +53,10 @@ Now that the spokes are attached to the hub, you can update their routing by add
 This is the diagram that show the final Network configuration:
 
 <img src="../../content/Final_Routing.png" width="1000" height="auto">
+
+And the complet picture after deploy the OKE clusters:
+
+<img src="../../content/Complete.png" width="1000" height="auto">
 
 &nbsp;
 
