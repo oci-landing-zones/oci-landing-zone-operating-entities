@@ -14,15 +14,17 @@ The next Diagram shows the routing included in the [ONE-OE Hub A Deployment (Lig
 The next Diagram shows the routing included in the OKE Ext LZ:
 <img src="../../content/Routing_OKE_ext.png" width="1000" height="auto">
 
-The next steps are to add the firewall and update the corresponding routes. To accomplish this, we need to follow the steps outlined in the [Hub A Deployment (Light Version - No Cost)](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/addons/oci-hub-models/hub_a/readme.md)
+The next step is to add the firewalls and update the corresponding routes. To accomplish this, we need to follow the steps outlined in the [Hub A Deployment (Light Version - No Cost)](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/addons/oci-hub-models/hub_a/readme.md)
 
-For demo purposes, we will deploy a dummy VM instead of a firewall. If needed, the steps to deploy the firewall are also provided on the previous page
+For demonstration purposes, we will deploy a dummy VMs instead of firewalls. However, the option to deploy firewalls is also available on the previous page if needed.
 
-**a.** Deploy a dummy FW VM for the DMZ and INTERNAL FWs following these steps [How to create a dummy FW VM](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/howto_create_dummy_fw_vm.md)
+STEPS:
+
+**a.** Deploy dummy FW VMs for the DMZ and INTERNAL FWs following these steps [How to create a dummy FW VM](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/howto_create_dummy_fw_vm.md)
 
 <img src="../../content/Instances.png" width="1000" height="auto">
 
-**b.** Identify the Private IP OCID of your firewalls following these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/howto_identify_private_ip_ocid_vm_vnic.md)
+**b.** Identify the Private IP OCID of your VMs following these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/howto_identify_private_ip_ocid_vm_vnic.md)
 
 **c.**
 You can find a generic JSON file for HUB A checking our [hub models asset](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_a).
@@ -54,7 +56,7 @@ This is the diagram that show the final Network configuration:
 
 <img src="../../content/Final_Routing.png" width="1000" height="auto">
 
-And the complet picture after deploy the OKE clusters:
+Finally, this will be the complete picture after deploying the OKE clusters.
 
 <img src="../../content/Complete.png" width="1000" height="auto">
 
