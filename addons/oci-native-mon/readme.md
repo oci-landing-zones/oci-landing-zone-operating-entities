@@ -26,7 +26,7 @@ Following the guidelines explained here reduces the overall management complexit
 * Add the required policies per each service.
 &nbsp; 
  
-## 3. Approaches
+## 3. Design Decisions
 
 ## 3.1 Private Endpoints  
 
@@ -66,139 +66,17 @@ In this asset, we provide two example Observability roles:
 
 * **Production Observability Team**: A specialized team focused on managing all O&M services and DM/OPSI private endpoints within the production environment.
 
-<img src="./content/ROLES.png" height="300" align="center">
+<img src="./images/ROLES.png" height="300" align="center">
 
 
 ## 4. Scenarios.
 
-### **4.1 Autonomous database**  (Database management & Operation Insights)
-
-To enable **Database Management** or **Operation Insight** for Autonomous you need to deploy Private Endpoints which must have access to the database that needs to be configured.
-To check the documentation you can use these links: [DM PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Database Management Private Endpoint). or [OPSI PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Operation Insights Private Endpoint).
-
-The private endpoint is a representation of OCI O&M Services in the VCN. 
-
-> [!WARNING]  
-> You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Database Management documentation](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99) or [Operations Insights documentation](https://docs.oracle.com/en-us/iaas/operations-insights/doc/create-private-endpoint.html).
-
-DM PE and OPSI PE needs visibility with the ATP PE.
-
-* In a **global approach**, PEs will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-mon-pe NSGs. The database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the nsg-lzp-p-projects-mon-pe-db1 NSGs.
-  
-In this case, a Shared Observability platform compartment, groups and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.
-<img src="./content/ATP_GLOBAL.png" height="300" align="center">
-
-&nbsp; 
-
-* In a **local approach**, DM/OPS PEs and ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
-  
-In this case, a Prod Observability platform compartment, groups and the necessary policies to manage native observability will be included among with the previous mentioned NSGs.<img src="./content/ATP_LOCAL.png" height="300" align="center">
-  
-Private endpoints will be placed in the observability compartments, accessing the required subnets.
-
-During the process of enabling Database Management or Operation Insights in an Autonomous Database, the user and password will be required. These credentials must be stored as secrets in a Vault within the specific security compartment (the shared security compartment in the global approach, or the dedicated environment security compartment in the local approach). All necessary policies to access the secret are already included in the add-on.
-
-> [!NOTE]  
-> To review the Oracle documentation for enabling Database Management, click [here](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
-> 
-> To review the Oracle documentation for enabling Operation Insights, click [here](https://docs.oracle.com/en-us/iaas/operations-insights/doc/autonomous-database-full-feature-support.html#GUID-27B9ABB0-BBC4-4F7D-9EC7-40EF09F8726B).
-> 
-> For OPSI Dedicated Autonomous databases require a special DNS proxy enabled private endpoint.
-
-&nbsp; 
-
-
-### **4.2 EXACS** (Database management, Operation Insights and logging Analytics)
-
-Database Management provides comprehensive performance diagnostics and management for EXACS Oracle Databases. Additionally, with the added capabilities of Ops Insights, you can:
-
-* Analyze resource usage across cloud databases
-* Forecast future resource demands, including CPU, memory, and storage, based on historical trends
-* Compare SQL performance across databases and identify common patterns
-* Monitor ASM disk group usage
-* Analyze storage server (cell) I/O and throughput
-
-The DM/OPSI PEs will need visibility with the EXACS SCAN listeners.
-
-* In a Global approach, the DM/OPSI PEs will be placed in the mon subnet in the hub and should be assigned to the nsg-fra-lzp-hub-global-mon-pe NSGs. EXACS resides in database client subnet (sn-<region>-p-projs-db) and has to be assigned to the nsg-lzp-p-projects-mon-pe-db NSGs.
-<img src="./content/EXACS_GLOBAL.png" height="300" align="center">
-
-  
-* In a Local approach DM/OPSI PEs and the VM cluster will reside in the same database client subnet(sn-<region>-p-projs-db), and the nsg-lzp-p-projects-mon-pe-db NSGs will allow communication between them.
-<img src="./content/EXACS_LOCAL.png" height="300" align="center">
-  
-
-> [!NOTE]  
-> To review the Oracle documentation for enabling Database Management and Operation Insights click [here](https://docs.public.content.oci.oraclecloud.com/en-us/iaas/exadatacloud/doc/observability-and-management-for-exacs.html).
-> 
-
-&nbsp; 
-
-### **4.3 EXACC** (Database management, Operation Insights and logging Analytics)
-
-For EXACC, we only have the option of a global approach. We deployed the DM/OPSI PEs in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models.
-
-<img src="./content/EXACC.png" height="300" align="center">
-
-> [!NOTE]  
-> This asset primarily focuses on enabling Native Observability services within the Landing Zone. However, when addressing EXACC workloads, it is also essential to consider events and alarms. These aspects are covered in our EXACC Landing Zone extension, which can be found [here](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/workload-extensions/exacc).
->
->The extension also provides an OCI Event Rule to capture the events generated by the Operator Access Control activities and are integrated with the OCI Notification Topic used by the Global Security Team.
->
->Enabled Observability Resources:
->* Shared ExaDB-C@C Platform Events,Alarms and Announcements
->* Production Workload Environment ExaDB-C@C Platform Events,Events, Alarms and Announcements
->* Pre-Production Workload Environment ExaDB-C@C Platform Events,Events, Alarms and Announcements
->* Example Production Project Alarms.
->* Example Pre-Production Project Alarms.
-
-&nbsp; 
-
-### **4.4 External Databases** (Database management, Operation Insights and logging Analytics)
-
-TBC
-
-&nbsp; 
-
-### **4.5 VM Databases** (Database management, Operation Insights and logging Analytics)
-
-TBC
-
-&nbsp; 
-
-### **4.6 VM** (Operation Insights and logging Analytics)
-
-TBC
-
-&nbsp; 
-
-## 5. Add-on Implementation
-
-## 5.1 Autonomous Implementation
-
-Example how to extend Observability in a Landing Zone for ATP.
-This template includes all cmp, groups, policies and NSGs needed for enabling Database Management, Operations Insights and Logging Analytics.
-
-**Step 1**. (Prerequisite) Deploy ONE-OE landing Zone. You can follow nexts [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
-
-<img src="./content/ONE-OE.png" height="800" align="center">
-
-&nbsp; 
-
-**Step 2**. Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](./AddOnImplementation.md).
-
-After running step2, Databases can be created and you can deploy the DM & OPSI PEs:
-
-Using Global PE Approach:
-
-<img src="./content/OBS_ADDON_GLOBAL.png" height="800" align="center">
-
-Using Local PE Approach:
-
-<img src="./content/OBS_ADDON_LOCAL.png" height="800" align="center">
-
-> [!NOTE]  
-> ATP PEs are created during databases creation and are not included in the Landing Zone add-on.
+| # |  Scenario  | Description | Status |
+|:--:|:--:|---|---|
+| 1 | [<img src="./images/icon_auto.png" height="40" align="center">](./scenario-autonomous-database/)| Autonomous database| [Available](./ebs/) |
+| 2 |  | EXACS | On process| | 
+| 4 | | EXACC | On process|
+| 5 |  | External Databases | On process | 
 
 
 
