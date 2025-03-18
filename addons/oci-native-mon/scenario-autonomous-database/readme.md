@@ -49,7 +49,7 @@ Our add-on template includes all cmp, groups, policies and NSGs needed for enabl
 
 &nbsp; 
 
-**Step 2**. Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](./AddOnImplementation.md).
+**Step 2**. Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](../AddOnImplementation.md).
 
 
 **Step 3**.
