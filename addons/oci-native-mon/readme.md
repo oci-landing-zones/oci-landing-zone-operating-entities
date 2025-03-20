@@ -28,11 +28,11 @@ Following the guidelines explained here reduces the overall management complexit
  
 ## 3. Design Decisions
 
-To configure this add-on, you will need to make two key design decisions:
+To configure this add-on, you will need to make some key design decisions:
 
-1.- **Private Endpoint Configuration** . Do you prefer to use shared and global private endpoints, or would you required dedicated private endpoints for each environment?
+* **Private Endpoints Configuration** . Do you prefer to use shared and global private endpoints, or would you required dedicated private endpoints for each environment?
 
-2.**Monitoring group Structure**. 
+* **Monitoring groups Structure**. 
 Would you like a single, generic monitoring team with visibility and management access across all OBS services and environments, or would you prefer a dedicated monitoring team for each environment?
 
 
