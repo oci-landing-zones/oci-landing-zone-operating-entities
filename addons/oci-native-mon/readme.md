@@ -28,6 +28,14 @@ Following the guidelines explained here reduces the overall management complexit
  
 ## 3. Design Decisions
 
+To configure this add-on, you will need to make two key design decisions:
+
+1.- **Private Endpoint Configuration** . Do you prefer to use shared and global private endpoints, or would you required dedicated private endpoints for each environment?
+
+2.**Monitoring group Structure**. 
+Would you like a single, generic monitoring team with visibility and management access across all OBS services and environments, or would you prefer a dedicated monitoring team for each environment?
+
+
 ## 3.1 Private Endpoints  
 
 For enhanced security, Observability Services should be configured with private access. Some of the key benefits of OCI Private Endpoints include:
@@ -58,9 +66,9 @@ In this case, a dedicated PEs can be deployed in the same subnet as the database
 &nbsp; 
 
 
-## 3.2 Roles
+## 3.2 Groups
 
-In this asset, we provide two example Observability roles:
+In this asset, we provide two example Observability groups (roles):
 
 * **Global Observability Team**: A general team responsible for managing all Operations and Maintenance (O&M) services, as well as DM/OPSI private endpoints across the organization.
 
