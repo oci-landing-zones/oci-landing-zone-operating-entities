@@ -2,4 +2,8 @@
 
 From the console: 
 
-Main menu -> Compute -> Instance -> Attached VNICs -> Click primary VNIC name -> IPv4 Addresses ->  3 dots -> Copy Private IP OCID
+**Redwood User Interface:**\
+Main menu -> Compute -> Instances -> Click your instance VM -> Networking -> Click Attached VNIC name -> Copy Private IP OCID
+
+**Legacy User Interface:**\
+Main menu -> Compute -> Instances -> Click your instance VM -> Attached VNICs -> Click primary VNIC name -> IPv4 Addresses ->  3 dots -> Copy Private IP OCID
