@@ -81,7 +81,7 @@ In this asset, we provide two example Observability groups (roles):
 
 | # |  Scenario  | Description | Status |
 |:--:|:--:|---|---|
-| 1 | <img src="./images/icon_auto.png" height="40" align="center">| Autonomous database| [Available](./scenario-autonomous-database/) |
+| 1 | <img src="./images/icon_auto.png" height="40" align="center">| Autonomous database| [Available](./scenario-autonomous-databases/readme.md) |
 | 2 |  | EXACS | On process| | 
 | 4 | | EXACC | On process|
 | 5 |  | External Databases | On process | 
