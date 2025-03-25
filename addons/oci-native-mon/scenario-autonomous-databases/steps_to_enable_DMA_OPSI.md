@@ -10,7 +10,7 @@
 </tr>
 <tr>
 
-<td align="left" rowspan="2" >Step 1</td>
+<td align="left" >Step1</td>
 <td align="left">
 The database should be created in the appropriate project compartment at the DB layer, using the DB subnet and assign the NSGs to the database. 
 
@@ -28,7 +28,7 @@ All resources needed like compartments, subnets and Network Security Groups (NSG
 </td>
 </tr>
 <tr>
-<td align="left">Step 2</td>
+<td align="left">Step2</td>
 <td align="left">
 
 Create the DMA private endpoint. 
@@ -43,7 +43,7 @@ All resources needed like Subnets, route tables (RT), Gateways (RT),security lis
 This operation can be easily automated with [Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/database_management_db_management_private_endpoint).</td>
 </tr>
 
-<td align="left">Step 3</td>
+<td align="left">Step3</td>
 <td align="left">
 Unlock and change the password for adbsnmp.
 </td>
@@ -52,7 +52,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 </td>
 </tr>
 
-<td align="left">Step 4</td>
+<td align="left">Step4</td>
 <td align="left">
 Create a secret in xxxx vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
 </td>
@@ -60,7 +60,7 @@ Create a secret in xxxx vault that is place in cmp-landingzone-p:cmp-lzp-securit
 All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
 </td>
 </tr> 
-<td align="left">Step 5</td>
+<td align="left">Step5</td>
 <td align="left">
 Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
 </td>
@@ -87,7 +87,7 @@ Remember to select the private DMA endpoint created in step2.
 </tr>
 <tr>
 
-<td align="left">Step 1</td>
+<td align="left">Step1</td>
 <td align="left">
 The database should be created in the appropriate project compartment at the DB layer, using the DB subnet and assign the NSGs to the database. 
 
@@ -105,7 +105,7 @@ All resources needed like compartments, subnets and Network Security Groups (NSG
 </td>
 </tr>
 <tr>
-<td align="left">Step 2</td>
+<td align="left">Step2</td>
 <td align="left">
 
 Create the OPSI private endpoint.
@@ -121,7 +121,7 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 </td>
 </tr>
 
-<td align="left">Step 3</td>
+<td align="left">Step3</td>
 <td align="left">
 Unlock and change the password for adbsnmp.
 </td>
@@ -132,7 +132,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 </td>
 </tr>
 
-<td align="left">Step 4</td>
+<td align="left">Step4</td>
 <td align="left">
 Create a secret in xxxx vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
 </td>
@@ -140,7 +140,7 @@ Create a secret in xxxx vault that is place in cmp-landingzone-p:cmp-lzp-securit
 All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
 </td>
 </tr> 
-<td align="left">Step 5</td>
+<td align="left">Step5</td>
 <td align="left">
 
 Enable [Operation Insights](https://docs.oracle.com/en-us/iaas/autonomous-database/doc/enable-operations-insights-dedicated-autonomous-database.html).
