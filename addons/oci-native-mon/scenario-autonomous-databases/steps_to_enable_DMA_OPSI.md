@@ -10,7 +10,7 @@
 </tr>
 <tr>
 
-<td align="left">Step 1</td>
+<td align="left" rowspan="2" >Step 1</td>
 <td align="left">
 The database should be created in the appropriate project compartment at the DB layer, using the DB subnet and assign the NSGs to the database. 
 
