@@ -63,6 +63,7 @@ All resources needed like the dedicated Vault and required policies was previous
 </tr> 
 <td align="left">5</td>
 <td align="left">
+
 Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
 </td>
 <td align="left">
@@ -75,8 +76,6 @@ Remember to select the private DMA endpoint created in step2.
 
 
 ## **Operation Insights Enabling Steps**
-
-
 
 
 <table>
