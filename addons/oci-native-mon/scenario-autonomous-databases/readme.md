@@ -12,9 +12,9 @@ To check the documentation you can use these links: [DMA PE](https://docs.oracle
 
 **GLOBAL APPROACH**
 
-For complex customers with many OEs and environments, it's important to be mindful of the service limits for Private Endpoints. In such cases, we recommend a shared approach using global Private Endpoints, which should be deployed in the HUB VCN and considered shared resources.
+For customers with multiple OEs and environments, it's crucial to consider the service limits for Private Endpoints. In such cases, we recommend a shared approach using global Private Endpoints, which should be deployed in the HUB VCN and considered shared resources.
 
-In this **global approach**, PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe). In the other hand the database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the DB NSGs (nsg-lzp-p-projects-mon-pe-db1).
+In this **global approach**, PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub vcn and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe). In the other hand the database will be placed in cmp-lzp-p-proj1-db compartment using the database subnet (ssn-fra-lzp-p-db) and assigned to the DB NSGs (nsg-lzp-p-projects-mon-pe-db1).
   
 In this add-on, we will deploy a Shared Observability Platform compartment, a dedicated Observability Vault, and include the necessary groups and policies to manage native observability, along with the previously mentioned NSGs
 
