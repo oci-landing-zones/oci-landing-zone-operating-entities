@@ -1,5 +1,64 @@
 ## **Database Management Enabling Steps**
 
+
+
+
+
+<table>
+  <tbody>
+    <tr>
+      <th align="left">Steps</th>
+      <th align="left">Descriptón</th>
+      <th align="left">Notes</th>
+    </tr>
+    <tr>
+      <td>Step1</td>
+      <td align="left">
+
+The database should be created in the appropriate project compartment at the DB layer, using the DB subnet. 
+
+An additional requirement is to assign the NSGs to the database. 
+
+Example for Prod database: 
+
+<li> Compartment-> cmp-landingzone-p:cmp-lzp-prod:cmp-lzp-p-projects:cmp-lzp-p-proj1:cmp-lzp-p-proj1-db</li>
+<li>Network-> vnc:vcn-fra-lzp-p-projects; subnet:ssn-fra-lzp-p-db</li>
+<li>nsg-> nsg-lzp-p-projects-mon-pe-db1</li>
+      </td>
+      <td align="left"> <li>If the database was created previously, ensure it is placed in the correct CMP, assigned to the proper subnet, and configured with the appropriate NSG.</li><li>
+      All resources needed like compartments, subnets and Network Security Groups (NSGs) were previously provisioned by the LZ
+      </li></td>
+    </tr>
+    <tr>
+      <td>Step2</td>
+      <td align="left">
+
+Create the DMA private endpoint. 
+
+In a **global approach**, DMA PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe).
+
+In a **local approach**, DMA PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.</td>
+      <td align="left">
+      
+All resources needed like Subnets, route tables (RT), Gateways (RT),security lists (SL), and Network Security Groups (NSGs) were previously provisioned by the LZ.
+
+This operation can be easily automated with [Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/database_management_db_management_private_endpoint).</td>
+    </tr>
+          <td>Step3</td>
+      <td align="left">
+      Unlock and change the password for adbsnmp.
+</td>
+      <td align="left">
+To connect to a database placed in a private subnet you can follow this [blog](https://blogs.oracle.com/datawarehousing/post/4-ways-to-connect-to-autonomous-database-on-a-private-network).
+.</td>
+    </tr>
+ 
+ 
+  </tbody>
+</table>
+
+
+
 **Step 1**
 
 The database should be created in the appropriate project compartment at the DB layer, using the DB subnet. An additional requirement is to assign the NSGs to the database.
