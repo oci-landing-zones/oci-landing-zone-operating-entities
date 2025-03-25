@@ -55,7 +55,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 
 <td align="left">4</td>
 <td align="left">
-Create a secret in xxxx vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
+Create a secret in vlt-lzp-shared-mon-security vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
 </td>
 <td align="left">
 All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
@@ -134,7 +134,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 
 <td align="left">4</td>
 <td align="left">
-Create a secret in xxxx vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
+Create a secret in vlt-lzp-shared-mon-security vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
 </td>
 <td align="left">
 All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
