@@ -21,13 +21,16 @@ An additional requirement is to assign the NSGs to the database.
 
 Example for Prod database: 
 
-<li> Compartment-> cmp-landingzone-p:cmp-lzp-prod:cmp-lzp-p-projects:cmp-lzp-p-proj1:cmp-lzp-p-proj1-db</li>
-<li>Network-> vnc:vcn-fra-lzp-p-projects; subnet:ssn-fra-lzp-p-db</li>
-<li>nsg-> nsg-lzp-p-projects-mon-pe-db1</li>
+* **Compartment**-> cmp-landingzone-p:cmp-lzp-prod:cmp-lzp-p-projects:cmp-lzp-p-proj1:cmp-lzp-p-proj1-db
+* **Network**-> vnc:vcn-fra-lzp-p-projects; subnet:ssn-fra-lzp-p-db
+* **nsg**-> nsg-lzp-p-projects-mon-pe-db1
       </td>
-      <td align="left"> <li>If the database was created previously, ensure it is placed in the correct CMP, assigned to the proper subnet, and configured with the appropriate NSG.</li><li>
-      All resources needed like compartments, subnets and Network Security Groups (NSGs) were previously provisioned by the LZ
-      </li></td>
+      <td align="left"> 
+
+If the database was created previously, ensure it is placed in the correct CMP, assigned to the proper subnet, and configured with the appropriate NSG.
+
+All resources needed like compartments, subnets and Network Security Groups (NSGs) were previously provisioned by the LZ
+      </td>
     </tr>
     <tr>
       <td>Step2</td>
