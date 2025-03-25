@@ -16,7 +16,7 @@ For complex customers with many OEs and environments, it's important to be mindf
 
 In this **global approach**, PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe). In the other hand the database will be placed in the database subnet (ssn-fra-lzp-p-db) assigned to the DB NSGs (nsg-lzp-p-projects-mon-pe-db1).
   
-Additionally, a Shared Observability platform compartment, a dedicated Observability Vault, and the necessary groups and policies to manage native observability will be included, along with the previously mentioned NSGs.
+In this add-on, we will deploy a Shared Observability Platform compartment, a dedicated Observability Vault, and include the necessary groups and policies to manage native observability, along with the previously mentioned NSGs
 
 <img src="../images/ATP_GLOBAL.png" height="300" align="center">
 
@@ -52,24 +52,29 @@ During the process of enabling Database Management or Operation Insights in an A
 
 ## Implementation
 
-Example how to extend Observability in a Landing Zone for ATP.
 Our add-on template includes all the necessary components, such as CMP, groups, a dedicated monitoring Vault, policies, and NSGs, to enable Database Management and Operations Insights.
 
-**Step 1**. (Prerequisite) Deploy ONE-OE landing Zone. You can follow nexts [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
+Follow these steps to extend your Landing zone:
+
+**Step 1**. 
+
+(Prerequisite) Deploy ONE-OE landing Zone. You can follow nexts [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
 
 <img src="../images/ONE-OE.png" height="800" align="center">
 
 &nbsp; 
 
-**Step 2**. Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](../AddOnImplementation.md).
+**Step 2**. 
 
-Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow [these](./DMA&OPSI_enabled_steps.md) steps to enable it.
+Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](../AddOnImplementation.md).
 
 <img src="../images/OBS_ADDON.png" height="800" align="center">
 
-Now your landing zone is ready to enable Database Management and Operations Insights. Please follow the next [steps](./DMA&OPSI_enabled_steps.md) to complete this operation.
+&nbsp; 
 
+Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow [these](./DMA&OPSI_enabled_steps.md) steps to enable it.
 
+&nbsp; 
 
 # License
 

@@ -2,14 +2,18 @@
 
 **Step 1**
 
-Database should be created in the proper project cmp in db layer using the db subnet.
-They extra requisit is asign the nsgs to the database.
+The database should be created in the appropriate project compartment at the DB layer, using the DB subnet. An additional requirement is to assign the NSGs to the database.
 
 Example for Prod database: 
 
 * **Compartment**-> cmp-landingzone-p:cmp-lzp-prod:cmp-lzp-p-projects:cmp-lzp-p-proj1:cmp-lzp-p-proj1-db
 * **Network**-> vnc:vcn-fra-lzp-p-projects; subnet:ssn-fra-lzp-p-db
 * **nsg**-> nsg-lzp-p-projects-mon-pe-db1
+
+> [!Note] 
+> If the database was created previously, ensure it is placed in the correct CMP, assigned to the proper subnet, and configured with the appropriate NSG.
+> 
+>  All resources needed like compartments, subnets and Network Security Groups (NSGs) were previously provisioned by the LZ.
 
 **Step 2**
 
@@ -19,6 +23,10 @@ In a **global approach**, DMA PEs will be placed in the monitoring subnet (sn-fr
 
 In a **local approach**, DMA PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
 
+> [!Note] 
+> All resources needed like Subnets, route tables (RT), Gateways (RT),security lists (SL), and Network Security Groups (NSGs) were previously provisioned by the LZ.
+> 
+> This operation can be easily automated with [Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/database_management_db_management_private_endpoint).
 
 **Step 3**
 
@@ -29,13 +37,15 @@ Unlock and change the password for adbsnmp.
 
 **Step 4**
 
-Create a Secret. The LZ add-on will include a dedicated Vault for observability along with the required policies.
-
 Create a secret in xxxx vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
+
+Note: All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
 
 **Step 5**
 
-Enable Database Management.
+Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
+
+Remember to select the private DMA endpoint created in step2.
 
 
 ## **Operations Insights Steps**
@@ -50,6 +60,11 @@ Example for Prod database:
 * **Network**->vnc:vcn-fra-lzp-p-projects;subnet:ssn-fra-lzp-p-db
 * **Nsg**-> nsg-lzp-p-projects-mon-pe-db1
 
+> [!Note] 
+> If the database was created previously, ensure it is placed in the correct CMP, assigned to the proper subnet, and configured with the appropriate NSG.
+> 
+> All resources needed like compartments, subnets and Network Security Groups (NSGs) were previously provisioned by the LZ.
+
 **Step 2**
 
 Create the OPSI private endpoint.
@@ -57,6 +72,11 @@ Create the OPSI private endpoint.
 In a **global approach**, OPSI PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe).
 
 In a **local approach**, OPSI PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
+
+> [!Note] 
+>  All resources needed like Subnets, route tables (RT), Gateways (RT),security lists (SL), and Network Security Groups (NSGs) were previously provisioned by the LZ.
+>
+> This operation can be easily automated with [Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/opsi_operations_insights_private_endpoints).
 
 **Step 3**
 
@@ -67,13 +87,14 @@ Unlock and change the password for adbsnmp.
 
 **Step 4**
 
-Create a Secret. The LZ add-on will include a dedicated Vault for observability along with the required policies.
-
 Create a secret in xxxx vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
+
+> [!Note] 
+>  All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
 
 **Step 5**
 
-Enable Operation Insights.
+Enable [Operation Insights](https://docs.oracle.com/en-us/iaas/autonomous-database/doc/enable-operations-insights-dedicated-autonomous-database.html).Remember to select the private OPSI endpoint created in step2.
 
 These diagrams illustrate the final result:
 
