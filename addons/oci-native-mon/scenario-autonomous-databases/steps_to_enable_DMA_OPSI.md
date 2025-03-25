@@ -114,10 +114,11 @@ In a **global approach**, OPSI PEs will be placed in the monitoring subnet (sn-f
 
 In a **local approach**, OPSI PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
       
+</td>
 All resources needed like Subnets, route tables (RT), Gateways (RT),security lists (SL), and Network Security Groups (NSGs) were previously provisioned by the LZ.
 
 This operation can be easily automated with [Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/opsi_operations_insights_private_endpoints).
-</td>
+
 </tr>
 
 <td>Step 3</td>
@@ -125,7 +126,9 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 Unlock and change the password for adbsnmp.
 </td>
 <td align="left">
-To connect to a database placed in a private subnet you can follow this [blog](https://blogs.oracle.com/datawarehousing/post/4-ways-to-connect-to-autonomous-database-on-a-private-network).
+
+To connect to a database placed in a private subnet you can follow this [blog](https://blogs.oracle.com/datawarehousing/post/4-ways-to-connect-to-autonomous-database-on-a-private-network)
+
 </td>
 </tr>
 
@@ -139,6 +142,7 @@ All resources needed like the dedicated Vault and required policies was previous
 </tr> 
 <td>Step 5</td>
 <td align="left">
+
 Enable [Operation Insights](https://docs.oracle.com/en-us/iaas/autonomous-database/doc/enable-operations-insights-dedicated-autonomous-database.html).
 </td>
 <td align="left">
