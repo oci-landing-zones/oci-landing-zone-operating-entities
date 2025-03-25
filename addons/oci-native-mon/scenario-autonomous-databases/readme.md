@@ -58,7 +58,7 @@ Follow these steps to extend your Landing zone:
 
 **Step 1**. 
 
-(Prerequisite) Deploy ONE-OE landing Zone. You can follow nexts [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
+(Prerequisite) Deploy ONE-OE landing Zone. You can follow next [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
 
 <img src="../images/ONE-OE.png" height="800" align="center">
 
@@ -66,13 +66,13 @@ Follow these steps to extend your Landing zone:
 
 **Step 2**. 
 
-Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](../AddOnImplementation.md).
+Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](./Implementation_addon_steps.md).
 
 <img src="../images/OBS_ADDON.png" height="800" align="center">
 
 &nbsp; 
 
-Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow [these](./DMA&OPSI_enabled_steps.md) steps to enable it.
+Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow [these](./steps_to_enable_DMA_OPSI.md).
 
 &nbsp; 
 
