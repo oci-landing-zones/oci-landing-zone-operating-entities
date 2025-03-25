@@ -65,7 +65,7 @@ Enable Observability adding this Add-on, use the ATP JSONs files provided in thi
 
 &nbsp; 
 
-Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow [these](./steps_to_enable_DMA_OPSI.md).
+Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow these [steps](./steps_to_enable_DMA_OPSI.md).
 
 &nbsp; 
 
