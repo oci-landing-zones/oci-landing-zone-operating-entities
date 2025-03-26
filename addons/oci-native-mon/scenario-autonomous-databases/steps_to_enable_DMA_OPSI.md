@@ -44,7 +44,7 @@ All resources needed like compartments, subnets and Network Security Groups (NSG
 </tr>
 <tr>
 
-<td align="left" colspan="2" >2</td>
+<td align="left" rowspan="2" >2</td>
 <td align="left">
 
 Create the DMA private endpoint. 
@@ -55,7 +55,7 @@ Create the DMA private endpoint.
 <img src="../images/GLOBAL_PE.png" height="100" align="left">
 
 </td>
-<td align="left" colspan="2">
+<td align="left">
       
 All resources needed like Subnets, route tables (RT), Gateways (RT),security lists (SL), and Network Security Groups (NSGs) were previously provisioned by the LZ.
 
