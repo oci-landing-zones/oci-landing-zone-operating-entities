@@ -120,22 +120,22 @@ All resources needed like the dedicated Vault and required policies was previous
 Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
 
 
-<img src="../images/ENABLE.png" height="100" align="left">  
+<img src="../images/ENABLE.png" height="100" align="left"></img>
 &nbsp; 
 &nbsp; 
 &nbsp; 
 
-<img src="../images/DM_1.png" height="100" width="200" align="left">  
+<img src="../images/DM_1.png" height="100" width="200" align="left"></img>  
 &nbsp; 
 &nbsp; 
 &nbsp; 
 
-<img src="../images/DM_2.png" height="100" width="200"  align="left">
+<img src="../images/DM_2.png" height="100" width="200"  align="left"></img>
 &nbsp; 
 &nbsp; 
 &nbsp; 
 
-<img src="../images/DM_3.png" height="100" width="200" align="left">
+<img src="../images/DM_3.png" height="100" width="200" align="left"></img>
 &nbsp; 
 &nbsp; 
 
@@ -149,13 +149,14 @@ Remember to select the private DMA endpoint created in step2.
 <td align="left">
 
 Click the 'Enable Database Management' button. Then, go to the work request and check the progress.
+
 &nbsp; 
-<img src="../images/50.png" height="100" width="400"  align="left"></img>
+<img src="../images/50.png" height="100" width="600"  align="left"></img>
 &nbsp; 
 &nbsp; 
 &nbsp; 
 
-<img src="../images/100.png" height="100"  width="400" align="left"></img>
+<img src="../images/100.png" height="100"  width="600" align="left"></img>
 &nbsp; 
 &nbsp; 
 &nbsp; 
@@ -165,7 +166,7 @@ Click the 'Enable Database Management' button. Then, go to the work request and 
 &nbsp; 
 &nbsp; 
 
-<img src="../images/DMA.png" height="100" width="600" align="left"> </img> 
+<img src="../images/DMA.png" align="left"> </img> 
 &nbsp; 
 &nbsp; 
 
