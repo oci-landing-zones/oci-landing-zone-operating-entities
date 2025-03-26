@@ -20,15 +20,19 @@ Example for Prod database:
 * **Compartment**-> cmp-landingzone-p:cmp-lzp-prod:cmp-lzp-p-projects:cmp-lzp-p-proj1:cmp-lzp-p-proj1-db
 * **Network**-> vnc:vcn-fra-lzp-p-projects; subnet:ssn-fra-lzp-p-db
 * **nsg**-> nsg-lzp-p-projects-mon-pe-db1
-  
-<img src="../images/NETOWRK_CONFIG.png" height="100" align="center">
+
+<img src="../images/DB_CMP.png" height="100" align="center">  
+
+<img src="../images/DB_NET.png" height="100" align="center">
+
+<img src="../images/DB_NSG.png" height="100" align="center">
 
 </td>
 <td align="left"> 
 
-If the database was created previously, ensure it is placed in the correct CMP, assigned to the proper subnet, and configured with the appropriate NSG.
+If the database was created previously, ensure it is placed in the correct cmp, assigned to the proper subnet, and configured with the appropriate NSG.
 
-All resources needed like compartments, subnets and Network Security Groups (NSGs) were previously provisioned by the LZ
+All resources needed like compartments, subnets and Network Security Groups (NSGs) were previously provisioned by the LZ.
 </td>
 </tr>
 <tr>
@@ -37,7 +41,7 @@ All resources needed like compartments, subnets and Network Security Groups (NSG
 
 Create the DMA private endpoint. 
 
-In a **global approach**, DMA PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe).
+In a **global approach**, DMA PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub vcn and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe).
 
 In a **local approach**, DMA PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.</td>
 <td align="left">
@@ -52,13 +56,15 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 Unlock and change the password for adbsnmp.
 </td>
 <td align="left">
+
 To connect to a database placed in a private subnet you can follow this [blog](https://blogs.oracle.com/datawarehousing/post/4-ways-to-connect-to-autonomous-database-on-a-private-network).
 </td>
 </tr>
 
 <td align="left">4</td>
 <td align="left">
-Create a secret in vlt-lzp-shared-mon-security vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
+Create a secret in the vlt-lzp-shared-mon-security vault located within the cmp-landingzone-p:cmp-lzp-security compartment.
+
 </td>
 <td align="left">
 All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
