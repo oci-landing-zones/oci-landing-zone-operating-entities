@@ -45,7 +45,7 @@ All resources needed like compartments, subnets and Network Security Groups (NSG
 
 
 <tr>
-<td align="left">2</td>
+<td align="left" rowspan="2" >2</td>
 
 
 <td align="left">
@@ -58,7 +58,7 @@ Create the DMA private endpoint.
 </td>
 
 
-<td align="left">      
+<td align="left" rowspan="2">      
 All resources needed like Subnets, route tables (RT), Gateways (RT),security lists (SL), and Network Security Groups (NSGs) were previously provisioned by the LZ.
 
 This operation can be easily automated with [Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/database_management_db_management_private_endpoint).
@@ -67,9 +67,9 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 
 
 <tr>
-<td align="left"></td>
 
 <td align="left">
+
 * In a **local approach**, DMA PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
 
 &nbsp; 
