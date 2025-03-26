@@ -150,22 +150,22 @@ Remember to select the private DMA endpoint created in step2.
 
 Click the 'Enable Database Management' button. Then, go to the work request and check the progress.
 &nbsp; 
-<img src="../images/50.png" height="100" align="left">
+<img src="../images/50.png" height="100" width="200" alt="" align="left">
 &nbsp; 
 &nbsp; 
 &nbsp; 
 
-<img src="../images/100.png" height="100" align="left">
+<img src="../images/100.png" height="100"  width="200" alt="" align="left">
 &nbsp; 
 &nbsp; 
 &nbsp; 
 
-<img src="../images/CONSOLE.png" height="100" align="left">  
+<img src="../images/CONSOLE.png" height="100" align="left" alt="">  
 &nbsp; 
 &nbsp; 
 &nbsp; 
 
-<img src="../images/DMA.png" height="100" align="left">  
+<img src="../images/DMA.png" height="100" width="200" alt="" align="left">  
 &nbsp; 
 &nbsp; 
 
