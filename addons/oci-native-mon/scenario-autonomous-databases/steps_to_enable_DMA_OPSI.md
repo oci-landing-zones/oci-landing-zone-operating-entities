@@ -125,17 +125,17 @@ Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-managem
 &nbsp; 
 &nbsp; 
 
-<img src="../images/DM_1.png" height="200" width="600" align="left"></img> 
+<img src="../images/DM_1.png" height="300" width="600" align="left"></img> 
 &nbsp; 
 &nbsp; 
 &nbsp;  
 
-<img src="../images/DM_2.png" height="200" width="600"  align="left"></img>
+<img src="../images/DM_2.png" height="300" width="600"  align="left"></img>
 &nbsp; 
 &nbsp; 
 &nbsp; 
 
-<img src="../images/DM_3.png" height="200" width="600" align="left"></img>
+<img src="../images/DM_3.png" height="300" width="600" align="left"></img>
 &nbsp; 
 &nbsp; 
 &nbsp; 
