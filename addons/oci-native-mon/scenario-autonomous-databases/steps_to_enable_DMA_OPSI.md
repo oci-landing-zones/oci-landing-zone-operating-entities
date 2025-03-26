@@ -20,12 +20,19 @@ Example for Prod database:
 * **Compartment**-> cmp-landingzone-p:cmp-lzp-prod:cmp-lzp-p-projects:cmp-lzp-p-proj1:cmp-lzp-p-proj1-db
 * **Network**-> vnc:vcn-fra-lzp-p-projects; subnet:ssn-fra-lzp-p-db
 * **nsg**-> nsg-lzp-p-projects-mon-pe-db1
+  
 
-<img src="../images/DB_CMP.png" height="100" align="center">  
+<img src="../images/DB_CMP.png" height="100" align="left">  
 
-<img src="../images/DB_NET.png" height="100" align="center">
+&nbsp; 
 
-<img src="../images/DB_NSG.png" height="100" align="center">
+<img src="../images/DB_NET.png" height="100" align="left">
+
+&nbsp; 
+
+<img src="../images/DB_NSG.png" height="100" align="left">
+
+&nbsp; 
 
 </td>
 <td align="left"> 
