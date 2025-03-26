@@ -43,7 +43,6 @@ All resources needed like compartments, subnets and Network Security Groups (NSG
 </td>
 </tr>
 
-
 <tr>
 <td align="left" rowspan="2" >2</td>
 
@@ -65,7 +64,6 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 </td>
 </tr>
 
-
 <tr>
 
 <td align="left">
@@ -76,6 +74,8 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 <img src="../images/LOCAL_PE.png" height="100" width="200"  align="left">
 </td>      
 </tr>
+
+
 
 <td align="left">3</td>
 <td align="left">
@@ -114,24 +114,56 @@ All resources needed like the dedicated Vault and required policies was previous
 </td>
 </tr> 
 
+
+
+<tr>
+<td align="left" rowspan="2" >5</td>
+
+
+<td align="left">
+Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
+
+<img src="../images/ENABLE.png" height="100" align="left"></img>
+&nbsp; 
+</td>
+
+
+<td align="left" rowspan="2">      
+</td>
+</tr>
+
+<tr>
+
+<td align="left">
+
+<img src="../images/DM_1.png" height="100" width="200" align="left"></img> 
+&nbsp; 
+
+<img src="../images/DM_2.png" height="100" width="200"  align="left"></img>
+&nbsp; 
+
+<img src="../images/DM_3.png" height="100" width="200" align="left"></img>
+&nbsp; 
+</td>      
+</tr>
+
+
+
+
 <td align="left">5</td>
 <td align="left">
 
 Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
 
-<br>
 <img src="../images/ENABLE.png" height="100" align="left"></img>
 &nbsp; 
 
-<br>
 <img src="../images/DM_1.png" height="100" width="200" align="left"></img> 
 &nbsp; 
 
-<br>
 <img src="../images/DM_2.png" height="100" width="200"  align="left"></img>
 &nbsp; 
 
-<br>
 <img src="../images/DM_3.png" height="100" width="200" align="left"></img>
 &nbsp; 
 
