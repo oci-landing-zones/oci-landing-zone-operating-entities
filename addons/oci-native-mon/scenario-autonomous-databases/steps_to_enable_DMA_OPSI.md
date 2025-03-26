@@ -105,7 +105,7 @@ Create a secret in the vlt-lzp-shared-mon-security vault located within the cmp-
 &nbsp; 
 &nbsp; 
 &nbsp; 
-<img src="../images/SECRET.png" height="300"  width="600" align="left">
+<img src="../images/SECRET.png" height="100"  width="200" align="left">
 
 
 </td>
