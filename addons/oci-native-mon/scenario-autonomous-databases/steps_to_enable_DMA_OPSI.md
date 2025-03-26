@@ -48,9 +48,22 @@ All resources needed like compartments, subnets and Network Security Groups (NSG
 
 Create the DMA private endpoint. 
 
-In a **global approach**, DMA PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub vcn and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe).
+In a **global approach**, DMA PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub vcn and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe). 
 
-In a **local approach**, DMA PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.</td>
+&nbsp; 
+<img src="../images/GLOBAL_PE.png" height="100" align="left">
+&nbsp; 
+&nbsp; 
+&nbsp; 
+&nbsp; 
+
+
+In a **local approach**, DMA PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
+
+&nbsp; 
+<img src="../images/LOCAL_PE.png" height="100" align="left">
+
+</td>
 <td align="left">
       
 All resources needed like Subnets, route tables (RT), Gateways (RT),security lists (SL), and Network Security Groups (NSGs) were previously provisioned by the LZ.
