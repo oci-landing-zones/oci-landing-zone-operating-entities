@@ -71,6 +71,8 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 &nbsp; 
 <img src="../images/LOCAL_PE.png" height="100" align="left">
 
+</tr>
+
 </td>
 <td align="left">
       
