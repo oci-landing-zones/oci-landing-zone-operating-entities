@@ -129,11 +129,12 @@ Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-managem
 
 
 <td align="left" rowspan="2">      
+Remember to select the private DMA endpoint created in step2.
+
 </td>
 </tr>
 
 <tr>
-
 <td align="left">
 
 <img src="../images/DM_1.png" height="100" width="200" align="left"></img> 
@@ -147,31 +148,6 @@ Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-managem
 </td>      
 </tr>
 
-
-
-
-<td align="left">5</td>
-<td align="left">
-
-Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
-
-<img src="../images/ENABLE.png" height="100" align="left"></img>
-&nbsp; 
-
-<img src="../images/DM_1.png" height="100" width="200" align="left"></img> 
-&nbsp; 
-
-<img src="../images/DM_2.png" height="100" width="200"  align="left"></img>
-&nbsp; 
-
-<img src="../images/DM_3.png" height="100" width="200" align="left"></img>
-&nbsp; 
-
-</td>
-<td align="left">
-Remember to select the private DMA endpoint created in step2.
-</td>
-</tr> 
 
 <td align="left">6</td>
 <td align="left">
