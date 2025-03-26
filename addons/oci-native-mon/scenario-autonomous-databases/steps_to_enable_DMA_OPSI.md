@@ -121,12 +121,24 @@ Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-managem
 
 
 <img src="../images/ENABLE.png" align="left"></img>
+&nbsp; 
+&nbsp; 
+&nbsp; 
 
-<img src="../images/DM_1.png" height="100" width="200" align="left"></img>  
+<img src="../images/DM_1.png" height="100" width="200" align="left"></img> 
+&nbsp; 
+&nbsp; 
+&nbsp;  
 
 <img src="../images/DM_2.png" height="100" width="200"  align="left"></img>
+&nbsp; 
+&nbsp; 
+&nbsp; 
 
 <img src="../images/DM_3.png" height="100" width="200" align="left"></img>
+&nbsp; 
+&nbsp; 
+&nbsp; 
 
 </td>
 <td align="left">
@@ -150,7 +162,7 @@ Click the 'Enable Database Management' button. Then, go to the work request and 
 &nbsp; 
 &nbsp; 
 
-<img src="../images/CONSOLE.png" height="100" align="left" > </img>
+<img src="../images/CONSOLE.png" align="left" > </img>
 &nbsp; 
 &nbsp; 
 &nbsp; 
