@@ -102,11 +102,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 
 Create a secret in the vlt-lzp-shared-mon-security vault located within the cmp-landingzone-p:cmp-lzp-security compartment.
 
-&nbsp; 
-&nbsp; 
-&nbsp; 
 <img src="../images/SECRET.png" height="100"  width="200" align="left">
-
 
 </td>
 <td align="left">
@@ -118,15 +114,13 @@ All resources needed like the dedicated Vault and required policies was previous
 
 <tr>
 <td align="left" rowspan="2" >5</td>
-
-
 <td align="left">
+
 Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
 
 <img src="../images/ENABLE.png" height="100" align="left"></img>
 &nbsp; 
 </td>
-
 
 <td align="left" rowspan="2">      
 Remember to select the private DMA endpoint created in step2.
