@@ -120,24 +120,13 @@ All resources needed like the dedicated Vault and required policies was previous
 Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
 
 
-<img src="../images/ENABLE.png" height="100" align="left"></img>
-&nbsp; 
-&nbsp; 
-&nbsp; 
+<img src="../images/ENABLE.png" align="left"></img>
 
 <img src="../images/DM_1.png" height="100" width="200" align="left"></img>  
-&nbsp; 
-&nbsp; 
-&nbsp; 
 
 <img src="../images/DM_2.png" height="100" width="200"  align="left"></img>
-&nbsp; 
-&nbsp; 
-&nbsp; 
 
 <img src="../images/DM_3.png" height="100" width="200" align="left"></img>
-&nbsp; 
-&nbsp; 
 
 </td>
 <td align="left">
