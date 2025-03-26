@@ -6,7 +6,7 @@
 <tbody>
 <tr>
 <th align="left">Steps</th>
-<th align="left">Descriptón</th>
+<th align="left">Description</th>
 <th align="left">Notes</th>
 </tr>
 <tr>
@@ -99,8 +99,12 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 
 <td align="left">4</td>
 <td align="left">
+
 Create a secret in the vlt-lzp-shared-mon-security vault located within the cmp-landingzone-p:cmp-lzp-security compartment.
 
+&nbsp; 
+&nbsp; 
+&nbsp; 
 <img src="../images/SECRET.png" height="100" align="left">
 
 
