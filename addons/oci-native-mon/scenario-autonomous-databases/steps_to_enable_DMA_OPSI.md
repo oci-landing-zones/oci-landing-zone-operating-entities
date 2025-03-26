@@ -80,6 +80,16 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 <td align="left">3</td>
 <td align="left">
 Unlock and change the password for adbsnmp.
+
+```
+ALTER USER adbsnmp ACCOUNT UNLOCK;
+ALTER USER adbsnmp IDENTIFIED BY adbsnmp_password; 
+grant SELECT ANY DICTIONARY to adbsnmp;
+grant SELECT_CATALOG_ROLE to adbsnmp;
+grant read on awr_pdb_snapshot to adbsnmp;
+grant execute on dbms_workload_repository to adbsnmp;
+```
+
 </td>
 <td align="left">
 
@@ -179,6 +189,16 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 <td align="left">3</td>
 <td align="left">
 Unlock and change the password for adbsnmp.
+
+```
+ALTER USER adbsnmp ACCOUNT UNLOCK;
+ALTER USER adbsnmp IDENTIFIED BY adbsnmp_password; 
+grant SELECT ANY DICTIONARY to adbsnmp;
+grant SELECT_CATALOG_ROLE to adbsnmp;
+grant read on awr_pdb_snapshot to adbsnmp;
+grant execute on dbms_workload_repository to adbsnmp;
+```
+
 </td>
 <td align="left">
 
