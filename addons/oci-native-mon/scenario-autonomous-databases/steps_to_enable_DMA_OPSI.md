@@ -101,6 +101,9 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 <td align="left">
 Create a secret in the vlt-lzp-shared-mon-security vault located within the cmp-landingzone-p:cmp-lzp-security compartment.
 
+<img src="../images/SECRET.png" height="100" align="left">
+
+
 </td>
 <td align="left">
 All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
@@ -110,6 +113,20 @@ All resources needed like the dedicated Vault and required policies was previous
 <td align="left">
 
 Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
+
+<img src="../images/DM_1.png" height="100" align="left">  
+
+&nbsp; 
+
+<img src="../images/DM_2.png" height="100" align="left">
+
+&nbsp; 
+
+<img src="../images/DM_3.png" height="100" align="left">
+
+&nbsp; 
+
+
 </td>
 <td align="left">
 Remember to select the private DMA endpoint created in step2.
@@ -190,6 +207,8 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 <td align="left">
 Unlock and change the password for adbsnmp.
 
+**Note**: If you have already completed this step to enable Database Management, you can skip this step.
+
 ```
 ALTER USER adbsnmp ACCOUNT UNLOCK;
 ALTER USER adbsnmp IDENTIFIED BY adbsnmp_password; 
@@ -210,6 +229,9 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 <td align="left">4</td>
 <td align="left">
 Create a secret in vlt-lzp-shared-mon-security vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
+
+**Note**: If you have already completed this step to enable Database Management, you can skip this step.
+
 </td>
 <td align="left">
 All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
