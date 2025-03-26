@@ -13,13 +13,16 @@
 
 <td align="left" >1</td>
 <td align="left">
-The database should be created in the appropriate project compartment at the DB layer, using the DB subnet and assign the NSGs to the database. 
+The database should be created in the appropriate project compartment at the database layer. Ensure that the 'Network Access' option is set to 'Private Endpoint Access Only.' Then, assign the database subnet and select the NSGs provisioned in the database compartment.
 
 Example for Prod database: 
 
 * **Compartment**-> cmp-landingzone-p:cmp-lzp-prod:cmp-lzp-p-projects:cmp-lzp-p-proj1:cmp-lzp-p-proj1-db
 * **Network**-> vnc:vcn-fra-lzp-p-projects; subnet:ssn-fra-lzp-p-db
 * **nsg**-> nsg-lzp-p-projects-mon-pe-db1
+  
+<img src="../images/NETOWRK_CONFIG.png" height="100" align="center">
+
 </td>
 <td align="left"> 
 
