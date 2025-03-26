@@ -22,15 +22,15 @@ Example for Prod database:
 * **nsg**-> nsg-lzp-p-projects-mon-pe-db1
   
 
-<img src="../images/DB_CMP.png" height="100" align="left">  
+<img src="../images/DB_CMP.png" height="100" width="200" align="left">  
 
 &nbsp; 
 
-<img src="../images/DB_NET.png" height="100" align="left">
+<img src="../images/DB_NET.png" height="100" width="200" align="left">
 
 &nbsp; 
 
-<img src="../images/DB_NSG.png" height="100" align="left">
+<img src="../images/DB_NSG.png" height="100" width="200" align="left">
 
 &nbsp; 
 
