@@ -113,10 +113,15 @@ Create a secret in the vlt-lzp-shared-mon-security vault located within the cmp-
 All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
 </td>
 </tr> 
+
 <td align="left">5</td>
 <td align="left">
 
 Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-management/doc/enable-database-management-autonomous-databases.html).
+
+<img src="../images/ENABLE.png" height="100" align="left">  
+
+&nbsp; 
 
 <img src="../images/DM_1.png" height="100" align="left">  
 
@@ -129,11 +134,33 @@ Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-managem
 <img src="../images/DM_3.png" height="100" align="left">
 
 &nbsp; 
-
-
 </td>
 <td align="left">
 Remember to select the private DMA endpoint created in step2.
+</td>
+</tr> 
+
+<td align="left">6</td>
+<td align="left">
+
+Click the 'Enable Database Management' button. Then, go to the work request and check the progress.
+
+<img src="../images/50.png" height="100" align="left">
+
+&nbsp; 
+
+<img src="../images/100.png" height="100" align="left">
+
+&nbsp; 
+
+<img src="../images/CONSOLE.png" height="100" align="left">  
+
+&nbsp; 
+
+<img src="../images/DMA.png" height="100" align="left">  
+
+</td>
+<td align="left">
 </td>
 </tr> 
  
