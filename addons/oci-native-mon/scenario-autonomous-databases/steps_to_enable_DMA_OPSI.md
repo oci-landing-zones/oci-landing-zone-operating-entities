@@ -54,7 +54,7 @@ Create the DMA private endpoint.
 * In a **global approach**, DMA PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub vcn and should be assigned to the GLOBAL PE NSGs (nsg-fra-lzp-hub-global-mon-pe). 
 
 &nbsp; 
-<img src="../images/GLOBAL_PE.png" height="100" width="200"  align="left">
+<img src="../images/GLOBAL_PE.png" height="300" width="600"  align="left">
 </td>
 
 
@@ -73,7 +73,7 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 * In a **local approach**, DMA PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
 
 &nbsp; 
-<img src="../images/LOCAL_PE.png" height="100" width="200"  align="left">
+<img src="../images/LOCAL_PE.png" height="300" width="600"  align="left">
 </td>      
 </tr>
 
@@ -105,7 +105,7 @@ Create a secret in the vlt-lzp-shared-mon-security vault located within the cmp-
 &nbsp; 
 &nbsp; 
 &nbsp; 
-<img src="../images/SECRET.png" height="100"  width="200" align="left">
+<img src="../images/SECRET.png" height="300"  width="600" align="left">
 
 
 </td>
