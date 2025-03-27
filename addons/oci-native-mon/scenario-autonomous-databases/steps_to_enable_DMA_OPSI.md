@@ -272,15 +272,70 @@ Create a secret in vlt-lzp-shared-mon-security vault that is place in cmp-landin
 All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
 </td>
 </tr> 
-<td align="left">5</td>
+
+
+<tr>
+<td align="left" rowspan="2" >5</td>
 <td align="left">
 
 Enable [Operation Insights](https://docs.oracle.com/en-us/iaas/autonomous-database/doc/enable-operations-insights-dedicated-autonomous-database.html).
+
+<img src="../images/ENABLE_OPSI.png" height="100" align="left"></img>
+&nbsp; 
 </td>
-<td align="left">
+
+<td align="left" rowspan="2">      
 Remember to select the private OPSI endpoint created in step2.
 </td>
+</tr>
+
+<tr>
+<td align="left">
+
+<img src="../images/OPSI.png" height="100" width="200" align="left"></img> 
+&nbsp; 
+
+<img src="../images/OPSI.png" height="100" width="200"  align="left"></img>
+&nbsp; 
+
+<img src="../images/GLOBAL.png" height="100" width="200" align="left"></img>
+&nbsp; 
+
+<img src="../images/OPSI_LOCAL.png" height="100" width="200" align="left"></img>
+</td>      
+</tr>
+
+
+<td align="left">6</td>
+<td align="left">
+
+Click the 'Enable Database Management' button. Then, go to the work request and check the progress.
+
+&nbsp; 
+<img src="../images/50.png" height="100" width="600"  align="left"></img>
+&nbsp; 
+&nbsp; 
+&nbsp; 
+
+<img src="../images/100.png" height="100"  width="600" align="left"></img>
+&nbsp; 
+&nbsp; 
+&nbsp; 
+
+<img src="../images/CONSOLE.png" height="100" align="left" > </img>
+&nbsp; 
+&nbsp; 
+&nbsp; 
+
+<img src="../images/DMA.png" align="left"> </img> 
+&nbsp; 
+&nbsp; 
+
+</td>
+<td align="left">
+</td>
 </tr> 
+ 
  
 </tbody>
 </table>
