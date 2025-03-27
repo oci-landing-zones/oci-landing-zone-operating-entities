@@ -294,11 +294,18 @@ Remember to select the private OPSI endpoint created in Step 2. Choose the appro
 <tr>
 <td align="left">
 <img src="../images/OPSI_1.png" height="100" width="200" align="left"></img> 
+&nbsp; 
+&nbsp; 
+&nbsp; 
 
 <img src="../images/OPSI_1.png" height="100" width="200"  align="left"></img>
 &nbsp; 
+&nbsp; 
+&nbsp; 
 
 <img src="../images/OPSI_GLOBAL.png" height="100" width="200" align="left"></img>
+&nbsp; 
+&nbsp; 
 &nbsp; 
 
 
