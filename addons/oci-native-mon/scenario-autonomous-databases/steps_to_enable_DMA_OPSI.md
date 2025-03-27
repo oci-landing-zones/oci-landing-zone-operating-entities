@@ -292,13 +292,13 @@ Remember to select the private OPSI endpoint created in step2.
 <tr>
 <td align="left">
 
-<img src="../images/OPSI.png" height="100" width="200" align="left"></img> 
+<img src="../images/OPSI_1.png" height="100" width="200" align="left"></img> 
 &nbsp; 
 
-<img src="../images/OPSI.png" height="100" width="200"  align="left"></img>
+<img src="../images/OPSI_1.png" height="100" width="200"  align="left"></img>
 &nbsp; 
 
-<img src="../images/GLOBAL.png" height="100" width="200" align="left"></img>
+<img src="../images/OPSI_GLOBAL.png" height="100" width="200" align="left"></img>
 &nbsp; 
 
 <img src="../images/OPSI_LOCAL.png" height="100" width="200" align="left"></img>
