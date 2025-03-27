@@ -320,7 +320,7 @@ Remember to select the private OPSI endpoint created in Step 2. Choose the appro
 Click the 'Add database' button. Then, go to the work request and check the progress.
 
 
-<img src="../images/OPSI_VIEW.png" height="200" width="400" align="left"></img>
+<img src="../images/OPSI_VIEW.png" height="200" width="800" align="left"></img>
 
 </td>
 <td align="left">
