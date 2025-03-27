@@ -291,7 +291,6 @@ Remember to select the private OPSI endpoint created in step2.
 
 <tr>
 <td align="left">
-
 <img src="../images/OPSI_1.png" height="100" width="200" align="left"></img> 
 &nbsp; 
 
@@ -302,6 +301,8 @@ Remember to select the private OPSI endpoint created in step2.
 &nbsp; 
 
 <img src="../images/OPSI_LOCAL.png" height="100" width="200" align="left"></img>
+&nbsp; 
+
 </td>      
 </tr>
 
