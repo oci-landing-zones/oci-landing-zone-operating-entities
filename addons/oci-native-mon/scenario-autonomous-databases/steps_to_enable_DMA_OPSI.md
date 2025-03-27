@@ -300,8 +300,8 @@ Remember to select the private OPSI endpoint created in step2.
 <img src="../images/OPSI_GLOBAL.png" height="100" width="200" align="left"></img>
 &nbsp; 
 
-<img src="../images/OPSI_LOCAL.png" height="100" width="200" align="left"></img>
-&nbsp; 
+Note: Select the appropriate PE depending on whether you're using a Global or Local approach.
+
 
 </td>      
 </tr>
