@@ -309,27 +309,7 @@ Remember to select the private OPSI endpoint created in step2.
 <td align="left">6</td>
 <td align="left">
 
-Click the 'Enable Database Management' button. Then, go to the work request and check the progress.
-
-&nbsp; 
-<img src="../images/50.png" height="100" width="600"  align="left"></img>
-&nbsp; 
-&nbsp; 
-&nbsp; 
-
-<img src="../images/100.png" height="100"  width="600" align="left"></img>
-&nbsp; 
-&nbsp; 
-&nbsp; 
-
-<img src="../images/CONSOLE.png" height="100" align="left" > </img>
-&nbsp; 
-&nbsp; 
-&nbsp; 
-
-<img src="../images/DMA.png" align="left"> </img> 
-&nbsp; 
-&nbsp; 
+Click the 'Add database' button. Then, go to the work request and check the progress.
 
 </td>
 <td align="left">
