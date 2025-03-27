@@ -284,8 +284,10 @@ Enable [Operation Insights](https://docs.oracle.com/en-us/iaas/autonomous-databa
 &nbsp; 
 </td>
 
-<td align="left" rowspan="2">      
-Remember to select the private OPSI endpoint created in step2.
+<td align="left" rowspan="2">     
+ 
+Remember to select the private OPSI endpoint created in Step 2. Choose the appropriate PE based on whether you're using a Global or Local approach.
+
 </td>
 </tr>
 
@@ -299,8 +301,6 @@ Remember to select the private OPSI endpoint created in step2.
 
 <img src="../images/OPSI_GLOBAL.png" height="100" width="200" align="left"></img>
 &nbsp; 
-
-Note: Select the appropriate PE depending on whether you're using a Global or Local approach.
 
 
 </td>      
