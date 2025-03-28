@@ -36,7 +36,7 @@ Click on each file to download it, and make any necessary changes if required.
 * Security:
 [oci_open_lz_one-oe_security_cisl1.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json)
 * Network: 
-[oci_open_lz_hub_a_network_light.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light.auto.tfvars.json)
+[oci_open_lz_hub_a_network_light.auto.tfvars.json](/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light.auto.tfvars.json)
 * Observability:
 [oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json)
 
