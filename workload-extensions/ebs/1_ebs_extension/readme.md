@@ -17,7 +17,6 @@
   - [**3.6 Gateways**](#36-gateways)
     - [**3.6.1 Dynamic Routing Gateway (DRGs) Attachments**](#361-dynamic-routing-gateway-drgs-attachments)
     - [**3.6.2 Service Gateway**](#362-service-gateway)
-    - [**3.6.3 NAT Gateway**](#363-nat-gateway)
 - [**4. JSON files Required Changes**](#4-json-files-required-changes)
 - [**5. Deploy**](#5-deploy)
 
@@ -245,17 +244,6 @@ The following table describes the proposed Service Gateways added for each envir
 | SGW.01 |  sgw-fra-lzp-m-ebs | SGW EBSCM VCN. |
 | SGW.02 |  sgw-fra-lzp-p-ebs | SGW EBS Prod VCN. |
 | SGW.03 |  sgw-fra-lzp-pp-ebs | SGW EBS PreProd VCN. |
-
-#### **3.6.3 NAT Gateway**
-
-
-The following table describes the proposed Service Gateways added for each environment EBS platform:
-
-| ID    |  NAME          | OBJECTIVES           |
-| ----- |  ------------- | -------------------- |
-| NGW.01 |  ngw-fra-lzp-m-ebs | NGW EBSCM VCN. |
-| NGW.02 |  ngw-fra-lzp-p-ebs | NGW EBS Prod VCN. |
-| NGW.03 |  ngw-fra-lzp-pp-ebs | NGW EBS PreProd VCN. |
 
 
 ## **4. JSON files Required Changes**
