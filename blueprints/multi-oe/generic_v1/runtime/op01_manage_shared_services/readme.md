@@ -189,7 +189,7 @@ For this example, replace the compartment_id "<OCID-COMPARTMENT-ROOT>" value to 
             },
             "PCY-IAM-ADMINISTRATION": {
                 "name": "pcy-iam-administration",
-                "description": "POL.01 Open LZ allows grp-iam-admins group users to manage IAM resoures in the tenancy.",
+                "description": "POL.01 Open LZ allows grp-iam-admins group users to manage IAM resources in the tenancy.",
                 "compartment_id": "<OCID-COMPARTMENT-ROOT>",
                 "statements": [
                     "allow group grp-iam-admins to inspect users in tenancy",
