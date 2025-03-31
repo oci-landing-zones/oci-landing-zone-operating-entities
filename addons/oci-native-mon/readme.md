@@ -9,7 +9,7 @@ Welcome to the **OCI Landing Zone Native Observability Services**.
 
 This guide provides the necessary configuration steps to enable OCI Observability native services, including **Database Management**, **Operations Insights**, and **Logging Analytics**.
 
-* **Database Management service** (DMA) offers a comprehensive set of database performance monitoring and management features. Diagnostics & Management enables you to monitor and manage Oracle databases, HeatWave and External MySQL DB systems, and infrastructure components such as DB system components and Exadata storage servers in multi-cloud and hybrid deployments.
+* **Database Management service** (DBM) offers a comprehensive set of database performance monitoring and management features. Diagnostics & Management enables you to monitor and manage Oracle databases, HeatWave and External MySQL DB systems, and infrastructure components such as DB system components and Exadata storage servers in multi-cloud and hybrid deployments.
 
 * **Ops Insights** (OPSI) provides comprehensive information about the resource use and capacity of databases and hosts. Use this service to analyze CPU and storage resources, forecast capacity issues, and proactively identify SQL performance issues across a database fleet.
 
@@ -63,16 +63,16 @@ We recommend deploying the PEs in the Monitoring Subnet, as this configuration w
 
 In specific cases where the customer has a single environment or no Hub, a local approach can be adopted using environment-dedicated Private Endpoints.
 
-In this case, dedicated PEs can be deployed in the same subnet as the database to be configured. To enable communication between the DMA/OPSI PEs and ATP PEs, an additional NSG will be used, which is included in this add-on.
+In this case, dedicated PEs can be deployed in the same subnet as the database to be configured. To enable communication between the DBM/OPSI PEs and ATP PEs, an additional NSG will be used, which is included in this add-on.
 &nbsp; 
 
 ## 3.2 Groups
 
 In this asset, we provide two example Observability groups (roles):
 
-* **Global Observability Team**: A general team responsible for managing all Operations and Maintenance (O&M) services, as well as DMA/OPSI private endpoints across the organization.
+* **Global Observability Team**: A general team responsible for managing all Operations and Maintenance (O&M) services, as well as DBM/OPSI private endpoints across the organization.
 
-* **Production Observability Team**: A specialized team focused on managing all O&M services and DMA/OPSI private endpoints within the production environment.
+* **Production Observability Team**: A specialized team focused on managing all O&M services and DBM/OPSI private endpoints within the production environment.
 
 <img src="./images/ROLES.png" height="300" align="center">
 

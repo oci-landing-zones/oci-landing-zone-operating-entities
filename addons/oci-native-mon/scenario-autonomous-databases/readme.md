@@ -5,9 +5,9 @@
 
 To enable **Database Management** or **Ops Insights** for Autonomous Databases, you must deploy Private Endpoints that have access to the database you wish to configure. A Private Endpoint acts as a representation of OCI O&M Services within the VCN.
 
-Both DMA Private Endpoints and OPSI Private Endpoints need visibility into the ATP Private Endpoint. To enable this, the add-on includes Network Security Groups (NSGs).
+Both DBM Private Endpoints and OPSI Private Endpoints need visibility into the ATP Private Endpoint. To enable this, the add-on includes Network Security Groups (NSGs).
 
-To check the documentation you can use these links: [DMA PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Database Management Private Endpoint). or [OPSI PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Ops Insights Private Endpoint).
+To check the documentation you can use these links: [DBM PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Database Management Private Endpoint). or [OPSI PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Ops Insights Private Endpoint).
 
 
 **GLOBAL APPROACH**
@@ -26,7 +26,7 @@ In this add-on, we will deploy a Shared Observability Platform compartment, a de
 
 Customers with simpler infrastructures, using a single OE and fewer environments, may choose to deploy dedicated Private Endpoints (PEs) for each environment. This approach is often preferred when there is a dedicated monitoring team for each environment.
 
-In a **local approach**, DMA/OPS PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
+In a **local approach**, DBM/OPS PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
   
 In this case, a dedicated Environment Observability platform compartment, a dedicated Observability Vault, along with the necessary groups and policies to manage native observability, will be included, in addition to the previously mentioned NSGs.
 

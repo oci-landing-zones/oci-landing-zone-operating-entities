@@ -48,9 +48,9 @@ All resources needed like compartments, subnets and Network Security Groups (NSG
 
 
 <td align="left">
-Create the DMA private endpoint. 
+Create the DBM private endpoint. 
 
-* In a **global approach**, DMA PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub vcn and should be assigned to the GLOBAL PE NSGs (nsg-fra-lzp-hub-global-mon-pe). Example: pe_lz_global_dma.
+* In a **global approach**, DBM PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub vcn and should be assigned to the GLOBAL PE NSGs (nsg-fra-lzp-hub-global-mon-pe). Example: pe_lz_global_dbm.
 
 &nbsp; 
 <img src="../images/GLOBAL_PE.png" height="100" width="200"  align="left">
@@ -68,7 +68,7 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 
 <td align="left">
 
-* In a **local approach**, DMA PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them. Example: pe_lz_p_dma.
+* In a **local approach**, DBM PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them. Example: pe_lz_p_dbm.
 
 &nbsp; 
 <img src="../images/LOCAL_PE.png" height="100" width="200"  align="left">
@@ -123,7 +123,7 @@ Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-managem
 </td>
 
 <td align="left" rowspan="2">      
-Remember to select the private DMA endpoint created in step2.
+Remember to select the private DBM endpoint created in step2.
 
 </td>
 </tr>
