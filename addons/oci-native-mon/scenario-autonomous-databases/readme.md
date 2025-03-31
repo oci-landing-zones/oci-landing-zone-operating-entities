@@ -37,7 +37,7 @@ Private endpoints will be placed in the observability compartments, accessing th
 During the process of enabling Database Management or Operation Insights in an Autonomous Database, the user and password will be required. These credentials must be stored as secrets in a dedicated Vault within the shared security compartment. All necessary policies to access the secret are already included in the add-on.
 
 > [!WARNING]  
-> You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Database Management documentation](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99) or [Operations Insights documentation](https://docs.oracle.com/en-us/iaas/operations-insights/doc/create-private-endpoint.html).
+> You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Database Management documentation](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99) or [Ops Insightsdocumentation](https://docs.oracle.com/en-us/iaas/operations-insights/doc/create-private-endpoint.html).
 >
 > There is a limitation: only one Private Endpoint can be created per VCN.
 &nbsp; 
@@ -65,7 +65,7 @@ Enable Observability adding this Add-on, use the ATP JSONs files provided in thi
 
 &nbsp; 
 
-Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow these [steps](./steps_to_enable_DMA_OPSI.md).
+Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow these steps for Database Management or Ops Insights.
 
 &nbsp; 
 
