@@ -53,7 +53,7 @@ Based on this, we can adopt two different approaches:
 
 | Option |  Description  | 
 |:--:|:--:|
-| **Global Approach** ( Recommended) | As a general approach, the Landing Zone uses a hub VCN, which is designed to centralize services such as load balancers, firewalls, DNS, and more. The global approach involves deploying a "Global" Private Endpoint (PE) that can be used across all databases in different projects, environments, or entities. We recommend deploying the PEs in the Monitoring Subnet, as this configuration will include the necessary routing and communication requirements through Network Security Groups (NSGs).| 
+| **Global Approach** (Recommended) | As a general approach, the Landing Zone uses a hub VCN, which is designed to centralize services such as load balancers, firewalls, DNS, and more. The global approach involves deploying a "Global" Private Endpoint (PE) that can be used across all databases in different projects, environments, or entities. We recommend deploying the PEs in the Monitoring Subnet, as this configuration will include the necessary routing and communication requirements through Network Security Groups (NSGs).| 
 | **Local Approach** | In specific cases where the customer has a single environment or no Hub, a local approach can be adopted using environment-dedicated Private Endpoints. In this case, dedicated PEs can be deployed in the same subnet as the database to be configured. To enable communication between the DBM/OPSI PEs and ATP PEs, an additional NSG will be used, which is included in this add-on..| 
 
 &nbsp; 
