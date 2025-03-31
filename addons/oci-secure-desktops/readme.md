@@ -43,7 +43,7 @@ Following the guidelines explained here reduces the overall management complexit
 
 ### Add-on Design
 
-<img src="./content/secure_desktops.png" width="1000" height="auto">
+<img src="./content/secure_desktops.png" width="600" height="auto">
 <img src="./content/one_oe_secure_desktops.png" width="1000" height="auto">
 
 ### Add-on Implementation
