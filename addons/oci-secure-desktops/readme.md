@@ -7,15 +7,13 @@
 
 Welcome to the **OCI Secure Desktops Guide**. 
 
-This guide provides guidelines on adding secure desktop to our Operating Entity Landing Zones.
+This guide provides instructions for onboarding the Secure Desktops service to Operating Entity Landing Zones blueprints.
 
-Secure Desktops is ideal for organizations that need to provide employees with controlled access to a preconfigured desktop environment.
+Oracle Cloud Infrastructure (OCI) Secure Desktops is ideal for organizations seeking controlled access to preconfigured desktop environments for their employees.OCI Secure Desktops is a cloud-native, managed service designed to ensure the security, reliability, and scalability of desktop environments. It enables organizations to provide their global workforce with secure, centrally controlled, customizable, and consistent desktop experiences, regardless of the device used.
 
-Oracle Cloud Infrastructure (OCI) Secure Desktops is a cloud-native, managed service that ensures the security and reliability of your desktop environments. Use OCI Secure Desktops to allow your global workforce to access enterprise data with a secure, centrally controlled, customizable, and consistent experience, regardless of the device used to access the desktop
+With OCI Secure Desktops, administrators can create pools of virtual desktops in their tenancy using existing compute shapes and custom images. These desktops are identical in configuration, and users can securely access them to work with enterprise data.
 
-Oracle Cloud Infrastructure (OCI) Secure Desktops service enables an administrator to create an identical set of virtual desktops that individual users can securely access. Administrators can create pools of desktops in their tenancy using existing compute shapes and custom images.
-
-The virtual desktops and OCI configuration are managed by the administrator, allowing non-technical users to easily and securely access the virtual desktop and use it for their daily work.
+The service allows administrators to manage both the virtual desktops and OCI configurations, ensuring non-technical users can easily and securely access their virtual desktops for daily tasks.
 
 The Secure Desktops service provides:
 
