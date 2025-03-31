@@ -11,6 +11,8 @@ This guide provides guidelines on adding secure desktop to our Operating Entity 
 
 Secure Desktops is ideal for organizations that need to provide employees with controlled access to a preconfigured desktop environment.
 
+Oracle Cloud Infrastructure (OCI) Secure Desktops is a cloud-native, managed service that ensures the security and reliability of your desktop environments. Use OCI Secure Desktops to allow your global workforce to access enterprise data with a secure, centrally controlled, customizable, and consistent experience, regardless of the device used to access the desktop
+
 Oracle Cloud Infrastructure (OCI) Secure Desktops service enables an administrator to create an identical set of virtual desktops that individual users can securely access. Administrators can create pools of desktops in their tenancy using existing compute shapes and custom images.
 
 The virtual desktops and OCI configuration are managed by the administrator, allowing non-technical users to easily and securely access the virtual desktop and use it for their daily work.
@@ -43,11 +45,20 @@ Following the guidelines explained here reduces the overall management complexit
 
 ### Add-on Design
 
+If you'd like to learn more about configuring Secure Desktops, we recommend checking out this [solution](https://docs.oracle.com/en/solutions/oci-tenancy-secure-desktop-pool/index.html#GUID-4FDC6E79-517F-49C4-80F6-AED75B85F293) published in the Architecture Center.
 <img src="./content/secure_desktops.png" width="600" height="auto">
+
+This add-on goes beyond by configuring secure desktops in a dedicated VCN connected to the HUB-and-Spoke architecture provided by the ONE-OE Landing Zone blueprint.
 <img src="./content/one_oe_secure_desktops.png" width="1000" height="auto">
 
-### Add-on Implementation
+It includes the following resources:
 
+* Dedicated secure desktop groups.
+* Required policies.
+* Dedicated spoke VCN.
+  
+
+### Add-on Implementation
 
 Import images into the compartment and add the following tags for each custom image. These tags allow the service to determine which images to display as an option when you create a desktop pool.
 
