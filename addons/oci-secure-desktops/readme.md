@@ -43,7 +43,7 @@ Following the guidelines explained here reduces the overall management complexit
 
 ### Add-on Design
 
-If you'd like to learn more about configuring Secure Desktops, we recommend checking out this [solution](https://docs.oracle.com/en/solutions/oci-tenancy-secure-desktop-pool/index.html#GUID-4FDC6E79-517F-49C4-80F6-AED75B85F293) published in the Architecture Center.
+If want to learn more about configuring Secure Desktops, we recommend checking out this [solution](https://docs.oracle.com/en/solutions/oci-tenancy-secure-desktop-pool/index.html#GUID-4FDC6E79-517F-49C4-80F6-AED75B85F293) published in the Architecture Center.
 &nbsp; 
 
 <img src="./content/secure_desktops.png" width="600" height="auto">
