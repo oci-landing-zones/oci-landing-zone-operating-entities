@@ -1,13 +1,13 @@
 # **[Autonomous Databases ](#)**
-## **An OCI Open LZ Addon to help you enable Database Management & Operation Insights for Autonomous Databases**
+## **An OCI Open LZ Addon to help you enable Database Management & Ops Insights for Autonomous Databases**
 
 ## Design
 
-To enable **Database Management** or **Operational Insights** for Autonomous Databases, you must deploy Private Endpoints that have access to the database you wish to configure. A Private Endpoint acts as a representation of OCI O&M Services within the VCN.
+To enable **Database Management** or **Ops Insights** for Autonomous Databases, you must deploy Private Endpoints that have access to the database you wish to configure. A Private Endpoint acts as a representation of OCI O&M Services within the VCN.
 
 Both DMA Private Endpoints and OPSI Private Endpoints need visibility into the ATP Private Endpoint. To enable this, the add-on includes Network Security Groups (NSGs).
 
-To check the documentation you can use these links: [DMA PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Database Management Private Endpoint). or [OPSI PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Operation Insights Private Endpoint).
+To check the documentation you can use these links: [DMA PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Database Management Private Endpoint). or [OPSI PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Ops Insights Private Endpoint).
 
 
 **GLOBAL APPROACH**
@@ -34,7 +34,7 @@ In this case, a dedicated Environment Observability platform compartment, a dedi
   
 Private endpoints will be placed in the observability compartments, accessing the required subnets.
 
-During the process of enabling Database Management or Operation Insights in an Autonomous Database, the user and password will be required. These credentials must be stored as secrets in a dedicated Vault within the shared security compartment. All necessary policies to access the secret are already included in the add-on.
+During the process of enabling Database Management or Ops Insights in an Autonomous Database, the user and password will be required. These credentials must be stored as secrets in a dedicated Vault within the shared security compartment. All necessary policies to access the secret are already included in the add-on.
 
 > [!WARNING]  
 > You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Database Management documentation](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99) or [Ops Insightsdocumentation](https://docs.oracle.com/en-us/iaas/operations-insights/doc/create-private-endpoint.html).
@@ -45,7 +45,7 @@ During the process of enabling Database Management or Operation Insights in an A
 
 ## Implementation
 
-Our add-on template includes all the necessary components, such as CMP, groups, a dedicated monitoring Vault, policies, and NSGs, to enable Database Management and Operations Insights.
+Our add-on template includes all the necessary components, such as CMP, groups, a dedicated monitoring Vault, policies, and NSGs, to enable Database Management and Ops Insights.
 
 Follow these steps to extend your Landing zone:
 
