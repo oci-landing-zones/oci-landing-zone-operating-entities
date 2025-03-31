@@ -44,9 +44,13 @@ Following the guidelines explained here reduces the overall management complexit
 ### Add-on Design
 
 If you'd like to learn more about configuring Secure Desktops, we recommend checking out this [solution](https://docs.oracle.com/en/solutions/oci-tenancy-secure-desktop-pool/index.html#GUID-4FDC6E79-517F-49C4-80F6-AED75B85F293) published in the Architecture Center.
+&nbsp; 
+
 <img src="./content/secure_desktops.png" width="600" height="auto">
 
 This add-on goes beyond by configuring secure desktops in a dedicated VCN connected to the HUB-and-Spoke architecture provided by the ONE-OE Landing Zone blueprint.
+&nbsp; 
+
 <img src="./content/one_oe_secure_desktops.png" width="1000" height="auto">
 
 It includes the following resources:
