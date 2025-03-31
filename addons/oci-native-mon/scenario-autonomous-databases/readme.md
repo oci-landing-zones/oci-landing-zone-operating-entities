@@ -65,7 +65,7 @@ Enable Observability adding this Add-on, use the ATP JSONs files provided in thi
 
 &nbsp; 
 
-Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow these steps for Database Management or Ops Insights.
+Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow these steps for [Database Management](https://github.com/oracle-devrel/technology-engineering/blob/O%26M-for-LZ/manageability-and-operations/observability-and-manageability/database-management/LZ-addons/steps_to_enable_DBM.md) or [Ops Insights](https://github.com/oracle-devrel/technology-engineering/blob/O%26M-for-LZ/manageability-and-operations/observability-and-manageability/operations-insights/LZ-addons/steps_to_enable_OPSI.md).
 
 &nbsp; 
 
