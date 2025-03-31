@@ -18,7 +18,7 @@ At the beginning of the README page, select 'Deploy to Oracle Cloud'. When you c
 7. Un-check run apply. Click Create.
 8. First, execute a plan job to review all the resources that Terraform will create. Once verified, proceed to run the apply job to initiate the deployment.
 
-9. During the first execution, the add-on will create a dedicated Observability Vault and Key. To grant access to these resources for the grp-lzp-mon-admins group, add the following two statements to the pcy-global-mon-admin policy by updating the file:
+9. During the first execution, the add-on will create a dedicated Observability Vault and Key. To grant access to these resources for the grp-lzp-mon-admins group, we have addeed the following two statements to the pcy-global-mon-admin policy . Check file
 [oci_open_lz_addon_mon_iam.auto.tfvars.json](oci_open_lz_addon_mon_iam.auto.tfvars.json)
 
 ```
@@ -29,7 +29,7 @@ Allow group grp-lzp-mon-admins to use keys in compartment cmp-landingzone-p:cmp-
 
 > [!NOTE] Be sure to update the OCIDs with your own resource IDs.
 
-1.  After making the changes, execute a second plan to review these updates before running the job again.
+10.  After making the changes, execute a second plan to review these updates before running the job again.
 
 # License <!-- omit from toc -->
 
