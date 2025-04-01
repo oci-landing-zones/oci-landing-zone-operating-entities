@@ -78,17 +78,15 @@ Follow these steps:
 
 1. Import a Custom Image.
 
-To use OCI Secure Desktops, you must import a custom image. For more information, see [Importing an Image](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/imageimportexport.htm#Importing).
-
-Note: To get the list of [supported images](https://docs.oracle.com/en-us/iaas/secure-desktops/supported-images.htm), see Supported Images.
+To use OCI Secure Desktops, you must import a custom image. For more information, see [Importing an Image](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/imageimportexport.htm#Importing). To get the list of [supported images](https://docs.oracle.com/en-us/iaas/secure-desktops/supported-images.htm), see Supported Images.
 
 Import the desired image into the compartment and add the following tags for each custom image. These tags allow the service to determine which images to display as an option when you create a desktop pool.
 
-
+```
 oci:desktops:is_desktop_image true
 oci:desktops:image_version <version>, where <version> is a meaningful reference for your use.
 oci:desktops:image_os_type [Oracle Linux | Windows]
-
+```
 
 2. Create a Desktop Pool.
 
