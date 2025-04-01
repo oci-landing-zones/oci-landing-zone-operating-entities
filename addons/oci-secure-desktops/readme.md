@@ -54,7 +54,7 @@ We cover two different scenarios:
 
 **Scenario 1**. Connection thought Internet.
 
-<img src="./content/one_oe_secure_Desktops_pub.png.png" width="1000" height="auto">
+<img src="./content/one_oe_secure_Desktops_pub.png" width="1000" height="auto">
 
 It includes the following resources:
 
