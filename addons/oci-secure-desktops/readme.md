@@ -72,7 +72,7 @@ To run this add-on, follow this [steps](./Implementation_addon_steps.md).
 
 ### Secure Desktop configuration.
 
-Now you have a Landing Zone ready to enable secure Desktops service.
+Now you have a Landing Zone ready to enable **Secure Desktops service**.
 
 Follow these steps:
 
@@ -96,7 +96,7 @@ oci:desktops:image_os_type [Oracle Linux | Windows]
 
 2. Create a Desktop Pool.
 
-Create a user that belong to the grp-lzp-p-secure-desktop-admin group to run this operation.
+Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run this operation.
 
 - Open the OCI Console and click Compute. Under Secure Desktops, click Desktop Pools.
 
