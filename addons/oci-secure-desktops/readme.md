@@ -69,6 +69,7 @@ It includes the following resources:
 * Dedicated secure desktop groups.
 * Required policies.
 * Dedicated spoke VCN.
+* DNS configuration. Listener
 * NSG 
   
 
