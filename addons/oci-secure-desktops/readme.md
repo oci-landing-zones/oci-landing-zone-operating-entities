@@ -41,7 +41,7 @@ Following the guidelines explained here reduces the overall management complexit
 
 &nbsp; 
 
-### Add-on Design
+### Add-on Design.
 
 If want to learn more about configuring Secure Desktops, we recommend checking out this [solution](https://docs.oracle.com/en/solutions/oci-tenancy-secure-desktop-pool/index.html#GUID-4FDC6E79-517F-49C4-80F6-AED75B85F293) published in the Architecture Center.
 &nbsp; 
@@ -60,9 +60,29 @@ It includes the following resources:
 * Dedicated spoke VCN.
   
 
-### Add-on Implementation
+### Add-on Implementation.
 
-Import images into the compartment and add the following tags for each custom image. These tags allow the service to determine which images to display as an option when you create a desktop pool.
+As a prerequisite you need to deploy a fundation landing zone, in that case we have choosen the [One-OE](../../../../blueprints/one-oe/). To understand how to perform this operation with ORM, follow these [steps](ORM_ONE-OE_deployment_steps.md).
+
+[<img src="../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/addons/oci-hub-models/hub_b/oci_open_lz_hub_b_network_light.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json"}) 
+
+
+
+To run this add-on, follow this [steps](./Implementation_addon_steps.md).
+
+### Secure Desktop configuration.
+
+Now you have a Landing Zone ready to enable secure Desktops service.
+
+Follow these steps:
+
+1. Import a Custom Image.
+
+To use OCI Secure Desktops, you must import a custom image. For more information, see [Importing an Image](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/imageimportexport.htm#Importing).
+
+Note: To get the list of [supported images](https://docs.oracle.com/en-us/iaas/secure-desktops/supported-images.htm), see Supported Images.
+
+Import the desired image into the compartment and add the following tags for each custom image. These tags allow the service to determine which images to display as an option when you create a desktop pool.
 
 
 oci:desktops:is_desktop_image true
@@ -70,7 +90,61 @@ oci:desktops:image_version <version>, where <version> is a meaningful reference 
 oci:desktops:image_os_type [Oracle Linux | Windows]
 
 
-### Secure Desktop configuration Steps
+2. Create a Desktop Pool.
+
+Create a user that belong to the grp-lzp-p-secure-desktop-admin group to run this operation.
+
+- Open the OCI Console and click Compute. Under Secure Desktops, click Desktop Pools.
+
+- Under List scope, select the compartment in which you want to create the pool and click Create Desktop Pool.
+
+- Enter a name for the desktop pool, you can edit this value later.
+
+- Enter the following Optional information.
+
+**Description**: Enter a description of the desktop pool.
+**Pool Start Time**: Select the date and time in UTC, when the pool becomes accessible. You can edit this value later.
+**Pool Stop Time**: Select the date and time in UTC when the pool stops and becomes inaccessible.
+Add Administrator contact details.
+Select Enable administrator privileges for users on their desktop to allow the desktop users to have administration privileges on their virtual desktops.
+In the Pool Size section, enter the following information.
+
+**Maximum size**: The maximum number of desktops in the pool.
+**Standby size**: The number of available, unassigned desktops. Standby desktops consume resources because they are running and available for immediate allocation to desktop users. You can edit these values later.
+Under Placement, select the availability domain in which to locate the desktop resources.
+
+Under Image and Shape, select the OS image and shape you want to use for the desktop. For Windows desktop pools, which require dedicated virtual machine hosts, use one of the following preferred shapes. They are mapped to DVH shapes for allocation of OCPUs and memory.
+
+Flex Low (2 OCPUs, 4GB RAM)
+Flex Medium (4 OCPUs, 8GB RAM)
+Flex High (8 OCPUs, 16GB RAM)
+
+Optional To enter persistent storage to desktop users by creating a block volume associated with a user, select Enable desktop storage and then select volume size (in GB).
+
+In the Networking section, enter the following information.
+
+**Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.
+**Subnet**: Select a public subnet in the VCN to use for the desktops.
+Optional Click Show advanced options to select use network security groups to control traffic.
+In Device Access Policy, specify how the virtual desktop and the client device interact.
+
+**Clipboard access**: Specify whether and how the virtual desktop can access the clipboard on the client device.
+**Audio access**: Specify whether and how the virtual desktop can access the speakers and microphone on the client device. This option is supported only when using the installed client, and the Audio In or microphone value is supported only on Windows desktops.
+**Drive mapping access**: Specify whether and how the virtual desktop can access drives on the client device. If you select Read or Write, users can move content between their local system and the virtual desktop. You can edit these values later.
+Note: When planning networking requirements, be sure to include necessary ingress and egress rules. For example, to the open internet. After a pool is created, its NSG configuration cannot be changed.
+
+Under Regular schedule, enter recurring times to start and stop the desktops in the pool. You can edit these values later.
+
+- Click Create.
+
+
+1. Access the Desktop Pool.
+
+Create a user that belong to the grp-lzp-p-secure-desktop-users group to run this operation.
+
+Edit the following URL with the appropriate region identifier. For more information about identifier values for your region, see Regions and Availability Domains.
+
+https://published.desktops.<RegionIdentifier>.oci.oraclecloud.com/client
 
 
 https://docs.oracle.com/en/learn/deploy-oci-secure-desktops/index.html#introduction
