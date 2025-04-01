@@ -128,16 +128,16 @@ Optional To enter persistent storage to desktop users by creating a block volume
 
 In the Networking section, enter the following information.
 
-**Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.
-**Subnet**: Select a public subnet in the VCN to use for the desktops.
-Optional Click Show advanced options to select use network security groups to control traffic.
-In Device Access Policy, specify how the virtual desktop and the client device interact.
-
+**Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.(vcn-fra-lzp-sd)
+**Subnet**: Select a the private desktops subnet in the VCN. (sn-fra-lzp-sd)
 
 <img src="./content/network.png" width="1000" height="auto">
 
+Select Private access Network. Create a private endpoint in the same Desktop subnet and select the pre-created network security group nsg-fra-lzp-hub-pe-sd.
+
 <img src="./content/pe.png" width="1000" height="auto">
 
+In Device Access Policy, specify how the virtual desktop and the client device interact.
 
 **Clipboard access**: Specify whether and how the virtual desktop can access the clipboard on the client device.
 **Audio access**: Specify whether and how the virtual desktop can access the speakers and microphone on the client device. This option is supported only when using the installed client, and the Audio In or microphone value is supported only on Windows desktops.
@@ -147,7 +147,8 @@ Note: When planning networking requirements, be sure to include necessary ingres
 Under **Regular schedule**, enter recurring times to start and stop the desktops in the pool. You can edit these values later.
 
 - Click Create.
-
+  
+<img src="./content/sd_creating.png" width="1000" height="auto">
 
 1. Access the Desktop Pool.
 
