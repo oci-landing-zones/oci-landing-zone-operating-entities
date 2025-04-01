@@ -76,7 +76,7 @@ Now you have a Landing Zone ready to enable **Secure Desktops service**.
 
 Follow these steps:
 
-1. Import a Custom Image.
+## 1. Import a Custom Image.
 
 To use OCI Secure Desktops, you must import a custom image. For more information, see [Importing an Image](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/imageimportexport.htm#Importing). To get the list of [supported images](https://docs.oracle.com/en-us/iaas/secure-desktops/supported-images.htm), see Supported Images.
 
@@ -94,7 +94,7 @@ oci:desktops:image_os_type [Oracle Linux | Windows]
 
 
 
-2. Create a Desktop Pool.
+## 2. Create a Desktop Pool.
 
 Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run this operation.
 
@@ -150,7 +150,7 @@ Under **Regular schedule**, enter recurring times to start and stop the desktops
   
 <img src="./content/sd_creating.png" width="1000" height="auto">
 
-1. Access the Desktop Pool.
+## 3. Access the Desktop Pool.
 
 Create a user that belong to the grp-lzp-p-secure-desktop-users group to run this operation.
 
