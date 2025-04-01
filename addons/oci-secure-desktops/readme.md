@@ -178,6 +178,12 @@ example: https://published.desktops.eu-frankfurt-1.oci.oraclecloud.com/client
 
 <img src="./content/opening_desktop.png" width="1000" height="auto">
 
+
+Some interesting links about Secure Desktops:
+
+* [OCI Secure Desktops](https://docs.oracle.com/en-us/iaas/secure-desktops/home.htm)
+* [OCI Secure Desktops YouTube series](https://www.youtube.com/playlist?list=PLKCk3OyNwIzv0axRP4vP7zpubJE555Wbb)
+* [OCI Secure Desktops Latest Blog](https://blogs.oracle.com/cloud-infrastructure/post/next-gen-oci-secure-desktops-security-flexibility)
 &nbsp; 
 
 # License
