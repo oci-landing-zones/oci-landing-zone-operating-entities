@@ -100,7 +100,7 @@ Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run
 
 - Open the OCI Console and click Compute. Under Secure Desktops, click Desktop Pools.
 
-- Under List scope, select the compartment in which you want to create the pool and click Create Desktop Pool.
+- Under List scope, select the compartment in which you want to create the pool and click Create Desktop Pool (cmp-landingzone-p:cmp-lzp-platform:cmp-lzp-platform-sd).
 
 - Enter a name for the desktop pool, you can edit this value later.
 
@@ -109,15 +109,16 @@ Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run
 **Description**: Enter a description of the desktop pool.
 **Pool Start Time**: Select the date and time in UTC, when the pool becomes accessible. You can edit this value later.
 **Pool Stop Time**: Select the date and time in UTC when the pool stops and becomes inaccessible.
-Add Administrator contact details.
+**Add Administrator contact details**.
 Select Enable administrator privileges for users on their desktop to allow the desktop users to have administration privileges on their virtual desktops.
-In the Pool Size section, enter the following information.
 
+In the **Pool Size section**, enter the following information.
 **Maximum size**: The maximum number of desktops in the pool.
 **Standby size**: The number of available, unassigned desktops. Standby desktops consume resources because they are running and available for immediate allocation to desktop users. You can edit these values later.
-Under Placement, select the availability domain in which to locate the desktop resources.
 
-Under Image and Shape, select the OS image and shape you want to use for the desktop. For Windows desktop pools, which require dedicated virtual machine hosts, use one of the following preferred shapes. They are mapped to DVH shapes for allocation of OCPUs and memory.
+Under **Placement**, select the availability domain in which to locate the desktop resources.
+
+Under **Image and Shape**, select the OS image and shape you want to use for the desktop. For Windows desktop pools, which require dedicated virtual machine hosts, use one of the following preferred shapes. They are mapped to DVH shapes for allocation of OCPUs and memory.
 
 Flex Low (2 OCPUs, 4GB RAM)
 Flex Medium (4 OCPUs, 8GB RAM)
@@ -132,12 +133,18 @@ In the Networking section, enter the following information.
 Optional Click Show advanced options to select use network security groups to control traffic.
 In Device Access Policy, specify how the virtual desktop and the client device interact.
 
+
+<img src="./content/network.png" width="1000" height="auto">
+
+<img src="./content/pe.png" width="1000" height="auto">
+
+
 **Clipboard access**: Specify whether and how the virtual desktop can access the clipboard on the client device.
 **Audio access**: Specify whether and how the virtual desktop can access the speakers and microphone on the client device. This option is supported only when using the installed client, and the Audio In or microphone value is supported only on Windows desktops.
 **Drive mapping access**: Specify whether and how the virtual desktop can access drives on the client device. If you select Read or Write, users can move content between their local system and the virtual desktop. You can edit these values later.
 Note: When planning networking requirements, be sure to include necessary ingress and egress rules. For example, to the open internet. After a pool is created, its NSG configuration cannot be changed.
 
-Under Regular schedule, enter recurring times to start and stop the desktops in the pool. You can edit these values later.
+Under **Regular schedule**, enter recurring times to start and stop the desktops in the pool. You can edit these values later.
 
 - Click Create.
 
