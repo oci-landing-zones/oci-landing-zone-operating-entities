@@ -13,9 +13,10 @@ At the beginning of the README page, select 'Deploy to Oracle Cloud'. When you c
 
 * [oci_sd_lz_addon_iam.auto.tfvars.json](oci_sd_lz_addon_iam.auto.tfvars.json)
 
-Select between these to files, pub for scenario 1 and priv for scenario 2.
+  Select between these to files, 'pub' for scenario 1 and 'priv' for scenario 2.
+
 * [oci_sd_lz_addon_priv_network.auto.tfvars.json](oci_sd_lz_addon_priv_network.auto.tfvars.json)
-* * [oci_sd_lz_addon_pub_network.auto.tfvars.json](oci_sd_lz_addon_pub_network.auto.tfvars.json)
+* [oci_sd_lz_addon_pub_network.auto.tfvars.json](oci_sd_lz_addon_pub_network.auto.tfvars.json)
 
 1. Add the files generated as output in the ONE-OE deployment as dependencies.
 2. Un-check run apply. Click Create.
