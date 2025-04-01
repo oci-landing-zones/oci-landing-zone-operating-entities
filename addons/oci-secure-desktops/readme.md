@@ -67,7 +67,7 @@ Prereqs: ONE-OE
 
 It includes the following resources:
 
-Prereqs: ONE-OE + dns add-on
+Prereqs: ONE-OE + DNS add-on
 * Dedicated secure desktop groups.
 * Required policies.
 * Dedicated spoke VCN.
