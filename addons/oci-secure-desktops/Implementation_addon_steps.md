@@ -1,4 +1,4 @@
-# STEP2. ORM Secure Desktops ADD-ON Deployment Steps <!-- omit from toc -->
+# ORM Secure Desktops ADD-ON Deployment Steps <!-- omit from toc -->
 
 
 Go to the orchestrator [github page](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator).
