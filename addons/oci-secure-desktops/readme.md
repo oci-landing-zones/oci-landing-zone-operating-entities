@@ -116,15 +116,15 @@ Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run
 
     Select Enable administrator privileges for users on their desktop to allow the desktop users to have administration privileges on their virtual desktops.
 
-- -In the **Pool Size section**, enter the following information:
+- In the **Pool Size section**, enter the following information:
 
     **Maximum size**: The maximum number of desktops in the pool.
 
     **Standby size**: The number of available, unassigned desktops. Standby desktops consume resources because they are running and available for immediate allocation to desktop users. You can edit these values later.
 
-    Under **Placement**, select the availability domain in which to locate the desktop resources.
+- Under **Placement**, select the availability domain in which to locate the desktop resources.
 
-    Under **Image and Shape**, select the OS image and shape you want to use for the desktop. For Windows desktop pools, which require dedicated virtual machine hosts, use one of the following preferred shapes. They are mapped to DVH shapes for allocation of OCPUs and memory.
+- Under **Image and Shape**, select the OS image and shape you want to use for the desktop. For Windows desktop pools, which require dedicated virtual machine hosts, use one of the following preferred shapes. They are mapped to DVH shapes for allocation of OCPUs and memory.
 
     * Flex Low (2 OCPUs, 4GB RAM)
     * Flex Medium (4 OCPUs, 8GB RAM)
@@ -132,7 +132,7 @@ Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run
 
     Optional To enter persistent storage to desktop users by creating a block volume associated with a user, select Enable desktop storage and then select volume size (in GB).
 
-_ In the **Networking section**, enter the following information.
+- In the **Networking section**, enter the following information:
 
     **Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.(vcn-fra-lzp-sd)
 
@@ -144,7 +144,7 @@ _ In the **Networking section**, enter the following information.
 
     <img src="./content/pe.png" width="1000" height="auto">
 
-- In** Device Access Policy**, specify how the virtual desktop and the client device interact.
+- In **Device Access Policy**, specify how the virtual desktop and the client device interact.
 
     **Clipboard access**: Specify whether and how the virtual desktop can access the clipboard on the client device.
 
