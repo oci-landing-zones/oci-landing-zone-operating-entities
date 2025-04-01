@@ -54,7 +54,7 @@ We cover two different scenarios:
 
 **Scenario 1**. Connection thought Internet.
 
-<img src="./content/one_oe_secure_desktops_pub.png" width="1000" height="auto">
+<img src="./content/one_oe_secure_Desktops_pub.png.png" width="1000" height="auto">
 
 It includes the following resources:
 
@@ -64,7 +64,7 @@ It includes the following resources:
   
 **Scenario 2**. Connection thought Private Access.
 
-<img src="./content/one_oe_secure_desktops_priv.png" width="1000" height="auto">
+<img src="./content/one_oe_secure_Desktops_priv.png" width="1000" height="auto">
 
 It includes the following resources:
 
