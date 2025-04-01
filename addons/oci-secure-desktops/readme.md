@@ -3,7 +3,7 @@
 
 &nbsp; 
 
-### Overview
+## Overview
 
 Welcome to the **OCI Secure Desktops Guide**. 
 
@@ -31,7 +31,7 @@ A virtual desktop provides:
 To know more about Secure Desktop Service you can check the Oracle Official documentation [here](https://docs.oracle.com/en-us/iaas/secure-desktops/overview-secure-desktops.htm).
 &nbsp; 
 
-### Benefits of this asset
+## Benefits of this asset
 
 Following the guidelines explained here reduces the overall management complexity and will help you with:
 
@@ -41,7 +41,7 @@ Following the guidelines explained here reduces the overall management complexit
 
 &nbsp; 
 
-### Add-on Design.
+## Add-on Design.
 
 If want to learn more about configuring Secure Desktops, we recommend checking out this [solution](https://docs.oracle.com/en/solutions/oci-tenancy-secure-desktop-pool/index.html#GUID-4FDC6E79-517F-49C4-80F6-AED75B85F293) published in the Architecture Center.
 &nbsp; 
@@ -60,7 +60,7 @@ It includes the following resources:
 * Dedicated spoke VCN.
   
 
-### Add-on Implementation.
+## Add-on Implementation.
 
 As a prerequisite you need to deploy a fundation landing zone, in that case we have choosen the [One-OE](../../../../blueprints/one-oe/). To understand how to perform this operation with ORM, follow these [steps](ORM_ONE-OE_deployment_steps.md).
 
@@ -70,13 +70,13 @@ As a prerequisite you need to deploy a fundation landing zone, in that case we h
 
 To run this add-on, follow this [steps](./Implementation_addon_steps.md).
 
-### Secure Desktop configuration.
+## Secure Desktop configuration.
 
 Now you have a Landing Zone ready to enable **Secure Desktops service**.
 
 Follow these steps:
 
-## 1. Import a Custom Image.
+### 1. Import a Custom Image.
 
 To use OCI Secure Desktops, you must import a custom image. For more information, see [Importing an Image](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/imageimportexport.htm#Importing). To get the list of [supported images](https://docs.oracle.com/en-us/iaas/secure-desktops/supported-images.htm), see Supported Images.
 
@@ -94,7 +94,7 @@ oci:desktops:image_os_type [Oracle Linux | Windows]
 
 
 
-## 2. Create a Desktop Pool.
+### 2. Create a Desktop Pool.
 
 Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run this operation.
 
@@ -150,7 +150,7 @@ Under **Regular schedule**, enter recurring times to start and stop the desktops
   
 <img src="./content/sd_creating.png" width="1000" height="auto">
 
-## 3. Access the Desktop Pool.
+### 3. Access the Desktop Pool.
 
 Create a user that belong to the grp-lzp-p-secure-desktop-users group to run this operation.
 
