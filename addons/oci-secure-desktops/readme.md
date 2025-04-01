@@ -87,7 +87,7 @@ oci:desktops:is_desktop_image true
 oci:desktops:image_version <version>, where <version> is a meaningful reference for your use.
 oci:desktops:image_os_type [Oracle Linux | Windows]
 ```
-<img src="./content/import_image.png" width="1000" height="auto">
+<img src="./content/Import_image.png" width="1000" height="auto">
 
 
 <img src="./content/add_tags.png" width="1000" height="auto">
