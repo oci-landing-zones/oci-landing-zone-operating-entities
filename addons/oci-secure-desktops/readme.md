@@ -48,9 +48,7 @@ If want to learn more about configuring Secure Desktops, we recommend checking o
 
 <img src="./content/secure_desktops.png" width="600" height="auto">
 
-This add-on goes beyond by configuring secure desktops in a dedicated VCN connected to the HUB-and-Spoke architecture provided by the ONE-OE Landing Zone blueprint.
-
-We cover two different scenarios:
+This add-on goes beyond by configuring secure desktops in a dedicated VCN connected to the HUB-and-Spoke architecture provided by the ONE-OE Landing Zone blueprint. We cover two different scenarios:
 
 **Scenario 1**. Connection thought Internet.
 
