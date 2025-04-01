@@ -107,9 +107,13 @@ Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run
 - Enter the following Optional information.
 
 **Description**: Enter a description of the desktop pool.
+
 **Pool Start Time**: Select the date and time in UTC, when the pool becomes accessible. You can edit this value later.
+
 **Pool Stop Time**: Select the date and time in UTC when the pool stops and becomes inaccessible.
+
 **Add Administrator contact details**.
+
 Select Enable administrator privileges for users on their desktop to allow the desktop users to have administration privileges on their virtual desktops.
 
 In the **Pool Size section**, enter the following information.
