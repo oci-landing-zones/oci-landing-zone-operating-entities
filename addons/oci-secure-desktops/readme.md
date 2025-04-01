@@ -166,12 +166,17 @@ Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run
 
 Create a user that belong to the grp-lzp-p-secure-desktop-users group to run this operation.
 
-Edit the following URL with the appropriate region identifier. For more information about identifier values for your region, see Regions and Availability Domains.
+Edit the following URL with the appropriate region identifier. For more information about identifier values for your region, see [Regions and Availability Domains](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#About).
 
 https://published.desktops.<RegionIdentifier>.oci.oraclecloud.com/client
 
+example: https://published.desktops.eu-frankfurt-1.oci.oraclecloud.com/client
 
-https://docs.oracle.com/en/learn/deploy-oci-secure-desktops/index.html#introduction
+
+<img src="./content/desktop_pool.png" width="1000" height="auto">
+
+
+<img src="./content/opening_desktop.png" width="1000" height="auto">
 
 &nbsp; 
 
