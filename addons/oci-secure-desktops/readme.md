@@ -56,6 +56,7 @@ This add-on goes beyond by configuring secure desktops in a dedicated VCN connec
 
 It includes the following resources:
 
+Prereqs: ONE-OE 
 * Dedicated secure desktop groups.
 * Required policies.
 * Dedicated spoke VCN.
@@ -66,6 +67,7 @@ It includes the following resources:
 
 It includes the following resources:
 
+Prereqs: ONE-OE + dns add-on
 * Dedicated secure desktop groups.
 * Required policies.
 * Dedicated spoke VCN.
