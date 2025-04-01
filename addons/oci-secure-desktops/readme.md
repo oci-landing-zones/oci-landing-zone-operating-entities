@@ -72,13 +72,6 @@ It includes the following resources:
 * Required policies.
 * Dedicated spoke VCN.
 * NSG 
-
-
-It includes the following resources:
-
-* Dedicated secure desktop groups.
-* Required policies.
-* Dedicated spoke VCN.
   
 
 ## Add-on Implementation.
