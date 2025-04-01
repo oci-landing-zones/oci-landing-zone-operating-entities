@@ -136,7 +136,7 @@ Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run
 
     **Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.(vcn-fra-lzp-sd)
 
-    **Subnet**: Select a the private desktops subnet in the VCN. (sn-fra-lzp-sd)
+    **Subnet**: Select a the public desktops subnet in the VCN. (sn-fra-lzp-sd)
 
     <img src="./content/network.png" width="1000" height="auto">
 
