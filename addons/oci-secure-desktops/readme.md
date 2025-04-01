@@ -159,6 +159,9 @@ Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run
   
 <img src="./content/sd_creating.png" width="1000" height="auto">
 
+
+<img src="./content/created.png" width="1000" height="auto">
+
 ### 3. Access the Desktop Pool.
 
 Create a user that belong to the grp-lzp-p-secure-desktop-users group to run this operation.
