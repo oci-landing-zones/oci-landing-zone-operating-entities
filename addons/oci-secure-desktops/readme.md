@@ -148,19 +148,19 @@ Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run
 
     In **Scenario 1**, the Desktop subnet will be public:
 
-        **Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.(vcn-fra-lzp-sd)
+    **Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.(vcn-fra-lzp-sd)
 
-        **Subnet**: Select a the public desktops subnet in the VCN. (sn-fra-lzp-sd)
+    **Subnet**: Select a the public desktops subnet in the VCN. (sn-fra-lzp-sd)
 
     <img src="./content/network.png" width="1000" height="auto">
 
-    In Scenario 2**, the Desktop subnet will be private and accesible thougt the fast connect, to check the private access documentation go [here]( https://docs.oracle.com/en-us/iaas/secure-desktops/private-access.htm#:~:text=A%20private%20endpoint%20is%20represented,endpoint%20configured%20in%20the%20VCN.&text=This%20feature%20can%20only%20be%20enabled%20when%20creating%20new%20desktop%20pools.):
+    In **Scenario 2**, the Desktop subnet will be private and accesible thougt the fast connect, to check the private access documentation go [here]( https://docs.oracle.com/en-us/iaas/secure-desktops/private-access.htm#:~:text=A%20private%20endpoint%20is%20represented,endpoint%20configured%20in%20the%20VCN.&text=This%20feature%20can%20only%20be%20enabled%20when%20creating%20new%20desktop%20pools.):
 
-        **Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.(vcn-fra-lzp-sd)
+    **Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.(vcn-fra-lzp-sd)
 
-        **Subnet**: Select a the private desktops subnet in the VCN. (sn-fra-lzp-sd)
+    **Subnet**: Select a the private desktops subnet in the VCN. (sn-fra-lzp-sd)
 
-        Select Private access Network. Create a private endpoint in the same Desktop subnet and select the pre-created network security group nsg-fra-lzp-hub-pe-sd.
+    Select Private access Network. Create a private endpoint in the same Desktop subnet and select the pre-created network security group nsg-fra-lzp-hub-pe-sd.
 
     <img src="./content/pe.png" width="1000" height="auto">
 
