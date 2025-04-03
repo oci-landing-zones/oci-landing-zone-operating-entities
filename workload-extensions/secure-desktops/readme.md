@@ -1,5 +1,5 @@
 # **[OCI Secure Desktop Guide](#)**
-## **An OCI Open LZ Addon to use Secure Desktops in your LZ**
+## **An OCI Open LZ Extension to onboard Secure Desktops in your LZ**
 
 &nbsp; 
 
