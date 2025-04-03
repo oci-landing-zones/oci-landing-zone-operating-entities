@@ -1,7 +1,9 @@
 # **[OCI Secure Desktop Guide](#)**
 ## **An OCI Open LZ Extension to onboard Secure Desktops in your LZ**
-
 &nbsp; 
+
+<img src="../../commons/images/icon_sd.jpg" height="80">
+
 
 ## Overview
 
