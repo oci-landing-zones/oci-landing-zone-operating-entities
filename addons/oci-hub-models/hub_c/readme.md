@@ -37,7 +37,7 @@
 - Four regional private subnets (depicted in dark-orange)
     1. private-subnet for Internal Network Load Balancer (NLB-Trust) and the internal interfaces of the firewalls (vNIC2)
     2. private-subnet for management workloads (depending on the 3rd-party firewall vendor, additional interfaces may be created here, such as a management network interfaces)
-    3. private-subnet for logs
+    3. private-subnet for monitoring and logs
     4. private-subnet for DNS (for OCI DNS resolver endpoints)
 - Internet Gateway
 - Service Gateway
