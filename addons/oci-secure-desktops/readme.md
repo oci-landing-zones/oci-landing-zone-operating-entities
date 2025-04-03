@@ -52,7 +52,7 @@ This add-on goes beyond by configuring secure desktops in a dedicated VCN connec
 
 **Scenario 1**. Connection thought Internet.
 
-<img src="./content/one_oe_secure_Desktops_pub.png" width="1000" height="auto">
+<img src="./content/one_oe_secure_Desktops_sc1.png" width="1000" height="auto">
 
 It includes the following resources:
 
@@ -63,7 +63,7 @@ Prereqs: ONE-OE
   
 **Scenario 2**. Connection thought Private Access.
 
-<img src="./content/one_oe_secure_Desktops_priv.png" width="1000" height="auto">
+<img src="./content/one_oe_secure_Desktops_sc2.png" width="1000" height="auto">
 
 It includes the following resources:
 
@@ -71,7 +71,7 @@ Prereqs: ONE-OE + DNS add-on
 * Dedicated secure desktop groups.
 * Required policies.
 * Dedicated spoke VCN.
-* DNS configuration. Listener
+* DNS configuration. Forwarder endpoint.
 * NSG 
   
 
@@ -147,23 +147,26 @@ Create a user that belong to the **grp-lzp-p-secure-desktop-admin** group to run
 
     Optional To enter persistent storage to desktop users by creating a block volume associated with a user, select Enable desktop storage and then select volume size (in GB).
 
-- In the **Networking section**, enter the following information:
+- In the **Desktop pool network**, enter the following information:
 
-    In **Scenario 1**, the Desktop subnet will be public:
+    In **Scenario 1**, the connection will be established through the internet:
 
     **Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.(vcn-fra-lzp-sd)
 
-    **Subnet**: Select a the public desktops subnet in the VCN. (sn-fra-lzp-sd)
+    **Subnet**: Select a the desktops subnet in the VCN. (sn-fra-lzp-sd).
+
+    Skip section **Private access network**.
 
     <img src="./content/network.png" width="1000" height="auto">
 
-    In **Scenario 2**, the Desktop subnet will be private and accesible thougt the fast connect, to check the private access documentation go [here]( https://docs.oracle.com/en-us/iaas/secure-desktops/private-access.htm#:~:text=A%20private%20endpoint%20is%20represented,endpoint%20configured%20in%20the%20VCN.&text=This%20feature%20can%20only%20be%20enabled%20when%20creating%20new%20desktop%20pools.).
+    In **Scenario 2**, the Desktop subnet will be accesible thougt the fast connect or IPSec VPN, to check the private access documentation go [here]( https://docs.oracle.com/en-us/iaas/secure-desktops/private-access.htm#:~:text=A%20private%20endpoint%20is%20represented,endpoint%20configured%20in%20the%20VCN.&text=This%20feature%20can%20only%20be%20enabled%20when%20creating%20new%20desktop%20pools.).
 
     **Virtual cloud network**: Select the virtual cloud network (VCN) for the desktops in this pool.(vcn-fra-lzp-sd)
 
-    **Subnet**: Select a the private desktops subnet in the VCN. (sn-fra-lzp-sd)
+    **Subnet**: Select the desktops subnet in the VCN (sn-fra-lzp-sd). Use Network Security Groups to control traffic and assign sg-fra-lzp-hub-pe-sd to the Desktop Pool that will be created.
 
-    Select Private access Network. Create a private endpoint in the same Desktop subnet and select the pre-created network security group nsg-fra-lzp-hub-pe-sd.
+
+    Select also **Private access Network**. Create a private endpoint in the same Desktop subnet and select the pre-created network security group nsg-fra-lzp-hub-pe-sd.
 
     <img src="./content/pe.png" width="1000" height="auto">
 
