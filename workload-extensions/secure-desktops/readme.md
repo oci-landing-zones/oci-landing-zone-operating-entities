@@ -202,13 +202,13 @@ Create a user that belong to the grp-lzp-p-secure-desktop-users group to run thi
     example: https://published.desktops.eu-frankfurt-1.oci.oraclecloud.com/client
 
 
-    <img src="./content/desktop_pool.png" width="1000" height="auto">
+<img src="./content/desktop_pool.png" width="1000" height="auto">
 
 
-    <img src="./content/opening_desktop.png" width="300" height="auto">
+<img src="./content/opening_desktop.png" width="300" height="auto">
 
 
-    <img src="./content/desktop.png" width="600" height="auto">
+<img src="./content/desktop.png" width="600" height="auto">
 
 &nbsp; 
 
