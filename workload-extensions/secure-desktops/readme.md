@@ -41,14 +41,14 @@ Following the guidelines explained here reduces the overall management complexit
 
 &nbsp; 
 
-## Add-on Design.
+## LZ Extension Design.
 
 If want to learn more about configuring Secure Desktops, we recommend checking out this [solution](https://docs.oracle.com/en/solutions/oci-tenancy-secure-desktop-pool/index.html#GUID-4FDC6E79-517F-49C4-80F6-AED75B85F293) published in the Architecture Center.
 &nbsp; 
 
 <img src="./content/secure_desktops.png" width="600" height="auto">
 
-This add-on goes beyond by configuring secure desktops in a dedicated VCN connected to the HUB-and-Spoke architecture provided by the ONE-OE Landing Zone blueprint. We cover two different scenarios:
+This LZ Ext. goes beyond by configuring secure desktops in a dedicated VCN connected to the HUB-and-Spoke architecture provided by the ONE-OE Landing Zone blueprint. We cover two different scenarios:
 
 **Scenario 1**. Connection thought Internet.
 
@@ -75,7 +75,7 @@ Prereqs: ONE-OE + DNS add-on
 * NSG 
   
 
-## Add-on Implementation.
+## LZ Extension Implementation.
 
 As a prerequisite you need to deploy a fundation landing zone, in that case we have choosen the [One-OE](../../../../blueprints/one-oe/). To understand how to perform this operation with ORM, follow these [steps].
 
@@ -83,7 +83,7 @@ As a prerequisite you need to deploy a fundation landing zone, in that case we h
 
 
 
-To run this add-on, follow this [steps](./Implementation_steps.md).
+To run this landing zone extension, follow this [steps](./Implementation_steps.md).
 
 ## Secure Desktop configuration.
 
