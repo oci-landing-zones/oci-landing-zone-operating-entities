@@ -210,6 +210,14 @@ example: https://published.desktops.eu-frankfurt-1.oci.oraclecloud.com/client
 
 <img src="./content/desktop.png" width="600" height="auto">
 
+&nbsp; 
+
+For Scenario 2, you will need to configure your on-premises DNS to access **private.devices.desktops.region-id.oci.oraclecloud.com**.
+
+The DNS name for each private pool endpoint will be unique and in the form: **pool-specific-id.private.devices.desktops.region-id.oci.oraclecloud.com**
+
+For more information about private access review the [official documentation](https://docs.oracle.com/en-us/iaas/secure-desktops/private-access.htm).
+
 
 
 Some interesting links about Secure Desktops:
