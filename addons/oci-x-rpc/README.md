@@ -150,7 +150,7 @@ Modify the network JSON config of the Child/OE tenancy by adding the RPC block u
 > [!IMPORTANT]
 >Ensure that the user performing Terraform automation belongs to the group specified in the RPC policy. Otherwise, the connection will not establish. From a One-OE standpoint, this group should be `grp-lzp-network-admins`.
 >
-> Refer to the hub_network.auto.tfvars.json and oe1_iam.network.tfvars.json files for the complete networking configuration sample template based on One-OE.
+> Refer to the runtime directory files hub_network.auto.tfvars.json and oe1_iam.network.tfvars.json files for the complete networking configuration sample template based on One-OE.
 
 &nbsp;
 

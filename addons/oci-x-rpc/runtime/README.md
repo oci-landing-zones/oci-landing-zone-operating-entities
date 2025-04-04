@@ -16,6 +16,13 @@ The diagram below illustrates a sample routing setup for a multi-tenancy/multi-r
 &nbsp;
 ### 2. Sample json configuration for RPC
 
+Configuration details:
+  - Connectivity Hub (CH) Configuration
+    - connectivity-hub_iam.auto.tfvars.json consits of the compartment groups and policies required for rpc setup in connectivity hub tenancy.
+    - connectivity-hub_network.auto.tfvars.json consists of the Hub and spoke network setup along with remote peering connection and associated route tables. The Connectivity hub json configuration is based on the OCI Open LZ - Hub A. To understand more about the HUB Model A, refer to the [OCI Open LZ - Hub A Documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_a).
+  - Operating Entity 1 (OE1) Configuration
+    - oe1_iam.auto.tfvars.json consits of the compartment groups and policies required for rpc setup in OE1 tenancy. 
+    - connectivity-hub_network.auto.tfvars.json consists of the Hub and spoke network setup along with remote peering connection and associated route tables. The Connectivity hub json configuration is based on the OCI Open LZ - Hub E. To understand more about the HUB Model E, refer to the [OCI Open LZ - Hub A Documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_e).
 
 
 
