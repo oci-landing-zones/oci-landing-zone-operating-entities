@@ -36,6 +36,10 @@ The following are some of the resources required to be selected in the Oracle E-
 > [!NOTE]
 > The EBS Landing Zone Extension includes both Security Lists and Network Security Groups so that either may be utilized.
 
+&nbsp;
+
+> [!NOTE]
+> Instructions for using the Bastion Service to connect to EBS Cloud Manager are [here](./bastion_access.md)
 
 &nbsp;
 
