@@ -1,4 +1,4 @@
-# Bastion Acess <!-- omit from toc -->
+# Bastion Access <!-- omit from toc -->
 
 ## **Table of Contents** <!-- omit from toc -->
 
