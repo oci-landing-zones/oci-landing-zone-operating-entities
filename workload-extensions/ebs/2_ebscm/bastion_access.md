@@ -54,7 +54,7 @@ ssh  -i <privateKey> opc@localhost -p <localPort>
 
 The URL to access the EBSCM UI needs to be setup.
 
-Update the EBSCM URL following the instructions contained [here](hhttps://docs.oracle.com/cd/E26401_01/doc.122/f35809/T679330T679341.htm#cmg_manage_updatecmurl).
+Update the EBSCM URL following the instructions contained [here](https://docs.oracle.com/cd/E26401_01/doc.122/f35809/T679330T679341.htm#cmg_manage_updatecmurl).
 
 Now follows an example URL using example.com as the domain.
 
