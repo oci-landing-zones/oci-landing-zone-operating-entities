@@ -9,9 +9,9 @@
 
 Welcome to the **OCI Secure Desktops Guide**. 
 
-This guide provides instructions for onboarding the Secure Desktops service to Operating Entity Landing Zones blueprints.
+This guide provides step-by-step instructions for integrating the Secure Desktops service into the Operating Entity Landing Zones blueprints.
 
-Oracle Cloud Infrastructure (OCI) Secure Desktops is ideal for organizations seeking controlled access to preconfigured desktop environments for their employees.OCI Secure Desktops is a cloud-native, managed service designed to ensure the security, reliability, and scalability of desktop environments. It enables organizations to provide their global workforce with secure, centrally controlled, customizable, and consistent desktop experiences, regardless of the device used.
+Oracle Cloud Infrastructure Secure Desktops is ideal for organizations seeking controlled access to preconfigured desktop environments for their employees.OCI Secure Desktops is a cloud-native, managed service designed to ensure the security, reliability, and scalability of desktop environments. It enables organizations to provide their global workforce with secure, centrally controlled, customizable, and consistent desktop experiences, regardless of the device used.
 
 With OCI Secure Desktops, administrators can create pools of virtual desktops in their tenancy using existing compute shapes and custom images. These desktops are identical in configuration, and users can securely access them to work with enterprise data.
 
@@ -35,7 +35,7 @@ To know more about Secure Desktop Service you can check the Oracle Official docu
 
 ## Benefits of this asset
 
-Following the guidelines explained here reduces the overall management complexity and will help you with:
+By following the guidelines outlined here, you can reduce overall management complexity and benefit from the following:
 
 * Reducing configuration complexity.
 * Facilitating organic growth of your Landing Zone, with the addition of the Secure Desktops service.
@@ -79,7 +79,7 @@ Prereqs: ONE-OE + DNS add-on
 
 ## LZ Extension Implementation.
 
-As a prerequisite you need to deploy a fundation landing zone, in that case we have choosen the [One-OE](../../../../blueprints/one-oe/). To understand how to perform this operation with ORM, follow these [steps].
+As a prerequisite you need to deploy a fundation landing zone, in that case we have choosen the [One-OE](../../../../blueprints/one-oe/). To understand how to perform this operation with ORM, follow these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
 
 [<img src="../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/addons/oci-hub-models/hub_b/oci_open_lz_hub_b_network_light.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json"}) 
 
@@ -91,7 +91,7 @@ To run this landing zone extension, follow this [steps](./Implementation_steps.m
 
 Now you have a Landing Zone ready to enable **Secure Desktops service**.
 
-Follow these steps:
+---
 
 ### 1. Import a Custom Image.
 
