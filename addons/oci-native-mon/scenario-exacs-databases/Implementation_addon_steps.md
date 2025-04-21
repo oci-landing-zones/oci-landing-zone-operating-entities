@@ -11,16 +11,16 @@ At the beginning of the README page, select 'Deploy to Oracle Cloud'. When you c
 4. Set the terraform version to 1.5.x. Click Next.
 5. Create you own bucket and upload the JSON files provided in this asset:
 
-* [oci_open_lz_addon_mon_iam_atp.auto.tfvars.json](oci_open_lz_addon_mon_iam_atp.auto.tfvars.json)
-* [oci_open_lz_addon_mon_network_atp.auto.tfvars.json](oci_open_lz_addon_mon_network_atp.auto.tfvars.json)
-* * [oci_open_lz_addon_mon_security_atp.auto.tfvars.json](oci_open_lz_addon_mon_security_atp.auto.tfvars.json)
+* [oci_open_lz_addon_mon_iam_exacs.auto.tfvars.json](oci_open_lz_addon_mon_iam_exacs.auto.tfvars.json)
+* [oci_open_lz_addon_mon_network_exacs.auto.tfvars.json](oci_open_lz_addon_mon_network_exacs.auto.tfvars.json)
+* * [oci_open_lz_addon_mon_security_exacs.auto.tfvars.json](oci_open_lz_addon_mon_network_exacs.auto.tfvars.json)
 
 1. Add the files generated as output in the ONE-OE deployment as dependencies.
 2. Un-check run apply. Click Create.
 3. First, execute a plan job to review all the resources that Terraform will create. Once verified, proceed to run the apply job to initiate the deployment.
 
 4. During the first execution, the add-on will create a dedicated Observability Vault and Key. To grant access to these resources for the grp-lzp-mon-admins group, we have added the following two statements to the pcy-global-mon-admin policy . Check file
-[oci_open_lz_addon_mon_iam_atp.auto.tfvars.json](oci_open_lz_addon_mon_iam_atp.auto.tfvars.json)
+[oci_open_lz_addon_mon_iam_exacs.auto.tfvars.json](oci_open_lz_addon_mon_iam.auto.tfvars.json)
 
 ```
 Allow group grp-lzp-mon-admins to use vaults in compartment cmp-landingzone-p:cmp-lzp-security where target.vault.id='ocid1.vault.oc1.region.xxxx'

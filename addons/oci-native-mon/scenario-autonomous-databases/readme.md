@@ -61,7 +61,7 @@ Follow these steps to extend your Landing zone:
 
 Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](./Implementation_addon_steps.md).
 
-<img src="../images/OBS_ADDON.png" height="600" align="center">
+<img src="../images/OBS_ADDON_ATP.png" height="600" align="center">
 
 &nbsp; 
 
