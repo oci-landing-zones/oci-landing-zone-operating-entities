@@ -1,6 +1,6 @@
 
 # **[EXACC](#)**
-## **An OCI Open LZ Addon to enable Database management & Operation Insights and Logging Analytics **
+## **An OCI Open LZ Addon to enable Database management & Operation Insights and Logging Analytics**
 
 
 ## Design
