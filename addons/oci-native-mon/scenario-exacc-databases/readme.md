@@ -2,9 +2,12 @@
 # **[EXACC](#)**
 ## **An OCI Open LZ Addon to enable Database management & Operation Insights and Logging Analytics **
 
+
+## Design
+
 For EXACC, we only have the option of a global approach. We deployed the DM/OPSI PEs in the HUB VCN, reusing the monitoring subnet (MON) that is included in all our LZ HUB models.
 
-<img src="./images/EXACC.png" height="300" align="center">
+<img src="../images/EXACC.png" height="300" align="center">
 
 > [!NOTE]  
 > This asset primarily focuses on enabling Native Observability services within the Landing Zone. However, when addressing EXACC workloads, it is also essential to consider events and alarms. These aspects are covered in our EXACC Landing Zone extension, which can be found [here](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/workload-extensions/exacc).
@@ -19,6 +22,37 @@ For EXACC, we only have the option of a global approach. We deployed the DM/OPSI
 >* Example Pre-Production Project Alarms.
 
 
+
+## Implementation
+
+Our add-on template includes all the necessary components, such as CMP, groups, a dedicated monitoring Vault, policies, and NSGs, to enable Database Management and Ops Insights.
+
+Follow these steps to extend your Landing zone:
+
+**Step 1**. 
+
+(Prerequisite) Deploy ONE-OE landing Zone. You can follow next [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
+
+<img src="../images/ONE-OE.png" height="850" align="center">
+
+&nbsp; 
+
+**Step 2**. 
+(Prerequisite) Deploy EXACC add-on landing Zone. You can follow next [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/workload-extensions/exacc). 
+
+<img src="../images/ADDON_EXACC.png" height="600" align="center">
+
+
+
+**Step 3**. 
+Enable Observability adding this Add-on, use the EXACC JSONs files provided in this asset. To check step by step how to do it check
+[here](./Implementation_addon_steps.md)
+
+<img src="../images/OBS_ADDON_EXACC.png" height="600" align="center">
+
+&nbsp; 
+
+Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow these steps .
 
 
 
