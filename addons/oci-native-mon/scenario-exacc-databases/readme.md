@@ -44,6 +44,9 @@ Follow these steps to extend your Landing zone:
 
 Deploy our hub model E and configure FastConnect or IPSec VPN from the CPE customer datacenter and the DRG.
 
+<img src="../images/HUB_E.png" height="600" align="center">
+
+
 **Step 3**. 
 
 Enable Observability adding this Add-on, use the EXACC JSONs files provided in this asset. To check step by step how to do it check
