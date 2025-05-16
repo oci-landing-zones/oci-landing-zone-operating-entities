@@ -3,10 +3,15 @@
 &nbsp;
 ## **Overview**
 
-The **OCI FinOps Solution** is an OCI Open Landing Zone addon designed to bring cost governance, visibility, and optimization to Operating Entities by leveraging the OCI FOCUS report with enhanced APEX-based visualization. This solution integrates into the platform layer of the Landing Zone and automates the collection, processing, and presentation of cost and usage data.
+The **OCI FinOps Solution** is an addon to the OCI Open Landing Zone framework, designed to enhance cost governance and financial visibility for Operating Entities. It leverages **OCI FOCUS reports** and integrates them into an **Autonomous Database + APEX-based dashboard**, providing actionable insights into cloud spending.
 
-At a high level, the solution architecture and workflow is as follows:
+This solution automates the entire workflow—from fetching and processing FOCUS reports to real-time ingestion into ADB and visualization—within a secure, private network setup.
 
+> **Why another dashboard?**  
+> While OCI offers built-in Cost Analysis, this solution addresses needs such as **multi-cloud cost visibility**, **external stakeholder access**, and **custom reporting**—making it ideal for FinOps practitioners.
+
+> **What is FinOps?**  
+> FinOps is a cultural and operational framework that maximizes cloud business value through **data-driven decision making**, **financial accountability**, and **collaboration between engineering, finance, and business teams**.
 
 &nbsp;
 
