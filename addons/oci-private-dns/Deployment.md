@@ -13,9 +13,9 @@ The components highlighted in the architecture diagram below will be implemented
 
 **Step 1**. Ensure that the [OCI Open Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md) is deployed, as it serves as the foundation for Private DNS configuration.
 
-**Step 2**. Update the Network Configuration json to include the objects shown below. You can also refer to and use the **Private DNS Network json template** for the Hub A model (light version, without OCI Network Firewalls), which includes all the necessary json objects for Private DNS configuration.
+**Step 2**. Update the Network Configuration json to include the objects shown below. You can also refer to and use the [Private DNS Network json template](../../blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json) for the Hub A model (light version, without OCI Network Firewalls), which includes all the necessary json objects for Private DNS configuration.
 
-**Private DNS Network json template** consist of the following six additional objects, which are added into Network Configuration:
+[Private DNS Network json template](../../blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json) consist of the following six additional objects, which are added into Network Configuration:
 
 - **1st object**: Network Security Group (NSG) configuration in the **Hub VCN**, attached to the Hub DNS Listener. This configuration enables the necessary Ingress and Egress DNS traffic flow with Spoke DNS Forwarders.
 
@@ -34,7 +34,7 @@ The components highlighted in the architecture diagram below will be implemented
                                         ...
                             }
 
-Note: Full configuration of the NSGs are available in the **Private DNS Network json template**
+Note: Full configuration of the NSGs are available in the [Private DNS Network json template](../../blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json)
 
 - **2nd object**: Configuration of the DNS Forwarder and Listener, as well as the Private views in the **Hub VCN**.<br>
   The OCIDs for the Hub, Prod, and PreProd private views should be obtained from the OCI Console or CLI and specified as values for `"existing_view_id"`.<br>
