@@ -13,6 +13,7 @@
   - [Single-Region: DNS query animation](#11-Single-Region-DNS-query-animation)</br>
 - [Multi-Region: Private DNS configuration view](#2-Multi-Region-Private-DNS-configuration-view)</br>
   - [Multi-Region: DNS query animation](#21-Multi-Region-DNS-query-animation)
+- [Configuration and deployment](#Configuration-and-deployment)
 
 &nbsp;
 
@@ -148,7 +149,10 @@ Configuration details:
 #### Summary
 This Private DNS configuration in a Hub and Spoke architecture ensures that all VCN-internal and Internet-specific DNS queries are handled by their respective VCN Resolvers. Meanwhile, Oracle-specific domains, On-Premises zones, and custom-created domains are handled and managed by the Hub VCN Resolver. This approach optimizes DNS management and supports a consistent, scalable architecture across OCI environments, in both single-region and multi-region deployments.
 
+&nbsp;
 
+### Configuration and deployment
+[Guide](Deployment.md) for OCI Private DNS configuration and deployment in a single region.
 
 &nbsp; 
 
