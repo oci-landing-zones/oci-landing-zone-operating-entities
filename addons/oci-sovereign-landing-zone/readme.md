@@ -1,4 +1,4 @@
-# Sovereign Controls <!-- omit from toc -->
+# OCI Sovereign Landing Zone <!-- omit from toc -->
 
 ## Table of contents <!-- omit from toc -->
   - [Summary](#summary)
@@ -19,7 +19,7 @@ A Sovereign Landing Zone (SLZ) is a specialized cloud environment tailored to me
 
 To configure a Sovereign Landing Zone, this section outlines four key Sovereign principles: Location, Isolation, Access Management, and Encryption. For more in-depth information on these topics, we also recommend reviewing the [Oracle Cloud Infrastructure Sovereign Cloud Principles](https://docs.oracle.com/en-us/iaas/Content/Resources/Assets/whitepapers/oracle-sovereign-cloud-principles.pdf).
 
-Additionally, we provide a [Sovereign implementation guide](./implementation.md) that outlines the steps to extend any existing OCI Landing Zone with the Sovereign Controls add-on. To illustrate the concepts of a Sovereign Landing Zone, we will use a German customer as an example for implementing Sovereign Controls. However, these principles can be applied by any customer to comply with local regulations.
+Additionally, we provide a [Sovereign implementation guide](./implementation.md) that outlines the steps to extend any existing OCI Landing Zone with the Sovereign Landing Zone add-on. To illustrate the concepts of a Sovereign Landing Zone, we will use a German customer as an example for implementing Sovereign Controls. However, these principles can be applied by any customer to comply with local regulations.
 
 ## Principle 1. Location
 

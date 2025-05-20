@@ -2,7 +2,7 @@
 /workload-extensions/ebs/ @rphibbert
 /workload-extensions/oke/ @paolajuarezgomez
 /addons/oci-hub-models/ @vavardan @paalonso
-/addons/oci-sovereign-controls/ @vavardan @hrvolapeter @paolajuarezgomez
+/addons/oci-sovereign-landing-zone/ @vavardan @hrvolapeter @paolajuarezgomez
 /addons/oci-lz-subnetting/ @paolajuarezgomez @paalonso
 /blueprints/one-oe/runtime/ @paalonso
 /blueprints/multi-oe/generic_v1/runtime/ @paalonso
