@@ -152,7 +152,7 @@ This Private DNS configuration in a Hub and Spoke architecture ensures that all 
 &nbsp;
 
 ### Configuration and deployment
-[OCI Private DNS configuration and deployment guide](Deployment.md) for a Single-Region.
+[OCI Private DNS configuration and deployment guide](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/dns_deployment/addons/oci-private-dns/Deployment.md) for a Single-Region.
 
 &nbsp; 
 
