@@ -35,12 +35,15 @@ The solution automates the complete workflow from fetching and processing FOCUS 
 
 &nbsp;
 
-### OCI FinOps Addon Setup
+### OCI FinOps Addon Deployment Guide
 
 &nbsp;
 
 #### Summary
-This addon enhances the OCI [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) with IaC-driven 
+### Summary
+
+This addon enhances the [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) by embedding a FinOps platform that brings cost governance, financial visibility, and optimization. It automates the collection, processing, and visualization of OCI FOCUS reports using Functions, Object Storage, Autonomous Database (private endpoint), and APEX. The dashboard enables deep insights without requiring OCI login, making it suitable for finance, engineering, and business teams. It also supports multi-cloud use cases, allowing centralized cost analysis across multiple cloud platforms.
+
 
 &nbsp;
 #### License
