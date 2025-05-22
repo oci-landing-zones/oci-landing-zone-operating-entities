@@ -54,7 +54,7 @@ You can use our hub e [example](https://github.com/oci-landing-zones/oci-landing
 
 To enable Observability native services for EXACC, use the EXACC JSONs files provided in this asset. 
 
-Our add-on template includes all the necessary components, such as cmps, groups, a dedicated monitoring Vault, policies, and NSGs, to enable Database Management and Ops Insights.
+Our add-on template includes all the necessary components, such as cmps, groups, a dedicated monitoring Vault, policies to enable Database Management and Ops Insights.
 
 To check step by step how to do it check [here](./Implementation_addon_steps.md)
 

@@ -12,7 +12,7 @@ At the beginning of the README page, select 'Deploy to Oracle Cloud'. When you c
 5. Create you own bucket and upload the JSON files provided in this asset:
 
 * [oci_open_lz_addon_mon_iam_exacc.auto.tfvars.json](oci_open_lz_addon_mon_iam_exacs.auto.tfvars.json)
-* * [oci_open_lz_addon_mon_security_exacc.auto.tfvars.json](oci_open_lz_addon_mon_network_exacs.auto.tfvars.json)
+* [oci_open_lz_addon_mon_security_exacc.auto.tfvars.json](oci_open_lz_addon_mon_network_exacs.auto.tfvars.json)
 
 1. Add the files generated as output in the ONE-OE deployment as dependencies.
 2. Un-check run apply. Click Create.
