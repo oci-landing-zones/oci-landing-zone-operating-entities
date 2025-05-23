@@ -5,13 +5,13 @@
 &nbsp; 
 
 ## **1. Introduction**
-Welcome to the **ExaDB-D Landing Zone Extension**.
+Welcome to the  **Exadata Database Service On Dedicated Infrastrucgture (ExaDB-D) Landing Zone Extension**.
 
-The ExaDB-D Landing Zone Extension is a secure cloud environment, designed with the best practices to simplify the on-boarding of [Exadata Database Service on Dedicated Infrastructure](https://docs.oracle.com/en/engineered-systems/exadata-cloud-service/index.html) and enable the continuous operations of their cloud resources. This reference architecture provides an automated landing zone configuration.
+The Exadata Database Service On Dedicated Infrastrucgture (ExaDB-D) Landing Zone Extension is a secure cloud environment, designed with the best practices to simplify the on-boarding of [Exadata Database Service on Dedicated Infrastructure](https://docs.oracle.com/en/engineered-systems/exadata-cloud-service/index.html) and enable the continuous operations of their cloud resources. This reference architecture provides an automated landing zone configuration.
 &nbsp;
 
 ## **2. Design Overview**
-This workload extension uses the [One-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe) Blueprint as the reference Landing Zone and guides the deployment of ExaDB-D on top of it. You could use this extension also in the other Operating Entities blueprints, as the [Multi-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/multi-oe) Blueprint or the [Multi-Tenancy](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/multi-tenancy) Blueprint.
+This workload extension uses the [One-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe) Blueprint as the reference Landing Zone and guides the deployment of ExaDB-D on top of it. You could use this extension also in the other Operating Entities blueprints, as the [Multi-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/multi-oe) or the [Multi-Tenancy](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/multi-tenancy) Blueprints.
 
 A Worklod extension satisfies the requirements to deploy a specific, complex workload, providing design guidelines about where to deploy the workload in a pre-existing baseline Landing Zone.
 
