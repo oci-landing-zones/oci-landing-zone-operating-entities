@@ -13,11 +13,11 @@ The components highlighted in the architecture diagram below will be implemented
 
 **Step 1**. Ensure that the [OCI Open Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md) is deployed, as it serves as the foundation for Private DNS configuration.
 
-**Step 2**. Update the Network Configuration json to include the objects shown below. You can also refer to and use the [Private DNS Network json template](../../blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json) for the Hub A model (light version, without OCI Network Firewalls), which includes all the necessary json objects for Private DNS configuration.
+**Step 2**. Update the Network Configuration JSON to include the blocks shown below. You can also refer to and use the [Private DNS Network JSON template](../../blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json) for the Hub A model (light version, without OCI Network Firewalls), which includes all the necessary JSON blocks for Private DNS configuration.
 
-[Private DNS Network json template](../../blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json) consist of the following six additional objects, which are added into Network Configuration:
+[Private DNS Network JSON template](../../blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json) consist of the following six additional blocks, which are added into Network Configuration:
 
-- **1st object**: Network Security Group (NSG) configuration in the **Hub VCN**, attached to the Hub DNS Listener. This configuration enables the necessary Ingress and Egress DNS traffic flow with Spoke DNS Forwarders.
+- **1st block**: Network Security Group (NSG) configuration in the **Hub VCN**, attached to the Hub DNS Listener and Forwarder. This configuration allows the Hub Listener to establish the necessary Ingress and Egress DNS traffic flow with the Spoke DNS Forwarders. Although the NSG is also associated with the Hub DNS Forwarder (defined in the **2nd block**), it does not include any specific rules for it. Any additional network access (e.g., access to on-premises DNS servers) should be configured either within this NSG or in a dedicated one.
 
 
                             "NSG-FRA-LZP-HUB-DNS-KEY": {
@@ -34,9 +34,9 @@ The components highlighted in the architecture diagram below will be implemented
                                         ...
                             }
 
-Note: Full configuration of the NSGs are available in the [Private DNS Network json template](../../blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json)
+Note: Full configuration of the NSGs are available in the [Private DNS Network JSON template](../../blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json)
 
-- **2nd object**: Configuration of the DNS Forwarder and Listener, as well as the Private views in the **Hub VCN**.<br>
+- **2nd block**: Configuration of the DNS Forwarder and Listener, as well as the Private views in the **Hub VCN**.<br>
   The OCIDs for the Hub, Prod, and PreProd private views should be obtained from the OCI Console or CLI and specified as values for `"existing_view_id"`.<br>
 
                         "dns_resolver": {
@@ -60,7 +60,7 @@ Note: Full configuration of the NSGs are available in the [Private DNS Network j
                                     "forwarding_address": "10.0.5.10",
                                     "name"              : "dns_forwarder_fra_hub",
                                     "subnet"            : "SN-FRA-LZP-HUB-DNS",
-                                    "nsg"               : null
+                                    "nsg"               : ["NSG-FRA-LZP-HUB-DNS-KEY"]
                                     },
                                 "RESOLVER_HUB_ENDPOINT_LISTENER_1" : {
                                     "enpoint_type"     : "VNIC",
@@ -76,7 +76,7 @@ Note: Full configuration of the NSGs are available in the [Private DNS Network j
 
   The OCIDs for the Private views in the OCI console can be found under **Networking -> DNS management -> Private views -> Private view information**.
 
-- **3rd object**: NSG configuration in the **Prod Spoke VCN**, attached to the Prod DNS Forwarder. This enables the required Ingress and Egress DNS traffic flow to the Hub DNS Listener.
+- **3rd block**: NSG configuration in the **Prod Spoke VCN**, attached to the Prod DNS Forwarder. This enables the required Ingress and Egress DNS traffic flow to the Hub DNS Listener.
 
                             "NSG-LZP-P-PROJECTS-DNS-KEY": {
                                 "display_name": "nsg-lzp-p-projects-dns",
@@ -93,7 +93,7 @@ Note: Full configuration of the NSGs are available in the [Private DNS Network j
                             }
 
 
-- **4th object**: DNS resolver configuration for the Forwarder and Forwarding Rules in **Prod Spoke VCN**. 
+- **4th block**: DNS resolver configuration for the Forwarder and Forwarding Rules in **Prod Spoke VCN**. 
 
                         "dns_resolver": {
                             "display_name": "vcn-fra-lzp-p-projects",
@@ -131,7 +131,7 @@ Note: Full configuration of the NSGs are available in the [Private DNS Network j
                             }
                         }
                     
-- **5th object**: NSG configuration in the **PreProd Spoke VCN**, attached to the PreProd DNS Forwarder.
+- **5th block**: NSG configuration in the **PreProd Spoke VCN**, attached to the PreProd DNS Forwarder.
 
                             "NSG-LZP-PP-PROJECTS-DNS-KEY": {
                                 "display_name": "nsg-lzp-pp-projects-dns",
@@ -148,7 +148,7 @@ Note: Full configuration of the NSGs are available in the [Private DNS Network j
                             }
 
 
-- **6th object**: DNS resolver configuration for the Forwarder and Forwarding Rules in **PreProd Spoke VCN**. 
+- **6th block**: DNS resolver configuration for the Forwarder and Forwarding Rules in **PreProd Spoke VCN**. 
 
                         "dns_resolver": {
                             "display_name": "vcn-fra-lzp-pp-projects",
@@ -171,13 +171,14 @@ Note: Full configuration of the NSGs are available in the [Private DNS Network j
 
 &nbsp;
 
-To summarize: Objects 1, 3, and 5 are the NSG configurations for the Hub, Prod, and PreProd respectively, while objects 2, 4, and 6 are the corresponding DNS resolver configurations.
+To summarize: Blocks 1, 3, and 5 are the NSG configurations for the Hub, Prod, and PreProd respectively, while blocks 2, 4, and 6 are the corresponding DNS resolver configurations.
 
 Note: Ensure that all required values, including IP addresses, OCIDs, naming conventions, are adjusted to match your specific deployment.
 
 &nbsp;
 
-**Step 3**. Run the stack with the updated Network Configuration json, which now includes the Private DNS objects.
+**Step 3**. Run the stack with the updated Network Configuration JSON, which now includes the Private DNS blocks.<br>
+For post-deployment steps, you can follow a similar sequence as outlined in [OCI Open LZ: POST DEPLOYMENT – STEP #2](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/readme.md).
 
 
 &nbsp; 
