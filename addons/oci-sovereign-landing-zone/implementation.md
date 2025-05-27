@@ -1,4 +1,4 @@
-# Sovereign Controls Implementation <!-- omit from toc -->
+# OCI Sovereign Landing Zone Implementation <!-- omit from toc -->
 
 ## Table of contents <!-- omit from toc -->
 - [Summary](#summary)
@@ -8,7 +8,7 @@
 - [4. Security Zones](#4-security-zones)
 
 ## Summary
-This guide covers the implementation of the principles outlined in the [Sovereign Controls add-on](./readme.md) document. As an example, we are going to implement restrictions for a German customer using EU Sovereign Cloud who wants to restrict data to the `eu-frankfurt-2` region. However, configuration files can be modified to specifically fit the sovereign requirements of any customer.
+This guide covers the implementation of the principles outlined in the [Sovereign Landing Zone add-on](./readme.md) document. As an example, we are going to implement restrictions for a German customer using EU Sovereign Cloud who wants to restrict data to the `eu-frankfurt-2` region. However, configuration files can be modified to specifically fit the sovereign requirements of any customer.
 
 ## Requirements
 Sovereign add-ons can be configured on top of any [OCI landing zone model](https://blogs.oracle.com/cloud-infrastructure/post/new-standardized-oci-landing-zones-framework). In this example, the Sovereign Landing Zone is built on top of the One-OE Landing Zone.[One-OE](../../blueprints/one-oe/) is a single operating-entity landing zone utilizing Oracle best practices for deployments in commercial regions. The Sovereign Landing Zone takes One-OE a step further and modifies it to meet the requirements of customers for sovereign regulations, either in EU Sovereign Cloud regions or any other OCI deployment models.
