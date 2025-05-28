@@ -37,9 +37,9 @@ Using this add-on provides the following benefits:
 
 > [!NOTE]
 >**Example.** 
->The default One-OE template uses 22 IAM policies, deploying 1 Project in 2 Workload Environments. Every Project requires 3 policies. The default IAM policy object limit (extendable) is 100 policies. Assuming we create the same project in all the Workload environments, we could be able to create 13 projects before hitting the default IAM policy objects limit.
+>The default One-OE template uses 22 IAM policies, deploying 1 Project in 2 workload environments. Every project requires 3 policies. The default IAM policy object limit (extendable) is 100 policies. Assuming we create the same project in all the workload environments, we could be able to create 13 projects before hitting the default IAM policy objects limit.
 >
->This approach requires 3 policies per Project on every workload environment, so we would not hit any IAM policy object limit but other possible limits as Compartments in the tenancy (by default 1000).
+>This approach reuse the policies for all projects per workload environment, so we would not hit any IAM policy object limit. Note that other limits can affect how many projects can be onboarded.
 &nbsp; 
 
 ### Landing Zone tag enablement
