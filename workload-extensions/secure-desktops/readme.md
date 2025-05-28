@@ -89,10 +89,9 @@ To run this landing zone extension, follow this [steps](./Implementation_s1_step
 
 As a prerequisite you need to deploy a foundation landing zone, in that case we have choosen the [One-OE](../../../../blueprints/one-oe/) adding the DNS configuration in the network layer. To understand how to perform this operation with ORM, follow these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
 
-To learn more about how DNS is configured, check out our DNS add-on
-
 [<img src="../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/dns_deployment/blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json"}) 
 
+To learn more about how DNS is configured, check out our DNS add-on.
 
 To run this landing zone extension, follow this [steps](./Implementation_s2_steps.md).
 
