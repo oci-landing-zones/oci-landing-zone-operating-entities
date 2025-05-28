@@ -56,9 +56,9 @@ This LZ Ext. goes beyond by configuring secure desktops in a dedicated VCN conne
 
 <img src="./content/one_oe_secure_Desktops_sc1.png" width="1000" height="auto">
 
-It includes the following resources:
+**Prereqs**: ONE-OE
 
-Prereqs: ONE-OE 
+It includes the following resources:
 * Dedicated secure desktop groups.
 * Required policies.
 * Dedicated spoke VCN.
@@ -67,9 +67,9 @@ Prereqs: ONE-OE
 
 <img src="./content/one_oe_secure_Desktops_sc2.png" width="1000" height="auto">
 
-It includes the following resources:
+**Prereqs**: ONE-OE + DNS add-on
 
-Prereqs: ONE-OE + DNS add-on
+It includes the following resources:
 * Dedicated secure desktop groups.
 * Required policies.
 * Dedicated spoke VCN.
