@@ -32,21 +32,20 @@ Enabled Observability Resources:
 
 Follow these steps to enable monitoring and observability for your EXACC environment through our Landing Zone assets:
 
+
 **Step 1**. 
- 
-To simplify the onboarding of your EXACC environment into a secure, best-practice cloud framework and to ensure continuous operations of your cloud resources, first deploy our EXACC Landing Zone extension as a prerequisite. You can follow next [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/workload-extensions/exacc). 
 
-<img src="../images/ADDON_EXACC.png" height="600" align="center">
+An existing deployment of the OCI Landing Zone is required. In this guide, we will build on top of the One-OE blueprint foundation. For the Hub-and-Spoke model, we will use the simplest configuration, Hub E. Additionally, we'll need to set up FastConnect or an IPSec VPN between the customer's CPE (Customer Premises Equipment) and the DRG.
 
+
+<img src="../images/One-OE.png" height="600" align="center">
 
 
 **Step 2**. 
+ 
+To simplify the onboarding of your Exadata Cloud@Customer (ExaCC) environment into a secure, best-practice cloud framework, we will extend the Landing Zone using the ExaCC Landing Zone Extension. You can follow next [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/workload-extensions/exacc). 
 
-Deploy our hub model E and configure FastConnect or IPSec VPN from the CPE customer datacenter and the DRG.
-
-You can use our hub e [example](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_e)
-
-<img src="../images/HUB_E.png" height="600" align="center">
+<img src="../images/ADDON_EXACC.png" height="600" align="center">
 
 
 
