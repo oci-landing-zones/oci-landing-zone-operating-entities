@@ -11,7 +11,7 @@ At the beginning of the README page, select 'Deploy to Oracle Cloud'. When you c
 4. Set the terraform version to 1.5.x. Click Next.
 5. Create you own bucket/github repo and upload the JSON files provided in this asset:
 
-* [oci_sd_lz_addon_iam.auto.tfvars.json](oci_sd_lz_addon_iam.auto.tfvars.json)
+[oci_sd_lz_addon_iam.auto.tfvars.json](oci_sd_lz_addon_iam.auto.tfvars.json)
 The IAM JSON files define the creation of the following resources:
 * **cmp-lzp-platform-sd**: Compartment for Secure Desktops.
 * **grp-lzp-secure-desktop-admin**: IAM group for Secure Desktop administrators.
@@ -20,7 +20,7 @@ The IAM JSON files define the creation of the following resources:
 * **pcy-secure-desktop-dg**: IAM policy for the dynamic group.
 * **pcy-secure-desktop-admin-and-users**: IAM policy for both admin and user groups.
 
-* [oci_sd_lz_addon_pub_network.auto.tfvars.json](oci_sd_lz_addon_pub_network.auto.tfvars.json)
+[oci_sd_lz_addon_pub_network.auto.tfvars.json](oci_sd_lz_addon_pub_network.auto.tfvars.json)
 * The Network JSON files define the creation of the following resources:
 * **vcn-fra-lzp-sd** Virtual Cloud Network for SD
 * **nsg-lzp-sd-dns**  Network Security Group to allow communication from DNS endpoints in the HUB
