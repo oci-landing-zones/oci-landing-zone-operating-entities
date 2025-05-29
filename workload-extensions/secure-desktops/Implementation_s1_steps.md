@@ -12,12 +12,13 @@ At the beginning of the README page, select 'Deploy to Oracle Cloud'. When you c
 5. Create you own bucket/github repo and upload the JSON files provided in this asset:
 
 * [oci_sd_lz_addon_iam.auto.tfvars.json](oci_sd_lz_addon_iam.auto.tfvars.json)
-  cmp-lzp-platform-sd- > compartment for secure desktops.
-  grp-lzp-secure-desktop-admin-> group for admin sd
-  grp-lzp-secure-desktop-users-g roup for users sd
-  dg-lzp-sd-> dynamic groups required for sd
-  pcy-secure-desktop-dg-> policy for dg
-  pcy-secure-desktop-admin-and-users-> policy for sd groups
+The IAM JSON files define the creation of the following resources:
+* **cmp-lzp-platform-sd**: Compartment for Secure Desktops.
+* **grp-lzp-secure-desktop-admin**: IAM group for Secure Desktop administrators.
+* **grp-lzp-secure-desktop-users**: IAM group for Secure Desktop users.
+* **dg-lzp-sd**: Dynamic group required for Secure Desktop access.
+* **pcy-secure-desktop-dg**: IAM policy for the dynamic group.
+* **pcy-secure-desktop-admin-and-users**: IAM policy for both admin and user groups.
 
 * [oci_sd_lz_addon_pub_network.auto.tfvars.json](oci_sd_lz_addon_pub_network.auto.tfvars.json)
 * The Network JSON files define the creation of the following resources:
