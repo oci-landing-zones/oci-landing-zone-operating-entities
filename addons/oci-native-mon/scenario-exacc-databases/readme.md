@@ -38,7 +38,7 @@ Follow these steps to enable monitoring and observability for your EXACC environ
 An existing deployment of the OCI Landing Zone is required. In this guide, we will build on top of the One-OE blueprint foundation. For the Hub-and-Spoke model, we will use the simplest configuration, Hub E. Additionally, we'll need to set up FastConnect or an IPSec VPN between the customer's CPE (Customer Premises Equipment) and the DRG.
 
 
-<img src="../images/One-OE.png" height="600" align="center">
+<img src="../images/ONE_OE.png.png" height="600" align="center">
 
 
 **Step 2**. 
