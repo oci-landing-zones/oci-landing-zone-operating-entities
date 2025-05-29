@@ -13,7 +13,8 @@ When you press the provided magic button, a new ORM stack is created. Follow the
 5. In our example, we include the required JSON files stored in our open Landing Zone GitHub repository. Running it as-is will deploy the ONE-OE Landing Zone in your tenancy. However, if you want to use the **Dependencies** and **Output** features, some minor modifications will be necessary. Click next.
 6. Un-check run apply. Click Create.
 
-<img src="../content/MagicButton.png" width="1000" height="auto">
+<img src="../oke/multi-stack/content/MagicButton.png" width="1000" height="auto">
+
 
 To minimize customizations and leverage the provided extension templates, we highly recommend using the output feature. This feature automatically generates a file containing key-resource pairs, simplifying subsequent operational deployments.
 
@@ -24,7 +25,8 @@ To store the Json files in a OCI bucket follow the next steps:
 1. **Main Menu-> Storage -> Buckets**
 2. **Create a new Bucket**.
 
-<img src="../content/Bucket.png" width="1000" height="auto">
+<img src="../oke/multi-stack/content/Bucket.png" width="1000" height="auto">
+
 
 &nbsp; 
 # Upload your customized JSON files
@@ -36,19 +38,19 @@ Click on each file to download it, and make any necessary changes if required.
 * Security:
 [oci_open_lz_one-oe_security_cisl1.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json)
 * Network Hub A, with DNS: 
-[oci_open_lz_hub_a_network_light.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json)
+oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json
 * Observability:
 [oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json)
 
-<img src="../content/UploadBucket.png" width="1000" height="auto">
+<img src="../oke/multi-stack/content/UploadBucket.png" width="1000" height="auto">
 
 Upload the files to your new bucket or drag and drop them directly.
 
-<img src="../content/UploadObjects.png" width="1000" height="auto">
+<img src="../oke/multi-stack/content/UploadObjects.png" width="1000" height="auto">
 
 You can now view the uploaded files in your bucket, giving you full control over them.
 
-<img src="../content/BucketFiles.png" width="1000" height="auto">
+<img src="../oke/multi-stack/content/BucketFiles.png" width="1000" height="auto">
 
 
 &nbsp; 
@@ -64,16 +66,16 @@ In the configuration variables page:
 6. Click next.
 7. Un-check run apply. Click Create.
 
-<img src="../content/ORMUpdated.png" width="1000" height="auto">
+<img src="../oke/multi-stack/content/ORMUpdated.png" width="1000" height="auto">
 
 
 First, execute a plan job (1) to review all the resources that Terraform will create. Once verified, proceed to run the apply job (2) to initiate the deployment.
 
-<img src="../content/ORMJobs.png" width="500" height="auto">
+<img src="../oke/multi-stack/content/ORMJobs.png" width="500" height="auto">
 
 After deployment, you can visit your bucket to check the new files created using the output option.
 
-<img src="../content/output.png" width="1000" height="auto">
+<img src=".../oke/multi-stack/content/output.png" width="1000" height="auto">
 
 Example of compartment_output.json
 
