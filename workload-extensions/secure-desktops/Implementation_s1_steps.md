@@ -23,7 +23,6 @@ At the beginning of the README page, select 'Deploy to Oracle Cloud'. When you c
 * The Network JSON files define the creation of the following resources:
 * **vcn-fra-lzp-sd** Virtual Cloud Network for SD
 * **nsg-lzp-sd-dns**  Network Security Group to allow communication from DNS endpoints in the HUB
-* **nsg-fra-lzp-hub-pe-sd**: NSG for the private endpoint (SD)
 * **sn-fra-sd-desktops** and **sn-fra-sd-infra**:SD and INFRA subnets
 * **rt-01-lzp-sd-vcn-gen**: Route Table for the SD VCN
 * **sl-lzp-sd-generic**:  Secure List
