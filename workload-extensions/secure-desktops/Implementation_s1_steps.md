@@ -25,8 +25,8 @@ The IAM JSON files define the creation of the following resources:
 
 The Network JSON files define the creation of the following resources:
 * **vcn-fra-lzp-sd** Virtual Cloud Network for SD
-* **nsg-lzp-sd-dns**  Network Security Group to allow communication from DNS endpoints in the HUB
 * **sn-fra-sd-desktops** and **sn-fra-sd-infra**:SD and INFRA subnets
+* **nsg-lzp-sd-dns**  Network Security Group to allow communication from DNS endpoints in the HUB
 * **rt-01-lzp-sd-vcn-gen**: Route Table for the SD VCN
 * **sl-lzp-sd-generic**:  Secure List
 * **drgatt-fra-lzp-sd-vcn**: Dynamic Routing Gateway attachment for the SD VCN
