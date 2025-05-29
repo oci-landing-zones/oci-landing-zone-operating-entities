@@ -1,5 +1,5 @@
 # **[OCI Secure Desktop Guide](#)**
-## **An OCI Open LZ Extension to onboard Secure Desktops in your LZ**
+## **An OCI Open LZ Addon to onboard Secure Desktops in your LZ**
 &nbsp; 
 
 <img src="../../commons/images/icon_sd.jpg" height="80">
@@ -43,7 +43,7 @@ By following the guidelines outlined here, you can reduce overall management com
 
 &nbsp; 
 
-## LZ Extension Design.
+## LZ Addon Design.
 
 If want to learn more about configuring Secure Desktops, we recommend checking out this [solution](https://docs.oracle.com/en/solutions/oci-tenancy-secure-desktop-pool/index.html#GUID-4FDC6E79-517F-49C4-80F6-AED75B85F293) published in the Architecture Center.
 &nbsp; 
@@ -77,7 +77,7 @@ It includes the following resources:
 * NSG 
   
 
-## LZ Extension Implementation Scenario 1 with ORM.
+## LZ Addon Implementation Scenario 1 with ORM.
 
 * Step1: As a prerequisite you need to deploy a foundation landing zone, in that case we have choosen the [One-OE](../../../../blueprints/one-oe/).
 
@@ -85,9 +85,9 @@ It includes the following resources:
 
 If you prefer to use a copy of the json files and store it in your own bucket or github repo , follow this [steps](../oke/multi-stack/1_oke_extension/ORM_ONE-OE_deployment_steps.md)
 
-* Step2: To run this landing zone extension, follow this [steps](./Implementation_s1_steps.md).
+* Step2: To run this landing zone addon, follow this [steps](./Implementation_s1_steps.md).
 
-## LZ Extension Implementation Scenario 2 with ORM.
+## LZ Addon Implementation Scenario 2 with ORM.
 
 * Step1: As a prerequisite you need to deploy a foundation landing zone, in that case we have choosen the [One-OE](../../../../blueprints/one-oe/) adding the DNS configuration in the network layer. To understand how to perform this operation with ORM, follow these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
 
@@ -97,7 +97,7 @@ If you prefer to use a copy of the json files and store it in your own bucket or
 
 To learn more about how DNS is configured, check out our DNS add-on.
 
-* Step2: To run this landing zone extension, follow this [steps](./Implementation_s2_steps.md).
+* Step2: To run this landing zone addon, follow this [steps](./Implementation_s2_steps.md).
 
 ## Secure Desktop configuration.
 
