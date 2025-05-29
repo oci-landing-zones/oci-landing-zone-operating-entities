@@ -11,8 +11,27 @@ At the beginning of the README page, select 'Deploy to Oracle Cloud'. When you c
 4. Set the terraform version to 1.5.x. Click Next.
 5. Create you own bucket/github repo and upload the JSON files provided in this asset:
 
-* [oci_sd_lz_addon_iam.auto.tfvars.json](oci_sd_lz_addon_iam.auto.tfvars.json)
-* [oci_sd_lz_addon_priv_network.auto.tfvars.json](oci_sd_lz_addon_priv_network.auto.tfvars.json)
+[oci_sd_lz_addon_iam.auto.tfvars.json](oci_sd_lz_addon_iam.auto.tfvars.json)
+The IAM JSON files define the creation of the following resources:
+* **cmp-lzp-platform-sd**: Compartment for Secure Desktops.
+* **grp-lzp-secure-desktop-admin**: IAM group for Secure Desktop administrators.
+* **grp-lzp-secure-desktop-users**: IAM group for Secure Desktop users.
+* **dg-lzp-sd**: Dynamic group required for Secure Desktop access.
+* **pcy-secure-desktop-dg**: IAM policy for the dynamic group.
+* **pcy-secure-desktop-admin-and-users**: IAM policy for both admin and user groups.
+  
+[oci_sd_lz_addon_priv_network.auto.tfvars.json](oci_sd_lz_addon_priv_network.auto.tfvars.json)
+The Network JSON files define the creation of the following resources:
+* **dns_resolver** with forwarding rules and **dns_forwarder**
+* **vcn-fra-lzp-sd** Virtual Cloud Network for SD
+* **nsg-lzp-sd-dns**  Network Security Group to allow communication from DNS endpoints in the HUB
+* **nsg-fra-lzp-hub-pe-sd**: NSG for the private endpoint (SD)
+* **sn-fra-sd-desktops** and **sn-fra-sd-infra**:SD and INFRA subnets
+* **rt-01-lzp-sd-vcn-gen**: Route Table for the SD VCN
+* **sl-lzp-sd-generic**:  Secure List
+* **drgatt-fra-lzp-sd-vcn**: Dynamic Routing Gateway attachment for the SD VCN
+* **sgw-fra-sd**: Service Gateway
+  
 
 1. Add the files generated as output in the ONE-OE deployment as dependencies.
 2. Un-check run apply. Click Create.
