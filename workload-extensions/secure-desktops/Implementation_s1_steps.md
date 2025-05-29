@@ -32,9 +32,9 @@ The Network JSON files define the creation of the following resources:
 * **drgatt-fra-lzp-sd-vcn**: Dynamic Routing Gateway attachment for the SD VCN
 * **sgw-fra-sd**: Service Gateway
 
-1. Add the files generated as output in the ONE-OE deployment as dependencies.
-2. Un-check run apply. Click Create.
-3. First, execute a plan job to review all the resources that Terraform will create. Once verified, proceed to run the apply job to initiate the deployment.
+6. Add the files generated as output in the ONE-OE deployment as dependencies.
+7. Un-check run apply. Click Create.
+8. First, execute a plan job to review all the resources that Terraform will create. Once verified, proceed to run the apply job to initiate the deployment.
 
 
 # License <!-- omit from toc -->
