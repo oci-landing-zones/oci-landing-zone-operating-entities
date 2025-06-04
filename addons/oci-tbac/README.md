@@ -107,7 +107,7 @@ The process is the following:
     - IAM admin created the groups locally in OCI and tags them based on the group's roles
 - Landing Zone environment admin (or Workload environment admin, if exist), creates the compartment structure for the new Project, and its sub-compartments for the specific teams
   
-The given IAM IaC configuration, provides all the automation to manage this process ***except*** for the case where the Identity Domain is federated. In that case, the external Identity Provider have to manage the group creation and membership, which might have its own automated management interface. As the groups are created in OCI automatically, the IAM admins must tag the groups manually in order to apply the needed permissions of the generic IAM policies.
+The given **IAM IaC configuration**, provides all the automation to manage this process ***except*** for the case where the Identity Domain is federated. In that case, the external Identity Provider have to manage the group creation and membership, which might have its own automated management interface. As the groups are created in OCI automatically, the IAM admins must tag the groups manually in order to apply the needed permissions of the generic IAM policies.
 
 &nbsp; 
 
