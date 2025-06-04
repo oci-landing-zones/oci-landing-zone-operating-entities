@@ -105,7 +105,7 @@ The Project supplied policies covers different use cases depending on resources 
 **US1: Team managing resources in their compartment.**
 The specific role within the Project team (Application administrator, DB administrator or Infra administrator) can manage resources in their compartment but not in others next to them in the same Project compartment.
 
-<p align="center" width="75%">
+<p align="center" width="10%">
     <img src="./content/tbac_us1.jpg">
 </p>
 
