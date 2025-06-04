@@ -10,6 +10,7 @@
 - [Project on-boarding process](#project-on-boarding-process)
 - [Policies use-cases](#policies-use-cases)
 - [Deploy instructions](#deploy-instructions)
+- [Alternative approaches](#alternative-approaches)
 
 &nbsp; 
 
@@ -39,7 +40,7 @@ Using this add-on provides the following benefits:
 >**Example.** 
 >The default One-OE template uses 22 IAM policies, deploying 1 Project in 2 workload environments. Every project requires 3 policies. The default IAM policy object limit (extendable) is 100 policies. Assuming we create the same project in all the workload environments, we could be able to create 13 projects before hitting the default IAM policy objects limit.
 >
->This approach reuse the policies for all projects per workload environment, so we would not hit any IAM policy object limit. Note that other limits can affect how many projects can be onboarded.
+>This approach **reuse the policies for all projects** per workload environment, so we **would not hit any IAM policy object limit**. Note that other limits can affect how many projects can be onboarded.
 &nbsp; 
 
 ### Landing Zone tag enablement
@@ -53,7 +54,7 @@ The most important aspect of working with this add-on and effective use of Tag-B
 
 These job roles are reflected in the created OCI Tag Namespace and Definitions:
 
-**Tag Namespace:** *lzp-proj-role*
+**Tag Namespace:** *tn-lzp-proj-role*
 
 **Tag Definitions:** *proj-admin*, *app-admin*, *db-admin*, *infra-admin*
 
@@ -144,10 +145,15 @@ These files can replace the default One-OE Blueprint's IAM file to switch to the
 | **TARGET RESOURCES**    | - **Security**: Compartments, Groups, Dynamic Groups, and Policies</br>- **Governance**: Tags |
 | **PREREQUISITES**       | N/A |
 | **CONFIGURATION FILES** | - [oci_open_lz_one-oe_tbac_iam.auto.tfvars.json](./oci_open_lz_one-oe_tbac_iam.auto.tfvars.json)  </br> - [oci_open_lz_one-oe_tbac_governance.auto.tfvars.json](./oci_open_lz_one-oe_tbac_governance.auto.tfvars.json) </br> Optionally you can complete your configuration with the **Networking**, **Monitoring** & **Security** configuration file of the One-OE Blueprint available [here](/blueprints/one-oe/runtime/one-stack/).|
-| **DEPLOYMENT**          | Using [Oracle Resource Manager (ORM)](/commons/content/orm.md): </br></br> <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.6.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-tbac/oci_open_lz_one-oe_tbac_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-tbac/oci_open_lz_one-oe_tbac_governance.auto.tfvars.json"}'><img src="/commons/images/DeployToOCI.svg" height="30"></a></br></br>Using: [Terraform CLI](/commons/content/terraform.md).            |
-| **POST-DEPLOYMENT**      | Edit your Governance [oci_open_lz_one-oe_tbac_governance.auto.tfvars.json](./oci_open_lz_one-oe_tbac_governance.auto.tfvars.json) file and replace the *"TENANCY-ROOT"* in the *"default_compartment_id"* field with the OCID of the *"cmp-lzp-security" compartment. This is needed because a temporary limitation in the governance/tags module. | 
+| **DEPLOYMENT**          | Using ***standalone IAM Configuration*** [Oracle Resource Manager (ORM)](/commons/content/orm.md): </br></br> <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.7.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-tbac/oci_open_lz_one-oe_tbac_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-tbac/oci_open_lz_one-oe_tbac_governance.auto.tfvars.json"}'><img src="/commons/images/DeployToOCI.svg" height="30"></a></br></br>Using: [Terraform CLI](/commons/content/terraform.md). </br></br> Using with ***One-OE, CIS Level 1, light version*** [Oracle Resource Manager (ORM)](/commons/content/orm.md): </br></br> <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.6.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-tbac/oci_open_lz_one-oe_tbac_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-tbac/oci_open_lz_one-oe_tbac_governance.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json"}'><img src="/commons/images/DeployToOCI.svg" height="30"></a></br></br>          |
+| **POST-DEPLOYMENT**      | Edit your Governance [oci_open_lz_one-oe_tbac_governance.auto.tfvars.json](./oci_open_lz_one-oe_tbac_governance.auto.tfvars.json) file and replace the *"TENANCY-ROOT"* in the *"default_compartment_id"* field with the OCID of the *"cmp-lzp-security" compartment. This is needed because a temporary limitation in the governance/tags module. </br></br> If you used the given example for the whole One-OE setup, follow also the post-deployment steps of the One-OE CIS Level 1 deployment specified [here](/blueprints/one-oe/runtime/one-stack/readme.md) | 
 
 &nbsp; 
+
+### Alternative approaches
+
+&nbsp; 
+
 
 ## License <!-- omit from toc -->
 
