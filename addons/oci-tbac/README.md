@@ -105,29 +105,29 @@ The Project supplied policies covers different use cases depending on resources 
 **US1: Team managing resources in their compartment.**
 The specific role within the Project team (Application administrator, DB administrator or Infra administrator) can manage resources in their compartment but not in others next to them in the same Project compartment.
 
-<p align="center" width="10%">
-    <img src="./content/tbac_us1.jpg">
+<p align="center">
+    <img src="./content/tbac_us1.jpg" height="300">
 </p>
 
 **US2: Team using resources in other compartments of their project.**
 One role in the Project team need to access a neighbor's compartment resource. E.g.: Infra admins need to manage storage resources in all Project sub-compartments or application VMs need to access database resources in other comparments.
 
-<p align="center" width="75%">
-    <img src="./content/tbac_us2.jpg">
+<p align="center">
+    <img src="./content/tbac_us2.jpg" height="300">
 </p>
 
 **US3: Team using shared services resources (security, network).**
 One role need to access workload environment's shared resources, as security or networking elements. E.g.: application or database admins, need to use the subnets of the shared projects VCN.
 
-<p align="center" width="75%">
-    <img src="./content/tbac_us3.jpg">
+<p align="center">
+    <img src="./content/tbac_us3.jpg" height="300">
 </p>
 
 **US4: Resources using shared services (dynamic groups).**
 Resources, not roles in the Project team, need to access some shared resources in other compartments. E.g.: databases accessing a shared vault to manage their encryption keys.
 
-<p align="center" width="75%">
-    <img src="./content/tbac_us4.jpg">
+<p align="center">
+    <img src="./content/tbac_us4.jpg" height="300">
 </p>
 
 &nbsp;
