@@ -7,7 +7,7 @@
 - [Overview](#overview)
 - [Benefits of this asset](#benefits-of-this-asset)
 - [Landing Zone tag enablement](#landing-zone-tag-enablement)
-- [Project on-boarding process](#project-on-boarding-process)
+- [Project onboarding process](#project-onboarding-process)
 - [Policies use-cases](#policies-use-cases)
 - [Deploy instructions](#deploy-instructions)
 - [Alternative approaches](#alternative-approaches)
@@ -86,7 +86,7 @@ The Landing Zone group that can manage tags, as the creation of new tags within 
 
 &nbsp; 
 
-### Project on-boarding process
+### Project onboarding process
 
 When a new project is needed, the below process is followed:
 
@@ -94,7 +94,20 @@ When a new project is needed, the below process is followed:
     <img src="./content/tbac_new_project_onbarding.jpg">
 </p>
 
-The given IAM IaC configuration, provides all the automation to manage this process except for the case where the Identity Domain is federated. In such case, the external Identity Provider have to manage the group creation and membership, which might have its own automated management interface. As the groups are created in OCI automatically, the IAM admins must tag the groups manually in order to apply the needed permissions of the generic IAM policies.
+The process is the following:
+- A new Project is requested by its Project lead for its Project Team, formed by different roles, to manage different OCI Workloads
+- IAM administrator asses if the existing roles and policies are enough to manage the required workloads for the Project Team
+  - If new roles are needed:
+    - IAM admin asked the Security admin to create new roles in the Projects Roles Tag Namespace
+    - The IAM admin creates new policies to allow the new roles to have enough permissions to manage the new workloads
+  - If the Identity Domain is federated:
+    - Identity Provider admin have to create the new groups for the Project Team
+    - IAM admin, tag the new groups with the role's tags manually, once they have been created by the federation provisioning process (SCIM/JIT)
+  - In other case (Identity Domain not federated)
+    - IAM admin created the groups locally in OCI and tags them based on the group's roles
+- Landing Zone environment admin (or Workload environment admin, if exist), creates the compartment structure for the new Project, and its sub-compartments for the specific teams
+  
+The given IAM IaC configuration, provides all the automation to manage this process ***except*** for the case where the Identity Domain is federated. In that case, the external Identity Provider have to manage the group creation and membership, which might have its own automated management interface. As the groups are created in OCI automatically, the IAM admins must tag the groups manually in order to apply the needed permissions of the generic IAM policies.
 
 &nbsp; 
 
