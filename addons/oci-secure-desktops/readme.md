@@ -91,13 +91,12 @@ It includes the following resources:
 
 ### Scenario 2 with ORM
 
-* Step 1: As a prerequisite you need to deploy a foundation landing zone, in that case, we have chosen the [One-OE](../../../../blueprints/one-oe/) adding the DNS configuration in the network layer. To understand how to perform this operation with ORM, follow these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
+* Step 1: As a prerequisite you need to deploy a foundation landing zone, in that case, we have chosen the [One-OE](../../../../blueprints/one-oe/) adding the DNS configuration in the network layer. To understand how to perform this operation with ORM, follow these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack). To learn more about how DNS is configured, check out our [DNS add-on](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-private-dns).
 
     [<img src="../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/dns_deployment/blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json"}) 
 
     If you prefer to use a copy of the json files and store it in your own bucket or github repo , follow this [steps](ORM_ONE-OE_DNS_deployment_steps.md)
 
-    To learn more about how DNS is configured, check out our [DNS add-on](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-private-dns).
 
 * Step 2: To run this landing zone addon, follow these [steps](./Implementation_s2_steps.md).
 
