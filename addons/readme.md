@@ -19,7 +19,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 | 5 | <img src="oci-lz-subnetting/content/subnetting.jpg" height="25" align="center"> &nbsp; **[Subnetting Guide](/addons/oci-lz-subnetting/readme.md)** | Guidelines to design your network subnetting between tenancies, landing zone & workload environments, and regions, **improving your landing zone scalability and planning for your future growth**. | [Available](/addons/oci-lz-subnetting/readme.md) | 
 | 6 | <img src="oci-x-rpc/images/rpc-icon.svg" height="25" align="center"> &nbsp; **[OCI Remote Peering Connections](./oci-x-rpc/README.md)** | Guidelines and IaC templates to setup Remote Peering Connections between regions and tenancies and **reduce the cross region/tenancy network connectivity setup**. | [Available](./oci-x-rpc/README.md) | 
 | 7 | <img src="oci-private-dns/images/oci-private-dns_icon.png" height="25" align="center"> &nbsp; **[OCI Private DNS](/addons/oci-private-dns/README.md)** | A set of **OCI Private DNS configurations** applicable to any landing zone or OCI deployment. | [Available](/addons/oci-private-dns/README.md) |
-| 8 | <img src="../commons/images/icon_sd.jpg" height="25" align="center"> &nbsp; **[OCI Secure Desktops](/addons/oci-secure-desktops/readme.md)** | Guidelines to enable and configure **OCI Secure Desktops** in your Landing Zone. | [Available](/addons/oci-secure-desktops/readme.md)
+| 8 | <img src="oci-secure-desktops/content/sd_icon.png" height="25" align="center"> &nbsp; **[OCI Secure Desktops](/addons/oci-secure-desktops/readme.md)** | Guidelines to enable and configure **OCI Secure Desktops** in your Landing Zone. | [Available](/addons/oci-secure-desktops/readme.md)
 
 &nbsp; 
 
