@@ -27,9 +27,9 @@ This approach offers a higher level of scalability for project onboarding, reduc
 ### Benefits of this asset
 
 Using this add-on provides the following benefits:
-- Defining IAM Permissions based on *Job Roles*, also known as **Role-Based Access Controls (RBAC)**.
-- **Extending project team's permissions is done only once** for new OCI capabilities.
-- **Faster and easier projects onboarding**.
+- Better IAM Governance by building Permissions based on *Job Roles*, also known as **Role-Based Access Controls (RBAC)**.
+- Defining only **one set of policies** that is reused by all projects.
+- Improved Operational Security by **faster and easier projects onboarding**.
 - **Simpler Projects Terraform configurations**, with less duplication.
 - **Clearer permissions control** for Internal Security reporting.
 - **Better scalability**, avoiding hitting Tenancy Limits for IAM Policies and statements.
@@ -164,6 +164,16 @@ These files can replace the default One-OE Blueprint's IAM file to switch to the
 &nbsp; 
 
 ### Alternative approaches
+
+In this Add-on we use policy statements in which the where-clauses have a few variants.
+1. We compare group tag definition values to compartment tag definition values with an '=' operator.
+2. We check for the availability of a specific group tag definition assignment.
+
+With this we basically implement Role based access because the assigned tag definition represents the role.
+
+An alternative way to compare tag definition values is the **sets-intersect** construct. It might be a cleaner way of variant 1. as mentioned above, however it can not be used for variant 2. For more information about using the sets-intersect construct and how Tab based policies, see this article:
+
+[Deep Dive into Tag based OCI Identity and Access Management Policies](https://docs.oracle.com/en/learn/oci-policy-deep-dive/index.html)
 
 &nbsp; 
 
