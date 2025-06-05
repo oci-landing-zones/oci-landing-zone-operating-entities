@@ -15,7 +15,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 | 3 | <img src="oci-oag/images/oci_oag_icon.svg" height="25" align="center"> &nbsp; **[Oracle Access Governance](/addons/oci-oag/README.md)** | Guidelines to increase the **security governance** of your Landing Zones with OAG. | [Available](/addons/oci-oag/README.md) | 
 | 4 | <img src="oci-sovereign-landing-zone/content/sovcloud_icon.png" height="25" align="center"> &nbsp; **[OCI Sovereign Landing Zone](./oci-sovereign-landing-zone/)**                                                                         | A set of **OCI Sovereign Landing Zone** applicable to any OCI LZ deployment.                                   | [Available](./oci-sovereign-landing-zone/)            |
 | 5 | <img src="oci-private-dns/images/oci-private-dns_icon.png" height="25" align="center"> &nbsp; **[OCI Private DNS](/addons/oci-private-dns/README.md)** | A set of **OCI Private DNS configurations** applicable to any landing zone or OCI deployment. | [Available](/addons/oci-private-dns/README.md) |
-| 6 | <img src="../commons/images/icon_sd.jpg" height="25" align="center"> &nbsp; **[OCI Secure Desktops](/addons/oci-secure-desktops/readme.md)** | Guidelines to enable and configure OCI Secure Desktops in your Landing Zone. | [Available](/addons/oci-secure-desktops/readme.md)
+| 6 | <img src="../commons/images/icon_sd.jpg" height="25" align="center"> &nbsp; **[OCI Secure Desktops](/addons/oci-secure-desktops/readme.md)** | Guidelines to enable and configure **OCI Secure Desktops** in your Landing Zone. | [Available](/addons/oci-secure-desktops/readme.md)
 
 &nbsp; 
 
