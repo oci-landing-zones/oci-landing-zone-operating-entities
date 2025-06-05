@@ -21,7 +21,7 @@ Before starting we recommend viewing an [8-minute video](https://www.linkedin.co
 | Hub with Two **OCI Network Firewalls** | Hub with One **OCI Network Firewall** | Hub with **3rd Party FW** - AA | Hub with **3rd Party FW** - AP | Hub without Network Firewall |
 | [Overview and Routing](/addons/oci-hub-models/hub_a/readme.md)  | [Overview and Routing](/addons/oci-hub-models/hub_b/readme.md) | [Overview and Routing](/addons/oci-hub-models/hub_c/readme.md) | -- | [Overview and Routing](/addons/oci-hub-models/hub_e/readme.md) |
 | [Packet Flow Animation](/addons/oci-hub-models/hub_a/hub-a-packet_flow.md) | [Packet Flow Animation](/addons/oci-hub-models/hub_b/hub-b-packet_flow.md) | [Packet Flow Animation](/addons/oci-hub-models/hub_c/hub-c-packet_flow.md) | -- |  -- |
-|  [<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](/addons/oci-hub-models/hub_a/readme.md#5-deploy) | [<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](/addons/oci-hub-models/hub_b/readme.md#5-deploy) | *Soon* | -- | *Soon* |
+|  [<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](/addons/oci-hub-models/hub_a/readme.md#5-deploy) | [<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](/addons/oci-hub-models/hub_b/readme.md#5-deploy) | *Soon* | -- | [<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](/addons/oci-hub-models/hub_e/readme.md#5-deploy) |
 
 &nbsp; 
 

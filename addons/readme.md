@@ -8,7 +8,6 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 
 &nbsp; 
 
-
 | # |  Add-on   | Description | Status |
 |:--:|--|-|---|
 | 1 | <img src="oci-learn-lz/diagrams/oci_learn_lz_icon.svg" height="26" align="center"> &nbsp;   **[OCI Learn LZ](/addons/oci-learn-lz/readme.md)**| A Landing Zone **training** to learn how to design and run a Landing Zone without code. | [Available](/addons/oci-learn-lz/readme.md) |
