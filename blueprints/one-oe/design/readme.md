@@ -19,7 +19,7 @@
 
 The OCI Open LZ is a set of public and open assets to onboard OCI, available in a dedicated [Git Repository](https://github.com/oracle-quickstart/terraform-oci-open-lz), containing several design **blueprints**, **IaC** configuration **examples**, and **enablement** activities.
 
-This document is a subset of the OCI Open LZ, and it provides an executive summary of the **One-OE blueprint**. The complete blueprint will be available soon in detail in the PDF format and supported by a [Drawio](/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio) containing all design diagrams, for reuse while tailoring new landing zones.
+This document is a subset of the OCI Open LZ, and it provides an executive summary of the **One-OE blueprint**. The complete blueprint will be available soon in detail in the PDF format and supported by a [Drawio](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio) containing all design diagrams, for reuse while tailoring new landing zones.
 
 For more approaches and assets on OCI Landing Zones refer to the [OCI Landing Zone Framework](https://github.com/oracle-devrel/technology-engineering/blob/main/landing-zones/README.md).
 
@@ -99,7 +99,7 @@ Before proceeding, it’s highly recommended OCI foundational knowledge of its c
 &nbsp; 
 
 # **2. Functional View**
-The Landing Zone blueprint has a set of **functional elements** that are **key building blocks** used throughout this document – with the same code color – and ultimately are used to aggregate and operate a set of OCI resources. These elements are presented in the following diagram it’s crucial to understand them to understand the whole design. All elements are presented in detail in the [OCI Open LZ One-OE Drawio - Functional Tabs](/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio).  
+The Landing Zone blueprint has a set of **functional elements** that are **key building blocks** used throughout this document – with the same code color – and ultimately are used to aggregate and operate a set of OCI resources. These elements are presented in the following diagram it’s crucial to understand them to understand the whole design. All elements are presented in detail in the [OCI Open LZ One-OE Drawio - Functional Tabs](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio).  
 
 &nbsp; 
 
@@ -158,7 +158,7 @@ The following diagram presents the tenancy structure up to L5, introducing the *
 &nbsp; 
 
 
-The next two diagrams depict the **security zones** of the landing zones and the general **security posture**. For more details on the tenancy structure levels (L3-L5), related IAM with OCI Groups and Policies, and security posture applied to each element refer to the [OCI Open LZ One-OE Drawio - Security Tabs](/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio). 
+The next two diagrams depict the **security zones** of the landing zones and the general **security posture**. For more details on the tenancy structure levels (L3-L5), related IAM with OCI Groups and Policies, and security posture applied to each element refer to the [OCI Open LZ One-OE Drawio - Security Tabs](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio). 
 
 &nbsp; 
 
@@ -202,7 +202,7 @@ The following diagram and table present the network structure of the One-OE blue
 
 &nbsp; 
 
-There are several possible **hub models** that can be used and they are described in the [OCI Open LZ One-OE Drawio - Network Tabs](/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio). The One-OE Blueprint uses **[Hub Model A](/addons/oci-hub-models/hub_a/readme.md)** for **Network Area 1,** and it's depicted below in **structure** and **routing**. 
+There are several possible **hub models** that can be used and they are described in the [OCI Open LZ One-OE Drawio - Network Tabs](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio). The One-OE Blueprint uses **[Hub Model A](/addons/oci-hub-models/hub_a/readme.md)** for **Network Area 1,** and it's depicted below in **structure** and **routing**. 
 
 &nbsp; 
 
@@ -216,7 +216,7 @@ There are several possible **hub models** that can be used and they are describe
 
 &nbsp; 
 
-For more details on the network design refer to the [OCI Open LZ One-OE Drawio - Network Tabs](/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio). 
+For more details on the network design refer to the [OCI Open LZ One-OE Drawio - Network Tabs](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio). 
 
 
 &nbsp; 
