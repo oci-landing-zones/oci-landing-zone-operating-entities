@@ -15,7 +15,7 @@ Oracle Cloud Infrastructure Secure Desktops is ideal for organizations seeking c
 
 With OCI Secure Desktops, administrators can create pools of virtual desktops in their tenancy using existing compute shapes and custom images. These desktops are identical in configuration, and users can securely access them to work with enterprise data.
 
-The service enable administrators to manage both virtual desktops and OCI configurations, ensuring non-technical users can easily and securely access their virtual desktops for daily tasks.
+The service enables administrators to manage both virtual desktops and OCI configurations, ensuring non-technical users can easily and securely access their virtual desktops for daily tasks.
 
 The OCI Secure Desktops service provides:
 
