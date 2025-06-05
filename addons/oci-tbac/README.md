@@ -28,7 +28,7 @@ This approach offers a higher level of scalability for project onboarding, reduc
 
 Using this add-on provides the following benefits:
 - Better IAM Governance by building Permissions based on *Job Roles*, also known as **Role-Based Access Controls (RBAC)**.
-- Defining only **one set of policies** that is reused by all projects.
+- Using **Standard Policies** for all projects by defining only **one set of policies** based on project roles.
 - Improved Operational Security by **faster and easier projects onboarding**.
 - **Simpler Projects Terraform configurations**, with less duplication.
 - **Clearer permissions control** for Internal Security reporting.
