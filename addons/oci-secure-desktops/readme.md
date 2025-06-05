@@ -97,7 +97,7 @@ It includes the following resources:
 
     If you prefer to use a copy of the json files and store it in your own bucket or github repo , follow this [steps](ORM_ONE-OE_DNS_deployment_steps.md)
 
-    To learn more about how DNS is configured, check out our DNS add-on.
+    To learn more about how DNS is configured, check out our [DNS add-on](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-private-dns).
 
 * Step 2: To run this landing zone addon, follow these [steps](./Implementation_s2_steps.md).
 
