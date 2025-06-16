@@ -9,6 +9,9 @@ Create a temporary [Auth token](https://docs.oracle.com/en-us/iaas/Content/Regis
 **Note:** Delete the Auth token after successful creation of resources.
 
 # Step 2: Create Resources using Terraform Script
+If you are running the terraform script locally you need to have docker up and running.
+You can also run the terraform script in OCI Cloudshell where docker is preinstalled. In Cloudshell make sure you have enough disk space.
+
 Use the provided [Terraform script](/addons/oci-finops/content/terraform/) or [RMS stack](<>) to create the necessary resources, including:
 - OCI Resource Scheduler [Reference](https://docs.oracle.com/en-us/iaas/Content/resource-scheduler/home.htm)
 - OCI Function [Reference](https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionsquickstartguidestop.htm)

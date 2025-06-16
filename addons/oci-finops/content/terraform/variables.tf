@@ -14,7 +14,7 @@ variable "adb_compartment_id" {
 
 variable "fn_subnet_id" {
   type        = string
-  description = "function subnet id"
+  description = "function private subnet id"
 }
 
 variable "secret_ocid" {
@@ -35,13 +35,13 @@ variable "repo_display_name" {
 
 variable "user_name" {
   type        = string
-  description = "Username for OCIR registry push"
+  description = "Username for OCIR registry push.This can be found under the profile section in OCI console"
 
 }
 
 variable "region_code" {
   type        = string
-  description = "OCIR Region code"
+  description = "OCIR Region code" 
 
 }
 

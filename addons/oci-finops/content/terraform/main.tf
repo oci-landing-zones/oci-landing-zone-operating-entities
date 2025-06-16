@@ -14,7 +14,7 @@ terraform {
 #To create container registry repo 
 resource "oci_artifacts_container_repository" "finops_repository" {
   compartment_id = var.fn_compartment_id
-  display_name   = var.repo_display_name
+  display_name   = lower(var.repo_display_name)
   is_public      = false
 }
 
@@ -32,7 +32,7 @@ data "oci_objectstorage_namespace" "ns" {
 
 locals {
   namespace   = data.oci_objectstorage_namespace.ns.namespace
-  region_code = var.region_code
+  region_code = lower(var.region_code)
   repo_name   = oci_artifacts_container_repository.finops_repository.display_name
   username    = var.user_name
   bucket_name = var.bucket_name
@@ -50,7 +50,7 @@ resource "null_resource" "image_creation" {
      cd funccode
      docker rmi ${local.region_code}.ocir.io/${local.namespace}/${local.repo_name}:latest
      docker build -t ${local.region_code}.ocir.io/${local.namespace}/${local.repo_name}:latest .
-     echo ${var.auth_token} | docker login ${local.region_code}.ocir.io -u '${local.namespace}/${local.username}' --password-stdin
+     echo "${var.auth_token}" | docker login ${local.region_code}.ocir.io -u '${local.namespace}/${local.username}' --password-stdin
     EOT
   }
   provisioner "local-exec" {
