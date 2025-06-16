@@ -92,7 +92,7 @@ resource "oci_resource_scheduler_schedule" "schedule" {
   recurrence_type    = "CRON"
 
   description  = "To schedule FINOPS function"
-  display_name = "FINOPS_FNSCHEDULE"
+  display_name = var.schedule_display_name
 
   resources {
     id = oci_functions_function.cost_function.id
@@ -116,15 +116,13 @@ resource "oci_database_autonomous_database" "autonomous_database_private" {
   compute_count            = 1
   compute_model            = "ECPU"
   data_storage_size_in_tbs = "1"
-  db_name                  = "FINOPS"
+  db_name                  = var.adw_display_name
 
-  db_version   = "23ai"
-  display_name = "FINOPS"
+  db_version   = var.db_version
+  display_name = var.adw_display_name
   is_auto_scaling_enabled             = "true"
   is_auto_scaling_for_storage_enabled = "true"
   license_model                       = var.autonomous_database_license_model
   subnet_id = var.fn_subnet_id
   #   nsg_ids = ["<placeholder>"]
 }
-
-

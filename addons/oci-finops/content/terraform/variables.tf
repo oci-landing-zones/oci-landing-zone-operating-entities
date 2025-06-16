@@ -32,6 +32,7 @@ variable "repo_display_name" {
   description = "OCI container registry repository name"
   default     = "function/finops"
 }
+
 variable "user_name" {
   type        = string
   description = "Username for OCIR registry push"
@@ -65,4 +66,22 @@ variable "autonomous_database_license_model" {
   type        = string
   description = "Autonomous database licence type"
   default     = "LICENSE_INCLUDED"
+}
+
+variable "adw_display_name" {
+  type = string
+  description = "ADW display name"
+  default = "FINOPS"
+}
+
+variable "schedule_display_name" {
+  type = string
+  description = "Resource scheduler display name used for scheduling the finops function"
+  default = "FINOPS-scheduler"
+}
+
+variable "db_version" {
+  type = string
+  description = "Database version."
+  default = "23ai"
 }
