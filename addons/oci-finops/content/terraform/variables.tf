@@ -12,7 +12,7 @@ variable "adb_compartment_id" {
 }
 
 
-variable "fn_subnet_id" {
+variable "fn_private_subnet_id" {
   type        = string
   description = "function private subnet id"
 }
@@ -35,13 +35,13 @@ variable "repo_display_name" {
 
 variable "user_name" {
   type        = string
-  description = "Username for OCIR registry push.This can be found under the profile section in OCI console"
+  description = "Username used to push image into OCIR .This can be found under the profile section in OCI console"
 
 }
 
-variable "region_code" {
+variable "ocir_url" {
   type        = string
-  description = "OCIR Region code" 
+  description = "OCIR registry URL.For example: ocir.us-ashburn-1.oci.oraclecloud.com" 
 
 }
 
@@ -71,6 +71,12 @@ variable "autonomous_database_license_model" {
 variable "adw_display_name" {
   type = string
   description = "ADW display name"
+  default = "FINOPS"
+}
+
+variable "adw_db_name" {
+  type = string
+  description = "ADW database name"
   default = "FINOPS"
 }
 

@@ -22,7 +22,7 @@ resource "oci_artifacts_container_repository" "finops_repository" {
 resource "oci_functions_application" "cost_app" {
   compartment_id = var.fn_compartment_id
   display_name   = var.fn_app_name
-  subnet_ids     = [var.fn_subnet_id]
+  subnet_ids     = [var.fn_private_subnet_id]
 }
 
 
@@ -32,7 +32,7 @@ data "oci_objectstorage_namespace" "ns" {
 
 locals {
   namespace   = data.oci_objectstorage_namespace.ns.namespace
-  region_code = lower(var.region_code)
+  ocir_url = lower(var.ocir_url)
   repo_name   = oci_artifacts_container_repository.finops_repository.display_name
   username    = var.user_name
   bucket_name = var.bucket_name
@@ -48,17 +48,16 @@ resource "null_resource" "image_creation" {
   provisioner "local-exec" {
     command = <<EOT
      cd funccode
-     docker rmi ${local.region_code}.ocir.io/${local.namespace}/${local.repo_name}:latest
-     docker build -t ${local.region_code}.ocir.io/${local.namespace}/${local.repo_name}:latest .
-     echo "${var.auth_token}" | docker login ${local.region_code}.ocir.io -u '${local.namespace}/${local.username}' --password-stdin
+     docker rmi ${local.ocir_url}/${local.namespace}/${local.repo_name}:latest
+     docker build -t ${local.ocir_url}/${local.namespace}/${local.repo_name}:latest .
+     echo "${var.auth_token}" | docker login ${local.ocir_url} -u '${local.namespace}/${local.username}' --password-stdin
     EOT
   }
   provisioner "local-exec" {
     command = <<EOT
-     docker push ${local.region_code}.ocir.io/${local.namespace}/${local.repo_name}:latest
-     docker logout ${local.region_code}.ocir.io
+     docker push ${local.ocir_url}/${local.namespace}/${local.repo_name}:latest
+     docker logout ${local.ocir_url}
     EOT
-
   }
 
   depends_on = [oci_artifacts_container_repository.finops_repository]
@@ -68,7 +67,7 @@ resource "null_resource" "image_creation" {
 resource "oci_functions_function" "cost_function" {
   application_id     = oci_functions_application.cost_app.id
   display_name       = var.fn_display_name
-  image              = "${local.region_code}.ocir.io/${local.namespace}/${local.repo_name}:latest"
+  image              = "${local.ocir_url}/${local.namespace}/${local.repo_name}:latest"
   memory_in_mbs      = "1024"
   timeout_in_seconds = 300
   config = {
@@ -116,13 +115,13 @@ resource "oci_database_autonomous_database" "autonomous_database_private" {
   compute_count            = 1
   compute_model            = "ECPU"
   data_storage_size_in_tbs = "1"
-  db_name                  = var.adw_display_name
+  db_name                  = var.adw_db_name
 
   db_version   = var.db_version
   display_name = var.adw_display_name
   is_auto_scaling_enabled             = "true"
   is_auto_scaling_for_storage_enabled = "true"
   license_model                       = var.autonomous_database_license_model
-  subnet_id = var.fn_subnet_id
+  subnet_id = var.fn_private_subnet_id
   #   nsg_ids = ["<placeholder>"]
 }

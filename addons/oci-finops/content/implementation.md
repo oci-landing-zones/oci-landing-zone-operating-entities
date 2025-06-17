@@ -10,7 +10,8 @@ Create a temporary [Auth token](https://docs.oracle.com/en-us/iaas/Content/Regis
 
 # Step 2: Create Resources using Terraform Script
 If you are running the terraform script locally you need to have docker up and running.
-You can also run the terraform script in OCI Cloudshell where docker is preinstalled. In Cloudshell make sure you have enough disk space.
+
+You can also run the terraform script in OCI Cloudshell where docker is preinstalled. In Cloudshell make sure you have enough disk space in the home directory for creating docker images.
 
 Use the provided [Terraform script](/addons/oci-finops/content/terraform/) or [RMS stack](<>) to create the necessary resources, including:
 - OCI Resource Scheduler [Reference](https://docs.oracle.com/en-us/iaas/Content/resource-scheduler/home.htm)
@@ -23,9 +24,11 @@ Connect to the ADW using SQL Worksheet available in OCI [SQL worksheet](https://
 
 
 ### Step 3.2: Run SQL Scripts as ADMIN User
-Run the following SQL scripts [admin.sql](/addons/oci-finops/content/sql/admin.sql) using the ADMIN user:
+[Resource Principal](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/resource-principal.html) is used to give access for the autonomous database. 
 
-[Resource Principal](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/resource-principal.html) is used to give access for the autonomous database.
+You have to add the required IAM policies before running the script.
+
+Run the following SQL scripts [admin.sql](/addons/oci-finops/content/sql/admin.sql) using the ADMIN user.
 
 ### Step 3.3: Run SQL Scripts as FINOPS User
 Run the following SQL scripts [finopsuser.sql](/addons/oci-finops/content/sql/finopsuser.sql) using the newly created FINOPS user:
@@ -34,7 +37,7 @@ Run the following SQL scripts [finopsuser.sql](/addons/oci-finops/content/sql/fi
 
 [DBMS_CLOUD_PIPELINE](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/autonomous-pipeline.html) is used to load data from objectstorage into the autonomous database. 
 
-By default for the dbms_cloud_pipeline the interval is set to 5 minutes.
+The interval for the dbms_cloud_pipeline is set to 5 minutes in finopsuser.sql.
 
 
 # Post-Deployment Steps
@@ -42,6 +45,7 @@ By default for the dbms_cloud_pipeline the interval is set to 5 minutes.
 2. Invoke the function to check its downloading the OCI FOCUS reports into the respective object storage bucket
 and its loaded into ADW after 5 minutes .
 3. Delete the temporary Auth token created in Step 1.
-4. You can set lifecycle policy rules in the object storage bucket to delete files after couple of days to save some cost.
+4. You can set lifecycle policy rules in the object storage bucket to delete files after couple of days to save objectstorage cost.
+5. The resource scheduler is set to run everyday at 11.30PM UTC. This can be modified to run frequently like every 6hours if needed. 
 
 By following these steps, you should be able to successfully deploy the FINOPS solution which will download yesterday FOCUS reports and load into Autonomous database.
