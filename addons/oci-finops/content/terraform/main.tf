@@ -23,11 +23,12 @@ resource "oci_functions_application" "cost_app" {
   compartment_id = var.fn_compartment_id
   display_name   = var.fn_app_name
   subnet_ids     = [var.fn_private_subnet_id]
+  shape = var.fn_app_shape
 }
 
 
 data "oci_objectstorage_namespace" "ns" {
-  compartment_id = var.tenancy_id
+  compartment_id = var.tenancy_ocid
 }
 
 locals {
