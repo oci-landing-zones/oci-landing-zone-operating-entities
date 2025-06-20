@@ -1,0 +1,19 @@
+tenancy_ocid      = ""
+
+#Secret OCID where the ADW admin passwod is stored
+secret_ocid       = ""
+
+#compartment ocid where the function will reside
+fn_compartment_id  = ""
+
+#compartmentocid where the autonomous database will reside
+adb_compartment_id = ""
+
+#private subnet ocid for the function and it will be used for the autonomous db as well.
+fn_private_subnet_id = ""
+
+#Username for OCIR.It can be found at the top right profile section of the OCI console home page.
+user_name         = ""
+
+#The FOCUS reports will get downloaded to this bucket. Dont use this bucket for other purpose.
+bucket_name       = ""
