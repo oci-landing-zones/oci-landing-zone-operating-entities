@@ -31,6 +31,14 @@ data "oci_objectstorage_namespace" "ns" {
   compartment_id = var.tenancy_ocid
 }
 
+resource "oci_objectstorage_bucket" "finops_bucket" {
+  compartment_id        = var.fn_compartment_id
+  name                  = var.bucket_name
+  namespace             = data.oci_objectstorage_namespace.ns.namespace
+  object_events_enabled = true
+  storage_tier          = "Standard"
+}
+
 locals {
   namespace   = data.oci_objectstorage_namespace.ns.namespace
   ocir_url = lower(var.ocir_url)
@@ -124,5 +132,4 @@ resource "oci_database_autonomous_database" "autonomous_database_private" {
   is_auto_scaling_for_storage_enabled = "true"
   license_model                       = var.autonomous_database_license_model
   subnet_id = var.fn_private_subnet_id
-  #   nsg_ids = ["<placeholder>"]
 }

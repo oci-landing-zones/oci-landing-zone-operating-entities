@@ -15,5 +15,5 @@ fn_private_subnet_id = ""
 #Username for OCIR.It can be found at the top right profile section of the OCI console home page.
 user_name         = ""
 
-#The bucket should exist.The FOCUS reports will get downloaded to this bucket
+#The FOCUS reports will get downloaded to this bucket. Dont use this bucket for other purpose.
 bucket_name       = ""
