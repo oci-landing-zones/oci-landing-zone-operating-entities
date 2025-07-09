@@ -4,15 +4,15 @@
 
 ## **Overview**
 
-The **OCI FinOps Solution** is an addon to the OCI Open Landing Zone framework. It enhances cost governance and financial visibility for Operating Entities by integrating **OCI FOCUS reports** with an **Autonomous Database and a dashboard** for insightful cost analysis.
+The **OCI FinOps Solution** is an addon to the OCI Open Landing Zone framework. It enhances cost governance and financial visibility for Operating Entities by integrating **OCI FOCUS reports** directly with an **Autonomous Database and a dashboard** for insightful cost analysis.
 
-The solution automates the complete workflow from fetching and processing FOCUS reports to securely ingesting them into ADB and visualizing them in a user-friendly interface. All components run within a secure private network setup in OCI.
+The solution describes the workflow end‑to‑end: it securely fetches FOCUS reports from the central tenancy into ADB and visualizes them in a user‑friendly interface. All components reside in a private network within OCI.
 
 > **Why another dashboard?**  
-> While OCI offers native Cost Analysis, this solution supports scenarios such as **multi-cloud cost aggregation**, **external stakeholder access**, and **customized reporting** for FinOps teams.
+> While OCI provides native Cost Analysis, this addon supports scenarios such as **multi‑cloud cost aggregation**, **external stakeholder access**, and **custom reporting** for FinOps teams.
 
 > **What is FinOps?**  
-> FinOps is an operational model and cultural practice that helps organizations maximize the value of cloud by enabling data-driven decisions and creating financial accountability across engineering, finance, and business teams.
+> FinOps is an operational model and cultural practice that maximizes cloud value through data‑driven decisions and financial accountability across engineering, finance, and business teams.
 
 &nbsp;
 
@@ -24,22 +24,26 @@ The solution automates the complete workflow from fetching and processing FOCUS 
 
 | **Resource** | **Description** |
 |--------------|------------------|
-| **Autonomous Database (ADB)** | Serves as the central data store for the FinOps solution. Provisioned with a **private endpoint** inside the VCN, it securely receives and stores the processed FOCUS report data, enabling backend processing and dashboard visualization. |
-| **Object Storage Bucket** | Acts as the intermediate data lake where **FOCUS reports** are uploaded after being pulled and decompressed. |
-| **Function – Fetch & Decompress** | A serverless function that authenticates with OCI APIs, pulls the **FOCUS cost and usage report** from the OCI Console, decompresses the file, and stores it into the Object Storage bucket. |
-| **UI Dashboard** | Presents the FinOps insights on top of the Autonomous Database. Tools like **Oracle APEX**, **Oracle Analytics Cloud**, or any preferred BI tool can be used to build the visualization layer. |
-| **VCN & Subnets** | A dedicated **Virtual Cloud Network** with private subnets to host the ADB with private endpoint, Functions, and other FinOps components in a secure and isolated manner. Ensures traffic stays within OCI without using public endpoints. |
-| **IAM Policies** | Fine-grained **Identity and Access Management** policies to allow Functions and users to access resources like Object Storage, ADB, and Metrics in a controlled and auditable manner. |
+| **Autonomous Database (ADB)** | Central data store for the FinOps platform. Provisioned with a **private endpoint** inside the VCN, it directly ingests FOCUS reports from the central tenancy and powers the visualization layer. |
+| **UI Dashboard** | Presents FinOps insights on top of ADB. You can build the UI with **Oracle APEX**, **Oracle Analytics Cloud**, or another BI tool of choice. |
+| **VCN & Subnets** | A dedicated **Virtual Cloud Network** with private subnets to host ADB, the dashboard, and related components in an isolated, secure manner—keeping traffic off the public internet. |
+| **IAM Policies** | Includes user policies to manage the FinOps platform and **service policies** that grant ADB permission to fetch FOCUS reports from the central tenancy, all in a controlled and auditable way. |
 
 &nbsp;
 
 ### OCI FinOps Addon Deployment Guide
 
+These are the required steps to provision the OKE workload:
+
+ 1. It's required to already have deployed OCI LZ. In this guide we will build on top of the One-OE LZ with Hub model E option. Any other OCI landing zone, such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime), can also used as a baseline landing zone as well.
+ 2. Deploy the FinOps solution from the [FinOps Setup](finops-setup) guide.
+
+
 &nbsp;
 
 ### Summary
 
-This addon enhances the [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) by embedding a FinOps platform that brings cost governance, financial visibility, and optimization. It automates the collection, processing, and visualization of OCI FOCUS reports using Functions, Object Storage, Autonomous Database (private endpoint), and a dashboard layer. The solution enables deep insights without requiring OCI login, making it suitable for finance, engineering, and business teams. It also supports multi-cloud use cases, allowing centralized cost analysis across multiple cloud platforms.
+This addon enhances the [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) by embedding a FinOps platform that delivers cost governance, visibility, and optimization. It automates the ingestion and analysis of OCI FOCUS reports using an Autonomous Database (private endpoint) and a flexible dashboard layer—no Object Storage or Functions required. The solution offers deep insights without necessitating OCI console access and supports centralized cost analysis across multiple clouds.
 
 &nbsp;
 
