@@ -37,7 +37,7 @@ CREATE TABLE "FINOPS"."OCI_FINOPS_REPORTS"
     ,"SKUPRICEID"                  VARCHAR2(32767)
     ,"SUBACCOUNTID"                VARCHAR2(4000)
     ,"SUBACCOUNTNAME"              VARCHAR2(4000)
-    ,"TAGS"                        CLOB
+    ,"TAGS"                        JSON
     ,"USAGEQUANTITY"               NUMBER
     ,"USAGEUNIT"                   VARCHAR2(4000)
     ,"OCI_REFERENCENUMBER"         VARCHAR2(4000)
@@ -55,20 +55,20 @@ CREATE TABLE "FINOPS"."OCI_FINOPS_REPORTS"
 
 -- Create dbms_cloud_pipeline to load data from object storage
 -- https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/autonomous-pipeline.html
-begin
-    dbms_cloud_pipeline.create_pipeline(
-        pipeline_name =>'FINOPS_REPORT',
-        pipeline_type => 'LOAD',
-        description => 'pipeline to load FOCUS report');
-end;
+BEGIN
+  dbms_cloud_pipeline.create_pipeline(
+      pipeline_name =>'FINOPS_REPORT',
+      pipeline_type => 'LOAD',
+      description => 'pipeline to load FOCUS report');
+END;
 
--- Set attributes for the dbms_cloud_pipeline
+-- Set attributes for the dbms_cloud_pipeline.
 BEGIN
   DBMS_CLOUD_PIPELINE.SET_ATTRIBUTE(
     pipeline_name => 'FINOPS_REPORT',
     attributes    => JSON_OBJECT(
       'credential_name' VALUE 'OCI$RESOURCE_PRINCIPAL',
-      'location'        VALUE 'https://<objectstorageurl>/n/<namespace>/b/<bucket>/o',
+      'location'        VALUE 'https://<objectstorageurl>/n/bling/b/<tenancyocid>/o/FOCUS Reports/<year>',
       'table_name'      VALUE 'OCI_FINOPS_REPORTS',
       'field_list'   VALUE q'[
      "AVAILABILITYZONE"            CHAR(4000)
@@ -133,10 +133,11 @@ BEGIN
          "logprefix" : "FOCUS",
          "logretention" : 7,
          "rejectlimit" : 10000000,
-         "recorddelimiter" : "X''0D0A''"
+         "recorddelimiter" : "X''0D0A''",
+         "compression": "gzip"
          }',
       'priority' VALUE 'HIGH',
-      'interval' VALUE '5'
+      'interval' VALUE '60'
     )
   );
 END;
