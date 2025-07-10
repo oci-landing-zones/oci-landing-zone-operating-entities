@@ -1,32 +1,32 @@
-### OCI FinOps Setup Guide
+# OCI FinOps Setup Guide
 
-#### 🚀 Pre-requisite
+### 🚀 Pre-requisite
 
 To deploy the OCI FinOps addon, it is recommended to start with an Oracle-supported Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime).  
 
-The design follows the implemenatation on top of the **One-OE Landing Zone** blueprint, with the FinOps platform hosted in the **platform layer**.
+The design follows the implementation on top of the [**One-OE Landing Zone**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) blueprint, with the FinOps solution hosted in the **platform layer**.
 
 > ℹ️ **Note:**  
-> Refer to the following files for One-OE Landing Zone IAM & Networking configurations:
+> Refer to the following files for One-OE Landing Zone IAM & networking configurations:
 
-- [`finops_iam.auto.tfvars.json`](./finops_iam.auto.tfvars.json): Sample template for IAM configuration including **compartments**, **groups**, and **policies** required for FinOps addon. You can customize this configuration to fit your exact OCI IAM topology.
-- [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json): Complete networking configuration template to support the FinOps platform within the **One-OE** blueprint. You can customize this configuration to fit your exact network requirement.
+- [`finops_iam.auto.tfvars.json`](./finops_iam.auto.tfvars.json): Sample template for IAM configuration including **compartments**, **groups**, and **policies** required for the FinOps addon. You can customize this configuration to align with your OCI IAM topology.
+- [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json): Complete networking configuration template to support the FinOps platform within the **One-OE** blueprint. You can modify it to meet your network design needs.
 
 > ⚠️ **Important:**  
-> The `finops_network.auto.tfvars.json` template is designed for the **Hub-and-Spoke (HUB-E)** network model. Refer [here](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models) to know more about different HUB Firewall options
+> The `finops_network.auto.tfvars.json` template is designed for the **Hub-and-Spoke (HUB-E)** network model.  
+> Refer to the [HUB firewall models](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models) for more information on supported deployment options.
 
 &nbsp;
 
-
 # Step 1: Create Autonomous database and required policies using Terraform Script
 Please choose a strong ADMIN password for Autonomous Data Warehouse (ADW) and store it in OCI Secret.
-Please refer the [doc](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/managingsecrets_topic-To_create_a_new_secret.htm) to create secret in OCI. 
+Please refer the [doc](https://docs.oracle.com/en-us/iaas/finops-setup/KeyManagement/Tasks/managingsecrets_topic-To_create_a_new_secret.htm) to create secret in OCI. 
 This is required if you are using the example terraform script provided to avoid writing passwords in the terraform state file.
 You can run the terraform script using OCI Cloudshell 
 
 You can also create autonomous database and policies manually via OCI console as well.
 
-Example [Terraform script](/addons/oci-finops/content/terraform/) is provided to create the resources
+Example [Terraform script](/addons/oci-finops/finops-setup/terraform/) is provided to create the resources
 - Autonomous Data Warehouse (ADW) [Reference](https://docs.oracle.com/en/cloud/paas/autonomous-database/index.html)
 
 
@@ -47,7 +47,7 @@ terraform apply -auto-approve
 # Step 2: Add the required IAM policies(Optional)
 If you have to create the policies and dynamic group manually
 
-Refer the [policies.md](/addons/oci-finops/content/policies.md) for examples.
+Refer the [policies.md](/addons/oci-finops/finops-setup/policies.md) for examples.
 
 # Step 3: Connect to ADW and Run SQL Scripts
 ### Step 3.1: Connect to ADW
@@ -58,11 +58,11 @@ Connect to the ADW using [SQL worksheet](https://docs.oracle.com/en-us/iaas/data
 [Resource Principal](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/resource-principal.html) is used to give access for the autonomous database. 
 
 
-Run the following SQL scripts [admin.sql](/addons/oci-finops/content/sql/admin.sql) using the ADMIN user.
+Run the following SQL scripts [admin.sql](/addons/oci-finops/finops-setup/sql/admin.sql) using the ADMIN user.
 
 ### Step 3.3: Run SQL Scripts as FINOPS User
 
-Run the SQL scripts provided in [finopsuser.sql](/addons/oci-finops/content/sql/finopsuser.sql) using the newly created FINOPS user:
+Run the SQL scripts provided in [finopsuser.sql](/addons/oci-finops/finops-setup/sql/finopsuser.sql) using the newly created FINOPS user:
 
 [DBMS_CLOUD_PIPELINE](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/autonomous-pipeline.html) is used to load data from objectstorage into the autonomous database. 
 
