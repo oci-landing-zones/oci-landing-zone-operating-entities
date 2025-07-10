@@ -47,7 +47,8 @@ Once your base Landing Zone is in place:
 
 ### Summary
 
-This addon enhances the [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) with a streamlined FinOps platform that delivers cost governance, financial visibility, and analysis capabilities. It automates the secure ingestion of FOCUS reports directly into an Autonomous Database using service principals. Users can then build dashboards using tools of their choice—such as Oracle APEX, Analytics Cloud, or other BI solutions—to visualize and analyze the data. The solution provides centralized cost insights without requiring OCI Console access, enabling broader reporting flexibility and operational transparency across cloud environments.
+This addon enhances the [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) with a streamlined FinOps platform that delivers cost governance, financial visibility, and analysis capabilities. It automates the secure ingestion of FOCUS reports directly into an Autonomous Database using service principals. Users can then build dashboards using tools of their choice, such as Oracle APEX, Analytics Cloud, or other BI solutions, to visualize and analyze the data. The solution provides centralized cost insights without requiring OCI Console access, enabling broader reporting flexibility and operational transparency across cloud environments.
+
 
 
 &nbsp;
