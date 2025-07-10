@@ -33,10 +33,14 @@ The solution describes the workflow end‑to‑end: it securely fetches FOCUS re
 
 ### OCI FinOps Addon Deployment Guide
 
-These are the required steps to provision the OKE workload:
+To get started with the OCI FinOps addon, ensure that a Landing Zone (LZ) is already deployed in your OCI tenancy. This guide is designed to build on top of the [**One-OE Landing Zone**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack), using the **Hub Model E** network topology.
 
- 1. It's required to already have deployed OCI LZ. In this guide we will build on top of the One-OE LZ with Hub model E option. Any other OCI landing zone, such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime), can also used as a baseline landing zone as well.
- 2. Deploy the FinOps solution from the [FinOps Setup](finops-setup) guide.
+You can also use other supported OCI Landing Zones as your foundation, such as [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime).
+
+Once your base Landing Zone is in place:
+
+- 📁 **Review/Modify and apply** the IAM and Networking configurations provided in the [`finops-setup`](finops-setup) folder.
+- 🛠️ **Follow the step-by-step instructions** in the [`finops-setup`](finops-setup) guide to deploy the FinOps solution with Autonomous Database and configure the ingestion and dashboard components.
 
 
 &nbsp;
