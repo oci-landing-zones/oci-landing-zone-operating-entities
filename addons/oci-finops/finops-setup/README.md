@@ -1,5 +1,21 @@
-# Pre-requisite:
-An OCI Virtual cloud network with a private subnet.
+### OCI FinOps Setup Guide
+
+#### 🚀 Pre-requisite
+
+To deploy the OCI FinOps addon, it is recommended to start with an Oracle-supported Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime).  
+
+The design follows the implemenatation on top of the **One-OE Landing Zone** blueprint, with the FinOps platform hosted in the **platform layer**.
+
+> ℹ️ **Note:**  
+> Refer to the following files for One-OE Landing Zone IAM & Networking configurations:
+
+- [`finops_iam.auto.tfvars.json`](./finops_iam.auto.tfvars.json): Sample template for IAM configuration including **compartments**, **groups**, and **policies** required for FinOps addon. You can customize this configuration to fit your exact OCI IAM topology.
+- [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json): Complete networking configuration template to support the FinOps platform within the **One-OE** blueprint. You can customize this configuration to fit your exact network requirement.
+
+> ⚠️ **Important:**  
+> The `finops_network.auto.tfvars.json` template is designed for the **Hub-and-Spoke (HUB-E)** network model. Refer [here](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models) to know more about different HUB Firewall options
+
+&nbsp;
 
 
 # Step 1: Create Autonomous database and required policies using Terraform Script
