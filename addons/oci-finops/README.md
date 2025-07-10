@@ -27,7 +27,7 @@ The solution describes the workflow end‑to‑end: it securely fetches FOCUS re
 | **Autonomous Database (ADB)** | Central data store for the FinOps platform. Provisioned with a **private endpoint** inside the VCN, it directly ingests FOCUS reports and powers the visualization layer. |
 | **UI Dashboard** | Presents FinOps insights on top of ADB. You can build the UI with **Oracle APEX**, **Oracle Analytics Cloud**, or another BI tool of your choice. |
 | **VCN & Subnets** | A dedicated **Virtual Cloud Network** with private subnets to host ADB and related components in an isolated, secure manner—keeping traffic off the public internet. |
-| **IAM Policies** | Includes user policies to manage the FinOps platform and **service policies** that grant ADB permission to fetch FOCUS reports, all in a controlled and auditable way. |
+| **IAM Policies** | Includes user policies to manage the FinOps platform and **resource principal** that grant ADB permission to fetch FOCUS reports, all in a controlled and auditable way. |
 
 &nbsp;
 

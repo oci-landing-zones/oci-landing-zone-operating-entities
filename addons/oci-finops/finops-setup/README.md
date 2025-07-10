@@ -46,7 +46,7 @@ terraform apply -auto-approve
 
 # Step 2: Add the required IAM policies (Optional)
 
-OCI Landing Zone IAM config json file already include the required dynamic group creation and service principal policies needed for the FinOps solution.  
+OCI Landing Zone IAM config json file already include the required dynamic group creation and resource principal policies needed for the FinOps solution.  
 This step is optional, if you prefer to review or create the policies manually, refer to the [policies.md](/addons/oci-finops/finops-setup/policies.md) for examples and guidance.
 
 # Step 3: Connect to ADW and Run SQL Scripts
