@@ -44,10 +44,10 @@ terraform plan
 terraform apply -auto-approve
 ```
 
-# Step 2: Add the required IAM policies(Optional)
-If you have to create the policies and dynamic group manually
+# Step 2: Add the required IAM policies (Optional)
 
-Refer the [policies.md](/addons/oci-finops/finops-setup/policies.md) for examples.
+OCI Landing Zone IAM config json file already include the required dynamic group creation and service principal policies needed for the FinOps solution.  
+This step is optional, if you prefer to review or create the policies manually, refer to the [policies.md](/addons/oci-finops/finops-setup/policies.md) for examples and guidance.
 
 # Step 3: Connect to ADW and Run SQL Scripts
 ### Step 3.1: Connect to ADW
@@ -66,7 +66,8 @@ Run the SQL scripts provided in [finopsuser.sql](/addons/oci-finops/finops-setup
 
 [DBMS_CLOUD_PIPELINE](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/autonomous-pipeline.html) is used to load data from objectstorage into the autonomous database. 
 
-**Note:** Replace the objectstorage url with your region objectstorage URL ,tenancy ocid and year in the placeholder in line number 71 for the set_attribute. 
+> ℹ️ **Note:**  
+> Replace the objectstorage url with your region objectstorage URL ,tenancy ocid and year in the placeholder in line number 71 for the set_attribute. 
 
 This is used to ingest all the previous and upcoming FOCUS reports of your tenancy into ADW for that year. If you have more old files to load scale the ADW so the pipeline will run faster for the initial load and you can scale it down later.
 
@@ -79,4 +80,5 @@ The interval for the dbms_cloud_pipeline is set to 60 minutes in finopsuser.sql.
 
 By following these steps, you should be able to successfully deploy the FINOPS solution which will ingest FOCUS reports into Autonomous database automatically.
 
-**NOTE:** This solution has been tested with Autonomous Database 23ai version for the FOCUS 1.0 specification .
+> ℹ️ **Note:**  
+> This solution has been tested with Autonomous Database 23ai version for the FOCUS 1.0 specification .

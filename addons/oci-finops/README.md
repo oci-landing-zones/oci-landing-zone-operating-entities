@@ -4,15 +4,15 @@
 
 ## **Overview**
 
-The **OCI FinOps Solution** is an addon to the OCI Open Landing Zone framework. It enhances cost governance and financial visibility for Operating Entities by integrating **OCI FOCUS reports** directly with an **Autonomous Database and a dashboard** for insightful cost analysis.
+The **OCI FinOps Solution** is an addon to the OCI Open Landing Zone framework. It enhances cost governance and financial visibility for Operating Entities by integrating **OCI FOCUS reports** directly with an **Autonomous Database and an optional dashboard** for insightful cost analysis.
 
-The solution describes the workflow end‑to‑end: it securely fetches FOCUS reports from the central tenancy into ADB and visualizes them in a user‑friendly interface. All components reside in a private network within OCI.
-
-> **Why another dashboard?**  
-> While OCI provides native Cost Analysis, this addon supports scenarios such as **multi‑cloud cost aggregation**, **external stakeholder access**, and **custom reporting** for FinOps teams.
+The solution describes the workflow end‑to‑end: it securely fetches FOCUS reports into ADB and visualizes them in a user‑friendly interface. All components reside in a private network within OCI.
 
 > **What is FinOps?**  
 > FinOps is an operational model and cultural practice that maximizes cloud value through data‑driven decisions and financial accountability across engineering, finance, and business teams.
+
+> **Why another solution?**  
+> While OCI provides native Cost Analysis, this addon supports scenarios such as **multi‑cloud cost aggregation**, **external stakeholder access**, **custom reporting**, and **long‑term cost data retention** for compliance and historical analysis.
 
 &nbsp;
 
@@ -24,10 +24,10 @@ The solution describes the workflow end‑to‑end: it securely fetches FOCUS re
 
 | **Resource** | **Description** |
 |--------------|------------------|
-| **Autonomous Database (ADB)** | Central data store for the FinOps platform. Provisioned with a **private endpoint** inside the VCN, it directly ingests FOCUS reports from the central tenancy and powers the visualization layer. |
-| **UI Dashboard** | Presents FinOps insights on top of ADB. You can build the UI with **Oracle APEX**, **Oracle Analytics Cloud**, or another BI tool of choice. |
-| **VCN & Subnets** | A dedicated **Virtual Cloud Network** with private subnets to host ADB, the dashboard, and related components in an isolated, secure manner—keeping traffic off the public internet. |
-| **IAM Policies** | Includes user policies to manage the FinOps platform and **service policies** that grant ADB permission to fetch FOCUS reports from the central tenancy, all in a controlled and auditable way. |
+| **Autonomous Database (ADB)** | Central data store for the FinOps platform. Provisioned with a **private endpoint** inside the VCN, it directly ingests FOCUS reports and powers the visualization layer. |
+| **UI Dashboard** | Presents FinOps insights on top of ADB. You can build the UI with **Oracle APEX**, **Oracle Analytics Cloud**, or another BI tool of your choice. |
+| **VCN & Subnets** | A dedicated **Virtual Cloud Network** with private subnets to host ADB and related components in an isolated, secure manner—keeping traffic off the public internet. |
+| **IAM Policies** | Includes user policies to manage the FinOps platform and **service policies** that grant ADB permission to fetch FOCUS reports, all in a controlled and auditable way. |
 
 &nbsp;
 
@@ -40,14 +40,15 @@ You can also use other supported OCI Landing Zones as your foundation, such as [
 Once your base Landing Zone is in place:
 
 - 📁 **Review/Modify and apply** the IAM and Networking configurations provided in the [`finops-setup`](finops-setup) folder.
-- 🛠️ **Follow the step-by-step instructions** in the [`finops-setup`](finops-setup) guide to deploy the FinOps solution with Autonomous Database and configure the ingestion and dashboard components.
+- 🛠️ **Follow the step-by-step instructions** in the [`finops-setup`](finops-setup) guide to deploy the FinOps solution with Autonomous Database and configure FOCUS report ingestion. Visualization can be implemented separately using a dashboard tool of your choice.
 
 
 &nbsp;
 
 ### Summary
 
-This addon enhances the [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) with a streamlined FinOps platform that delivers cost governance, financial visibility, and analysis capabilities. It automates the secure ingestion of FOCUS reports directly into an Autonomous Database using service principals and presents the data through customizable dashboards like Oracle APEX or Analytics Cloud and other UI tools. The solution provides centralized cost insights without requiring OCI Console access, enabling broader reporting flexibility and operational transparency across cloud environments.
+This addon enhances the [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) with a streamlined FinOps platform that delivers cost governance, financial visibility, and analysis capabilities. It automates the secure ingestion of FOCUS reports directly into an Autonomous Database using service principals. Users can then build dashboards using tools of their choice—such as Oracle APEX, Analytics Cloud, or other BI solutions—to visualize and analyze the data. The solution provides centralized cost insights without requiring OCI Console access, enabling broader reporting flexibility and operational transparency across cloud environments.
+
 
 &nbsp;
 
