@@ -4,11 +4,11 @@
 
 **Table of Contents**
 
-[1. Overview](#1-overview)
-[2. OCI FinOps Addon Architecture](#2-oci-finops-addon-architecture)
-[3. Resources](#3-resources)
-[4. Deployment Guide](#4-deployment-guide)
-[5. Summary](#5-summary)
+[1. Overview](#1-overview)</br>
+[2. OCI FinOps Addon Architecture](#2-oci-finops-addon-architecture)</br>
+[3. Resources](#3-resources)</br>
+[4. Deployment Guide](#4-deployment-guide)</br>
+[5. Summary](#5-summary)</br>
 &nbsp;
 
 ## 1.**Overview**
