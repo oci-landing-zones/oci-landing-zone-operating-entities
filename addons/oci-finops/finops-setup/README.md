@@ -2,7 +2,7 @@
 
 ## Prerequisite
 
-To deploy the OCI FinOps addon, it is recommended to start with an Oracle-supported Foundational Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime).  
+To deploy the OCI FinOps addon, it is recommended to start with an Oracle recommended Foundational Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [OCI Operating Entities Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/).  
 
 &nbsp;
 
@@ -57,7 +57,7 @@ terraform apply -auto-approve
 ```
 
 > [!NOTE]
-> IAM policies for ADB
+> IAM policies for ADB. 
 > OCI Landing Zone IAM config json file already include the required dynamic group creation and resource principal policies needed for the FinOps solution. Refer the policies here in  [policies.md](/addons/oci-finops/finops-setup/policies.md) file
 
 ## Step 3: Connect to ADW and Run SQL Scripts
