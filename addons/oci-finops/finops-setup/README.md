@@ -1,18 +1,18 @@
 # OCI FinOps Setup Guide
 
-### 🚀 Pre-requisite
+### Pre-requisite
 
 To deploy the OCI FinOps addon, it is recommended to start with an Oracle-supported Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime).  
 
 The design follows the implementation on top of the [**One-OE Landing Zone**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) blueprint, with the FinOps solution hosted in the **platform layer**.
 
-> ℹ️ **Note:**  
+> **Note:**  
 > Refer to the following files for One-OE Landing Zone IAM & networking configurations:
 
 - [`finops_iam.auto.tfvars.json`](./finops_iam.auto.tfvars.json): Sample template for IAM configuration including **compartments**, **groups**, and **policies** required for the FinOps addon. You can customize this configuration to align with your OCI IAM topology.
 - [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json): Complete networking configuration template to support the FinOps platform within the **One-OE** blueprint. You can modify it to meet your network design needs.
 
-> ⚠️ **Important:**  
+>  **Important:**  
 > The `finops_network.auto.tfvars.json` template is designed for the **Hub-and-Spoke (HUB-E)** network model.  
 > Refer to the [HUB firewall models](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models) for more information on supported deployment options.
 
@@ -66,7 +66,7 @@ Run the SQL scripts provided in [finopsuser.sql](/addons/oci-finops/finops-setup
 
 [DBMS_CLOUD_PIPELINE](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/autonomous-pipeline.html) is used to load data from objectstorage into the autonomous database. 
 
-> ℹ️ **Note:**  
+> **Note:**  
 > Replace the objectstorage url with your region objectstorage URL ,tenancy ocid and year in the placeholder in line number 71 for the set_attribute. 
 
 This is used to ingest all the previous and upcoming FOCUS reports of your tenancy into ADW for that year. If you have more old files to load scale the ADW so the pipeline will run faster for the initial load and you can scale it down later.
@@ -80,5 +80,5 @@ The interval for the dbms_cloud_pipeline is set to 60 minutes in finopsuser.sql.
 
 By following these steps, you should be able to successfully deploy the FINOPS solution which will ingest FOCUS reports into Autonomous database automatically.
 
-> ℹ️ **Note:**  
+> **Note:**  
 > This solution has been tested with Autonomous Database 23ai version for the FOCUS 1.0 specification .
