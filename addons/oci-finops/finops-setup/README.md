@@ -18,15 +18,16 @@ Follow the deployment sheet below to setup the FinOps platform in your tenancy o
 | **INPUT CONFIGURATIONS** </br></br><img src="../../../commons/images/icon_json.jpg" width="30" align="center">&nbsp; +&nbsp; <img src="../../../commons/images/icon_terraform.jpg" width="32" align="center">|</br>[**IAM Configuration**](finops_iam.auto.tfvars.json) as input to the [OCI Landing Zone IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) module. </br>[**Network Configuration**](finops_network.auto.tfvars.json) as input to the [OCI Landing Zone Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking) module.</br></br> | 
 | **DEPLOY WITH ORM** </br>*- STEP #1* </br></br><img src="../../../commons/images/icon_orm.jpg" width="40">| </br>[<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-finops/finops-setup/finops_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-finops/finops-setup/finops_network.auto.tfvars.json"})  </br></br> And follow these steps:</br> **a**. Accept terms,  wait for the configuration to load. </br> **b**. Set the working directory to “rms-facade”. </br> **c**. Set the stack name you prefer.</br> **d**. Set the terraform version to 1.5.x. Click Next. </br> **e**. Accept the default files. Click Next. Optionally, replace with your json/yaml config files. </br> **f**. Un-check run apply. Click Create. </br> </br> |
 
-> [!NOTE]
-> Refer to the following files for One-OE Landing Zone IAM & Networking configurations:
 
-- [`finops_iam.auto.tfvars.json`](./finops_iam.auto.tfvars.json): Sample template for IAM configuration including **compartments**, **groups**, and **policies** required for the FinOps addon. You can customize this configuration to align with your OCI IAM topology.
-- [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json): Complete networking configuration template to support the FinOps platform within the **One-OE** blueprint. You can modify it to meet your network design needs.
+> [!NOTE]  
+> If you already have an existing **Operating Entities Landing Zone** in place, refer to the following input configuration templates and update your own configurations accordingly to align with your OCI IAM and network topology:  
+> - [`finops_iam.auto.tfvars.json`](./finops_iam.auto.tfvars.json)  
+> - [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json)  
+> These files define the required IAM and networking components for the FinOps addon.
 
-> [!IMPORTANT]
-> The `finops_network.auto.tfvars.json` template is designed for the **Hub-and-Spoke (HUB-E)** network model.  
-> Refer to the [HUB firewall models](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models) for more information on supported deployment options.
+> [!IMPORTANT]  
+> The [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json) file is designed for the **Hub-and-Spoke (HUB-E)** network model.  
+> For alternative network architectures, refer to the [HUB firewall models documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models).
 
 &nbsp;
 
