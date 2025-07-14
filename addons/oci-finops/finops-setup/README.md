@@ -7,7 +7,7 @@ To deploy the OCI FinOps addon, it is recommended to start with an Oracle-suppor
 The design follows the implementation on top of the [**One-OE Landing Zone**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) blueprint, with the FinOps solution hosted in the **platform layer**.
 
 > [!NOTE]
-> Refer to the following files for One-OE Landing Zone IAM & networking configurations:
+> Refer to the following files for One-OE Landing Zone IAM & Networking configurations:
 
 - [`finops_iam.auto.tfvars.json`](./finops_iam.auto.tfvars.json): Sample template for IAM configuration including **compartments**, **groups**, and **policies** required for the FinOps addon. You can customize this configuration to align with your OCI IAM topology.
 - [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json): Complete networking configuration template to support the FinOps platform within the **One-OE** blueprint. You can modify it to meet your network design needs.
