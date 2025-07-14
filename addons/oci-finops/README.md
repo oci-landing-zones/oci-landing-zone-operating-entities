@@ -2,13 +2,14 @@
 ## **An OCI Open LZ [Addon](#) that enables cost governance, visibility, and optimization through the FinOps solution**
 &nbsp;
 
-**Table of Contents**
+**Table of Contents**  
+[1. Overview](#1-overview)<br>
+[2. OCI FinOps Addon Architecture](#2-oci-finops-addon-architecture)<br>
+[3. Resources](#3-resources)<br>
+[4. Deployment Guide](#4-deployment-guide)<br>
+[5. Summary](#5-summary)<br>
 
-[1. Overview](#1-overview)</br>
-[2. OCI FinOps Addon Architecture](#2-oci-finops-addon-architecture)</br>
-[3. Resources](#3-resources)</br>
-[4. Deployment Guide](#4-deployment-guide)</br>
-[5. Summary](#5-summary)</br>
+
 &nbsp;
 
 ## 1.**Overview**
