@@ -47,7 +47,7 @@ The solution describes the end-to-end workflow by securely fetching FOCUS report
 To get started with the OCI FinOps addon, it is recommended to start with an Oracle-supported Foundational Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [OCI Operating Entities Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/).  
 
 
-**Follow the step-by-step instructions** in the [`finops-setup`](finops-setup) guide to deploy the FinOps Solution on top of **One-OE Landing Zone**. 
+**Follow the step-by-step instructions** in the [`FinOps-Setup`](finops-setup) guide to deploy the FinOps Solution on top of **One-OE Landing Zone**. 
 
 
 &nbsp;
