@@ -12,7 +12,7 @@
 
 &nbsp;
 
-## 1.**Overview**
+### 1. Overview
 
 The **OCI FinOps Solution** is an addon to the OCI Landing Zones Framework. It enhances cost governance and financial visibility for Operating Entities by integrating **OCI FOCUS reports** directly with an **Autonomous Database and an optional dashboard** for insightful cost analysis.
 
@@ -26,11 +26,11 @@ The solution describes the end-to-end workflow by securely fetching FOCUS report
 
 &nbsp;
 
-### 2.OCI FinOps Addon Architecture
+### 2. OCI FinOps Addon Architecture
 
 <img src="images/OCI_FinOps_Arch.png" width="900">
 
-### 3.Resources
+### 3. Resources
 
 | **Resource**              | **Description** |
 |---------------------------|------------------|
@@ -42,7 +42,7 @@ The solution describes the end-to-end workflow by securely fetching FOCUS report
 
 &nbsp;
 
-### 4.Deployment Guide
+### 4. Deployment Guide
 
 To get started with the OCI FinOps addon, ensure that a Landing Zone (LZ) is already deployed in your OCI tenancy. This guide is designed to build on top of the [**One-OE Landing Zone**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack), using the **Hub Model E** network topology.
 
@@ -56,7 +56,7 @@ Once your base Landing Zone is in place:
 
 &nbsp;
 
-### 5.Summary
+### 5. Summary
 
 This addon enhances the [OCI One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) with a streamlined FinOps platform that delivers cost governance, financial visibility, and analysis capabilities. It automates the secure ingestion of FOCUS reports directly into an Autonomous Database using resource principal. Users can then build dashboards using tools of their choice, such as Oracle APEX, Analytics Cloud, or other BI solutions, to visualize and analyze the data. The solution provides centralized cost insights without requiring OCI Console access, enabling broader reporting flexibility and operational transparency across cloud environments.
 
