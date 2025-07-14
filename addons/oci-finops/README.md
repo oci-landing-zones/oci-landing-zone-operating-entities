@@ -48,10 +48,7 @@ To get started with the OCI FinOps addon, ensure that a Landing Zone (LZ) is alr
 
 You can also use other supported OCI Landing Zones as your foundation, such as [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime).
 
-Once your base Landing Zone is in place:
-
-- **Review/Modify and apply** the IAM and Networking configurations provided in the [`finops-setup`](finops-setup) folder.
-- **Follow the step-by-step instructions** in the [`finops-setup`](finops-setup) guide to deploy the FinOps solution with Autonomous Database and configure FOCUS report ingestion. Visualization can be implemented separately using a dashboard tool of your choice.
+**Follow the step-by-step instructions** in the [`finops-setup`](finops-setup) guide to deploy the FinOps Solution on top of **One-OE Landing Zone**. 
 
 
 &nbsp;
