@@ -1,10 +1,22 @@
 # OCI FinOps Setup Guide
 
-### Pre-requisite
+## Prerequisite
 
-To deploy the OCI FinOps addon, it is recommended to start with an Oracle-supported Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime).  
+To deploy the OCI FinOps addon, it is recommended to start with an Oracle-supported Foundational Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime).  
 
-The design follows the implementation on top of the [**One-OE Landing Zone**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) blueprint, with the FinOps solution hosted in the **platform layer**.
+&nbsp;
+
+## Step 1: Setup One-OE Landing Zone with FinOps Platform
+
+Follow the deployment sheet below to setup the FinOps platform in your tenancy on top of the [**One-OE Landing Zone**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) blueprint with IaC declarations.  This will not provision the ADB, but this is a reusable operation you can use to setup the FinOps platform in **any** Operating Entities Landing Zone blueprint.
+
+
+| |  |
+|---|---| 
+| **OPERATION** | **FinOps Platform Deployment** | 
+| **TARGET RESOURCES**  </br></br><img src="../../../commons/images/icon_oci.jpg" width="32">| </br>This operation provisions the foundational FinOps platform resources including IAM group, policies, compartment, and networking **without** Autonomous Database. | 
+| **INPUT CONFIGURATIONS** </br></br><img src="../../../commons/images/icon_json.jpg" width="30" align="center">&nbsp; +&nbsp; <img src="../../../commons/images/icon_terraform.jpg" width="32" align="center">|</br>[**IAM Configuration**](finops_iam.auto.tfvars.json) as input to the [OCI Landing Zone IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) module. </br>[**Network Configuration**](finops_network.auto.tfvars.json) as input to the [OCI Landing Zone Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking) module.</br></br> | 
+| **DEPLOY WITH ORM** </br>*- STEP #1* </br></br><img src="../../../commons/images/icon_orm.jpg" width="40">| </br>[<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-finops/finops-setup/finops_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-finops/finops-setup/finops_network.auto.tfvars.json"})  </br></br> And follow these steps:</br> **a**. Accept terms,  wait for the configuration to load. </br> **b**. Set the working directory to “rms-facade”. </br> **c**. Set the stack name you prefer.</br> **d**. Set the terraform version to 1.5.x. Click Next. </br> **e**. Accept the default files. Click Next. Optionally, replace with your json/yaml config files. </br> **f**. Un-check run apply. Click Create. </br> </br> |
 
 > [!NOTE]
 > Refer to the following files for One-OE Landing Zone IAM & Networking configurations:
@@ -18,7 +30,7 @@ The design follows the implementation on top of the [**One-OE Landing Zone**](ht
 
 &nbsp;
 
-# Step 1: Create Autonomous database and required policies using Terraform Script
+## Step 2: Create Autonomous database and required policies using Terraform Script
 Please choose a strong ADMIN password for Autonomous Data Warehouse (ADW) and store it in OCI Secret.
 Please refer the [doc](https://docs.oracle.com/en-us/iaas/finops-setup/KeyManagement/Tasks/managingsecrets_topic-To_create_a_new_secret.htm) to create secret in OCI. 
 This is required if you are using the example terraform script provided to avoid writing passwords in the terraform state file.
@@ -44,12 +56,11 @@ terraform plan
 terraform apply -auto-approve
 ```
 
-# Step 2: Add the required IAM policies (Optional)
+> [!NOTE]
+> IAM policies for ADB
+> OCI Landing Zone IAM config json file already include the required dynamic group creation and resource principal policies needed for the FinOps solution. Refer the policies here in  [policies.md](/addons/oci-finops/finops-setup/policies.md) file
 
-OCI Landing Zone IAM config json file already include the required dynamic group creation and resource principal policies needed for the FinOps solution.  
-This step is optional, if you prefer to review or create the policies manually, refer to the [policies.md](/addons/oci-finops/finops-setup/policies.md) for examples and guidance.
-
-# Step 3: Connect to ADW and Run SQL Scripts
+## Step 3: Connect to ADW and Run SQL Scripts
 ### Step 3.1: Connect to ADW
 Connect to the ADW using [SQL worksheet](https://docs.oracle.com/en-us/iaas/database-tools/doc/run-sql-statement-sql-worksheet.html) available in OCI  or other SQL client tools.
 
@@ -82,3 +93,12 @@ By following these steps, you should be able to successfully deploy the FINOPS s
 
 > [!NOTE]
 > This solution has been tested with Autonomous Database 23ai version for the FOCUS 1.0 specification .
+
+## Step 4. UI Dashboard (Optional)
+
+The FinOps addon ingests OCI FOCUS reports into an Autonomous Database, and users can optionally build a UI dashboard using tools like [Oracle APEX](https://docs.oracle.com/en/database/oracle/apex/24.2/index.html), [Oracle Analytics Cloud (OAC)](https://www.oracle.com/business-analytics/analytics-cloud.html), or any BI tool compatible with Oracle DB.
+
+> **Tip:** Oracle APEX supports Generative AI to help you build apps and queries faster. [Learn more](https://docs.oracle.com/en/database/oracle/apex/24.2/htmdb/managing-generative-ai-in-apex.html)
+
+> [!NOTE]
+> This addon does not provision a dashboard. Visualization is left to the user's preference.
