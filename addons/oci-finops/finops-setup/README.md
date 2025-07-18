@@ -41,17 +41,17 @@ Storing the password as a secret is **recommended** when using the provided Terr
 You can run the Terraform script directly using **OCI Cloud Shell** for convenience and security.
 
 
-**1. Using Terraform**  
+- **Using Terraform**  
 Use the example [Terraform script](/addons/oci-finops/finops-setup/terraform/) provided in this repository to deploy the Autonomous Data Warehouse (ADW).  
 Refer the [Autonomous Database Terraform documentation](https://docs.oracle.com/en/cloud/paas/autonomous-database/index.html) for more details.
 
-**2. Using the OCI Console**  
+- **Using the OCI Console**  
 Alternatively, you can manually create the Autonomous Database through the OCI Console.  
 Refer the [OCI documentation](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/autonomous-provision.html) for step-by-step instructions.
 
 > [!NOTE]
 > When deploying the Autonomous Database, use the **compartment**, **VCN**, **subnet**, and **NSG** resources that were created as part of your Landing Zone setup for FinOps.  
-> The required **Dynamic Group** and **Resource Principal policies** for ADB access are already included in the Landing Zone IAM configuration.  
+> The required **Dynamic Group** and **Resource Principal policies** for ADB access are already in place and included in the Landing Zone IAM configuration.  
 > Ensure you reuse those instead of creating new ones.
 
 ## Step 3: Connect to ADW and Run SQL Scripts
