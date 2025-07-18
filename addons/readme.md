@@ -19,7 +19,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 | 7 | <img src="oci-private-dns/images/oci-private-dns_icon.png" height="25" align="center"> &nbsp; **[OCI Private DNS](/addons/oci-private-dns/README.md)** | A set of **OCI Private DNS configurations** applicable to any landing zone or OCI deployment. | [Available](/addons/oci-private-dns/README.md) |
 | 8 | <img src="oci-secure-desktops/content/sd_icon.png" height="25" align="center"> &nbsp; **[OCI Secure Desktops](/addons/oci-secure-desktops/readme.md)** | Guidelines to enable and configure **OCI Secure Desktops** in your Landing Zone. | [Available](/addons/oci-secure-desktops/readme.md)
 | 9 | <img src="oci-tbac/content/tbac_icon.svg" height="25" align="center"> &nbsp;**[OCI TBAC](./oci-tbac/README.md)**| Use roles to manage IAM permissions for projects onboarding with **Tag-Based Access Controls**.| [Available](./oci-tbac/README.md) |
-| 10 | <img src="oci-finops/images/finops.png" height="25" align="center"> &nbsp;**[OCI TBAC](./oci-finops/README.md)**| Guidelines and IaC templates to setup FinOps solution on One-OE| [Available](./oci-finops/README.md) |
+| 10 | <img src="oci-finops/images/finops.png" height="25" align="center"> &nbsp;**[OCI FinOps](./oci-finops/README.md)**| Guidelines and IaC templates to setup FinOps solution on One-OE| [Available](./oci-finops/README.md) |
 
 &nbsp; 
 
