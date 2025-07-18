@@ -1,0 +1,14 @@
+#Tenancy OCID
+tenancy_ocid = ""
+
+#Secret OCID where the ADW admin passwod is stored
+secret_ocid       = ""
+
+#compartmentocid where the autonomous database will reside
+adb_compartment_id = ""
+
+#private subnet ocid for the autonomous db.
+private_subnet_id = ""
+
+#To create dynamic group and policy or not. Default is false
+create_policy = false
