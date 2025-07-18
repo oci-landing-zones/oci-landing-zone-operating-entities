@@ -31,13 +31,14 @@ Follow the deployment sheet below to setup the FinOps platform in your tenancy o
 
 &nbsp;
 
-## Step 2: Create Autonomous database and required policies using Terraform Script
+## Step 2: Create Autonomous Database
 Please choose a strong ADMIN password for Autonomous Data Warehouse (ADW) and store it in OCI Secret.
 Please refer the [doc](https://docs.oracle.com/en-us/iaas/finops-setup/KeyManagement/Tasks/managingsecrets_topic-To_create_a_new_secret.htm) to create secret in OCI. 
 This is required if you are using the example terraform script provided to avoid writing passwords in the terraform state file.
 You can run the terraform script using OCI Cloudshell 
 
-You can also create autonomous database and policies manually via OCI console as well.
+You can also create autonomous database via OCI console as well.
+- Refer the documentation to deploy [ADB using OCI clonsole](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/autonomous-provision.html)
 
 Example [Terraform script](/addons/oci-finops/finops-setup/terraform/) is provided to create the resources
 - Autonomous Data Warehouse (ADW) [Reference](https://docs.oracle.com/en/cloud/paas/autonomous-database/index.html)
