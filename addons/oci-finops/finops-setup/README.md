@@ -43,7 +43,7 @@ You can run the Terraform script directly using **OCI Cloud Shell** for convenie
 
 - **Using Terraform**  
 Use the example [Terraform script](/addons/oci-finops/finops-setup/terraform/) provided in this repository to deploy the Autonomous Data Warehouse (ADW).  
-Refer the [Autonomous Database Terraform documentation](https://docs.oracle.com/en/cloud/paas/autonomous-database/index.html) for more details.
+Refer the [ADB documentation](https://docs.oracle.com/en/cloud/paas/autonomous-database/index.html) for more details.
 
 - **Using the OCI Console**  
 Alternatively, you can manually create the Autonomous Database through the OCI Console.  
