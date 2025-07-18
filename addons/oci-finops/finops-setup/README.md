@@ -24,7 +24,7 @@ Follow the deployment sheet below to setup the FinOps platform in your tenancy o
 > - [`finops_iam.auto.tfvars.json`](./finops_iam.auto.tfvars.json)  
 > - [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json)
 
-> These files define the required IAM and networking components for the FinOps addon. If you wish to create a seperate stack for FinOps platform deployment, Consider the deployed Landing Zone compartment output and Dependencies Source. 
+> These files define the required IAM and networking components for the FinOps addon. If you wish to create a seperate stack for FinOps platform deployment, Consider the deployed Landing Zone compartment output and Dependencies Source.<br>
 > Dynamic groups matching rules have associated OCIDs that cannot be referenced using the KEY identifier. After the first apply job, you need to update the **CMP-LZP-PLATFORM-FINOPS-KEY** attributes with the correct **OCID**, and then run a second apply job.
 
 > [!IMPORTANT]  
