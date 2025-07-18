@@ -25,7 +25,8 @@ resource "oci_database_autonomous_database" "autonomous_database_private" {
   is_auto_scaling_enabled             = "true"
   is_auto_scaling_for_storage_enabled = "true"
   license_model                       = var.autonomous_database_license_model
-  subnet_id = var.private_subnet_id
+  subnet_id = var.private_subnet_id 
+  nsg_ids = [var.nsg_id]
 }
 
 locals {

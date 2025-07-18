@@ -1,6 +1,6 @@
 variable "tenancy_ocid" {
   type = string
-  description = "Tenancy OCID"
+  description = "Tenancy ocid"
 }
 
 variable "adb_compartment_id" {
@@ -10,7 +10,7 @@ variable "adb_compartment_id" {
 
 variable "private_subnet_id" {
   type        = string
-  description = "private subnet id"
+  description = "private subnet ocid"
 }
 
 variable "secret_ocid" {
@@ -64,4 +64,8 @@ variable "create_policy" {
   type = bool
   default = false
   description = "Whether to create dynamic group and policy or not"
+}
+
+variable "nsg_id" {
+  description = "nsg ocid"
 }
