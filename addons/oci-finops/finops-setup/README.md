@@ -22,7 +22,7 @@ Follow the deployment sheet below to setup the FinOps platform in your tenancy o
 > [!NOTE]  
 > If you already have an existing **Operating Entities Landing Zone** in place, refer to the following input configuration templates and update your own configurations accordingly to align with your OCI IAM and network topology:  
 > - [`finops_iam.auto.tfvars.json`](./finops_iam.auto.tfvars.json)  
-> - [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json)  
+> - [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json)  <br>
 > These files define the required IAM and networking components for the FinOps addon. If you wish to create a seperate stack for FinOps platform deployment, Consider the deployed Landing Zone compartment output and Dependencies Source. 
 > Dynamic groups matching rules have associated OCIDs that cannot be referenced using the KEY identifier. After the first apply job, you need to update the **CMP-LZP-PLATFORM-FINOPS-KEY** attributes with the correct **OCID**, and then run a second apply job.
 
