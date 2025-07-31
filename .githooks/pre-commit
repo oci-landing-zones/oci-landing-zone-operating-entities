@@ -1,0 +1,16 @@
+#!/bin/bash
+set -eou pipefail
+
+# Stash non added files before running
+git stash --keep-index --include-untracked
+
+echo "Generating templates 📄"
+./gen/generate.sh
+
+# Add working directory
+git add .
+
+# Restore original working directory
+git stash pop
+
+exit 0

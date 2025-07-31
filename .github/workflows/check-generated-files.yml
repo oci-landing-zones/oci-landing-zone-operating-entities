@@ -1,0 +1,78 @@
+name: Check Generated Files
+
+on: [pull_request]
+jobs:
+  Templates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+      - name: Verify Template Modification
+        run: |
+          set -eou pipefail
+          echo "INFO: Determining changed files in this PR..."
+
+          CHANGED_FILES=$(git diff --name-only HEAD^1 HEAD)
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "INFO: No file changes detected. Skipping check."
+            exit 0
+          fi
+
+          echo "INFO: Found the following changed files:"
+          echo "$CHANGED_FILES"
+          echo "---"
+
+          # This variable will store any error messages we find.
+          ERRORS=""
+
+          # Loop through each changed file to check for violations.
+          for file in $CHANGED_FILES; do
+            # RULE 1: We only care about generated files. Generated files live
+            # outside the 'gen/' directory. If a file is in 'gen/', it's a
+            # template, so we skip it in this main loop.
+            if [[ "$file" == gen/* ]]; then
+              continue
+            fi
+
+            # RULE 2: Based on repo structure, a '.json' file might be generated
+            # from a '.jsonnet' template. We'll check for this pattern.
+            if [[ "$file" == *.json ]]; then
+              # Construct the expected path of the template file.
+              # Example: 'addon/a.json' -> 'gen/addon/a.jsonnet'
+              template_file="gen/${file%.json}.jsonnet"
+
+              # Check if this template file actually exists in the repository.
+              # If it doesn't, then the modified .json file is not a generated
+              # file that we need to track, so we do nothing.
+              if [ -f "$template_file" ]; then
+                echo "-> Found modified file '$file' which appears to be generated from a template."
+
+                # Now, check if the template is in our list of changed files.
+                # The `grep -Fxq` command checks for an exact, full-line match quietly.
+                if ! echo "$CHANGED_FILES" | grep -Fxq "$template_file"; then
+                  # VIOLATION! The generated file was changed, but the template was not.
+                  echo "   [ERROR] The template '$template_file' was NOT modified."
+                  # Append a detailed error message to our error list.
+                  ERRORS="${ERRORS}Violation: Generated file '$file' was modified, but its template '$template_file' was not.\n"
+                else
+                  # The template was also modified, which is the correct workflow.
+                  echo "   [OK] The template '$template_file' was also modified."
+                fi
+              fi
+            fi
+          done
+
+          echo "---"
+
+          # Report the final status of the check.
+          if [ -n "$ERRORS" ]; then
+            echo -e "ERROR: Found one or more violations:\n"
+            echo -e "$ERRORS"
+            # This special command formats the message as an error in the GitHub UI.
+            echo "::error::Generated files were modified without updating their templates. Please modify the .jsonnet file and regenerate the .json file."
+            exit 1
+          else
+            echo "SUCCESS: All checks passed."
+            exit 0
+          fi
