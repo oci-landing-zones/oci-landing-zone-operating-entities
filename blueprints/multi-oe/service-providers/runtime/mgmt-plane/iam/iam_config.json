@@ -11,11 +11,11 @@
                         "children" : {
                             "SHARED-NETWORK-CMP" : {
                                 "name" : "isv-network-cmp",
-                                "description" : "Shared customer network compartment."
+                                "description" : "Network compartment."
                             },
                             "SHARED-LOGGING-CMP" : {
-                                "name" : "isv-logging-cmp",
-                                "description" : "Shared logging compartment."
+                                "name" : "isv-security-cmp",
+                                "description" : "Security compartment."
                             },
                             "SHARED-SERVICES-CMP" : {
                                 "name" : "isv-shared-services-cmp",
@@ -154,7 +154,7 @@
                   "allow group isv-ops-network-grp to manage keys in compartment isv-mgmt-plane-cmp:isv-network-cmp",
                   "allow group isv-ops-network-grp to manage secret-family in compartment isv-mgmt-plane-cmp:isv-network-cmp",
                   "allow group isv-ops-network-grp to use key-delegate in compartment isv-mgmt-plane-cmp:isv-network-cmp",
-                  "allow group isv-ops-network-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-logging-cmp"
+                  "allow group isv-ops-network-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp"
                 ]            
             },
             "SECURITY-POLICY" : {
@@ -162,21 +162,21 @@
                 "description" : "Management plane security policy.",
                 "compartment_id" : "TOP-CMP",
                 "statements" : [
-                  "allow group isv-ops-security-grp to manage instance-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage volume-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage instance-agent-plugins in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage private-ips in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage vaults in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage keys in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to use key-delegate in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage instance-family in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage volume-family in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage instance-agent-plugins in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage private-ips in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage keys in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to use key-delegate in compartment isv-mgmt-plane-cmp:isv-security-cmp",
                   "allow group isv-ops-security-grp to manage subnets in compartment isv-mgmt-plane-cmp:isv-network-cmp where request.permission = 'SUBNET_UPDATE'",
                   "allow group isv-ops-security-grp to use network-security-groups in compartment isv-mgmt-plane-cmp:isv-network-cmp",
                   "allow group isv-ops-security-grp to use vnics in compartment isv-mgmt-plane-cmp:isv-network-cmp",
-                  "allow group isv-ops-security-grp to manage ons-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage logging-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage stream-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage serviceconnectors in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage policies in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage ons-family in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage logging-family in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage stream-family in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage serviceconnectors in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage policies in compartment isv-mgmt-plane-cmp:isv-security-cmp",
                   "allow group isv-ops-security-grp to manage vss-family in compartment isv-mgmt-plane-cmp",
                   "allow group isv-ops-security-grp to use buckets in compartment isv-mgmt-plane-cmp",
                   "allow group isv-ops-security-grp to inspect all-resources in compartment isv-mgmt-plane-cmp",
@@ -189,21 +189,21 @@
                 "description" : "Management plane shared services policy.",
                 "compartment_id" : "TOP-CMP",
                 "statements" : [
-                  "allow group isv-ops-security-grp to manage instance-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage volume-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage instance-agent-plugins in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage private-ips in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage vaults in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage keys in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to use key-delegate in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage instance-family in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage volume-family in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage instance-agent-plugins in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage private-ips in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage keys in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to use key-delegate in compartment isv-mgmt-plane-cmp:isv-security-cmp",
                   "allow group isv-ops-security-grp to manage subnets in compartment isv-mgmt-plane-cmp:isv-network-cmp where request.permission = 'SUBNET_UPDATE'",
                   "allow group isv-ops-security-grp to use network-security-groups in compartment isv-mgmt-plane-cmp:isv-network-cmp",
                   "allow group isv-ops-security-grp to use vnics in compartment isv-mgmt-plane-cmp:isv-network-cmp",
-                  "allow group isv-ops-security-grp to manage ons-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage logging-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage stream-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage serviceconnectors in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
-                  "allow group isv-ops-security-grp to manage policies in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage ons-family in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage logging-family in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage stream-family in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage serviceconnectors in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-security-grp to manage policies in compartment isv-mgmt-plane-cmp:isv-security-cmp",
                   "allow group isv-ops-security-grp to manage vss-family in compartment isv-mgmt-plane-cmp",
                   "allow group isv-ops-security-grp to use buckets in compartment isv-mgmt-plane-cmp",
                   "allow group isv-ops-security-grp to inspect all-resources in compartment isv-mgmt-plane-cmp",
@@ -254,11 +254,11 @@
                 "description" : "Customer operations on management plane policy.",
                 "compartment_id" : "TOP-CMP",
                 "statements" : [
-                  "allow group isv-ops-customers-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-customers-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp",
                   "allow group isv-ops-customers-grp to use drg-object in compartment isv-mgmt-plane-cmp:isv-network-cmp",
                   "allow group isv-ops-customers-grp to manage drg-route-tables in compartment isv-mgmt-plane-cmp:isv-network-cmp",
                   "allow group isv-ops-customers-grp to manage drg-route-distribution in compartment isv-mgmt-plane-cmp:isv-network-cmp",
-                  "allow group isv-ops-snowflake-customers-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-snowflake-customers-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp",
                   "allow group isv-ops-snowflake-customers-grp to use drg-object in compartment isv-mgmt-plane-cmp:isv-network-cmp",
                   "allow group isv-ops-snowflake-customers-grp to manage drg-route-tables in compartment isv-mgmt-plane-cmp:isv-network-cmp",
                   "allow group isv-ops-snowflake-customers-grp to manage drg-route-distribution in compartment isv-mgmt-plane-cmp:isv-network-cmp"
