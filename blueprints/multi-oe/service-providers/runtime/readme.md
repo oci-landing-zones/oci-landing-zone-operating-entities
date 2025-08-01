@@ -64,14 +64,14 @@ The configuration files are organized in different folders, according to the bro
 
 The blueprint (or any customization) is deployed in separate stacks. A stack is a group of configuration files given as inputs to Terraform, reflected in a single Terraform state file. The decision factor for how many stacks lies on how the organization wants to manage the environment, especially which roles are expected to deploy which parts of the blueprint. 
 
-On a high level, there are two broader sets of stacks for the SaaS ISV blueprint build out: **management plane deployment** and **customer onboarding**.
+On a high level, there are two broader sets of stacks for the blueprint build out: **management plane deployment** and **customer onboarding**.
 
 **Management plane deployment** is composed of the following stacks, that must be executed as the presented order below:
 1. **Foundational stack**: assembles IAM, governance, security and observability configuration files in a single stack. As mentioned before, it can be further split depending on organizational deployment requirements. 
 2. **Network stack**: manages the management plane network configuration, including all the routing to customer VCNs.
 3. **Firewall stack**: manages a pair of Palo Alto Networks firewalls, *sandwiched* by a pair of OCI network load balancers.
 
-**Customer onboarding** is composed of customer-specific stacks, either for the Pod model or for the Multi-Tenant model.
+**Customer onboarding** is composed of customer-specific stacks.
 
 ### The OCI Landing Zones Orchestrator
 
@@ -106,7 +106,7 @@ Onboarding customers in the Multi-Tenant model has one shared infrastructure con
 5. [Shared Stack - Multi-Tenant Model](docs/MT-SHARED.md)
 6. [Customer Onboarding Stack - Multi-Tenant Model](docs/MT-CUSTOMER-ONBOARDING.md)
  
- The diagram below depicts the deployment sequencing. Note that the Network stack must be updated once after Firewall deployment (step 4). Also note that the customer stack (step 5) must be executed for each new customer.
+ The diagram below depicts the deployment sequencing. Note that the Network stack must be updated once after Firewall deployment (step 4). Also note that the customer stack (step 5 in Pod model and step 6 in multi-tenant model) must be executed for each new customer.
 
  ![Deployment Sequencing](../design/images/deployment-sequencing.png)
 
