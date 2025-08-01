@@ -1,0 +1,293 @@
+{
+    "compartments_configuration" : {
+        "compartments" : {
+            "TOP-CMP" : { 
+                "name" : "isv-enclosing-cmp", 
+                "description" : "ISV enclosing compartment.",
+                "children" : {   
+                    "MGMT-PLANE-CMP" : {
+                        "name" : "isv-mgmt-plane-cmp",
+                        "description" : "Management Plane compartment.",
+                        "children" : {
+                            "SHARED-NETWORK-CMP" : {
+                                "name" : "isv-network-cmp",
+                                "description" : "Shared customer network compartment."
+                            },
+                            "SHARED-LOGGING-CMP" : {
+                                "name" : "isv-logging-cmp",
+                                "description" : "Shared logging compartment."
+                            },
+                            "SHARED-SERVICES-CMP" : {
+                                "name" : "isv-shared-services-cmp",
+                                "description" : "Shared services compartment."
+                            }
+                        }
+                    },
+                    "CUSTOMERS-CMP" : {
+                        "name" : "isv-customers-cmp",
+                        "description" : "Customers enclosing compartment.",
+                        "children" : {
+                            "CUSTOMERS-DEV-CMP" : {
+                                "name" : "isv-dev-cmp",
+                                "description" : "Dev compartment."
+                            },
+                            "CUSTOMERS-TEST-CMP" : {
+                                "name" : "isv-test-cmp",
+                                "description" : "Test compartment."
+                            },
+                            "CUSTOMERS-PROD-CMP" : {
+                                "name" : "isv-prod-cmp",
+                                "description" : "Production compartment."
+                            }
+                        }
+                    } 
+                }    
+            }           
+        }
+    },
+    "groups_configuration" : {
+        "groups" : {
+            "IAM-GROUP" : {
+                "name" : "isv-ops-iam-group",
+                "description" : "ISV IAM operations group."
+            },
+            "CRED-GROUP" : {
+                "name" : "isv-ops-cred-group",
+                "description" : "ISV Credential operations group."
+            },
+            "NETWORK-GROUP" : {
+                "name" : "isv-ops-network-grp",
+                "description" : "ISV Network operations group."
+            },
+            "SECURITY-GROUP" : {
+                "name" : "isv-ops-security-grp",
+                "description" : "ISV Security operations group."
+            },
+            "SHARED-SERVICES-GROUP" : {
+                "name" : "isv-ops-shared-services-grp",
+                "description" : "ISV Shared Services operations group."
+            },
+            "GOVERNANCE-GROUP" : {
+                "name" : "isv-ops-governance-grp",
+                "description" : "ISV Governance operations group."
+            },
+            "CUSTOMERS-GROUP" : {
+                "name" : "isv-ops-customers-grp",
+                "description" : "ISV Customers operations group."
+            },"AUDITORS-GROUP" : {
+                "name" : "isv-auditors-grp",
+                "description" : "ISV auditors group."
+            }
+        }
+    },
+    "policies_configuration" : {
+        "supplied_policies" : {
+            "ROOT-POLICY" : {
+                "name" : "isv-mgmt-plane-root-policy",
+                "description" : "Root compartment policy.",
+                "compartment_id" : "TENANCY-ROOT",
+                "statements" : [
+                  "define tenancy usage-report as ocid1.tenancy.oc1..aaaaaaaaned4fkpkisbwjlr56u7cj63lf3wffbilvqknstgtvzub7vhqkggq", 
+                  "endorse group isv-ops-governance-grp to read objects in tenancy usage-report",
+                  "allow group isv-ops-iam-group to manage users in tenancy where all {request.operation != 'ListApiKeys',request.operation != 'ListAuthTokens',request.operation != 'ListCustomerSecretKeys',request.operation != 'UploadApiKey',request.operation != 'DeleteApiKey',request.operation != 'UpdateAuthToken',request.operation != 'CreateAuthToken',request.operation != 'DeleteAuthToken',request.operation != 'CreateSecretKey',request.operation != 'UpdateCustomerSecretKey',request.operation != 'DeleteCustomerSecretKey'}",
+                  "allow group isv-ops-iam-group to read policies in tenancy",
+                  "allow group isv-ops-iam-group to manage groups in tenancy where all {target.group.name != 'Administrators', target.group.name != 'isv-ops-cred-group'}",
+                  "allow group isv-ops-iam-group to inspect identity-providers in tenancy",
+                  "allow group isv-ops-iam-group to manage identity-providers in tenancy where any {request.operation = 'AddIdpGroupMapping', request.operation = 'DeleteIdpGroupMapping'}",
+                  "allow group isv-ops-iam-group to manage dynamic-groups in tenancy",
+                  "allow group isv-ops-iam-group to manage authentication-policies in tenancy",
+                  "allow group isv-ops-iam-group to manage network-sources in tenancy",
+                  "allow group isv-ops-iam-group to manage quota in tenancy",
+                  "allow group isv-ops-iam-group to read audit-events in tenancy",
+                  "allow group isv-ops-iam-group to manage tag-defaults in tenancy",
+                  "allow group isv-ops-iam-group to manage tag-namespaces in tenancy",
+                  "allow group isv-ops-iam-group to manage orm-stacks in tenancy",
+                  "allow group isv-ops-iam-group to manage orm-jobs in tenancy",
+                  "allow group isv-ops-iam-group to manage orm-config-source-providers in tenancy",
+                  "allow group isv-ops-iam-group to manage policies in tenancy",
+                  "allow group isv-ops-iam-group to manage compartments in tenancy",
+                  "allow group isv-ops-cred-group to manage users in tenancy where any {request.operation = 'ListApiKeys',request.operation = 'ListAuthTokens',request.operation = 'ListCustomerSecretKeys',request.operation = 'UploadApiKey',request.operation = 'DeleteApiKey',request.operation = 'UpdateAuthToken',request.operation = 'CreateAuthToken',request.operation = 'DeleteAuthToken',request.operation = 'CreateSecretKey',request.operation = 'UpdateCustomerSecretKey',request.operation = 'DeleteCustomerSecretKey',request.operation = 'UpdateUserCapabilities'}",
+                  "allow group isv-ops-iam-group, isv-ops-cred-group to inspect users in tenancy",
+                  "allow group isv-ops-iam-group, isv-ops-cred-group to inspect groups in tenancy",
+                  "allow group isv-ops-iam-group, isv-ops-cred-group to use cloud-shell in tenancy",
+                  "allow group isv-ops-iam-group, isv-ops-cred-group to read usage-budgets in tenancy",
+                  "allow group isv-ops-iam-group, isv-ops-cred-group to read usage-reports in tenancy",
+                  "allow group isv-ops-iam-group, isv-ops-cred-group to read objectstorage-namespaces in tenancy",
+                  "allow group isv-ops-network-grp, isv-ops-security-grp, isv-ops-governance-grp, isv-ops-customers-grp, isv-ops-snowflake-customers-grp to read objectstorage-namespaces in tenancy",
+                  "allow group isv-ops-network-grp, isv-ops-security-grp, isv-ops-governance-grp, isv-ops-customers-grp, isv-ops-snowflake-customers-grp to inspect compartments in tenancy",
+                  "allow group isv-ops-security-grp to manage cloudevents-rules in tenancy",
+                  "allow group isv-ops-security-grp to manage alarms in tenancy",
+                  "allow group isv-ops-security-grp to manage metrics in tenancy",
+                  "allow group isv-ops-security-grp to manage cloud-guard-family in tenancy",
+                  "allow group isv-ops-security-grp to read tenancies in tenancy",
+                  "allow group isv-ops-security-grp to read audit-events in tenancy",
+                  "allow group isv-ops-governance-grp to manage usage-report in tenancy",
+                  "allow group isv-ops-governance-grp to manage usage-budgets in tenancy",
+                  "allow group isv-auditors-grp to inspect all-resources in tenancy",
+                  "allow group isv-auditors-grp to read instances in tenancy",
+                  "allow group isv-auditors-grp to read load-balancers in tenancy",
+                  "allow group isv-auditors-grp to read buckets in tenancy",
+                  "allow group isv-auditors-grp to read nat-gateways in tenancy",
+                  "allow group isv-auditors-grp to read public-ips in tenancy",
+                  "allow group isv-auditors-grp to read file-family in tenancy",
+                  "allow group isv-auditors-grp to read instance-configurations in tenancy",
+                  "allow group isv-auditors-grp to read network-security-groups in tenancy",
+                  "allow group isv-auditors-grp to read resource-availability in tenancy",
+                  "allow group isv-auditors-grp to read audit-events in tenancy",
+                  "allow group isv-auditors-grp to read users in tenancy",
+                  "allow group isv-auditors-grp to read vss-family in tenancy",       
+                  "allow group isv-auditors-grp to read data-safe-family in tenancy"
+                ]
+            },
+            "NETWORK-POLICY" : {
+                "name" : "isv-mgmt-plane-network-policy",
+                "description" : "Management plane network policy.",
+                "compartment_id" : "TOP-CMP",
+                "statements" : [
+                  "allow group isv-ops-network-grp to manage virtual-network-family in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-network-grp to manage drgs in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-network-grp to manage load-balancers in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-network-grp to manage instance-family in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-network-grp to manage instance-agent-plugins in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-network-grp to manage volume-family in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-network-grp to manage file-family in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-network-grp to manage keys in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-network-grp to manage secret-family in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-network-grp to use key-delegate in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-network-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-logging-cmp"
+                ]            
+            },
+            "SECURITY-POLICY" : {
+                "name" : "isv-mgmt-plane-security-policy",
+                "description" : "Management plane security policy.",
+                "compartment_id" : "TOP-CMP",
+                "statements" : [
+                  "allow group isv-ops-security-grp to manage instance-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage volume-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage instance-agent-plugins in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage private-ips in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage vaults in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage keys in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to use key-delegate in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage subnets in compartment isv-mgmt-plane-cmp:isv-network-cmp where request.permission = 'SUBNET_UPDATE'",
+                  "allow group isv-ops-security-grp to use network-security-groups in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-security-grp to use vnics in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-security-grp to manage ons-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage logging-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage stream-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage serviceconnectors in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage policies in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage vss-family in compartment isv-mgmt-plane-cmp",
+                  "allow group isv-ops-security-grp to use buckets in compartment isv-mgmt-plane-cmp",
+                  "allow group isv-ops-security-grp to inspect all-resources in compartment isv-mgmt-plane-cmp",
+                  "allow group isv-ops-security-grp to use instances in compartment isv-mgmt-plane-cmp",
+                  "allow group isv-ops-security-grp to read repos in compartment isv-mgmt-plane-cmp"
+                ]            
+              },
+              "SHARED-SERVICES-POLICY" : {
+                "name" : "isv-mgmt-plane-shared-services-policy",
+                "description" : "Management plane shared services policy.",
+                "compartment_id" : "TOP-CMP",
+                "statements" : [
+                  "allow group isv-ops-security-grp to manage instance-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage volume-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage instance-agent-plugins in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage private-ips in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage vaults in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage keys in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to use key-delegate in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage subnets in compartment isv-mgmt-plane-cmp:isv-network-cmp where request.permission = 'SUBNET_UPDATE'",
+                  "allow group isv-ops-security-grp to use network-security-groups in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-security-grp to use vnics in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-security-grp to manage ons-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage logging-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage stream-family in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage serviceconnectors in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage policies in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-security-grp to manage vss-family in compartment isv-mgmt-plane-cmp",
+                  "allow group isv-ops-security-grp to use buckets in compartment isv-mgmt-plane-cmp",
+                  "allow group isv-ops-security-grp to inspect all-resources in compartment isv-mgmt-plane-cmp",
+                  "allow group isv-ops-security-grp to use instances in compartment isv-mgmt-plane-cmp",
+                  "allow group isv-ops-security-grp to read repos in compartment isv-mgmt-plane-cmp"
+                ]            
+              },
+              "CUSTOMERS-POLICY" : {
+                "name" : "isv-ops-customers-policy",
+                "description" : "Customer operations policy.",
+                "compartment_id" : "TOP-CMP",
+                "statements" : [
+                  "allow group isv-ops-customers-grp to manage compartments in compartment isv-customers-cmp", 
+                  "allow group isv-ops-customers-grp to manage policies in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage virtual-network-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage instance-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage compute-management-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage instance-agent-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage instance-agent-command-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage auto-scaling-configurations in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage compute-capacity-reports in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage compute-capacity-reservations in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage compute-clusters in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage dedicated-vm-hosts in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage compute-global-image-capability-schema in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage compute-image-capability-schema in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to inspect work-requests in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage volume-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage file-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage buckets in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage private-ips in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage stream-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage functions-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage ons-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage api-gateway-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage cluster-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage autonomous-database-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage database-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage keys in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage secret-family in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to use key-delegate in compartment isv-customers-cmp",
+                  "allow group isv-ops-customers-grp to manage drg-attachment in compartment isv-customers-cmp",
+                  "allow group isv-ops-network-grp to read drg-attachment in compartment isv-customers-cmp"
+                ]            
+              },
+              "CUSTOMER-OPS-ON-MGMT-POLICY" : {
+                "name" : "isv-customer-ops-on-mgmt-plane-policy",
+                "description" : "Customer operations on management plane policy.",
+                "compartment_id" : "TOP-CMP",
+                "statements" : [
+                  "allow group isv-ops-customers-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-customers-grp to use drg-object in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-customers-grp to manage drg-route-tables in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-customers-grp to manage drg-route-distribution in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-snowflake-customers-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-logging-cmp",
+                  "allow group isv-ops-snowflake-customers-grp to use drg-object in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-snowflake-customers-grp to manage drg-route-tables in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-snowflake-customers-grp to manage drg-route-distribution in compartment isv-mgmt-plane-cmp:isv-network-cmp"
+                ]  
+            },
+            "OCI-SERVICES-POLICY" : {
+                "name" : "isv-oci-services-policy",
+                "description" : "OCI services policy.",
+                "compartment_id" : "TENANCY-ROOT",
+                "statements" : [
+                  "allow service vulnerability-scanning-service to manage instances in tenancy",
+                  "allow service vulnerability-scanning-service to read compartments in tenancy",
+                  "allow service vulnerability-scanning-service to read repos in tenancy",
+                  "allow service vulnerability-scanning-service to read vnics in tenancy",
+                  "allow service vulnerability-scanning-service to read vnic-attachments in tenancy",
+                  "allow service cloudguard to read all-resources in tenancy",
+                  "allow service cloudguard to use network-security-groups in tenancy",
+                  "allow service blockstorage, oke, streaming, Fssoc1Prod, objectstorage-us-ashburn-1, objectstorage-us-phoenix-1, objectstorage-us-sanjose-1, objectstorage-ca-toronto-1 to use keys in tenancy"
+                ]
+            },
+            "TERRAFORM-RUNTIME-POLICY" : {
+              "name" : "isv-terraform-runtime-policy",
+              "description" : "ISV Terraform runtime policy.",
+              "compartment_id" : "TOP-CMP",                
+              "statements" : [
+                  "allow group isv-ops-iam-group, isv-ops-network-grp, isv-ops-security-grp to manage buckets in compartment isv-enclosing-cmp",
+                  "allow group isv-ops-iam-group, isv-ops-network-grp, isv-ops-security-grp to manage objects in compartment isv-enclosing-cmp where target.bucket.name = 'isv-terraform-runtime-bucket'"
+              ]   
+          }
+        }
+    }
+}

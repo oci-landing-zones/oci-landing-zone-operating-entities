@@ -1,0 +1,17 @@
+{
+    "compartments_configuration" : {
+        "default_parent_id" : "CUSTOMERS-CMP",
+        "compartments" : {
+            "SHARED-DB-CMP" : {
+                "name" : "isv-shared-db-cmp",
+                "description" : "Shared database compartment.",
+                "tag_defaults" : {
+                    "CUSTOMER-ID-TAG-DEFAULT" : {
+                        "tag_id" : "ENV-ID-TAG",
+                        "default_value" : "prod"
+                    }    
+                }
+            }   
+        }
+    }
+}

@@ -1,0 +1,39 @@
+{
+    "compartments_configuration" : {
+        "compartments" : {
+            "CUSTOMER-1-DEV-CMP" : {
+                "parent_id" : "CUSTOMERS-DEV-CMP",
+                "name" : "isv-customer-1-dev-cmp",
+                "description" : "Customer 1 Dev compartment.",
+                "tag_defaults" : {
+                    "CUSTOMER-ID-TAG-DEFAULT" : {
+                        "tag_id" : "CUSTOMER-ID-TAG",
+                        "default_value" : "isv-customer-1"
+                    }    
+                }
+            },
+            "CUSTOMER-1-TEST-CMP" : {
+                "parent_id" : "CUSTOMERS-TEST-CMP",
+                "name" : "isv-customer-1-test-cmp",
+                "description" : "Customer 1 Test compartment.",
+                "tag_defaults" : {
+                    "CUSTOMER-ID-TAG-DEFAULT" : {
+                        "tag_id" : "CUSTOMER-ID-TAG",
+                        "default_value" : "isv-customer-1"
+                    }    
+                }
+            },
+            "CUSTOMER-1-PROD-CMP" : {
+                "parent_id" : "CUSTOMERS-PROD-CMP",
+                "name" : "isv-customer-1-prod-cmp",
+                "description" : "Customer 1 Prod compartment.",
+                "tag_defaults" : {
+                    "CUSTOMER-ID-TAG-DEFAULT" : {
+                        "tag_id" : "CUSTOMER-ID-TAG",
+                        "default_value" : "isv-customer-1"
+                    }    
+                }
+            }     
+        }
+    }
+}   
