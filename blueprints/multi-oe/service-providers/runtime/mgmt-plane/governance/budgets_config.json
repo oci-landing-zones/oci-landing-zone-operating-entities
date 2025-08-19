@@ -37,21 +37,7 @@
                     "recipients" : "email.address@example.com",
                     "message" : "Actual spending goes above 80% of configured budget."
                 }
-            },
-            "SNOWFLAKE-CUSTOMERS-BUDGET" : {
-                "name" : "isv-snowflake-customers-budget",
-                "description" : "Snowflake customers budget.",
-                "amount" : 20000,
-                "target" : {
-                    "type" : "COMPARTMENT",
-                    "values" : ["SNOWFLAKE-CUSTOMERS-CMP"]
-                },
-                "alert_rule" : {
-                    "threshold_value" : 80,
-                    "recipients" : "email.address@example.com",
-                    "message" : "Actual spending goes above 80% of configured budget."
-                }
-            }   
+            }
         }    
     }
 }
