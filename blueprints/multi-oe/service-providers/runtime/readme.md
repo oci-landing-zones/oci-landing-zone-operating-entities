@@ -103,7 +103,7 @@ The following is executed for each new customer in the Pod Model:
 #### Customer Onboarding - Multi-Tenant Model
 Onboarding customers in the Multi-Tenant model has one shared infrastructure configuration and customer-specific configurations further deployed on the shared infrastructure.
 
-5. [Shared Stack - Multi-Tenant Model](docs/MT-SHARED.md)
+5. [Shared Stack - Multi-Tenant Model](docs/MT-SHARED-DB.md)
 6. [Customer Onboarding Stack - Multi-Tenant Model](docs/MT-CUSTOMER-ONBOARDING.md)
  
  The diagram below depicts the deployment sequencing. Note that the Network stack must be updated once after Firewall deployment (step 4). Also note that the customer stack (step 5 in Pod model and step 6 in multi-tenant model) must be executed for each new customer.
