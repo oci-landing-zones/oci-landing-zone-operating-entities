@@ -4,13 +4,11 @@ It assembles IAM, governance, security and observability configuration files in 
 
 ### Overall Deployment Sequence
 
-1. **Mgmt Plane Foundational - IAM, Logging, Governance (this stack)**
+1. **Mgmt Plane Foundational - IAM, Security, Governance (this stack)**
 2. [Mgmt Plane Networking 1st stage - Mgmt Plane VCNs](./MPLANE-NETWORKING.md#stage1)
 3. [Mgmt Plane Networking - Firewall](./MPLANE-FIREWALL.md)
 4. [Mgmt Plane Networking 2nd stage - Network routing post firewall deployment](./MPLANE-NETWORKING.md#stage2)
-5. [Customer Onboarding](./CUSTOMER-ONBOARDING.md)
-
-**Stack #5 must be repeated for each NEW customer onboarding.**
+5. Either [Pod Model - Customer Onboarding](./POD-CUSTOMER-ONBOARDING.md) or [Multi-Tenant Shared](./MT-SHARED.md)/[Multi-Tenant Model - Customer Onboarding](./MT-CUSTOMER-ONBOARDING.md).
 
 ### Stack Configuration
 
@@ -28,7 +26,7 @@ In the Resource Manager Service (RMS) **Create stack - Stack Information** scree
 
 ![Working_directory](../../design/images/orchestrator-working-dir.png)
 
-Give the stack a meaningful name in the *Name* field (*isv-saas-foundational*, for instance), and follow the RMS workflow to complete the stack creation. 
+Give the stack a meaningful name in the *Name* field (*isv-foundational*, for instance), and follow the RMS workflow to complete the stack creation. 
 
 The **Create stack - Configure variables** screen shows the variables pre-filled.
 

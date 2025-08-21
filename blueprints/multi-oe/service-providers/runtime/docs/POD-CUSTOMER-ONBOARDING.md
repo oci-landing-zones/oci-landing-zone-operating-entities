@@ -11,7 +11,7 @@ The *three-tier-vcn* can be changed in configuration file [network_three_tier_co
 
 ### Overall Deployment Sequence
 
-1. [Mgmt Plane Foundational - IAM, Logging, Governance](./MPLANE-FOUNDATIONAL.md)
+1. [Mgmt Plane Foundational - IAM, Security, Governance](./MPLANE-FOUNDATIONAL.md)
 2. [Mgmt Plane Networking 1st stage - Mgmt Plane VCNs](./MPLANE-NETWORKING.md#stage1)
 3. [Mgmt Plane Networking - Firewall](./MPLANE-FIREWALL.md)
 4. [Mgmt Plane Networking 2nd stage - Network routing post firewall deployment](./MPLANE-NETWORKING.md#stage2)
@@ -33,7 +33,7 @@ In the Resource Manager Service (RMS) **Create stack - Stack Information** scree
 
 ![Working_directory](../../design/images/orchestrator-working-dir.png)
 
-Give the stack a meaningful name in the *Name* field (*isv-saas-customer1*, for instance), and follow the RMS workflow to complete the stack creation. 
+Give the stack a meaningful name in the *Name* field (*isv-customer1*, for instance), and follow the RMS workflow to complete the stack creation. 
 
 The **Create stack - Configure variables** screen shows the variables pre-filled.
 

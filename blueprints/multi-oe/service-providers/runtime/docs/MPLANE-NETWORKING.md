@@ -14,13 +14,11 @@ The CIDR ranges can be changed in configuration files [network_initial_config.js
 
 This stack is executed in two different stages with a **PROGRESSIVELY UPDATED input configuration file**.
 
-1. [Mgmt Plane Foundational - IAM, Logging, Governance](./MPLANE-FOUNDATIONAL.md)
+1. [Mgmt Plane Foundational - IAM, Security, Governance](./MPLANE-FOUNDATIONAL.md)
 2. **Mgmt Plane Networking 1st stage - Mgmt Plane VCNs and DRG (this stack)**
 3. [Mgmt Plane Networking - Firewall](./MPLANE-FIREWALL.md)
 4. **Mgmt Plane Networking 2nd stage - Network routing post firewall deployment (this stack)**
-5. [Customer Onboarding](./CUSTOMER-ONBOARDING.md)
-
-**Stack #5 must be repeated for each NEW customer onboarding.**
+5. Either [Pod Model - Customer Onboarding](./POD-CUSTOMER-ONBOARDING.md) or [Multi-Tenant Shared](./MT-SHARED.md)/[Multi-Tenant Model - Customer Onboarding](./MT-CUSTOMER-ONBOARDING.md)
 
 ### <a name="stage1">Network Stack 1st Stage</a> 
 
@@ -44,7 +42,7 @@ In the Resource Manager Service (RMS) **Create stack - Stack Information** scree
 
 ![Working_directory](../../design/images/orchestrator-working-dir.png)
 
-Give the stack a meaningful name in the *Name* field (*isv-saas-networking*, for instance), and follow the RMS workflow to complete the stack creation. 
+Give the stack a meaningful name in the *Name* field (*isv-networking*, for instance), and follow the RMS workflow to complete the stack creation. 
 
 The **Create stack - Configure variables** screen shows the variables pre-filled.
 
