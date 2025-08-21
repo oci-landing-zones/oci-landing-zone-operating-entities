@@ -20,7 +20,7 @@ A stack that deploys database shared infrastructure in the Multi-Tenant model. I
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[iam_config.json](../mt/shared/db/iam_config.json) <br> [budgets_config.json](../mt/shared/db/budgets_config.json) <br> [network_exacs_config.json](../mt/shared/db/network_exacs_config.json) | iam/output/compartments_output.json, network/output/network_output.json | mt-shared-exa/output/compartments_output.json, mt-shared-db/output/network_output.json
+[iam_config.json](../mt/shared/db/iam_config.json) <br> [budgets_config.json](../mt/shared/db/budgets_config.json) <br> [network_exacs_config.json](../mt/shared/db/network_exacs_config.json) | iam/output/compartments_output.json, network/output/network_output.json | mt-shared-db/output/compartments_output.json, mt-shared-db/output/network_output.json
 
 ### Stack Creation
 
