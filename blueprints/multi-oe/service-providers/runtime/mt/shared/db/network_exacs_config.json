@@ -46,6 +46,17 @@
                       "destination_type"   : "CIDR_BLOCK"
                     }
                   }
+                },
+                "BACKUP-SUBNET-ROUTE" : {
+                  "display_name" : "exacs-backup-subnet-route-table",
+                  "route_rules" : {
+                    "DRG-RULE" : {
+                      "network_entity_key" : "SERVICE-GATEWAY",
+                      "description"        : "To Service Gateway.",
+                      "destination"        : "objectstorage",
+                      "destination_type"   : "SERVICE_CIDR_BLOCK"
+                    }
+                  }
                 }
               },
 
@@ -178,8 +189,17 @@
                       "dst_port_max": 443
                     }
                 }
-              }
-            }
+              },
+
+              "vcn_specific_gateways" : {
+                "service_gateways" : {
+                  "SERVICE-GATEWAY" : {
+                    "display_name" : "exacs-vcn-service-gateway",
+                    "services" : "objectstorage"
+                  }
+                }
+              } 
+            }    
           },
   
           "non_vcn_specific_gateways" : {

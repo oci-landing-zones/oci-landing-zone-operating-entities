@@ -57,7 +57,7 @@
                   "dns_label"                  : "data",
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
-                  "route_table_key"            : "OKE-VCN-ROUTE"
+                  "route_table_key"            : "DATA-SUBNET-ROUTE"
                 }
               },
   
@@ -70,6 +70,17 @@
                       "description"        : "All traffic goes to DRG.",
                       "destination"        : "0.0.0.0/0",
                       "destination_type"   : "CIDR_BLOCK"
+                    }
+                  }
+                },
+                "DATA-SUBNET-ROUTE" : {
+                  "display_name" : "data-subnet-route-table",
+                  "route_rules" : {
+                    "DRG-RULE" : {
+                      "network_entity_key" : "SERVICE-GATEWAY",
+                      "description"        : "To Service Gateway.",
+                      "destination"        : "objectstorage",
+                      "destination_type"   : "SERVICE_CIDR_BLOCK"
                     }
                   }
                 }
@@ -262,6 +273,15 @@
                       "dst"         : "0.0.0.0/0",
                       "dst_type"    : "CIDR_BLOCK"
                     }
+                  }
+                }
+              },
+
+              "vcn_specific_gateways" : {
+                "service_gateways" : {
+                  "SERVICE-GATEWAY" : {
+                    "display_name" : "oke-dev-vcn-service-gateway",
+                    "services" : "objectstorage"
                   }
                 }
               }
