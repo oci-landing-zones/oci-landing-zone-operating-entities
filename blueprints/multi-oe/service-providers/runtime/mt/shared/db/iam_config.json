@@ -6,7 +6,7 @@
                 "name" : "isv-shared-db-cmp",
                 "description" : "Shared database compartment.",
                 "tag_defaults" : {
-                    "CUSTOMER-ID-TAG-DEFAULT" : {
+                    "ENV-TAG-DEFAULT" : {
                         "tag_id" : "ENV-ID-TAG",
                         "default_value" : "prod"
                     }    

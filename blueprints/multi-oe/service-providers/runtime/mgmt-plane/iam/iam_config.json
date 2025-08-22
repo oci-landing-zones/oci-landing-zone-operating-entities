@@ -8,6 +8,12 @@
                     "MGMT-PLANE-CMP" : {
                         "name" : "isv-mgmt-plane-cmp",
                         "description" : "Management Plane compartment.",
+                        "tag_defaults" : {
+                            "ENV-TAG-DEFAULT" : {
+                                "tag_id" : "ENV-ID-TAG",
+                                "default_value" : "prod"
+                            }    
+                        },
                         "children" : {
                             "SHARED-NETWORK-CMP" : {
                                 "name" : "isv-network-cmp",
@@ -29,15 +35,33 @@
                         "children" : {
                             "CUSTOMERS-DEV-CMP" : {
                                 "name" : "isv-dev-cmp",
-                                "description" : "Dev compartment."
+                                "description" : "Dev compartment.",
+                                "tag_defaults" : {
+                                    "ENV-TAG-DEFAULT" : {
+                                        "tag_id" : "ENV-ID-TAG",
+                                        "default_value" : "dev"
+                                    }    
+                                }
                             },
                             "CUSTOMERS-TEST-CMP" : {
                                 "name" : "isv-test-cmp",
-                                "description" : "Test compartment."
+                                "description" : "Test compartment.",
+                                "tag_defaults" : {
+                                    "ENV-TAG-DEFAULT" : {
+                                        "tag_id" : "ENV-ID-TAG",
+                                        "default_value" : "test"
+                                    }    
+                                }
                             },
                             "CUSTOMERS-PROD-CMP" : {
                                 "name" : "isv-prod-cmp",
-                                "description" : "Production compartment."
+                                "description" : "Production compartment.",
+                                "tag_defaults" : {
+                                    "ENV-TAG-DEFAULT" : {
+                                        "tag_id" : "ENV-ID-TAG",
+                                        "default_value" : "prod"
+                                    }    
+                                }
                             }
                         }
                     } 
