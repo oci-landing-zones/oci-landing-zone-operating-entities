@@ -37,7 +37,7 @@
                                 "name" : "isv-dev-cmp",
                                 "description" : "Dev compartment.",
                                 "tag_defaults" : {
-                                    "ENV-TAG-DEFAULT" : {
+                                    "DEV-ENV-TAG-DEFAULT" : {
                                         "tag_id" : "ENV-ID-TAG",
                                         "default_value" : "dev"
                                     }    
@@ -47,7 +47,7 @@
                                 "name" : "isv-test-cmp",
                                 "description" : "Test compartment.",
                                 "tag_defaults" : {
-                                    "ENV-TAG-DEFAULT" : {
+                                    "TEST-ENV-TAG-DEFAULT" : {
                                         "tag_id" : "ENV-ID-TAG",
                                         "default_value" : "test"
                                     }    
@@ -57,7 +57,7 @@
                                 "name" : "isv-prod-cmp",
                                 "description" : "Production compartment.",
                                 "tag_defaults" : {
-                                    "ENV-TAG-DEFAULT" : {
+                                    "PROD-ENV-TAG-DEFAULT" : {
                                         "tag_id" : "ENV-ID-TAG",
                                         "default_value" : "prod"
                                     }    

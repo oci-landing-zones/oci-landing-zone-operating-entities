@@ -6,7 +6,7 @@
                 "name" : "isv-customer-1-dev-cmp",
                 "description" : "Customer 1 Dev compartment.",
                 "tag_defaults" : {
-                    "CUSTOMER-TAG-DEFAULT" : {
+                    "DEV-CUSTOMER-1-TAG-DEFAULT" : {
                         "tag_id" : "CUSTOMER-ID-TAG",
                         "default_value" : "isv-customer-1"
                     }    
@@ -17,7 +17,7 @@
                 "name" : "isv-customer-1-test-cmp",
                 "description" : "Customer 1 Test compartment.",
                 "tag_defaults" : {
-                    "CUSTOMER-TAG-DEFAULT" : {
+                    "TEST-CUSTOMER-1-TAG-DEFAULT" : {
                         "tag_id" : "CUSTOMER-ID-TAG",
                         "default_value" : "isv-customer-1"
                     }    
@@ -28,7 +28,7 @@
                 "name" : "isv-customer-1-prod-cmp",
                 "description" : "Customer 1 Prod compartment.",
                 "tag_defaults" : {
-                    "CUSTOMER-TAG-DEFAULT" : {
+                    "PROD-CUSTOMER-1-TAG-DEFAULT" : {
                         "tag_id" : "CUSTOMER-ID-TAG",
                         "default_value" : "isv-customer-1"
                     }    
