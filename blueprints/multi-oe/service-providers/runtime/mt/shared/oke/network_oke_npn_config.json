@@ -9,13 +9,13 @@
               "display_name"                     : "oke-dev-vcn",
               "is_ipv6enabled"                   : false,
               "is_oracle_gua_allocation_enabled" : false,
-              "cidr_blocks"                      : ["10.0.128.0/17"],
+              "cidr_blocks"                      : ["10.0.128.0/22"],
               "dns_label"                        : "okeprodvcn",
               "block_nat_traffic"                : false,
   
               "subnets" : {
                 "OKE-SERVICES-SUBNET" : {
-                  "cidr_block"                 : "10.0.145.0/27",
+                  "cidr_block"                 : "10.0.130.128/27",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "services-subnet",
                   "dns_label"                  : "services",
@@ -24,7 +24,7 @@
                   "route_table_key"            : "OKE-VCN-ROUTE"
                 },
                 "OKE-WORKERS-SUBNET" : {
-                  "cidr_block"                 : "10.0.128.0/24",
+                  "cidr_block"                 : "10.0.130.0/25",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "workers-subnet",
                   "dns_label"                  : "workers",
@@ -33,7 +33,7 @@
                   "route_table_key"            : "OKE-VCN-ROUTE"
                 },
                 "OKE-PODS-SUBNET" : {
-                  "cidr_block"                 : "10.0.129.0/20",
+                  "cidr_block"                 : "10.0.128.0/23",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "pods-subnet",
                   "dns_label"                  : "pods",
@@ -42,7 +42,7 @@
                   "route_table_key"            : "OKE-VCN-ROUTE"
                 },
                 "OKE-API-SUBNET" : {
-                  "cidr_block"                 : "10.0.145.64/29",
+                  "cidr_block"                 : "10.0.130.192/29",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "api-subnet",
                   "dns_label"                  : "api",
@@ -51,7 +51,7 @@
                   "route_table_key"            : "OKE-VCN-ROUTE"
                 },
                 "OKE-MGMT-SUBNET" : {
-                  "cidr_block"                 : "10.0.145.72/29",
+                  "cidr_block"                 : "10.0.130.200/29",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "mgm-subnet",
                   "dns_label"                  : "mgmt",
@@ -60,7 +60,7 @@
                   "route_table_key"            : "OKE-VCN-ROUTE"
                 },
                 "OKE-DATA-SUBNET" : {
-                  "cidr_block"                 : "10.0.145.32/27",
+                  "cidr_block"                 : "10.0.130.160/27",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "data-subnet",
                   "dns_label"                  : "data",
