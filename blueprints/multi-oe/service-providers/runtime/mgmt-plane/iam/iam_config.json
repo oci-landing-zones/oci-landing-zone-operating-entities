@@ -9,7 +9,7 @@
                         "name" : "isv-mgmt-plane-cmp",
                         "description" : "Management Plane compartment.",
                         "tag_defaults" : {
-                            "ENV-TAG-DEFAULT" : {
+                            "MGMT-ENV-TAG-DEFAULT" : {
                                 "tag_id" : "ENV-ID-TAG",
                                 "default_value" : "prod"
                             }    
