@@ -17,7 +17,7 @@
     },
 
     "workers_configuration" : {
-        "default_ssh_public_key_path" : "~/.ssh/id_rsa.pub",
+        "default_ssh_public_key_path" : null,
         "node_pools" : {
             "NODEPOOL1" : {
                 "cluster_id" : "OKE1",
