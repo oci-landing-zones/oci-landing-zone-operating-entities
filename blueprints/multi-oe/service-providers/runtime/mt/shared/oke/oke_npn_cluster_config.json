@@ -17,7 +17,7 @@
     },
 
     "workers_configuration" : {
-        "default_ssh_public_key_path" : null,
+        "default_ssh_public_key_path" : "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2V+ihVhbsXq2/1KkpSZiNDtRN9BSiHJmXGq8xsw/CFHeIaAa835xntvGjFk8tFCKOGusS0LqdkdaTYTAf530nqJUN91Vm17s/3GzK81bDYI8G/i4+xBlxm9oaEFWCaEgXberD7hWUc4Yg1HlfaNuHWhvmF86y6vf+ovpTaVVsJx5DLSvCjy0aRfzYISE6ZNN2e3+Eq2LcrQp8jynsnUo6ZxNunPW0bHGSemcE3e9B7DhydxgpWBs0NoEtyvPQlk/6oKIbGD6CtHYPmE2lA3xx+ol8ImnqhGoL7E72ylSBbxQaktOKgZxFsupt6FoPfFrfYbQzQMYr+LW4Uhsj8QcAalFGLcFhCm1ERE44AlIa6ePaxw/l2s4d3F84hrKkquD9DeO9KQkjzarcx3rqj7OPz77XAMMw/Ptb/8PjYePSB4oO8aMeNOKA9QyYYi081XB3s43n5EbwoG1tl1BogiH59KWnQQroaVhOwhDg73HN5CQ2MzFvbLEGTNPH88XMOx0= AXCORRE@AXCORRE-7420",
         "node_pools" : {
             "NODEPOOL1" : {
                 "cluster_id" : "OKE1",
