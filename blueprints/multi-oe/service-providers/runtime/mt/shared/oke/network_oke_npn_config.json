@@ -50,15 +50,6 @@
                   "prohibit_internet_ingress"  : true,
                   "route_table_key"            : "OKE-VCN-ROUTE"
                 },
-                "OKE-MGMT-SUBNET" : {
-                  "cidr_block"                 : "10.0.130.200/29",
-                  "dhcp_options_key"           : "default_dhcp_options",
-                  "display_name"               : "mgm-subnet",
-                  "dns_label"                  : "mgmt",
-                  "ipv6cidr_blocks"            : [],
-                  "prohibit_internet_ingress"  : true,
-                  "route_table_key"            : "OKE-VCN-ROUTE"
-                },
                 "OKE-DATA-SUBNET" : {
                   "cidr_block"                 : "10.0.130.160/27",
                   "dhcp_options_key"           : "default_dhcp_options",
@@ -151,15 +142,6 @@
                       "src_type"     : "NETWORK_SECURITY_GROUP",
                       "dst_port_min" : 30000,
                       "dst_port_max" : 32767
-                    },
-                    "INGRESS-FROM-MGMT-NSG-RULE" : {
-                      "description"  : "Allows ingress from hosts used to manage the cluster.",
-                      "stateless"    : false,
-                      "protocol"     : "TCP",
-                      "src"          : "OKE-VCN-MGMT-NSG",
-                      "src_type"     : "NETWORK_SECURITY_GROUP",
-                      "dst_port_min" : 22,
-                      "dst_port_max" : 22
                     },
                     "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
                       "description"  : "Allows ingress from jump hosts in Central Hub VCN's Bastion subnet.",
@@ -266,29 +248,6 @@
                       "dst_port_max" : 12250
                     }
                   }, 
-                  "egress_rules" : {
-                    "EGRESS-TO-ANYWHERE" : {
-                      "description" : "Allows egress to anywhere.",
-                      "stateless"   : false,
-                      "protocol"    : "TCP",
-                      "dst"         : "0.0.0.0/0",
-                      "dst_type"    : "CIDR_BLOCK"
-                    }
-                  }
-                },
-                "OKE-VCN-MGMT-NSG" : {
-                  "display_name" : "mgmt-nsg",
-                  "ingress_rules" : {
-                    "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
-                      "description"  : "Allows ingress from jump hosts in Central Hub VCN's Bastion subnet.",
-                      "stateless"    : false,
-                      "protocol"     : "TCP",
-                      "src"          : "192.168.0.32/29",
-                      "src_type"     : "CIDR_BLOCK",
-                      "dst_port_min" : 22,
-                      "dst_port_max" : 22
-                    }
-                  },
                   "egress_rules" : {
                     "EGRESS-TO-ANYWHERE" : {
                       "description" : "Allows egress to anywhere.",
