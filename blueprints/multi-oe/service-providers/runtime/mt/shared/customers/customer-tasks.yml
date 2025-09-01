@@ -1,0 +1,70 @@
+---
+- name: Create namespace for {{ customer.name }}
+  kubernetes.core.k8s:
+    name: "{{ customer.name }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Create 'app-developer' RBAC role for {{ customer.name }}
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: app-developer
+        namespace: "{{ customer.name }}"
+      rules:
+        - apiGroups: ["", "apps", "extensions"]
+          resources: ["deployments", "replicasets", "pods", "services"]
+          verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+- name: Bind 'app-developer' role to user '{{ customer.user }}' in {{ customer.name }}
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: app-developer-binding
+        namespace: "{{ customer.name }}"
+      subjects:
+        - kind: User
+          name: "{{ customer.user }}"
+          apiGroup: rbac.authorization.k8s.io
+      roleRef:
+        kind: Role
+        name: app-developer
+        apiGroup: rbac.authorization.k8s.io
+
+- name: Apply resource quota for {{ customer.name }}
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: ResourceQuota
+      metadata:
+        name: customer-quota
+        namespace: "{{ customer.name }}"
+      spec:
+        hard:
+          pods: "10"
+          requests.cpu: "1"
+          requests.memory: "1Gi"
+          limits.cpu: "2"
+          limits.memory: "2Gi"
+
+- name: Configure network policies for {{ customer.name }}
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: default-deny-and-allow-intra
+        namespace: "{{ customer.name }}"
+      spec:
+        podSelector: {} # Selects all pods in the namespace
+        policyTypes:
+          - Ingress
+          - Egress
+        ingress:
+          - from:
+              - podSelector: {} # Allow all traffic from pods within the same namespace
