@@ -10,7 +10,7 @@
               "is_ipv6enabled"                   : false,
               "is_oracle_gua_allocation_enabled" : false,
               "cidr_blocks"                      : ["10.0.128.0/17"],
-              "dns_label"                        : "okeprodvcn",
+              "dns_label"                        : "okedevvcn",
               "block_nat_traffic"                : false,
   
               "subnets" : {
@@ -21,7 +21,7 @@
                   "dns_label"                  : "services",
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
-                  "route_table_key"            : "OKE-VCN-ROUTE"
+                  "route_table_key"            : "DRG-ONLY-ROUTE"
                 },
                 "OKE-WORKERS-SUBNET" : {
                   "cidr_block"                 : "10.0.128.0/18",
@@ -30,7 +30,7 @@
                   "dns_label"                  : "workers",
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
-                  "route_table_key"            : "OKE-VCN-ROUTE"
+                  "route_table_key"            : "DRG-OSN-ROUTE"
                 },
                 "OKE-API-SUBNET" : {
                   "cidr_block"                 : "10.0.192.64/29",
@@ -39,7 +39,7 @@
                   "dns_label"                  : "api",
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
-                  "route_table_key"            : "OKE-VCN-ROUTE"
+                  "route_table_key"            : "DRG-ONLY-ROUTE"
                 },
                 "OKE-DATA-SUBNET" : {
                   "cidr_block"                 : "10.0.192.32/27",
@@ -48,13 +48,13 @@
                   "dns_label"                  : "data",
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
-                  "route_table_key"            : "DATA-SUBNET-ROUTE"
+                  "route_table_key"            : "DRG-OSN-ROUTE"
                 }
               },
   
               "route_tables" : {
-                "OKE-VCN-ROUTE" : {
-                  "display_name" : "generic-route-table",
+                "DRG-ONLY-ROUTE" : {
+                  "display_name" : "drg-only-route-table",
                   "route_rules" : {
                     "DRG-RULE" : {
                       "network_entity_key" : "CENTRAL-HUB-DRG",
@@ -64,13 +64,19 @@
                     }
                   }
                 },
-                "DATA-SUBNET-ROUTE" : {
-                  "display_name" : "data-subnet-route-table",
+                "DRG-OSN-ROUTE" : {
+                  "display_name" : "drg-osn-route-table",
                   "route_rules" : {
                     "DRG-RULE" : {
+                      "network_entity_key" : "CENTRAL-HUB-DRG",
+                      "description"        : "All traffic goes to DRG.",
+                      "destination"        : "0.0.0.0/0",
+                      "destination_type"   : "CIDR_BLOCK"
+                    },
+                    "OSN-RULE" : {
                       "network_entity_key" : "SERVICE-GATEWAY",
                       "description"        : "To Service Gateway.",
-                      "destination"        : "objectstorage",
+                      "destination"        : "all-services",
                       "destination_type"   : "SERVICE_CIDR_BLOCK"
                     }
                   }
@@ -231,7 +237,7 @@
                 "service_gateways" : {
                   "SERVICE-GATEWAY" : {
                     "display_name" : "oke-dev-vcn-service-gateway",
-                    "services" : "objectstorage"
+                    "services" : "all-services"
                   }
                 }
               }
