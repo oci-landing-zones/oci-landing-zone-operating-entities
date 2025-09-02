@@ -15,7 +15,7 @@
     },
 
     "workers_configuration" : {
-        "default_ssh_public_key_path" : null,
+        "default_ssh_public_key_path" : "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDyb8osp9GUTyIdRLq7GKYrlBvKJA0uqTaT9AgTS5thoqMBnss6ArWGSHGNPXSHWbv6fOWucMrURZA3E5hpPWrMUNOLoHDJJLgaGBvaIGoD9W2LoqAeCJ9DY6HE4xNmxFQE19fGYi1GGExfs5vTUri59HMQ6Zi+EkoI3dDZOucdaXVEiRe7ocdswqm+QppYm5fAjNG0yZ9BHYquzvj12ywj8Ln3lkHMZxea14LDftv4wdKe6X8KpbyZAU41aERY+9XqhXAZ2I8St652wVBJ7x6VqNlQslq2qvzIUse8s4lBXOOEeHZv2LyTBEuXLc35edNpfAjjFHf0cg6hyArNEl4B user@example.com",
         "node_pools" : {
             "NODEPOOL1" : {
                 "cluster_id" : "OKE1",
