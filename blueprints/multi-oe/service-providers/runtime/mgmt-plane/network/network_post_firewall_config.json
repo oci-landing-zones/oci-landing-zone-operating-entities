@@ -349,6 +349,13 @@
               "INDOOR-FW-NSG" : {
                 "display_name" : "indoor-fw-nsg",
                 "ingress_rules" : {
+                  "FROM-INDOOR-NSG" : {
+                    "description"  : "Ingress from Indoor NSG.",
+                    "stateless"    : false,
+                    "protocol"     : "ALL",
+                    "src"          : "INDOOR-NLB-NSG",
+                    "src_type"     : "NETWORK_SECURITY_GROUP"
+                  },
                   "FROM-SECURITY-VCN" : {
                     "description"  : "Ingress from Mgmt Plane Security VCN.",
                     "stateless"    : false,
