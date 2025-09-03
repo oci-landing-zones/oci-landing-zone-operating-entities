@@ -560,6 +560,15 @@
                     "src_type"     : "NETWORK_SECURITY_GROUP",
                     "dst_port_min" : 80,
                     "dst_port_max" : 80
+                  },
+                  "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
+                    "description"  : "Allows ingress from jump hosts in Central Hub VCN's Bastion subnet.",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "src"          : "192.168.0.32/29",
+                    "src_type"     : "CIDR_BLOCK",
+                    "dst_port_min" : 22,
+                    "dst_port_max" : 22
                   }
                 }, 
                 "egress_rules" : {
@@ -730,6 +739,15 @@
                     "src_type"     : "NETWORK_SECURITY_GROUP",
                     "dst_port_min" : 80,
                     "dst_port_max" : 80
+                  },
+                  "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
+                    "description"  : "Allows ingress from jump hosts in Central Hub VCN's Bastion subnet.",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "src"          : "192.168.0.32/29",
+                    "src_type"     : "CIDR_BLOCK",
+                    "dst_port_min" : 22,
+                    "dst_port_max" : 22
                   }
                 },  
                 "egress_rules" : {
@@ -745,7 +763,7 @@
               "SHARED-SERVICES-VCN-BACK-NSG" : {
                 "display_name" : "back-nsg",
                 "ingress_rules" : {
-                  "FROM-OUTDOOR-NSG" : {
+                  "FROM-MID-NSG" : {
                     "description"  : "Ingress from Mid NSG",
                     "stateless"    : false,
                     "protocol"     : "TCP",
