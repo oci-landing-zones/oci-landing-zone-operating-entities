@@ -17,7 +17,7 @@
     },
 
     "workers_configuration" : {
-        "default_ssh_public_key_path" : "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDyb8osp9GUTyIdRLq7GKYrlBvKJA0uqTaT9AgTS5thoqMBnss6ArWGSHGNPXSHWbv6fOWucMrURZA3E5hpPWrMUNOLoHDJJLgaGBvaIGoD9W2LoqAeCJ9DY6HE4xNmxFQE19fGYi1GGExfs5vTUri59HMQ6Zi+EkoI3dDZOucdaXVEiRe7ocdswqm+QppYm5fAjNG0yZ9BHYquzvj12ywj8Ln3lkHMZxea14LDftv4wdKe6X8KpbyZAU41aERY+9XqhXAZ2I8St652wVBJ7x6VqNlQslq2qvzIUse8s4lBXOOEeHZv2LyTBEuXLc35edNpfAjjFHf0cg6hyArNEl4B user@example.com",
+        "default_ssh_public_key_path" : "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDLFFTrb6laiXUuHuJzX4Im67DTKRqMFMWld3vTe2t4Me547LOlHcgDxLDx6o00DcBP4L+q9tXAUrnoXv/85Lo7IC75dHek3DQYNqAsHyQ2i2vw6Oq4F/bqPpmQ60/Uu9aJ925NQxQ3D012Q66C/OR9kScodORFMnTzkv5hAKv2sziCu/HxUZAzc23XBRu5KQ750vQYZcWy3TqUebU7+VcAFE0uZVff3aOnWW7PSD4yQ0/G3xoLMb1X/bKgJwiAZneoABlorbZ0LIK4Z5wUMd54ey2He+B8b8AZtWzgYrreXztFX02xpvrqNupbCMUiZ1XJXP/6MGsl0r4YmO6aMiaXalDaMZY8kOoBuMtz3rinv8rvdDOjzYU21hhQyVFaDTvsQWZHobV1jnYEE1JNxeFh14CyeFFeRM0C7YAiWIONzCgFRcMNReRn2us7MoGbUOMNvRbYOU73IoPoda/5LNXhLdeTxLoyEjROeFZTqV9r01FOnC95gxLZZk9GvvLsSkatseXdwLHGtlutRXSug4jdPY25dzCi6EB8UIhC5elBCv3i9W/TbduG/ycVXmD1iFp6PKy72vKxH8I0/tsxiIjPLyrjIo+atXRrBO5j3kP2T9maM5MQ0KxkYsBvo6K8yEYUNC2xzEdZxFvF9qpXUnVwuhGw273z+RboQTQ3vQcRgQ== user@example.com",
         "node_pools" : {
             "NODEPOOL1" : {
                 "cluster_id" : "OKE1",
