@@ -15,9 +15,8 @@
           },
           "networking" : {
             "assign_public_ip" : false,
-            "hostname " : "jump-host",
-            "subnet_id" : "JUMP-HOST-SUB",
-            "network_security_groups" : ["JUMP-HOST-NSG"]
+            "hostname " : "dev-jump-host",
+            "subnet_id" : "DEV-MGMT-VCN-JUMP-HOST-SUB"
           },
           "encryption" : {
             "encrypt_in_transit_on_instance_create" : null,
@@ -27,7 +26,10 @@
             "disable_monitoring" : false,
             "disable_management" : false,
             "plugins" : [
-              {"name" : "Bastion", "enabled" : true}
+              {"name" : "Bastion", "enabled" : true},
+              {"name" : "Vulnerability Scanning", "enabled" : true},
+              {"name" : "OS Management Service Agent", "enabled" : true},
+              {"name" : "Custom Logs Monitoring", "enabled" : true}
             ]
           }
         }

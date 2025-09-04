@@ -4,3 +4,5 @@
 **/*.out
 **/.terraform/*
 **/*oci-credentials.tfvars.json
+**/*.old
+**/*.backup

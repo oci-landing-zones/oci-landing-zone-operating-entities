@@ -135,6 +135,23 @@
             },
 
             "route_tables" : {
+              "LBR-SUB-ROUTE" : {
+                "display_name" : "lbr-subnet-route-table",
+                "route_rules" : {
+                  "OUTDOOR-NLB-RULE" : {
+                    "network_entity_key" : "OUTDOOR-NLB",
+                    "description"        : "Traffic destined to customer VCNs goes to Outdoor NLB.",
+                    "destination"        : "10.0.0.0/16",
+                    "destination_type"   : "CIDR_BLOCK"
+                  },
+                  "INTERNET-RULE" : {
+                    "network_entity_key" : "CENTRAL-HUB-VCN-IGW",
+                    "description"        : "All remaining traffic goes to Internet Gateway.",
+                    "destination"        : "0.0.0.0/0",
+                    "destination_type"   : "CIDR_BLOCK"
+                  }
+                }
+              },
               "OUTDOOR-SUB-ROUTE" : {
                 "display_name" : "outdoor-subnet-route-table",
                 "route_rules" : {
@@ -199,6 +216,23 @@
                     "description"        : "All traffic goes to DRG.",
                     "destination"        : "0.0.0.0/0",
                     "destination_type"   : "CIDR_BLOCK"
+                  }
+                }
+              },
+              "HUB-INGRESS-ROUTE" : {
+                "display_name" : "central-hub-vcn-ingress-route-table",
+                "route_rules" : {
+                  "TO-OSN-RULE" : {
+                    "description"        : "Traffic destined to Oracle Services Network goes to Service Gateway.",
+                    "destination"        : "all-services",
+                    "destination_type"   : "SERVICE_CIDR_BLOCK",
+                    "network_entity_key" : "CENTRAL-HUB-VCN-SGW"
+                  },
+                  "TO-ANYWHERE-RULE" : {
+                    "description"        : "All remaining traffic goes to Indoor NLB.",
+                    "destination"        : "0.0.0.0/0",
+                    "destination_type"   : "CIDR_BLOCK",
+                    "network_entity_key" : "INDOOR-NLB"
                   }
                 }
               }
@@ -315,6 +349,13 @@
               "INDOOR-FW-NSG" : {
                 "display_name" : "indoor-fw-nsg",
                 "ingress_rules" : {
+                  "FROM-INDOOR-NSG" : {
+                    "description"  : "Ingress from Indoor NSG.",
+                    "stateless"    : false,
+                    "protocol"     : "ALL",
+                    "src"          : "INDOOR-NLB-NSG",
+                    "src_type"     : "NETWORK_SECURITY_GROUP"
+                  },
                   "FROM-SECURITY-VCN" : {
                     "description"  : "Ingress from Mgmt Plane Security VCN.",
                     "stateless"    : false,
@@ -545,6 +586,15 @@
                     "src_type"     : "NETWORK_SECURITY_GROUP",
                     "dst_port_min" : 80,
                     "dst_port_max" : 80
+                  },
+                  "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
+                    "description"  : "Allows ingress from jump hosts in Central Hub VCN's Bastion subnet.",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "src"          : "192.168.0.32/29",
+                    "src_type"     : "CIDR_BLOCK",
+                    "dst_port_min" : 22,
+                    "dst_port_max" : 22
                   }
                 }, 
                 "egress_rules" : {
@@ -715,6 +765,15 @@
                     "src_type"     : "NETWORK_SECURITY_GROUP",
                     "dst_port_min" : 80,
                     "dst_port_max" : 80
+                  },
+                  "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
+                    "description"  : "Allows ingress from jump hosts in Central Hub VCN's Bastion subnet.",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "src"          : "192.168.0.32/29",
+                    "src_type"     : "CIDR_BLOCK",
+                    "dst_port_min" : 22,
+                    "dst_port_max" : 22
                   }
                 },  
                 "egress_rules" : {
@@ -730,7 +789,7 @@
               "SHARED-SERVICES-VCN-BACK-NSG" : {
                 "display_name" : "back-nsg",
                 "ingress_rules" : {
-                  "FROM-OUTDOOR-NSG" : {
+                  "FROM-MID-NSG" : {
                     "description"  : "Ingress from Mid NSG",
                     "stateless"    : false,
                     "protocol"     : "TCP",
@@ -776,47 +835,7 @@
             }
           }
         },
-        "inject_into_existing_vcns" : {
-          "CENTRAL-HUB-VCN-INJECT" : {
-            "vcn_id" : "CENTRAL-HUB-VCN",
-            "route_tables" : {
-              "LBR-SUB-ROUTE" : {
-                "display_name" : "lbr-subnet-route-table",
-                "route_rules" : {
-                  "OUTDOOR-NLB-RULE" : {
-                    "network_entity_key" : "OUTDOOR-NLB",
-                    "description"        : "Traffic destined to customer VCNs goes to Outdoor NLB.",
-                    "destination"        : "10.0.0.0/16",
-                    "destination_type"   : "CIDR_BLOCK"
-                  },
-                  "INTERNET-RULE" : {
-                    "network_entity_key" : "CENTRAL-HUB-VCN-IGW",
-                    "description"        : "All remaining traffic goes to Internet Gateway.",
-                    "destination"        : "0.0.0.0/0",
-                    "destination_type"   : "CIDR_BLOCK"
-                  }
-                }
-              },
-              "HUB-INGRESS-ROUTE" : {
-                "display_name" : "central-hub-vcn-ingress-route-table",
-                "route_rules" : {
-                  "TO-OSN-RULE" : {
-                    "description"        : "Traffic destined to Oracle Services Network goes to Service Gateway.",
-                    "destination"        : "all-services",
-                    "destination_type"   : "SERVICE_CIDR_BLOCK",
-                    "network_entity_key" : "CENTRAL-HUB-VCN-SGW"
-                  },
-                  "TO-ANYWHERE-RULE" : {
-                    "description"        : "All remaining traffic goes to Indoor NLB.",
-                    "destination"        : "0.0.0.0/0",
-                    "destination_type"   : "CIDR_BLOCK",
-                    "network_entity_key" : "INDOOR-NLB"
-                  }
-                }
-              }
-            }  
-          }
-        },
+
        "non_vcn_specific_gateways" : {
           "dynamic_routing_gateways" : {
             "CENTRAL-HUB-DRG" : {

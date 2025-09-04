@@ -15,9 +15,8 @@
           },
           "networking" : {
             "assign_public_ip" : false,
-            "hostname " : "oke-operator-host",
-            "subnet_id" : "SHARED-SERVICES-VCN-MID-SUB",
-            "network_security_groups" : ["SHARED-SERVICES-VCN-MID-NSG"]
+            "hostname " : "dev-oke-operator-host",
+            "subnet_id" : "DEV-MGMT-VCN-APP-OPERATOR-SUB"
           },
           "encryption" : {
             "encrypt_in_transit_on_instance_create" : null,
