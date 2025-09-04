@@ -430,17 +430,6 @@
                   }
                 }
               },
-              "OSN-ONLY-ROUTE" : {
-                "display_name" : "osn-only-route-table",
-                "route_rules" : {
-                  "TO-OSN-RULE" : {
-                    "description"        : "Traffic destined to Oracle Services Network goes to Service Gateway.",
-                    "destination"        : "all-services",
-                    "destination_type"   : "SERVICE_CIDR_BLOCK",
-                    "network_entity_key" : "DEV-MGMT-VCN-SGW"
-                  }
-                }
-              },
               "DRG-OSN-ROUTE" : {
                 "display_name" : "drg-osn-route-table",
                 "route_rules" : {
@@ -574,8 +563,7 @@
               "service_gateways" : {
                 "DEV-MGMT-VCN-SGW" : {
                   "display_name" : "dev-mgmt-vcn-sgw",
-                  "services" : "all-services",
-                  "route_table_key" : "OSN-ONLY-ROUTE"
+                  "services" : "all-services"
                 }
               }
             }
