@@ -149,11 +149,11 @@
                       "dst_port_min" : 30000,
                       "dst_port_max" : 32767
                     },
-                    "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
-                      "description"  : "Allows ingress from jump hosts in Central Hub VCN's Bastion subnet.",
+                    "INGRESS-FROM-MGMT-SUBNET-RULE" : {
+                      "description"  : "Allows ingress to SSH from hosts used to manage the cluster: app-operator-subnet in mgmt plane's mgmt-vcn.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
-                      "src"          : "192.168.0.32/29",
+                      "src"          : "192.168.0.80/28",
                       "src_type"     : "CIDR_BLOCK",
                       "dst_port_min" : 22,
                       "dst_port_max" : 22
@@ -208,11 +208,11 @@
                       "dst_port_min" : 12250,
                       "dst_port_max" : 12250
                     },
-                    "INGRESS-FROM-MGMT-NSG-RULE" : {
-                      "description"  : "Allows ingress from hosts used to manage the cluster: mid-subnet in mgmt plane's shared-services-vcn.",
+                    "INGRESS-FROM-MGMT-SUBNET-RULE" : {
+                      "description"  : "Allows ingress to OKE APIs from hosts used to manage the cluster: app-operator-subnet in mgmt plane's mgmt-vcn.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
-                      "src"          : "192.168.0.144/28",
+                      "src"          : "192.168.0.80/28",
                       "src_type"     : "CIDR_BLOCK",
                       "dst_port_min" : 6443,
                       "dst_port_max" : 6443
