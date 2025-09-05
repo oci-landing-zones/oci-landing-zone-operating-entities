@@ -508,6 +508,13 @@
                     "dst_type"     : "CIDR_BLOCK",
                     "dst_port_min" : 22,
                     "dst_port_max" : 22
+                  },
+                  {
+                    "description"  : "Egress to Oracle Services Network.",
+                    "stateless"    : false,
+                    "protocol"     : "TCP",
+                    "dst"          : "all-services",
+                    "dst_type"     : "SERVICE_CIDR_BLOCK"
                   }
                 ]
               },
