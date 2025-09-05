@@ -88,7 +88,7 @@
                 "route_rules" : {
                   "INTERNET-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-VCN-IGW",
-                    "description"        : "All traffic goes to Internet Gateway.",
+                    "description"        : "Traffic goes to Internet Gateway.",
                     "destination"        : "0.0.0.0/0",
                     "destination_type"   : "CIDR_BLOCK"
                   }
@@ -99,7 +99,7 @@
                 "route_rules" : {
                   "TO-ANYWHERE-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-VCN-NATGW",
-                    "description"        : "All traffic goes to NAT Gateway",
+                    "description"        : "Traffic goes to NAT Gateway",
                     "destination"        : "0.0.0.0/0",
                     "destination_type"   : "CIDR_BLOCK"
                   }
@@ -116,7 +116,7 @@
                   },
                   "TO-ANYWHERE-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-DRG",
-                    "description"        : "All remaining traffic goes to DRG.",
+                    "description"        : "Traffic goes to DRG.",
                     "destination"        : "0.0.0.0/0",
                     "destination_type"   : "CIDR_BLOCK"
                   }
@@ -125,9 +125,15 @@
               "MGMT-SUB-ROUTE" : {
                 "display_name" : "mgmt-subnet-route-table",
                 "route_rules" : {
+                  "TO-MGMT-VCN-RULE" : {
+                    "network_entity_key" : "CENTRAL-HUB-DRG",
+                    "description"        : "Traffic destined to mgmt-vcn goes to DRG.",
+                    "destination"        : "192.168.0.64/26",
+                    "destination_type"   : "CIDR_BLOCK"
+                  },
                   "TO-ANYWHERE-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-VCN-NATGW",
-                    "description"        : "All traffic goes to NAT Gateway",
+                    "description"        : "Traffic goes to NAT Gateway",
                     "destination"        : "0.0.0.0/0",
                     "destination_type"   : "CIDR_BLOCK"
                   }
@@ -138,7 +144,7 @@
                 "route_rules" : {
                   "TO-ANYWHERE-RULE" : {
                     "network_entity_key" : "CENTRAL-HUB-DRG",
-                    "description"        : "All traffic goes to DRG.",
+                    "description"        : "Traffic goes to DRG.",
                     "destination"        : "0.0.0.0/0",
                     "destination_type"   : "CIDR_BLOCK"
                   }
