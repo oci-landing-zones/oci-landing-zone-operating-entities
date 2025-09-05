@@ -7,7 +7,7 @@
           "name" : "oke-operator-host",
           "shape" : "VM.Standard.E4.Flex",
           "marketplace_image" : {
-            "name" : "Oracle Linux 8 STIG"
+            "name" : "Oracle Linux 7 STIG"
           },
           "boot_volume" : {
             "size" : 60,
