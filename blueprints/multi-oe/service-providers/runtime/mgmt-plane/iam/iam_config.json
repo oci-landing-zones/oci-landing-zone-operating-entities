@@ -196,10 +196,10 @@
                   "allow group isv-ops-network-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp",
                   "allow group isv-ops-network-grp to manage virtual-network-family in compartment isv-customers-cmp:isv-dev-cmp",
                   "allow group isv-ops-network-grp to manage virtual-network-family in compartment isv-customers-cmp:isv-test-cmp",
-                  "allow group isv-ops-network-grp to manage virtual-network-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-network-grp to manage virtual-network-family in compartment isv-customers-cmp:isv-prod-cmp",
                   "allow group isv-ops-network-grp to manage drgs in compartment isv-customers-cmp:isv-dev-cmp",
                   "allow group isv-ops-network-grp to manage drgs in compartment isv-customers-cmp:isv-test-cmp",
-                  "allow group isv-ops-network-grp to manage drgs in compartment isv-customers-cmp:isv-dev-cmp"
+                  "allow group isv-ops-network-grp to manage drgs in compartment isv-customers-cmp:isv-prod-cmp"
                 ]            
             },
             "SECURITY-POLICY" : {
