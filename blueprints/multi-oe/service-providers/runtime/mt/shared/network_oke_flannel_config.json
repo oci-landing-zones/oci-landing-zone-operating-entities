@@ -14,7 +14,7 @@
               "block_nat_traffic"                : false,
   
               "subnets" : {
-                "OKE-SERVICES-SUBNET" : {
+                "OKE-VCN-SERVICES-SUBNET" : {
                   "cidr_block"                 : "10.0.129.0/26",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "services-subnet",
@@ -23,7 +23,7 @@
                   "prohibit_internet_ingress"  : true,
                   "route_table_key"            : "DRG-ONLY-ROUTE"
                 },
-                "OKE-WORKERS-SUBNET" : {
+                "OKE-VCN-WORKERS-SUBNET" : {
                   "cidr_block"                 : "10.0.128.0/24",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "workers-subnet",
@@ -32,7 +32,7 @@
                   "prohibit_internet_ingress"  : true,
                   "route_table_key"            : "DRG-OSN-ROUTE"
                 },
-                "OKE-API-SUBNET" : {
+                "OKE-VCN-API-SUBNET" : {
                   "cidr_block"                 : "10.0.129.64/29",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "api-subnet",
@@ -41,7 +41,7 @@
                   "prohibit_internet_ingress"  : true,
                   "route_table_key"            : "DRG-ONLY-ROUTE"
                 },
-                "OKE-DATA-SUBNET" : {
+                "OKE-VCN-DATA-SUBNET" : {
                   "cidr_block"                 : "10.0.129.72/25",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "data-subnet",

@@ -8,8 +8,8 @@
                 "is_enhanced" : false,
                 "networking" : {
                     "vcn_id" : "OKE-VCN",
-                    "api_endpoint_subnet_id" : "OKE-API-SUBNET",
-                    "services_subnet_id" : ["OKE-SERVICES-SUBNET"],
+                    "api_endpoint_subnet_id" : "OKE-VCN-API-SUBNET",
+                    "services_subnet_id" : ["OKE-VCN-SERVICES-SUBNET"],
                     "api_endpoint_nsg_ids" : ["OKE-VCN-API-NSG"]
                 }
             }
@@ -24,8 +24,8 @@
                 "name"       : "node-pool",
                 "size"       : 1,
                 "networking" : {
-                    "workers_subnet_id" : "OKE-WORKERS-SUBNET",
-                    "pods_subnet_id"    : "OKE-PODS-SUBNET",
+                    "workers_subnet_id" : "OKE-VCN-WORKERS-SUBNET",
+                    "pods_subnet_id"    : "OKE-VCN-PODS-SUBNET",
                     "workers_nsg_ids"   : ["OKE-VCN-WORKERS-NSG"],
                     "pods_nsg_ids"      : ["OKE-VCN-PODS-NSG"]
                 },
