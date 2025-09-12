@@ -161,7 +161,14 @@
                   "allow group isv-ops-security-grp to read tenancies in tenancy",
                   "allow group isv-ops-security-grp to read audit-events in tenancy",
                   "allow group isv-ops-governance-grp to manage usage-report in tenancy",
-                  "allow group isv-ops-governance-grp to manage usage-budgets in tenancy",
+                  "allow group isv-ops-governance-grp to manage usage-budgets in tenancy"
+                ]
+            },
+            "AUDITORS-POLICY" : {
+                "name" : "isv-auditors-policy",
+                "description" : "Auditors policy.",
+                "compartment_id" : "TENANCY-ROOT",
+                "statements" : [
                   "allow group isv-auditors-grp to inspect all-resources in tenancy",
                   "allow group isv-auditors-grp to read instances in tenancy",
                   "allow group isv-auditors-grp to read load-balancers in tenancy",
