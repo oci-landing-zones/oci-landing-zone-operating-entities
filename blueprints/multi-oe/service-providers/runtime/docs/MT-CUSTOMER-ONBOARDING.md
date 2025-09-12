@@ -8,9 +8,7 @@ A stack that deploys customer specific artifacts in the Multi-Tenant model.
 2. [Mgmt Plane Networking 1st stage - Mgmt Plane VCNs](./MPLANE-NETWORKING.md#stage1)
 3. [Mgmt Plane Networking - Firewall](./MPLANE-FIREWALL.md)
 4. [Mgmt Plane Networking 2nd stage - Network routing post firewall deployment](./MPLANE-NETWORKING.md#stage2)
-5. **Multi-Tenant Shared**
-    1. [Database Service](./MT-SHARED-DB.md)
-    2. [OKE - Oracle Kubernetes Engine](./MT-SHARED-OKE.md)
+5. [Multi-tenant OKE - Oracle Kubernetes Engine](./MT-SHARED-OKE.md)
 6. **Multi-Tenant Model - Customer Onboarding (this stack)**
 
 ### Stack Configuration

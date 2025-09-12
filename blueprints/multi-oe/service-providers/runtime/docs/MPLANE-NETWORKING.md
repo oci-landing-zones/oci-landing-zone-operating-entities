@@ -18,7 +18,7 @@ This stack is executed in two different stages with a **PROGRESSIVELY UPDATED in
 2. **Mgmt Plane Networking 1st stage - Mgmt Plane VCNs and DRG (this stack)**
 3. [Mgmt Plane Networking - Firewall](./MPLANE-FIREWALL.md)
 4. **Mgmt Plane Networking 2nd stage - Network routing post firewall deployment (this stack)**
-5. Either [Pod Model - Customer Onboarding](./POD-CUSTOMER-ONBOARDING.md) or [Multi-Tenant Shared](./MT-SHARED-DB.md)/[Multi-Tenant Model - Customer Onboarding](./MT-CUSTOMER-ONBOARDING.md)
+5. Either [Pod Model - Customer Onboarding](./POD-CUSTOMER-ONBOARDING.md) or [Multi-Tenant Shared](./MT-SHARED-OKE.md)/[Multi-Tenant Model - Customer Onboarding](./MT-CUSTOMER-ONBOARDING.md)
 
 ### <a name="stage1">Network Stack 1st Stage</a> 
 

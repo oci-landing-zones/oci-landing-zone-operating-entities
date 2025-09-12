@@ -95,19 +95,32 @@
                 "name" : "isv-ops-governance-grp",
                 "description" : "ISV Governance operations group."
             },
-            "CUSTOMERS-GROUP" : {
-                "name" : "isv-ops-customers-grp",
-                "description" : "ISV Customers operations group."
-            },"AUDITORS-GROUP" : {
+            "AUDITORS-GROUP" : {
                 "name" : "isv-auditors-grp",
                 "description" : "ISV auditors group."
+            },
+            "ANNOUNCEMENT-READERS-GROUP" : {
+                "name" : "isv-announcement-readers-grp",
+                "description" : "ISV announcement readers group."
+            },
+            "DEV-ENV-ADMIN-GROUP" : {
+                "name" : "isv-ops-dev-env-admin-grp",
+                "description" : "ISV Dev environment admin group."
+            },
+            "TEST-ENV-ADMIN-GROUP" : {
+                "name" : "isv-ops-test-env-admin-grp",
+                "description" : "ISV Test environment admin group."
+            },
+            "PROD-ENV-ADMIN-GROUP" : {
+                "name" : "isv-ops-prod-env-admin-grp",
+                "description" : "ISV Prod environment admin group."
             }
         }
     },
     "policies_configuration" : {
         "supplied_policies" : {
             "ROOT-POLICY" : {
-                "name" : "isv-mgmt-plane-root-policy",
+                "name" : "isv-root-policy",
                 "description" : "Root compartment policy.",
                 "compartment_id" : "TENANCY-ROOT",
                 "statements" : [
@@ -130,15 +143,17 @@
                   "allow group isv-ops-iam-group to manage orm-config-source-providers in tenancy",
                   "allow group isv-ops-iam-group to manage policies in tenancy",
                   "allow group isv-ops-iam-group to manage compartments in tenancy",
+                  "allow group isv-ops-iam-group to manage announcement-subscriptions in tenancy",
+                  "allow group isv-ops-iam-group to manage ons-family in tenancy",
+                  "allow group isv-announcement-readers-grp to read announcements in tenancy",
                   "allow group isv-ops-cred-group to manage users in tenancy where any {request.operation = 'ListApiKeys',request.operation = 'ListAuthTokens',request.operation = 'ListCustomerSecretKeys',request.operation = 'UploadApiKey',request.operation = 'DeleteApiKey',request.operation = 'UpdateAuthToken',request.operation = 'CreateAuthToken',request.operation = 'DeleteAuthToken',request.operation = 'CreateSecretKey',request.operation = 'UpdateCustomerSecretKey',request.operation = 'DeleteCustomerSecretKey',request.operation = 'UpdateUserCapabilities'}",
                   "allow group isv-ops-iam-group, isv-ops-cred-group to inspect users in tenancy",
                   "allow group isv-ops-iam-group, isv-ops-cred-group to inspect groups in tenancy",
                   "allow group isv-ops-iam-group, isv-ops-cred-group to use cloud-shell in tenancy",
                   "allow group isv-ops-iam-group, isv-ops-cred-group to read usage-budgets in tenancy",
                   "allow group isv-ops-iam-group, isv-ops-cred-group to read usage-reports in tenancy",
-                  "allow group isv-ops-iam-group, isv-ops-cred-group to read objectstorage-namespaces in tenancy",
-                  "allow group isv-ops-network-grp, isv-ops-security-grp, isv-ops-governance-grp, isv-ops-customers-grp, isv-ops-snowflake-customers-grp to read objectstorage-namespaces in tenancy",
-                  "allow group isv-ops-network-grp, isv-ops-security-grp, isv-ops-governance-grp, isv-ops-customers-grp, isv-ops-snowflake-customers-grp to inspect compartments in tenancy",
+                  "allow group isv-ops-iam-group, isv-ops-cred-group, isv-ops-network-grp, isv-ops-security-grp, isv-ops-governance-grp to read objectstorage-namespaces in tenancy",
+                  "allow group isv-ops-network-grp, isv-ops-security-grp, isv-ops-governance-grp to inspect compartments in tenancy",
                   "allow group isv-ops-security-grp to manage cloudevents-rules in tenancy",
                   "allow group isv-ops-security-grp to manage alarms in tenancy",
                   "allow group isv-ops-security-grp to manage metrics in tenancy",
@@ -178,7 +193,13 @@
                   "allow group isv-ops-network-grp to manage keys in compartment isv-mgmt-plane-cmp:isv-network-cmp",
                   "allow group isv-ops-network-grp to manage secret-family in compartment isv-mgmt-plane-cmp:isv-network-cmp",
                   "allow group isv-ops-network-grp to use key-delegate in compartment isv-mgmt-plane-cmp:isv-network-cmp",
-                  "allow group isv-ops-network-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp"
+                  "allow group isv-ops-network-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-network-grp to manage virtual-network-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-network-grp to manage virtual-network-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-network-grp to manage virtual-network-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-network-grp to manage drgs in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-network-grp to manage drgs in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-network-grp to manage drgs in compartment isv-customers-cmp:isv-dev-cmp"
                 ]            
             },
             "SECURITY-POLICY" : {
@@ -235,57 +256,126 @@
                   "allow group isv-ops-security-grp to read repos in compartment isv-mgmt-plane-cmp"
                 ]            
               },
-              "CUSTOMERS-POLICY" : {
-                "name" : "isv-ops-customers-policy",
-                "description" : "Customer operations policy.",
+              "DEV-ENV-POLICY" : {
+                "name" : "isv-ops-dev-env-policy",
+                "description" : "Development environment operations policy.",
                 "compartment_id" : "TOP-CMP",
                 "statements" : [
-                  "allow group isv-ops-customers-grp to manage compartments in compartment isv-customers-cmp", 
-                  "allow group isv-ops-customers-grp to manage policies in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage virtual-network-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage instance-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage compute-management-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage instance-agent-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage instance-agent-command-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage auto-scaling-configurations in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage compute-capacity-reports in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage compute-capacity-reservations in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage compute-clusters in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage dedicated-vm-hosts in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage compute-global-image-capability-schema in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage compute-image-capability-schema in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to inspect work-requests in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage volume-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage file-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage buckets in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage private-ips in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage stream-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage functions-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage ons-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage api-gateway-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage cluster-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage autonomous-database-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage database-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage keys in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage secret-family in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to use key-delegate in compartment isv-customers-cmp",
-                  "allow group isv-ops-customers-grp to manage drg-attachment in compartment isv-customers-cmp",
-                  "allow group isv-ops-network-grp to read drg-attachment in compartment isv-customers-cmp"
+                  "allow group isv-ops-dev-env-admin-grp to manage compartments in compartment isv-customers-cmp:isv-dev-cmp", 
+                  "allow group isv-ops-dev-env-admin-grp to manage policies in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage virtual-network-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage instance-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage compute-management-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage instance-agent-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage instance-agent-command-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage auto-scaling-configurations in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage compute-capacity-reports in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage compute-capacity-reservations in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage compute-clusters in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage dedicated-vm-hosts in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage compute-global-image-capability-schema in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage compute-image-capability-schema in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to inspect work-requests in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage volume-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage file-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage buckets in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage private-ips in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage stream-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage functions-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage ons-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage api-gateway-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage cluster-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage autonomous-database-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage database-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage keys in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage secret-family in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to use key-delegate in compartment isv-customers-cmp:isv-dev-cmp",
+                  "allow group isv-ops-dev-env-admin-grp to manage drg-attachment in compartment isv-customers-cmp:isv-dev-cmp"
                 ]            
               },
-              "CUSTOMER-OPS-ON-MGMT-POLICY" : {
-                "name" : "isv-customer-ops-on-mgmt-plane-policy",
-                "description" : "Customer operations on management plane policy.",
+              "TEST-ENV-POLICY" : {
+                "name" : "isv-ops-test-env-policy",
+                "description" : "Test environment operations policy.",
                 "compartment_id" : "TOP-CMP",
                 "statements" : [
-                  "allow group isv-ops-customers-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp",
-                  "allow group isv-ops-customers-grp to use drg-object in compartment isv-mgmt-plane-cmp:isv-network-cmp",
-                  "allow group isv-ops-customers-grp to manage drg-route-tables in compartment isv-mgmt-plane-cmp:isv-network-cmp",
-                  "allow group isv-ops-customers-grp to manage drg-route-distribution in compartment isv-mgmt-plane-cmp:isv-network-cmp",
-                  "allow group isv-ops-snowflake-customers-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp",
-                  "allow group isv-ops-snowflake-customers-grp to use drg-object in compartment isv-mgmt-plane-cmp:isv-network-cmp",
-                  "allow group isv-ops-snowflake-customers-grp to manage drg-route-tables in compartment isv-mgmt-plane-cmp:isv-network-cmp",
-                  "allow group isv-ops-snowflake-customers-grp to manage drg-route-distribution in compartment isv-mgmt-plane-cmp:isv-network-cmp"
+                  "allow group isv-ops-test-env-admin-grp to manage compartments in compartment isv-customers-cmp:isv-test-cmp", 
+                  "allow group isv-ops-test-env-admin-grp to manage policies in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage virtual-network-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage instance-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage compute-management-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage instance-agent-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage instance-agent-command-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage auto-scaling-configurations in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage compute-capacity-reports in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage compute-capacity-reservations in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage compute-clusters in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage dedicated-vm-hosts in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage compute-global-image-capability-schema in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage compute-image-capability-schema in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to inspect work-requests in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage volume-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage file-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage buckets in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage private-ips in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage stream-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage functions-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage ons-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage api-gateway-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage cluster-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage autonomous-database-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage database-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage keys in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage secret-family in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to use key-delegate in compartment isv-customers-cmp:isv-test-cmp",
+                  "allow group isv-ops-test-env-admin-grp to manage drg-attachment in compartment isv-customers-cmp:isv-test-cmp"
+                ]            
+              },
+              "PROD-ENV-POLICY" : {
+                "name" : "isv-ops-prod-env-policy",
+                "description" : "Production environment operations policy.",
+                "compartment_id" : "TOP-CMP",
+                "statements" : [
+                  "allow group isv-ops-prod-env-admin-grp to manage compartments in compartment isv-customers-cmp:isv-prod-cmp", 
+                  "allow group isv-ops-prod-env-admin-grp to manage policies in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage virtual-network-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage instance-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage compute-management-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage instance-agent-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage instance-agent-command-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage auto-scaling-configurations in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage compute-capacity-reports in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage compute-capacity-reservations in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage compute-clusters in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage dedicated-vm-hosts in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage compute-global-image-capability-schema in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage compute-image-capability-schema in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to inspect work-requests in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage volume-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage file-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage buckets in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage private-ips in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage stream-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage functions-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage ons-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage api-gateway-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage cluster-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage autonomous-database-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage database-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage keys in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage secret-family in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to use key-delegate in compartment isv-customers-cmp:isv-prod-cmp",
+                  "allow group isv-ops-prod-env-admin-grp to manage drg-attachment in compartment isv-customers-cmp:isv-prod-cmp"
+                ]            
+              },
+              "ENV-ADMINS-ON-MGMT-PLANE-POLICY" : {
+                "name" : "isv-env-admins-on-mgmt-plane-policy",
+                "description" : "Environment administrators policy to act on management plane.",
+                "compartment_id" : "TOP-CMP",
+                "statements" : [
+                  "allow group isv-ops-dev-env-admin-grp,isv-ops-test-env-admin-grp,isv-ops-prod-env-admin-grp to use vaults in compartment isv-mgmt-plane-cmp:isv-security-cmp",
+                  "allow group isv-ops-dev-env-admin-grp,isv-ops-test-env-admin-grp,isv-ops-prod-env-admin-grp to use drg-object in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-dev-env-admin-grp,isv-ops-test-env-admin-grp,isv-ops-prod-env-admin-grp to manage drg-route-tables in compartment isv-mgmt-plane-cmp:isv-network-cmp",
+                  "allow group isv-ops-dev-env-admin-grp,isv-ops-test-env-admin-grp,isv-ops-prod-env-admin-grp to manage drg-route-distribution in compartment isv-mgmt-plane-cmp:isv-network-cmp"
                 ]  
             },
             "OCI-SERVICES-POLICY" : {

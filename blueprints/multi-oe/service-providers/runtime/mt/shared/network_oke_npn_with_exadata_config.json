@@ -3,7 +3,7 @@
       "default_enable_cis_checks" : true,
       "default_compartment_id" : "CUSTOMERS-DEV-CMP",
       "network_configuration_categories" : {
-        "production" : {
+        "DEV" : {
           "vcns" : {
             "OKE-VCN" : {
               "display_name"                     : "oke-dev-vcn",
@@ -15,7 +15,7 @@
   
               "subnets" : {
                 "OKE-SERVICES-SUBNET" : {
-                  "cidr_block"                 : "10.0.130.128/27",
+                  "cidr_block"                 : "10.0.129.128/26",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "services-subnet",
                   "dns_label"                  : "services",
@@ -24,7 +24,7 @@
                   "route_table_key"            : "DRG-ONLY-ROUTE"
                 },
                 "OKE-WORKERS-SUBNET" : {
-                  "cidr_block"                 : "10.0.130.0/25",
+                  "cidr_block"                 : "10.0.129.0/25",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "workers-subnet",
                   "dns_label"                  : "workers",
@@ -33,7 +33,7 @@
                   "route_table_key"            : "DRG-OSN-ROUTE"
                 },
                 "OKE-PODS-SUBNET" : {
-                  "cidr_block"                 : "10.0.128.0/23",
+                  "cidr_block"                 : "10.0.128.0/24",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "pods-subnet",
                   "dns_label"                  : "pods",
@@ -42,7 +42,7 @@
                   "route_table_key"            : "DRG-ONLY-ROUTE"
                 },
                 "OKE-API-SUBNET" : {
-                  "cidr_block"                 : "10.0.130.192/29",
+                  "cidr_block"                 : "10.0.129.192/29",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "api-subnet",
                   "dns_label"                  : "api",
@@ -51,13 +51,23 @@
                   "route_table_key"            : "DRG-ONLY-ROUTE"
                 },
                 "OKE-DATA-SUBNET" : {
-                  "cidr_block"                 : "10.0.130.160/27",
+                  "cidr_block"                 : "10.0.130.0/25",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "data-subnet",
                   "dns_label"                  : "data",
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
-                  "route_table_key"            : "DRG-OSN-ROUTE"
+                  "route_table_key"            : "DRG-OSN-ROUTE",
+                  "security_list_keys"         : ["EXACS-CLIENT-SUBNET-SL"]
+                },
+                "EXA-BACKUP-SUBNET" : {
+                  "cidr_block"                 : "10.0.130.128/26",
+                  "dhcp_options_key"           : "default_dhcp_options",
+                  "display_name"               : "exacs-backup-subnet",
+                  "dns_label"                  : "exacsbackup",
+                  "ipv6cidr_blocks"            : [],
+                  "prohibit_internet_ingress"  : true,
+                  "route_table_key"            : "OSN-ONLY-ROUTE"
                 }
               },
   
@@ -67,9 +77,20 @@
                   "route_rules" : {
                     "DRG-RULE" : {
                       "network_entity_key" : "CENTRAL-HUB-DRG",
-                      "description"        : "All traffic goes to DRG.",
+                      "description"        : "Traffic goes to DRG.",
                       "destination"        : "0.0.0.0/0",
                       "destination_type"   : "CIDR_BLOCK"
+                    }
+                  }
+                },
+                "OSN-ONLY-ROUTE" : {
+                  "display_name" : "osn-only-route-table",
+                  "route_rules" : {
+                    "OSN-RULE" : {
+                      "network_entity_key" : "SERVICE-GATEWAY",
+                      "description"        : "Traffic goes to Service Gateway.",
+                      "destination"        : "all-services",
+                      "destination_type"   : "SERVICE_CIDR_BLOCK"
                     }
                   }
                 },
@@ -78,13 +99,13 @@
                   "route_rules" : {
                     "DRG-RULE" : {
                       "network_entity_key" : "CENTRAL-HUB-DRG",
-                      "description"        : "All traffic goes to DRG.",
+                      "description"        : "Traffic goes to DRG.",
                       "destination"        : "0.0.0.0/0",
                       "destination_type"   : "CIDR_BLOCK"
                     },
                     "OSN-RULE" : {
                       "network_entity_key" : "SERVICE-GATEWAY",
-                      "description"        : "To Service Gateway.",
+                      "description"        : "Traffic goes to Service Gateway.",
                       "destination"        : "all-services",
                       "destination_type"   : "SERVICE_CIDR_BLOCK"
                     }
@@ -92,6 +113,43 @@
                 }
               },
   
+              "security_lists" : {
+                "EXACS-CLIENT-SUBNET-SL" : {
+                  "display_name" : "exacs-client-subnet-security-list",
+                  "ingress_rules" : [
+                    {
+                      "description"  : "Allows SSH connections from hosts in Exadata client subnet.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "10.0.130.0/25",
+                      "src_type"     : "CIDR_BLOCK",
+                      "dst_port_min" : 22,
+                      "dst_port_max" : 22
+                    }
+                  ],
+                  "egress_rules" : [
+                    {
+                      "description"  : "Allows SSH connections to hosts in Exadata client subnet.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "dst"          : "10.0.130.0/25",
+                      "dst_type"     : "CIDR_BLOCK",
+                      "dst_port_min" : 22,
+                      "dst_port_max" : 22
+                    },
+                    {
+                      "description" : "Allows the initiation of ICMP connections to hosts in Exadata client subnet.",
+                      "stateless"   : false,
+                      "protocol"    : "ICMP",
+                      "dst"         : "10.0.130.0/25",
+                      "dst_type"    : "CIDR_BLOCK",
+                      "icmp_type"   : 3,
+                      "icmp_code"   : 4
+                    }
+                  ]
+                }
+              },
+
               "network_security_groups" : {
                 "OKE-VCN-SERVICES-NSG" : {
                   "display_name" : "services-nsg",
@@ -159,7 +217,7 @@
                       "dst_port_max" : 22
                     },
                     "INGRESS-FROM-ANYWHERE-ICMP-WORKERS-RULE" : {
-                      "description" : "Allow ICMP ingress to workers for path discovery.",
+                      "description" : "Allows ICMP ingress to workers for path discovery.",
                       "stateless"   : false,
                       "protocol"    : "ICMP",
                       "src"         : "0.0.0.0/0",
@@ -218,7 +276,7 @@
                       "dst_port_max" : 6443
                     },
                     "INGRESS-FROM-API-API-RULE" : {
-                      "description"  : "Allow TCP ingress for Kubernetes control plane inter-communication.",
+                      "description"  : "Allows TCP ingress for Kubernetes control plane inter-communication.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "OKE-VCN-API-NSG",
@@ -227,7 +285,7 @@
                       "dst_port_max" : 6443
                     },
                     "INGRESS-FROM-WORKERS-ICMP-API-RULE" : {
-                      "description" : "Allow ICMP ingress for path discovery from worker nodes.",
+                      "description" : "Allows ICMP ingress for path discovery from worker nodes.",
                       "stateless"   : false,
                       "protocol"    : "ICMP",
                       "src"         : "OKE-VCN-WORKERS-NSG",
@@ -254,43 +312,6 @@
                       "dst_port_max" : 12250
                     }
                   }, 
-                  "egress_rules" : {
-                    "EGRESS-TO-ANYWHERE" : {
-                      "description" : "Allows egress to anywhere.",
-                      "stateless"   : false,
-                      "protocol"    : "TCP",
-                      "dst"         : "0.0.0.0/0",
-                      "dst_type"    : "CIDR_BLOCK"
-                    }
-                  }
-                },
-                "OKE-VCN-DATA-NSG" : {
-                  "display_name" : "data-nsg",
-                  "ingress_rules" : {
-                    "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
-                      "description"  : "Allows ingress from jump hosts in Central Hub VCN's Bastion subnet.",
-                      "stateless"    : false,
-                      "protocol"     : "TCP",
-                      "src"          : "192.168.0.32/29",
-                      "src_type"     : "CIDR_BLOCK",
-                      "dst_port_min" : 22,
-                      "dst_port_max" : 22
-                    },
-                    "INGRESS-FROM-WORKERS-NSG-RULE" : {
-                      "description"  : "Allows ingress from worker nodes.",
-                      "stateless"    : false,
-                      "protocol"     : "TCP",
-                      "src"          : "OKE-VCN-WORKERS-NSG",
-                      "src_type"     : "NETWORK_SECURITY_GROUP"
-                    },
-                    "INGRESS-FROM-PODS-NSG-RULE" : {
-                      "description"  : "Allows ingress from pods.",
-                      "stateless"    : false,
-                      "protocol"     : "TCP",
-                      "src"          : "OKE-VCN-PODS-NSG",
-                      "src_type"     : "NETWORK_SECURITY_GROUP"
-                    }
-                  },
                   "egress_rules" : {
                     "EGRESS-TO-ANYWHERE" : {
                       "description" : "Allows egress to anywhere.",
@@ -350,13 +371,6 @@
                       "dst"         : "all-services",
                       "dst_type"    : "SERVICE_CIDR_BLOCK"
                     },
-                    "EGRESS-TO-INTERNET-RULE" : {
-                      "description" : "(optional) Allows pods nodes to communicate with internet.",
-                      "stateless"   : false,
-                      "protocol"    : "TCP",
-                      "dst"         : "0.0.0.0/0",
-                      "dst_type"    : "CIDR_BLOCK"
-                    },
                     "EGRESS-TO-API-RULE" : {
                       "description"  : "Allows TCP egress from pods to Kubernetes API server.",
                       "stateless"    : false,
@@ -374,8 +388,120 @@
                       "dst_type"     : "NETWORK_SECURITY_GROUP",
                       "dst_port_min" : 12250,
                       "dst_port_max" : 12250
+                    },
+                    "EGRESS-TO-DATA-RULE" : {
+                      "description" : "Allows pods to communicate with data layer.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "OKE-VCN-DATA-NSG",
+                      "dst_type"    : "NETWORK_SECURITY_GROUP"
                     }
                   }
+                },
+                "OKE-VCN-DATA-NSG" : {
+                  "display_name" : "exacs-client-nsg",
+                  "ingress_rules" : {
+                    "INGRESS-FROM-MGMT-SUBNET-RULE" : {
+                      "description"  : "Allows ingress to SSH from hosts used to manage the cluster: db-operator-subnet in mgmt plane's mgmt-vcn.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "192.168.0.96/28",
+                      "src_type"     : "CIDR_BLOCK",
+                      "dst_port_min" : 22,
+                      "dst_port_max" : 22
+                    },
+                    "INGRESS-FROM-WORKERS-NSG-RULE" : {
+                      "description"  : "Allows ingress from worker nodes.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-WORKERS-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP"
+                    },
+                    "INGRESS-FROM-PODS-NSG-RULE" : {
+                      "description"  : "Allows ingress from OKE pods.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-PODS-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP"
+                    },
+                    "INGRESS-FROM-SSH-CLIENT-RULE" : {
+                      "description"  : "Allows SSH connections from hosts in Client NSG.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-DATA-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 22,
+                      "dst_port_max" : 22
+                    },
+                    "INGRESS-FROM-SQLNET-CLIENT-RULE" : {
+                      "description"  : "Allows SQLNet connections from hosts in Client NSG.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-DATA-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 1521,
+                      "dst_port_max" : 1522
+                    },
+                    "INGRESS-FROM-ONS-CLIENT-RULE" : {
+                      "description"  : "Allows Oracle Notification Services (ONS) communication from hosts in Client NSG for Fast Application Notifications (FAN).",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-DATA-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 6200,
+                      "dst_port_max" : 6200
+                    }
+                  },
+                  "egress_rules" : {
+                    "EGRESS-TO-SSH-RULE" : {
+                      "description" : "Allows SSH connections to hosts in Client NSG.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "OKE-VCN-DATA-NSG",
+                      "dst_type"    : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min": 22,
+                      "dst_port_max": 22
+                    },
+                    "EGRESS-TO-SQLNET-RULE" : {
+                      "description" : "Allows SQLNet connections to hosts in Client NSG.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "OKE-VCN-DATA-NSG",
+                      "dst_type"    : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min": 1521,
+                      "dst_port_max": 1522
+                    },
+                    "EGRESS-TO-ONS-RULE" : {
+                      "description" : "Allows Oracle Notification Services (ONS) communication to hosts in Client NSG for Fast Application Notifications (FAN).",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "OKE-VCN-DATA-NSG",
+                      "dst_type"    : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min": 6200,
+                      "dst_port_max": 6200
+                    },
+                    "EGRESS-TO-OSN-RULE" : {
+                      "description" : "Allows HTTPS connections to Oracle Services Network (OSN).",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "all-services",
+                      "dst_type"    : "SERVICE_CIDR_BLOCK",
+                      "dst_port_min": 443,
+                      "dst_port_max": 443
+                    }
+                  }
+                },
+                "EXACS-BACKUP-NSG" : {
+                  "display_name" : "exacs-backup-nsg",
+                  "EGRESS-TO-OSN-RULE" : {
+                      "description" : "Allows HTTPS connections to Oracle Services Network (OSN).",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "objectstorage",
+                      "dst_type"    : "SERVICE_CIDR_BLOCK",
+                      "dst_port_min": 443,
+                      "dst_port_max": 443
+                    }
                 }
               },
 

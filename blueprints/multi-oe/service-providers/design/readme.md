@@ -55,14 +55,9 @@ The Shared Services compartment (in firm yellow color, below the Security compar
 
 The Customers compartment (in light blue color) is designed to host the service provider application, including the data layer. In the Pod model, each customer is assigned its own compartment and executes a copy of the application within a dedicated application network. In the multi-tenant model, a common application infrastructure is shared among customers.
 
-### 2.3.1 Application Lifecycle Compartment
+### 2.3.1 Application Lifecycle Compartment (Dev, Test, Prod)
 
-The Application Lifecycle compartment (in light blue color) is designed to host an application lifecycle environment, like Dev, Test, Prod. In the Pod model, it encloses the various customer compartments wherein the application is deployed. In the multi-tenant model, it encloses the customer shared application infrastructure for that environment. Additionally, it hosts data caching layer and may also host customer dedicated databases.
-
-### 2.3.2 Shared Database Compartment
-
-The Shared Database compartment (dashed, in firm blue color) is designed for service providers using a shared infrastructure platform for the data layer. Typically, a single infrastructure serves multiple lifecycle environments and customer application workloads. One typical instantiation of such pattern is Oracle Exadata platform (Cloud Service or Cloud@Customer). Depending on customer requirements, multiple infrastructure platforms matching lifecycle environments is also a valid option.
-
+The Application Lifecycle compartment (in light blue color) is designed to host an application lifecycle environment, like Dev, Test, Prod. In the Pod model, it encloses the various customer compartments wherein the application copy is deployed. In the multi-tenant model, it encloses the shared application infrastructure for that environment along with the data management layer.
 
 ## 3. Administration Groups
 

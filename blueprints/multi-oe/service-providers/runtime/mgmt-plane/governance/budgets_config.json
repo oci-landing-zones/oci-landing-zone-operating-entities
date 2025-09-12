@@ -37,6 +37,48 @@
                     "recipients" : "email.address@example.com",
                     "message" : "Actual spending goes above 80% of configured budget."
                 }
+            },
+            "CUSTOMERS-DEV-BUDGET" : {
+                "name" : "isv-customers-dev-budget",
+                "description" : "Dev environment budget.",
+                "amount" : 20000,
+                "target" : {
+                    "type" : "COMPARTMENT",
+                    "values" : ["CUSTOMERS-DEV-CMP"]
+                },
+                "alert_rule" : {
+                    "threshold_value" : 80,
+                    "recipients" : "email.address@example.com",
+                    "message" : "Actual spending goes above 80% of configured budget."
+                }
+            },
+            "CUSTOMERS-TEST-BUDGET" : {
+                "name" : "isv-customers-test-budget",
+                "description" : "Test environment budget.",
+                "amount" : 20000,
+                "target" : {
+                    "type" : "COMPARTMENT",
+                    "values" : ["CUSTOMERS-TEST-CMP"]
+                },
+                "alert_rule" : {
+                    "threshold_value" : 80,
+                    "recipients" : "email.address@example.com",
+                    "message" : "Actual spending goes above 80% of configured budget."
+                }
+            },
+            "CUSTOMERS-PROD-BUDGET" : {
+                "name" : "isv-customers-prod-budget",
+                "description" : "Prod environment budget.",
+                "amount" : 20000,
+                "target" : {
+                    "type" : "COMPARTMENT",
+                    "values" : ["CUSTOMERS-PROD-CMP"]
+                },
+                "alert_rule" : {
+                    "threshold_value" : 80,
+                    "recipients" : "email.address@example.com",
+                    "message" : "Actual spending goes above 80% of configured budget."
+                }
             }
         }    
     }

@@ -2,7 +2,7 @@
 
 A stack that deploys OKE (oracle Kubernetes Engine) shared infrastructure in the Multi-Tenant model. It contains network and Kubernetes cluster configurations.
 
-The sample OKE VCN is pre-configured with 10.0.128.0/17 CIDR range, that can be changed in configuration files [network_oke_npn_config.json](../mt/shared/oke/network_oke_npn_config.json) or [network_oke_flannel_config.json](../mt/shared/oke/network_oke_flannel_config.json), depending on the chosen networking model for OKE.
+The sample OKE VCN is pre-configured with 10.0.128.0/22 CIDR range, that can be changed in configuration files [network_oke_npn_config.json](../mt/shared/network_oke_npn_config.json) or [network_oke_flannel_config.json](../mt/shared/network_oke_flannel_config.json), depending on the chosen networking model for OKE.
 
 ### Overall Deployment Sequence
 
@@ -10,22 +10,28 @@ The sample OKE VCN is pre-configured with 10.0.128.0/17 CIDR range, that can be 
 2. [Mgmt Plane Networking 1st stage - Mgmt Plane VCNs](./MPLANE-NETWORKING.md#stage1)
 3. [Mgmt Plane Networking - Firewall](./MPLANE-FIREWALL.md)
 4. [Mgmt Plane Networking 2nd stage - Network routing post firewall deployment](./MPLANE-NETWORKING.md#stage2)
-5. **Multi-Tenant Shared**
-    1. [Database Service](./MT-SHARED-DB.md)
-    2. **OKE - Oracle Kubernetes Engine (this stack)**
+5. **Multi-tenant OKE - Oracle Kubernetes Engine (this stack)**
 6. [Multi-Tenant Model - Customer Onboarding](./MT-CUSTOMER-ONBOARDING.md)
 
-### Exadata Cloud Service Stack Configuration
+### Stack Configuration
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_oke_npn_config.json](../mt/shared/oke/network_oke_npn_config.json) <br> [oke_npn_cluster_config.json](../mt/shared/oke/oke_npn_cluster_config.json) <br> [oke_operator_host_config.json](../mgmt-plane/network/oke_operator_host_config.json) <br> [network_oke_flannel_config.json](../mt/shared/oke/network_oke_flannel_config.json)* <br> [oke_flannel_cluster_config.json](../mt/shared/oke/oke_flannel_cluster_config.json)* | iam/output/compartments_output.json, network/output/network_output.json | mt-shared-oke/output/network_output.json
+[network_oke_npn_config.json](../mt/shared/network_oke_npn_config.json) <br> [network_oke_npn_with_exadata_config.json](../mt/shared/network_oke_npn_with_exadata_config.json) <br> [oke_npn_cluster_config.json](../mt/shared/oke_npn_cluster_config.json) <br> [oke_operator_host_config.json](../mgmt-plane/network/oke_operator_host_config.json) <br> [network_oke_flannel_config.json](../mt/shared/network_oke_flannel_config.json) <br> [network_oke_flannel_with_exadata_config.json](../mt/shared/network_oke_flannel_with_exadata_config.json) <br> [oke_flannel_cluster_config.json](../mt/shared/oke_flannel_cluster_config.json) | iam/output/compartments_output.json, network/output/network_output.json | mt-shared-oke/output/network_output.json
 
-* *network_oke_flannel_config.json* and *oke_flannel_cluster_config* contain the declarations for the deployment of an OKE *Flannel* cluster. They are not included automatically in the stack creation below, that favors native pod networking. If the application requires flannel networking, replace *network_oke_npn_config.json* and *oke_npn_cluster_config* by *network_oke_flannel_config.json* and *oke_flannel_cluster_config*, respectively.
+The provided networking templates support the following distinct configurations:
+Input Configuration File | OKE networking | Data Layer
+-------------------------|----------------|-------------
+[network_oke_npn_config.json](../mt/shared/network_oke_npn_config.json) | Native (NPN) | Non-Exadata (Autonomous Database, OCI Base DB, MySQL, Postgres, etc.)
+[network_oke_npn_with_exadata_config.json](../mt/shared/network_oke_npn_with_exadata_config.json) | Native (NPN) | OCI Exadata Cloud Service
+[network_oke_flannel_config.json](../mt/shared/network_oke_flannel_config.json) | Flannel | Non-Exadata (Autonomous Database, OCI Base DB, MySQL, Postgres, etc.)
+[network_oke_flannel_with_exadata_config.json](../mt/shared/network_oke_flannel_with_exadata_config.json) | Flannel | OCI Exadata Cloud Service
+
+The sample stack below favors OKE Native networking and non-Exadata data management layer ([network_oke_npn_config.json](../mt/shared/network_oke_npn_config.json)). Replace the file according to your requirements per table above. 
 
 ### Stack Creation
 
-[![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/shared/oke/network_oke_npn_config.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/shared/oke/oke_npn_cluster_config.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/network/oke_operator_host_config.json","url_dependency_source_oci_bucket":"isv-terraform-runtime-bucket","url_dependency_source":"ocibucket","url_dependency_source_oci_objects":"iam/output/compartments_output.json,network/output/network_output.json","save_output":true,"oci_object_prefix":"mt-shared-oke/output"})
+[![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/shared/network_oke_npn_config.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/shared/oke_npn_cluster_config.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/network/oke_operator_host_config.json","url_dependency_source_oci_bucket":"isv-terraform-runtime-bucket","url_dependency_source":"ocibucket","url_dependency_source_oci_objects":"iam/output/compartments_output.json,network/output/network_output.json","save_output":true,"oci_object_prefix":"mt-shared-oke/output"})
 
 In the Resource Manager Service (RMS) **Create stack - Stack Information** screen that shows up, check the *I have reviewed and accept the Oracle Terms of Use* box, make sure to select *terraform-oci-modules-orchestrator-main/rms-facade* in the **Working directory** drop down, as shown in the image below. 
 

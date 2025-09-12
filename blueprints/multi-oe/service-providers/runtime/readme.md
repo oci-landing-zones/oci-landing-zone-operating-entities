@@ -23,7 +23,7 @@ The configuration files are organized in different folders, according to the bro
     - security: 
         - [cloud_guard_config.json](mgmt-plane/security/cloud_guard_config.json), with Cloud Guard configuration.
         - [security_zones_config.json](mgmt-plane/security/security_zones_config.json), with Security Zones configuration.
-        - [scanning_config.json](mgmt-plane/security/scanning_config.json), with scanning configuration.
+        - [scanning_config.json](mgmt-plane/security/scanning_config.json), with Compute scanning configuration.
     - observability: 
         - [observability_config.json](mgmt-plane/observability/observability_config.json), with logging, streams, notifications, events, alarms and service connector hub configurations.
     - network: 
@@ -36,9 +36,6 @@ The configuration files are organized in different folders, according to the bro
         - [flow_logs_config.json](mgmt-plane/network/flow_logs_config.json), with flow logs configuration for all VCNs in the mgmt plane.
         - [jump_host_config.json](mgmt-plane/network/jump_host_config.json), with a jump host configuration, defining a central SSH client to any hosts that are eventually deployed.
             - **IMPORTANT:** in a real deployment, make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
-        - [bastion_service_config.json](mgmt-plane/network/bastion_service_config.json), with OCI Bastion service configuration, defining a secure access path to the jump host. 
-            - **IMPORTANT:** in a real deployment, make sure to replace the value in *cidr_block_allow_list* attribute (192.168.0.0/32) by the IP addresses allowed to connect to OCI Bastion service. Be as much specific as possible.
-            - **IMPORTANT:** the configuration does not deploy any Bastion Service sessions. Those are expected to be created manually afterwards.
     - firewall: [firewall_config.json](mgmt-plane/firewall/firewall_config.json), with firewall appliance and OCI Network Load Balancer configurations.
         - **IMPORTANT:** in a real deployment, make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
 
@@ -48,15 +45,15 @@ The configuration files are organized in different folders, according to the bro
 
 - mt: containing shared and customer configurations for the Multi-Tenant model.     
     - shared:
-        - [iam_config.json](mt/shared/iam_config.json)
-        - [budgets_config.json](mt/shared/budgets_config.json)
-        - [network_exacs_config](mt/shared/network_exacs_config.json)
-        - [network_oke_flannel_config](mt/shared/network_oke_flannel_config.json)
-        - [oke_flannel_cluster_config](mt/shared/oke_flannel_cluster_config.json)
-        - [network_oke_npn_config](mt/shared/network_oke_npn_config.json)
-        - [oke_npn_cluster_config](mt/shared/oke_npn_cluster_config.json)
-    - customer-1:
-        - TBD    
+        - [network_oke_flannel_config.json](mt/shared/network_oke_flannel_config.json), a network template for Flannel-based OKE cluster with a data management layer set to host non-Exadata databases.
+        - [network_oke_flannel_with_exadata_config.json](mt/shared/network_oke_flannel_with_exadata_config.json), a network template for Flannel-based OKE cluster with a data management layer set to host OCI Exadata Cloud Service databases.
+        - [oke_flannel_cluster_config.json](mt/shared/oke_flannel_cluster_config.json), a template for Flannel-based OKE cluster deployment.
+        - [network_oke_npn_config.json](mt/shared/network_oke_npn_config.json), a network template for NPN-based (Native Pod Networking) OKE cluster with a data management layer set to host non-Exadata databases.
+        - [network_oke_npn_with_exadata_config.json](mt/shared/network_oke_npn_with_exadata_config.json), a network template for NPN-based (Native Pod Networking) OKE cluster with a data management layer set to host OCI Exadata Cloud Service databases.
+        - [oke_npn_cluster_config.json](mt/shared/oke_npn_cluster_config.json), a template for NPN-based (Native Pod Networking) OKE cluster deployment.
+    - customers:
+        - [customer-tasks.yml](mt/customers/customer-tasks.yml)
+        - [customers.yml](mt/customers/customers.yml)    
 
 &nbsp; 
 
@@ -103,7 +100,7 @@ The following is executed for each new customer in the Pod Model:
 #### Customer Onboarding - Multi-Tenant Model
 Onboarding customers in the Multi-Tenant model has one shared infrastructure configuration and customer-specific configurations further deployed on the shared infrastructure.
 
-5. [Shared Stack - Multi-Tenant Model](docs/MT-SHARED-DB.md)
+5. [Shared Stack - Multi-Tenant Model](docs/MT-SHARED-OKE.md)
 6. [Customer Onboarding Stack - Multi-Tenant Model](docs/MT-CUSTOMER-ONBOARDING.md)
  
  The diagram below depicts the deployment sequencing. Note that the Network stack must be updated once after Firewall deployment (step 4). Also note that the customer stack (step 5 in Pod model and step 6 in multi-tenant model) must be executed for each new customer.
