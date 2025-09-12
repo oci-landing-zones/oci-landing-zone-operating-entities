@@ -6,8 +6,8 @@
         "OKE-OPERATOR-HOST" : {
           "name" : "oke-operator-host",
           "shape" : "VM.Standard.E4.Flex",
-          "marketplace_image" : {
-            "name" : "Oracle Linux 7 STIG"
+          "platform_image" : {
+            "name" : "Oracle-Linux-Cloud-Developer-8.10-2025.01.31-0"
           },
           "boot_volume" : {
             "size" : 60,
