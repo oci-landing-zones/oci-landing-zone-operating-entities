@@ -40,7 +40,7 @@ The configuration files are organized in different folders, according to the bro
         - **IMPORTANT:** in a real deployment, make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
 
 - pod: containing customer configurations for the Pod model.
-    - customer1: [compartments_config.json](pod/customer1/ccompartments_config.json), [budgets_config.json](pod/customer1/budgets_config.json), [network_three_tier_config.json](pod/customer1/network_three_tier_config.json), [network_oke_config.json](pod/customer1/network_oke_config.json) with sample resources configurations for one customer, including IAM, budget and networking (supporting traditional three tier apps or Kubernetes-based apps), respectively. Use these files as templates to onboard other customers.
+    - customer1: [compartments_config.json](pod/customer1/ccompartments_config.json), [budgets_config.json](pod/customer1/budgets_config.json), [network_three_tier_config.json](pod/customer1/network_three_tier_config.json), [network_oke_flannel_config.json](pod/customer1/network_oke_flannel_config.json), [oke_flannel_cluster_config.json](pod/customer1/oke_flannel_cluster_config.json) with sample resources configurations for one customer, including IAM, budget, networking (supporting traditional three tier apps or Kubernetes-based apps), respectively; and an OKE cluster. Use these files as templates to onboard other customers.
         - **IMPORTANT:** customer1 template has CIDR range 10.0.0.0/26 for the three-tier vcn and 10.0.1.0/24 for the OKE VCN. 
 
 - mt: containing shared and customer configurations for the Multi-Tenant model.     

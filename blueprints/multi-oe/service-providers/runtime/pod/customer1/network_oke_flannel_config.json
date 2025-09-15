@@ -15,7 +15,7 @@
               "block_nat_traffic"                : false,
   
               "subnets" : {
-                "OKE-SERVICES-SUBNET" : {
+                "OKE-VCN-SERVICES-SUBNET" : {
                   "cidr_block"                 : "10.0.1.144/29",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "services-subnet",
@@ -23,9 +23,9 @@
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
                   "prohibit_public_ip_on_vnic" : true,
-                  "route_table_key"            : "OKE-VCN-ROUTE"
+                  "route_table_key"            : "DRG-ONLY-ROUTE"
                 },
-                "OKE-WORKERS-SUBNET" : {
+                "OKE-VCN-WORKERS-SUBNET" : {
                   "cidr_block"                 : "10.0.1.0/25",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "workers-subnet",
@@ -33,9 +33,9 @@
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
                   "prohibit_public_ip_on_vnic" : true,
-                  "route_table_key"            : "WORKERS-VCN-ROUTE"
+                  "route_table_key"            : "DRG-OSN-ROUTE"
                 },
-                "OKE-API-SUBNET" : {
+                "OKE-VCN-API-SUBNET" : {
                   "cidr_block"                 : "10.0.1.152/29",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "api-subnet",
@@ -43,19 +43,9 @@
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
                   "prohibit_public_ip_on_vnic" : true,
-                  "route_table_key"            : "OKE-VCN-ROUTE"
+                  "route_table_key"            : "DRG-ONLY-ROUTE"
                 },
-                "OKE-MGMT-SUBNET" : {
-                  "cidr_block"                 : "10.0.1.160/29",
-                  "dhcp_options_key"           : "default_dhcp_options",
-                  "display_name"               : "mgm-subnet",
-                  "dns_label"                  : "mgmt",
-                  "ipv6cidr_blocks"            : [],
-                  "prohibit_internet_ingress"  : true,
-                  "prohibit_public_ip_on_vnic" : true,
-                  "route_table_key"            : "OKE-VCN-ROUTE"
-                },
-                "OKE-DATA-SUBNET" : {
+                "OKE-VCN-DATA-SUBNET" : {
                   "cidr_block"                 : "10.0.1.128/28",
                   "dhcp_options_key"           : "default_dhcp_options",
                   "display_name"               : "data-subnet",
@@ -63,19 +53,36 @@
                   "ipv6cidr_blocks"            : [],
                   "prohibit_internet_ingress"  : true,
                   "prohibit_public_ip_on_vnic" : true,
-                  "route_table_key"            : "OKE-VCN-ROUTE"
+                  "route_table_key"            : "DRG-OSN-ROUTE"
                 }
               },
   
               "route_tables" : {
-                "OKE-VCN-ROUTE" : {
-                  "display_name" : "generic-route-table",
+                "DRG-ONLY-ROUTE" : {
+                  "display_name" : "drg-only-route-table",
                   "route_rules" : {
                     "DRG-RULE" : {
                       "network_entity_key" : "CENTRAL-HUB-DRG",
-                      "description"        : "All traffic goes to DRG.",
+                      "description"        : "Traffic goes to DRG.",
                       "destination"        : "0.0.0.0/0",
                       "destination_type"   : "CIDR_BLOCK"
+                    }
+                  }
+                },
+                "DRG-OSN-ROUTE" : {
+                  "display_name" : "drg-osn-route-table",
+                  "route_rules" : {
+                    "DRG-RULE" : {
+                      "network_entity_key" : "CENTRAL-HUB-DRG",
+                      "description"        : "Traffic goes to DRG.",
+                      "destination"        : "0.0.0.0/0",
+                      "destination_type"   : "CIDR_BLOCK"
+                    },
+                    "OSN-RULE" : {
+                      "network_entity_key" : "SERVICE-GATEWAY",
+                      "description"        : "Traffic goes to Service Gateway.",
+                      "destination"        : "all-services",
+                      "destination_type"   : "SERVICE_CIDR_BLOCK"
                     }
                   }
                 }
@@ -86,7 +93,7 @@
                   "display_name" : "services-nsg",
                   "ingress_rules" : {
                     "INGRESS-FROM-CENTRAL-HUB-VCN-LBR-SUBNET-RULE" : {
-                      "description"  : "Ingress from Central Hub VCN's LBR subnet.",
+                      "description"  : "Allows ingress from Central Hub VCN's LBR subnet.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "192.168.0.0/29",
@@ -95,7 +102,7 @@
                   },
                   "egress_rules" : {
                     "EGRESS-TO-ANYWHERE" : {
-                      "description" : "Egress to anywhere.",
+                      "description" : "Allows egress to anywhere.",
                       "stateless"   : false,
                       "protocol"    : "TCP",
                       "dst"         : "0.0.0.0/0",
@@ -107,21 +114,21 @@
                   "display_name" : "workers-nsg",
                   "ingress_rules" : {
                     "INGRESS-FROM-WORKERS-NODE-RULE" : {
-                      "description"  : "Ingress from worker nodes.",
+                      "description"  : "Allows ingress from worker nodes.",
                       "stateless"    : false,
                       "protocol"     : "ALL",
                       "src"          : "OKE-VCN-WORKERS-NSG",
                       "src_type"     : "NETWORK_SECURITY_GROUP"
                     },
                     "INGRESS-FROM-OKE-API-RULE" : {
-                      "description"  : "Ingress from OKE control plane for webhooks served by workers.",
+                      "description"  : "Allows ingress from OKE control plane for webhooks served by workers.",
                       "stateless"    : false,
                       "protocol"     : "ALL",
                       "src"          : "OKE-VCN-API-NSG",
                       "src_type"     : "NETWORK_SECURITY_GROUP"
                     },
                     "INGRESS-FROM-SERVICES-NSG-HEALTH-CHECK-RULE" : {
-                      "description"  : "Ingress from load balancers for health checks.",
+                      "description"  : "Allows ingress from load balancers for health checks.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "OKE-VCN-SERVICES-NSG",
@@ -130,7 +137,7 @@
                       "dst_port_max" : 10256
                     },
                     "INGRESS-FROM-SERVICES-NSG-RULE" : {
-                      "description"  : "Ingress from load balancers for NodePort traffic.",
+                      "description"  : "Allows ingress from load balancers for NodePort traffic.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "OKE-VCN-SERVICES-NSG",
@@ -138,28 +145,17 @@
                       "dst_port_min" : 30000,
                       "dst_port_max" : 32767
                     },
-                    "INGRESS-FROM-MGMT-NSG-RULE" : {
-                      "description"  : "Ingress from hosts used to manage the cluster.",
+                    "INGRESS-FROM-MGMT-SUBNET-RULE" : {
+                      "description"  : "Allows ingress from hosts used to manage the cluster: app-operator-subnet in mgmt plane's mgmt-vcn.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
-                      "src"          : "OKE-VCN-MGMT-NSG",
-                      "src_type"     : "NETWORK_SECURITY_GROUP",
-                      "dst_port_min" : 22,
-                      "dst_port_max" : 22
-                    },
-                    "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
-                      "description"  : "Ingress from jump hosts in Central Hub VCN's Bastion subnet.",
-                      "stateless"    : false,
-                      "protocol"     : "TCP",
-                      "src"          : "192.168.0.32/29",
-                      "src_type"     : "CIDR_BLOCK",
-                      "dst_port_min" : 22,
-                      "dst_port_max" : 22
+                      "src"          : "192.168.0.80/28",
+                      "src_type"     : "CIDR_BLOCK"
                     }
                   },
                   "egress_rules" : {
                     "EGRESS-TO-ANYWHERE" : {
-                      "description" : "Egress to anywhere.",
+                      "description" : "Allows egress to anywhere.",
                       "stateless"   : false,
                       "protocol"    : "TCP",
                       "dst"         : "0.0.0.0/0",
@@ -171,7 +167,7 @@
                   "display_name" : "api-nsg",
                   "ingress_rules" : {
                     "INGRESS-FROM-WORKERS-NSG-6443-RULE" : {
-                      "description"  : "Ingress from worker nodes.",
+                      "description"  : "Allows ingress from worker nodes.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "OKE-VCN-WORKERS-NSG",
@@ -180,7 +176,7 @@
                       "dst_port_max" : 6443
                     },
                     "INGRESS-FROM-WORKERS-NSG-10250-RULE" : {
-                      "description"  : "Ingress from worker nodes (control plane health checks).",
+                      "description"  : "Allows ingress from worker nodes (control plane health checks).",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "OKE-VCN-WORKERS-NSG",
@@ -189,7 +185,7 @@
                       "dst_port_max" : 10250
                     },
                     "INGRESS-FROM-WORKERS-NSG-12250-RULE" : {
-                      "description"  : "Ingress from worker nodes.",
+                      "description"  : "Allows ingress from worker nodes.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "OKE-VCN-WORKERS-NSG",
@@ -198,7 +194,7 @@
                       "dst_port_max" : 12250
                     },
                     "INGRESS-FROM-MGMT-NSG-RULE" : {
-                      "description"  : "Ingress from hosts used to manage the cluster.",
+                      "description"  : "Allows ingress from hosts used to manage the cluster.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "OKE-VCN-MGMT-NSG",
@@ -209,30 +205,7 @@
                   }, 
                   "egress_rules" : {
                     "EGRESS-TO-ANYWHERE" : {
-                      "description" : "Egress to anywhere.",
-                      "stateless"   : false,
-                      "protocol"    : "TCP",
-                      "dst"         : "0.0.0.0/0",
-                      "dst_type"    : "CIDR_BLOCK"
-                    }
-                  }
-                },
-                "OKE-VCN-MGMT-NSG" : {
-                  "display_name" : "mgmt-nsg",
-                  "ingress_rules" : {
-                    "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
-                      "description"  : "Ingress from jump hosts in Central Hub VCN's Bastion subnet.",
-                      "stateless"    : false,
-                      "protocol"     : "TCP",
-                      "src"          : "192.168.0.32/29",
-                      "src_type"     : "CIDR_BLOCK",
-                      "dst_port_min" : 22,
-                      "dst_port_max" : 22
-                    }
-                  },
-                  "egress_rules" : {
-                    "EGRESS-TO-ANYWHERE" : {
-                      "description" : "Egress to anywhere.",
+                      "description" : "Allows egress to anywhere.",
                       "stateless"   : false,
                       "protocol"    : "TCP",
                       "dst"         : "0.0.0.0/0",
@@ -243,17 +216,15 @@
                 "OKE-VCN-DATA-NSG" : {
                   "display_name" : "data-nsg",
                   "ingress_rules" : {
-                    "INGRESS-FROM-CENTRAL-HUB-VCN-BASTION-SUBNET-RULE" : {
-                      "description"  : "Ingress from jump hosts in Central Hub VCN's Bastion subnet.",
+                    "INGRESS-FROM-MGMT-SUBNET-RULE" : {
+                      "description"  : "Allows ingress from hosts used to manage the cluster: db-operator-subnet in mgmt plane's mgmt-vcn.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
-                      "src"          : "192.168.0.32/29",
-                      "src_type"     : "CIDR_BLOCK",
-                      "dst_port_min" : 22,
-                      "dst_port_max" : 22
+                      "src"          : "192.168.0.96/28",
+                      "src_type"     : "CIDR_BLOCK"
                     },
                     "INGRESS-FROM-WORKERS-NSG-RULE" : {
-                      "description"  : "Ingress from worker nodes.",
+                      "description"  : "Allows ingress from worker nodes.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "OKE-VCN-WORKERS-NSG",
@@ -262,7 +233,7 @@
                   },
                   "egress_rules" : {
                     "EGRESS-TO-ANYWHERE" : {
-                      "description" : "Egress to anywhere.",
+                      "description" : "Allows egress to anywhere.",
                       "stateless"   : false,
                       "protocol"    : "TCP",
                       "dst"         : "0.0.0.0/0",
