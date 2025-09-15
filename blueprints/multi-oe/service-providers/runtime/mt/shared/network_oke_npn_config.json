@@ -150,13 +150,11 @@
                       "dst_port_max" : 32767
                     },
                     "INGRESS-FROM-MGMT-SUBNET-RULE" : {
-                      "description"  : "Allows ingress to SSH from hosts used to manage the cluster: app-operator-subnet in mgmt plane's mgmt-vcn.",
+                      "description"  : "Allows ingress from hosts used to manage the cluster: app-operator-subnet in mgmt plane's mgmt-vcn.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "192.168.0.80/28",
-                      "src_type"     : "CIDR_BLOCK",
-                      "dst_port_min" : 22,
-                      "dst_port_max" : 22
+                      "src_type"     : "CIDR_BLOCK"
                     },
                     "INGRESS-FROM-ANYWHERE-ICMP-WORKERS-RULE" : {
                       "description" : "Allows ICMP ingress to workers for path discovery.",
@@ -344,13 +342,11 @@
                   "display_name" : "data-nsg",
                   "ingress_rules" : {
                     "INGRESS-FROM-MGMT-SUBNET-RULE" : {
-                      "description"  : "Allows ingress to SSH from hosts used to manage the cluster: db-operator-subnet in mgmt plane's mgmt-vcn.",
+                      "description"  : "Allows ingress from hosts used to manage data: db-operator-subnet in mgmt plane's mgmt-vcn.",
                       "stateless"    : false,
                       "protocol"     : "TCP",
                       "src"          : "192.168.0.96/28",
-                      "src_type"     : "CIDR_BLOCK",
-                      "dst_port_min" : 22,
-                      "dst_port_max" : 22
+                      "src_type"     : "CIDR_BLOCK"
                     },
                     "INGRESS-FROM-WORKERS-NSG-RULE" : {
                       "description"  : "Allows ingress from worker nodes.",
