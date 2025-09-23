@@ -32,7 +32,7 @@
             ]
           },
           "cloud_init" : {
-            "heredoc_script" : "<<-EOT
+            "heredoc_script" : "<<YAML
               #cloud-config
               write_files:
                 - path: /etc/oke_operator_setup.conf
@@ -45,7 +45,7 @@
                 - curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/oke_operator_setup.sh -o /home/opc/oke_operator_setup.sh
                 - chmod +x /home/opc/oke_operator_setup.sh
                 - /home/opc/oke_operator_setup.sh
-            EOT"
+            YAML"
           }
         }
       }
