@@ -32,19 +32,19 @@
             ]
           },
           "cloud_init" : {
-            "heredoc_script" : "<<YAML
-              #cloud-config
-              write_files:
-              - path: /etc/oke_operator_setup.conf
-                permissions: '0644'
-                owner: root:root
-                content: |
-                  KUBECTL_VERSION=v1.34.1
-                  ANSIBLE_VERSION=2.9.7
-              runcmd:
-                - curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/oke_operator_setup.sh -o /tmp/oke_operator_setup.sh
-                - chmod +x /tmp/oke_operator_setup.sh
-                - /tmp/oke_operator_setup.sh
+            "heredoc_script" : "<<YAML\n
+              #cloud-config\n
+              write_files:\n
+              - path: /etc/oke_operator_setup.conf\n
+                permissions: '0644'\n
+                owner: root:root\n
+                content: |\n
+                  KUBECTL_VERSION=v1.34.1\n
+                  ANSIBLE_VERSION=2.9.7\n
+              runcmd:\n
+                - curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/oke_operator_setup.sh -o /tmp/oke_operator_setup.sh\n
+                - chmod +x /tmp/oke_operator_setup.sh\n
+                - /tmp/oke_operator_setup.sh\n
             YAML"
           }
         }
