@@ -9,7 +9,8 @@ This stack is responsible for OKE intra-cluster configuration, supporting partit
 3. [Mgmt Plane Networking - Firewall](./MPLANE-FIREWALL.md)
 4. [Mgmt Plane Networking 2nd stage - Network routing post firewall deployment](./MPLANE-NETWORKING.md#stage2)
 5. [Multi-tenant OKE - Oracle Kubernetes Engine](./MT-SHARED-OKE.md)
-6. **Multi-Tenant Model - Customer Onboarding (this stack)**
+6. [Mgmt Plane Tooling](./MPLANE-TOOLING.md)
+7. **Multi-Tenant Model - Customer Onboarding (this stack)**
 
 ### Stack Configuration
 

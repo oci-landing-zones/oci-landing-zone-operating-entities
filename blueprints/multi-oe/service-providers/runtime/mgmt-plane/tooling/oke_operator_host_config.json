@@ -42,7 +42,7 @@
                     KUBECTL_VERSION=v1.34.1
                     ANSIBLE_VERSION=2.9.7
               runcmd:
-                - [ bash, -c, "curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/shared/oke_operator_setup.sh -o /home/opc/oke_operator_setup.sh" ]
+                - [ bash, -c, "curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/oke_operator_setup.sh -o /home/opc/oke_operator_setup.sh" ]
                 - [ bash, -c, "chmod +x /home/opc/oke_operator_setup.sh" ]
                 - [ sudo, -u, opc, /home/opc/oke_operator_setup.sh" ]
             EOT"

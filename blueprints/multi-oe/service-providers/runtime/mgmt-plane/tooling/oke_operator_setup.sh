@@ -47,14 +47,14 @@ mkdir -p /home/opc/ansible-playbooks/tasks
 
 # --- grabbing K8S manifests ---
 echo "[INFO] Grabbing K8S manifests..."
-curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/k8s-manifests/calico-policy.yml -o /home/opc/k8s-manifests/calico-policy.yml
+curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/k8s-manifests/calico-policy.yml -o /home/opc/k8s-manifests/calico-policy.yml
 
 # --- grabbing playbooks ---
 echo "[INFO] Grabbing playbooks..."
-curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/ansible-playbooks/inventory.yml -o /home/opc/ansible-playbooks/inventory.yml
-curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/ansible-playbooks/customer.yml -o /home/opc/ansible-playbooks/customer.yml
-curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/ansible-playbooks/tasks/customer_tasks.yml -o /home/opc/ansible-playbooks/tasks/customer_tasks.yml
-curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/ansible-playbooks/rbac.yml -o /home/opc/ansible-playbooks/rbac.yml
-curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/ansible-playbooks/tasks/rbac_tasks.yml -o /home/opc/ansible-playbooks/tasks/rbac_tasks.yml
+curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/ansible-playbooks/inventory.yml -o /home/opc/ansible-playbooks/inventory.yml
+curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/ansible-playbooks/customer.yml -o /home/opc/ansible-playbooks/customer.yml
+curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/ansible-playbooks/tasks/customer_tasks.yml -o /home/opc/ansible-playbooks/tasks/customer_tasks.yml
+curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/ansible-playbooks/rbac.yml -o /home/opc/ansible-playbooks/rbac.yml
+curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/ansible-playbooks/tasks/rbac_tasks.yml -o /home/opc/ansible-playbooks/tasks/rbac_tasks.yml
 
 echo "[INFO] Done."
