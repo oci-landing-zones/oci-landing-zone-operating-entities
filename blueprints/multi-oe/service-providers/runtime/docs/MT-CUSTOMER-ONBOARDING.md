@@ -1,6 +1,6 @@
 ## Multi-Tenant Model Customer Onboarding Stack Deployment
 
-A stack that deploys customer specific artifacts in the Multi-Tenant model. 
+This stack is responsible for OKE intra-cluster configuration, supporting partitioning and isolation of customer workloads on shared infrastructure.
 
 ### Overall Deployment Sequence
 
@@ -13,13 +13,28 @@ A stack that deploys customer specific artifacts in the Multi-Tenant model.
 
 ### Stack Configuration
 
-Input Configuration Files | Input Dependency Files | Generated Output
---------------------------|------------------------|------------------
-TBD | TBD | TBD
+#### Requirements
+
+The following tools (with where to get them downloaded) are required for OKE cluster configuration/management:
+
+- OCI CLI
+- Kubectl
+- Ansible
+- Calico
+
+Input Configuration Files | Description 
+--------------------------|-------------------------------------------
+rbac-play.yml      | Optional. Ansible playbook for managing role and role binding definitions. Execute it for utilizing narrower roles (bound to OCI groups/users with constrained permissions) for managing Kubernetes clusters. 
+rbac-tasks         | Ansible tasks for managing role and role binding definitions. It is part of *rbac-play.yml*.
+customer-play.yml  | Ansible playbook for onboarding customers into Kubernetes cluster. It must be updated and executed for any new customer.
+customer-tasks.yml | Ansible tasks for managing namespaces, quota policies and network policies. Each customer is assigned a namespace, a quota policy and a network policy. It is part of *customer-play*.yml.
 
 ### Stack Creation
 
-TBD
+1. Make above files available in a machine where you have Ansible installed and access to OKE API endpoint. [Multi-tenant OKE - Oracle Kubernetes Engine](./MT-SHARED-OKE.md) stack deploys an operator host for OKE with access to OKE API endpoint enabled.
+2. Execute the Ansible playbooks:
+    - 2.1. > ansible-playbook rbac-play.yml (Optional. Execute it for utilizing narrower roles (bound to OCI groups/users with constrained permissions) for managing Kubernetes clusters)
+    - 2.2. > ansible-playbook customer-play.yml (Execute for onboarding customers in Kubernetes cluster. It must be updated and executed for any new customer.)
 
 ### What Gets Deployed
 

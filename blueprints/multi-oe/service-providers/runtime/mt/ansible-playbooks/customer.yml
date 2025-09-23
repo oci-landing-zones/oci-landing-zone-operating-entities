@@ -7,9 +7,9 @@
   vars:
     customers:
       - name: customer-1
-        user: "customer-1-user"
+        group: "customer-1-user"
       - name: customer-2
-        user: "customer-2-user"
+        group: "customer-2-user"
 
   tasks:
     - name: Create isolation configuration for each customer
@@ -17,3 +17,5 @@
       loop: "{{ customers }}"
       loop_control:
         loop_var: customer
+
+

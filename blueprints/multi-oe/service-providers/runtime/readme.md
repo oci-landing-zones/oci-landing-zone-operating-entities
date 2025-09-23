@@ -52,8 +52,11 @@ The configuration files are organized in different folders, according to the bro
         - [network_oke_npn_with_exadata_config.json](mt/shared/network_oke_npn_with_exadata_config.json), a network template for NPN-based (Native Pod Networking) OKE cluster with a data management layer set to host OCI Exadata Cloud Service databases.
         - [oke_npn_cluster_config.json](mt/shared/oke_npn_cluster_config.json), a template for NPN-based (Native Pod Networking) OKE cluster deployment.
     - customers:
-        - [customer-tasks.yml](mt/customers/customer-tasks.yml)
-        - [customers.yml](mt/customers/customers.yml)    
+        - [rbac-play.yml](mt/customers/rbac-play.yml), an Ansible playbook for managing role and role binding definitions. This is optional. Use it when utilizing narrower roles (bound to OCI groups/users with constrained permissions) for managing Kubernetes clusters. 
+        - [rbac-tasks.yml](mt/customers/rbac-tasks.yml), defining Ansible tasks for managing role and role binding definitions. It is part of *rbac-play.yml*. 
+        - [customer-play.yml](mt/customers/customer-play.yml), an Ansible playbook for onboarding customers into a Kubernetes cluster. It must be updated and executed for any new customer.  
+        - [customer-tasks.yml](mt/customers/customer-tasks.yml), defining Ansible tasks for managing namespaces, quota policies and network policies. Each customer is assigned a namespace, a quota policy and a network policy. It is part of *customer-play*.yml.
+          
 
 &nbsp; 
 

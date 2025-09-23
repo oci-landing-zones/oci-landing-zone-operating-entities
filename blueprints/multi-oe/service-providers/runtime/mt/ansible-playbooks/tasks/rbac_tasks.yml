@@ -1,0 +1,17 @@
+---
+- name: Create Cluster Role Binding for "{{ group }}"
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: "isv-cluster-admin-binding"
+      subjects:
+        - kind: Group
+          name: "{{ group }}"
+          apiGroup: rbac.authorization.k8s.io
+      roleRef:
+        kind: ClusterRole
+        name: cluster-admin
+        apiGroup: rbac.authorization.k8s.io

@@ -4,7 +4,7 @@
             "ROOT-BUDGET" : {
                 "name" : "isv-root-budget",
                 "description" : "Tenancy level budget.",
-                "amount" : 50000,
+                "amount" : 100000,
                 "alert_rule" : {
                     "threshold_value" : 80,
                     "recipients" : "email.address@example.com",
@@ -14,7 +14,7 @@
             "MGMT-PLANE-BUDGET" : {
                 "name" : "isv-mgmt-plane-budget",
                 "description" : "Management Plane budget.",
-                "amount" : 10000,
+                "amount" : 40000,
                 "target" : {
                     "values" : ["MGMT-PLANE-CMP"]
                 },
@@ -27,7 +27,7 @@
             "CUSTOMERS-BUDGET" : {
                 "name" : "isv-customers-budget",
                 "description" : "Customers budget.",
-                "amount" : 20000,
+                "amount" : 60000,
                 "target" : {
                     "type" : "COMPARTMENT",
                     "values" : ["CUSTOMERS-CMP"]
