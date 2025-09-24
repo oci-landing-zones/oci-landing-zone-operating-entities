@@ -7,9 +7,6 @@ ANSIBLE_VERSION=2.9.7
 echo "[INFO] Running oke_operator_setup.sh as $(whoami)"
 echo "[INFO] Vars -> kubectl:$KUBECTL_VERSION ansible:$ANSIBLE_VERSION"
 
-# Ensure PATH has ~/.local/bin for pip installs
-export PATH=$HOME/.local/bin:/usr/local/bin:$PATH
-
 # --- System deps ---
 echo "[INFO] Installing system deps..."
 sudo dnf -y install python3-pip curl unzip
@@ -28,6 +25,8 @@ if ! command -v kubectl >/dev/null 2>&1 || [[ "$(kubectl version --client --outp
   curl -sLO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
   chmod +x kubectl
   mv kubectl /usr/bin
+  echo "[INFO] kubectl $KUBECTL_VERSION installed. Sanity testing [kubectl version --client --output=yaml]"
+  kubectl version --client --output=yaml
 else
   echo "[INFO] kubectl $KUBECTL_VERSION already installed."
 fi
@@ -56,5 +55,8 @@ curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-ope
 curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/ansible-playbooks/tasks/customer_tasks.yml -o /home/opc/ansible-playbooks/tasks/customer_tasks.yml
 curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/ansible-playbooks/rbac.yml -o /home/opc/ansible-playbooks/rbac.yml
 curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/ansible-playbooks/tasks/rbac_tasks.yml -o /home/opc/ansible-playbooks/tasks/rbac_tasks.yml
+
+chown -R opc:opc /home/opc/k8s-manifests
+chown -R opc:opc /home/opc/ansible-playbooks 
 
 echo "[INFO] Done."
