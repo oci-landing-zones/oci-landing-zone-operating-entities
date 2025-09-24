@@ -4,9 +4,6 @@ set -euo pipefail
 KUBECTL_VERSION=v1.34.1
 ANSIBLE_VERSION=2.9.7
 
-# Load Terraform-provided variables
-source /tmp/oke_operator_setup.conf
-
 echo "[INFO] Running oke_operator_setup.sh as $(whoami)"
 echo "[INFO] Vars -> kubectl:$KUBECTL_VERSION ansible:$ANSIBLE_VERSION"
 
@@ -29,8 +26,8 @@ fi
 if ! command -v kubectl >/dev/null 2>&1 || [[ "$(kubectl version --client --output=yaml | grep gitVersion | awk '{print $2}')" != "$KUBECTL_VERSION" ]]; then
   echo "[INFO] Installing kubectl $KUBECTL_VERSION..."
   curl -sLO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-  rm -f kubectl
+  chmod +x kubectl
+  mv kubectl /usr/bin
 else
   echo "[INFO] kubectl $KUBECTL_VERSION already installed."
 fi
