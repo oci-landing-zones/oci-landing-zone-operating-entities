@@ -1,8 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+KUBECTL_VERSION=v1.34.1
+ANSIBLE_VERSION=2.9.7
+
 # Load Terraform-provided variables
-source /etc/oke_operator_setup.conf
+source /tmp/oke_operator_setup.conf
 
 echo "[INFO] Running oke_operator_setup.sh as $(whoami)"
 echo "[INFO] Vars -> kubectl:$KUBECTL_VERSION ansible:$ANSIBLE_VERSION"
