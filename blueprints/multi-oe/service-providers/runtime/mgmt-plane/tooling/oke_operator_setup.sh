@@ -1,11 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
-KUBECTL_VERSION=v1.34.1
-ANSIBLE_VERSION=2.9.7
+KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
 
 echo "[INFO] Running oke_operator_setup.sh as $(whoami)"
-echo "[INFO] Vars -> kubectl:$KUBECTL_VERSION ansible:$ANSIBLE_VERSION"
 
 # --- System deps ---
 echo "[INFO] Installing system deps..."
@@ -21,8 +19,8 @@ fi
 
 # --- kubectl ---
 if ! command -v kubectl >/dev/null 2>&1 || [[ "$(kubectl version --client --output=yaml | grep gitVersion | awk '{print $2}')" != "$KUBECTL_VERSION" ]]; then
-  echo "[INFO] Installing kubectl $KUBECTL_VERSION..."
-  curl -sLO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+  echo "[INFO] Installing kubectl $KUBECTL_VERSION (latest)..."
+  curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
   chmod +x kubectl
   mv kubectl /usr/bin
   echo "[INFO] kubectl $KUBECTL_VERSION installed. Sanity testing [kubectl version --client --output=yaml]"
@@ -32,12 +30,13 @@ else
 fi
 
 # --- ansible ---
-if ! ansible --version 2>/dev/null | grep -q "$ANSIBLE_VERSION"; then
-  echo "[INFO] Installing ansible $ANSIBLE_VERSION..."
-  pip3 install --user --upgrade pip
-  pip3 install --user "ansible==${ANSIBLE_VERSION}"
+if ! ansible --version 2>/dev/null; then
+  echo "[INFO] Installing ansible (latest)..."
+  python3 -m pip install --user ansible
+  echo "[INFO] ansible installed. Sanity testing [ansible --version]"
+  ansible --version
 else
-  echo "[INFO] ansible $ANSIBLE_VERSION already installed."
+  echo "[INFO] Ansible already installed."
 fi
 
 mkdir -p /home/opc/k8s-manifests
