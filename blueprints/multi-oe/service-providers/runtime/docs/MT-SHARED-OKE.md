@@ -18,7 +18,7 @@ The sample OKE VCN is pre-configured with 10.0.128.0/22 CIDR range, that can be 
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_oke_npn_config.json](../mt/shared/network_oke_npn_config.json) <br> [network_oke_npn_with_exadata_config.json](../mt/shared/network_oke_npn_with_exadata_config.json) <br> [oke_npn_cluster_config.json](../mt/shared/oke_npn_cluster_config.json) <br> [oke_operator_host_config.json](../mgmt-plane/network/oke_operator_host_config.json) <br> [network_oke_flannel_config.json](../mt/shared/network_oke_flannel_config.json) <br> [network_oke_flannel_with_exadata_config.json](../mt/shared/network_oke_flannel_with_exadata_config.json) <br> [oke_flannel_cluster_config.json](../mt/shared/oke_flannel_cluster_config.json) | iam/output/compartments_output.json, network/output/network_output.json | mt-shared-oke/output/network_output.json
+[network_oke_npn_config.json](../mt/shared/network_oke_npn_config.json) <br> [network_oke_npn_with_exadata_config.json](../mt/shared/network_oke_npn_with_exadata_config.json) <br> [oke_npn_cluster_config.json](../mt/shared/oke_npn_cluster_config.json) <br> [oke_operator_host_config.json](../mgmt-plane/network/oke_operator_host_config.json) <br> [network_oke_flannel_config.json](../mt/shared/network_oke_flannel_config.json) <br> [network_oke_flannel_with_exadata_config.json](../mt/shared/network_oke_flannel_with_exadata_config.json) <br> [oke_flannel_cluster_config.json](../mt/shared/oke_flannel_cluster_config.json) | mgmt-plane/iam/output/compartments_output.json, mgmt-plane/network/output/network_output.json | mt/shared/output/network_output.json
 
 The provided networking templates support the following distinct configurations:
 Input Configuration File | OKE networking | Data Layer
@@ -32,7 +32,9 @@ The sample stack below favors OKE Native networking and non-Exadata data managem
 
 ### Stack Creation
 
-[![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/shared/network_oke_npn_config.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mt/shared/oke_npn_cluster_config.json,"url_dependency_source_oci_bucket":"isv-terraform-runtime-bucket","url_dependency_source":"ocibucket","url_dependency_source_oci_objects":"iam/output/compartments_output.json,network/output/network_output.json","save_output":true,"oci_object_prefix":"mt-shared-oke/output"})
+**Deploying this stack as-is requires [Deployment Bootstrap](../readme.md#deployment-bootstrap)**.
+
+[![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"configuration_source":"ocibucket","oci_configuration_bucket":"landing-zone-runtime-bucket","oci_configuration_objects":"mt/shared/network_oke_npn_config.json,mt/shared/oke_npn_cluster_config.json,"oci_dependency_objects":"mgmt-plane/iam/output/compartments_output.json,mgmt-plane/network/output/network_output.json","save_output":true,"oci_object_prefix":"mt/shared/output"})
 
 In the Resource Manager Service (RMS) **Create stack - Stack Information** screen that shows up, check the *I have reviewed and accept the Oracle Terms of Use* box, make sure to select *terraform-oci-modules-orchestrator-main/rms-facade* in the **Working directory** drop down, as shown in the image below. 
 

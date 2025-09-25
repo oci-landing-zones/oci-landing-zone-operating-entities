@@ -26,15 +26,15 @@ This stack is executed in two different stages with a **PROGRESSIVELY UPDATED in
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_initial_config.json](../mgmt-plane/network/network_initial_config.json) <br> [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json)  <br> [jump_host_config.json](../mgmt-plane/network/jump_host_config.json)* | iam/output/compartments_output.json | network/output/network_output.json
+[network_initial_config.json](../mgmt-plane/network/network_initial_config.json) <br> [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json)  <br> [jump_host_config.json](../mgmt-plane/network/jump_host_config.json)* | mgmt-plane/iam/output/compartments_output.json | mgmt-plane/network/output/network_output.json
 
 \* in a real deployment, make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
 
 #### Stack Creation
 
-Click the button to create the stack with all variables pre-filled.
+**Deploying this stack as-is requires [Deployment Bootstrap](../readme.md#deployment-bootstrap)**.
 
-[![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/network/network_initial_config.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/network/flow_logs_config.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/network/jump_host_config.json","url_dependency_source_oci_bucket":"isv-terraform-runtime-bucket","url_dependency_source":"ocibucket","url_dependency_source_oci_objects":"iam/output/compartments_output.json","save_output":true,"oci_object_prefix":"network/output"})
+[![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/heads/main.zip&zipUrlVariables={"configuration_source":"ocibucket","oci_configuration_bucket":"landing-zone-runtime-bucket","oci_configuration_objects":"mgmt-plane/network/network_initial_config.json,mgmt-plane/network/flow_logs_config.json,mgmt-plane/network/jump_host_config.json","oci_dependency_objects":"mgmt-plane/iam/output/compartments_output.json","save_output":true,"oci_object_prefix":"mgmt-plane/network/output"})
 
 In the Resource Manager Service (RMS) **Create stack - Stack Information** screen that shows up, check the *I have reviewed and accept the Oracle Terms of Use* box, make sure to select *terraform-oci-modules-orchestrator-main/rms-facade* in the **Working directory** drop down, as shown in the image below. 
 
