@@ -43,9 +43,9 @@ Input Configuration Files | Description
     - 4.3. > ```export KUBECONFIG=$HOME/.kube/config```
 5. Execute the following playbooks/manifests:
     - 5.1. > ```ansible-playbook ~/ansible-playbooks/rbac.yml``` (**Optional**. Execute it for utilizing a narrower role - bound to OCI groups/users with constrained permissions - for managing Kubernetes clusters.)
-    - 5.2. > ```kubectl apply -f ~/k8s-manifests/calico-policy.yml``` (for enabling Kubernetes network policies.)
+    - 5.2. > ```kubectl apply -f ~/k8s-manifests/calico-policy.yml``` (for enabling Kubernetes network policies. **IMPORTANT**: If the cluster worker nodes operating system is Oracle Linux 8, make sure to uncomment line 4798 of [calico-policy.xml](../mgmt-plane/tooling/k8s-manifests/calico-policy.yml), that says ```- name: FELIX_IPTABLESBACKEND```)
 
 #### For each customer  
 
-- 5.3. > ```ansible-playbook ~/ansible-playbooks/customer.yml``` (for onboarding customers in Kubernetes cluster. It creates a namespace, quota policy and network policy for each customer. It must be updated and executed for any new customer.)
+- 5.3. > ```ansible-playbook ~/ansible-playbooks/customer.yml``` (for onboarding customers in Kubernetes cluster. It creates a namespace, quota policy and network policy for each customer. It must be updated and executed for any new customer. Simply provide your actual customer identifiers in block ```vars:customers:```. *customer-1* and *customer-2* are just samples and should be changed.)
 

@@ -7,10 +7,8 @@
   vars:
     customers:
       - name: customer-1
-        group: "customer-1-user"
-      - name: customer-2
-        group: "customer-2-user"
-
+        name: customer-2
+        
   tasks:
     - name: Create isolation configuration for each customer
       include_tasks: customer_tasks.yml
