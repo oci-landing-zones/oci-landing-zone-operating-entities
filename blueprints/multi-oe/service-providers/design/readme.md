@@ -1,35 +1,48 @@
-# **The OCI Open LZ &ndash; Multi-OE Service Providers [Blueprint](#)**
+# The OCI Open LZ Service Providers Blueprint
 
-### A Blueprint to Simplify the Onboarding of Organizations, Business Units, and Subsidiaries into OCI
+Simplifying the onboarding of service providers into OCI.
 
-&nbsp; 
-
-**Table of Contents**
-
-- [1. Introduction](#1-introduction)
-- [2. Security View](#2-security-view)
-- [3. Runtime View](#3-runtime-view)
-
-&nbsp; 
-
-# **1. Introduction**
+# 1. Introduction
 
 This blueprint defines a tenancy model for service providers that is based on OCI Core Landing Zone (formerly known as OCI CIS Landing Zone) principles. It is designed for managed service providers to onboard OCI in a streamlined manner that aligns with the CIS OCI Benchmark and best practices. Two variations are provided:
 
-1. **Pod model**: each customer gets a copy of the application stack and has its own separate data stack. This pattern can be seen in SaaS and managed services industries where each customer's environment is independent of another, and the only shared part is the management plane. 
+- **Pod model**: each customer gets a copy of the application stack and has its own separate data stack. This pattern can be seen in SaaS and managed services industries where each customer's environment is independent of another, and the only shared part is the management plane. 
 
 ![architecture-pod](images/architecture-pod.png)
 
-2. **Multi-tenant model**: the application stack is shared by the service provider customers. Customer segregation is defined through constraints available in the framework that underpins the application layer. Typically, the service provider manages a single multi-tenant application stack that is split in multiple customer spaces. The data layer has a shared infrastructure and customers data are segregated through available constraints in the data processing technology, like portable databases within Exadata Cloud Service, multiple Oracle Autonomous databases, or more simplistically, separate schemas within a shared database. 
+Click [here](images/architecture-pod.svg) for the .svg version that can be edited in [draw io](https://www.drawio.com/).
+
+- **Multi-tenant model**: the application stack is shared by the service provider customers. Customer segregation is defined through constraints available in the framework that underpins the application layer. Typically, the service provider manages a single multi-tenant application stack that is split in multiple customer spaces. 
 
 ![architecture-mt](images/architecture-mt.png)
 
-Both models have a management plane that hosts shared services for the application layer and for itself, including network security, observability, monitoring and DevOps.
+Click [here](images/architecture-mt.svg) for the .svg version that can be edited in [draw io](https://www.drawio.com/).
 
-# **2. Tenancy Structure**
 
-The blueprint separates the management plane from the application layer using compartments, as depicted in the following diagram. [Click here](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/multi-oe/saas/OCI_Open_LZ_Multi-OE_SaaS_Blueprint.drawio) to download the drawio version.
+# 2. Main Tenets
 
+**Segregation of Duties**: IAM compartments, groups and policies provide for separation of duties across distinct aspects of the tenancy infrastructure. The defined groups are expected to be used on day 2 and beyond for managing the infrastructure.
+
+**Application Layer separated from Management Plane**: Both models have a management plane that hosts shared services for the application layer and for itself, including network security, application management and observability. Tenancy administrators utilize the management plane for deploying management tools, security services and consolidating tenancy wide logging. Additionally, the management plane hosts the Hub network for all application supporting spoke networks.
+
+**Network Traffic Screening**: A network firewall deployed in the Hub VCN provides screening for North/South and East/West traffic. End user application requests as well as admin requests flow through the firewall for evaluation.
+
+**Well Defined Access Paths for Application Management**: the pattern enforces specific network access paths for application management in the different lifecycle environments, mitigating unintentional mistakes when dealing with multiple environments. 
+
+**Consolidated Logging**: the pattern enforces tenancy wide logging consolidation in the management plane for further consumption by SIEM services.
+
+**Cloud Security Posture Monitoring**: detective and preventative security controls are enforced by Cloud Guard and Security Zones, respectively.
+
+**Operational Awareness**: OCI services fire events to alert users about specific changes in the infrastructure.
+
+**Cost Management**: Budgets provide pro-active cost management, emitting events when consumption reaches determined thresholds. Additionally, the blueprints provide the building blocks for a charge back model, based either on compartments or tags.
+
+**Streamlined Customer Onboarding**: automation streamlines customer onboarding, bringing repeatability and consistency to the process.
+
+
+# 3. Tenancy Structure
+
+The blueprint separates the management plane from the application layer using compartments.
 
 ## 2.1 Enclosing Compartment
 
@@ -79,26 +92,16 @@ Following CIS OCI Benchmark recommendations on segregation of duties, the bluepr
 
 **Shared Services Administrators:** manage OCI services that support the overall solution, but are neither network nor security related, for example, a 3rd-party Kubernetes management solution, Oracle Enterprise Manager or a DevOps framework.
 
-### 2.2.3 Customer Groups
+### 2.2.3 Environment Administration Groups
 
-**Customer Administrators:** manage application stacks deployments and related resources in the Customer Compartment.  OCI resources include Compartments, Network, Compute images, Database OCI Functions, Kubernetes clusters, Streams, Object Storage, Block Storage, File Storage, Keys, Budgets, and others.
+**Dev Environment Administrators:** manage application stacks deployments and related resources in Dev Compartment. OCI resources include Compartments, Network, Compute images, Database OCI Functions, Kubernetes clusters, Streams, Object Storage, Block Storage, File Storage, Keys, Budgets, and others.
 
-&nbsp; 
+**Test Environment Administrators:** manage application stacks deployments and related resources in Test Compartment.
 
-## 2.3 Posture Management
+**Prod Environment Administrators:** manage application stacks deployments and related resources in Prod Compartment.
 
-**Oracle Cloud Guard:** activity, configuration, and threat detector recipes are defined at the tenancy level to examine your resources for security weaknesses and to monitor operators and users for risky activities.
 
-**Policies:** IAM policies which grants access to the tenancy level wide administrator groups as the IAM, credentials, cost administrator groups, announcement readers, auditors and the specific ISV enclosing, and shared services compartments. It will also contain OCI services needed policies.
+# 4. Runtime View
 
-**Events:** The events related to CRUD (Create, Read, Update or Delete) state changes of tenancy level resources, as Budget events or Cloud Guard events or reported problems.
-
-**Budgets:** The budgets configured will emit events when reaching the percentage or amount of money configured for a given budget. It will fire an event that can be integrated with the OCI Notification services.
-
-**Subscriptions:** The OCI notification subscription will let the subscribers to receive information about an specific topic, as budget topic. By default the subscription type will be by e-mail.
-
-&nbsp; 
-
-# 3. Runtime View
-This chapter is presented [here](/blueprints/multi-oe/service-providers/runtime/readme.md) and guides the **deployment** activities to provision this blueprint.
+Proceed to [Service Providers Landing Zone Runtime](../runtime/readme.md) for instructions how to deploy this blueprint.
 

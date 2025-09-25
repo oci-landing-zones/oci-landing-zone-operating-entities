@@ -42,4 +42,4 @@ Within the stack, perform a *Plan*, inspect its output, and finally run an *Appl
 
 The resources in red color are added.
 
-![shared-mt](../../design/images/shared-mt.png)
+![shared-mt](../../design/images/mgmt-plane-tooling.png)

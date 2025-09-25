@@ -1,6 +1,4 @@
-# **The OCI Open LZ &ndash; Multi-OE Service Providers [Blueprint](#)**
-
-&nbsp; 
+# Service Providers Landing Zone Runtime
 
 ## <a name="configfiles">Configuration Files</a>
 
@@ -95,7 +93,7 @@ The automated stacks below require the [configuration files](#configfiles) above
 
 ```> runtime_bucket_setup.sh <BUCKET-NAME> <BUCKET-COMPARTMENT-OCID> <FILES-DIRECTORY>```
 
-If you clone this repository, change to *runtime* directory and execute:
+If you clone this repository, change directory to *blueprints/multi-oe/service-providers/runtime* (where the script is located) and execute:
 
 ```> runtime_bucket_setup.sh landing-zone-runtime-bucket ocid1.compartment.oc...aaaaaaaa...2ia .```
 
