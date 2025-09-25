@@ -1,4 +1,4 @@
-## Management Plane Network Stack Deployment
+## Management Plane Tooling Stack Deployment
 
 A stack that deploys necessary tooling for managing the application resources serving customers. It deploys a Compute instance using "Oracle-Linux-Cloud-Developer-8.10-2025.01.31-0" image. As part of deployment, it attempts to install OCI CLI, kubectl and Ansible in it via cloud-init. Additionally, it downloads pre-configured Kubernetes manifests and Ansible playbooks for deploying Calico policy, setting up RBAC policy and onboarding customers.
 

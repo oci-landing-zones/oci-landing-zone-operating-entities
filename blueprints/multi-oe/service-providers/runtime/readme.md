@@ -116,7 +116,7 @@ Onboarding customers in the Multi-Tenant model requires shared infrastructure as
 6. [Mgmt Plane Tooling Stack](docs/MPLANE-TOOLING.md)
 7. [Multi-Tenant Customer Onboarding Stack](docs/MT-CUSTOMER-ONBOARDING.md)
  
- The diagram below depicts the deployment sequencing. Note that the Network stack must be updated once after Firewall deployment (step 4). Also note that the customer stack (step 5 in Pod model and step 6 in multi-tenant model) must be executed for each new customer.
+ The diagram below depicts the deployment sequencing. Note that the Network stack must be updated once after Firewall deployment (step 4). Also note that the customer stack (step 5 in Pod model and step 7 in multi-tenant model) must be executed for each new customer.
 
  ![Deployment Sequencing](../design/images/deployment-sequencing.png)
 
