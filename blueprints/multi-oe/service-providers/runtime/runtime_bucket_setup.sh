@@ -28,5 +28,5 @@ find . -path ./docs -prune -o -type f \( -name "*.json" -o -name "*.sh" -o -name
   oci os object put --namespace "$NAMESPACE" --bucket-name "$BUCKET_NAME" --file "$file" --name "$file" --force
 done
 
-echo "✅ Upload completed."
+echo "Upload completed."
 

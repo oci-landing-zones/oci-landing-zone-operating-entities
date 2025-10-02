@@ -34,7 +34,7 @@
           "cloud_init" : {
             "heredoc_script" : "#cloud-config\n
               runcmd:\n
-                - curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/multi-tenant-pattern/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/oke_operator_setup.sh -o /home/opc/oke_operator_setup.sh\n
+                - curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/oke_operator_setup.sh -o /home/opc/oke_operator_setup.sh\n
                 - chmod +x /home/opc/oke_operator_setup.sh\n
                 - /home/opc/oke_operator_setup.sh > /home/opc/oke_operator_setup.log\n
                 - chown opc:opc /home/opc/oke_operator_setup.sh\n

@@ -22,7 +22,7 @@ Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
 [firewall_config.json](../mgmt-plane/firewall/firewall_config.json)* | mgmt-plane/iam/output/compartments_output.json, mgmt-plane/network/output/network_output.json  | mgmt-plane/firewall/output/instances_output.json
 
-\* in a real deployment, make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
+\* Make sure to assign your SSH public key to *default_ssh_public_key_path* attribute in *firewall_config.json*.
 
 ### Stack Creation
 
