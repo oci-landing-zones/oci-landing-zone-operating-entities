@@ -18,12 +18,12 @@
           "fault_domain" : 1
         },
         "boot_volume" : {
-          "size" : 60,
+          "size" : 100,
           "preserve_on_instance_deletion" : true,
           "measured_boot" : true
         },
         "networking" : {
-          "hostname " : "panf-1",
+          "hostname" : "panf-1",
           "subnet_id" : "MGMT-SUB",
           "network_security_groups" : ["MGMT-NSG"],
           "secondary_vnics" : {
@@ -63,12 +63,12 @@
           "fault_domain" : 1
         },
         "boot_volume" : {
-          "size" : 60,
+          "size" : 100,
           "preserve_on_instance_deletion" : true,
           "measured_boot" : true
         },
         "networking" : {
-          "hostname " : "panf-2",
+          "hostname" : "panf-2",
           "subnet_id" : "MGMT-SUB",
           "network_security_groups" : ["MGMT-NSG"],
           "secondary_vnics" : {

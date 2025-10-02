@@ -23,7 +23,7 @@ fi
 
 # === Upload files ===
 cd "$FILES_DIRECTORY" || exit 1
-find . -path ./docs -prune -o -type f ! -name "./*.sh" ! -name "*.md" ! -name "*.old" -print | while read -r file; do
+find . -path ./docs -prune -o -type f \( -name "*.json" -o -name "*.sh" -o -name "*.xml" \) -print | while read -r file; do
   echo "Uploading $file ..."
   oci os object put --namespace "$NAMESPACE" --bucket-name "$BUCKET_NAME" --file "$file" --name "$file" --force
 done

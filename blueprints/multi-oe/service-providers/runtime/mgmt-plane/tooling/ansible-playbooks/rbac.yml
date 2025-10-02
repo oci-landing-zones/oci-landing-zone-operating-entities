@@ -5,8 +5,8 @@
   gather_facts: false
 
   vars:
-    group: "ocid1.group.oc1..aaaaaaaavmtb33krmht3aytazyamez4yer72dupc7c6fu2x3cbaoc7ee4tga"
+    group: "<REPLACE-WITH-GROUP-OCID>"  # e.g., ocid1.group.oc1..aaaaaaaaxxxxx
 
   tasks:
     - name: Set ClusterRole for "{{ group }}"
-      include_tasks: rbac_tasks.yml
+      include_tasks: tasks/rbac_tasks.yml

@@ -2,7 +2,11 @@
 
 The firewall stack deploys a pair of Palo Alto Network firewalls from OCI Marketplace, *sandwiched* by a pair of OCI network load balancers. 
 
-The marketplace image deployed is the latest available version of "Palo Alto Networks VM-Series Next Generation Firewall", BYOL license type.
+The marketplace image deployed is the latest available version of "Palo Alto Networks VM-Series Next Generation Firewall", BYOL license type. These can be adjusted in [firewall_config.json](../mgmt-plane/firewall/firewall_config.json).
+
+**IMPORTANT: The stack does not configure any firewall policies. After deploying this stack, you must log in the firewall nodes and configure policies for allowing network traffic. Without firewall policies configuration, all Internet traffic as well as any traffic between management plane VCNs and customer VCNs are blocked.**
+
+After deploying this stack, see [Basic Firewall Configuration](./PALO-INTRA-CONFIG.md) for configuring a basic firewall policy to unblock traffic.
 
 ### Overall Deployment Sequence
 

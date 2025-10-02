@@ -131,7 +131,7 @@ In order to update the initial network configuration, edit the existing network 
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_post_firewall_config.json](../mgmt-plane/network/network_post_firewall_config.json) (**must be added, replacing *network_initial_config.json***) <br> [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json) (unchanged) <br> [bastion_service_config.json](../mgmt-plane/network/bastion_service_config.json) (unchanged) <br> [jump_host_config.json](../mgmt-plane/network/jump_host_config.json) (unchanged) | iam/output/compartments_output.json (unchanged) <br> firewall/output/nlbs_output.json (**must be added. It brings in the references to NLB OCIDs**)  | network/output/network_output.json
+[network_post_firewall_config.json](../mgmt-plane/network/network_post_firewall_config.json) (**must be added, replacing *network_initial_config.json***) <br> [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json) (unchanged) <br> [jump_host_config.json](../mgmt-plane/network/jump_host_config.json) (unchanged) | mgmt-plane/iam/output/compartments_output.json (unchanged) <br> mgmt-plane/firewall/output/nlbs_output.json (**must be added. It brings in the references to NLB OCIDs**)  | mgmt-plane/network/output/network_output.json
 
 #### What Gets Deployed
 

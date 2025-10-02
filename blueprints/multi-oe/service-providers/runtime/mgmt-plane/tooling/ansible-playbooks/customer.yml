@@ -11,7 +11,7 @@
         
   tasks:
     - name: Create isolation configuration for each customer
-      include_tasks: customer_tasks.yml
+      include_tasks: tasks/customer_tasks.yml
       loop: "{{ customers }}"
       loop_control:
         loop_var: customer

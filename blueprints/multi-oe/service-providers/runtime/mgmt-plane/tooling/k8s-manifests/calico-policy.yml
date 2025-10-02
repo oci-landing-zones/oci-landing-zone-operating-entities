@@ -4794,7 +4794,7 @@ spec:
               value: "Append"
             - name: FELIX_IPTABLESMANGLEALLOWACTION
               value: "Return"
-            # Orale Linux 8 Worker Nodes Only
+            # Oracle Linux 8 Worker Nodes Only
             #- name: FELIX_IPTABLESBACKEND
             #  value: "NFT"
             # Use Kubernetes API as the backing datastore.
