@@ -115,17 +115,17 @@ The provided *XML* has to be modified for each Palo Alto instance. Load the modi
     (Confirm with y)
     ```    
 
-### <a name="network-path-to-firewall-management-interface">Network Path to Firewall Management Interface</a>
+## <a name="network-path-to-firewall-management-interface">Network Path to Firewall Management Interface</a>
 
 Per this blueprint, Palo Alto Network Firewall management interfaces are deployed in private subnets. This means access to them must be configured from within the VCN. One practical and secure way is through [OCI Bastion service](https://docs.oracle.com/en-us/iaas/Content/Bastion/Concepts/bastionoverview.htm).
 
-#### Command Line SSH
+### Command Line SSH
 
 SSH access to the management interfaces is available via the Jump Host deployed by [Mgmt Plane Networking 1st stage - Mgmt Plane VCNs](./MPLANE-NETWORKING.md#stage1), which in turn can be accessed through an OCI Bastion Managed SSH Session. With OCI Bastion deployed, make an SSH connection to the jump host, and from the jump host, ssh connect to the management interface.
 
 **Note:**: For command line SSH, OCI Bastion must be manually provisioned by users in _Management VCN's Jump Host subnet_, where the jump host is deployed.
 
-#### HTTP over SSH
+### HTTP over SSH
 
 The Palo Alto Admin Web UI is accessible through an SSH Port Forwarding Session to the management interface. With OCI Bastion deployed, start an SSH port forward session to the management interface in your local machine, and use the browser to navigate to ```https://localhost```.
 
