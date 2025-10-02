@@ -16,7 +16,9 @@ A stack that deploys necessary tooling for managing the application resources se
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[oke_operator_host_config.json](../mgmt-plane/tooling/oke_operator_host_config.json) | mgmt-plane/iam/output/compartments_output.json, mgmt-plane/network/output/network_output.json | mgmt-plane/tooling/output/instances_output.json
+[oke_operator_host_config.json](../mgmt-plane/tooling/oke_operator_host_config.json)* | mgmt-plane/iam/output/compartments_output.json, mgmt-plane/network/output/network_output.json | mgmt-plane/tooling/output/instances_output.json
+
+\* Make sure to assign your SSH public key to *default_ssh_public_key_path* attribute in *oke_operator_host_config.json*.
 
 ### Stack Creation
 

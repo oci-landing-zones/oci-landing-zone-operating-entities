@@ -26,9 +26,9 @@ This stack is executed in two different stages with a **PROGRESSIVELY UPDATED in
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_initial_config.json](../mgmt-plane/network/network_initial_config.json) <br> [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json)  <br> [jump_host_config.json](../mgmt-plane/network/jump_host_config.json)* | mgmt-plane/iam/output/compartments_output.json | mgmt-plane/network/output/network_output.json
+[network_initial_config.json](../mgmt-plane/network/network_initial_config.json)* <br> [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json)  <br> [jump_host_config.json](../mgmt-plane/network/jump_host_config.json)* | mgmt-plane/iam/output/compartments_output.json | mgmt-plane/network/output/network_output.json
 
-\* in a real deployment, make sure to assign your SSH public key to *default_ssh_public_key_path* attribute.
+\* Make sure to assign your SSH public key to *default_ssh_public_key_path* attribute in *network_initial_config.json*.
 
 #### Stack Creation
 
@@ -131,7 +131,9 @@ In order to update the initial network configuration, edit the existing network 
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_post_firewall_config.json](../mgmt-plane/network/network_post_firewall_config.json) (**must be added, replacing *network_initial_config.json***) <br> [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json) (unchanged) <br> [jump_host_config.json](../mgmt-plane/network/jump_host_config.json) (unchanged) | mgmt-plane/iam/output/compartments_output.json (unchanged) <br> mgmt-plane/firewall/output/nlbs_output.json (**must be added. It brings in the references to NLB OCIDs**)  | mgmt-plane/network/output/network_output.json
+[network_post_firewall_config.json](../mgmt-plane/network/network_post_firewall_config.json)* (**must be added, replacing *network_initial_config.json***) <br> [flow_logs_config.json](../mgmt-plane/network/flow_logs_config.json) (unchanged) <br> [jump_host_config.json](../mgmt-plane/network/jump_host_config.json) (unchanged) | mgmt-plane/iam/output/compartments_output.json (unchanged) <br> mgmt-plane/firewall/output/nlbs_output.json (**must be added. It brings in the references to NLB OCIDs**)  | mgmt-plane/network/output/network_output.json
+
+\* Make sure to assign your SSH public key to *default_ssh_public_key_path* attribute in *network_post_firewall_config.json*.
 
 #### What Gets Deployed
 
