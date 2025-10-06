@@ -3,7 +3,7 @@
 
 ## **Using Output and Dependencies features with ORM**
 
-Our Landing Zone extensions are designed to integrate seamlessly with our core Landing Zone models, such as ONE-OE or Multi-OE. We onboard a LZ extension as an additional operation performed after the initial deployment of the core Landing Zone.
+Our Landing Zone extensions are designed to integrate seamlessly with our Landing Zone models, such as ONE-OE or Multi-OE. We onboard a LZ extension as an additional operation performed after the initial deployment of the Landing Zone.
 
 When you press the provided magic button, a new ORM stack is created. Follow these steps:
 1. Accept terms, wait for the configuration to load.
