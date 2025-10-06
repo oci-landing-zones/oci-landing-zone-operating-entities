@@ -1,0 +1,49 @@
+{
+    "instances_configuration" : {
+      "default_compartment_id" : "SHARED-NETWORK-CMP",
+      "default_ssh_public_key_path" : "ssh-rsa AAAAB3NzaC1......RgQ== user@example.com",
+      "instances" : {
+        "OKE-OPERATOR-HOST" : {
+          "name" : "dev-oke-operator-host",
+          "shape" : "VM.Standard.E4.Flex",
+          "platform_image" : {
+            "name" : "Oracle-Linux-Cloud-Developer-8.10-2025.01.31-0"
+          },
+          "boot_volume" : {
+            "size" : 60,
+            "preserve_on_instance_deletion" : false
+          },
+          "networking" : {
+            "assign_public_ip" : false,
+            "hostname" : "dev-oke-operator-host",
+            "subnet_id" : "DEV-MGMT-VCN-APP-OPERATOR-SUB"
+          },
+          "encryption" : {
+            "encrypt_in_transit_on_instance_create" : null,
+            "encrypt_in_transit_on_instance_update" : null
+          },
+          "cloud_agent" : {
+            "disable_monitoring" : false,
+            "disable_management" : false,
+            "plugins" : [
+              {"name" : "Vulnerability Scanning", "enabled" : true},
+              {"name" : "OS Management Service Agent", "enabled" : true},
+              {"name" : "Custom Logs Monitoring", "enabled" : true}
+            ]
+          },
+          "cloud_init" : {
+            "heredoc_script" : "#cloud-config\n
+              runcmd:\n
+                - curl -s https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/blueprints/multi-oe/service-providers/runtime/mgmt-plane/tooling/oke_operator_setup.sh -o /home/opc/oke_operator_setup.sh\n
+                - chmod +x /home/opc/oke_operator_setup.sh\n
+                - /home/opc/oke_operator_setup.sh > /home/opc/oke_operator_setup.log\n
+                - chown opc:opc /home/opc/oke_operator_setup.sh\n
+                - chown opc:opc /home/opc/oke_operator_setup.log\n"
+          }
+        }
+      }
+    }
+  }
+  
+  
+  

@@ -1,0 +1,19 @@
+---
+- name: Configure Kubernetes isolation for multiple customers
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    customers:
+      - name: customer-1
+        name: customer-2
+        
+  tasks:
+    - name: Create isolation configuration for each customer
+      include_tasks: tasks/customer_tasks.yml
+      loop: "{{ customers }}"
+      loop_control:
+        loop_var: customer
+
+

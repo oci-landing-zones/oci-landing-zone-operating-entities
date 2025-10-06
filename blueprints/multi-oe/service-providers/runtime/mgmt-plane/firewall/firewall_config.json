@@ -1,0 +1,168 @@
+{
+  "instances_configuration" : {
+    "default_compartment_id" : "SHARED-NETWORK-CMP",
+    "default_ssh_public_key_path" : "ssh-rsa AAAAB3NzaC1......RgQ== user@example.com",
+    "instances" : {
+      "PANF-1" : {
+        "name"  : "panf-1",
+        "shape" : "VM.Standard3.Flex",
+        "flex_shape_settings" : {
+          "ocpus" : 4,
+          "memory_in_gbs" : 16
+        },
+        "marketplace_image" : {
+          "name" : "Palo Alto Networks VM-Series Next Generation Firewall"
+        },
+        "placement" : {
+          "availability_domain" : 1,
+          "fault_domain" : 1
+        },
+        "boot_volume" : {
+          "size" : 100,
+          "preserve_on_instance_deletion" : true,
+          "measured_boot" : true
+        },
+        "networking" : {
+          "hostname" : "panf-1",
+          "subnet_id" : "MGMT-SUB",
+          "network_security_groups" : ["MGMT-NSG"],
+          "secondary_vnics" : {
+            "INDOOR" : {
+              "display_name" : "panf-1-indoor",
+              "hostname" : "panf-1-indoor",
+              "subnet_id" : "INDOOR-SUB",
+              "network_security_groups" : ["INDOOR-FW-NSG"],
+              "skip_source_dest_check" : true
+            },
+            "OUTDOOR" : {
+              "display_name" : "panf-1-outdoor",
+              "hostname" : "panf-1-outdoor",
+              "subnet_id" : "OUTDOOR-SUB",
+              "network_security_groups" : ["OUTDOOR-FW-NSG"],
+              "skip_source_dest_check" : true
+            }
+          }
+        },
+        "encryption" : {
+          "encrypt_in_transit_on_instance_create" : null,
+          "encrypt_in_transit_on_instance_update" : null
+        }
+      },
+      "PANF-2" : {
+        "name" : "panf-2",
+        "shape" : "VM.Standard3.Flex",
+        "flex_shape_settings" : {
+          "ocpus" : 4,
+          "memory_in_gbs" : 16
+        },
+        "marketplace_image" : {
+          "name" : "Palo Alto Networks VM-Series Next Generation Firewall"
+        },
+        "placement" : {
+          "availability_domain" : 2,
+          "fault_domain" : 1
+        },
+        "boot_volume" : {
+          "size" : 100,
+          "preserve_on_instance_deletion" : true,
+          "measured_boot" : true
+        },
+        "networking" : {
+          "hostname" : "panf-2",
+          "subnet_id" : "MGMT-SUB",
+          "network_security_groups" : ["MGMT-NSG"],
+          "secondary_vnics" : {
+            "INDOOR" : {
+              "display_name" : "panf-2-indoor",
+              "hostname" : "panf-2-indoor",
+              "subnet_id" : "INDOOR-SUB",
+              "network_security_groups" : ["INDOOR-FW-NSG"],
+              "skip_source_dest_check" : true
+            },
+            "OUTDOOR" : {
+              "display_name" : "panf-2-outdoor",
+              "hostname" : "panf-2-outdoor",
+              "subnet_id" : "OUTDOOR-SUB",
+              "network_security_groups" : ["OUTDOOR-FW-NSG"],
+              "skip_source_dest_check" : true
+            }
+          }
+        },
+        "encryption" : {
+          "encrypt_in_transit_on_instance_create" : null,
+          "encrypt_in_transit_on_instance_update" : null
+        }
+      }
+    }
+  },
+  "nlb_configuration" : {
+    "default_compartment_id" : "SHARED-NETWORK-CMP",
+    "nlbs" : {
+      "INDOOR-NLB" : {
+        "display_name" : "isv-indoor-nlb",
+        "is_private" : true,
+        "subnet_id" : "INDOOR-SUB",
+        "network_security_group_ids" : ["INDOOR-NLB-NSG"],
+        "enable_symmetric_hashing" : true,
+        "listeners" : {
+          "LISTENER-1" : {
+            "port" : 0,
+            "protocol" : "ANY",
+            "backend_set" : {
+              "name" : "default-backend-set",
+              "health_checker" : {
+                "protocol" : "TCP",
+                "port" : 22
+              },
+              "backends" : {
+                "BACKEND-1" : {
+                  "name" : "backend-1",
+                  "port" : 0,
+                  "ip_address" : "PANF-1.INDOOR"
+                },
+                "BACKEND-2" : {
+                  "name" : "backend-2",
+                  "port" : 0,
+                  "ip_address" : "PANF-2.INDOOR"
+                }
+              }
+            }
+          }
+        }
+      },
+      "OUTDOOR-NLB" : {
+        "display_name" : "isv-outdoor-nlb",
+        "is_private" : true,
+        "subnet_id" : "OUTDOOR-SUB",
+        "network_security_group_ids" : ["OUTDOOR-NLB-NSG"],
+        "listeners" : {
+          "LISTENER-1" : {
+            "port" : 0,
+            "protocol" : "ANY",
+            "backend_set" : {
+              "name" : "default-backend-set",
+              "health_checker" : {
+                "protocol" : "TCP",
+                "port" : 22
+              },
+              "backends" : {
+                "BACKEND-1" : {
+                  "name" : "backend-1",
+                  "port" : 0,
+                  "ip_address" : "PANF-1.OUTDOOR"
+                },
+                "BACKEND-2" : {
+                  "name" : "backend-2",
+                  "port" : 0,
+                  "ip_address" : "PANF-2.OUTDOOR"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+

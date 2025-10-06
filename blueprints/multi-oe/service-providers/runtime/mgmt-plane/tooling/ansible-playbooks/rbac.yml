@@ -1,0 +1,12 @@
+---
+- name: Configure Kubernetes RBAC
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    group: "<REPLACE-WITH-GROUP-OCID>"  # e.g., ocid1.group.oc1..aaaaaaaaxxxxx
+
+  tasks:
+    - name: Set ClusterRole for "{{ group }}"
+      include_tasks: tasks/rbac_tasks.yml

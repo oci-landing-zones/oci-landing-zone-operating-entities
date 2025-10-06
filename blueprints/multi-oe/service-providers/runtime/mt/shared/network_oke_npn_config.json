@@ -1,0 +1,432 @@
+{
+    "network_configuration" : {
+      "default_enable_cis_checks" : true,
+      "default_compartment_id" : "CUSTOMERS-DEV-CMP",
+      "network_configuration_categories" : {
+        "DEV" : {
+          "vcns" : {
+            "OKE-VCN" : {
+              "display_name"                     : "oke-dev-vcn",
+              "is_ipv6enabled"                   : false,
+              "is_oracle_gua_allocation_enabled" : false,
+              "cidr_blocks"                      : ["10.0.128.0/22"],
+              "dns_label"                        : "okedevvcn",
+              "block_nat_traffic"                : false,
+  
+              "subnets" : {
+                "OKE-VCN-SERVICES-SUBNET" : {
+                  "cidr_block"                 : "10.0.129.128/26",
+                  "dhcp_options_key"           : "default_dhcp_options",
+                  "display_name"               : "services-subnet",
+                  "dns_label"                  : "services",
+                  "ipv6cidr_blocks"            : [],
+                  "prohibit_internet_ingress"  : true,
+                  "route_table_key"            : "DRG-ONLY-ROUTE"
+                },
+                "OKE-VCN-WORKERS-SUBNET" : {
+                  "cidr_block"                 : "10.0.129.0/25",
+                  "dhcp_options_key"           : "default_dhcp_options",
+                  "display_name"               : "workers-subnet",
+                  "dns_label"                  : "workers",
+                  "ipv6cidr_blocks"            : [],
+                  "prohibit_internet_ingress"  : true,
+                  "route_table_key"            : "DRG-OSN-ROUTE"
+                },
+                "OKE-VCN-PODS-SUBNET" : {
+                  "cidr_block"                 : "10.0.128.0/24",
+                  "dhcp_options_key"           : "default_dhcp_options",
+                  "display_name"               : "pods-subnet",
+                  "dns_label"                  : "pods",
+                  "ipv6cidr_blocks"            : [],
+                  "prohibit_internet_ingress"  : true,
+                  "route_table_key"            : "DRG-ONLY-ROUTE"
+                },
+                "OKE-VCN-API-SUBNET" : {
+                  "cidr_block"                 : "10.0.129.192/29",
+                  "dhcp_options_key"           : "default_dhcp_options",
+                  "display_name"               : "api-subnet",
+                  "dns_label"                  : "api",
+                  "ipv6cidr_blocks"            : [],
+                  "prohibit_internet_ingress"  : true,
+                  "route_table_key"            : "DRG-ONLY-ROUTE"
+                },
+                "OKE-VCN-DATA-SUBNET" : {
+                  "cidr_block"                 : "10.0.130.0/25",
+                  "dhcp_options_key"           : "default_dhcp_options",
+                  "display_name"               : "data-subnet",
+                  "dns_label"                  : "data",
+                  "ipv6cidr_blocks"            : [],
+                  "prohibit_internet_ingress"  : true,
+                  "route_table_key"            : "DRG-OSN-ROUTE"
+                }
+              },
+  
+              "route_tables" : {
+                "DRG-ONLY-ROUTE" : {
+                  "display_name" : "drg-only-route-table",
+                  "route_rules" : {
+                    "DRG-RULE" : {
+                      "network_entity_key" : "CENTRAL-HUB-DRG",
+                      "description"        : "All traffic goes to DRG.",
+                      "destination"        : "0.0.0.0/0",
+                      "destination_type"   : "CIDR_BLOCK"
+                    }
+                  }
+                },
+                "DRG-OSN-ROUTE" : {
+                  "display_name" : "drg-osn-route-table",
+                  "route_rules" : {
+                    "DRG-RULE" : {
+                      "network_entity_key" : "CENTRAL-HUB-DRG",
+                      "description"        : "All traffic goes to DRG.",
+                      "destination"        : "0.0.0.0/0",
+                      "destination_type"   : "CIDR_BLOCK"
+                    },
+                    "OSN-RULE" : {
+                      "network_entity_key" : "SERVICE-GATEWAY",
+                      "description"        : "To Service Gateway.",
+                      "destination"        : "all-services",
+                      "destination_type"   : "SERVICE_CIDR_BLOCK"
+                    }
+                  }
+                }
+              },
+  
+              "network_security_groups" : {
+                "OKE-VCN-SERVICES-NSG" : {
+                  "display_name" : "services-nsg",
+                  "ingress_rules" : {
+                    "INGRESS-FROM-CENTRAL-HUB-VCN-LBR-SUBNET-RULE" : {
+                      "description"  : "Allows ingress from Central Hub VCN's LBR subnet.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "192.168.0.0/29",
+                      "src_type"     : "CIDR_BLOCK"
+                    }
+                  },
+                  "egress_rules" : {
+                    "EGRESS-TO-ANYWHERE" : {
+                      "description" : "Allows egress to anywhere.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "0.0.0.0/0",
+                      "dst_type"    : "CIDR_BLOCK"
+                    }
+                  }
+                },
+                "OKE-VCN-WORKERS-NSG" : {
+                  "display_name" : "workers-nsg",
+                  "ingress_rules" : {
+                    "INGRESS-FROM-WORKERS-NODE-RULE" : {
+                      "description"  : "Allows ingress from worker nodes.",
+                      "stateless"    : false,
+                      "protocol"     : "ALL",
+                      "src"          : "OKE-VCN-WORKERS-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP"
+                    },
+                    "INGRESS-FROM-OKE-API-RULE" : {
+                      "description"  : "Allows ingress from OKE control plane for webhooks served by workers.",
+                      "stateless"    : false,
+                      "protocol"     : "ALL",
+                      "src"          : "OKE-VCN-API-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP"
+                    },
+                    "INGRESS-FROM-SERVICES-NSG-HEALTH-CHECK-RULE" : {
+                      "description"  : "Allows ingress from load balancers for health checks.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-SERVICES-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 10256,
+                      "dst_port_max" : 10256
+                    },
+                    "INGRESS-FROM-SERVICES-NSG-RULE" : {
+                      "description"  : "Allows ingress from load balancers for NodePort traffic.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-SERVICES-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 30000,
+                      "dst_port_max" : 32767
+                    },
+                    "INGRESS-FROM-MGMT-SUBNET-RULE" : {
+                      "description"  : "Allows ingress from hosts used to manage the cluster: app-operator-subnet in mgmt plane's mgmt-vcn.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "192.168.0.80/28",
+                      "src_type"     : "CIDR_BLOCK"
+                    },
+                    "INGRESS-FROM-ANYWHERE-ICMP-WORKERS-RULE" : {
+                      "description" : "Allows ICMP ingress to workers for path discovery.",
+                      "stateless"   : false,
+                      "protocol"    : "ICMP",
+                      "src"         : "0.0.0.0/0",
+                      "src_type"    : "CIDR_BLOCK",
+                      "icmp_type"   : 3,
+                      "icmp_code"   : 4
+                    }
+                  },
+                  "egress_rules" : {
+                    "EGRESS-TO-ANYWHERE" : {
+                      "description" : "Allows egress to anywhere.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "0.0.0.0/0",
+                      "dst_type"    : "CIDR_BLOCK"
+                    }
+                  }
+                },
+                "OKE-VCN-API-NSG" : {
+                  "display_name" : "api-nsg",
+                  "ingress_rules" : {
+                    "INGRESS-FROM-WORKERS-NSG-6443-RULE" : {
+                      "description"  : "Allows ingress from worker nodes.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-WORKERS-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 6443,
+                      "dst_port_max" : 6443
+                    },
+                    "INGRESS-FROM-WORKERS-NSG-10250-RULE" : {
+                      "description"  : "Allows ingress from worker nodes (control plane health checks).",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-WORKERS-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 10250,
+                      "dst_port_max" : 10250
+                    },
+                    "INGRESS-FROM-WORKERS-NSG-12250-RULE" : {
+                      "description"  : "Allows ingress from worker nodes.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-WORKERS-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 12250,
+                      "dst_port_max" : 12250
+                    },
+                    "INGRESS-FROM-MGMT-SUBNET-RULE" : {
+                      "description"  : "Allows ingress to OKE APIs from hosts used to manage the cluster: app-operator-subnet in mgmt plane's mgmt-vcn.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "192.168.0.80/28",
+                      "src_type"     : "CIDR_BLOCK",
+                      "dst_port_min" : 6443,
+                      "dst_port_max" : 6443
+                    },
+                    "INGRESS-FROM-API-API-RULE" : {
+                      "description"  : "Allows TCP ingress for Kubernetes control plane inter-communication.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-API-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 6443,
+                      "dst_port_max" : 6443
+                    },
+                    "INGRESS-FROM-WORKERS-ICMP-API-RULE" : {
+                      "description" : "Allows ICMP ingress for path discovery from worker nodes.",
+                      "stateless"   : false,
+                      "protocol"    : "ICMP",
+                      "src"         : "OKE-VCN-WORKERS-NSG",
+                      "src_type"    : "NETWORK_SECURITY_GROUP",
+                      "icmp_type"   : 3,
+                      "icmp_code"   : 4
+                    },
+                    "INGRESS-FROM-PODS-6443-API-RULE" : {
+                      "description"  : "Pod to Kubernetes API endpoint communication (when using VCN-native pod networking)",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-PODS-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 6443,
+                      "dst_port_max" : 6443
+                    },
+                    "INGRESS-FROM-PODS-12250-API-RULE" : {
+                      "description"  : "Pod to Kubernetes API endpoint communication (when using VCN-native pod networking)",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-PODS-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 12250,
+                      "dst_port_max" : 12250
+                    }
+                  }, 
+                  "egress_rules" : {
+                    "EGRESS-TO-ANYWHERE" : {
+                      "description" : "Allows egress to anywhere.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "0.0.0.0/0",
+                      "dst_type"    : "CIDR_BLOCK"
+                    }
+                  }
+                },
+                "OKE-VCN-PODS-NSG" : {
+                  "display_name" : "pods-nsg",
+                  "ingress_rules" : {
+                    "INGRESS-FROM-WORKERS-RULE" : {
+                      "description" : "Allows worker nodes to access pods.",
+                      "stateless"   : false,
+                      "protocol"    : "ALL",
+                      "src"         : "OKE-VCN-WORKERS-NSG",
+                      "src_type"    : "NETWORK_SECURITY_GROUP"
+                    },
+                    "INGRESS-FROM-API-RULE" : {
+                      "description" : "Allows Kubernetes API endpoint to communicate with pods.",
+                      "stateless"   : false,
+                      "protocol"    : "ALL",
+                      "src"         : "OKE-VCN-API-NSG",
+                      "src_type"    : "NETWORK_SECURITY_GROUP"
+                    },
+                    "INGRESS-TO-PODS-RULE" : {
+                      "description" : "Allows pods to communicate with other pods.",
+                      "stateless"   : false,
+                      "protocol"    : "ALL",
+                      "src"         : "OKE-VCN-PODS-NSG",
+                      "src_type"    : "NETWORK_SECURITY_GROUP"
+                    }
+                  },
+                  "egress_rules" : {
+                    "EGRESS-TO-PODS-RULE" : {
+                      "description" : "Allows pods to communicate with other pods.",
+                      "stateless"   : false,
+                      "protocol"    : "ALL",
+                      "dst"         : "OKE-VCN-PODS-NSG",
+                      "dst_type"    : "NETWORK_SECURITY_GROUP"
+                    },
+                    "EGRESS-TO-ICMP-RULE" : {
+                      "description" : "Path Discovery.",
+                      "stateless"   : false,
+                      "protocol"    : "ICMP",
+                      "dst"         : "all-services",
+                      "dst_type"    : "SERVICE_CIDR_BLOCK",
+                      "icmp_type"   : 3,
+                      "icmp_code"   : 4
+                    },
+                    "EGRESS-TO-SERVICES-TCP-RULE" : {
+                      "description" : "Allows TCP egress from pods to OCI Services.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "all-services",
+                      "dst_type"    : "SERVICE_CIDR_BLOCK"
+                    },
+                    "EGRESS-TO-API-RULE" : {
+                      "description"  : "Allows TCP egress from pods to Kubernetes API server.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "dst"          : "OKE-VCN-API-NSG",
+                      "dst_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 6443,
+                      "dst_port_max" : 6443
+                    },
+                    "EGRESS-TO-API-12250-RULE" : {
+                      "description"  : "Allows TCP egress from pods to OKE control plane.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "dst"          : "OKE-VCN-API-NSG",
+                      "dst_type"     : "NETWORK_SECURITY_GROUP",
+                      "dst_port_min" : 12250,
+                      "dst_port_max" : 12250
+                    },
+                    "EGRESS-TO-DATA-RULE" : {
+                      "description" : "Allows pods to communicate with data layer.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "OKE-VCN-DATA-NSG",
+                      "dst_type"    : "NETWORK_SECURITY_GROUP"
+                    }
+                  }
+                },
+                "OKE-VCN-DATA-NSG" : {
+                  "display_name" : "data-nsg",
+                  "ingress_rules" : {
+                    "INGRESS-FROM-MGMT-SUBNET-RULE" : {
+                      "description"  : "Allows ingress from hosts used to manage data: db-operator-subnet in mgmt plane's mgmt-vcn.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "192.168.0.96/28",
+                      "src_type"     : "CIDR_BLOCK"
+                    },
+                    "INGRESS-FROM-WORKERS-NSG-RULE" : {
+                      "description"  : "Allows ingress from worker nodes.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-WORKERS-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP"
+                    },
+                    "INGRESS-FROM-PODS-NSG-RULE" : {
+                      "description"  : "Allows ingress from pods.",
+                      "stateless"    : false,
+                      "protocol"     : "TCP",
+                      "src"          : "OKE-VCN-PODS-NSG",
+                      "src_type"     : "NETWORK_SECURITY_GROUP"
+                    }
+                  },
+                  "egress_rules" : {
+                    "EGRESS-TO-ANYWHERE" : {
+                      "description" : "Allows egress to anywhere.",
+                      "stateless"   : false,
+                      "protocol"    : "TCP",
+                      "dst"         : "0.0.0.0/0",
+                      "dst_type"    : "CIDR_BLOCK"
+                    }
+                  }
+                }
+              },
+
+              "vcn_specific_gateways" : {
+                "service_gateways" : {
+                  "SERVICE-GATEWAY" : {
+                    "display_name" : "oke-dev-vcn-service-gateway",
+                    "services" : "all-services"
+                  }
+                }
+              }
+            }
+          },     
+  
+          "non_vcn_specific_gateways" : {
+            "inject_into_existing_drgs" : {
+              "OKE-CENTRAL-HUB-DRG-INJECT" : {
+                "drg_id" : "CENTRAL-HUB-DRG",
+                "drg_attachments" : {
+                  "OKE-VCN-ATTACH" : {
+                    "display_name" : "oke-dev-vcn-attachment",
+                    "drg_route_table_key" : "OKE-VCN-DRG-ROUTE",
+                    "network_details" : {
+                      "attached_resource_key" : "OKE-VCN",
+                      "type" : "VCN"
+                    }
+                  }
+                },
+                "drg_route_tables" : {
+                  "OKE-VCN-DRG-ROUTE" : { 
+                    "display_name" : "oke-dev-vcn-drg-route-table",
+                    "import_drg_route_distribution_key" : "OKE-VCN-IMPORT-ROUTE-DISTRIBUTION"
+                  }
+                },
+                "drg_route_distributions" : {
+                  "OKE-VCN-IMPORT-ROUTE-DISTRIBUTION" : {
+                    "display_name" : "oke-dev-vcn-route-distribution",
+                    "distribution_type" : "IMPORT",
+                    "statements" : {
+                      "OKE-VCN-TO-CENTRAL-HUB-VCN-STMT" : {
+                        "action" : "ACCEPT",
+                        "priority" : 1,
+                        "match_criteria" : {
+                          "match_type" : "DRG_ATTACHMENT_ID",
+                          "attachment_type" : "VCN",
+                          "drg_attachment_key" : "CENTRAL-HUB-VCN-ATTACH"
+                        }
+                      }
+                    }  
+                }
+              }
+            }
+          }
+        }
+      }
+    }  
+  }  
+}

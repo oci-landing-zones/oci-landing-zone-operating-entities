@@ -1,0 +1,20 @@
+{
+    "budgets_configuration" : {
+        "budgets" : {
+            "CUSTOMER-1-BUDGET" : {
+                "name" : "isv-customer-1-budget",
+                "description" : "Customer 1 budget.",
+                "amount" : 5000,
+                "target" : {
+                    "type" : "COMPARTMENT",
+                    "values" : ["CUSTOMER-1-DEV-CMP","CUSTOMER-1-TEST-CMP","CUSTOMER-1-PROD-CMP"]
+                },
+                "alert_rule" : {
+                    "threshold_value" : 80,
+                    "recipients" : "email.address@example.com",
+                    "message" : "Actual spending goes above 80% of configured budget."
+                }
+            }   
+        }    
+    }
+}

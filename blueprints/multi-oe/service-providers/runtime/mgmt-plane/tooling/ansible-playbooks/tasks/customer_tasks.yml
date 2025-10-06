@@ -1,0 +1,43 @@
+---
+- name: Create namespace for {{ customer.name }}
+  kubernetes.core.k8s:
+    name: "{{ customer.name }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Apply resource quota for {{ customer.name }}
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: ResourceQuota
+      metadata:
+        name: customer-quota
+        namespace: "{{ customer.name }}"
+      spec:
+        hard:
+          pods: "10"
+          requests.cpu: "1"
+          requests.memory: "1Gi"
+          limits.cpu: "2"
+          limits.memory: "2Gi"
+
+- name: Configure network policies for {{ customer.name }}
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: default-deny-and-allow-intra
+        namespace: "{{ customer.name }}"
+      spec:
+        podSelector: {} # Selects all pods in the namespace
+        policyTypes:
+          - Ingress
+          - Egress
+        ingress:
+          - from:
+              - podSelector: {} # Allow all traffic from pods within the same namespace
+        egress:
+          - to:
+              - podSelector: {} # Allow all traffic to pods within the same namespace
