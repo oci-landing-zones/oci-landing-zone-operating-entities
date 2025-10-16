@@ -45,7 +45,7 @@ The OKE LZ extension provisions three **compartments**: two dedicated to managin
 
 New OKE compartments will be added as platform in each One-OE LZ environment, following the example shown in the next diagram:
 
-<img src="../contents/One-OE-LZP.png" width="1000" height="value">
+<img src="../contents/openshift_compartments.png" width="1000" height="value">
 
 > [!NOTE]
 > For extended documentation regarding compartment definition please refer to the [Identity & Access Management CIS Terraform module compartment example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/compartments/examples/vision/input.auto.tfvars.template).
