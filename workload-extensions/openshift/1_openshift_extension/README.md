@@ -96,7 +96,7 @@ The Openshift Cluster requires specific subnets. You can review all these requir
 
 Our OKE LZ extension will deploy the necessary core resources for both the Production and Pre-production environments included in the ONE-OE blueprint. This example is based on the OCI VCN-Native Pod Networking CNI scenario. You should make a few adjustments and select the appropriate files for a Flannel setup.
 
-<img src="../content/openshift_network.png" width="1000" height="auto">
+<img src="../contents/openshift_network.png" width="1000" height="auto">
 
 
 The network layer covers the following resources:
