@@ -29,21 +29,21 @@
 | **TARGET RESOURCES**    | - **Identity**: Compartments, Groups, Dynamic groups and Policies </br>- **Network**: Spoke VCNs, Route tables, Security Lists, NSGs                 |
 | **PREREQUISITES**       | The [One-OE](../../../../blueprints/one-oe/) Blueprint deployed as a foundation. </br> For this example we have used: </br> [<img src="/commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/addons/oci-hub-models/hub_b/oci_open_lz_hub_b_network_light.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json"}) </br>**Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_ONE-OE_deployment_steps.md).|
 | **CONFIGURATION FILES** | - [oci_openshift_lz_ext_iam.auto.tfvars.json](./oci_openshift_lz_ext_iam.auto.tfvars.json)  </br> - [oci_openshift_lz_ext_network.auto.tfvars.json](./oci_openshift_lz_ext_network.auto.tfvars.json)|
-| **DEPLOYMENT**          | [<img src="/commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/multi-stack/1_oke_extension/oci_openshift_lz_ext_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/multi-stack/1_oke_extension/oci_openshift_lz_ext_network.auto.tfvars.json"}) </br> **Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_OKE-LZ-EXT_deployment_steps.md). [Terraform CLI](/commons/content/terraform.md)  can be also used.           |
+| **DEPLOYMENT**          | [<img src="/commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/multi-stack/openshift/oci_openshift_lz_ext_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/multi-stack/1_openshift_extension/oci_openshift_lz_ext_network.auto.tfvars.json"}) </br> **Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_OPENSHIFT-LZ-EXT_deployment_steps.md). [Terraform CLI](/commons/content/terraform.md)  can be also used.           |
 
 &nbsp; 
 
 ## **2. Setup IAM Configuration**
 
-For configuring and running the One-OE Landing Zone OKE extension IAM Layer use the following JSON file: [oci_openshift_lz_ext_iam.auto.tfvars.json](./oci_openshift_lz_ext_iam.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the One-OE Landing Zone Openshift extension IAM Layer use the following JSON file: [oci_openshift_lz_ext_iam.auto.tfvars.json](./oci_openshift_lz_ext_iam.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
 
 This configuration file covers three categories of resources described in the next sections.
 
 ###  **2.1. Compartments**
 
-The OKE LZ extension provisions three **compartments**: two dedicated to managing environments, such as PROD and PRE-PROD, and a third compartment for management purposes.
+The OKE LZ extension provisions three **compartments**: two dedicated to managing environments, such as PROD and PRE-PROD, and a third compartment for management/shared openshift cluster.
 
-New OKE compartments will be added as platform in each One-OE LZ environment, following the example shown in the next diagram:
+New openshift compartments will be added as platform in each One-OE LZ environment, following the example shown in the next diagram:
 
 <img src="../contents/openshift_compartments.png" width="1000" height="value">
 
@@ -53,7 +53,7 @@ New OKE compartments will be added as platform in each One-OE LZ environment, fo
 
 ### **2.2 Groups**
 
-The Openshift extension will deploy IAM groups to manage resources in OKE compartments and provide fine-grained access to specific OKE resources.
+The Openshift extension will deploy IAM groups to manage resources in openshift compartments and provide fine-grained access to specific openshift resources.
 
 As part of the deployment the following groups are created in the [Default Identity Domain](https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm):
 
@@ -62,7 +62,7 @@ As part of the deployment the following groups are created in the [Default Ident
 | ------ |  -------------------------- | ------------------------------------------- |---|
 | GRP.00 |  grp-lzp-platform-openshift-admin | IAM |Group for managing shared Openshift-related resources |
 | GRP.01 |  grp-lzp-p-platform-openshift-admin | IAM| Group for managing Prod Openshift-related resources |
-| GRP.02 |  grp-lzp-pp-platform-openshift-admin | IAM | Group for managing Pre-prod OKE-related resources |
+| GRP.02 |  grp-lzp-pp-platform-openshift-admin | IAM | Group for managing Pre-prod openshift-related resources |
 
 
 
@@ -75,14 +75,14 @@ As part of the deployment the following groups are created in the [Default Ident
 As part of the deployment the following policies are created:
 | Policy                     | Description                                             | Manage resources             | Use resources                   | Inspect resources |
 | -------------------------- | ------------------------------------------------------- | ---------------------------- | ------------------------------- | ----------------- |
-| pcy-p-platform-openshift-admins | Grants group **grp-lzp-p-platform-oke-admins** permissions. |  Computes, VCN, Storage | NSG, Subnets, VNICs, IPs | compartments    |
-| pcy-pp-platform-openshift-admins | Grants group **grp-lzp-pp-platform-oke-admins** permissions. |  Computes, VCN, Storage | NSG, Subnets, VNICs, IPs | compartments    |
-| pcy-platform-openshift-admins | Grants group **grp-lzp-m-platform-oke-admins** permissions. |  Computes, VCN, Storage | NSG, Subnets, VNICs, IPs | compartments    |
+| pcy-p-platform-openshift-admins | Grants group **grp-lzp-p-platform-openshift-admins** permissions. |  Computes, VCN, Storage | NSG, Subnets, VNICs, IPs | compartments    |
+| pcy-pp-platform-openshift-admins | Grants group **grp-lzp-pp-platform-openshift-admins** permissions. |  Computes, VCN, Storage | NSG, Subnets, VNICs, IPs | compartments    |
+| pcy-platform-openshift-admins | Grants group **grp-lzp-platform-openshift-admins** permissions. |  Computes, VCN, Storage | NSG, Subnets, VNICs, IPs | compartments    |
 | pcy-p-platform-openshift-secrets| The **pcy-p-platform-openshift-secrets** is an example of a recommended policy to allow applications running on the cluster to be authenticated with OCI through InstancePrincipal, for example to grant access to secrets. To read more about his check this [article](https://vaibhav-sonavane.medium.com/use-instance-principal-to-access-secrets-6c4aee1bfea4) or the [official documentation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm?source=post_page-----6c4aee1bfea4--------------------------------)| -  | - | -    |
 
 
 Additional policies may be required for using [Capacity Reservations](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengmakingcapacityreservations.htm) or if you choose to [manage the master encryption key yourself](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengencryptingdata.htm). These policies are not included in this example, make sure to add them if they apply to your use case.
-For a detailed review of OKE policies, please refer to the official OKE documentation [here](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpolicyconfig.htm#Policy_Configuration_for_Cluster_Creation_and_Deployment) and this [link](https://github.com/oracle-devrel/technology-engineering/blob/main/app-dev/devops-and-containers/oke/oke-policies/policies.md).
+For a detailed review of openshift policies, please refer to the official openshift documentation [here](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpolicyconfig.htm#Policy_Configuration_for_Cluster_Creation_and_Deployment) and this [link](https://docs.oracle.com/en-us/iaas/Content/openshift-on-oci/overview.htm).
 
 
 > [!NOTE]
@@ -128,24 +128,20 @@ The following table describes the deployed VCNs.
 
 ### **3.2 Subnets**
 
-The following table describes the deployed Subnets added for each environment OKE platform:
+The following table describes the deployed Subnets added for each environment Openshift platform:
 
 | ID    |  NAME             | OBJECTIVES                |
 | ----- | ---------------- | ------------------------- |
-| SN.00 |  sn-fra-lzp-p-platform-oke-lb | OKE private Prod lb subnet |
-| SN.01 |  sn-fra-lzp-p-platform-oke-cp | OKE Prod control plane subnet |
-| SN.02 |  sn-fra-lzp-p-platform-oke-workers | OKE Prod workers subnet |
-| SN.03 |  sn-fra-lzp-p-platform-oke-pods| OKE Prod pods subnet |
-| SN.04 |  sn-fra-lzp-p-platform-oke-db| db Prod subnet |
-| SN.05 |  sn-fra-lzp-p-platform-oke-bastion| Prod bastion subnet |
-| SN.06 |  sn-fra-lzp-p-platform-oke-fss| Prod fss subnet |
-| SN.07 |  sn-fra-lzp-pp-platform-oke-lb | OKE PreProd private lb subnet |
-| SN.08 |  sn-fra-lzp-pp-platform-oke-cp | OKE PreProd control plane subnet |
-| SN.09 |  sn-fra-lzp-pp-platform-oke-workers | OKE PreProd workers subnet |
-| SN.10 |  sn-fra-lzp-pp-platform-oke-pods| OKE PreProd pods subnet |
-| SN.11 |  sn-fra-lzp-pp-platform-oke-db| db PreProd subnet |
-| SN.12 |  sn-fra-lzp-pp-platform-oke-bastion| PreProd bastion subnet |
-| SN.13 |  sn-fra-lzp-pp-platform-oke-fss| fss PreProd subnet |
+| SN.00 |  sn-fra-lzp-p-openshift-lb-private | Openshift Prod lb subnet |
+| SN.01 |  sn-fra-lzp-p-openshift-bm-private | Openshift Prod bare metal subnet |
+| SN.02 |  sn-fra-lzp-p-openshift-workers-private | Openshift Prod workers subnet |
+| SN.03 |  sn-fra-lzp-pp-openshift-lb-private | Openshift Pre Prod lb subnet |
+| SN.04 |  sn-fra-lzp-pp-openshift-bm-private | Openshift Pre Prod bare metal subnet |
+| SN.05 |  sn-fra-lzp-pp-openshift-workers-private | Openshift Pre Prod workers subnet |
+| SN.06 |  sn-fra-lzp-openshift-lb-private | Openshift Shared lb subnet |
+| SN.07 |  sn-fra-lzp-openshift-bm-private | Openshift Shared bare metal subnet |
+| SN.08 |  sn-fra-lzp-openshift-workers-private | Openshift Shared workers subnet |
+
 
 ### **3.3 Route Tables (RTs)**
 
@@ -153,31 +149,24 @@ The following table describes the deployed Route Tables:
 
 | ID    |  NAME               | OBJECTIVES                            |
 | ----- |  ------------------ | ------------------------------------- |
-| RT.00 | rt-fra-lzp-p-lb | OKE Load Balancer Prod subnet route table |
-| RT.01 | rt-fra-lzp-p-cp | OKE Control Plane Prod subnet route table |
-| RT.02 | rt-fra-lzp-p-pods | OKE Pods Prod subnet route table |
-| RT.03 | rt-fra-lzp-p-workers | OKE Workers Prod subnet route table |
-| RT.04 | rt-fra-lzp-p-generic | OKE Generic Prod subnet route table |
-| RT.00 | rt-fra-lzp-pp-lb | OKE Load Balancer PreProd subnet route table |
-| RT.01 | rt-fra-lzp-pp-cp | OKE Control Plane PreProd subnet route table |
-| RT.02 | rt-fra-lzp-pp-pods | OKE Pods PreProd subnet route table |
-| RT.03 | rt-fra-lzp-pp-workers | OKE Workers PreProd subnet route table |
-| RT.04 | rt-fra-lzp-pp-generic | OKE Generic PreProd subnet route table |
-
+| RT.00 | rt-fra-lzp-p-public | Openhsift Load Balancer Prod subnet route table |
+| RT.01 | rt-fra-lzp-p-private | Openshift compute private Prod subnet route table |
+| RT.02 | rt-fra-lzp-pp-public | Openhsift Load Balancer Pre Prod subnet route table |
+| RT.03 | rt-fra-lzp-pp-private | Openshift compute private Pre Prod subnet route table |
+| RT.04 | rt-fra-lzp-public | Openhsift Load Balancer shared subnet route table |
+| RT.05 | rt-fra-lzp-private | Openshift compute private shared subnet route table |
 
 ### **3.4 Security Lists (SLs)**
 The following table describes the deployed Security Lists (SLs):
 
 | ID    |  NAME                | OBJECTIVES                              |
 | ----- |  ------------------- | --------------------------------------- |
-| SL.00 | sl-lzp-p-platform-pods | OKE Prod pods subnet security list |
-| SL.01 | sl-lzp-p-platform-workers| OKE Prod Workers subnet security list |
-| SL.02 | sl-lzp-d-platform-lb | OKE Prod Load Balancer subnet security list |
-| SL.03 | sl-lzp-p-platform-cp | OKE Prod Control Plane subnet security list |
-| SL.04 | sl-lzp-pp-platform-pods | OKE Pre-prod pods subnet security list |
-| SL.05 | sl-lzp-pp-platform-workers| OKE Pre-prod Workers subnet security list |
-| SL.06 | sl-lzp-pp-platform-lb | OKE Pre-prod Load Balancer  subnet security list |
-| SL.07 | sl-lzp-pp-platform-cp | OKE Pre-prod Control Plane subnet security list |
+| SL.00 | sl-lzp-p-openshift-public | Openshift Prod public subnet security list |
+| SL.01 | sl-lzp-p-openshift-private| Openshift Prod private subnet security list |
+| SL.02 | sl-lzp-pp-openshift-public | Openshift Pre Prod public subnet security list |
+| SL.03 | sl-lzp-pp-openshift-private| Openshift Prod private subnet security list |
+| SL.04 | sl-lzp-openshift-public | Openshift shared public subnet security list |
+| SL.05 | sl-lzp-openshift-private| Openshift shared private subnet security list |
 
 
 ### **3.5 Gateways**
@@ -189,9 +178,9 @@ The following tables describe the deployed DRG Attachments.
 
 | ID      |  NAME                      | OBJECTIVES                                   |
 | ------- |  ------------------------- | -------------------------------------------- |
-| DRGA.00 |  drgatt-vcn-fra-lzp-p-platform-oke | DRG Attachment for the OKE Prod spoke to the hub |
-| DRGA.00 |  drgatt-vcn-fra-lzp-pp-platform-oke | DRG Attachment for the OKE Preprod spoke to the hub 
-| DRGA.00 |  drgatt-vcn-fra-lzp-m-platform-oke | DRG Attachment for the OKE Mgt spoke to the hub 
+| DRGA.00 |  drgatt-vcn-fra-lzp-p-openshift | DRG Attachment for the Openshift Prod spoke to the hub |
+| DRGA.00 |  drgatt-vcn-fra-lzp-pp-openshift | DRG Attachment for the Openshift Preprod spoke to the hub 
+| DRGA.00 |  drgatt-vcn-fra-lzp-openshift | DRG Attachment for the Openshift shared spoke to the hub 
 
 
 #### **3.5.2 Service Gateway**
@@ -201,10 +190,20 @@ The following table describes the proposed Service Gateways added for each envir
 
 | ID    |  NAME          | OBJECTIVES           |
 | ----- |  ------------- | -------------------- |
-| SGW.00 |  sgw-fra-lzp-p-oke | SGW OKE Prod VCN. |
-| SGW.00 |  sgw-fra-lzp-pp-oke | SGW OKE Pre-prod VCN. |
-| SGW.00 |  sgw-fra-lzp-m-oke | SGW OKE Mgt VCN. |
+| SGW.00 |  sgw-fra-lzp-p-oke | SGW Openshift Prod VCN. |
+| SGW.00 |  sgw-fra-lzp-pp-oke | SGW Openshift Pre-prod VCN. |
+| SGW.00 |  sgw-fra-lzp-m-oke | SGW Openshift shared VCN. |
 
+#### **3.5.23 NAT Gateway**
+
+
+The following table describes the proposed Service Gateways added for each environment OKE platform:
+
+| ID    |  NAME          | OBJECTIVES           |
+| ----- |  ------------- | -------------------- |
+| NGW.00 |  ngw-fra-lzp-p-oke | NGW Openshift Prod VCN. |
+| NGW.00 |  ngw-fra-lzp-pp-oke | NGW Openshift Pre-prod VCN. |
+| NGW.00 |  ngw-fra-lzp-m-oke | NGW Openshift shared VCN. |
 
 ## **4. JSON files Required Changes**
 
@@ -219,7 +218,7 @@ If you are using the CIS Landing Zone or another OCI Landing Zone option, this c
 | cmp-lzp-platform |compartments | CMP-LZP-PLATFORM-KEY| The Shared platforms compartment OCID |
 | Prod Network Compartment | Network| CMP-LZP-P-NETWORK-KEY | The OCID of the Prod Network Compartment |
 | Pre-prod Network Compartment | Network| CMP-LZP-PP-NETWORK-KEY |  The OCID of the Pre-prod Network Compartment  |
-| Mgt Network Compartment |  Network| CMP-LZP-NETWORK-KEY |  The OCID of the Network Compartment |
+| Shared Network Compartment |  Network| CMP-LZP-NETWORK-KEY |  The OCID of the Network Compartment |
 | Hub DRG                  | Network| DRG-FRA-LZP-HUB-KEY                 | The OCID of the DRG in Hub deployed by One-OE LZ             |
 | Hub DRG Route Table      | Network| OCID-DRG-HUB-ROUTE-TABLE      | The OCID of Route table in DRG  |
 
@@ -234,10 +233,8 @@ Use the magic button provided in the summary section to deploy the OKE LZ extens
 
 This operation creates a default routing configuration. To complete the network layer setup, deploy the firewalls and update the routing in the hub to prepare for deploying the OKE cluster. All these steps are defined in this [POST operation](../1_oke_extension/1.1_Network_post_updates/readme.md). Once completed, everything will be ready for onboarding an OKE cluster.
 
-**NOTE:**
-**Dynamic groups matching rules** have associated OCIDs that cannot be referenced using the dependencies feature. After the first apply job, you need to update the CMP-PLATFORM-PROD-KEY and CMP-SECURITY-KEY attributes with the correct OCIDs, and then run a second apply job.
 
-You can now proceed and create the [OKE Cluster](../2_oke/).
+You can now proceed with Openshift Cluster installation [Openshift Installation](../2_openshift/).
 
 &nbsp;
 
