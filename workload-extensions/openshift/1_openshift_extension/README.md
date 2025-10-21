@@ -186,7 +186,7 @@ The following tables describe the deployed DRG Attachments.
 #### **3.5.2 Service Gateway**
 
 
-The following table describes the proposed Service Gateways added for each environment OKE platform:
+The following table describes the proposed NAT Gateways added for each environment OKE platform:
 
 | ID    |  NAME          | OBJECTIVES           |
 | ----- |  ------------- | -------------------- |
