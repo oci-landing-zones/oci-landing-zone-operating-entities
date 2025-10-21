@@ -29,8 +29,7 @@ There are two options available for provisioning the OpenShift cluster infrastru
    Users can either leverage the OCI-provided Terraform script or manually provision the infrastructure if their configurations are not supported.
 
 > [!NOTE]
-> Make any necessary adjustments to customize your OpenShift cluster configuration.  
-> For additional details, refer to the official documentation.
+> Make any necessary adjustments to customize your OpenShift cluster configuration. For additional details, refer to the official documentation.
 
 &nbsp;
 
@@ -42,7 +41,7 @@ The following flow outlines the OpenShift cluster installation process based on 
 Refer to the official [OCI OpenShift GitHub Repository](https://github.com/oracle-quickstart/oci-openshift/) for detailed steps.  
 Terraform stack details are available [here](https://github.com/oracle-quickstart/oci-openshift/tree/main/terraform-stacks).
 
----
+
 
 #### **Step 1: Create Resource Attribution Tags**
 
@@ -50,16 +49,15 @@ OpenShift resource attribution tags are used to categorize, organize, and track 
 This stack creates a **Tag Namespace** and a **Defined Tag**, which are applied to all OpenShift resources to enhance manageability, visibility, and reporting.
 
 > [!NOTE]
-> Run this stack with default values.  
-> The tenancy OCID and target namespace compartment default to the **root compartment**.
+> Run this stack with default values. 
 
----
+
 
 #### **Step 2: Create Cluster**
 
 This stack provisions the required OCI resources for the OpenShift cluster and facilitates the installation.
 
-Below are the recommended configuration variables for deploying the **Production OpenShift Cluster**:
+Below are the recommended configuration variables for deploying the **Production Platform OpenShift Cluster**:
 
 | Resource | Configuration |
 | --------- | -------------- |
@@ -73,7 +71,7 @@ Below are the recommended configuration variables for deploying the **Production
 | **Existing Private Subnet for Bare Metal** | `sn-fra-lzp-p-openshift-bm-private` |
 | **Existing Public Subnet** | `sn-fra-lzp-p-openshift-lb-public` |
 
----
+
 
 
 
