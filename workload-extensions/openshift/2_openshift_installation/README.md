@@ -49,7 +49,7 @@ OpenShift resource attribution tags are used to categorize, organize, and track 
 This stack creates a **Tag Namespace** and a **Defined Tag**, which are applied to all OpenShift resources to enhance manageability, visibility, and reporting.
 
 > [!NOTE]
-> Run this stack with default values. 
+> Run this stack with default values. The tenancy OCID and target namespace compartment default to the **root compartment**.
 
 
 
@@ -63,8 +63,8 @@ Below are the recommended configuration variables for deploying the **Production
 | --------- | -------------- |
 | **Target Compartment** | `cmp-lzp-p-platform-openshift` |
 | **Tag Namespace Compartment** | `root` *(default)* |
-| **Create Private DNS** | ✅ Enabled |
-| **Use Existing Networking Infrastructure** | ✅ Enabled |
+| **Create Private DNS** | ✔ Enabled |
+| **Use Existing Networking Infrastructure** | ✔ Enabled |
 | **Networking Compartment** | `cmp-lzp-p-network` |
 | **Existing VCN** | `vcn-fra-lzp-p-platform-openshift` |
 | **Existing Private Subnet for OCP** | `sn-fra-lzp-p-openshift-workers-private` |
@@ -72,9 +72,11 @@ Below are the recommended configuration variables for deploying the **Production
 | **Existing Public Subnet** | `sn-fra-lzp-p-openshift-lb-public` |
 
 
+#### **Step 3: Opemshift Extension Cleanup & Routing /**
 
 
-
+Once the OpenShift cluster installation is successfully completed, remove the Internet Gateway from the **spoke OpenShift VCN** and connect it to the **HUB VCN** to route all traffic through the HUB network.  
+Refer to [OpenShift Extension Cleanup and Routing](../3_openshift_cleanup_and_routing/) for detailed instructions.
 
 &nbsp;
 
