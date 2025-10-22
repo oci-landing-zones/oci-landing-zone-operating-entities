@@ -113,18 +113,16 @@ All blueprints follow the same CIS-based security standards. For detailed inform
 
 13. **How do I get support?**
   
-  For issues, questions, or feature requests, please open an issue in this GitHub repository. You can also refer to Oracle Cloud Infrastructure documentation and community forums.
-
-  Please do NOT raise a GitHub Issue to report a security vulnerability. If you believe you have found a security vulnerability, please submit a report to secalert_us@oracle.com preferably with a proof of concept. Please review some additional information on how to report security vulnerabilities to Oracle. We encourage people who contact Oracle Security to use email encryption using our encryption key.
-  
-  TBD. add channel for partners.
+    For issues, questions, or feature requests, please open an issue in this GitHub repository. You can also refer to Oracle Cloud Infrastructure documentation and community forums.
+    
+    Please do NOT raise a GitHub Issue to report a security vulnerability. If you believe you have found a security vulnerability, please submit a report to secalert_us@oracle.com preferably with a proof of concept. Please review some additional information on how to report security vulnerabilities to Oracle. We encourage people who contact Oracle Security to use email encryption using our encryption key.
+    
+    TBD. add channel for partners.
   
 14. **Can I contribute to the project?**
     
-  Yes! Contributions are welcome. Please review the contribution guide before submitting pull requests. We appreciate bug fixes, documentation improvements, new workload extensions, and feature enhancements.
+    Yes! Contributions are welcome. Please review the contribution guide before submitting pull requests. We appreciate bug fixes, documentation improvements, new workload extensions, and feature enhancements.
 
 15. **Is this an official Oracle product?**
-  The OCI Open LZ is an open-source project provided under the Universal Permissive License (UPL), Version 1.0. While it incorporates Oracle best practices and is maintained with Oracle involvement, it is a community-driven project.
-
-16. **How often is the repository updated?**
-  The repository is actively maintained with regular updates for new OCI services, security patches, and feature enhancements. Watch the repository or check the releases page for updates.
+    
+    The OCI Open LZ is an open-source project provided under the Universal Permissive License (UPL), Version 1.0. While it incorporates Oracle best practices and is maintained with Oracle involvement, it is a community-driven project.
