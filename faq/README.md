@@ -90,28 +90,28 @@ I4. **What is the recommended deployment order?**
 
 T1. **What IaC approach does OCI Open LZ use?**
     
-    The OCI Open LZ uses a declarative Infrastructure-as-Code approach with Terraform modules. The implementation is distributed across multiple specialized repositories covering IAM, networking, security, observability, and governance.
+  The OCI Open LZ uses a declarative Infrastructure-as-Code approach with Terraform modules. The implementation is distributed across multiple specialized repositories covering IAM, networking, security, observability, and governance.
 
-    The landing zone leverages these module repositories:
+  The landing zone leverages these module repositories:
 
-      * OCI Landing Zones IAM - Identity and Access Management
-      * OCI Landing Zones Network - Network topology and connectivity
-      * OCI Landing Zones Security - Security controls and policies
-      * OCI Landing Zones Observability - Monitoring and logging
-      * OCI Landing Zones Governance - Governance and compliance
+  * OCI Landing Zones IAM - Identity and Access Management
+  * OCI Landing Zones Network - Network topology and connectivity
+  * OCI Landing Zones Security - Security controls and policies
+  * OCI Landing Zones Observability - Monitoring and logging
+  * OCI Landing Zones Governance - Governance and compliance
 
 T2. **Does the landing zone comply with security best practices?**
     
-    Yes, the OCI Open LZ is built on the CIS (Center for Internet Security) Oracle Cloud Infrastructure Foundations Benchmark, implementing industry-recognized security best practices. 
+  Yes, the OCI Open LZ is built on the CIS (Center for Internet Security) Oracle Cloud Infrastructure Foundations Benchmark, implementing industry-recognized security best practices. 
     
-    The landing zone includes:
+  The landing zone includes:
 
-    * Proper compartment structure for resource isolation and least-privilege access
-    * Network isolation with secure VCN designs and security lists
-    * Identity and Access Management (IAM) with groups, policies, and federation support
-    * Security zones for policy enforcement
-    * Cloud Guard and logging configurations for threat detection
-    * Compliance controls aligned with common regulatory frameworks
+  * Proper compartment structure for resource isolation and least-privilege access
+  * Network isolation with secure VCN designs and security lists
+  * Identity and Access Management (IAM) with groups, policies, and federation support
+  * Security zones for policy enforcement
+  * Cloud Guard and logging configurations for threat detection
+  * Compliance controls aligned with common regulatory frameworks
 
 All blueprints follow the same CIS-based security standards. For detailed information on the security posture, threat model, and vulnerability disclosure process, review the security guide.
 
