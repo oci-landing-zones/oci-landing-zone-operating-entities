@@ -105,7 +105,7 @@
 
 All blueprints follow the same CIS-based security standards. For detailed information on the security posture, threat model, and vulnerability disclosure process, review the security guide.
 
-1.  **How do I manage state files for Terraform?**
+12.  **How do I manage state files for Terraform?**
     
   It's strongly recommended to use OCI Object Storage with state file locking for Terraform remote state management, especially in production environments. Each blueprint includes guidance on configuring remote state.
 
