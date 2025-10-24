@@ -4,25 +4,25 @@
 
 G1. **What is the OCI Open LZ?**
    
-      The OCI Operating Entities Landing Zone is a set of blueprints and Infrastructure-as-Code assets designed to simplify the onboarding and management of organizations, business units, and subsidiaries on Oracle Cloud Infrastructure. It provides pre-built, secure, and scalable landing zone architectures that reduce implementation time and costs.
+  The OCI Operating Entities Landing Zone is a set of blueprints and Infrastructure-as-Code assets designed to simplify the onboarding and management of organizations, business units, and subsidiaries on Oracle Cloud Infrastructure. It provides pre-built, secure, and scalable landing zone architectures that reduce implementation time and costs.
 
 G2. **Who should use the OCI Open LZ?**
    
    Everyone deploying on Oracle Cloud Infrastructure can benefit from the OCI Operating Entities LZ, regardless of organization size, industry, or technical expertise. The modular and scalable design makes it suitable for a wide range of use cases, some examples can be:
 
-    * Organizations starting their cloud journey who want to implement best practices from day one
-    * Multi-national corporations managing multiple business units, subsidiaries, or brands
-    * Service providers managing multiple customer tenancies
-    * Software vendors deploying multi-tenant SaaS solutions
-    * Agencies requiring strong governance and compliance frameworks
-    * Cloud architects looking for OCI best practices and reference architectures.
+  * Organizations starting their cloud journey who want to implement best practices from day one
+  * Multi-national corporations managing multiple business units, subsidiaries, or brands
+  * Service providers managing multiple customer tenancies
+  * Software vendors deploying multi-tenant SaaS solutions
+  * Agencies requiring strong governance and compliance frameworks
+  * Cloud architects looking for OCI best practices and reference architectures.
   
-   The beauty of the OCI Open LZ is its flexibility: whether you're deploying a simple single-environment setup or a complex multi-tenancy architecture, the blueprints scale to your needs. Start with what fits your current requirements (Size M, L, or XL) and grow as your organization evolves. The open-source nature means you can customize every aspect to match your specific requirements while still benefiting from community-tested patterns and Oracle best practices.
+  The beauty of the OCI Open LZ is its flexibility: whether you're deploying a simple single-environment setup or a complex multi-tenancy architecture, the blueprints scale to your needs. Start with what fits your current requirements (Size M, L, or XL) and grow as your organization evolves. The open-source nature means you can customize every aspect to match your specific requirements while still benefiting from community-tested patterns and Oracle best practices.
 
 
 G3. **What is an Operating Entity (OE)?**
    
-    An Operating Entity represents a functional division of an organization, such as a business unit, subsidiary, department, or any organizational structure that requires isolated or semi-isolated cloud resources within OCI. Each OE typically has its own environments, platforms, and projects.
+  An Operating Entity represents a functional division of an organization, such as a business unit, subsidiary, department, or any organizational structure that requires isolated or semi-isolated cloud resources within OCI. Each OE typically has its own environments, platforms, and projects.
 
 ## Assets: Blueprints, add-ons and workload extensions.
 
