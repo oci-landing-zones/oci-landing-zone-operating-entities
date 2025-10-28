@@ -1,0 +1,77 @@
+name: Check JSON Format
+
+on: [pull_request]
+
+jobs:
+  json-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Fetch base commit
+        run: |
+          # Fetch the specific base commit from the PR (minimal transfer)
+          git fetch origin ${{ github.event.pull_request.base.sha }} --depth=1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+
+      - name: Check JSON Formatting
+        run: |
+          set -eou pipefail
+          echo "INFO: Determining changed files in this PR..."
+          echo "Base SHA: ${{ github.event.pull_request.base.sha }}"
+          echo "Head SHA: ${{ github.sha }}"
+
+          # Get changed files using the PR base SHA (no merge base needed)
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} HEAD)
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "INFO: No file changes detected. Skipping check."
+            exit 0
+          fi
+
+          echo "INFO: Found the following changed files:"
+          echo "$CHANGED_FILES"
+          echo "---"
+
+          # Filter for JSON files only
+          JSON_FILES=""
+          for file in $CHANGED_FILES; do
+            if [[ "$file" == *.json ]] && [ -f "$file" ]; then
+              JSON_FILES="$JSON_FILES $file"
+            fi
+          done
+
+          if [ -z "$JSON_FILES" ]; then
+            echo "INFO: No JSON files were modified in this PR. Skipping check."
+            exit 0
+          fi
+
+          echo "INFO: Checking formatting for modified JSON files:"
+          echo "$JSON_FILES"
+          echo "---"
+
+          # Run formatter in check mode on modified files
+          if python3 gen/format_json.py --check $JSON_FILES; then
+            echo "---"
+            echo "SUCCESS: All modified JSON files are correctly formatted."
+            exit 0
+          else
+            echo "---"
+            echo "ERROR: Some JSON files are not correctly formatted."
+            echo ""
+            echo "To fix formatting issues, run:"
+            echo "  python3 gen/format_json.py $JSON_FILES"
+            echo ""
+            echo "Or to format all JSON files:"
+            echo "  python3 gen/format_json.py \"**/*.json\""
+            echo ""
+            echo "Or regenerate files by running:"
+            echo "  ./gen/generate.sh"
+            echo "::error::JSON files are not properly formatted. See job output for details."
+            exit 1
+          fi
