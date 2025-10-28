@@ -1,27 +1,29 @@
 {
-  "tags_configuration" : {
-    "default_compartment_id" : "TENANCY-ROOT",
-    "namespaces" : {
-      "ISV-NAMESPACE"  : { 
-        "name" : "isv-namespace",
-        "description" : "ISV tag namespace.",   
-        "is_retired" : false,  
-        "tags" : {
-          "CUSTOMER-ID-TAG" : {
-            "name" : "customer-id",
-            "description" : "The customer id.",
-            "is_cost_tracking" : true,
-            "is_retired" : false
-          },
-          "ENV-ID-TAG" : {
-            "name" : "env-id",
-            "description" : "The environment id.",
-            "is_cost_tracking" : true,
-            "is_retired" : false
-          }
-        } 
-      }
-    }   
-  }   
-}  
-  
+    "tags_configuration": {
+        "default_compartment_id"          : "TENANCY-ROOT",
+
+        "namespaces": {
+            "ISV-NAMESPACE": {
+                "name"                    : "isv-namespace",
+                "description"             : "ISV tag namespace.",
+                "is_retired"              : false,
+
+                "tags": {
+                    "CUSTOMER-ID-TAG": {
+                        "name"            : "customer-id",
+                        "description"     : "The customer id.",
+                        "is_cost_tracking": true,
+                        "is_retired"      : false
+                    },
+
+                    "ENV-ID-TAG": {
+                        "name"            : "env-id",
+                        "description"     : "The environment id.",
+                        "is_cost_tracking": true,
+                        "is_retired"      : false
+                    }
+                }
+            }
+        }
+    }
+}
