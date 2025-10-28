@@ -13,7 +13,7 @@
 
 ### I2. What is the recommended deployment order?
 
-* Choose the appropriate blueprint size: one-oe, multi-oe, or multi-tenancy
+* Choose the appropriate blueprint size: One-OE, Multi-OE, or Multi-Tenancy
 * Review and include relevant network add-ons (e.g., hub models, DNS, RBAC)
 * Include workload extensions as needed for specific applications
 * Choose an approach for implementation: ORM or Terraform CLI

@@ -2,7 +2,7 @@
 
 ### D1. What's the difference between blueprints, add-ons, and workload extensions?
 
-* [**Blueprints**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints): Core landing zone architectures ([one-oe](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe), [multi-oe](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe), [multi-tenancy](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-tenancy)) providing the foundational OCI structure.
+* [**Blueprints**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints): Core landing zone architectures ([One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe), [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe), [Multi-Tenancy](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-tenancy)) providing the foundational OCI structure.
 * [**Add-ons**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons): Complementary components like network hub models, subnetting, DNS, TBAC, etc that enhance the base blueprint.
 * [**Workload Extensions**](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/workload-extensions): Specific application workloads (EBS, OCVS, AI services) that can be deployed on top of the landing zone.
 
@@ -12,19 +12,19 @@
 
 ### D2. Which LZ blueprint Model should I choose?
 
-* **Size S-M** ([one-oe](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe)): Choose this for a single Operating Entity with its environments, platforms, and projects within one OCI tenancy. Ideal for single business units or smaller organizations.
+* **Size S-M** ([One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe)): Choose this for a single Operating Entity with its environments, platforms, and projects within one OCI tenancy. Ideal for single business units or smaller organizations.
 
-* **Size M-L** ([multi-oe](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe)): Select this when you have multiple Operating Entities sharing common services while maintaining OE-dedicated resources in a single tenancy. Best for organizations with multiple business units requiring some level of isolation.
+* **Size M-L** ([Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe)): Select this when you have multiple Operating Entities sharing common services while maintaining OE-dedicated resources in a single tenancy. Best for organizations with multiple business units requiring some level of isolation.
 
-* **Size L-XL** ([multi-tenancy](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-tenancy)): Use this for enterprise-scale deployments spanning multiple OCI tenancies. Suitable for large organizations requiring complete isolation between Operating Entities.
+* **Size L-XL** ([Multi-Tenancy](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-tenancy)): Use this for enterprise-scale deployments spanning multiple OCI tenancies. Suitable for large organizations requiring complete isolation between Operating Entities.
 
 ---
 
 ### D3. What LZ blueprint fits better for 3-layer apps?
 
-The one-oe template is designed for a single Operating Entity (OE) and includes two pre-configured environments: Production and Pre-Production. Within each environment, the architecture enforces network isolation between the web, application, and database tiers, ensuring secure segmentation and controlled access across your infrastructure layers.
+The One-OE template is designed for a single Operating Entity (OE) and includes two pre-configured environments: Production and Pre-Production. Within each environment, the architecture enforces network isolation between the web, application, and database tiers, ensuring secure segmentation and controlled access across your infrastructure layers.
 
-To easy deploy the one-oe we offer the one-stack asset.(check question D4)
+To easy deploy the One-OE we offer the one-stack asset.(check question D4)
 
 ---
 
@@ -66,7 +66,7 @@ Check out our library series and watch the [Network Hubs episode](https://www.yo
 
 Yes, migration between blueprints is possible. All blueprints are built on the same CIS best practices, share a common structure, and use the same modular building blocks, which facilitates transitions between them.
 
-However, migration still requires careful planning and execution. Depending on the complexity and the direction of migration (one-oe to multi-oe, one-oe to multi-tenancy, multi-oe to multi-tenancy...), you may need to:
+However, migration still requires careful planning and execution. Depending on the complexity and the direction of migration (One-OE to Multi-OE, One-OE to Multi-Tenancy, Multi-OE to Multi-Tenancy...), you may need to:
 
 * Restructure compartment hierarchies
 * Reconfigure network topologies

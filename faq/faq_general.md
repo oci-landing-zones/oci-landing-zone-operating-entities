@@ -19,7 +19,7 @@ Everyone deploying on Oracle Cloud Infrastructure can benefit from the OCI Opera
 * Agencies requiring strong governance and compliance frameworks
 * Cloud architects looking for OCI best practices and reference architectures
 
-The beauty of the OCI Open LZ is its flexibility: whether you're deploying a simple single-environment setup or a complex multi-tenancy architecture, the blueprints scale to your needs. Start with what fits your current requirements and grow as your organization evolves.
+The beauty of the OCI Open LZ is its flexibility: whether you're deploying a simple single-environment setup or a complex Multi-Tenancy architecture, the blueprints scale to your needs. Start with what fits your current requirements and grow as your organization evolves.
 
 ---
 
