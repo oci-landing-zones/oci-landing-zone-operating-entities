@@ -38,7 +38,7 @@ Using this add-on provides the following benefits:
 
 > [!NOTE]
 >**Example.** 
->The default One-OE template uses 22 IAM policies, deploying 1 Project in 2 workload environments. Every project requires 3 policies. The default IAM policy object limit (extendable) is 100 policies. Assuming we create the same project in all the workload environments, we could be able to create 13 projects before hitting the default IAM policy objects limit.
+>The default One-OE template uses 555 IAM policy statements, deploying 1 Project in 2 workload environments. Every project requires 101 policy statements. The default IAM policy object limit (extendable) is 100 policy statements. Assuming we create the same project in all the workload environments.
 >
 >This approach **reuse the policies for all projects** per workload environment, so we **would not hit any IAM policy object limit**. Note that other limits can affect how many projects can be onboarded.
 &nbsp; 
