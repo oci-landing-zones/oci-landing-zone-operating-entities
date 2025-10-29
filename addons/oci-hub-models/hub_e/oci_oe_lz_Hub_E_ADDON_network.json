@@ -1,11 +1,11 @@
 {
     "network_configuration": {
-        "default_compartment_id": "CMP-LZP-NETWORK-KEY",
-        "default_enable_cis_checks": false,
+        "default_compartment_id"                                : "CMP-LZP-NETWORK-KEY",
+        "default_enable_cis_checks"                             : false,
 
         "network_configuration_categories": {
             "shared": {
-                "category_compartment_key": "CMP-LZP-NETWORK-KEY",
+                "category_compartment_key"                      : "CMP-LZP-NETWORK-KEY",
                 "vcns": {
                     "VCN-FRA-LZP-HUB-KEY": {
                         "display_name"                          : "vcn-fra-lzp-hub",
@@ -18,7 +18,7 @@
                         "is_oracle_gua_allocation_enabled"      : false,
  
                         "route_tables": {
-                            "RT-01-FRA-LZP-HUB-VCN-LB-KEY": {
+                            "RT-FRA-LZP-HUB-VCN-LB-KEY": {
                                 "display_name"                  : "rt-fra-lzp-hub-lb",
                                 "route_rules": {
                                     "rt-internet": {
@@ -29,7 +29,7 @@
                                     }
                                 }
                             },
-                            "RT-02-LZP-HUB-VCN-MGMT-KEY": {
+                            "RT-FRA-LZP-HUB-VCN-MGMT-KEY": {
                                 "display_name"                  : "rt-fra-lzp-hub-mgmt",
                                 "route_rules": {
                                     "rt-natgw": {
@@ -39,7 +39,7 @@
                                         "network_entity_key"    : "NGW-FRA-LZP-HUB-KEY"
                                     },
                                     "rt-sgw": {
-                                        "description"           : "Route to Oracle Service Network through Service GW",
+                                        "description"           : "Route to Oracle Services Network through Service GW",
                                         "destination"           : "all-services",
                                         "destination_type"      : "SERVICE_CIDR_BLOCK",
                                         "network_entity_key"    : "SGW-FRA-LZP-HUB-KEY"
@@ -53,7 +53,7 @@
                         },
                         "security_lists": {
                             "SL-FRA-LZP-HUB-LB-KEY": {
-                                "display_name": "sl-fra-lzp-hub-lb",
+                                "display_name"                  : "sl-fra-lzp-hub-lb",
                                 "egress_rules": [],
                                 "ingress_rules": [
                                     {
@@ -63,6 +63,14 @@
                                         "protocol"              : "ICMP",
                                         "icmp_type"             : 3,
                                         "icmp_code"             : 4,
+                                        "stateless"             : false
+                                    },
+                                    {
+                                    "description"               : "ICMP type 3",
+                                        "src"                   : "10.0.0.0/21",
+                                        "src_type"              : "CIDR_BLOCK",                                    
+                                        "protocol"              : "ICMP",
+                                        "icmp_type"             : 3,
                                         "stateless"             : false
                                     },
                                     {
@@ -77,7 +85,7 @@
                                 ]
                             },
                             "SL-FRA-LZP-HUB-MGMT-KEY": {
-                                "display_name": "sl-fra-lzp-hub-mgmt",
+                                "display_name"                  : "sl-fra-lzp-hub-mgmt",
                                 "egress_rules": [
                                     {
                                         "description"           : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
@@ -98,6 +106,14 @@
                                         "stateless"             : false
                                     },
                                     {
+                                    "description"               : "ICMP type 3",
+                                        "src"                   : "10.0.0.0/21",
+                                        "src_type"              : "CIDR_BLOCK",                                    
+                                        "protocol"              : "ICMP",
+                                        "icmp_type"             : 3,
+                                        "stateless"             : false
+                                    },
+                                    {
                                         "description"           : "ICMP type 8 (Echo)",
                                         "src"                   : "10.0.0.0/21",
                                         "src_type"              : "CIDR_BLOCK",
@@ -107,7 +123,7 @@
                                         "stateless"             : false
                                     }, 
                                     {
-                                        "description"           : "Allow inbound traffic from the Bastion Service private endpoint IP address",
+                                        "description"           : "EXAMPLE: Allow inbound traffic from the Bastion Service private endpoint IP address",
                                         "src"                   : "10.0.1.123/32",
                                         "src_type"              : "CIDR_BLOCK",
                                         "dst_port_max"          : 22,
@@ -120,10 +136,10 @@
                         },
                         "network_security_groups": {
                             "NSG-FRA-LZP-HUB-LB-KEY": {
-                                "display_name": "nsg-fra-lzp-hub-lb",
+                                "display_name"                  : "nsg-fra-lzp-hub-lb",
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"           : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"           : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
                                         "dst"                   : "0.0.0.0/0",
                                         "dst_type"              : "CIDR_BLOCK",
                                         "protocol"              : "TCP",
@@ -160,7 +176,7 @@
                                 "dhcp_options_key"              : "default_dhcp_options",
                                 "prohibit_internet_ingress"     : false,
                                 "prohibit_public_ip_on_vnic"    : false,
-                                "route_table_key"               : "RT-01-FRA-LZP-HUB-VCN-LB-KEY",
+                                "route_table_key"               : "RT-FRA-LZP-HUB-VCN-LB-KEY",
                                 "security_list_keys"            : ["SL-FRA-LZP-HUB-LB-KEY"]
                             },                            
                             "SN-FRA-LZP-HUB-MGMT-KEY": {
@@ -170,7 +186,7 @@
                                 "dhcp_options_key"              : "default_dhcp_options",
                                 "prohibit_internet_ingress"     : true,
                                 "prohibit_public_ip_on_vnic"    : true,
-                                "route_table_key"               : "RT-02-LZP-HUB-VCN-MGMT-KEY",
+                                "route_table_key"               : "RT-FRA-LZP-HUB-VCN-MGMT-KEY",
                                 "security_list_keys"            : ["SL-FRA-LZP-HUB-MGMT-KEY"]
                             },
                             "SN-FRA-LZP-HUB-MON-KEY": {
@@ -180,7 +196,7 @@
                                 "dhcp_options_key"              : "default_dhcp_options",
                                 "prohibit_internet_ingress"     : true,
                                 "prohibit_public_ip_on_vnic"    : true,
-                                "route_table_key"               : "RT-02-LZP-HUB-VCN-MGMT-KEY",
+                                "route_table_key"               : "RT-FRA-LZP-HUB-VCN-MGMT-KEY",
                                 "security_list_keys"            : ["SL-FRA-LZP-HUB-MGMT-KEY"]             
                             },
                             "SN-FRA-LZP-HUB-DNS": {
@@ -190,7 +206,7 @@
                                 "dhcp_options_key"              : "default_dhcp_options",
                                 "prohibit_internet_ingress"     : true,
                                 "prohibit_public_ip_on_vnic"    : true,
-                                "route_table_key"               : "RT-02-LZP-HUB-VCN-MGMT-KEY",
+                                "route_table_key"               : "RT-FRA-LZP-HUB-VCN-MGMT-KEY",
                                 "security_list_keys"            : ["SL-FRA-LZP-HUB-MGMT-KEY"]
                             }
                         },
@@ -217,7 +233,7 @@
                 "non_vcn_specific_gateways": {
                     "dynamic_routing_gateways": {
                         "DRG-FRA-LZP-HUB-KEY": {
-                            "display_name"                      : "drg-fra-hub",
+                            "display_name"                      : "drg-fra-lzp-hub",
 
                             "drg_attachments": {
                                 "DRGATT-FRA-LZP-HUB-VCN-KEY": {
