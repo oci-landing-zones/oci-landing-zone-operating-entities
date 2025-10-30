@@ -490,7 +490,7 @@
                                         "network_entity_key"    : "DRG-FRA-LZP-HUB-KEY"
                                     },
                                     "rt-vcn-fra-pp-projects": {
-                                        "description"           : "Route to th VCN PreProd Projects through DRG",
+                                        "description"           : "Route to the VCN PreProd Projects through DRG",
                                         "destination"           : "10.0.128.0/21",
                                         "destination_type"      : "CIDR_BLOCK",
                                         "network_entity_key"    : "DRG-FRA-LZP-HUB-KEY"
