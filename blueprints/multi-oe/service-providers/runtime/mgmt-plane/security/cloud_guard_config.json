@@ -1,11 +1,11 @@
 {
-    "cloud_guard_configuration" : {
-        "targets" : {
-            "ROOT-CLOUD-GUARD-TARGET" : {
-                "name" : "isv-cloud-guard-target",
-                "resource_id" : "TENANCY-ROOT",
+    "cloud_guard_configuration": {
+        "targets": {
+            "ROOT-CLOUD-GUARD-TARGET": {
+                "name"               : "isv-cloud-guard-target",
+                "resource_id"        : "TENANCY-ROOT",
                 "use_cloned_recipes" : true
             }
         }
     }
-}    
+}

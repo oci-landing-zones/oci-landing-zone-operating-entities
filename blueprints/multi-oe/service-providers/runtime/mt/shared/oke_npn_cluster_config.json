@@ -1,38 +1,43 @@
 {
-    "clusters_configuration" : {
-        "default_compartment_id" : "CUSTOMERS-DEV-CMP",
-        "clusters" : {
-            "OKE1" : {
-                "name" : "oke-npn-cluster",
-                "cni_type" : "native",
-                "is_enhanced" : false,
-                "networking" : {
-                    "vcn_id" : "OKE-VCN",
-                    "api_endpoint_subnet_id" : "OKE-VCN-API-SUBNET",
-                    "services_subnet_id" : ["OKE-VCN-SERVICES-SUBNET"],
-                    "api_endpoint_nsg_ids" : ["OKE-VCN-API-NSG"]
+    "clusters_configuration": {
+        "default_compartment_id"            : "CUSTOMERS-DEV-CMP",
+
+        "clusters": {
+            "OKE1": {
+                "name"                      : "oke-npn-cluster",
+                "cni_type"                  : "native",
+                "is_enhanced"               : false,
+
+                "networking": {
+                    "api_endpoint_nsg_ids"  : ["OKE-VCN-API-NSG"],
+                    "api_endpoint_subnet_id": "OKE-VCN-API-SUBNET",
+                    "services_subnet_id"    : ["OKE-VCN-SERVICES-SUBNET"],
+                    "vcn_id"                : "OKE-VCN"
                 }
             }
         }
     },
 
-    "workers_configuration" : {
-        "default_ssh_public_key_path" : "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDLFFTrb6laiXUuHuJzX4Im67DTKRqMFMWld3vTe2t4Me547LOlHcgDxLDx6o00DcBP4L+q9tXAUrnoXv/85Lo7IC75dHek3DQYNqAsHyQ2i2vw6Oq4F/bqPpmQ60/Uu9aJ925NQxQ3D012Q66C/OR9kScodORFMnTzkv5hAKv2sziCu/HxUZAzc23XBRu5KQ750vQYZcWy3TqUebU7+VcAFE0uZVff3aOnWW7PSD4yQ0/G3xoLMb1X/bKgJwiAZneoABlorbZ0LIK4Z5wUMd54ey2He+B8b8AZtWzgYrreXztFX02xpvrqNupbCMUiZ1XJXP/6MGsl0r4YmO6aMiaXalDaMZY8kOoBuMtz3rinv8rvdDOjzYU21hhQyVFaDTvsQWZHobV1jnYEE1JNxeFh14CyeFFeRM0C7YAiWIONzCgFRcMNReRn2us7MoGbUOMNvRbYOU73IoPoda/5LNXhLdeTxLoyEjROeFZTqV9r01FOnC95gxLZZk9GvvLsSkatseXdwLHGtlutRXSug4jdPY25dzCi6EB8UIhC5elBCv3i9W/TbduG/ycVXmD1iFp6PKy72vKxH8I0/tsxiIjPLyrjIo+atXRrBO5j3kP2T9maM5MQ0KxkYsBvo6K8yEYUNC2xzEdZxFvF9qpXUnVwuhGw273z+RboQTQ3vQcRgQ== user@example.com",
-        "node_pools" : {
-            "NODEPOOL1" : {
-                "cluster_id" : "OKE1",
-                "name"       : "node-pool",
-                "size"       : 1,
-                "networking" : {
-                    "workers_subnet_id" : "OKE-VCN-WORKERS-SUBNET",
-                    "pods_subnet_id"    : "OKE-VCN-PODS-SUBNET",
-                    "workers_nsg_ids"   : ["OKE-VCN-WORKERS-NSG"],
-                    "pods_nsg_ids"      : ["OKE-VCN-PODS-NSG"]
+    "workers_configuration": {
+        "default_ssh_public_key_path"       : "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDLFFTrb6laiXUuHuJzX4Im67DTKRqMFMWld3vTe2t4Me547LOlHcgDxLDx6o00DcBP4L+q9tXAUrnoXv/85Lo7IC75dHek3DQYNqAsHyQ2i2vw6Oq4F/bqPpmQ60/Uu9aJ925NQxQ3D012Q66C/OR9kScodORFMnTzkv5hAKv2sziCu/HxUZAzc23XBRu5KQ750vQYZcWy3TqUebU7+VcAFE0uZVff3aOnWW7PSD4yQ0/G3xoLMb1X/bKgJwiAZneoABlorbZ0LIK4Z5wUMd54ey2He+B8b8AZtWzgYrreXztFX02xpvrqNupbCMUiZ1XJXP/6MGsl0r4YmO6aMiaXalDaMZY8kOoBuMtz3rinv8rvdDOjzYU21hhQyVFaDTvsQWZHobV1jnYEE1JNxeFh14CyeFFeRM0C7YAiWIONzCgFRcMNReRn2us7MoGbUOMNvRbYOU73IoPoda/5LNXhLdeTxLoyEjROeFZTqV9r01FOnC95gxLZZk9GvvLsSkatseXdwLHGtlutRXSug4jdPY25dzCi6EB8UIhC5elBCv3i9W/TbduG/ycVXmD1iFp6PKy72vKxH8I0/tsxiIjPLyrjIo+atXRrBO5j3kP2T9maM5MQ0KxkYsBvo6K8yEYUNC2xzEdZxFvF9qpXUnVwuhGw273z+RboQTQ3vQcRgQ== user@example.com",
+
+        "node_pools": {
+            "NODEPOOL1": {
+                "name"                      : "node-pool",
+                "cluster_id"                : "OKE1",
+                "size"                      : 1,
+
+                "networking": {
+                    "pods_nsg_ids"          : ["OKE-VCN-PODS-NSG"],
+                    "pods_subnet_id"        : "OKE-VCN-PODS-SUBNET",
+                    "workers_nsg_ids"       : ["OKE-VCN-WORKERS-NSG"],
+                    "workers_subnet_id"     : "OKE-VCN-WORKERS-SUBNET"
                 },
-                "node_config_details" : {
-                    "node_shape" : "VM.Standard.E4.Flex"
+
+                "node_config_details": {
+                    "node_shape"            : "VM.Standard.E4.Flex"
                 }
             }
         }
     }
-}    
+}
