@@ -22,7 +22,7 @@ Update the One-OE Landing Zone stack network configuration file to:
 - Add the required route rules for both the DRG and the VCN route tables
 
 > [!NOTE]
-> This demonstration is based on the One-OE Hub E model, refer the file  following HUB E network post operation JSON file: [oci_open_lz_hub_e_network_post.auto.tfvars.json](./oci_open_lz_hub_e_network_post.auto.tfvars.json).
+> This demonstration is based on the One-OE Hub E model, refer the file  following HUB E network post operation JSON file, edit the One-OE ORM stack and replace with updated file: [oci_open_lz_hub_e_network_post.auto.tfvars.json](./oci_open_lz_hub_e_network_post.auto.tfvars.json).
 
 ### Step 2
 
@@ -33,9 +33,11 @@ After completing Step 1, update the OpenShift Extension stack networking configu
 - Add route rules to send and receive traffic via the Hub through the DRG
 
 > [!NOTE]
-> Refer the file  following openshift extension network post operation JSON file: [oci_openshift_lz_ext_network_post.auto.tfvars.json](./oci_openshift_lz_ext_network_post.auto.tfvars.json).
+> Refer the file  following openshift extension network post operation JSON file, edith the Openshif extension ORM stack and replace with updated file: [oci_openshift_lz_ext_network_post.auto.tfvars.json](./oci_openshift_lz_ext_network_post.auto.tfvars.json).
 
-###After completing the above steps, the OpenShift Landing Zone Extension will be fully configured, connected through the Hub via DRG, and ready for use.
+&nbsp;
+
+### After completing the above steps, the OpenShift Landing Zone Extension will be fully configured, connected through the Hub via DRG, and ready for use.
 
 &nbsp;
 
