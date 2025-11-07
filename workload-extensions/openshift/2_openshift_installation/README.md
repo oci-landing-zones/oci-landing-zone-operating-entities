@@ -21,8 +21,7 @@ There are two options available for provisioning the OpenShift cluster infrastru
    This is an automated and streamlined installation method using the Red Hat Assisted Installer.  
    It is the preferred approach for most users and requires an internet connection during installation.  
 
-   Once the cluster installation is successfully completed, remove the Internet Gateway from the **spoke OpenShift VCN** and connect it to the **HUB VCN** to route traffic through the HUB.  
-   Refer to [Step 3 - OpenShift Extension Cleanup and Routing](../3_openshift_cleanup_and_routing/).
+
 
 2. **[Agent-based Installer](https://docs.oracle.com/en-us/iaas/Content/openshift-on-oci/agent-installer.htm#agent-installer)**  
    This is an advanced method suitable for environments that require custom infrastructure setup or operate in a disconnected (offline) mode.  
@@ -72,11 +71,11 @@ Below are the recommended configuration variables for deploying the **Production
 | **Existing Public Subnet** | `sn-fra-lzp-p-openshift-lb-public` |
 
 
-#### **Step 3: Opemshift Extension Cleanup & Routing /**
+#### **Step 3: Openshift Extension Cleanup & Routing **
 
 
 Once the OpenShift cluster installation is successfully completed, remove the Internet Gateway from the **spoke OpenShift VCN** and connect it to the **HUB VCN** to route all traffic through the HUB network.  
-Refer to [OpenShift Extension Cleanup and Routing](../3_openshift_cleanup_and_routing/) for detailed instructions.
+Refer to [OpenShift Extension Cleanup and Routing](../3_openshift_ext_cleanup_and_routing/) for detailed instructions.
 
 &nbsp;
 
