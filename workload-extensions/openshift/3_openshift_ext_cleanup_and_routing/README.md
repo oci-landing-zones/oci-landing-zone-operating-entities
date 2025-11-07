@@ -37,7 +37,8 @@ After completing Step 1, update the OpenShift Extension stack networking configu
 
 &nbsp;
 
-### After completing the above steps, the OpenShift Landing Zone Extension will be fully configured, connected through the Hub via DRG, and ready for use.
+### > 💡 *After completing the above steps, the OpenShift Landing Zone Extension will be fully configured, connected through the Hub via DRG, and ready for use.*
+
 
 &nbsp;
 
