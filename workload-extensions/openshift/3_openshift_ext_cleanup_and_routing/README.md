@@ -33,7 +33,7 @@ After completing Step 1, update the OpenShift Extension stack networking configu
 - Add route rules to send and receive traffic via the Hub through the DRG
 
 > [!NOTE]
-> Refer the file  following openshift extension network post operation JSON file, edith the Openshif extension ORM stack and replace with updated file: [oci_openshift_lz_ext_network_post.auto.tfvars.json](./oci_openshift_lz_ext_network_post.auto.tfvars.json).
+> Refer the file  following openshift extension network post operation JSON file, edit the Openshift extension ORM stack and replace with updated file: [oci_openshift_lz_ext_network_post.auto.tfvars.json](./oci_openshift_lz_ext_network_post.auto.tfvars.json).
 
 &nbsp;
 
