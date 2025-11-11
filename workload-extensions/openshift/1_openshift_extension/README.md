@@ -40,7 +40,7 @@ This configuration file covers three categories of resources described in the ne
 
 ###  **2.1. Compartments**
 
-The OKE LZ extension provisions three **compartments**: two dedicated to managing environments, such as PROD and PRE-PROD, and a third compartment for management/shared openshift cluster.
+The Openshift LZ extension provisions three **compartments**: two dedicated to managing environments, such as PROD and PRE-PROD, and a third compartment for management/shared openshift cluster.
 
 New openshift compartments will be added as platform in each One-OE LZ environment, following the example shown in the next diagram:
 
@@ -93,7 +93,7 @@ For a detailed review of openshift policies, please refer to the official opensh
 The Openshift Cluster requires specific subnets. You can review all these requirements in the [Openshift documentation](https://docs.oracle.com/en-us/iaas/Content/openshift-on-oci/overview.htm).
 
 
-Our OKE LZ extension will deploy the necessary core resources for both the Production and Pre-production environments included in the ONE-OE blueprint. This example is based on the OCI VCN-Native Pod Networking CNI scenario. You should make a few adjustments and select the appropriate files for a Flannel setup.
+Our Openshift LZ extension will deploy the necessary core resources for both the Production and Pre-production environments included in the ONE-OE blueprint. This example is based on the OCI VCN-Native Pod Networking CNI scenario. You should make a few adjustments and select the appropriate files for a Flannel setup.
 
 <img src="../contents/openshift_network.png" width="1000" height="auto">
 
@@ -189,9 +189,9 @@ The following table describes the proposed NAT Gateways added for each environme
 
 | ID    |  NAME          | OBJECTIVES           |
 | ----- |  ------------- | -------------------- |
-| SGW.00 |  sgw-fra-lzp-p-oke | SGW Openshift Prod VCN. |
-| SGW.00 |  sgw-fra-lzp-pp-oke | SGW Openshift Pre-prod VCN. |
-| SGW.00 |  sgw-fra-lzp-m-oke | SGW Openshift shared VCN. |
+| SGW.00 |  sgw-fra-lzp-p-openshift | SGW Openshift Prod VCN. |
+| SGW.00 |  sgw-fra-lzp-pp-openshift | SGW Openshift Pre-prod VCN. |
+| SGW.00 |  sgw-fra-lzp-m-openshift | SGW Openshift shared VCN. |
 
 #### **3.5.23 NAT Gateway**
 
@@ -200,9 +200,9 @@ The following table describes the proposed Service Gateways added for each envir
 
 | ID    |  NAME          | OBJECTIVES           |
 | ----- |  ------------- | -------------------- |
-| NGW.00 |  ngw-fra-lzp-p-oke | NGW Openshift Prod VCN. |
-| NGW.00 |  ngw-fra-lzp-pp-oke | NGW Openshift Pre-prod VCN. |
-| NGW.00 |  ngw-fra-lzp-m-oke | NGW Openshift shared VCN. |
+| NGW.00 |  ngw-fra-lzp-p-openshift | NGW Openshift Prod VCN. |
+| NGW.00 |  ngw-fra-lzp-pp-openshift | NGW Openshift Pre-prod VCN. |
+| NGW.00 |  ngw-fra-lzp-m-openshift | NGW Openshift shared VCN. |
 
 ## **4. JSON files Required Changes**
 
