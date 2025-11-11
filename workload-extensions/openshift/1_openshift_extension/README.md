@@ -6,7 +6,6 @@
 - [**2. Setup IAM Configuration**](#2-setup-iam-configuration)
   - [**2.1. Compartments**](#21-compartments)
   - [**2.2 Groups**](#22-groups)
-  - [**3.4 Dynamic groups**](#34-dynamic-groups)
   - [**2.3 Policies**](#23-policies)
 - [**3. Setup Network Configuration**](#3-setup-network-configuration)
   - [**3.1 VCNs**](#31-vcns)
