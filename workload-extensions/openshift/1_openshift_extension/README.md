@@ -93,7 +93,7 @@ For a detailed review of openshift policies, please refer to the official opensh
 The Openshift Cluster requires specific subnets. You can review all these requirements in the [Openshift documentation](https://docs.oracle.com/en-us/iaas/Content/openshift-on-oci/overview.htm).
 
 
-Our Openshift LZ extension will deploy the necessary core resources for both the Production and Pre-production environments included in the ONE-OE blueprint. This example is based on the OCI VCN-Native Pod Networking CNI scenario. You should make a few adjustments and select the appropriate files for a Flannel setup.
+Our Openshift LZ extension will deploy the necessary core resources for both the Production and Pre-production environments included in the ONE-OE blueprint.
 
 <img src="../contents/openshift_network.png" width="1000" height="auto">
 
@@ -185,7 +185,7 @@ The following tables describe the deployed DRG Attachments.
 #### **3.5.2 Service Gateway**
 
 
-The following table describes the proposed NAT Gateways added for each environment OKE platform:
+The following table describes the proposed NAT Gateways added for each environment Openshift platform:
 
 | ID    |  NAME          | OBJECTIVES           |
 | ----- |  ------------- | -------------------- |
@@ -196,7 +196,7 @@ The following table describes the proposed NAT Gateways added for each environme
 #### **3.5.23 NAT Gateway**
 
 
-The following table describes the proposed Service Gateways added for each environment OKE platform:
+The following table describes the proposed Service Gateways added for each environment Openshift platform:
 
 | ID    |  NAME          | OBJECTIVES           |
 | ----- |  ------------- | -------------------- |
@@ -206,7 +206,7 @@ The following table describes the proposed Service Gateways added for each envir
 
 ## **4. JSON files Required Changes**
 
-If ONE-OE is used as the foundation Landing Zone with output saving enabled, running this OKE extension with the added dependencies will automatically match the keys with the correct OCIDs. No changes to the JSON file are needed. Therefore, you can skip this section and move to point 5.
+If ONE-OE is used as the foundation Landing Zone with output saving enabled, running this Openshift extension with the added dependencies will automatically match the keys with the correct OCIDs. No changes to the JSON file are needed. Therefore, you can skip this section and move to point 5.
 
 If you are using the CIS Landing Zone or another OCI Landing Zone option, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
 
@@ -228,9 +228,9 @@ The paths can change based on the modification in the previous [Compartments](#2
 
 ## **4. Deploy**
 
-Use the magic button provided in the summary section to deploy the OKE LZ extension using [Oracle Resource Manager (ORM)](/commons/content/orm.md) or use [Terraform CLI](/commons/content/terraform.md).
+Use the magic button provided in the summary section to deploy the Openshift LZ extension using [Oracle Resource Manager (ORM)](/commons/content/orm.md) or use [Terraform CLI](/commons/content/terraform.md).
 
-This operation creates a default routing configuration. To complete the network layer setup, deploy the firewalls and update the routing in the hub to prepare for deploying the OKE cluster. All these steps are defined in this [POST operation](../1_oke_extension/1.1_Network_post_updates/readme.md). Once completed, everything will be ready for onboarding an OKE cluster.
+This operation creates a default routing configuration. To complete the network layer setup, deploy the firewalls and update the routing in the hub to prepare for deploying the Openshift cluster.
 
 
 You can now proceed with Openshift Cluster installation [Openshift Installation](../2_openshift/).
