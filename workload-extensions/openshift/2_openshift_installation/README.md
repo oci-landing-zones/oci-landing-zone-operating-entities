@@ -71,7 +71,7 @@ Below are the recommended configuration variables for deploying the **Production
 | **Existing Public Subnet** | `sn-fra-lzp-p-openshift-lb-public` |
 
 
-#### **Step 3: Openshift Extension Cleanup & Routing **
+#### **Step 3: Openshift Extension Cleanup & Routing**
 
 
 Once the OpenShift cluster installation is successfully completed, remove the Internet Gateway from the **spoke OpenShift VCN** and connect it to the **HUB VCN** to route all traffic through the HUB network.  
