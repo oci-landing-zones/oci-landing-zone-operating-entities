@@ -114,6 +114,12 @@ In this asset, we use reserved CIDR blocks for the different VCNs, but this can 
 
 For customization of the pre-defined setup please refer to the [Networking documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) for documentation and examples.
 
+> [!NOTE]
+> The example configuration is based on the Hub E model for simplicity and demonstration purposes.
+For production deployments, it is recommended to use other Hub Firewall models such as Hub A or Hub B to ensure optimal design, security, and compliance alignment.
+
+For more details and configuration references, see: [OCI Hub Models](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models).
+
 ### **3.1 VCNs**
 
 The following table describes the deployed VCNs.
