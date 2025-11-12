@@ -6,13 +6,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
+
+      - name: Fetch base commit
+        run: |
+          # Fetch the specific base commit from the PR (minimal transfer)
+          git fetch origin ${{ github.event.pull_request.base.sha }} --depth=1
+
       - name: Verify Template Modification
         run: |
           set -eou pipefail
           echo "INFO: Determining changed files in this PR..."
 
-          CHANGED_FILES=$(git diff --name-only HEAD^1 HEAD)
+          # Get changed files using the PR base SHA (no merge base needed)
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} HEAD)
 
           if [ -z "$CHANGED_FILES" ]; then
             echo "INFO: No file changes detected. Skipping check."

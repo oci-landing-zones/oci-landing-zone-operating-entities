@@ -58,6 +58,16 @@ if ! command -v jsonnet &>/dev/null; then
   exit 1
 fi
 
+# Ensure Python 3 is installed and available on the PATH
+if ! command -v python3 &>/dev/null; then
+  echo "Error: 'python3' command not found." >&2
+  echo "Please install Python 3.8+ and make sure it's in your system's PATH." >&2
+  echo "📦 Using Package managers:" >&2
+  echo "  brew install python3" >&2
+  echo "  apt-get install python3" >&2
+  exit 1
+fi
+
 # Set the input and output directories
 INPUT_DIR=$(dirname "${BASH_SOURCE[0]}")
 OUTPUT_DIR="$INPUT_DIR/.."
@@ -71,9 +81,9 @@ while IFS= read -r -d '' file; do
   output_dir="$(dirname "$OUTPUT_DIR/$rel_path")"
   mkdir -p "$output_dir"
 
-  # Run jsonnet to generate the JSON file
+  # Run jsonnet to generate the JSON file, then format it with Python
   jsonnet_file="$file"
   json_file="$OUTPUT_DIR/$rel_path"
   json_file="${json_file%.jsonnet}.json"
-  jsonnet "$jsonnet_file" >"$json_file"
+  jsonnet "$jsonnet_file" | python3 "$INPUT_DIR/format_json.py" >"$json_file"
 done < <(find "$INPUT_DIR" -type f -name "*.jsonnet" -print0)

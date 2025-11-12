@@ -1,41 +1,57 @@
 {
-    "instances_configuration" : {
-      "default_compartment_id" : "SHARED-NETWORK-CMP",
-      "default_ssh_public_key_path" : "ssh-rsa AAAAB3NzaC1......RgQ== user@example.com",
-      "instances" : {
-        "JUMP-HOST" : {
-          "name" : "dev-jump-host",
-          "shape" : "VM.Standard.E4.Flex",
-          "marketplace_image" : {
-            "name" : "Oracle Linux 7 STIG"
-          },
-          "boot_volume" : {
-            "size" : 60,
-            "preserve_on_instance_deletion" : false
-          },
-          "networking" : {
-            "assign_public_ip" : false,
-            "hostname" : "dev-jump-host",
-            "subnet_id" : "DEV-MGMT-VCN-JUMP-HOST-SUB"
-          },
-          "encryption" : {
-            "encrypt_in_transit_on_instance_create" : null,
-            "encrypt_in_transit_on_instance_update" : null
-          },
-          "cloud_agent" : {
-            "disable_monitoring" : false,
-            "disable_management" : false,
-            "plugins" : [
-              {"name" : "Bastion", "enabled" : true},
-              {"name" : "Vulnerability Scanning", "enabled" : true},
-              {"name" : "OS Management Service Agent", "enabled" : true},
-              {"name" : "Custom Logs Monitoring", "enabled" : true}
-            ]
-          }
+    "instances_configuration": {
+        "default_compartment_id"                           : "SHARED-NETWORK-CMP",
+        "default_ssh_public_key_path"                      : "ssh-rsa AAAAB3NzaC1......RgQ== user@example.com",
+
+        "instances": {
+            "JUMP-HOST": {
+                "name"                                     : "dev-jump-host",
+                "shape"                                    : "VM.Standard.E4.Flex",
+
+                "boot_volume": {
+                    "preserve_on_instance_deletion"        : false,
+                    "size"                                 : 60
+                },
+
+                "cloud_agent": {
+                    "disable_management"                   : false,
+                    "disable_monitoring"                   : false,
+
+                    "plugins": [
+                        {
+                            "name"                         : "Bastion",
+                            "enabled"                      : true
+                        },
+                        {
+                            "name"                         : "Vulnerability Scanning",
+                            "enabled"                      : true
+                        },
+                        {
+                            "name"                         : "OS Management Service Agent",
+                            "enabled"                      : true
+                        },
+                        {
+                            "name"                         : "Custom Logs Monitoring",
+                            "enabled"                      : true
+                        }
+                    ]
+                },
+
+                "encryption": {
+                    "encrypt_in_transit_on_instance_create": null,
+                    "encrypt_in_transit_on_instance_update": null
+                },
+
+                "marketplace_image": {
+                    "name"                                 : "Oracle Linux 7 STIG"
+                },
+
+                "networking": {
+                    "assign_public_ip"                     : false,
+                    "hostname"                             : "dev-jump-host",
+                    "subnet_id"                            : "DEV-MGMT-VCN-JUMP-HOST-SUB"
+                }
+            }
         }
-      }
     }
-  }
-  
-  
-  
+}

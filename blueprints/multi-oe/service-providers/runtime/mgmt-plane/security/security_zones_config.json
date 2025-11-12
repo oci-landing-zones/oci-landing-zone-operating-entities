@@ -1,19 +1,20 @@
 {
-    "security_zones_configuration" : {
-        "security_zones" : {
-            "SECURITY-ZONE" : {
-                "name" : "isv-security-zone",
-                "compartment_id" : "TOP-CMP",
-                "recipe_key" : "CIS-L1-RECIPE"
-            }  
+    "security_zones_configuration": {
+        "recipes": {
+            "CIS-L1-RECIPE": {
+                "name"            : "isv-security-zone-cis-level-1-recipe",
+                "description"     : "CIS Level 1 recipe",
+                "compartment_id"  : "TOP-CMP",
+                "cis_level"       : "1"
+            }
         },
-        "recipes" : {
-            "CIS-L1-RECIPE" : {
-                "name" : "isv-security-zone-cis-level-1-recipe",
-                "description" : "CIS Level 1 recipe",
-                "compartment_id" : "TOP-CMP",
-                "cis_level" : "1"
+
+        "security_zones": {
+            "SECURITY-ZONE": {
+                "name"            : "isv-security-zone",
+                "compartment_id"  : "TOP-CMP",
+                "recipe_key"      : "CIS-L1-RECIPE"
             }
         }
     }
-}    
+}

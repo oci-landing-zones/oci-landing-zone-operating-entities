@@ -1,85 +1,101 @@
 {
-    "budgets_configuration" : {
-        "budgets" : {
-            "ROOT-BUDGET" : {
-                "name" : "isv-root-budget",
-                "description" : "Tenancy level budget.",
-                "amount" : 100000,
-                "alert_rule" : {
-                    "threshold_value" : 80,
-                    "recipients" : "email.address@example.com",
-                    "message" : "Actual spending goes above 80% of configured budget."
+    "budgets_configuration": {
+        "budgets": {
+            "CUSTOMERS-BUDGET": {
+                "name"               : "isv-customers-budget",
+                "description"        : "Customers budget.",
+                "amount"             : 60000,
+
+                "alert_rule": {
+                    "message"        : "Actual spending goes above 80% of configured budget.",
+                    "recipients"     : "email.address@example.com",
+                    "threshold_value": 80
+                },
+
+                "target": {
+                    "type"           : "COMPARTMENT",
+                    "values"         : ["CUSTOMERS-CMP"]
                 }
             },
-            "MGMT-PLANE-BUDGET" : {
-                "name" : "isv-mgmt-plane-budget",
-                "description" : "Management Plane budget.",
-                "amount" : 40000,
-                "target" : {
-                    "values" : ["MGMT-PLANE-CMP"]
+
+            "CUSTOMERS-DEV-BUDGET": {
+                "name"               : "isv-customers-dev-budget",
+                "description"        : "Dev environment budget.",
+                "amount"             : 20000,
+
+                "alert_rule": {
+                    "message"        : "Actual spending goes above 80% of configured budget.",
+                    "recipients"     : "email.address@example.com",
+                    "threshold_value": 80
                 },
-                "alert_rule" : {
-                    "threshold_value" : 80,
-                    "recipients" : "email.address@example.com",
-                    "message" : "Actual spending goes above 80% of configured budget."
+
+                "target": {
+                    "type"           : "COMPARTMENT",
+                    "values"         : ["CUSTOMERS-DEV-CMP"]
                 }
             },
-            "CUSTOMERS-BUDGET" : {
-                "name" : "isv-customers-budget",
-                "description" : "Customers budget.",
-                "amount" : 60000,
-                "target" : {
-                    "type" : "COMPARTMENT",
-                    "values" : ["CUSTOMERS-CMP"]
+
+            "CUSTOMERS-PROD-BUDGET": {
+                "name"               : "isv-customers-prod-budget",
+                "description"        : "Prod environment budget.",
+                "amount"             : 20000,
+
+                "alert_rule": {
+                    "message"        : "Actual spending goes above 80% of configured budget.",
+                    "recipients"     : "email.address@example.com",
+                    "threshold_value": 80
                 },
-                "alert_rule" : {
-                    "threshold_value" : 80,
-                    "recipients" : "email.address@example.com",
-                    "message" : "Actual spending goes above 80% of configured budget."
+
+                "target": {
+                    "type"           : "COMPARTMENT",
+                    "values"         : ["CUSTOMERS-PROD-CMP"]
                 }
             },
-            "CUSTOMERS-DEV-BUDGET" : {
-                "name" : "isv-customers-dev-budget",
-                "description" : "Dev environment budget.",
-                "amount" : 20000,
-                "target" : {
-                    "type" : "COMPARTMENT",
-                    "values" : ["CUSTOMERS-DEV-CMP"]
+
+            "CUSTOMERS-TEST-BUDGET": {
+                "name"               : "isv-customers-test-budget",
+                "description"        : "Test environment budget.",
+                "amount"             : 20000,
+
+                "alert_rule": {
+                    "message"        : "Actual spending goes above 80% of configured budget.",
+                    "recipients"     : "email.address@example.com",
+                    "threshold_value": 80
                 },
-                "alert_rule" : {
-                    "threshold_value" : 80,
-                    "recipients" : "email.address@example.com",
-                    "message" : "Actual spending goes above 80% of configured budget."
+
+                "target": {
+                    "type"           : "COMPARTMENT",
+                    "values"         : ["CUSTOMERS-TEST-CMP"]
                 }
             },
-            "CUSTOMERS-TEST-BUDGET" : {
-                "name" : "isv-customers-test-budget",
-                "description" : "Test environment budget.",
-                "amount" : 20000,
-                "target" : {
-                    "type" : "COMPARTMENT",
-                    "values" : ["CUSTOMERS-TEST-CMP"]
+
+            "MGMT-PLANE-BUDGET": {
+                "name"               : "isv-mgmt-plane-budget",
+                "description"        : "Management Plane budget.",
+                "amount"             : 40000,
+
+                "alert_rule": {
+                    "message"        : "Actual spending goes above 80% of configured budget.",
+                    "recipients"     : "email.address@example.com",
+                    "threshold_value": 80
                 },
-                "alert_rule" : {
-                    "threshold_value" : 80,
-                    "recipients" : "email.address@example.com",
-                    "message" : "Actual spending goes above 80% of configured budget."
+
+                "target": {
+                    "values"         : ["MGMT-PLANE-CMP"]
                 }
             },
-            "CUSTOMERS-PROD-BUDGET" : {
-                "name" : "isv-customers-prod-budget",
-                "description" : "Prod environment budget.",
-                "amount" : 20000,
-                "target" : {
-                    "type" : "COMPARTMENT",
-                    "values" : ["CUSTOMERS-PROD-CMP"]
-                },
-                "alert_rule" : {
-                    "threshold_value" : 80,
-                    "recipients" : "email.address@example.com",
-                    "message" : "Actual spending goes above 80% of configured budget."
+
+            "ROOT-BUDGET": {
+                "name"               : "isv-root-budget",
+                "description"        : "Tenancy level budget.",
+                "amount"             : 100000,
+
+                "alert_rule": {
+                    "message"        : "Actual spending goes above 80% of configured budget.",
+                    "recipients"     : "email.address@example.com",
+                    "threshold_value": 80
                 }
             }
-        }    
+        }
     }
 }
