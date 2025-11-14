@@ -92,16 +92,18 @@ For a detailed review of openshift policies, please refer to the official opensh
 
 The Openshift Cluster requires specific subnets. You can review all these requirements in the [Openshift documentation](https://docs.oracle.com/en-us/iaas/Content/openshift-on-oci/overview.htm).
 
+For configuring and running the One-OE Landing Zone Openshift extension network Layer use the following JSON file: [oci_openshift_lz_ext_network.auto.tfvars.json](./oci_openshift_lz_ext_network.auto.tfvars.json). You can customize this configuration to fit your exact OCI networking topology.
 
-Our Openshift LZ extension will deploy the necessary core resources for both the Production and Pre-production environments included in the ONE-OE blueprint.
+This configuration file deploy the networking setup for the production OpenShift environment in a simplified form for easier understanding.
+
 
 <img src="../contents/openshift_network.jpeg" width="1000" height="auto">
 
 
 The network layer covers the following resources:
 1. Hub VCN for traffic inspection purposes, centralized DNS service, Internet Gateway, and NAT Gateway.
-2. Spoke VCN for Openshift shared cluster.
-3. Spokes VNCs for each environment - one Spoke Pre-prod Openshift VCN and one Spoke Prod Openshift VCN
+2. Spoke VCN for the OpenShift shared cluster, designed to support a common OpenShift setup across multiple environments.
+3. Spoke VCNs for dedicated OpenShift clusters, designed to provide isolated OpenShift setups for each environment, one for Pre-Prod and one for Prod.
 4. Subnets - Openshift required subnets; like load balancer, bare metal & workers subnet.
 5. Service & NAT Gateway - Service Gateway for access OCI services in all VCNs as well as NAT for Internet outbound (optional)
 6. Security List - allowing all ingress/egress
@@ -118,7 +120,7 @@ For customization of the pre-defined setup please refer to the [Networking docum
 > The example configuration is based on the Hub E model for simplicity and demonstration purposes.
 For production deployments, it is recommended to use other Hub Firewall models such as Hub A or Hub B to ensure optimal design, security, and compliance alignment.
 
-For more details and configuration references, see: [OCI Hub Models](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models).
+For more details and configuration references, refer the [OCI Hub Models](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models).
 
 ### **3.1 VCNs**
 
@@ -212,14 +214,14 @@ The following table describes the proposed Service Gateways added for each envir
 
 ## **4. JSON files Required Changes**
 
-If ONE-OE is used as the foundation Landing Zone with output saving enabled, running this Openshift extension with the added dependencies will automatically match the keys with the correct OCIDs. No changes to the JSON file are needed. Therefore, you can skip this section and move to point 5.
+If [One-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe) is used as the foundation Landing Zone with output saving enabled, running this Openshift extension with the added dependencies will automatically match the keys with the correct OCIDs. No changes to the JSON file are needed. Therefore, you can skip this section and move to point 5.
 
-If you are using the CIS Landing Zone or another OCI Landing Zone option, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
+If you are using the Core Landing Zone or another OCI Landing Zone option, this configuration file requires modification to reference the OCIDs of the existing deployed resources. Locate the values indicated below and replace them with the correct OCIDs.
 
 | Resource         | Section          | Replace with OCIDs              | Description                        |
 | ------------------------- | ------| --------------------------------- | ---------------------------------- |
 | cmp-lzp-p-platform |  compartments| CMP-LZP-P-PLATFORM-KEY | The Prod platforms compartment OCID in Prod Env |
-| cmp-lzp-d-platform | compartments| CMP-LZP-PP-PLATFORM-KEY| The Pre-prod platforms compartment OCID  in Preprod Env |
+| cmp-lzp-pp-platform | compartments| CMP-LZP-PP-PLATFORM-KEY| The Pre-prod platforms compartment OCID  in Preprod Env |
 | cmp-lzp-platform |compartments | CMP-LZP-PLATFORM-KEY| The Shared platforms compartment OCID |
 | Prod Network Compartment | Network| CMP-LZP-P-NETWORK-KEY | The OCID of the Prod Network Compartment |
 | Pre-prod Network Compartment | Network| CMP-LZP-PP-NETWORK-KEY |  The OCID of the Pre-prod Network Compartment  |
@@ -234,7 +236,7 @@ The paths can change based on the modification in the previous [Compartments](#2
 
 ## **4. Deploy**
 
-Use the magic button provided in the summary section to deploy the Openshift LZ extension using [Oracle Resource Manager (ORM)](/commons/content/orm.md) or use [Terraform CLI](/commons/content/terraform.md).
+Use the magic button provided in the summary section to deploy the Openshift landing zone extension using [Oracle Resource Manager (ORM)](/commons/content/orm.md) or use [Terraform CLI](/commons/content/terraform.md).
 
 This operation creates a default routing configuration. To complete the network layer setup, deploy the firewalls and update the routing in the hub to prepare for deploying the Openshift cluster.
 
