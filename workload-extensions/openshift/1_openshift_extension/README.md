@@ -92,7 +92,7 @@ For a detailed review of openshift policies, please refer to the official opensh
 
 The Openshift Cluster requires specific subnets. You can review all these requirements in the [Openshift documentation](https://docs.oracle.com/en-us/iaas/Content/openshift-on-oci/overview.htm).
 
-For configuring and running the One-OE Landing Zone Openshift extension network Layer use the following JSON file: [oci_openshift_lz_ext_network.auto.tfvars.json](./oci_openshift_lz_ext_network.auto.tfvars.json). You can customize this configuration to fit your exact OCI networking topology.
+For configuring and running the One-OE Landing Zone Openshift extension network layer use the following JSON file: [oci_openshift_lz_ext_network.auto.tfvars.json](./oci_openshift_lz_ext_network.auto.tfvars.json). You can customize this configuration to fit your exact OCI networking topology.
 
 This configuration file deploy the networking setup for the production OpenShift environment in a simplified form for easier understanding.
 
