@@ -114,7 +114,7 @@ The network layer covers the following resources:
 In this asset, we use reserved CIDR blocks for the different VCNs, but this can be customized. To learn more about managing your OCI subnetting, we recommend checking this [asset](/addons/oci-lz-subnetting).
 
 
-For customization of the pre-defined setup please refer to the [Networking documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) for documentation and examples.
+For customization of the pre-defined setup please refer to the [Networking module documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) for documentation and examples.
 
 > [!NOTE]
 > The example configuration is based on the Hub E model for simplicity and demonstration purposes.
