@@ -94,7 +94,7 @@ The Openshift Cluster requires specific subnets. You can review all these requir
 
 For configuring and running the One-OE Landing Zone Openshift extension network layer use the following JSON file: [oci_openshift_lz_ext_network.auto.tfvars.json](./oci_openshift_lz_ext_network.auto.tfvars.json). You can customize this configuration to fit your exact OCI networking topology.
 
-This configuration file deploy the networking setup for the production OpenShift environment in a simplified form for easier understanding.
+The architecture design below illustrates the different deployment options for placing the OpenShift cluster on top of the One-OE Landing Zone across Shared, Pre-Prod, and Prod environments. For simplicity and ease of understanding, the provided configuration file includes only the production environment setup.
 
 
 <img src="../contents/openshift_network.jpeg" width="1000" height="auto">
