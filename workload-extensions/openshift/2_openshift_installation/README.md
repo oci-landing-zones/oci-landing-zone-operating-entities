@@ -81,7 +81,7 @@ Refer to [OpenShift Extension Cleanup and Routing](../3_openshift_ext_cleanup_an
 
 # License <!-- omit from toc -->
 
-Copyright (c) 2024 Oracle and/or its affiliates.
+Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
