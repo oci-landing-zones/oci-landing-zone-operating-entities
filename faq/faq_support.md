@@ -1,6 +1,6 @@
 # FAQ - Support & Contribution
 
----
+## Support & Contribution Questions
 
 ### S1. Is this an official Oracle product?
 
@@ -16,7 +16,7 @@ The OCI Open LZ is built on top of the official OCI Landing Zone modules (IAM, n
 
 For issues, questions, or feature requests, please open an issue in this GitHub repository. However, do not use GitHub Issues to report security vulnerabilities. If you believe you've discovered a security vulnerability, please refer to the [Security Guidelines](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/SECURITY.md) for proper reporting procedures.
 
-For optimal support with your Oracle products and services—whether you're seeking answers, engaging with communities, or resolving technical issues—we recommend using [support.oracle.com](https://support.oracle.com/signin)
+For optimal support with your Oracle products and services—whether you're seeking answers, engaging with communities, or resolving technical issues—we recommend using [support.oracle.com](https://support.oracle.com/signin).
 
 **For Partners:**
 

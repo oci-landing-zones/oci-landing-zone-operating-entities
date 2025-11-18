@@ -37,12 +37,12 @@ The OCI Open LZ uses a declarative Infrastructure-as-Code approach with Terrafor
 
 **The landing zone leverages these module repositories:**
 
-* [OCI Landing Zones IAM](https://github.com/oci-landing-zones/terraform-oci-modules-iam) - Identity and Access Management
-* [OCI Landing Zones Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking) - Network topology and connectivity
-* [OCI Landing Zones Security](https://github.com/oci-landing-zones/terraform-oci-modules-security) - Security controls and policies
-* [OCI Landing Zones Observability](https://github.com/oci-landing-zones/terraform-oci-modules-observability) - Monitoring and logging
-* [OCI Landing Zones Governance](https://github.com/oci-landing-zones/terraform-oci-modules-governance) - Governance and compliance
-* [OCI Landing Zones Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator) - Relates several OCI resource into one consolidated operation
+* [OCI Landing Zones IAM](https://github.com/oci-landing-zones/terraform-oci-modules-iam) - Identity and Access Management.
+* [OCI Landing Zones Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking) - Network topology and connectivity.
+* [OCI Landing Zones Security](https://github.com/oci-landing-zones/terraform-oci-modules-security) - Security controls and policies.
+* [OCI Landing Zones Observability](https://github.com/oci-landing-zones/terraform-oci-modules-observability) - Monitoring and logging.
+* [OCI Landing Zones Governance](https://github.com/oci-landing-zones/terraform-oci-modules-governance) - Governance and compliance.
+* [OCI Landing Zones Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator) - Relates several OCI resources into one consolidated operation.
 
 
 ---
