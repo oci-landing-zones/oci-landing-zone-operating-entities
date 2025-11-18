@@ -6,18 +6,20 @@
 
 The OCI Operating Entities Landing Zone is a set of blueprints and Infrastructure-as-Code assets designed to simplify the onboarding and management of organizations, business units, and subsidiaries on Oracle Cloud Infrastructure. It provides pre-built, secure, and scalable landing zone architectures that reduce implementation time and costs.
 
+Check out our video series!. Start with the [first episode](https://www.youtube.com/watch?v=4zCGJt1vUog&t=11s), a 13-minute where we explain our approach and core concepts.
+
 ---
 
 ### G2. Who should use the OCI Open LZ?
 
 Everyone deploying on Oracle Cloud Infrastructure can benefit from the OCI Operating Entities LZ, regardless of organization size, industry, or technical expertise. The modular and scalable design makes it suitable for a wide range of use cases, some examples include:
 
-* Organizations starting their cloud journey who want to implement best practices from day one
-* Multi-national corporations managing multiple business units, subsidiaries, or brands
-* Service providers managing multiple customer tenancies
-* Software vendors deploying multi-tenant SaaS solutions
-* Agencies requiring strong governance and compliance frameworks
-* Cloud architects looking for OCI best practices and reference architectures
+* Organizations starting their cloud journey who want to implement best practices from day one.
+* Multi-national corporations managing multiple business units, subsidiaries, or brands.
+* Service providers managing multiple customer tenancies.
+* Software vendors deploying multi-tenant SaaS solutions.
+* Agencies requiring strong governance and compliance frameworks.
+* Cloud architects looking for OCI best practices and reference architectures.
 
 The beauty of the OCI Open LZ is its flexibility: whether you're deploying a simple single-environment setup or a complex Multi-Tenancy architecture, the blueprints scale to your needs. Start with what fits your current requirements and grow as your organization evolves.
 
@@ -51,17 +53,12 @@ Yes, the OCI Open LZ is built on the [CIS (Center for Internet Security) Oracle 
 
 **The landing zone includes:**
 
-* Proper compartment structure for resource isolation and least-privilege access
-* Network isolation with secure VCN designs and security lists
-* Identity and Access Management (IAM) with groups, policies, and federation support
-* Security zones for policy enforcement
-* Cloud Guard and logging configurations for threat detection
-* Compliance controls aligned with common regulatory frameworks
+* Proper compartment structure for resource isolation and least-privilege access.
+* Network isolation with secure VCN designs and security lists.
+* Identity and Access Management (IAM) with groups, policies, and federation support.
+* Security zones for policy enforcement.
+* Cloud Guard and logging configurations for threat detection.
+* Compliance controls aligned with common regulatory frameworks.
 
 All blueprints follow the same CIS-based security standards. For detailed information on the security posture, threat model, and vulnerability disclosure process, review the security guide.
 
----
-
-### G6. Is this an official Oracle product?
-
-The OCI Open LZ is an open-source project provided under the Universal Permissive License (UPL), Version 1.0. While it incorporates Oracle best practices and is maintained with Oracle involvement, it is a community-driven project.

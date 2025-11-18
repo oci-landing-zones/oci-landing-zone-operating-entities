@@ -39,7 +39,7 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 <tr>
 <td>
 
-### 🏗️ [Design](./faq_design_.md)
+### 🏗️ [Design](./faq_design.md)
 
 **Choose the right architecture for your needs**
 
@@ -84,8 +84,7 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 - S3. Where can I find additional documentation and resources?
 - S4. What is the release and update cadence?
 - S5. How do I report bugs or request features?
-- S6. Is this an official Oracle product?
-- S7. Is there a community forum or discussion board?
+- S6. Is there a community forum or discussion board?
 
 </td>
 </tr>
@@ -98,7 +97,7 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 ## 🚀 Quick Start Guide
 
 1. **Explore** → Start with [General Questions](./faq_general.md) to understand the fundamentals
-2. **Design** → Review [Design & Blueprints](./faq_design_.md) to select your architecture
+2. **Design** → Review [Design & Blueprints](./faq_design.md) to select your architecture
 3. **Deploy** → Follow [Implementation](./faq_implementation.md) for deployment guidance
 4. **Connect** → Visit [Support](./faq_support.md) when you need help
 

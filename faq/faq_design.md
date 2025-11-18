@@ -28,7 +28,7 @@ To easy deploy the One-OE we offer the one-stack asset.(check question D4)
 
 ---
 
-### D4.What offers the one-stack asset?
+### D4. What offers the one-stack asset?
 
 The **one-stack** asset offers a consolidated deployment method for the One-OE blueprint, combining all infrastructure components into a single Terraform stack. This approach reduces deployment complexity and time-to-value compared to multi-stack deployments.
 
