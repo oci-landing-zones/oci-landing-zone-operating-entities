@@ -6,7 +6,7 @@
 
 The OCI Operating Entities Landing Zone is a set of blueprints and Infrastructure-as-Code assets designed to simplify the onboarding and management of organizations, business units, and subsidiaries on Oracle Cloud Infrastructure. It provides pre-built, secure, and scalable landing zone architectures that reduce implementation time and costs.
 
-Check out our video series!. Start with the [first episode](https://www.youtube.com/watch?v=4zCGJt1vUog&t=11s), a 13-minute where we explain our approach and core concepts.
+Check out our video series! Start with the [first episode](https://www.youtube.com/watch?v=4zCGJt1vUog&t=11s), a 13-minute introduction where we explain our approach and core concepts.
 
 ---
 

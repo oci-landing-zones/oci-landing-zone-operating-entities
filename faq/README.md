@@ -31,7 +31,6 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 - G3. What is an Operating Entity (OE)?
 - G4. What IaC approach does OCI Open LZ use?
 - G5. Does the landing zone comply with security best practices?
-- G6. Is this an official Oracle product?
 
 </td>
 </tr>
@@ -65,9 +64,8 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 - I2. What is the recommended deployment order?
 - I3. How can I modify the JSON file to accommodate my required changes, such as adding a third environment?
 - I4. How do I manage state files for Terraform?
-- I5. Can I use Oracle Resource Manager (ORM) instead of Terraform CLI?
-- I6. How do I handle updates to the landing zone?
-- I7. What should I do if my deployment fails?
+- I5. Can I deploy the OCI Landing Zone using any OCI-native managed service?
+- I6. What should I do if my deployment fails?
 
 </td>
 </tr>
@@ -79,12 +77,8 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 
 **Get help and contribute back**
 
-- S1. How do I get support?
-- S2. Can I contribute to the project?
-- S3. Where can I find additional documentation and resources?
-- S4. What is the release and update cadence?
-- S5. How do I report bugs or request features?
-- S6. Is there a community forum or discussion board?
+- S1. Is this an official Oracle product?
+- S2. How do I get support?
 
 </td>
 </tr>

@@ -77,7 +77,7 @@ terraform {
 
 ---
 
-### I5. Can I use Oracle Resource Manager (ORM) instead of Terraform CLI?
+### I5. Can I deploy the OCI Landing Zone using any OCI-native managed service?
 
 Yes! All blueprints support deployment via Oracle Resource Manager (ORM), which is OCI's managed Terraform service. ORM provides:
 
@@ -95,20 +95,7 @@ Yes! All blueprints support deployment via Oracle Resource Manager (ORM), which 
 
 ---
 
-### I6. How do I handle updates to the landing zone?
-
-When updating your landing zone:
-
-1. **Review changes**: Check the changelog and release notes for breaking changes
-2. **Test in non-production**: Apply updates to a test environment first
-3. **Backup state files**: Always backup your Terraform state before updates
-4. **Use version pinning**: Pin module versions in production to control updates
-5. **Plan before apply**: Always run `terraform plan` to review changes
-6. **Update incrementally**: Update one component at a time when possible
-
----
-
-### I7. What should I do if my deployment fails?
+### I6. What should I do if my deployment fails?
 
 If your deployment fails:
 
