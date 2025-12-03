@@ -13,7 +13,7 @@ The ExaDB-C@C Landing Zone Extension is a secure cloud environment, designed wit
 ## **2. Design Overview**
 This workload extension uses a simplified version of the [One-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe) Blueprint as the reference Landing Zone and guides the deployment of ExaDB-C@C on top of it. You could use this extension also in the other Operating Entities blueprints, as the [Multi-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/multi-oe) Blueprint or the [Multi-Tenancy](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/multi-tenancy) Blueprint.
 
-A Worklod extension satisfies the requirements to deploy a specific, complex workload, providing design guidelines about where to deploy the workload in a pre-existing baseline Landing Zone.
+A Workload extension satisfies the requirements to deploy a specific, complex workload, providing design guidelines about where to deploy the workload in a pre-existing baseline Landing Zone.
 
 &nbsp;
 
