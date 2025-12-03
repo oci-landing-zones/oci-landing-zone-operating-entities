@@ -15,9 +15,9 @@
   - [**3.5 Gateways**](#35-gateways)
     - [**3.5.1 Dynamic Routing Gateway (DRGs) Attachments**](#351-dynamic-routing-gateway-drgs-attachments)
     - [**3.5.2 Service Gateway**](#352-service-gateway)
+    - [**3.5.3 NAT Gateway**](#353-nat-gateway)
 - [**4. JSON files Required Changes**](#4-json-files-required-changes)
 - [**4. Deploy**](#4-deploy)
-
 
 ## **1. Summary**
 
@@ -26,11 +26,11 @@
 | **NAME**                | Openshift Landing Zone Extension set-up                                                                                                    |
 | **OBJECTIVE**           | Provision Identity and Network                                                                               |
 | **TARGET RESOURCES**    | - **Identity**: Compartments, Groups, Dynamic groups and Policies </br>- **Network**: Spoke VCNs, Route tables, Security Lists, NSGs                 |
-| **PREREQUISITES**       | The [One-OE](../../../../blueprints/one-oe/) Blueprint deployed as a foundation. </br> For this example we have used: </br> [<img src="/commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/addons/oci-hub-models/hub_b/oci_open_lz_hub_b_network_light.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json"}) </br>**Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_ONE-OE_deployment_steps.md).|
+| **PREREQUISITES**       | The [One-OE](../../../../blueprints/one-oe/) Blueprint deployed as a foundation. </br> For this example we have used: </br> [<img src="/commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.8.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/addons/oci-hub-models/hub_b/oci_open_lz_hub_b_network_light.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json"}) </br>**Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_ONE-OE_deployment_steps.md).|
 | **CONFIGURATION FILES** | - [oci_openshift_lz_ext_iam.auto.tfvars.json](./oci_openshift_lz_ext_iam.auto.tfvars.json)  </br> - [oci_openshift_lz_ext_network.auto.tfvars.json](./oci_openshift_lz_ext_network.auto.tfvars.json)|
-| **DEPLOYMENT**          | [<img src="/commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.5.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/openshift/1_openshift_extension/oci_openshift_lz_ext_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/openshift/1_openshift_extension/oci_openshift_lz_ext_network.auto.tfvars.json"}) </br> **Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_OPENSHIFT-LZ-EXT_deployment_steps.md). [Terraform CLI](/commons/content/terraform.md)  can be also used.           |
+| **DEPLOYMENT**          | [<img src="/commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.8.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/openshift/1_openshift_extension/oci_openshift_lz_ext_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/openshift/1_openshift_extension/oci_openshift_lz_ext_network.auto.tfvars.json"}) </br> **Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_OPENSHIFT-LZ-EXT_deployment_steps.md). [Terraform CLI](/commons/content/terraform.md)  can be also used.           |
 
-&nbsp; 
+&nbsp;
 
 ## **2. Setup IAM Configuration**
 
@@ -38,7 +38,7 @@ For configuring and running the One-OE Landing Zone Openshift extension IAM Laye
 
 This configuration file covers three categories of resources described in the next sections.
 
-###  **2.1. Compartments**
+### **2.1. Compartments**
 
 The Openshift LZ extension provisions three **compartments**: two dedicated to managing environments, such as PROD and PRE-PROD, and a third compartment for management/shared openshift cluster.
 
@@ -49,13 +49,11 @@ New openshift compartments will be added as platform in each One-OE LZ environme
 > [!NOTE]
 > For extended documentation regarding compartment definition please refer to the [Identity & Access Management CIS Terraform module compartment example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/compartments/examples/vision/input.auto.tfvars.template).
 
-
 ### **2.2 Groups**
 
 The Openshift extension will deploy IAM groups to manage resources in openshift compartments and provide fine-grained access to specific openshift resources.
 
 As part of the deployment the following groups are created in the [Default Identity Domain](https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm):
-
 
 | ID     |     NAME                       | TYPE | OBJECTIVES                                  |
 | ------ |  -------------------------- | ------------------------------------------- |---|
@@ -63,15 +61,13 @@ As part of the deployment the following groups are created in the [Default Ident
 | GRP.01 |  grp-lzp-p-platform-openshift-admin | IAM| Group for managing Prod Openshift-related resources |
 | GRP.02 |  grp-lzp-pp-platform-openshift-admin | IAM | Group for managing Pre-prod openshift-related resources |
 
-
-
 > [!NOTE]
 > For extended documentation regarding group definition please refer to the [Identity & Access Management CIS Terraform module groups example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/groups/examples/vision/input.auto.tfvars.template).
-
 
 ### **2.3 Policies**
 
 As part of the deployment the following policies are created:
+
 | Policy                     | Description                                             | Manage resources             | Use resources                   | Inspect resources |
 | -------------------------- | ------------------------------------------------------- | ---------------------------- | ------------------------------- | ----------------- |
 | pcy-p-platform-openshift-admins | Grants group **grp-lzp-p-platform-openshift-admins** permissions. |  Computes, VCN, Storage | NSG, Subnets, VNICs, IPs | compartments    |
@@ -79,14 +75,11 @@ As part of the deployment the following policies are created:
 | pcy-platform-openshift-admins | Grants group **grp-lzp-platform-openshift-admins** permissions. |  Computes, VCN, Storage | NSG, Subnets, VNICs, IPs | compartments    |
 | pcy-p-platform-openshift-secrets| The **pcy-p-platform-openshift-secrets** is an example of a recommended policy to allow applications running on the cluster to be authenticated with OCI through InstancePrincipal, for example to grant access to secrets. To read more about his check this [article](https://vaibhav-sonavane.medium.com/use-instance-principal-to-access-secrets-6c4aee1bfea4) or the [official documentation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm?source=post_page-----6c4aee1bfea4--------------------------------)| -  | - | -    |
 
-
 Additional policies may be required for using [Capacity Reservations](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengmakingcapacityreservations.htm) or if you choose to [manage the master encryption key yourself](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengencryptingdata.htm). These policies are not included in this example, make sure to add them if they apply to your use case.
 For a detailed review of openshift policies, please refer to the official openshift documentation [here](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpolicyconfig.htm#Policy_Configuration_for_Cluster_Creation_and_Deployment) and this [link](https://docs.oracle.com/en-us/iaas/Content/openshift-on-oci/overview.htm).
 
-
 > [!NOTE]
 >For extended documentation regarding policies refer to the [Identity & Access Management CIS Terraform module policies examples](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies/examples) and [policy resource documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies)
-
 
 ## **3. Setup Network Configuration**
 
@@ -96,11 +89,10 @@ For configuring and running the One-OE Landing Zone Openshift extension network 
 
 The architecture design below illustrates the different deployment options for placing the OpenShift cluster on top of the One-OE Landing Zone across Shared, Pre-Prod, and Prod environments. For simplicity and ease of understanding, the provided configuration file includes only the production environment setup.
 
-
 <img src="../contents/openshift_network.jpeg" width="1000" height="auto">
 
-
 The network layer covers the following resources:
+
 1. Hub VCN for traffic inspection purposes, centralized DNS service, Internet Gateway, and NAT Gateway.
 2. Spoke VCN for the OpenShift shared cluster, designed to support a common OpenShift setup across multiple environments.
 3. Spoke VCNs for dedicated OpenShift clusters, designed to provide isolated OpenShift setups for each environment, one for Pre-Prod and one for Prod.
@@ -112,7 +104,6 @@ The network layer covers the following resources:
 9. DRG Attachments - Connect spokes with the central Hub
 
 In this asset, we use reserved CIDR blocks for the different VCNs, but this can be customized. To learn more about managing your OCI subnetting, we recommend checking this [asset](/addons/oci-lz-subnetting).
-
 
 For customization of the pre-defined setup please refer to the [Networking module](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking) for documentation and examples.
 
@@ -132,7 +123,6 @@ The following table describes the deployed VCNs.
 | VCN.02  | vcn-fra-lzp-p-openshift | Spoke VCN dedicated to Prod openshift set-up |
 | VCN.03  | vcn-fra-lzp-pp-openshift | Spoke VCN dedicated to Preprod openshift set-up |
 
-
 ### **3.2 Subnets**
 
 The following table describes the deployed Subnets added for each environment Openshift platform:
@@ -149,7 +139,6 @@ The following table describes the deployed Subnets added for each environment Op
 | SN.07 |  sn-fra-lzp-openshift-bm-private | Openshift Shared bare metal subnet |
 | SN.08 |  sn-fra-lzp-openshift-workers-private | Openshift Shared workers subnet |
 
-
 ### **3.3 Route Tables (RTs)**
 
 The following table describes the deployed Route Tables:
@@ -164,6 +153,7 @@ The following table describes the deployed Route Tables:
 | RT.05 | rt-fra-lzp-private | Openshift compute private shared subnet route table |
 
 ### **3.4 Security Lists (SLs)**
+
 The following table describes the deployed Security Lists (SLs):
 
 | ID    |  NAME                | OBJECTIVES                              |
@@ -175,9 +165,7 @@ The following table describes the deployed Security Lists (SLs):
 | SL.04 | sl-lzp-openshift-public | Openshift shared public subnet security list |
 | SL.05 | sl-lzp-openshift-private| Openshift shared private subnet security list |
 
-
 ### **3.5 Gateways**
-
 
 #### **3.5.1 Dynamic Routing Gateway (DRGs) Attachments**
 
@@ -186,12 +174,10 @@ The following tables describe the deployed DRG Attachments.
 | ID      |  NAME                      | OBJECTIVES                                   |
 | ------- |  ------------------------- | -------------------------------------------- |
 | DRGA.00 |  drgatt-vcn-fra-lzp-p-openshift | DRG Attachment for the Openshift Prod spoke to the hub |
-| DRGA.00 |  drgatt-vcn-fra-lzp-pp-openshift | DRG Attachment for the Openshift Preprod spoke to the hub 
-| DRGA.00 |  drgatt-vcn-fra-lzp-openshift | DRG Attachment for the Openshift shared spoke to the hub 
-
+| DRGA.00 |  drgatt-vcn-fra-lzp-pp-openshift | DRG Attachment for the Openshift Preprod spoke to the hub
+| DRGA.00 |  drgatt-vcn-fra-lzp-openshift | DRG Attachment for the Openshift shared spoke to the hub
 
 #### **3.5.2 Service Gateway**
-
 
 The following table describes the proposed NAT Gateways added for each environment Openshift platform:
 
@@ -201,8 +187,7 @@ The following table describes the proposed NAT Gateways added for each environme
 | SGW.00 |  sgw-fra-lzp-pp-openshift | SGW Openshift Pre-prod VCN. |
 | SGW.00 |  sgw-fra-lzp-m-openshift | SGW Openshift shared VCN. |
 
-#### **3.5.23 NAT Gateway**
-
+#### **3.5.3 NAT Gateway**
 
 The following table describes the proposed Service Gateways added for each environment Openshift platform:
 
@@ -230,16 +215,14 @@ If you are using the Core Landing Zone or another OCI Landing Zone option, this 
 | Hub DRG Route Table      | Network| OCID-DRG-HUB-ROUTE-TABLE      | The OCID of Route table in DRG  |
 
 **NOTE:**
-Policies contain compartment paths. 
+Policies contain compartment paths.
 The paths can change based on the modification in the previous [Compartments](#21-compartments) section. The paths need to be updated following the OCI [Policies and Compartment hierarchy](https://docs.oracle.com/en-us/iaas/Content/Identity/Concepts/policies.htm#hierarchy).
-
 
 ## **4. Deploy**
 
 Use the magic button provided in the summary section to deploy the Openshift landing zone extension using [Oracle Resource Manager (ORM)](/commons/content/orm.md) or use [Terraform CLI](/commons/content/terraform.md).
 
 This operation creates a default routing configuration. To complete the network layer setup, deploy the firewalls and update the routing in the hub to prepare for deploying the Openshift cluster.
-
 
 You can now proceed with Openshift Cluster installation [Openshift Installation](../2_openshift/).
 
