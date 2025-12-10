@@ -21,9 +21,9 @@ For this Demo we are going to use Cloud Shell. See the full module documentation
 
 1. Click the 'Next' button, cloud shell will be open
 
-[![Open in Code Editor](https://raw.githubusercontent.com/oracle-devrel/oci-code-editor-samples/main/images/open-in-code-editor.png)](https://cloud.oracle.com/?region=home&cs_repo_url=https://github.com/oci-landing-zones/oci-landing-zone-operating-entities.git&cs_branch=master&cs_readme_path=workload-extensions/oke/multi-stack/2_oke/README.md&cs_open_ce=false)
+[![Open in Code Editor](https://raw.githubusercontent.com/oracle-devrel/oci-code-editor-samples/main/images/open-in-code-editor.png)](https://cloud.oracle.com/?region=home&cs_repo_url=https://github.com/oci-landing-zones/oci-landing-zone-operating-entities.git&cs_branch=master&cs_readme_path=workload-extensions/oke/advanced/2_oke/README.md&cs_open_ce=false)
 
-2. `$ cd oci-landing-zone-operating-entities/workload-extensions/oke/multi-stack/2_oke/oke_lz_tf`
+2. `$ cd oci-landing-zone-operating-entities/workload-extensions/oke/advanced/2_oke/oke_lz_tf`
 3. Change the **KEYS values** for the respective **OCIDs** in the oke.tf file 
 
 | Placeholder | Description |
