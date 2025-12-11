@@ -5,7 +5,7 @@
 ### I1. What are the prerequisites for deploying OCI Open LZ?
 
 * An OCI tenancy with appropriate administrative privileges
-* Terraform installed (version requirements specified in each blueprint)
+* Terraform installed (version requirements specified in each blueprint) or ORM (Oracle Resource Manager)
 * Basic understanding of OCI services and concepts
 * Familiarity with Infrastructure-as-Code principles
 
