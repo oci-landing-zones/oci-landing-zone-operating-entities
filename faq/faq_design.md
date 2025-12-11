@@ -83,4 +83,4 @@ For these reasons, it's recommended to choose the appropriate model from the sta
 
 Yes! The blueprints are designed to be customizable. You can modify the declarative configuration files to adjust compartment structures, network topologies, security policies, and other elements to match your organization's specific needs.
 
-See the [Implementation FAQ](./faq_implementation.md), question I3, for guidance on how to customize and deploy your changes.
+See the [question I3](./faq_implementation.md/#i3-how-can-i-modify-the-json-file-to-accommodate-my-required-changes-such-as-adding-a-third-environment), for guidance on how to customize and deploy your changes.
