@@ -46,7 +46,7 @@ The one-stack is available in two security configurations (v1 with CISv1 control
 
 The OCI Hub Models are network add-ons that provide pre-configured hub-and-spoke network architectures for the OCI Operating Entities Landing Zone. These add-ons complement your landing zone blueprint with different network topologies designed to meet various security, cost, and complexity requirements.
 
-<img src="../faq/content/hubs.png" width="1200" >
+<img src="../faq/content/Hubs.png" width="1200" >
 
 The [hub models add-on](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models) includes:
 
