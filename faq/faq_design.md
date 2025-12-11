@@ -26,7 +26,7 @@
 
 The One-OE template is designed for a single Operating Entity (OE) and includes two pre-configured environments: Production and Pre-Production. Within each environment, the architecture enforces network isolation between the web, application, and database tiers, ensuring secure segmentation and controlled access across your infrastructure layers.
 
-To easily deploy the One-OE we offer the one-stack asset. (check question D4)
+To easily deploy the One-OE we offer the one-stack asset. Check question [D4](#d4-what-offers-the-one-stack-asset).
 
 ---
 
@@ -83,4 +83,4 @@ For these reasons, it's recommended to choose the appropriate model from the sta
 
 Yes! The blueprints are designed to be customizable. You can modify the declarative configuration files to adjust compartment structures, network topologies, security policies, and other elements to match your organization's specific needs.
 
-See the [Implementation FAQ](./faq_implementation.md), [check this other question](#D6-can-i-migrate-from-one-blueprint-model-to-another), for guidance on how to customize and deploy your changes.
+See the [Implementation FAQ](./faq_implementation.md), question I3, for guidance on how to customize and deploy your changes.
