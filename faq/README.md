@@ -32,13 +32,13 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 
 **Choose the right architecture for your needs**
 
-- D1. What's the difference between blueprints, add-ons, and workload extensions?
-- D2. Which LZ blueprint Model should I choose?
-- D3. What LZ blueprint fits better for 3-layer apps?
-- D4. What offers the one-stack asset?
-- D5. Which HUB models are included in the Operating Entities LZ blueprints?
-- D6. Can I migrate from one blueprint model to another?
-- D7. Can I customize the blueprints for my specific requirements?
+- [D1. What's the difference between blueprints, add-ons, and workload extensions?](./faq_design.md/#d1-whats-the-difference-between-blueprints-add-ons-and-workload-extensions)
+- [D2. Which LZ blueprint Model should I choose?](./faq_design.md/#d2-which-lz-blueprint-model-should-i-choose)
+- [D3. What LZ blueprint fits better for 3-layer apps?](./faq_design.md/#d3-what-lz-blueprint-fits-better-for-3-layer-apps)
+- [D4. What offers the one-stack asset?](./faq_design.md/#d4-what-offers-the-one-stack-asset)
+- [D5. Which HUB models are included in the Operating Entities LZ blueprints?](./faq_design.md/#d5-which-hub-models-are-included-in-the-operating-entities-lz-blueprints)
+- [D6. Can I migrate from one blueprint model to another?](./faq_design.md/#d6-can-i-migrate-from-one-blueprint-model-to-another)
+- [D7. Can I customize the blueprints for my specific requirements?](./faq_design.md/#d7-can-i-customize-the-blueprints-for-my-specific-requirements)
 
 </td>
 </tr>
@@ -50,12 +50,12 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 
 **Deployment guidance and customization**
 
-- I1. What are the prerequisites for deploying OCI Open LZ?
-- I2. What is the recommended deployment order?
-- I3. How can I modify the JSON file to accommodate my required changes, such as adding a third environment?
-- I4. How do I manage state files for Terraform?
-- I5. Can I deploy the OCI Landing Zone using any OCI-native managed service?
-- I6. What should I do if my deployment fails?
+- [I1. What are the prerequisites for deploying OCI Open LZ?](./faq_implementation.md/#i1-what-are-the-prerequisites-for-deploying-oci-open-lz)
+- [I2. What is the recommended deployment order?](./faq_implementation.md/#i2-what-is-the-recommended-deployment-order)
+- [I3. How can I modify the JSON file to accommodate my required changes, such as adding a third environment?](./faq_implementation.md/#i3-how-can-i-modify-the-json-file-to-accommodate-my-required-changes-such-as-adding-a-third-environment)
+- [I4. How do I manage state files for Terraform?](./faq_implementation.md/#i4-how-do-i-manage-state-files-for-terraform)
+- [I5. Can I deploy the OCI Landing Zone using any OCI-native managed service?](./faq_implementation.md/#i5-can-i-deploy-the-oci-landing-zone-using-any-oci-native-managed-service)
+- [I6. What should I do if my deployment fails?](./faq_implementation.md/#i6-what-should-i-do-if-my-deployment-fails)
 
 </td>
 </tr>
@@ -67,8 +67,8 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 
 **Get help and contribute back**
 
-- S1. Is this an official Oracle product?
-- S2. How do I get support?
+- [S1. Is this an official Oracle product?](./faq_support.md/#s1-is-this-an-official-oracle-product)
+- [S2. How do I get support?](./faq_support.md/#s2-how-do-i-get-support)
 
 </td>
 </tr>
@@ -80,10 +80,10 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 
 ## 🚀 Quick Start Guide
 
-1. **Explore** → Start with [General Questions](./faq_general.md) to understand the fundamentals
-2. **Design** → Review [Design & Blueprints](./faq_design.md) to select your architecture
-3. **Deploy** → Follow [Implementation](./faq_implementation.md) for deployment guidance
-4. **Connect** → Visit [Support](./faq_support.md) when you need help
+   **Explore** → Start with [General Questions](./faq_general.md) to understand the fundamentals
+   **Design** → Review [Design & Blueprints](./faq_design.md) to select your architecture
+   **Deploy** → Follow [Implementation](./faq_implementation.md) for deployment guidance
+   **Connect** → Visit [Support](./faq_support.md) when you need help
 
 ---
 
