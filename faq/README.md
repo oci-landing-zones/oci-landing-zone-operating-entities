@@ -81,8 +81,11 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 ## 🚀 Quick Start Guide
 
    **Explore** → Start with [General Questions](./faq_general.md) to understand the fundamentals
+
    **Design** → Review [Design & Blueprints](./faq_design.md) to select your architecture
+
    **Deploy** → Follow [Implementation](./faq_implementation.md) for deployment guidance
+   
    **Connect** → Visit [Support](./faq_support.md) when you need help
 
 ---
