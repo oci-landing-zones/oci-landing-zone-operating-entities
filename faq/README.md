@@ -4,20 +4,9 @@
 
 ### Welcome to the OCI Operating Entities Landing Zone FAQ
 
-*Your comprehensive guide to understanding, implementing, and managing OCI Operating Entities landing zones*
-
----
-
-</div>
-
-## 🎯 Quick Navigation
-
 Whether you're exploring OCI landing zones for the first time, deciding which blueprint size fits your organization, or troubleshooting an implementation, you'll find answers to the most frequently asked questions here.
 
 <br>
-
-## 📖 FAQ Documentation
-
 <table>
 <tr>
 <td>
@@ -26,11 +15,12 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 
 **Start here if you're new to OCI Open LZ**
 
-- G1. What is the OCI Open LZ?
-- G2. Who should use the OCI Open LZ?
-- G3. What is an Operating Entity (OE)?
-- G4. What IaC approach does OCI Open LZ use?
-- G5. Does the landing zone comply with security best practices?
+- [G1. What is the OCI Open LZ?](./faq_general.md/#g1-what-is-the-oci-open-lz)
+- [G2. Who should use the OCI Open LZ?](./faq_general.md/#g2-who-should-use-the-oci-open-lz)
+- [G3. What is an Operating Entity (OE)?](./faq_general.md/#g3-what-is-an-operating-entity-oe)
+- [G4. What IaC approach does OCI Open LZ use?](./faq_general.md/#g4-what-iac-approach-does-oci-open-lz-use)
+- [G5. Does the landing zone comply with security best practices?](./faq_general.md/#g5-does-the-landing-zone-comply-with-security-best-practices)
+- [G6. What are the infrastructure costs when deploying an OCI Landing Zone?](./faq_general.md/#g6-what-are-the-infrastructure-costs-when-deploying-an-oci-landing-zone)
 
 </td>
 </tr>

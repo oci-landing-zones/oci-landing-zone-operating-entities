@@ -62,3 +62,16 @@ Yes, the OCI Open LZ is built on the [CIS (Center for Internet Security) Oracle 
 
 All blueprints follow the same CIS-based security standards. For detailed information on the security posture, threat model, and vulnerability disclosure process, review the security guide.
 
+
+---
+
+### G6. What are the infrastructure costs when deploying an OCI Landing Zone?
+
+OCI Landing Zone blueprints cover multiple layers: IAM, Network, Security, and Observability. Most infrastructure services deployed incur minimal or no cost. By default, all included resources use free or low-cost OCI services, but optional add-ons may increase costs.
+
+**Resources that incur additional costs:**
+- **Network Firewall** - Included in Hub A and B network models
+- **Load Balancers** - Included as examples in hub network models  
+- **Vault** - Required for CIS v2 compliance. The option configured in our JSON security file is free, while alternative options may incur additional costs.
+
+Actual costs depend on your configuration, the services you enable, and the workloads you deploy.
