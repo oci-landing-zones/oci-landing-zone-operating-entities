@@ -75,3 +75,15 @@ OCI Landing Zone blueprints cover multiple layers: IAM, Network, Security, and O
 - **Vault** - Required for CIS v2 compliance. The option configured in our JSON security file is free, while alternative options may incur additional costs.
 
 Actual costs depend on your configuration, the services you enable, and the workloads you deploy.
+
+
+---
+
+### G7. What is an OCI Sovereign Landing Zone?
+
+A Sovereign Landing Zone (SLZ) is a specialized cloud environment tailored to meet strict data sovereignty, compliance, and security requirements, often mandated by government regulations or specific organizational policies. While all OCI landing zones are designed with enhanced security features, the Sovereign Landing Zone model is specifically recommended for organizations or government entities handling sensitive or regulated data. This model includes additional Sovereign Controls that ensure data remains within specified geographic or jurisdictional boundaries, reinforcing compliance with local data residency laws and regulations.
+
+To learn more about sovereign principles, check our [dedicated asset](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-sovereign-landing-zone).
+
+Check out our video series! We also cover this interesting topic in [Episode 4](https://www.youtube.com/watch?v=bn9gSIZ8tfU&list=PLPIzp-E1msrYh1wirCM52WO2gJBkwWe0X&index=5&t=3s)
+, duration 23':30''.
