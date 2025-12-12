@@ -21,7 +21,7 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 - [G4. What IaC approach does OCI Open LZ use?](./faq_general.md/#g4-what-iac-approach-does-oci-open-lz-use)
 - [G5. Does the landing zone comply with security best practices?](./faq_general.md/#g5-does-the-landing-zone-comply-with-security-best-practices)
 - [G6. What are the infrastructure costs when deploying an OCI Landing Zone?](./faq_general.md/#g6-what-are-the-infrastructure-costs-when-deploying-an-oci-landing-zone)
-- [G7. What is a OCI Sovereign Landing zone ?](./faq_general.md/#g7-what-is-an-oci-sovereign-landing-zone)
+- [G7. What is an OCI Sovereign Landing zone ?](./faq_general.md/#g7-what-is-an-oci-sovereign-landing-zone)
 
 </td>
 </tr>
