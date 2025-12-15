@@ -64,7 +64,7 @@
 
             route_tables: {
               'RT-PROD-OKE-CP-KEY': {
-                display_name: ' rt-fra-fdz-p-cp',
+                display_name: ' rt-fra-lzp-p-cp',
 
                 route_rules: {
                   sgw_route: {
@@ -77,7 +77,7 @@
               },
 
               'RT-PROD-OKE-INT-LB-KEY': {
-                display_name: 'rt-fra-fdz-p-lb',
+                display_name: 'rt-fra-lzp-p-lb',
 
                 route_rules: {
                   sgw_route: {
@@ -90,7 +90,7 @@
               },
 
               'RT-PROD-OKE-PODS-KEY': {
-                display_name: ' rt-fra-fdz-p-pods',
+                display_name: ' rt-fra-lzp-p-pods',
 
                 route_rules: {
                   sgw_route: {
@@ -103,7 +103,7 @@
               },
 
               'RT-PROD-OKE-WORKERS-KEY': {
-                display_name: ' rt-fra-fdz-p-workers',
+                display_name: ' rt-fra-lzp-p-workers',
 
                 route_rules: {
                   sgw_route: {
