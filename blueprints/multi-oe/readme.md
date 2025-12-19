@@ -25,8 +25,7 @@ Find below the guides to your design and deployment activities.
 |---|---|:-:|:-:|:-:|:-:|
 | 1 | High-level Design - MD | <img src="../../commons/images/icon_md.jpg" width="45">  |  [Available](/blueprints/multi-oe/generic_v1/design/readme.md) | *Available Soon* | [Available](/blueprints/multi-oe/service-providers/design/readme.md)
 | 2 | High-level Design - Drawio | <img src="../../commons/images/icon_drawio.jpg" width="30"> | [Available](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) | [Available](/blueprints/multi-oe/generic_v2/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) | [Available](/blueprints/multi-oe/service-providers/design/images/open-lz-multi-oe-service-providers.drawio) |
-| 3 | High-level Design - PDF | <img src="../../commons/images/icon_pdf.jpg" width="30"> | [Available](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.pdf) | -- | --
-| 4 |  Multi-stack Deployment for Distributed Declarative IaC Operations - Terraform + JSON | <img src="../../commons/images/icon_terraform.jpg" width="32"><img src="../../commons/images/icon_json.jpg" width="30"> | [Available](/blueprints/multi-oe/generic_v1/runtime/readme.md) | *Available Soon* | [Available](/blueprints/multi-oe/service-providers/runtime/readme.md)
+| 3 |  Multi-stack Deployment for Distributed Declarative IaC Operations - Terraform + JSON | <img src="../../commons/images/icon_terraform.jpg" width="32"><img src="../../commons/images/icon_json.jpg" width="30"> | [Available](/blueprints/multi-oe/generic_v1/runtime/readme.md) | *Available Soon* | [Available](/blueprints/multi-oe/service-providers/runtime/readme.md)
 
 
 &nbsp; 

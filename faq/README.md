@@ -1,6 +1,6 @@
 # 📚 Frequently Asked Questions
 
-<div align="center">
+
 
 ### Welcome to the OCI Operating Entities Landing Zone FAQ
 

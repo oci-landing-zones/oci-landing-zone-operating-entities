@@ -15,9 +15,7 @@ This model onboards **one Operating Entity (OE)** with its **environments**, **p
 |---|---|:-:|---|
 | 1 | High-level Design - MD | [<img src="../../commons/images/icon_md.jpg" width="45">](/blueprints/one-oe/design/readme.md)   |  [Available](/blueprints/one-oe/design/readme.md) |
 | 2 | High-level Design - Drawio | [ <img src="../../commons/images/icon_drawio.jpg" width="30"> ](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio) | [Available](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio)
-| 3 | High-level Design - PDF | <img src="../../commons/images/icon_pdf_grayed.jpg" width="30"> | *Available Soon* |
-| 4 | One-stack Deployment with Declarative IaC - Terraform + JSON| [<img src="../../commons/images/icon_terraform.jpg" width="32"><img src="../../commons/images/icon_json.jpg" width="30">](/blueprints/one-oe/runtime/one-stack/readme.md) | [Available](/blueprints/one-oe/runtime/one-stack/readme.md) |
-| 5 | Multi-stack Deployment for Distributed IaC Operations - Terraform + JSON |  <img src="../../commons/images/icon_terraform_grayed.jpg" width="32"><img src="../../commons/images/icon_json_grayed.jpg" width="30">  | *Available Soon* |
+| 3 | One-stack Deployment with Declarative IaC - Terraform + JSON| [<img src="../../commons/images/icon_terraform.jpg" width="32"><img src="../../commons/images/icon_json.jpg" width="30">](/blueprints/one-oe/runtime/one-stack/readme.md) | [Available](/blueprints/one-oe/runtime/one-stack/readme.md) |
 
 
 &nbsp; 
