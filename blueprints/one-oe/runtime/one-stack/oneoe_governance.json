@@ -4,14 +4,14 @@
 
         "namespaces": {
             "TAGNS-LZP-ROLE-KEY": {
-                "name"                    : "tn-lzp-role",
+                "name"                    : "tn-lz-role",
                 "description"             : "Tag namespace for Tag Based Access Controls of Landing Zone Roles.",
                 "is_retired"              : false,
 
                 "tags": {
                     "TAG-LZP-ROLE-KEY": {
                         "name"            : "name",
-                        "description"     : "Tag to identify the administrator role for Landing Zone network compartments.",
+                        "description"     : "Tag used to identify different administrative roles within the Landing Zone, across network and security compartments",
                         "is_cost_tracking": false,
                         "is_retired"      : false
                     }
