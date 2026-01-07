@@ -1,0 +1,499 @@
+{
+    "compartments_configuration": {
+        "enable_delete"                                       : "true",
+
+        "compartments": {
+            "CMP-LANDINGZONE-KEY": {
+                "name"                                        : "cmp-landingzone",
+                "description"                                 : "Enclosing Production Landing Zone Compartment",
+
+                "children": {
+                    "CMP-LZ-NETWORK-KEY": {
+                        "name"                                : "cmp-lz-network",
+                        "description"                         : "Shared Network Compartment",
+
+                        "defined_tags": {
+                            "tn-lz-role.name"                 : "lz-network-admin"
+                        }
+                    },
+
+                    "CMP-LZ-PLATFORM-KEY": {
+                        "name"                                : "cmp-lz-platform",
+                        "description"                         : "Shared Platform Compartment"
+                    },
+
+                    "CMP-LZ-PREPROD-KEY": {
+                        "name"                                : "cmp-lz-preprod",
+                        "description"                         : "Pre-Production Environment Compartment",
+
+                        "children": {
+                            "CMP-LZ-PREPROD-NETWORK-KEY": {
+                                "name"                        : "cmp-lz-preprod-network",
+                                "description"                 : "Pre-Production Workload Environment, Common Network Compartment",
+
+                                "defined_tags": {
+                                    "tn-lz-role.name"         : "lz-network-admin"
+                                }
+                            },
+
+                            "CMP-LZ-PREPROD-PLATFORM-KEY": {
+                                "name"                        : "cmp-lz-preprod-platform",
+                                "description"                 : "Pre-Production Workload Environment, Common Platform Compartment"
+                            },
+
+                            "CMP-LZ-PREPROD-PROJECTS-KEY": {
+                                "name"                        : "cmp-lz-preprod-projects",
+                                "description"                 : "One-OE Pre-Production Workload Environment, Common Projects Compartment",
+
+                                "children": {
+                                    "CMP-LZ-PREPROD-PROJ1-KEY": {
+                                        "name"                : "cmp-lz-preprod-proj1",
+                                        "description"         : "Pre-Production environment, Project 1 compartment"
+                                    }
+                                }
+                            },
+
+                            "CMP-LZ-PREPROD-SECURITY-KEY": {
+                                "name"                        : "cmp-lz-preprod-security",
+                                "description"                 : "Pre-Production Workload Environment, Common Security Compartment",
+
+                                "defined_tags": {
+                                    "tn-lz-role.name"         : "lz-security-admin"
+                                }
+                            }
+                        }
+                    },
+
+                    "CMP-LZ-PROD-KEY": {
+                        "name"                                : "cmp-lz-prod",
+                        "description"                         : "Production Environment Compartment",
+
+                        "children": {
+                            "CMP-LZ-PROD-NETWORK-KEY": {
+                                "name"                        : "cmp-lz-prod-network",
+                                "description"                 : "Prod Workload Environment, Common Network Compartment",
+
+                                "defined_tags": {
+                                    "tn-lz-role.name"         : "lz-network-admin"
+                                }
+                            },
+
+                            "CMP-LZ-PROD-PLATFORM-KEY": {
+                                "name"                        : "cmp-lz-prod-platform",
+                                "description"                 : "Production Workload Environment, Common Platform Compartment"
+                            },
+
+                            "CMP-LZ-PROD-PROJECTS-KEY": {
+                                "name"                        : "cmp-lz-prod-projects",
+                                "description"                 : "One-OE Production Workload Environment, Common Projects Compartment",
+
+                                "children": {
+                                    "CMP-LZ-PROD-PROJ1-KEY": {
+                                        "name"                : "cmp-lz-prod-proj1",
+                                        "description"         : "Production environment, Project 1 Compartment"
+                                    }
+                                }
+                            },
+
+                            "CMP-LZ-PROD-SECURITY-KEY": {
+                                "name"                        : "cmp-lz-prod-security",
+                                "description"                 : "Production Workload Environment, Common Security Compartment",
+
+                                "defined_tags": {
+                                    "tn-lz-role.name"         : "lz-security-admin"
+                                }
+                            }
+                        }
+                    },
+
+                    "CMP-LZ-SECURITY-KEY": {
+                        "name"                                : "cmp-lz-security",
+                        "description"                         : "Shared Security Compartment",
+
+                        "defined_tags": {
+                            "tn-lz-role.name"                 : "lz-security-admin"
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    "identity_domain_groups_configuration": {
+        "default_identity_domain_id"                          : "COMMON-DOMAIN",
+
+        "groups": {
+            "GRP-AUDITORS-ADMIN-KEY": {
+                "name"                                        : "grp-auditors-admin",
+                "description"                                 : "Tenancy global read access group(for security auditing or health checks)."
+            },
+
+            "GRP-COST-ADMIN-KEY": {
+                "name"                                        : "grp-cost-admin",
+                "description"                                 : "Tenancy global cost control group."
+            },
+
+            "GRP-IAM-ADMIN-KEY": {
+                "name"                                        : "grp-iam-admin",
+                "description"                                 : "Tenancy global Identity and access management administrator group."
+            },
+
+            "GRP-LZ-NETWORK-ADMIN-KEY": {
+                "name"                                        : "grp-lz-network-admin",
+                "description"                                 : "One-OE Landing Zone, Shared network administration group, including common OE network elements."
+            },
+
+            "GRP-LZ-PREPROD-PROJ1-ADMIN-KEY": {
+                "name"                                        : "grp-lz-preprod-proj1-admin",
+                "description"                                 : "One-OE Landing Zone, Pre-Production environment, Project 1, Administrators."
+            },
+
+            "GRP-LZ-PROD-PROJ1-ADMIN-KEY": {
+                "name"                                        : "grp-lz-prod-proj1-admin",
+                "description"                                 : "One-OE Landing Zone, Production environment, Project 1, Administrators."
+            },
+
+            "GRP-LZ-SECURITY-ADMIN-KEY": {
+                "name"                                        : "grp-lz-security-admin",
+                "description"                                 : "One-OE Landing Zone, Shared security administration group, including common OE network elements."
+            },
+
+            "GRP-SECURITY-ADMIN-KEY": {
+                "name"                                        : "grp-security-admin",
+                "description"                                 : "Tenancy Security Administrators for global resources as Cloud Guard."
+            }
+        }
+    },
+
+    "identity_domains_configuration": {
+        "default_compartment_id"                              : null,
+        "default_defined_tags"                                : null,
+        "default_freeform_tags"                               : null,
+
+        "identity_domains": {
+            "COMMON-DOMAIN": {
+                "display_name"                                : "id_lz_common",
+                "description"                                 : "One-OE LZ common Identity Domain",
+                "compartment_id"                              : null,
+                "admin_email"                                 : null,
+                "admin_first_name"                            : null,
+                "admin_last_name"                             : null,
+                "admin_user_name"                             : null,
+                "allow_signing_cert_public_access"            : false,
+                "home_region"                                 : null,
+                "is_hidden_on_login"                          : false,
+                "is_notification_bypassed"                    : false,
+                "is_primary_email_required"                   : false,
+                "license_type"                                : "free",
+                "replica_region"                              : null
+            }
+        }
+    },
+
+    "policies_configuration": {
+        "enable_cis_benchmark_checks"                         : "false",
+
+        "supplied_policies": {
+            "PCY-AUDITING-ADMIN-KEY": {
+                "name"                                        : "pcy-auditing-admin",
+                "description"                                 : "Allow grp-auditors-admin group users to read all the resources in the tenancy.",
+                "compartment_id"                              : "TENANCY-ROOT",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to inspect all-resources in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read instances in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read load-balancers in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read buckets in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read nat-gateways in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read public-ips in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read file-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read instance-configurations in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read network-security-groups in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read resource-availability in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read audit-events in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read users in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to use cloud-shell in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read vss-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read usage-budgets in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read usage-reports in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read data-safe-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read vaults in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read keys in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read tag-namespaces in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to read serviceconnectors in tenancy",
+                    "allow group 'id_lz_common'/'grp-auditors-admin' to use ons-family in tenancy where any {request.operation!=/Create*/, request.operation!=/Update*/, request.operation!=/Delete*/, request.operation!=/Change*/}"
+                ]
+            },
+
+            "PCY-COST-ADMIN-KEY": {
+                "name"                                        : "pcy-cost-admin",
+                "description"                                 : "Allow grp-cost-admin group users to manage all budget resources in the tenancy.",
+                "compartment_id"                              : "TENANCY-ROOT",
+
+                "statements": [
+                    "define tenancy usage-report as ocid1.tenancy.oc1..aaaaaaaaned4fkpkisbwjlr56u7cj63lf3wffbilvqknstgtvzub7vhqkggq",
+                    "endorse group 'id_lz_common'/'grp-cost-admin' to read objects in tenancy usage-report",
+                    "allow group 'id_lz_common'/'grp-cost-admin' to manage usage-report in tenancy",
+                    "allow group 'id_lz_common'/'grp-cost-admin' to manage usage-budgets in tenancy"
+                ]
+            },
+
+            "PCY-GENERIC-ADMIN-KEY": {
+                "name"                                        : "pcy-generic-admin",
+                "description"                                 : "Allow defined groups to use generic services.",
+                "compartment_id"                              : "TENANCY-ROOT",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to use cloud-shell in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to use cloud-shell-public-network in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to read usage-budgets in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to read usage-reports in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to read objectstorage-namespaces in tenancy",
+                    "allow any-user to inspect tag-namespaces in tenancy where target.tag-namespace.name='tn-lz-role'"
+                ]
+            },
+
+            "PCY-IAM-ADMIN-KEY": {
+                "name"                                        : "pcy-iam-admin",
+                "description"                                 : "Allow grp-iam-admin group users to manage IAM resources in the tenancy.",
+                "compartment_id"                              : "TENANCY-ROOT",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage policies in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage users in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to inspect groups in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage groups in tenancy where all {target.group.name != 'Administrators'}",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage identity-providers in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage dynamic-groups in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage authentication-policies in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage network-sources in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage quota in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage tag-defaults in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage tag-namespaces in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage orm-jobs in tenancy",
+                    "allow group 'id_lz_common'/'grp-iam-admin' to manage orm-config-source-providers in tenancy"
+                ]
+            },
+
+            "PCY-LZ-NETWORK-ADMIN-KEY": {
+                "name"                                        : "pcy-lz-network-admin",
+                "description"                                 : "Allow grp-lz-network-admin group users to manage all network resources in the child compartments of cmp-landingzone with the matching tags.",
+                "compartment_id"                              : "CMP-LANDINGZONE-KEY",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage dns in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage load-balancers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage instance-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage volume-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage object-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage file-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage bastion-session in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read instance-agent-plugins in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use key-delegate in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage repos in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read vss-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read ons-topics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use bastion in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use bastion-session in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))"
+                ]
+            },
+
+            "PCY-LZ-PREPROD-PROJ1-ADMIN-KEY": {
+                "name"                                        : "pcy-lz-preprod-proj1-admin",
+                "description"                                 : "Allow grp-lz-preprod-proj1-admin group to use shared resources and manage their dedicated project 1 compartment",
+                "compartment_id"                              : "CMP-LZ-PREPROD-KEY",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use virtual-network-family in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use subnets in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use vnics in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage private-ips in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read ons-topics in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use vaults in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage instance-images in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use vss-family in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use bastion in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read logging-family in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read all-resources in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read bucket in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to inspect object in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read audit-events in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read work-requests in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read instance-agent-plugins in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use network-security-groups in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use load-balancers in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use vnics in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use key-delegate in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage api-gateway-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage streams in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage cluster-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage alarms in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage metrics in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage logging-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage instance-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage volume-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1 where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage object-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1 where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage file-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1 where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage repos in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage orm-stacks in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage orm-jobs in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage orm-config-source-providers in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage bastion-session in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage cloudevents-rules in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage keys in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage secret-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage database-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage autonomous-database-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage data-safe-family in compartment cmp-lz-preprod-projects:cmp-lz-preprod-proj1"
+                ]
+            },
+
+            "PCY-LZ-PROD-PROJ1-ADMIN-KEY": {
+                "name"                                        : "pcy-lz-prod-proj1-admin",
+                "description"                                 : "Allow grp-lz-prod-proj1-admin group to use shared resources and manage their dedicated project 1 compartment",
+                "compartment_id"                              : "CMP-LZ-PROD-KEY",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use virtual-network-family in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use subnets in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use vnics in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage private-ips in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read ons-topics in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use vaults in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage instance-images in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use vss-family in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use bastion in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read logging-family in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read all-resources in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read bucket in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to inspect object in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read audit-events in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read work-requests in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read instance-agent-plugins in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use network-security-groups in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use load-balancers in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use vnics in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use key-delegate in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage api-gateway-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage streams in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage cluster-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage alarms in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage metrics in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage logging-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage instance-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage volume-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1 where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage object-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1 where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage file-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1 where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage repos in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage orm-stacks in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage orm-jobs in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage orm-config-source-providers in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage bastion-session in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage cloudevents-rules in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage keys in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage secret-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage database-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage autonomous-database-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage data-safe-family in compartment cmp-lz-prod-projects:cmp-lz-prod-proj1"
+                ]
+            },
+
+            "PCY-LZ-SECURITY-ADMIN-KEY": {
+                "name"                                        : "pcy-lz-security-admin",
+                "description"                                 : "Allow grp-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
+                "compartment_id"                              : "CMP-LANDINGZONE-KEY",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-namespaces in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-defaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage repos in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read app-catalog-listing in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-images in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to inspect buckets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage instance-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage volume-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage object-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage file-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage serviceconnectors in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage streams in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage functions-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage waas-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage security-zone in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage vss-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage bastion-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-agent-plugins in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use key-delegate in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use subnets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use network-security-groups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage private-ips in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage operator-control-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))"
+                ]
+            },
+
+            "PCY-SECURITY-ADMIN-KEY": {
+                "name"                                        : "pcy-security-admin",
+                "description"                                 : "Allow grp-security-admin group users to manage all security resources in the security compartment.",
+                "compartment_id"                              : "TENANCY-ROOT",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-security-admin' to manage cloudevents-rules in tenancy",
+                    "allow group 'id_lz_common'/'grp-security-admin' to manage cloud-guard-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-security-admin' to read tenancies in tenancy"
+                ]
+            },
+
+            "PCY-SERVICES-ADMIN-KEY": {
+                "name"                                        : "pcy-services-admin",
+                "description"                                 : "Policy for all supported services in the tenancy.",
+                "compartment_id"                              : "TENANCY-ROOT",
+
+                "statements": [
+                    "allow service cloudguard to manage cloudevents-rules in tenancy where target.rule.type='managed'",
+                    "allow service cloudguard to read tenancies in tenancy",
+                    "allow service cloudguard to read all-resources in tenancy",
+                    "allow service cloudguard to use network-security-groups in tenancy",
+                    "allow any-user to { WLP_BOM_READ, WLP_CONFIG_READ } in tenancy where all { request.principal.id = target.agent.id, request.principal.type = 'workloadprotectionagent'}",
+                    "endorse any-user to { WLP_LOG_CREATE, WLP_METRICS_CREATE, WLP_ADHOC_QUERY_READ, WLP_ADHOC_RESULTS_CREATE } in any-tenancy where all { request.principal.id = target.agent.id, request.principal.type = 'workloadprotectionagent' }",
+                    "allow service vulnerability-scanning-service to manage instances in tenancy",
+                    "allow service vulnerability-scanning-service to read compartments in tenancy",
+                    "allow service vulnerability-scanning-service to read repos in tenancy",
+                    "allow service vulnerability-scanning-service to read vnics in tenancy",
+                    "allow service vulnerability-scanning-service to read vnic-attachments in tenancy",
+                    "allow service osms to read instances in tenancy",
+                    "allow service blockstorage, oke, streaming, Fssoc1Prod, objectstorage-eu-frankfurt-1 to use keys in tenancy"
+                ]
+            }
+        }
+    }
+}
