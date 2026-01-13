@@ -34,7 +34,7 @@ There are  **four deployment steps** to provision OCVS landing zone extension:
 &nbsp; 
 # License <!-- omit from toc -->
 
-Copyright (c) 2025 Oracle and/or its affiliates.
+Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 

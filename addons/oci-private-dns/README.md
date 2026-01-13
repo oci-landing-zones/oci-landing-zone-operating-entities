@@ -157,7 +157,7 @@ This Private DNS configuration in a Hub and Spoke architecture ensures that all 
 &nbsp; 
 
 #### License
-Copyright (c) 2025 Oracle and/or its affiliates.
+Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 

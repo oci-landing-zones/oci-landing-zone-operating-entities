@@ -120,7 +120,7 @@ You can proceed to [Exercise 2](/addons/oci-learn-lz/exercise2/readme.md).
 
 # License
 
-Copyright (c) 2025 Oracle and/or its affiliates.
+Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
