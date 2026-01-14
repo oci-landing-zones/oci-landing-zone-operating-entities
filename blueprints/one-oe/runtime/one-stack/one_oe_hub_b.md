@@ -15,7 +15,10 @@ The diagram provides a comprehensive visual representation of the key OCI resour
 &nbsp; 
 
 > [!NOTE]
-> *In the JSON configurations, the default OCI region is set to Frankfurt, and this is reflected in the naming conventions (e.g., vcn-**fra**-lz-hub). For deployments in other regions, the JSON configurations must be updated accordingly to ensure that the resource names align with the target region.*
+>
+> - **This stack deploys OCI Network Firewall and will incur additional OCI service costs.**
+> 
+> - In the JSON configurations, the default OCI region is set to Frankfurt, and this is reflected in the naming conventions (e.g., vcn-**fra**-lz-hub). For deployments in other regions, the JSON configurations must be updated accordingly to ensure that the resource names align with the target region.
 
 &nbsp;
 
@@ -63,7 +66,7 @@ And follow these steps:
   
 
   1. **Network - Routing**:</br>
-     - Use the [oneoe_network_hub_b.json](oneoe_network_hub_b.json) configuration file and update all fields labeled "OCI NFW PRIVATE IP OCID" with the Private IP OCID of the OCI Network Firewall deployed in Step 1.
+     - Use the [oneoe_network_hub_b.json](oneoe_network_hub_b.json) configuration file and update all fields labeled "OCI NFW PRIVATE IP OCID" with the Private IP OCID of the OCI Network Firewall deployed in Step 1 ([how to obtain the Network Firewall Private IP OCID](../../../commons/content/howto_identify_private_ip_ocid_network_firewall.md)).
      - After updating the file, edit the ORM stack and replace the previous [oneoe_network_hub_b_pre.json](oneoe_network_hub_b_pre.json) network configuration with [oneoe_network_hub_b.json](oneoe_network_hub_b.json). This updated JSON file now includes the Private IP (OCID) of the OCI Network Firewall and ensures it is referenced correctly in the associated route tables.
   
   2. **Security - Security Zones, Vulnerability Scanning Service**:</br></br>

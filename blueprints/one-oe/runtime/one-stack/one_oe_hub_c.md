@@ -15,9 +15,9 @@ The diagram provides a comprehensive visual representation of the key OCI resour
 &nbsp; 
 
 > [!NOTE]
-> *The JSON configuration does not include the deployment of third-party Firewalls; these are depicted in the diagram for illustrative purposes only.*
+> - The JSON configuration does not include the deployment of third-party Firewalls; these are depicted in the diagram for illustrative purposes only.
 > 
-> *In the JSON configurations, the default OCI region is set to Frankfurt, and this is reflected in the naming conventions (e.g., vcn-**fra**-lz-hub). For deployments in other regions, the JSON configurations must be updated accordingly to ensure that the resource names align with the target region.*
+> - In the JSON configurations, the default OCI region is set to Frankfurt, and this is reflected in the naming conventions (e.g., vcn-**fra**-lz-hub). For deployments in other regions, the JSON configurations must be updated accordingly to ensure that the resource names align with the target region.
 
 &nbsp;
 
