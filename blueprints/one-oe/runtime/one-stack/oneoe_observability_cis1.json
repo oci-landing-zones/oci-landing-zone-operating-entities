@@ -4,7 +4,7 @@
 
         "alarms": {
             "AL-LZ-NETWORK-LB-KEY": {
-                "display_name"                        : "al-lz-lb-unhealthy-backend",
+                "display_name"                        : "al-lz-network-lb",
                 "destination_topic_ids"               : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                          : "false",
 
@@ -22,10 +22,10 @@
         "default_compartment_id"                      : "CMP-LANDINGZONE-KEY",
 
         "event_rules": {
-            "RUL-LZ-NOTIFICATION-NETWORK-KEY": {
+            "RUL-LZ-NOTIFY-NETWORK-KEY": {
                 "compartment_id"                      : "CMP-LZ-NETWORK-KEY",
                 "destination_topic_ids"               : ["NOTT-LZ-NETWORK-KEY"],
-                "event_display_name"                  : "rul-lz-notify-on-notifications-net-changes",
+                "event_display_name"                  : "rul-lz-notify-network",
 
                 "supplied_events": [
                     "com.oraclecloud.virtualnetwork.createvcn",
@@ -74,10 +74,10 @@
                 ]
             },
 
-            "RUL-LZ-NOTIFICATION-SECURITY-KEY": {
+            "RUL-LZ-NOTIFY-SECURITY-KEY": {
                 "compartment_id"                      : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"               : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"                  : "rul-lz-notify-on-notifications-sec-changes",
+                "event_display_name"                  : "rul-lz-notify-security",
 
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
@@ -89,10 +89,10 @@
                 ]
             },
 
-            "RUL-LZ-PREPROD-NOTIFICATION-NETWORK-KEY": {
+            "RUL-LZ-PREPROD-NOTIFY-NETWORK-KEY": {
                 "compartment_id"                      : "CMP-LZ-PREPROD-NETWORK-KEY",
                 "destination_topic_ids"               : ["NOTT-LZ-NETWORK-KEY"],
-                "event_display_name"                  : "rul-lz-preprod-notify-on-notifications-net-changes-rule",
+                "event_display_name"                  : "rul-lz-preprod-notify-network",
 
                 "supplied_events": [
                     "com.oraclecloud.virtualnetwork.createvcn",
@@ -141,10 +141,10 @@
                 ]
             },
 
-            "RUL-LZ-PREPROD-NOTIFICATION-SECURITY-KEY": {
+            "RUL-LZ-PREPROD-NOTIFY-SECURITY-KEY": {
                 "compartment_id"                      : "CMP-LZ-PREPROD-SECURITY-KEY",
                 "destination_topic_ids"               : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"                  : "rul-lz-preprod-notify-on-notifications-sec-changes",
+                "event_display_name"                  : "rul-lz-preprod-notify-security",
 
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
@@ -156,10 +156,10 @@
                 ]
             },
 
-            "RUL-LZ-PROD-NOTIFICATION-NETWORK-KEY": {
+            "RUL-LZ-PROD-NOTIFY-NETWORK-KEY": {
                 "compartment_id"                      : "CMP-LZ-PROD-NETWORK-KEY",
                 "destination_topic_ids"               : ["NOTT-LZ-NETWORK-KEY"],
-                "event_display_name"                  : "rul-lz-prod-notify-on-notifications-net-changes-rule",
+                "event_display_name"                  : "rul-lz-prod-notify-network",
 
                 "supplied_events": [
                     "com.oraclecloud.virtualnetwork.createvcn",
@@ -208,10 +208,10 @@
                 ]
             },
 
-            "RUL-LZ-PROD-NOTIFICATION-SECURITY-KEY": {
+            "RUL-LZ-PROD-NOTIFY-SECURITY-KEY": {
                 "compartment_id"                      : "CMP-LZ-PROD-SECURITY-KEY",
                 "destination_topic_ids"               : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"                  : "rul-lz-prod-notify-on-notifications-sec-changes",
+                "event_display_name"                  : "rul-lz-prod-notify-security",
 
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
@@ -376,7 +376,7 @@
             },
 
             "NOTT-LZ-SECURITY-KEY": {
-                "name"                                : "nott-lz-notifications",
+                "name"                                : "nott-lz-security",
                 "description"                         : "Topic for notifications.",
                 "compartment_id"                      : "CMP-LZ-SECURITY-KEY",
 
@@ -395,15 +395,15 @@
 
         "buckets": {
             "BKT-LZ-SERVICE-CONNECTOR": {
-                "name"                                : "bkt-lz-audit",
+                "name"                                : "bkt-lz-service-connector",
                 "compartment_id"                      : "CMP-LZ-SECURITY-KEY",
                 "cis_level"                           : "1"
             }
         },
 
         "service_connectors": {
-            "SCH-LZ-MON": {
-                "display_name"                        : "sch-lz-mon",
+            "SCH-LZ-MONITOR-KEY": {
+                "display_name"                        : "sch-lz-monitor",
 
                 "policy": {
                     "name"                            : "service-connector-audit-policy",
@@ -422,7 +422,7 @@
                 },
 
                 "target": {
-                    "bucket_name"                     : "bkt-lz-audit",
+                    "bucket_name"                     : "bkt-lz-service-connector",
                     "bucket_object_name_prefix"       : "sch",
                     "kind"                            : "objectstorage"
                 }
