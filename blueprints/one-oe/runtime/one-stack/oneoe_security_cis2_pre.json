@@ -1,16 +1,16 @@
 {
     "cloud_guard_configuration": {
-        "compartment_id"            : "TENANCY-ROOT",
-        "reporting_region"          : "eu-frankfurt-1",
-        "self_manage_resources"     : false,
+        "compartment_id"                          : "TENANCY-ROOT",
+        "reporting_region"                        : "eu-frankfurt-1",
+        "self_manage_resources"                   : false,
 
         "targets": {
             "CG-TGT-ROOT-KEY": {
-                "name"              : "cg-tgt-root",
-                "compartment_id"    : "TENANCY-ROOT",
-                "resource_id"       : "TENANCY-ROOT",
-                "resource_type"     : "COMPARTMENT",
-                "use_cloned_recipes": true
+                "name"                            : "cg-tgt-root",
+                "compartment_id"                  : "TENANCY-ROOT",
+                "resource_id"                     : "TENANCY-ROOT",
+                "resource_type"                   : "COMPARTMENT",
+                "use_cloned_recipes"              : true
             }
         }
     },

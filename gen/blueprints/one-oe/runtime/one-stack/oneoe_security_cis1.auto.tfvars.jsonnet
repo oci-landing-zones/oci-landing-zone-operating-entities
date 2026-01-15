@@ -14,9 +14,9 @@
       }
    },
    "scanning_configuration": {
-      "default_compartment_id": "CMP-LZP-SECURITY-KEY",
+      "default_compartment_id": "CMP-LZ-SECURITY-KEY",
       "host_recipes": {
-         "VSS-RECH-LZP-KEY": {
+         "VSS-RCPH-LZ-KEY": {
             "agent_settings": {
                "cis_benchmark_scan_level": "STRICT",
                "scan_level": "STANDARD",
@@ -30,7 +30,7 @@
                "operating_system": "LINUX",
                "scan_recurrence": "FREQ=WEEKLY;INTERVAL=2;WKST=SU"
             },
-            "name": "vss-rech-lzp",
+            "name": "vss-rcph-lz",
             "port_scan_level": "STANDARD",
             "schedule_settings": {
                "day_of_week": "SUNDAY",
@@ -39,32 +39,32 @@
          }
       },
       "host_targets": {
-         "VSS-TGT-LZP-KEY": {
-            "host_recipe_id": "VSS-RECH-LZP-KEY",
-            "name": "vss-tgt-lzp",
-            "target_compartment_id": "CMP-LANDINGZONE-P-KEY"
+         "VSS-TGTH-LZ-KEY": {
+            "host_recipe_id": "VSS-RCPH-LZ-KEY",
+            "name": "vss-tgth-lz",
+            "target_compartment_id": "CMP-LANDINGZONE-KEY"
          }
       }
    },
    "security_zones_configuration": {
       "recipes": {
-         "SZ-RCP-LZP-01-CIS-LVL-1-KEY": {
+         "SZ-RCP-LZ-01-CIS-L1-KEY": {
             "cis_level": "1",
-            "compartment_id": "CMP-LZP-SECURITY-KEY",
+            "compartment_id": "CMP-LZ-SECURITY-KEY",
             "description": "Recipe 01 CIS Level 1",
-            "name": "sz-rcp-lzp-01-CIS-Level-1"
+            "name": "sz-rcp-lz-01-cis-l1"
          },
-         "SZ-RCP-LZP-02-CIS-LVL-2-KEY": {
+         "SZ-RCP-LZ-02-CIS-L2-KEY": {
             "cis_level": "2",
-            "compartment_id": "CMP-LZP-SECURITY-KEY",
+            "compartment_id": "CMP-LZ-SECURITY-KEY",
             "description": "Recipe 02 CIS Level 2",
-            "name": "sz-rcp-lzp-02-CIS-Level-2"
+            "name": "sz-rcp-lz-02-cis-l2"
          },
-         "SZ-RCP-LZP-03-SHARED-NETWORK-KEY": {
+         "SZ-RCP-LZ-03-SHARED-NETWORK-KEY": {
             "cis_level": "2",
-            "compartment_id": "CMP-LZP-SECURITY-KEY",
+            "compartment_id": "CMP-LZ-SECURITY-KEY",
             "description": "Recipe 03 Shared Network",
-            "name": "sz-rcp-lzp-03-shared-network",
+            "name": "sz-rcp-lz-03-shared-network",
             "security_policies_ocids": [
                "ocid1.securityzonessecuritypolicy.oc1..aaaaaaaavolswrbfqy6qn2qe7zek2dumml6pbmyzv47q6jfwdatrywmqumba",
                "ocid1.securityzonessecuritypolicy.oc1..aaaaaaaayxn5ccbavcx5w35uoozguju5zlovvtbnuvnrduxpdp3vsho33lba",
@@ -72,11 +72,11 @@
                "ocid1.securityzonessecuritypolicy.oc1..aaaaaaaaw6v2nz4unovq3joqk6pguxpaqriws2vzd7gvpldgai47tl72wseq"
             ]
          },
-         "SZ-RCP-LZP-04-ENV-NETWORK-KEY": {
+         "SZ-RCP-LZ-04-ENVIRONMENT-NETWORK-KEY": {
             "cis_level": "2",
-            "compartment_id": "CMP-LZP-SECURITY-KEY",
+            "compartment_id": "CMP-LZ-SECURITY-KEY",
             "description": "Recipe 04 Environment Network",
-            "name": "sz-rcp-lzp-04-environment-network",
+            "name": "sz-rcp-lz-04-environment-network",
             "security_policies_ocids": [
                "ocid1.securityzonessecuritypolicy.oc1..aaaaaaaavolswrbfqy6qn2qe7zek2dumml6pbmyzv47q6jfwdatrywmqumba",
                "ocid1.securityzonessecuritypolicy.oc1..aaaaaaaayxn5ccbavcx5w35uoozguju5zlovvtbnuvnrduxpdp3vsho33lba",
@@ -88,11 +88,11 @@
                "ocid1.securityzonessecuritypolicy.oc1..aaaaaaaamewv6k5a7cik6ds6m6bsijwkiixpfzgsqzvrjlns5pxg6lslrzgq"
             ]
          },
-         "SZ-RCP-LZP-05-WORKLOADS-KEY": {
+         "SZ-RCP-LZ-05-WORKLOAD-KEY": {
             "cis_level": "2",
-            "compartment_id": "CMP-LZP-SECURITY-KEY",
-            "description": "Recipe 05 Workloads",
-            "name": "sz-rcp-lzp-05-workloads",
+            "compartment_id": "CMP-LZ-SECURITY-KEY",
+            "description": "Recipe 05 Workload",
+            "name": "sz-rcp-lz-05-workload",
             "security_policies_ocids": [
                "ocid1.securityzonessecuritypolicy.oc1..aaaaaaaavolswrbfqy6qn2qe7zek2dumml6pbmyzv47q6jfwdatrywmqumba",
                "ocid1.securityzonessecuritypolicy.oc1..aaaaaaaayxn5ccbavcx5w35uoozguju5zlovvtbnuvnrduxpdp3vsho33lba",
@@ -127,10 +127,10 @@
       },
       "reporting_region": "eu-frankfurt-1",
       "security_zones": {
-         "SZ-TGT-LZP-CISL1-KEY": {
-            "compartment_id": "CMP-LANDINGZONE-P-KEY",
-            "name": "sz-tgt-lzp-cisl1",
-            "recipe_key": "SZ-RCP-LZP-01-CIS-LVL-1-KEY"
+         "SZ-TGT-LZ-CIS-L1-KEY": {
+            "compartment_id": "CMP-LANDINGZONE-KEY",
+            "name": "sz-tgt-lz-cis-l1",
+            "recipe_key": "SZ-RCP-LZ-01-CIS-L1-KEY"
          }
       },
       "tenancy_ocid": "TENANCY-ROOT"

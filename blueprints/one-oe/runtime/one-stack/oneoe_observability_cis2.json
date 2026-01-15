@@ -1,31 +1,31 @@
 {
     "alarms_configuration": {
-        "default_compartment_id"                      : "CMP-LZ-NETWORK-KEY",
+        "default_compartment_id"                : "CMP-LZ-NETWORK-KEY",
 
         "alarms": {
             "AL-LZ-NETWORK-LB-KEY": {
-                "display_name"                        : "al-lz-network-lb",
-                "destination_topic_ids"               : ["NOTT-LZ-NETWORK-KEY"],
-                "is_enabled"                          : "false",
+                "display_name"                  : "al-lz-network-lb",
+                "destination_topic_ids"         : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                    : "false",
 
                 "supplied_alarm": {
-                    "message_format"                  : "PRETTY_JSON",
-                    "namespace"                       : "oci_lbaas",
-                    "pending_duration"                : "PT5M",
-                    "query"                           : "UnHealthyBackendServers[1m].mean() >= 0"
+                    "message_format"            : "PRETTY_JSON",
+                    "namespace"                 : "oci_lbaas",
+                    "pending_duration"          : "PT5M",
+                    "query"                     : "UnHealthyBackendServers[1m].mean() >= 0"
                 }
             }
         }
     },
 
     "events_configuration": {
-        "default_compartment_id"                      : "CMP-LANDINGZONE-KEY",
+        "default_compartment_id"                : "CMP-LANDINGZONE-KEY",
 
         "event_rules": {
             "RUL-LZ-NOTIFY-NETWORK-KEY": {
-                "compartment_id"                      : "CMP-LZ-NETWORK-KEY",
-                "destination_topic_ids"               : ["NOTT-LZ-NETWORK-KEY"],
-                "event_display_name"                  : "rul-lz-notify-network",
+                "compartment_id"                : "CMP-LZ-NETWORK-KEY",
+                "destination_topic_ids"         : ["NOTT-LZ-NETWORK-KEY"],
+                "event_display_name"            : "rul-lz-notify-network",
 
                 "supplied_events": [
                     "com.oraclecloud.virtualnetwork.createvcn",
@@ -75,9 +75,9 @@
             },
 
             "RUL-LZ-NOTIFY-SECURITY-KEY": {
-                "compartment_id"                      : "CMP-LZ-SECURITY-KEY",
-                "destination_topic_ids"               : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"                  : "rul-lz-notify-security",
+                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"         : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"            : "rul-lz-notify-security",
 
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
@@ -90,9 +90,9 @@
             },
 
             "RUL-LZ-PREPROD-NOTIFY-NETWORK-KEY": {
-                "compartment_id"                      : "CMP-LZ-PREPROD-NETWORK-KEY",
-                "destination_topic_ids"               : ["NOTT-LZ-NETWORK-KEY"],
-                "event_display_name"                  : "rul-lz-preprod-notify-network",
+                "compartment_id"                : "CMP-LZ-PREPROD-NETWORK-KEY",
+                "destination_topic_ids"         : ["NOTT-LZ-NETWORK-KEY"],
+                "event_display_name"            : "rul-lz-preprod-notify-network",
 
                 "supplied_events": [
                     "com.oraclecloud.virtualnetwork.createvcn",
@@ -142,9 +142,9 @@
             },
 
             "RUL-LZ-PREPROD-NOTIFY-SECURITY-KEY": {
-                "compartment_id"                      : "CMP-LZ-PREPROD-SECURITY-KEY",
-                "destination_topic_ids"               : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"                  : "rul-lz-preprod-notify-security",
+                "compartment_id"                : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "destination_topic_ids"         : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"            : "rul-lz-preprod-notify-security",
 
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
@@ -157,9 +157,9 @@
             },
 
             "RUL-LZ-PROD-NOTIFY-NETWORK-KEY": {
-                "compartment_id"                      : "CMP-LZ-PROD-NETWORK-KEY",
-                "destination_topic_ids"               : ["NOTT-LZ-NETWORK-KEY"],
-                "event_display_name"                  : "rul-lz-prod-notify-network",
+                "compartment_id"                : "CMP-LZ-PROD-NETWORK-KEY",
+                "destination_topic_ids"         : ["NOTT-LZ-NETWORK-KEY"],
+                "event_display_name"            : "rul-lz-prod-notify-network",
 
                 "supplied_events": [
                     "com.oraclecloud.virtualnetwork.createvcn",
@@ -209,9 +209,9 @@
             },
 
             "RUL-LZ-PROD-NOTIFY-SECURITY-KEY": {
-                "compartment_id"                      : "CMP-LZ-PROD-SECURITY-KEY",
-                "destination_topic_ids"               : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"                  : "rul-lz-prod-notify-security",
+                "compartment_id"                : "CMP-LZ-PROD-SECURITY-KEY",
+                "destination_topic_ids"         : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"            : "rul-lz-prod-notify-security",
 
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
@@ -226,12 +226,12 @@
     },
 
     "home_region_events_configuration": {
-        "default_compartment_id"                      : "TENANCY-ROOT",
+        "default_compartment_id"                : "TENANCY-ROOT",
 
         "event_rules": {
             "RUL-LZ-CLOUDGUARD-KEY": {
-                "destination_topic_ids"               : ["NOTT-LZ-CLOUDGUARD-KEY"],
-                "event_display_name"                  : "rul-lz-notify-on-cloudguard-changes",
+                "destination_topic_ids"         : ["NOTT-LZ-CLOUDGUARD-KEY"],
+                "event_display_name"            : "rul-lz-notify-on-cloudguard-changes",
 
                 "supplied_events": [
                     "com.oraclecloud.cloudguard.problemdetected",
@@ -244,8 +244,8 @@
             },
 
             "RUL-LZ-IAM-KEY": {
-                "destination_topic_ids"               : ["NOTT-LZ-IAM-KEY"],
-                "event_display_name"                  : "rul-lz-notify-on-iam-changes",
+                "destination_topic_ids"         : ["NOTT-LZ-IAM-KEY"],
+                "event_display_name"            : "rul-lz-notify-on-iam-changes",
 
                 "supplied_events": [
                     "com.oraclecloud.identitycontrolplane.createidentityprovider",
@@ -275,115 +275,115 @@
     },
 
     "logging_configuration": {
-        "default_compartment_id"                      : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
         "flow_logs": {
             "LOG-LZ-PREPROD-SUBNET-FLOW-KEY": {
-                "log_group_id"                        : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
-                "target_compartment_ids"              : ["CMP-LZ-PREPROD-NETWORK-KEY"],
-                "target_resource_type"                : "subnet"
+                "log_group_id"                  : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"          : "subnet"
             },
 
             "LOG-LZ-PREPROD-VCN-FLOW-KEY": {
-                "log_group_id"                        : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
-                "target_compartment_ids"              : ["CMP-LZ-PREPROD-NETWORK-KEY"],
-                "target_resource_type"                : "vcn"
+                "log_group_id"                  : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"          : "vcn"
             },
 
             "LOG-LZ-PROD-SUBNET-FLOW-KEY": {
-                "log_group_id"                        : "LGRP-LZ-PROD-VCN-FLOW-KEY",
-                "target_compartment_ids"              : ["CMP-LZ-PROD-NETWORK-KEY"],
-                "target_resource_type"                : "subnet"
+                "log_group_id"                  : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"          : "subnet"
             },
 
             "LOG-LZ-PROD-VCN-FLOW-KEY": {
-                "log_group_id"                        : "LGRP-LZ-PROD-VCN-FLOW-KEY",
-                "target_compartment_ids"              : ["CMP-LZ-PROD-NETWORK-KEY"],
-                "target_resource_type"                : "vcn"
+                "log_group_id"                  : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"          : "vcn"
             },
 
             "LOG-LZ-SUBNET-FLOW-KEY": {
-                "log_group_id"                        : "LGRP-LZ-VCN-FLOW-KEY",
-                "target_compartment_ids"              : ["CMP-LZ-NETWORK-KEY"],
-                "target_resource_type"                : "subnet"
+                "log_group_id"                  : "LGRP-LZ-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-NETWORK-KEY"],
+                "target_resource_type"          : "subnet"
             },
 
             "LOG-LZ-VCN-FLOW-KEY": {
-                "log_group_id"                        : "LGRP-LZ-VCN-FLOW-KEY",
-                "target_compartment_ids"              : ["CMP-LZ-NETWORK-KEY"],
-                "target_resource_type"                : "vcn"
+                "log_group_id"                  : "LGRP-LZ-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-NETWORK-KEY"],
+                "target_resource_type"          : "vcn"
             }
         },
 
         "log_groups": {
             "LGRP-LZ-PREPROD-VCN-FLOW-KEY": {
-                "name"                                : "lgrp-lz-preprod-vcn-flow",
-                "compartment_id"                      : "CMP-LZ-PREPROD-SECURITY-KEY"
+                "name"                          : "lgrp-lz-preprod-vcn-flow",
+                "compartment_id"                : "CMP-LZ-PREPROD-SECURITY-KEY"
             },
 
             "LGRP-LZ-PROD-VCN-FLOW-KEY": {
-                "name"                                : "lgrp-lz-prod-vcn-flow",
-                "compartment_id"                      : "CMP-LZ-PROD-SECURITY-KEY"
+                "name"                          : "lgrp-lz-prod-vcn-flow",
+                "compartment_id"                : "CMP-LZ-PROD-SECURITY-KEY"
             },
 
             "LGRP-LZ-VCN-FLOW-KEY": {
-                "name"                                : "lgrp-lz-vcn-flow"
+                "name"                          : "lgrp-lz-vcn-flow"
             }
         }
     },
 
     "notifications_configuration": {
-        "default_compartment_id"                      : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
         "topics": {
             "NOTT-LZ-CLOUDGUARD-KEY": {
-                "name"                                : "nott-lz-cloudguard",
-                "description"                         : "Topic for Cloud Guard related notifications.",
-                "compartment_id"                      : "CMP-LZ-SECURITY-KEY",
+                "name"                          : "nott-lz-cloudguard",
+                "description"                   : "Topic for Cloud Guard related notifications.",
+                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
-                        "protocol"                    : "EMAIL",
-                        "values"                      : ["email.address@example.com"]
+                        "protocol"              : "EMAIL",
+                        "values"                : ["email.address@example.com"]
                     }
                 ]
             },
 
             "NOTT-LZ-IAM-KEY": {
-                "name"                                : "nott-lz-iam",
-                "description"                         : "Topic for IAM related notifications.",
-                "compartment_id"                      : "CMP-LZ-SECURITY-KEY",
+                "name"                          : "nott-lz-iam",
+                "description"                   : "Topic for IAM related notifications.",
+                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
-                        "protocol"                    : "EMAIL",
-                        "values"                      : ["email.address@example.com"]
+                        "protocol"              : "EMAIL",
+                        "values"                : ["email.address@example.com"]
                     }
                 ]
             },
 
             "NOTT-LZ-NETWORK-KEY": {
-                "name"                                : "nott-lz-network",
-                "description"                         : "Topic for network related notifications.",
-                "compartment_id"                      : "CMP-LZ-SECURITY-KEY",
+                "name"                          : "nott-lz-network",
+                "description"                   : "Topic for network related notifications.",
+                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
-                        "protocol"                    : "EMAIL",
-                        "values"                      : ["email.address@example.com"]
+                        "protocol"              : "EMAIL",
+                        "values"                : ["email.address@example.com"]
                     }
                 ]
             },
 
             "NOTT-LZ-SECURITY-KEY": {
-                "name"                                : "nott-lz-security",
-                "description"                         : "Topic for notifications.",
-                "compartment_id"                      : "CMP-LZ-SECURITY-KEY",
+                "name"                          : "nott-lz-security",
+                "description"                   : "Topic for notifications.",
+                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
-                        "protocol"                    : "EMAIL",
-                        "values"                      : ["email.address@example.com"]
+                        "protocol"              : "EMAIL",
+                        "values"                : ["email.address@example.com"]
                     }
                 ]
             }
@@ -391,41 +391,41 @@
     },
 
     "service_connectors_configuration": {
-        "default_compartment_id"                      : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
         "buckets": {
             "BKT-LZ-SERVICE-CONNECTOR": {
-                "name"                                : "bkt-lz-service-connector",
-                "compartment_id"                      : "CMP-LZ-SECURITY-KEY",
-                "cis_level"                           : "2",
-                "kms_key_id"                          : "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY"
+                "name"                          : "bkt-lz-service-connector",
+                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
+                "cis_level"                     : "2",
+                "kms_key_id"                    : "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY"
             }
         },
 
         "service_connectors": {
             "SCH-LZ-MONITOR-KEY": {
-                "display_name"                        : "sch-lz-monitor",
+                "display_name"                  : "sch-lz-monitor",
 
                 "policy": {
-                    "name"                            : "service-connector-audit-policy",
-                    "description"                     : "IAM policy for letting Service Connector to push data to target resource.",
-                    "compartment_id"                  : "CMP-LZ-SECURITY-KEY"
+                    "name"                      : "service-connector-audit-policy",
+                    "description"               : "IAM policy for letting Service Connector to push data to target resource.",
+                    "compartment_id"            : "CMP-LZ-SECURITY-KEY"
                 },
 
                 "source": {
-                    "kind"                            : "logging",
+                    "kind"                      : "logging",
 
                     "audit_logs": [
                         {
-                            "cmp_id"                  : "ALL"
+                            "cmp_id"            : "ALL"
                         }
                     ]
                 },
 
                 "target": {
-                    "bucket_name"                     : "bkt-lz-service-connector",
-                    "bucket_object_name_prefix"       : "sch",
-                    "kind"                            : "objectstorage"
+                    "bucket_name"               : "bkt-lz-service-connector",
+                    "bucket_object_name_prefix" : "sch",
+                    "kind"                      : "objectstorage"
                 }
             }
         }

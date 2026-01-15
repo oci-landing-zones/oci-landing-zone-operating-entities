@@ -93,7 +93,7 @@ In this example we use YAML configurations files, but JSON files examples are al
 
 | ACTIVITY | DESCRIPTION   | 
 |---|---| 
-| **1** | Create a new ORM Stack: [![Deploy_To_OCI](/commons/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.8.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/addons/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_solution.yml"}) |
+| **1** | Create a new ORM Stack: [![Deploy_To_OCI](/commons/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.10.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oracle-quickstart/terraform-oci-open-lz/master/addons/oci-learn-lz/exercise1/config_yaml/oci_learn_lz_iam_solution.yml"}) |
 | **2** | Accept terms,  **wait** for the configuration to load. |
 | **3** | Set the working directory to “**rms-facade**”. | 
 | **4** | Set the stack **name** you prefer. | 
