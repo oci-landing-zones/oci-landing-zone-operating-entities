@@ -13,7 +13,7 @@
                         "description"                         : "Shared Network Compartment",
 
                         "defined_tags": {
-                            "tn-lz-role.name"                 : "lz-network-admin"
+                            "tagns-lz-role.tag-lz-role"       : "lz-network-admin"
                         }
                     },
 
@@ -32,7 +32,7 @@
                                 "description"                 : "Pre-Production Workload Environment, Common Network Compartment",
 
                                 "defined_tags": {
-                                    "tn-lz-role.name"         : "lz-network-admin"
+                                    "tagns-lz-role.tag-lz-role": "lz-network-admin"
                                 }
                             },
 
@@ -58,7 +58,7 @@
                                 "description"                 : "Pre-Production Workload Environment, Common Security Compartment",
 
                                 "defined_tags": {
-                                    "tn-lz-role.name"         : "lz-security-admin"
+                                    "tagns-lz-role.tag-lz-role": "lz-security-admin"
                                 }
                             }
                         }
@@ -74,7 +74,7 @@
                                 "description"                 : "Prod Workload Environment, Common Network Compartment",
 
                                 "defined_tags": {
-                                    "tn-lz-role.name"         : "lz-network-admin"
+                                    "tagns-lz-role.tag-lz-role": "lz-network-admin"
                                 }
                             },
 
@@ -100,7 +100,7 @@
                                 "description"                 : "Production Workload Environment, Common Security Compartment",
 
                                 "defined_tags": {
-                                    "tn-lz-role.name"         : "lz-security-admin"
+                                    "tagns-lz-role.tag-lz-role": "lz-security-admin"
                                 }
                             }
                         }
@@ -111,7 +111,7 @@
                         "description"                         : "Shared Security Compartment",
 
                         "defined_tags": {
-                            "tn-lz-role.name"                 : "lz-security-admin"
+                            "tagns-lz-role.tag-lz-role"       : "lz-security-admin"
                         }
                     }
                 }
@@ -249,7 +249,7 @@
                     "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to read usage-budgets in tenancy",
                     "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to read usage-reports in tenancy",
                     "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to read objectstorage-namespaces in tenancy",
-                    "allow any-user to inspect tag-namespaces in tenancy where target.tag-namespace.name='tn-lz-role'"
+                    "allow any-user to inspect tag-namespaces in tenancy where target.tag-namespace.name='tagns-lz-role'"
                 ]
             },
 
@@ -281,34 +281,34 @@
                 "compartment_id"                              : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage dns in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage load-balancers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage instance-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage volume-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage object-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage file-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage bastion-session in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read instance-agent-plugins in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use key-delegate in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage repos in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read vss-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read ons-topics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use bastion in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use bastion-session in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))"
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage dns in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage load-balancers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage instance-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage volume-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage object-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage file-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage bastion-session in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read instance-agent-plugins in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use key-delegate in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage repos in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read vss-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read ons-topics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use bastion in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use bastion-session in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to use vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ]
             },
 
@@ -454,46 +454,46 @@
                 "compartment_id"                              : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-namespaces in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-defaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage repos in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read app-catalog-listing in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-images in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to inspect buckets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage instance-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage volume-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage object-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage file-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage serviceconnectors in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage streams in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage functions-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage waas-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage security-zone in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage vss-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage bastion-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-agent-plugins in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use key-delegate in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use subnets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use network-security-groups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage private-ips in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage operator-control-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tn-lz-role.name, ('lz-security-admin'))"
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-namespaces in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-defaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage repos in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read app-catalog-listing in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-images in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to inspect buckets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage instance-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage volume-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage object-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage file-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage serviceconnectors in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage streams in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage functions-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage waas-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage security-zone in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage vss-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage bastion-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-agent-plugins in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use key-delegate in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use subnets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use network-security-groups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage private-ips in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage operator-control-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ]
             },
 
