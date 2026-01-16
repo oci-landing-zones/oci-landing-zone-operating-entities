@@ -1,6 +1,6 @@
 {
     "oke_workers_configuration": {
-        "default_compartment_id"         : "CMP-LZP-P-PLATFORM-OKE-KEY",
+        "default_compartment_id"         : "CMP-LZ-PROD-PLATFORM-OKE-KEY",
 
         "node_pools": {
             "NODEPOOL-QUICKSTART-1": {
@@ -21,10 +21,10 @@
                 },
 
                 "networking": {
-                    "pods_nsg_ids"       : ["NSG-PROD-PODS"],
-                    "pods_subnet_id"     : "SN-PROD-OKE-PODS-KEY",
-                    "workers_nsg_ids"    : ["NSG-PROD-WORKERS"],
-                    "workers_subnet_id"  : "SN-PROD-OKE-WORKERS-KEY"
+                    "pods_nsg_ids"       : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"],
+                    "pods_subnet_id"     : "SN-FRA-LZ-PROD-OKE-PODS-KEY",
+                    "workers_nsg_ids"    : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"],
+                    "workers_subnet_id"  : "SN-FRA-LZ-PROD-OKE-WORKERS-KEY"
                 },
 
                 "node_config_details": {

@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """
 JSON formatter for OCI Landing Zone configurations.
-Formats JSON with terraform fmt-style aligned colons and sorted keys.
+Formats JSON with terraform fmt-style aligned colons.
 
 Requirements:
 - Python 3.8+
 - No external dependencies (stdlib only)
 - Align colons within each object independently
-- Sort keys by priority order, then alphabetically
+- 4-space indentation
 - Add empty line before nested blocks
-- 2-space indentation
+
+Configuration:
+- ENABLE_KEY_SORTING: Set to False (default) to preserve original key order.
+  Set to True to enable key sorting by priority order, CIDR blocks, etc.
 
 Usage:
   # Format from stdin
@@ -33,6 +36,7 @@ from typing import Any, Dict, List, Tuple
 
 # Configuration constants
 INDENT_SIZE = 4  # spaces per indent level
+ENABLE_KEY_SORTING = False  # Set to True to enable key rearranging (sorting by priority, CIDR, etc.)
 
 # Keys are sorted in this priority order first, then alphabetically
 KEY_PRIORITY_ORDER = [
@@ -136,19 +140,10 @@ def parse_cidr(cidr: str) -> Tuple[int, int]:
 def sort_array_items(arr: List[Any], parent_key: str = None) -> List[Any]:
     """
     Sort array items based on parent key context.
-    - For 'subnets': sort by CIDR block semantically (IP address order)
     - For 'drg_route_distributions': sort by priority field
     - Otherwise: return unsorted
     """
-    if parent_key == 'subnets':
-        # Sort subnet objects by cidr_block field
-        def get_subnet_cidr(item):
-            if isinstance(item, dict) and 'cidr_block' in item:
-                return parse_cidr(item['cidr_block'])
-            return (2**32, 2**32)
-        return sorted(arr, key=get_subnet_cidr)
-
-    elif parent_key == 'drg_route_distributions':
+    if parent_key == 'drg_route_distributions':
         # Sort by priority field (lower priority first)
         def get_priority(item):
             if isinstance(item, dict) and 'priority' in item:
@@ -162,13 +157,14 @@ def sort_array_items(arr: List[Any], parent_key: str = None) -> List[Any]:
     return arr
 
 
-def sort_dict_keys(obj: Dict[str, Any]) -> List[str]:
+def sort_dict_keys(obj: Dict[str, Any], parent_key: str = None) -> List[str]:
     """
     Sort object keys with the following priority:
     1. If all values are dicts with 'priority' field: sort by priority (ascending)
-    2. Otherwise: primitive values before objects/arrays
-    3. Priority keys (from KEY_PRIORITY_ORDER) before other keys
-    4. Alphabetically by key name
+    2. If parent_key is 'subnets': sort by CIDR block (ascending IP address)
+    3. Otherwise: primitive values before objects/arrays
+    4. Priority keys (from KEY_PRIORITY_ORDER) before other keys
+    5. Alphabetically by key name
     """
     # Check if all values are dicts with a 'priority' field
     if obj and all(isinstance(v, dict) and 'priority' in v for v in obj.values()):
@@ -179,6 +175,24 @@ def sort_dict_keys(obj: Dict[str, Any]) -> List[str]:
             except (ValueError, TypeError, KeyError):
                 return float('inf')
         return sorted(obj.keys(), key=priority_sort_key)
+
+    # Special handling for subnet objects: sort by CIDR block
+    if parent_key == 'subnets':
+        def subnet_cidr_sort_key(key: str) -> Tuple[int, int]:
+            value = obj[key]
+            if not isinstance(value, dict):
+                raise ValueError(f"Subnet '{key}' is not a dict object")
+            if 'cidr_block' not in value:
+                raise ValueError(f"Subnet '{key}' is missing 'cidr_block' field")
+
+            cidr = value['cidr_block']
+            parsed = parse_cidr(cidr)
+            # parse_cidr returns (2**32, 2**32) for invalid CIDRs
+            if parsed == (2**32, 2**32):
+                raise ValueError(f"Subnet '{key}' has invalid CIDR block: '{cidr}'")
+            return parsed
+
+        return sorted(obj.keys(), key=subnet_cidr_sort_key)
 
     # Default sorting logic
     def sort_key(key: str) -> Tuple[int, int, str]:
@@ -249,8 +263,11 @@ def format_array(arr: List[Any], indent_level: int, global_max_col: int, parent_
     if not arr:
         return "[]"
 
-    # Sort array items based on parent key context
-    sorted_arr = sort_array_items(arr, parent_key)
+    # Sort array items based on parent key context (controlled by ENABLE_KEY_SORTING flag)
+    if ENABLE_KEY_SORTING:
+        sorted_arr = sort_array_items(arr, parent_key)
+    else:
+        sorted_arr = arr
 
     indent = " " * (INDENT_SIZE * indent_level)
     next_indent = " " * (INDENT_SIZE * (indent_level + 1))
@@ -260,7 +277,7 @@ def format_array(arr: List[Any], indent_level: int, global_max_col: int, parent_
     for i, item in enumerate(sorted_arr):
         if isinstance(item, dict):
             # Format object in array with alignment
-            formatted_obj = format_object(item, indent_level + 1, global_max_col)
+            formatted_obj = format_object(item, indent_level + 1, global_max_col, parent_key)
             lines.append(next_indent + formatted_obj + ("," if i < len(sorted_arr) - 1 else ""))
         elif isinstance(item, list):
             # Nested array
@@ -275,7 +292,7 @@ def format_array(arr: List[Any], indent_level: int, global_max_col: int, parent_
     return "\n".join(lines)
 
 
-def format_object(obj: Dict[str, Any], indent_level: int, global_max_col: int) -> str:
+def format_object(obj: Dict[str, Any], indent_level: int, global_max_col: int, parent_key: str = None) -> str:
     """
     Format a JSON object with globally aligned colons for primitive values.
     All primitive values across all nesting levels have their colons aligned
@@ -288,8 +305,11 @@ def format_object(obj: Dict[str, Any], indent_level: int, global_max_col: int) -
     indent = " " * (INDENT_SIZE * indent_level)
     next_indent = " " * (INDENT_SIZE * (indent_level + 1))
 
-    # Sort keys by priority
-    sorted_keys = sort_dict_keys(obj)
+    # Sort keys by priority (controlled by ENABLE_KEY_SORTING flag)
+    if ENABLE_KEY_SORTING:
+        sorted_keys = sort_dict_keys(obj, parent_key)
+    else:
+        sorted_keys = list(obj.keys())
 
     lines = ["{"]
 
@@ -312,7 +332,7 @@ def format_object(obj: Dict[str, Any], indent_level: int, global_max_col: int) -
 
         # Format the value
         if isinstance(value, dict):
-            formatted_value = format_object(value, indent_level + 1, global_max_col)
+            formatted_value = format_object(value, indent_level + 1, global_max_col, key)
         elif isinstance(value, list):
             # Format empty arrays and 1-2 element primitive arrays inline
             if is_inline_array(value):
@@ -346,7 +366,7 @@ def format_json(data: Any) -> str:
 
     # Second pass: format with global alignment
     if isinstance(data, dict):
-        result = format_object(data, indent_level=0, global_max_col=global_max_col)
+        result = format_object(data, indent_level=0, global_max_col=global_max_col, parent_key=None)
     elif isinstance(data, list):
         result = format_array(data, indent_level=0, global_max_col=global_max_col, parent_key=None)
     else:

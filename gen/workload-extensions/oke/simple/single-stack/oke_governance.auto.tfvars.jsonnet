@@ -1,3 +1,3 @@
-local governance = import '../../../../../blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_governance.auto.tfvars.json';
+local governance = import '../../../../../blueprints/one-oe/runtime/one-stack/oneoe_governance.json';
 
 governance
