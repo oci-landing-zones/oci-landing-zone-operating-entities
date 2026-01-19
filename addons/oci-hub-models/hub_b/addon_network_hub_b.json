@@ -499,7 +499,7 @@
 
                                     "backends": {
                                         "LBBE-FRA-LZ-PROD-02-KEY": {
-                                            "ip_address"                  : "10.0.64.11",
+                                            "ip_address"                  : "10.0.64.20",
                                             "port"                        : 80
                                         }
                                     },
