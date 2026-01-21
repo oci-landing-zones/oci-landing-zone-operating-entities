@@ -1,6 +1,6 @@
 {
     "oke_clusters_configuration": {
-        "default_compartment_id"                       : "CMP-LZP-P-PLATFORM-OKE-KEY",
+        "default_compartment_id"                       : "CMP-LZ-PROD-PLATFORM-OKE-KEY",
 
         "clusters": {
             "OKE-QUICKSTART-CLUSTER": {
@@ -12,12 +12,12 @@
                 "services_cidr"                        : "10.96.0.0/16",
 
                 "networking": {
-                    "api_endpoint_nsg_ids"             : ["NSG-PROD-CP"],
-                    "api_endpoint_subnet_id"           : "SN-PROD-OKE-CP-KEY",
+                    "api_endpoint_nsg_ids"             : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY"],
+                    "api_endpoint_subnet_id"           : "SN-FRA-LZ-PROD-OKE-CP-KEY",
                     "assign_public_ip_to_control_plane": false,
                     "is_api_endpoint_public"           : false,
-                    "services_subnet_id"               : ["SN-PROD-OKE-INT-LB-KEY"],
-                    "vcn_id"                           : "VCN-FRA-LZP-P-PLATFORM-OKE-KEY"
+                    "services_subnet_id"               : ["SN-FRA-LZ-PROD-OKE-INT-LB-KEY"],
+                    "vcn_id"                           : "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY"
                 },
 
                 "options": {

@@ -33,6 +33,48 @@ jobs:
           # This variable will store any error messages we find.
           ERRORS=""
 
+          # Function to check if a template's dependencies were modified
+          check_template_dependencies() {
+            local template_file="$1"
+            local changed_files="$2"
+
+            # Extract import statements from the template
+            # Matches: import 'path' or import "path"
+            local imports=$(grep -oE "import ['\"]([^'\"]+)['\"]" "$template_file" 2>/dev/null | sed -E "s/import ['\"]([^'\"]+)['\"]/\1/")
+
+            if [ -z "$imports" ]; then
+              return 1  # No imports found
+            fi
+
+            # Get the directory of the template file for resolving relative paths
+            local template_dir=$(dirname "$template_file")
+
+            # Check each imported file
+            while IFS= read -r import_path; do
+              # Resolve the relative path by combining template directory with import path
+              # Then normalize it to remove .. and . components
+              local full_path="$template_dir/$import_path"
+
+              # Normalize the path using Python (works on both Linux and macOS)
+              local resolved_path=$(python3 -c "import os; print(os.path.normpath('$full_path'))" 2>/dev/null)
+
+              if [ -n "$resolved_path" ] && [ -f "$resolved_path" ]; then
+                # Check if this imported file was modified
+                if echo "$changed_files" | grep -Fxq "$resolved_path"; then
+                  echo "   [OK] The imported dependency '$resolved_path' was modified."
+                  return 0  # Dependency was modified, validation passes
+                fi
+
+                # Recursively check if the imported file has dependencies that changed
+                if check_template_dependencies "$resolved_path" "$changed_files"; then
+                  return 0  # Nested dependency was modified
+                fi
+              fi
+            done <<< "$imports"
+
+            return 1  # No dependencies were modified
+          }
+
           # Loop through each changed file to check for violations.
           for file in $CHANGED_FILES; do
             # RULE 1: We only care about generated files. Generated files live
@@ -55,13 +97,17 @@ jobs:
               if [ -f "$template_file" ]; then
                 echo "-> Found modified file '$file' which appears to be generated from a template."
 
-                # Now, check if the template is in our list of changed files.
-                # The `grep -Fxq` command checks for an exact, full-line match quietly.
+                # Check if the template is in our list of changed files.
                 if ! echo "$CHANGED_FILES" | grep -Fxq "$template_file"; then
-                  # VIOLATION! The generated file was changed, but the template was not.
-                  echo "   [ERROR] The template '$template_file' was NOT modified."
-                  # Append a detailed error message to our error list.
-                  ERRORS="${ERRORS}Violation: Generated file '$file' was modified, but its template '$template_file' was not.\n"
+                  # Template was not directly modified, check dependencies
+                  if check_template_dependencies "$template_file" "$CHANGED_FILES"; then
+                    # A dependency was modified, so this is valid
+                    continue
+                  else
+                    # VIOLATION! Neither template nor dependencies were changed.
+                    echo "   [ERROR] The template '$template_file' and its dependencies were NOT modified."
+                    ERRORS="${ERRORS}Violation: Generated file '$file' was modified, but its template '$template_file' and dependencies were not.\n"
+                  fi
                 else
                   # The template was also modified, which is the correct workflow.
                   echo "   [OK] The template '$template_file' was also modified."

@@ -45,7 +45,7 @@ The following are some of the resources required to be selected in the Oracle E-
 
 # License <!-- omit from toc -->
 
-Copyright (c) 2025 Oracle and/or its affiliates.
+Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 

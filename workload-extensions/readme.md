@@ -24,13 +24,13 @@ Find below the list of available workload landing zones and our backlog. Be free
 | 4 | <img src="../commons/images/icon_oke.jpg" height="50" align="center"> | A Pluggable **OKE** Landing Zone Workload. | [Available](./oke/)|
 | 5 | [<img src="../commons/images/icon_exacc.jpg" height="30" align="center">](./exacc) | A Pluggable **ExaDB-C@C** Landing Zone Extension. | [Available](./exacc/) | 
 | 6 | [<img src="../commons/images/icon_hpc.png" height="30" align="center">](./hpc) | A Pluggable **HPC** Landing Zone Extension. | [Available](./hpc/) | 
-| 7 | [<img src="../commons/images/icon_openshift.png" height="30" align="center">](./openshift) | A Pluggable **Openshift** Landing Zone Extension. | [Available](./openshift/) | 
+| 7 | [<img src="openshift/contents/icon_openshift.png" height="30" align="center">](./openshift) | A Pluggable **Openshift** Landing Zone Extension. | [Available](./openshift/) | 
 
 &nbsp; 
 
 # License
 
-Copyright (c) 2025 Oracle and/or its affiliates.
+Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 

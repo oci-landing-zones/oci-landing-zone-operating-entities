@@ -1,0 +1,755 @@
+{
+    "network_configuration": {
+        "default_compartment_id"                                          : "CMP-LZ-NETWORK-KEY",
+        "default_enable_cis_checks"                                       : false,
+
+        "network_configuration_categories": {
+            "0-shared": {
+                "category_compartment_key"                                : "CMP-LZ-NETWORK-KEY",
+
+                "vcns": {
+                    "VCN-FRA-LZ-HUB-KEY": {
+                        "display_name"                                    : "vcn-fra-lz-hub",
+                        "cidr_blocks"                                     : ["10.0.0.0/21"],
+                        "dns_label"                                       : "vcnfralzhub",
+                        "block_nat_traffic"                               : false,
+                        "is_attach_drg"                                   : false,
+                        "is_create_igw"                                   : false,
+                        "is_ipv6enabled"                                  : false,
+                        "is_oracle_gua_allocation_enabled"                : false,
+
+                        "subnets": {
+                            "SN-FRA-LZ-HUB-UNTRUST-KEY": {
+                                "display_name"                            : "sn-fra-lz-hub-untrust",
+                                "cidr_block"                              : "10.0.0.0/24",
+                                "dns_label"                               : "snfrahubuntrust",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : false,
+                                "prohibit_public_ip_on_vnic"              : false,
+                                "route_table_key"                         : "RT-FRA-LZ-HUB-UNTRUST-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-HUB-UNTRUST-KEY"]
+                            },
+
+                            "SN-FRA-LZ-HUB-TRUST-KEY": {
+                                "display_name"                            : "sn-fra-lz-hub-trust",
+                                "cidr_block"                              : "10.0.1.0/24",
+                                "dns_label"                               : "snfrahubtrust",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-FRA-LZ-HUB-TRUST-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-HUB-TRUST-KEY"]
+                            },
+
+                            "SN-FRA-LZ-HUB-LB-KEY": {
+                                "display_name"                            : "sn-fra-lz-hub-lb",
+                                "cidr_block"                              : "10.0.2.0/24",
+                                "dns_label"                               : "snfrahublb",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : false,
+                                "prohibit_public_ip_on_vnic"              : false,
+                                "route_table_key"                         : "RT-FRA-LZ-HUB-LB-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-HUB-LB-KEY"]
+                            },
+
+                            "SN-FRA-LZ-HUB-MGMT-KEY": {
+                                "display_name"                            : "sn-fra-lz-hub-mgmt",
+                                "cidr_block"                              : "10.0.3.0/24",
+                                "dns_label"                               : "snfrahubmgmt",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-FRA-LZ-HUB-MGMT-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-HUB-MGMT-KEY"]
+                            },
+
+                            "SN-FRA-LZ-HUB-MON-KEY": {
+                                "display_name"                            : "sn-fra-lz-hub-mon",
+                                "cidr_block"                              : "10.0.4.0/24",
+                                "dns_label"                               : "snfrahubmon",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-FRA-LZ-HUB-MGMT-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-HUB-MGMT-KEY"]
+                            },
+
+                            "SN-FRA-LZ-HUB-DNS": {
+                                "display_name"                            : "sn-fra-lz-hub-dns",
+                                "cidr_block"                              : "10.0.5.0/24",
+                                "dns_label"                               : "snfrahubdns",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-FRA-LZ-HUB-MGMT-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-HUB-MGMT-KEY"]
+                            }
+                        },
+
+                        "route_tables": {
+                            "RT-FRA-LZ-HUB-UNTRUST-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-untrust",
+
+                                "route_rules": {
+                                    "rt-igw": {
+                                        "description"                     : "Route to the Internet through Internet GW",
+                                        "destination"                     : "0.0.0.0/0",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "IGW-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
+                            "RT-FRA-LZ-HUB-TRUST-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-trust",
+                                "route_rules"                             : {}
+                            },
+
+                            "RT-FRA-LZ-HUB-LB-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-lb",
+                                "route_rules"                             : {}
+                            },
+
+                            "RT-FRA-LZ-HUB-IGW-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-igw",
+                                "route_rules"                             : {}
+                            },
+
+                            "RT-FRA-LZ-HUB-MGMT-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-mgmt",
+
+                                "route_rules": {
+                                    "rt-sgw": {
+                                        "description"                     : "Route to Oracle Services Network through Service GW",
+                                        "destination"                     : "all-services",
+                                        "destination_type"                : "SERVICE_CIDR_BLOCK",
+                                        "network_entity_key"              : "SGW-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
+                            "RT-FRA-LZ-HUB-INGRESS-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-ingress",
+                                "route_rules"                             : {}
+                            }
+                        },
+
+                        "default_security_list": {
+                            "egress_rules"                                : [],
+                            "ingress_rules"                               : []
+                        },
+
+                        "security_lists": {
+                            "SL-FRA-LZ-HUB-UNTRUST-KEY": {
+                                "display_name"                            : "sl-fra-lz-hub-untrust",
+                                "egress_rules"                            : [],
+
+                                "ingress_rules": [
+                                    {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "icmp_code"                       : 4,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 3",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ]
+                            },
+
+                            "SL-FRA-LZ-HUB-LB-KEY": {
+                                "display_name"                            : "sl-fra-lz-hub-lb",
+                                "egress_rules"                            : [],
+
+                                "ingress_rules": [
+                                    {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "icmp_code"                       : 4,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 3",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ]
+                            },
+
+                            "SL-FRA-LZ-HUB-TRUST-KEY": {
+                                "display_name"                            : "sl-fra-lz-hub-trust",
+                                "egress_rules"                            : [],
+
+                                "ingress_rules": [
+                                    {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "icmp_code"                       : 4,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 3",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ]
+                            },
+
+                            "SL-FRA-LZ-HUB-MGMT-KEY": {
+                                "display_name"                            : "sl-fra-lz-hub-mgmt",
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                ],
+
+                                "ingress_rules": [
+                                    {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "icmp_code"                       : 4,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 3",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "EXAMPLE: Allow inbound traffic from the Bastion Service private endpoint IP address",
+                                        "src"                             : "10.0.3.123/32",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_max"                    : 22,
+                                        "dst_port_min"                    : 22,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    }
+                                ]
+                            }
+                        },
+
+                        "network_security_groups": {
+                            "NSG-FRA-LZ-HUB-UNTRUST-NLB-KEY": {
+                                "display_name"                            : "nsg-fra-lz-hub-untrust-nlb",
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                },
+
+                                "ingress_rules": {
+                                    "http_80": {
+                                        "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTP",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_max"                    : 80,
+                                        "dst_port_min"                    : 80,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+
+                                    "http_443": {
+                                        "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTPS",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_max"                    : 443,
+                                        "dst_port_min"                    : 443,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    }
+                                }
+                            },
+
+                            "NSG-FRA-LZ-HUB-UNTRUST-FW-KEY": {
+                                "display_name"                            : "nsg-fra-lz-hub-untrust-fw",
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                },
+
+                                "ingress_rules": {
+                                    "from_untrust_nlb": {
+                                        "description"                     : "Allow inbound from NSG nsg-fra-lz-hub-untrust-nlb over TCP ALL",
+                                        "src"                             : "NSG-FRA-LZ-HUB-UNTRUST-NLB-KEY",
+                                        "src_type"                        : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    }
+                                }
+                            },
+
+                            "NSG-FRA-LZ-HUB-TRUST-NLB-KEY": {
+                                "display_name"                            : "nsg-fra-lz-hub-trust-nlb",
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                },
+                                "ingress_rules"                           : {}
+                            },
+
+                            "NSG-FRA-LZ-HUB-TRUST-FW-KEY": {
+                                "display_name"                            : "nsg-fra-lz-hub-trust-fw",
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                },
+
+                                "ingress_rules": {
+                                    "from_trust_nlb_http": {
+                                        "description"                     : "Allow inbound from NSG nsg-fra-lz-hub-trust-nlb over HTTP",
+                                        "src"                             : "NSG-FRA-LZ-HUB-TRUST-NLB-KEY",
+                                        "src_type"                        : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_max"                    : 80,
+                                        "dst_port_min"                    : 80,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+
+                                    "from_trust_nlb_https": {
+                                        "description"                     : "Allow inbound from NSG nsg-fra-lz-hub-trust-nlb over HTTPS",
+                                        "src"                             : "NSG-FRA-LZ-HUB-TRUST-NLB-KEY",
+                                        "src_type"                        : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_max"                    : 443,
+                                        "dst_port_min"                    : 443,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+
+                                    "from_trust_nlb_ssh": {
+                                        "description"                     : "Allow inbound from NSG nsg-fra-lz-hub-trust-nlb over SSH",
+                                        "src"                             : "NSG-FRA-LZ-HUB-TRUST-NLB-KEY",
+                                        "src_type"                        : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_max"                    : 22,
+                                        "dst_port_min"                    : 22,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+
+                                    "from_trust_nlb_icmp": {
+                                        "description"                     : "Allow ICMP type 8 (Echo) from NSG nsg-fra-lz-hub-trust-nlb",
+                                        "src"                             : "NSG-FRA-LZ-HUB-TRUST-NLB-KEY",
+                                        "src_type"                        : "NETWORK_SECURITY_GROUP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "protocol"                        : "ICMP",
+                                        "stateless"                       : false
+                                    }
+                                }
+                            },
+
+                            "NSG-FRA-LZ-HUB-LB-KEY": {
+                                "display_name"                            : "nsg-fra-lz-hub-lb",
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    }
+                                },
+
+                                "ingress_rules": {
+                                    "http_80": {
+                                        "description"                     : "Allow inbound traffic from Hub Untrust subnet over HTTP",
+                                        "src"                             : "10.0.0.0/24",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_max"                    : 80,
+                                        "dst_port_min"                    : 80,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+
+                                    "https_443": {
+                                        "description"                     : "Allow inbound traffic from Hub Untrust subnet over HTTPS",
+                                        "src"                             : "10.0.0.0/24",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_max"                    : 443,
+                                        "dst_port_min"                    : 443,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    }
+                                }
+                            }
+                        },
+
+                        "vcn_specific_gateways": {
+                            "internet_gateways": {
+                                "IGW-FRA-LZ-HUB-KEY": {
+                                    "display_name"                        : "igw-fra-lz-hub",
+                                    "route_table_key"                     : "RT-FRA-LZ-HUB-IGW-KEY"
+                                }
+                            },
+
+                            "service_gateways": {
+                                "SGW-FRA-LZ-HUB-KEY": {
+                                    "display_name"                        : "sgw-fra-lz-hub",
+                                    "services"                            : "all-services"
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "non_vcn_specific_gateways": {
+                    "dynamic_routing_gateways": {
+                        "DRG-FRA-LZ-HUB-KEY": {
+                            "display_name"                                : "drg-fra-lz-hub",
+
+                            "drg_attachments": {
+                                "DRGATT-FRA-LZ-HUB-VCN-KEY": {
+                                    "display_name"                        : "drgatt-fra-lz-hub",
+                                    "drg_route_table_key"                 : "DRGRT-FRA-LZ-HUB-KEY",
+
+                                    "network_details": {
+                                        "type"                            : "VCN",
+                                        "attached_resource_key"           : "VCN-FRA-LZ-HUB-KEY",
+                                        "route_table_key"                 : "RT-FRA-LZ-HUB-INGRESS-KEY"
+                                    }
+                                }
+                            },
+
+                            "drg_route_distributions": {
+                                "DRGRD-FRA-LZ-HUB-KEY": {
+                                    "display_name"                        : "drgrd-fra-lz-hub",
+                                    "distribution_type"                   : "IMPORT",
+                                    "statements"                          : {}
+                                }
+                            },
+
+                            "drg_route_tables": {
+                                "DRGRT-FRA-LZ-HUB-KEY": {
+                                    "display_name"                        : "drgrt-fra-lz-hub",
+                                    "import_drg_route_distribution_key"   : "DRGRD-FRA-LZ-HUB-KEY",
+                                    "is_ecmp_enabled"                     : false,
+                                    "route_rules"                         : {}
+                                },
+
+                                "DRGRT-FRA-LZ-SPOKES-KEY": {
+                                    "display_name"                        : "drgrt-fra-lz-spokes",
+                                    "is_ecmp_enabled"                     : false,
+
+                                    "route_rules": {
+                                        "DRGRT-FRA-LZ-SPOKES-STATIC-ROUTE": {
+                                            "destination"                 : "0.0.0.0/0",
+                                            "destination_type"            : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key" : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+
+                    "l7_load_balancers": {
+                        "LB-FRA-LZ-PROD-01-KEY": {
+                            "display_name"                                : "lb-fra-lz-prod-01",
+                            "ip_mode"                                     : "IPV4",
+                            "is_private"                                  : false,
+                            "subnet_ids"                                  : [],
+                            "subnet_keys"                                 : ["SN-FRA-LZ-HUB-LB-KEY"],
+                            "network_security_group_keys"                 : ["NSG-FRA-LZ-HUB-LB-KEY"],
+                            "shape"                                       : "flexible",
+
+                            "shape_details": {
+                                "maximum_bandwidth_in_mbps"               : 10,
+                                "minimum_bandwidth_in_mbps"               : 10
+                            },
+
+                            "listeners": {
+                                "LBLSNR-FRA-LZ-PROD-01-KEY": {
+                                    "connection_configuration": {
+                                        "idle_timeout_in_seconds"         : 1200
+                                    },
+                                    "name"                                : "lblsnr-fra-lz-prod-01",
+                                    "default_backend_set_key"             : "LBBKST-FRA-LZ-PROD-01-KEY",
+                                    "port"                                : "80",
+                                    "protocol"                            : "HTTP",
+                                    "routing_policy_key"                  : "LBRT-FRA-LZ-PROD-01-KEY"
+                                }
+                            },
+
+                            "backend_sets": {
+                                "LBBKST-FRA-LZ-PROD-01-KEY": {
+                                    "name"                                : "lbbkst-fra-lz-prod-01",
+                                    "policy"                              : "ROUND_ROBIN",
+
+                                    "backends": {
+                                        "LBBE-FRA-LZ-PROD-01-KEY": {
+                                            "ip_address"                  : "10.0.64.10",
+                                            "port"                        : 80
+                                        }
+                                    },
+
+                                    "health_checker": {
+                                        "interval_ms"                     : 10000,
+                                        "is_force_plain_text"             : true,
+                                        "port"                            : 80,
+                                        "protocol"                        : "HTTP",
+                                        "retries"                         : 3,
+                                        "return_code"                     : 200,
+                                        "timeout_in_millis"               : 3000,
+                                        "url_path"                        : "/testapp1/"
+                                    }
+                                },
+
+                                "LBBKST-FRA-LZ-PROD-02-KEY": {
+                                    "name"                                : "lbbkst-fra-lz-prod-02",
+                                    "policy"                              : "ROUND_ROBIN",
+
+                                    "backends": {
+                                        "LBBE-FRA-LZ-PROD-02-KEY": {
+                                            "ip_address"                  : "10.0.64.20",
+                                            "port"                        : 80
+                                        }
+                                    },
+
+                                    "health_checker": {
+                                        "interval_ms"                     : 10000,
+                                        "is_force_plain_text"             : true,
+                                        "port"                            : 80,
+                                        "protocol"                        : "HTTP",
+                                        "retries"                         : 3,
+                                        "return_code"                     : 200,
+                                        "timeout_in_millis"               : 3000,
+                                        "url_path"                        : "/testapp2/"
+                                    }
+                                }
+                            },
+
+                            "routing_policies": {
+                                "LBRT-FRA-LZ-PROD-01-KEY": {
+                                    "name"                                : "lbrt-fra-lz-prod-01",
+                                    "condition_language_version"          : "V1",
+
+                                    "rules": {
+                                        "lbrouterule_testapp1": {
+                                            "actions": {
+                                                "action-1": {
+                                                    "backend_set_key"     : "LBBKST-FRA-LZ-PROD-01-KEY",
+                                                    "name"                : "FORWARD_TO_BACKENDSET"
+                                                }
+                                            },
+                                            "condition"                   : "all(http.request.url.path sw (i '/testapp1/'))",
+                                            "name"                        : "testapp1"
+                                        },
+
+                                        "lbrouterule_testapp2": {
+                                            "actions": {
+                                                "action-2": {
+                                                    "backend_set_key"     : "LBBKST-FRA-LZ-PROD-02-KEY",
+                                                    "name"                : "FORWARD_TO_BACKENDSET"
+                                                }
+                                            },
+                                            "condition"                   : "all(http.request.url.path sw (i '/testapp2/'))",
+                                            "name"                        : "testapp2"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    "nlb_configuration": {
+        "default_compartment_id"                                          : "CMP-LZ-NETWORK-KEY",
+
+        "nlbs": {
+            "NLB-FRA-LZ-HUB-UNTRUST-KEY": {
+                "display_name"                                            : "nlb-fra-hub-untrust",
+                "enable_symmetric_hashing"                                : true,
+                "is_preserve_source_destination"                          : true,
+                "is_private"                                              : true,
+                "network_security_group_ids"                              : ["NSG-FRA-LZ-HUB-UNTRUST-NLB-KEY"],
+                "subnet_id"                                               : "SN-FRA-LZ-HUB-UNTRUST-KEY",
+
+                "listeners": {
+                    "NLBLSNR-FRA-LZ-HUB-UNTRUST-KEY": {
+                        "name"                                            : "listener-fra-untrust",
+                        "protocol"                                        : "ANY",
+                        "port"                                            : "0",
+
+                        "backend_set": {
+                            "name"                                        : "backend-set-fra-untrust",
+
+                            "backends": {
+                                "FW-UNTRUST-BACKEND-01": {
+                                    "name"                                : "fw-untrust-backend-01",
+                                    "port"                                : "0",
+                                    "is_backup"                           : "false",
+                                    "is_drain"                            : "false",
+                                    "is_offline"                          : "false",
+                                    "target_id"                           : "NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsm...",
+                                    "weight"                              : "1"
+                                },
+
+                                "FW-UNTRUST-BACKEND-02": {
+                                    "name"                                : "fw-untrust-backend-02",
+                                    "port"                                : "0",
+                                    "is_backup"                           : "false",
+                                    "is_drain"                            : "false",
+                                    "is_offline"                          : "false",
+                                    "target_id"                           : "NETWORK FIREWALL-2 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsh...",
+                                    "weight"                              : "1"
+                                }
+                            },
+
+                            "health_checker": {
+                                "protocol"                                : "TCP",
+                                "port"                                    : "22",
+                                "interval_in_millis"                      : "10000",
+                                "retries"                                 : "3",
+                                "timeout_in_millis"                       : "3000"
+                            }
+                        }
+                    }
+                }
+            },
+
+            "NLB-FRA-LZ-HUB-TRUST-KEY": {
+                "display_name"                                            : "nlb-fra-hub-trust",
+                "enable_symmetric_hashing"                                : true,
+                "is_preserve_source_destination"                          : true,
+                "is_private"                                              : true,
+                "network_security_group_ids"                              : ["NSG-FRA-LZ-HUB-TRUST-NLB-KEY"],
+                "subnet_id"                                               : "SN-FRA-LZ-HUB-TRUST-KEY",
+
+                "listeners": {
+                    "NLBLSNR-FRA-LZ-HUB-TRUST-KEY": {
+                        "name"                                            : "listener-fra-trust",
+                        "protocol"                                        : "ANY",
+                        "port"                                            : "0",
+
+                        "backend_set": {
+                            "name"                                        : "backend-set-fra-trust",
+
+                            "backends": {
+                                "FW-TRUST-BACKEND-01": {
+                                    "name"                                : "fw-trust-backend-01",
+                                    "port"                                : "0",
+                                    "is_backup"                           : "false",
+                                    "is_drain"                            : "false",
+                                    "is_offline"                          : "false",
+                                    "target_id"                           : "NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrr...",
+                                    "weight"                              : "1"
+                                },
+
+                                "FW-TRUST-BACKEND-02": {
+                                    "name"                                : "fw-trust-backend-02",
+                                    "port"                                : "0",
+                                    "is_backup"                           : "false",
+                                    "is_drain"                            : "false",
+                                    "is_offline"                          : "false",
+                                    "target_id"                           : "NETWORK FIREWALL-2 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrt...",
+                                    "weight"                              : "1"
+                                }
+                            },
+
+                            "health_checker": {
+                                "protocol"                                : "TCP",
+                                "port"                                    : "22",
+                                "interval_in_millis"                      : "10000",
+                                "retries"                                 : "3",
+                                "timeout_in_millis"                       : "3000"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
