@@ -16,78 +16,22 @@ This workload extension uses the [One-OE](https://github.com/oracle-quickstart/t
 
 ## **3. Deployment Options**
 
-This OKE Landing Zone Extension provides **two deployment approaches** to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator) for automated dependency resolution with configuration keys.
+This OKE Landing Zone Extension provides **two deployment approaches**, [single-stack](single-stack/) and  [multi-stack](multi-stack/), to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator) for automated dependency resolution with configuration keys.
 
-### **Multi-Stack Deployment** ([multi-stack/](multi-stack/))
-
-**Best for:** Adding OKE to an existing Landing Zone (OneOE, CIS LZ, etc.)
-
-The OKE extension is deployed as a **separate Terraform stack** that integrates with your existing Landing Zone infrastructure using dependency injection through the orchestrator module. Configuration keys are exchanged between stacks to establish connectivity and dependencies.
-
-**Architecture:**
-- **Stack 1**: Existing Landing Zone (OneOE, CIS, etc.) with compartments, networking, and DRG
-- **Stack 2**: OKE Extension (this deployment) attaches to existing resources
-
-**Key Features:**
-- Deploys only OKE resources (compartment, VCN, OKE cluster)
-- Attaches to existing DRG and uses existing Hub infrastructure
-- Separate Terraform state for clean resource boundaries
-- References existing resources by configuration keys (e.g., `DRG-FRA-LZP-HUB-KEY`)
-
-**Prerequisites:**
-1. An existing OCI Landing Zone deployment with:
-   - Compartment structure
-   - DRG with route tables configured
-   - Hub VCN with firewall/egress capabilities
-
-**Supported Landing Zones:**
-- [One-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe) 
-- [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime)
-
-📖 **[See Multi-Stack Deployment Guide →](multi-stack/readme.md)**
-
----
-
-### **Single-Stack Deployment** ([single-stack/](single-stack/))
-
-**Best for:** Complete greenfield deployment from scratch with a *Single Click*
-
-The OKE extension is combined with **OneOE + Hub Model E + OKE** in a **single Terraform deployment**. All resources (Landing Zone, Hub, and OKE) are provisioned together in one operation.
-
-**Key Features:**
-- All-in-one deployment: Landing Zone, Hub networking, and OKE
-- Single Terraform state for all resources
-- Hub and DRG routing is pre-configured out of the box
-- No manual configuration for dependency exchange needed
-- Complete Hub-and-Spoke topology in one deployment
-
-**Prerequisites:**
-1. OCI tenancy with appropriate permissions
-
-**What's Included:**
-- Complete OneOE Landing Zone foundation
-- Hub VCN with Model E (no NGFW firewall) architecture
-- DRG with route tables and distributions
-- OKE VCN with all networking components
-- OKE cluster with worker pools
-- All IAM resources (compartments, groups, policies)
-
-📖 **[See Single-Stack Deployment Guide →](single-stack/readme.md)**
-
----
 
 ### **Choosing the Right Approach**
 
-| Consideration | Multi-Stack | Single-Stack |
+| Consideration | [Single-stack](single-stack/) | [Multi-stack](multi-stack/) |
 |---------------|-------------|--------------|
-| **Use Case** | Add OKE to existing LZ | New deployment from scratch |
-| **Landing Zone** | Already exists | Created together |
-| **Deployment Steps** | Deploy LZ first, then OKE extension | Single deployment operation |
-| **Terraform State** | Separate (2 states) | Combined (1 state) |
-| **Resource Lifecycle** | Independent | Coupled |
-| **Flexibility** | Can destroy OKE separately | Must destroy everything together |
-| **Complexity** | Requires key coordination | Self-contained |
-| **Hub Configuration** | Manual Hub route updates | Automatic Hub route updates |
+| **Use Case** | PoC, Exploration | Production deployment |
+| **Hub Model** |  [Hub E (free)](../../../addons/oci-hub-models/hub_e/) |  [Hub A](../../../addons/oci-hub-models/hub_a/) |
+| **Routing Configuration** |  Automatic Hub route updates | Manual Hub route updates |
+| **Landing Zone** | Created together  | Already exists |
+| **Deployment Steps** | Single deployment operation | Deploy LZ first, then OKE extension |
+| **Terraform State** |  Combined (1 state) | Separate (2 states) |
+| **Resource Lifecycle** | Coupled | Independent |
+| **Complexity** | Self-contained | Requires key coordination across stacks |
+
 
 ### Common Features (Both Approaches)
 
@@ -111,7 +55,7 @@ Both approaches deploy these resources:
 
 ## License <!-- omit from toc -->
 
-Copyright (c) 2025 Oracle and/or its affiliates.
+Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
