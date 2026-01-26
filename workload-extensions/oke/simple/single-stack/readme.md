@@ -39,6 +39,8 @@
 
 This deployment combines **OneOE Blueprint**, **Hub Model E networking**, and **OKE cluster** into a **single comprehensive Terraform deployment**. Unlike the multi-stack approach where OKE is added to an existing Landing Zone, this single-stack deployment creates everything together from scratch.
 
+<img src="../single-stack/content/oke_oneclick.png" width="800">
+
 **What Makes This Different:**
 - **All-in-One**: OneOE + Hub E + OKE deployed in a single `terraform apply`
 - **Automatic Integration**: Hub routes, DRG distributions, and network connectivity configured automatically
