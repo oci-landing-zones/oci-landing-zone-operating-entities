@@ -47,6 +47,18 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 <tr>
 <td>
 
+### 📜 [Decisions](./faq_decisions.md)
+
+**Why there is something rather than nothing**
+
+- [View 20+ 'Why' Questions on key technical decisions](./faq_decisions.md)
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 ### ⚙️ [Implementation](./faq_implementation.md)
 
 **Deployment guidance and customization**
