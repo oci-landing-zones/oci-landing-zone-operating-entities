@@ -1,32 +1,23 @@
-local cis1 = import 'oneoe_security_cis1.auto.tfvars.jsonnet';
+local cis2 = import 'oneoe_security_cis2_pre.jsonnet';
 
-cis1 {
+cis2 {
   security_zones_configuration+: {
-    security_zones: {
-      'SZ-TGT-LZ-CIS-L2-KEY': {
-        name: 'sz-tgt-lz-cis-l2',
-        compartment_id: 'CMP-LANDINGZONE-KEY',
-        recipe_key: 'SZ-RCP-LZ-02-CIS-L2-KEY',
+    security_zones+: {
+      'SZ-TGT-LZ-SHARED-NETWORK-KEY': {
+        name: 'sz-tgt-lz-shared-network',
+        compartment_id: 'CMP-LZ-NETWORK-KEY',
+        recipe_key: 'SZ-RCP-LZ-03-SHARED-NETWORK-KEY',
       },
-    },
-  },
-  vaults_configuration: {
-    default_compartment_id: 'CMP-LZ-SECURITY-KEY',
-    vaults: {
-      'VLT-LZ-SHARED-SECURITY-KEY': {
-        name: 'vlt-lz-shared-security',
+      'SZ-TGT-LZ-PROD-ENVIRONMENT-NETWORK-KEY': {
+        name: 'sz-tgt-lz-prod-environment-network',
+        compartment_id: 'CMP-LZ-PROD-NETWORK-KEY',
+        recipe_key: 'SZ-RCP-LZ-04-ENVIRONMENT-NETWORK-KEY',
       },
-    },
-    keys: {
-      'KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY': {
-        name: 'key-lz-shared-oss-audit-bkt',
-        protection_mode: 'SOFTWARE',
-        vault_key: 'VLT-LZ-SHARED-SECURITY-KEY',
-        service_grantees: ['objectstorage-eu-frankfurt-1'],
-        group_grantees: ['grp-lz-shared-security-key-admin'],
-        versions: ['1', '2'],
+      'SZ-TGT-LZ-PROD-PROJ1-KEY': {
+        name: 'sz-tgt-lz-prod-proj1',
+        compartment_id: 'CMP-LZ-PROD-PROJ1-KEY',
+        recipe_key: 'SZ-RCP-LZ-05-WORKLOAD-KEY',
       },
     },
   },
 }
-

@@ -1,10 +1,7 @@
 /workload-extensions/ocvs/ @hrvolapeter
 /workload-extensions/ebs/ @rphibbert
 /workload-extensions/oke/ @paolajuarezgomez
-/addons/oci-hub-models/ @vavardan @paalonso
+/addons/oci-hub-models/ @vavardan
 /addons/oci-sovereign-landing-zone/ @vavardan @hrvolapeter @paolajuarezgomez
-/addons/oci-lz-subnetting/ @paolajuarezgomez @paalonso
-/blueprints/one-oe/runtime/ @paalonso
-/blueprints/multi-oe/generic_v1/runtime/ @paalonso
-/blueprints/multi-oe/saas/runtime/ @paalonso
-/workload-extensions/exacc/ @paalonso
+/addons/oci-lz-subnetting/ @paolajuarezgomez
+/workload-extensions/exacc/ @paolajuarezgomez
