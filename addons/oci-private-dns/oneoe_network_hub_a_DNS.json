@@ -5,7 +5,7 @@
 
         "network_configuration_categories": {
             "0-shared": {
-                "category_compartment_key"                                 : "CMP-LZP-NETWORK-KEY",
+                "category_compartment_id"                                  : "CMP-LZP-NETWORK-KEY",
 
                 "vcns": {
                     "VCN-FRA-LZP-HUB-KEY": {
