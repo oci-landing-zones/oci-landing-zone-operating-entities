@@ -22,6 +22,8 @@ Whether you're exploring OCI landing zones for the first time, deciding which bl
 - [G5. Does the landing zone comply with security best practices?](./faq_general.md/#g5-does-the-landing-zone-comply-with-security-best-practices)
 - [G6. What are the infrastructure costs when deploying an OCI Landing Zone?](./faq_general.md/#g6-what-are-the-infrastructure-costs-when-deploying-an-oci-landing-zone)
 - [G7. What is an OCI Sovereign Landing zone?](./faq_general.md/#g7-what-is-an-oci-sovereign-landing-zone)
+- [G8. What are the most common bad practices that you’ve seen?](./faq_general.md/#g8-what-are-the-most-common-bad-practices-that-youve-seen)
+
 
 </td>
 </tr>
