@@ -59,7 +59,7 @@ Note: Full configuration of the NSGs are available in the [Private DNS Network J
 
                             "resolver_endpoints": {
                                 "RESOLVER_HUB_ENDPOINT_FORWARDER_1": {
-                                    "name"                      : "dns_forwarder_fra_hub",
+                                    "name"                      : "dns_fra_forwarder_hub",
                                     "enpoint_type"              : "VNIC",
                                     "forwarding_address"        : "10.0.5.10",
                                     "is_forwarding"             : "true",
@@ -69,7 +69,7 @@ Note: Full configuration of the NSGs are available in the [Private DNS Network J
                                 },
 
                                 "RESOLVER_HUB_ENDPOINT_LISTENER_1": {
-                                    "name"                      : "dns_listener_fra_hub",
+                                    "name"                      : "dns_fra_listener_hub",
                                     "enpoint_type"              : "VNIC",
                                     "is_forwarding"             : "false",
                                     "is_listening"              : "true",
