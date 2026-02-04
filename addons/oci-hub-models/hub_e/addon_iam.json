@@ -1,33 +1,33 @@
 {
     "compartments_configuration": {
-        "enable_delete"                                        : "true",
+        "enable_delete"                                : "true",
 
         "compartments": {
             "CMP-LANDINGZONE-KEY": {
-                "name"                                         : "cmp-landingzone",
-                "description"                                  : "Enclosing Production Landing Zone Compartment",
+                "name"                                 : "cmp-landingzone",
+                "description"                          : "Enclosing Production Landing Zone Compartment",
 
                 "children": {
                     "CMP-LZ-NETWORK-KEY": {
-                        "name"                                 : "cmp-lz-network",
-                        "description"                          : "Shared Network Compartment",
+                        "name"                         : "cmp-lz-network",
+                        "description"                  : "Shared Network Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-role.tag-lz-role"        : "lz-network-admin"
+                            "tagns-lz-role.tag-lz-role": "lz-network-admin"
                         }
                     },
 
                     "CMP-LZ-PLATFORM-KEY": {
-                        "name"                                 : "cmp-lz-platform",
-                        "description"                          : "Shared Platform Compartment"
+                        "name"                         : "cmp-lz-platform",
+                        "description"                  : "Shared Platform Compartment"
                     },
 
                     "CMP-LZ-SECURITY-KEY": {
-                        "name"                                 : "cmp-lz-security",
-                        "description"                          : "Shared Security Compartment",
+                        "name"                         : "cmp-lz-security",
+                        "description"                  : "Shared Security Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-role.tag-lz-role"        : "lz-security-admin"
+                            "tagns-lz-role.tag-lz-role": "lz-security-admin"
                         }
                     }
                 }
@@ -36,74 +36,74 @@
     },
 
     "identity_domain_groups_configuration": {
-        "default_identity_domain_id"                           : "COMMON-DOMAIN",
+        "default_identity_domain_id"                   : "COMMON-DOMAIN",
 
         "groups": {
             "GRP-AUDITORS-ADMIN-KEY": {
-                "name"                                         : "grp-auditors-admin",
-                "description"                                  : "Tenancy global read access group(for security auditing or health checks)."
+                "name"                                 : "grp-auditors-admin",
+                "description"                          : "Tenancy global read access group(for security auditing or health checks)."
             },
 
             "GRP-COST-ADMIN-KEY": {
-                "name"                                         : "grp-cost-admin",
-                "description"                                  : "Tenancy global cost control group."
+                "name"                                 : "grp-cost-admin",
+                "description"                          : "Tenancy global cost control group."
             },
 
             "GRP-IAM-ADMIN-KEY": {
-                "name"                                         : "grp-iam-admin",
-                "description"                                  : "Tenancy global Identity and access management administrator group."
+                "name"                                 : "grp-iam-admin",
+                "description"                          : "Tenancy global Identity and access management administrator group."
             },
 
             "GRP-LZ-NETWORK-ADMIN-KEY": {
-                "name"                                         : "grp-lz-network-admin",
-                "description"                                  : "One-OE Landing Zone, Shared network administration group, including common OE network elements."
+                "name"                                 : "grp-lz-network-admin",
+                "description"                          : "One-OE Landing Zone, Shared network administration group, including common OE network elements."
             },
 
             "GRP-LZ-SECURITY-ADMIN-KEY": {
-                "name"                                         : "grp-lz-security-admin",
-                "description"                                  : "One-OE Landing Zone, Shared security administration group, including common OE network elements."
+                "name"                                 : "grp-lz-security-admin",
+                "description"                          : "One-OE Landing Zone, Shared security administration group, including common OE network elements."
             },
 
             "GRP-SECURITY-ADMIN-KEY": {
-                "name"                                         : "grp-security-admin",
-                "description"                                  : "Tenancy Security Administrators for global resources as Cloud Guard."
+                "name"                                 : "grp-security-admin",
+                "description"                          : "Tenancy Security Administrators for global resources as Cloud Guard."
             }
         }
     },
 
     "identity_domains_configuration": {
-        "default_compartment_id"                               : null,
-        "default_defined_tags"                                 : null,
-        "default_freeform_tags"                                : null,
+        "default_compartment_id"                       : null,
+        "default_defined_tags"                         : null,
+        "default_freeform_tags"                        : null,
 
         "identity_domains": {
             "COMMON-DOMAIN": {
-                "display_name"                                 : "id_lz_common",
-                "description"                                  : "One-OE LZ common Identity Domain",
-                "compartment_id"                               : null,
-                "admin_email"                                  : null,
-                "admin_first_name"                             : null,
-                "admin_last_name"                              : null,
-                "admin_user_name"                              : null,
-                "allow_signing_cert_public_access"             : false,
-                "home_region"                                  : null,
-                "is_hidden_on_login"                           : false,
-                "is_notification_bypassed"                     : false,
-                "is_primary_email_required"                    : false,
-                "license_type"                                 : "free",
-                "replica_region"                               : null
+                "display_name"                         : "id_lz_common",
+                "description"                          : "One-OE LZ common Identity Domain",
+                "compartment_id"                       : null,
+                "admin_email"                          : null,
+                "admin_first_name"                     : null,
+                "admin_last_name"                      : null,
+                "admin_user_name"                      : null,
+                "allow_signing_cert_public_access"     : false,
+                "home_region"                          : null,
+                "is_hidden_on_login"                   : false,
+                "is_notification_bypassed"             : false,
+                "is_primary_email_required"            : false,
+                "license_type"                         : "free",
+                "replica_region"                       : null
             }
         }
     },
 
     "policies_configuration": {
-        "enable_cis_benchmark_checks"                          : "false",
+        "enable_cis_benchmark_checks"                  : "false",
 
         "supplied_policies": {
             "PCY-AUDITING-ADMIN-KEY": {
-                "name"                                         : "pcy-auditing-admin",
-                "description"                                  : "Allow grp-auditors-admin group users to read all the resources in the tenancy.",
-                "compartment_id"                               : "TENANCY-ROOT",
+                "name"                                 : "pcy-auditing-admin",
+                "description"                          : "Allow grp-auditors-admin group users to read all the resources in the tenancy.",
+                "compartment_id"                       : "TENANCY-ROOT",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-auditors-admin' to inspect all-resources in tenancy",
@@ -132,9 +132,9 @@
             },
 
             "PCY-COST-ADMIN-KEY": {
-                "name"                                         : "pcy-cost-admin",
-                "description"                                  : "Allow grp-cost-admin group users to manage all budget resources in the tenancy.",
-                "compartment_id"                               : "TENANCY-ROOT",
+                "name"                                 : "pcy-cost-admin",
+                "description"                          : "Allow grp-cost-admin group users to manage all budget resources in the tenancy.",
+                "compartment_id"                       : "TENANCY-ROOT",
 
                 "statements": [
                     "define tenancy usage-report as ocid1.tenancy.oc1..aaaaaaaaned4fkpkisbwjlr56u7cj63lf3wffbilvqknstgtvzub7vhqkggq",
@@ -145,9 +145,9 @@
             },
 
             "PCY-GENERIC-ADMIN-KEY": {
-                "name"                                         : "pcy-generic-admin",
-                "description"                                  : "Allow defined groups to use generic services.",
-                "compartment_id"                               : "TENANCY-ROOT",
+                "name"                                 : "pcy-generic-admin",
+                "description"                          : "Allow defined groups to use generic services.",
+                "compartment_id"                       : "TENANCY-ROOT",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to use cloud-shell in tenancy",
@@ -160,9 +160,9 @@
             },
 
             "PCY-IAM-ADMIN-KEY": {
-                "name"                                         : "pcy-iam-admin",
-                "description"                                  : "Allow grp-iam-admin group users to manage IAM resources in the tenancy.",
-                "compartment_id"                               : "TENANCY-ROOT",
+                "name"                                 : "pcy-iam-admin",
+                "description"                          : "Allow grp-iam-admin group users to manage IAM resources in the tenancy.",
+                "compartment_id"                       : "TENANCY-ROOT",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-iam-admin' to manage policies in tenancy",
@@ -182,9 +182,9 @@
             },
 
             "PCY-LZ-NETWORK-ADMIN-KEY": {
-                "name"                                         : "pcy-lz-network-admin",
-                "description"                                  : "Allow grp-lz-network-admin group users to manage all network resources in the child compartments of cmp-landingzone with the matching tags.",
-                "compartment_id"                               : "CMP-LANDINGZONE-KEY",
+                "name"                                 : "pcy-lz-network-admin",
+                "description"                          : "Allow grp-lz-network-admin group users to manage all network resources in the child compartments of cmp-landingzone with the matching tags.",
+                "compartment_id"                       : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-network-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
@@ -219,9 +219,9 @@
             },
 
             "PCY-LZ-SECURITY-ADMIN-KEY": {
-                "name"                                         : "pcy-lz-security-admin",
-                "description"                                  : "Allow grp-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
-                "compartment_id"                               : "CMP-LANDINGZONE-KEY",
+                "name"                                 : "pcy-lz-security-admin",
+                "description"                          : "Allow grp-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
+                "compartment_id"                       : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-namespaces in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
@@ -268,9 +268,9 @@
             },
 
             "PCY-SECURITY-ADMIN-KEY": {
-                "name"                                         : "pcy-security-admin",
-                "description"                                  : "Allow grp-security-admin group users to manage all security resources in the security compartment.",
-                "compartment_id"                               : "TENANCY-ROOT",
+                "name"                                 : "pcy-security-admin",
+                "description"                          : "Allow grp-security-admin group users to manage all security resources in the security compartment.",
+                "compartment_id"                       : "TENANCY-ROOT",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-security-admin' to manage cloudevents-rules in tenancy",
@@ -280,9 +280,9 @@
             },
 
             "PCY-SERVICES-ADMIN-KEY": {
-                "name"                                         : "pcy-services-admin",
-                "description"                                  : "Policy for all supported services in the tenancy.",
-                "compartment_id"                               : "TENANCY-ROOT",
+                "name"                                 : "pcy-services-admin",
+                "description"                          : "Policy for all supported services in the tenancy.",
+                "compartment_id"                       : "TENANCY-ROOT",
 
                 "statements": [
                     "allow service cloudguard to manage cloudevents-rules in tenancy where target.rule.type='managed'",

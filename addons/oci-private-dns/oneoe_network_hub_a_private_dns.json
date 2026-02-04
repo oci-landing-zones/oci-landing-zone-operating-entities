@@ -595,7 +595,7 @@
                                     }
                                 }
                             },
-                            
+
                             "NSG-FRA-LZ-HUB-DNS-KEY": {
                                 "display_name"                            : "nsg-fra-lz-hub-dns",
 
@@ -619,7 +619,6 @@
                                         "protocol"                        : "UDP",
                                         "stateless"                       : true
                                     }
-
                                 },
 
                                 "ingress_rules": {
@@ -642,6 +641,7 @@
                                         "protocol"                        : "UDP",
                                         "stateless"                       : true
                                     },
+
                                     "ingress_dns_preprod_tcp": {
                                         "description"                     : "Ingress from PreProd DNS endpoint: TCP, Stateful",
                                         "src"                             : "10.0.131.10/32",
@@ -651,6 +651,7 @@
                                         "protocol"                        : "TCP",
                                         "stateless"                       : false
                                     },
+
                                     "ingress_dns_preprod_udp": {
                                         "description"                     : "Ingress from PreProd DNS endpoint: UDP, Stateless",
                                         "src"                             : "10.0.131.10/32",
