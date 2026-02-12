@@ -793,7 +793,7 @@
 
                             "routing_policies": {
                                 "LBRT-FRA-LZ-PROD-01-KEY": {
-                                    "name"                                : "lbrt-fra-lz-prod-01",
+                                    "name"                                : "lbrtfralzprod01",
                                     "condition_language_version"          : "V1",
 
                                     "rules": {
