@@ -36,7 +36,7 @@ from typing import Any, Dict, List, Tuple
 
 # Configuration constants
 INDENT_SIZE = 4  # spaces per indent level
-ENABLE_KEY_SORTING = False  # Set to True to enable key rearranging (sorting by priority, CIDR, etc.)
+ENABLE_KEY_SORTING = True  # Set to True to enable key rearranging (sorting by priority, CIDR, etc.)
 
 # Keys are sorted in this priority order first, then alphabetically
 KEY_PRIORITY_ORDER = [
