@@ -21,7 +21,7 @@ jobs:
 
       - name: Check JSON Formatting
         run: |
-          set -eou pipefail
+          set -euo pipefail
           echo "INFO: Determining changed files in this PR..."
           echo "Base SHA: ${{ github.event.pull_request.base.sha }}"
           echo "Head SHA: ${{ github.sha }}"

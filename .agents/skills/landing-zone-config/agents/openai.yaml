@@ -1,0 +1,4 @@
+interface:
+  display_name: "Landing Zone Config"
+  short_description: "Help with OCI landing zone config tasks"
+  default_prompt: "Use $landing-zone-config to author or review the config-driven OCI landing zone Jsonnet input for this repo."

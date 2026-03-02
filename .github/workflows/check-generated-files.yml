@@ -22,7 +22,7 @@ jobs:
 
       - name: Regenerate and verify
         run: |
-          set -eou pipefail
+          set -euo pipefail
           echo "INFO: Running ./gen/generate.sh to regenerate all files from templates..."
           ./gen/generate.sh
 

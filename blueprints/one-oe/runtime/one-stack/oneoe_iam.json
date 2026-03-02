@@ -43,7 +43,7 @@
 
                             "CMP-LZ-PREPROD-PROJECTS-KEY": {
                                 "name"                         : "cmp-lz-preprod-projects",
-                                "description"                  : "One-OE Pre-Production Workload Environment, Common Projects Compartment",
+                                "description"                  : "Pre-Production Workload Environment, Common Projects Compartment",
 
                                 "children": {
                                     "CMP-LZ-PREPROD-PROJ1-KEY": {
@@ -85,12 +85,12 @@
 
                             "CMP-LZ-PROD-PROJECTS-KEY": {
                                 "name"                         : "cmp-lz-prod-projects",
-                                "description"                  : "One-OE Production Workload Environment, Common Projects Compartment",
+                                "description"                  : "Production Workload Environment, Common Projects Compartment",
 
                                 "children": {
                                     "CMP-LZ-PROD-PROJ1-KEY": {
                                         "name"                 : "cmp-lz-prod-proj1",
-                                        "description"          : "Production environment, Project 1 Compartment"
+                                        "description"          : "Production environment, Project 1 compartment"
                                     }
                                 }
                             },
@@ -450,7 +450,7 @@
 
             "PCY-LZ-SECURITY-ADMIN-KEY": {
                 "name"                                         : "pcy-lz-security-admin",
-                "description"                                  : "Allow grp-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
+                "description"                                  : "Allow grp-lz-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
                 "compartment_id"                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [

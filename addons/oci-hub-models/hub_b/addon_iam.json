@@ -220,7 +220,7 @@
 
             "PCY-LZ-SECURITY-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-security-admin",
-                "description"                          : "Allow grp-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
+                "description"                          : "Allow grp-lz-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
                 "compartment_id"                       : "CMP-LANDINGZONE-KEY",
 
                 "statements": [

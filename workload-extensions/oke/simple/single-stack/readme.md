@@ -30,7 +30,7 @@
 | **NAME**         | Complete Landing Zone with OKE (Single-Stack)                                    |
 | **OBJECTIVE**        | Deploy OneOE Landing Zone + Hub Model E + OKE cluster in a single unified Terraform deployment. |
 | **TARGET RESOURCES** | Complete LZ Foundation, IAM, Hub Network, DRG, OKE VCN, OKE Cluster with all components integrated |
-| **DEPLOYMENT**          | [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_workers.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_network.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_identity.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_clusters.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_governance.auto.tfvars.json"}) </br> **Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_OKE-LZ-EXT_deployment_steps.md). [Terraform CLI](/commons/content/terraform.md)  can be also used.           |
+| **DEPLOYMENT**          | [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_workers.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_network.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_identity.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_clusters.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_governance.json"}) </br> **Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_OKE-LZ-EXT_deployment_steps.md). [Terraform CLI](/commons/content/terraform.md)  can be also used.           |
 
 
 &nbsp;
@@ -101,7 +101,7 @@ The deployment includes the complete OneOE blueprint with:
 ### **3.4 DRG Routing** <!-- omit from toc -->
 
 **Automatic DRG Configuration:**
-- **DRG Attachment**: OKE VCN attached to DRG with spoke route table (`DRGRT-FRA-LZP-SPOKES-KEY`)
+- **DRG Attachment**: OKE VCN attached to DRG with spoke route table (`DRGRT-FRA-LZ-SPOKES-KEY`)
 - **Route Distributions**:
   - Hub route distribution updated to accept routes from OKE VCN
   - Spoke route distribution updated to advertise OKE VCN routes
@@ -119,14 +119,15 @@ The deployment includes the complete OneOE blueprint with:
 
 ## **4. Configuration Files**
 
-The deployment uses four JSON configuration files:
+The deployment uses five JSON configuration files:
 
-| File | Purpose  | 
+| File | Purpose  |
 | --- | --- |
-| `oke_identity.auto.tfvars.json` | OneOE IAM + OKE-specific groups/policies |
-| `oke_network.auto.tfvars.json` | OneOE + Hub E + OKE network |
-| `oke_clusters.auto.tfvars.json` | OKE cluster configuration |
-| `oke_workers.auto.tfvars.json` | OKE Node pool configuration | 
+| `oke_identity.json` | OneOE IAM + OKE-specific groups/policies |
+| `oke_network.json` | OneOE + Hub E + OKE network |
+| `oke_governance.json` | Tag namespaces and governance definitions |
+| `oke_clusters.json` | OKE cluster configuration |
+| `oke_workers.json` | OKE Node pool configuration | 
 
 &nbsp;
 
@@ -148,7 +149,7 @@ The deployment uses four JSON configuration files:
 
 1. **Create ORM Stack**
    
-   Using one-click deployment. [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_workers.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_network.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_identity.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_clusters.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_governance.auto.tfvars.json"}) change working directory to `rms-facade`.
+   Using one-click deployment. [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_workers.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_network.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_identity.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_clusters.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_governance.json"}) change working directory to `rms-facade`.
 
 2. **Review Configuration** (Optional Customization)
 
@@ -160,7 +161,7 @@ The deployment uses four JSON configuration files:
      - Hub VCN: `10.0.0.0/21`
      - OKE VCN: `10.0.80.0/21`
      - Adjust these in the JSON files if they conflict with existing networks
-   - **Configuration Keys**: Ensure keys like `DRG-FRA-LZP-HUB-KEY` match your naming convention
+   - **Configuration Keys**: Ensure keys like `DRG-FRA-LZ-HUB-KEY` match your naming convention
 
 3. **Run Terraform Plan**
    - Click **Next** → **Create**
@@ -206,7 +207,7 @@ cd terraform-oci-modules-orchestrator
 
 ```bash
 # Copy configuration files to orchestrator directory
-cp /path/to/workload-extensions/oke/simple/single-stack/*.auto.tfvars.json \
+cp /path/to/workload-extensions/oke/simple/single-stack/*.json \
    /path/to/terraform-oci-modules-orchestrator/
 ```
 
@@ -284,7 +285,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 ### 7.1 Modify Network CIDRs
 
-**File**: `workload-extensions/oke/simple/single-stack/oke_network.auto.tfvars.json`
+**File**: `workload-extensions/oke/simple/single-stack/oke_network.json`
 
 Edit the JSON file to modify CIDR blocks:
 
@@ -294,14 +295,14 @@ Edit the JSON file to modify CIDR blocks:
     "network_configuration_categories": {
       "hub": {
         "vcns": {
-          "VCN-FRA-LZP-HUB-KEY": {
+          "VCN-FRA-LZ-HUB-KEY": {
             "cidr_blocks": ["10.1.0.0/21"]
           }
         }
       },
       "prod": {
         "vcns": {
-          "VCN-FRA-LZP-P-PLATFORM-OKE-KEY": {
+          "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY": {
             "cidr_blocks": ["10.1.80.0/21"]
           }
         }
@@ -315,7 +316,7 @@ Edit the JSON file to modify CIDR blocks:
 
 ### 7.2 Scale Worker Nodes
 
-**File**: `workload-extensions/oke/simple/single-stack/oke_workers.auto.tfvars.json`
+**File**: `workload-extensions/oke/simple/single-stack/oke_workers.json`
 
 ```json
 {
@@ -332,7 +333,7 @@ Edit the JSON file to modify CIDR blocks:
 
 ### 7.3 Change Instance Shape
 
-**File**: `workload-extensions/oke/simple/single-stack/oke_workers.auto.tfvars.json`
+**File**: `workload-extensions/oke/simple/single-stack/oke_workers.json`
 
 ```json
 {
@@ -353,7 +354,7 @@ Edit the JSON file to modify CIDR blocks:
 
 ### 7.4 Upgrade Kubernetes Version
 
-**File**: `workload-extensions/oke/simple/single-stack/oke_clusters.auto.tfvars.json`
+**File**: `workload-extensions/oke/simple/single-stack/oke_clusters.json`
 
 ```json
 {
@@ -372,7 +373,7 @@ Edit the JSON file to modify CIDR blocks:
 
 ### 7.5 Add Custom NSG Rules
 
-**File**: `workload-extensions/oke/simple/single-stack/oke_network.auto.tfvars.json`
+**File**: `workload-extensions/oke/simple/single-stack/oke_network.json`
 
 To add custom NSG rules, locate the NSG configuration in the JSON file and add new rules. Example for allowing SSH to workers:
 
@@ -419,7 +420,7 @@ Default Route:
 
 Hub and Other Networks Route:
   Destination: 10.0.0.0/16
-  Target: DRG (DRG-FRA-LZP-HUB-KEY)
+  Target: DRG (DRG-FRA-LZ-HUB-KEY)
   Purpose: Access to Hub VCN and other attached networks
 
 Service Gateway Route:
@@ -480,11 +481,11 @@ OKE VCN Route:
 
 ### 8.4 DRG Route Distributions <!-- omit from toc -->
 
-**Hub Route Distribution** (`IRTD-FRA-LZP-HUB-KEY`):
+**Hub Route Distribution** (`IRTD-FRA-LZ-HUB-KEY`):
 - Priority 30: Accept routes from OKE VCN attachment
 - Imports OKE VCN routes to Hub route table
 
-**Spoke Route Distribution** (`IRTD-FRA-LZP-SPOKE-KEY`):
+**Spoke Route Distribution** (`IRTD-FRA-LZ-SPOKE-KEY`):
 - Priority 40: Accept routes from OKE VCN attachment
 - Advertises OKE routes to other spokes (if any)
 
@@ -506,10 +507,10 @@ OKE VCN Route:
 **Cause**: IAM policies may not be sufficient or VCN configuration incorrect.
 
 **Solution**:
-1. Verify IAM policies in `oke_identity.auto.tfvars.json`
+1. Verify IAM policies in `oke_identity.json`
 2. Check that VCN-native CNI policy exists:
    ```
-   PCY-P-PLATFORM-OKE-VCN-CNI
+   PCY-LZ-PROD-PLATFORM-OKE-VCN-CNI-KEY
    ```
 3. Verify subnet CIDRs don't overlap
 4. Check NSG rules allow required traffic
@@ -558,7 +559,7 @@ OKE VCN Route:
 
 **Solution**:
 1. Verify configuration keys match exactly (case-sensitive)
-2. Check for typos: `DRG-FRA-LZP-HUB-KEY` vs `DRG-FRA-LZP-HUB`
+2. Check for typos: `DRG-FRA-LZ-HUB-KEY` vs `DRG-FRA-LZ-HUB`
 3. In single-stack, all resources are created together, so this shouldn't happen unless there's a typo
 
 ### Issue: CIDR Block Conflicts <!-- omit from toc -->

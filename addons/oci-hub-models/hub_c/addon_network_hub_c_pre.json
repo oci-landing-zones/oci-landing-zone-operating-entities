@@ -74,7 +74,7 @@
                                 "security_list_keys"                      : ["SL-FRA-LZ-HUB-MGMT-KEY"]
                             },
 
-                            "SN-FRA-LZ-HUB-DNS": {
+                            "SN-FRA-LZ-HUB-DNS-KEY": {
                                 "display_name"                            : "sn-fra-lz-hub-dns",
                                 "cidr_block"                              : "10.0.5.0/24",
                                 "dns_label"                               : "snfrahubdns",
@@ -106,7 +106,7 @@
                                 "display_name"                            : "rt-fra-lz-hub-mgmt",
 
                                 "route_rules": {
-                                    "rt-sgw": {
+                                    "rr-fra-sgw": {
                                         "description"                     : "Route to Oracle Services Network through Service GW",
                                         "destination"                     : "all-services",
                                         "destination_type"                : "SERVICE_CIDR_BLOCK",
@@ -124,7 +124,7 @@
                                 "display_name"                            : "rt-fra-lz-hub-untrust",
 
                                 "route_rules": {
-                                    "rt-igw": {
+                                    "rr-fra-igw": {
                                         "description"                     : "Route to the Internet through Internet GW",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
@@ -163,7 +163,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -196,7 +196,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -249,7 +249,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -283,7 +283,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -323,7 +323,7 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "TCP",
@@ -441,7 +441,7 @@
                                         "stateless"                       : false
                                     },
 
-                                    "http_443": {
+                                    "https_443": {
                                         "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTPS",
                                         "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
@@ -653,7 +653,7 @@
 
         "nlbs": {
             "NLB-FRA-LZ-HUB-TRUST-KEY": {
-                "display_name"                                            : "nlb-fra-hub-trust",
+                "display_name"                                            : "nlb-fra-lz-hub-trust",
                 "enable_symmetric_hashing"                                : true,
                 "is_preserve_source_destination"                          : true,
                 "is_private"                                              : true,
@@ -662,12 +662,12 @@
 
                 "listeners": {
                     "NLBLSNR-FRA-LZ-HUB-TRUST-KEY": {
-                        "name"                                            : "listener-fra-trust",
+                        "name"                                            : "listener-fra-lz-hub-trust",
                         "port"                                            : "0",
                         "protocol"                                        : "ANY",
 
                         "backend_set": {
-                            "name"                                        : "backend-set-fra-trust",
+                            "name"                                        : "backend-set-fra-lz-hub-trust",
                             "backends"                                    : {},
 
                             "health_checker": {
@@ -683,7 +683,7 @@
             },
 
             "NLB-FRA-LZ-HUB-UNTRUST-KEY": {
-                "display_name"                                            : "nlb-fra-hub-untrust",
+                "display_name"                                            : "nlb-fra-lz-hub-untrust",
                 "enable_symmetric_hashing"                                : true,
                 "is_preserve_source_destination"                          : true,
                 "is_private"                                              : true,
@@ -692,12 +692,12 @@
 
                 "listeners": {
                     "NLBLSNR-FRA-LZ-HUB-UNTRUST-KEY": {
-                        "name"                                            : "listener-fra-untrust",
+                        "name"                                            : "listener-fra-lz-hub-untrust",
                         "port"                                            : "0",
                         "protocol"                                        : "ANY",
 
                         "backend_set": {
-                            "name"                                        : "backend-set-fra-untrust",
+                            "name"                                        : "backend-set-fra-lz-hub-untrust",
                             "backends"                                    : {},
 
                             "health_checker": {

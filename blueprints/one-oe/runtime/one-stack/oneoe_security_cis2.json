@@ -175,7 +175,7 @@
         "keys": {
             "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY": {
                 "name"                              : "key-lz-shared-oss-audit-bkt",
-                "group_grantees"                    : ["grp-lz-shared-security-key-admin"],
+                "group_grantees"                    : ["grp-lz-security-admin"],
                 "protection_mode"                   : "SOFTWARE",
                 "service_grantees"                  : ["objectstorage-eu-frankfurt-1"],
                 "vault_key"                         : "VLT-LZ-SHARED-SECURITY-KEY",

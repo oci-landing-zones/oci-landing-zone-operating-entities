@@ -11,8 +11,8 @@ Requirements:
 - Add empty line before nested blocks
 
 Configuration:
-- ENABLE_KEY_SORTING: Set to False (default) to preserve original key order.
-  Set to True to enable key sorting by priority order, CIDR blocks, etc.
+- ENABLE_KEY_SORTING: Set to True (default) to enable key sorting by priority order, CIDR blocks, etc.
+  Set to False to preserve original key order.
 
 Usage:
   # Format from stdin
@@ -36,7 +36,7 @@ from typing import Any, Dict, List, Tuple
 
 # Configuration constants
 INDENT_SIZE = 4  # spaces per indent level
-ENABLE_KEY_SORTING = True # Set to True to enable key rearranging (sorting by priority, CIDR, etc.)
+ENABLE_KEY_SORTING = True  # Set to True to enable key rearranging (sorting by priority, CIDR, etc.)
 
 # Keys are sorted in this priority order first, then alphabetically
 KEY_PRIORITY_ORDER = [
@@ -105,7 +105,6 @@ KEY_PRIORITY_ORDER = [
     "SL-FRA-LZ-HUB-FW-INT-KEY",
     "NSG-FRA-LZ-HUB-FW-DMZ-KEY",
     "NSG-FRA-LZ-HUB-LB-KEY",
-    "NSG-FRA-LZ-HUB-LB-KEY",
     "NSG-FRA-LZ-HUB-FW-INT-KEY",
     "NFW-FRA-LZ-ADDRLIST-PUB-KEY",
     "NFW-FRA-LZ-ADDRLIST-PROD-KEY",
@@ -117,18 +116,18 @@ KEY_PRIORITY_ORDER = [
     "to_lb",
     "from_lb",
     "http_80",
-    "http_443",
+    "https_443",
     "anywhere",
     "ipv4address",
     "subnet_key",
     "ingress_rules",
     "egress_rules",
-    "rt-vcn-fra-hub-mgmt-sn",
-    "rt-vcn-fra-hub-logs-sn",
-    "rt-vcn-fra-hub-dns-sn",
-    "rt-internet",
-    "rt-natgw",
-    "rt-fra-prod-projects",
+    "rr-vcn-fra-hub-mgmt-sn",
+    "rr-vcn-fra-hub-mon-sn",
+    "rr-vcn-fra-hub-dns-sn",
+    "rr-fra-internet",
+    "rr-fra-natgw",
+    "rr-fra-prod-projects",
     "from_prod_http",
     "from_prod_https",
     "from_prod_icmp",

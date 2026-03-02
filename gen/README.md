@@ -1,6 +1,35 @@
 # Local Set-up
 
-To configure generation using Jsonnet `./gen/generate.sh` needs to be run for the first time manualy. This will set-up git pre-commit hooks, verify jsonnet is installed and generate files from jsonnet
+Run `bash gen/generate.sh` the first time you work on the generator. It sets up the repo hooks, checks that `jsonnet` is installed, and regenerates the checked-in outputs.
+
+## Documentation Map
+
+- [`../AGENTS.md`](../AGENTS.md): repo-specific workflow rules and generator guardrails.
+- [`CONVENTIONS.md`](CONVENTIONS.md): architecture, schema, naming rules, publication rules, and stable generator contracts.
+- [`JSONNET_COMPOSITION.md`](JSONNET_COMPOSITION.md): how the Jsonnet files compose and where to edit for common change types.
+- [`../tests/gen/`](../tests/gen/): generator test modules and fixtures.
+
+## Generator Workflow
+
+- Default generation: `bash gen/generate.sh`
+- Config mode: `bash gen/generate.sh --config <config_file> [output_dir]`
+- Raw config-mode fan-out and debugging: `jsonnet --multi <output_dir>/ --tla-code-file config=<config_file> gen/landing_zone_multi.jsonnet`
+
+Config-mode network artifacts use one canonical final file: `network.json`. Only hubs that require staged deployment also emit `network_pre.json`.
+
+Change the Jsonnet sources under `gen/` first. Checked-in JSON under `blueprints/` and `workload-extensions/` are generated snapshots, not hand-maintained source files.
+
+Use `jsonnet --multi` only for config-mode output fan-out and debugging. Do not use it to regenerate committed snapshot families.
+
+## Generator Tests
+
+Run the generator suite from the repository root with:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py'
+```
+
+These tests require `jsonnet` on `PATH`.
 
 # Jsonnet Quick Reference
 

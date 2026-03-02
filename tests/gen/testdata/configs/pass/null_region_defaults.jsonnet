@@ -1,0 +1,12 @@
+{
+  region: null,
+  region_short_name: null,
+  realm: 'oc1',
+  hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
+  environments: {
+    prod: {
+      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      projects: { proj1: {} },
+    },
+  },
+}
