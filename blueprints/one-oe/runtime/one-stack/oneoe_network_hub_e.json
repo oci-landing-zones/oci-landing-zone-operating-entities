@@ -156,7 +156,7 @@
                                         "stateless"                    : false
                                     },
                                     {
-                                        "description"                  : "ICMP type 8 (Echo)",
+                                        "description"                  : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                          : "10.0.0.0/21",
                                         "src_type"                     : "CIDR_BLOCK",
                                         "protocol"                     : "ICMP",
@@ -189,7 +189,7 @@
                                         "stateless"                    : false
                                     },
                                     {
-                                        "description"                  : "ICMP type 8 (Echo)",
+                                        "description"                  : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                          : "10.0.0.0/21",
                                         "src_type"                     : "CIDR_BLOCK",
                                         "protocol"                     : "ICMP",
@@ -248,7 +248,7 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
                                         "dst"                          : "0.0.0.0/0",
                                         "dst_type"                     : "CIDR_BLOCK",
                                         "protocol"                     : "TCP",
@@ -335,7 +335,7 @@
                                             }
                                         },
 
-                                        "ROUTE-TO-VCN-NONPROD-KEY": {
+                                        "ROUTE-TO-VCN-PREPROD-KEY": {
                                             "action"                   : "ACCEPT",
                                             "priority"                 : 20,
 
@@ -353,7 +353,7 @@
                                     "distribution_type"                : "IMPORT",
 
                                     "statements": {
-                                        "ROUTE-TO-VCN-S-HUB-KEY": {
+                                        "ROUTE-TO-VCN-HUB-KEY": {
                                             "action"                   : "ACCEPT",
                                             "priority"                 : 10,
 
@@ -364,7 +364,7 @@
                                             }
                                         },
 
-                                        "ROUTE-TO-VCN-S-PROD-KEY": {
+                                        "ROUTE-TO-VCN-PROD-KEY": {
                                             "action"                   : "ACCEPT",
                                             "priority"                 : 20,
 
@@ -375,7 +375,7 @@
                                             }
                                         },
 
-                                        "ROUTE-TO-VCN-S-NONPROD-KEY": {
+                                        "ROUTE-TO-VCN-PREPROD-KEY": {
                                             "action"                   : "ACCEPT",
                                             "priority"                 : 30,
 
@@ -572,7 +572,7 @@
                             "SN-FRA-LZ-PROD-INFRA-KEY": {
                                 "display_name"                         : "sn-fra-lz-prod-infra",
                                 "cidr_block"                           : "10.0.67.0/24",
-                                "dns_label"                            : "snfralzpinfra",
+                                "dns_label"                            : "snfralzpinfr",
                                 "dhcp_options_key"                     : "default_dhcp_options",
                                 "prohibit_internet_ingress"            : true,
                                 "prohibit_public_ip_on_vnic"           : true,
@@ -888,7 +888,7 @@
                                     },
 
                                     "rt-fra-prod-projects": {
-                                        "description"                  : "Route to th VCN Prod Projects through DRG",
+                                        "description"                  : "Route to the VCN Prod Projects through DRG",
                                         "destination"                  : "10.0.64.0/21",
                                         "destination_type"             : "CIDR_BLOCK",
                                         "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
@@ -984,7 +984,7 @@
                                         "stateless"                    : false
                                     },
 
-                                    "http_443": {
+                                    "https_443": {
                                         "description"                  : "Allow inbound traffic from Hub LB subnet over over HTTPS",
                                         "src"                          : "10.0.0.0/24",
                                         "src_type"                     : "CIDR_BLOCK",

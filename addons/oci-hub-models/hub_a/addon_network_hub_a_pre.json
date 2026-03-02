@@ -176,7 +176,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -210,7 +210,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -244,7 +244,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -277,7 +277,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -331,7 +331,7 @@
                                         "stateless"                       : false
                                     },
 
-                                    "http_443": {
+                                    "https_443": {
                                         "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTPS",
                                         "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
@@ -388,7 +388,7 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "TCP",

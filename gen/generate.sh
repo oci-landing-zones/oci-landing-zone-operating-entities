@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eou pipefail
+set -euo pipefail
 
 SCRIPT_FOLDER=$(dirname "${BASH_SOURCE[0]}")
 HOOKS_SOURCE_DIR="$SCRIPT_FOLDER/../.githooks"

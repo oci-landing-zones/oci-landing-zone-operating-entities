@@ -61,7 +61,7 @@ one_oe_hub_e + oke_network + {
                 },
                 'DRGRD-FRA-LZ-SPOKE-KEY'+: {
                   statements+: {
-                    'ROUTE-TO-VCN-S-PROD-PLATFORM-OKE-KEY': {
+                    'ROUTE-TO-VCN-PROD-PLATFORM-OKE-KEY': {
                       priority: 40,
                       action: 'ACCEPT',
                       match_criteria: {
