@@ -38,13 +38,13 @@ for hook in "$HOOKS_SOURCE_DIR"/*; do
 
   # Check if hook already exists
   if [ -f "$target_hook" ]; then
-    ((ALREADY_EXISTED_COUNT++))
+    ALREADY_EXISTED_COUNT=$((ALREADY_EXISTED_COUNT + 1))
   else
     # Copy the hook and make it executable
     cp "$hook" "$target_hook"
     chmod +x "$target_hook"
     echo "Installed git hook for automated execution of templates: $hook_name"
-    ((INSTALLED_COUNT++))
+    INSTALLED_COUNT=$((INSTALLED_COUNT + 1))
   fi
 done
 

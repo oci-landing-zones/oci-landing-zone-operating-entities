@@ -36,17 +36,19 @@ from typing import Any, Dict, List, Tuple
 
 # Configuration constants
 INDENT_SIZE = 4  # spaces per indent level
-ENABLE_KEY_SORTING = False  # Set to True to enable key rearranging (sorting by priority, CIDR, etc.)
+ENABLE_KEY_SORTING = True # Set to True to enable key rearranging (sorting by priority, CIDR, etc.)
 
 # Keys are sorted in this priority order first, then alphabetically
 KEY_PRIORITY_ORDER = [
     "name",
+    "action",
     "display_name",
     "description",
     "id",
     "compartment_id",
     "compartment_key",
     "cidr_blocks",
+    "cidr_block",
     "dns_label",
     "block_nat_traffic",
     "is_attach_drg",
@@ -54,7 +56,10 @@ KEY_PRIORITY_ORDER = [
     "is_ipv6enabled",
     "is_oracle_gua_allocation_enabled",
     "type",
-    "protocol",
+    "attached_resource_key",
+    "ip_address",
+    "interval_ms",
+    "is_force_plain_text",
     "port",
     "vcns",
     "subnets",
@@ -62,6 +67,74 @@ KEY_PRIORITY_ORDER = [
     "default_security_list",
     "security_lists",
     "network_security_groups",
+    "minimum_port",
+    "maximum_port",
+    "src",
+    "src_type",
+    "src_port_min",
+    "src_port_max",
+    "dst",
+    "dst_type",
+    "dst_port_min",
+    "dst_port_max",
+    "protocol",
+    "icmp_type",
+    "icmp_code",
+    "services",
+    "service_lists",
+    "applications",
+    "application_lists",
+    "address_lists",
+    "url_lists",
+    "security_rules",
+    "shape_details",
+    "listeners",
+    "backend_sets",
+    "source_address_lists",
+    "destination_address_lists",
+    "match_type",
+    "RT-FRA-LZ-HUB-INGRESS-KEY",
+    "RT-FRA-LZ-HUB-LB-KEY",
+    "RT-FRA-LZ-HUB-FW-KEY",
+    "RT-FRA-LZ-HUB-FW-DMZ-KEY",
+    "RT-FRA-LZ-HUB-FW-INT-KEY",
+    "RT-FRA-LZ-HUB-NATGW-KEY",
+    "RT-FRA-LZ-HUB-IGW-KEY",
+    "SL-FRA-LZ-HUB-FW-DMZ-KEY",
+    "SL-FRA-LZ-HUB-LB-KEY",
+    "SL-FRA-LZ-HUB-FW-INT-KEY",
+    "NSG-FRA-LZ-HUB-FW-DMZ-KEY",
+    "NSG-FRA-LZ-HUB-LB-KEY",
+    "NSG-FRA-LZ-HUB-LB-KEY",
+    "NSG-FRA-LZ-HUB-FW-INT-KEY",
+    "NFW-FRA-LZ-ADDRLIST-PUB-KEY",
+    "NFW-FRA-LZ-ADDRLIST-PROD-KEY",
+    "DRGATT-FRA-LZ-HUB-VCN-KEY",
+    "DRGATT-FRA-LZ-PROD-PROJ-KEY",
+    "NSG-FRA-LZ-PREPROD-PROJ1-WEB-KEY",
+    "NSG-FRA-LZ-PREPROD-PROJ1-APP-KEY",
+    "NSG-FRA-LZ-PREPROD-PROJ1-DB-KEY",
+    "to_lb",
+    "from_lb",
+    "http_80",
+    "http_443",
+    "anywhere",
+    "ipv4address",
+    "subnet_key",
+    "ingress_rules",
+    "egress_rules",
+    "rt-vcn-fra-hub-mgmt-sn",
+    "rt-vcn-fra-hub-logs-sn",
+    "rt-vcn-fra-hub-dns-sn",
+    "rt-internet",
+    "rt-natgw",
+    "rt-fra-prod-projects",
+    "from_prod_http",
+    "from_prod_https",
+    "from_prod_icmp",
+    "from_preprod_http",
+    "from_preprod_https",
+    "from_preprod_icmp",
 ]
 
 
@@ -478,12 +551,19 @@ Examples:
             return 1
 
         # Process all files
-        all_success = True
+        failed_files = []
         for file_path in all_files:
             success = process_file(file_path, check_mode=args.check)
-            all_success = all_success and success
+            if not success:
+                failed_files.append(file_path)
 
-        return 0 if all_success else 1
+        if failed_files:
+            print(f"\n{len(failed_files)} file(s) failed:", file=sys.stderr)
+            for f in failed_files:
+                print(f"  - {f}", file=sys.stderr)
+            return 1
+
+        return 0
 
     except json.JSONDecodeError as e:
         print(f"Error: Invalid JSON input: {e}", file=sys.stderr)

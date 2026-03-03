@@ -22,8 +22,8 @@
                         "subnets": {
                             "SUBNET-HUB-KEY": {
                                 "display_name"                 : "sn-fra-hub-fw",
-                                "dns_label"                    : "snfrahubfw",
                                 "cidr_block"                   : "10.0.0.0/26",
+                                "dns_label"                    : "snfrahubfw",
                                 "dhcp_options_key"             : "default_dhcp_options",
                                 "ipv6cidr_blocks"              : [],
                                 "prohibit_internet_ingress"    : true,
@@ -41,33 +41,33 @@
                         },
 
                         "default_security_list": {
-                            "egress_rules": [
-                                {
-                                    "description"              : "egress to 0.0.0.0/0 over ALL protocols",
-                                    "protocol"                 : "ALL",
-                                    "dst"                      : "0.0.0.0/0",
-                                    "dst_type"                 : "CIDR_BLOCK",
-                                    "stateless"                : false
-                                }
-                            ],
-
                             "ingress_rules": [
                                 {
                                     "description"              : "ingress from 0.0.0.0/0 over TCP22",
-                                    "protocol"                 : "TCP",
-                                    "dst_port_max"             : 22,
-                                    "dst_port_min"             : 22,
                                     "src"                      : "0.0.0.0/0",
                                     "src_type"                 : "CIDR_BLOCK",
+                                    "dst_port_min"             : 22,
+                                    "dst_port_max"             : 22,
+                                    "protocol"                 : "TCP",
                                     "stateless"                : false
                                 },
                                 {
                                     "description"              : "ingress from 0.0.0.0/0 over TCP443",
-                                    "protocol"                 : "TCP",
-                                    "dst_port_max"             : 443,
-                                    "dst_port_min"             : 443,
                                     "src"                      : "0.0.0.0/0",
                                     "src_type"                 : "CIDR_BLOCK",
+                                    "dst_port_min"             : 443,
+                                    "dst_port_max"             : 443,
+                                    "protocol"                 : "TCP",
+                                    "stateless"                : false
+                                }
+                            ],
+
+                            "egress_rules": [
+                                {
+                                    "description"              : "egress to 0.0.0.0/0 over ALL protocols",
+                                    "dst"                      : "0.0.0.0/0",
+                                    "dst_type"                 : "CIDR_BLOCK",
+                                    "protocol"                 : "ALL",
                                     "stateless"                : false
                                 }
                             ]
@@ -125,8 +125,8 @@
                         "subnets": {
                             "SUBNET-CH-KEY": {
                                 "display_name"                 : "sn-channels-np-common",
-                                "dns_label"                    : "snchnpcommon",
                                 "cidr_block"                   : "10.1.0.0/26",
+                                "dns_label"                    : "snchnpcommon",
                                 "dhcp_options_key"             : "default_dhcp_options",
                                 "ipv6cidr_blocks"              : [],
                                 "prohibit_internet_ingress"    : true,
@@ -144,33 +144,33 @@
                         },
 
                         "default_security_list": {
-                            "egress_rules": [
-                                {
-                                    "description"              : "egress to 0.0.0.0/0 over ALL protocols",
-                                    "protocol"                 : "ALL",
-                                    "dst"                      : "0.0.0.0/0",
-                                    "dst_type"                 : "CIDR_BLOCK",
-                                    "stateless"                : false
-                                }
-                            ],
-
                             "ingress_rules": [
                                 {
                                     "description"              : "ingress from 0.0.0.0/0 over TCP22",
-                                    "protocol"                 : "TCP",
-                                    "dst_port_max"             : 22,
-                                    "dst_port_min"             : 22,
                                     "src"                      : "0.0.0.0/0",
                                     "src_type"                 : "CIDR_BLOCK",
+                                    "dst_port_min"             : 22,
+                                    "dst_port_max"             : 22,
+                                    "protocol"                 : "TCP",
                                     "stateless"                : false
                                 },
                                 {
                                     "description"              : "ingress from 0.0.0.0/0 over TCP443",
-                                    "protocol"                 : "TCP",
-                                    "dst_port_max"             : 443,
-                                    "dst_port_min"             : 443,
                                     "src"                      : "0.0.0.0/0",
                                     "src_type"                 : "CIDR_BLOCK",
+                                    "dst_port_min"             : 443,
+                                    "dst_port_max"             : 443,
+                                    "protocol"                 : "TCP",
+                                    "stateless"                : false
+                                }
+                            ],
+
+                            "egress_rules": [
+                                {
+                                    "description"              : "egress to 0.0.0.0/0 over ALL protocols",
+                                    "dst"                      : "0.0.0.0/0",
+                                    "dst_type"                 : "CIDR_BLOCK",
+                                    "protocol"                 : "ALL",
                                     "stateless"                : false
                                 }
                             ]

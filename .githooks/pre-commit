@@ -1,16 +1,23 @@
 #!/bin/bash
 set -eou pipefail
 
-# Stash non added files before running
-git stash --keep-index --include-untracked
+# Stash non-staged files
+STASH_COUNT=$(git stash list | wc -l | tr -d ' ')
+git stash --keep-index --include-untracked || true
 
 echo "Generating templates 📄"
 ./gen/generate.sh
 
-# Add working directory
-git add .
+echo "Formatting JSON files 📐"
+find . -name '*.json' -not -path './.git/*' -not -path './gen/*' | xargs python3 ./gen/format_json.py
 
-# Restore original working directory
-git stash pop
+# Stage all changes (stash ensures only staged content + generation output is present)
+git add -A
+
+# Restore unstaged changes (only if we actually created a stash)
+NEW_STASH_COUNT=$(git stash list | wc -l | tr -d ' ')
+if [ "$NEW_STASH_COUNT" -gt "$STASH_COUNT" ]; then
+  git stash pop || true
+fi
 
 exit 0
