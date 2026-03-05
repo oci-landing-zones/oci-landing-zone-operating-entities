@@ -19,7 +19,11 @@ A Worklod extension satisfies the requirements to deploy a specific, complex wor
 
 ## **3. Deployment**
 
-These are the required steps to provision the ExaDB-C@C landing zone extension:
+The EXACC Landing Zone Extension provides two deployment approaches, single-stack and multi-stack, to accommodate different use cases and architectural preferences. Both approaches use the OCI Landing Zone Orchestrator for automated dependency resolution with configuration keys.
+
+
+
+
 
  1. It's required to already have deployed an OCI Landing Zone. In this guide we will build on top of the [One-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe) Landing Zone without any network.
  2. **Deploy** the Landing Zone ExaDB-C@C requirements with the [**Step 1 - ExaDB-C@C Extension**](1_exacc_extension/) guide.
