@@ -12,6 +12,22 @@ exacc_identity {
         defined_tags: {
             'tagns-lz-role.tag-lz-role': 'lz-exacs-admin',
           },
+          children: {
+            'CMP-LZ-EXACS-DB-KEY': {
+              name: 'cmp-lz-exacs-db',
+              description: 'Shared exacs Platform, db compartment',
+              defined_tags: {
+                'tagns-lz-role.tag-lz-role': 'lz-exacs-db-admin',
+              },
+            },
+            'CMP-LZ-EXACS-INFRA-KEY': {
+              name: 'cmp-lz-exacs-infra',
+              description: 'Shared exacs Platform, infra compartment',
+              defined_tags: {
+                'tagns-lz-role.tag-lz-role': 'lz-exacs-infra-admin',
+              },
+            },
+          },
       },
     },
   },
