@@ -1,9 +1,11 @@
 {
     "alarms_configuration": {
+        "default_compartment_id"                : "CMP-LZ-NETWORK-KEY",
+
         "alarms": {
             "AL-LZ-NETWORK-LB-KEY": {
-                "destination_topic_ids"         : ["NOTT-LZ-NETWORK-KEY"],
                 "display_name"                  : "al-lz-network-lb",
+                "destination_topic_ids"         : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                    : "false",
 
                 "supplied_alarm": {
@@ -13,8 +15,7 @@
                     "query"                     : "UnHealthyBackendServers[1m].mean() >= 0"
                 }
             }
-        },
-        "default_compartment_id"                : "CMP-LZ-NETWORK-KEY"
+        }
     },
 
     "events_configuration": {
@@ -273,14 +274,72 @@
         }
     },
 
+    "logging_configuration": {
+        "default_compartment_id"                : "CMP-LZ-SECURITY-KEY",
+
+        "flow_logs": {
+            "LOG-LZ-PREPROD-SUBNET-FLOW-KEY": {
+                "log_group_id"                  : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"          : "subnet"
+            },
+
+            "LOG-LZ-PREPROD-VCN-FLOW-KEY": {
+                "log_group_id"                  : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"          : "vcn"
+            },
+
+            "LOG-LZ-PROD-SUBNET-FLOW-KEY": {
+                "log_group_id"                  : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"          : "subnet"
+            },
+
+            "LOG-LZ-PROD-VCN-FLOW-KEY": {
+                "log_group_id"                  : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"          : "vcn"
+            },
+
+            "LOG-LZ-SUBNET-FLOW-KEY": {
+                "log_group_id"                  : "LGRP-LZ-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-NETWORK-KEY"],
+                "target_resource_type"          : "subnet"
+            },
+
+            "LOG-LZ-VCN-FLOW-KEY": {
+                "log_group_id"                  : "LGRP-LZ-VCN-FLOW-KEY",
+                "target_compartment_ids"        : ["CMP-LZ-NETWORK-KEY"],
+                "target_resource_type"          : "vcn"
+            }
+        },
+
+        "log_groups": {
+            "LGRP-LZ-PREPROD-VCN-FLOW-KEY": {
+                "name"                          : "lgrp-lz-preprod-vcn-flow",
+                "compartment_id"                : "CMP-LZ-PREPROD-SECURITY-KEY"
+            },
+
+            "LGRP-LZ-PROD-VCN-FLOW-KEY": {
+                "name"                          : "lgrp-lz-prod-vcn-flow",
+                "compartment_id"                : "CMP-LZ-PROD-SECURITY-KEY"
+            },
+
+            "LGRP-LZ-VCN-FLOW-KEY": {
+                "name"                          : "lgrp-lz-vcn-flow"
+            }
+        }
+    },
+
     "notifications_configuration": {
         "default_compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
         "topics": {
             "NOTT-LZ-CLOUDGUARD-KEY": {
-                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
-                "description"                   : "Topic for Cloud Guard related notifications.",
                 "name"                          : "nott-lz-cloudguard",
+                "description"                   : "Topic for Cloud Guard related notifications.",
+                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
@@ -291,9 +350,9 @@
             },
 
             "NOTT-LZ-IAM-KEY": {
-                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
-                "description"                   : "Topic for IAM related notifications.",
                 "name"                          : "nott-lz-iam",
+                "description"                   : "Topic for IAM related notifications.",
+                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
@@ -304,9 +363,9 @@
             },
 
             "NOTT-LZ-NETWORK-KEY": {
-                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
-                "description"                   : "Topic for network related notifications.",
                 "name"                          : "nott-lz-network",
+                "description"                   : "Topic for network related notifications.",
+                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
@@ -317,9 +376,9 @@
             },
 
             "NOTT-LZ-SECURITY-KEY": {
-                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
-                "description"                   : "Topic for notifications.",
                 "name"                          : "nott-lz-security",
+                "description"                   : "Topic for notifications.",
+                "compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
@@ -332,33 +391,35 @@
     },
 
     "service_connectors_configuration": {
+        "default_compartment_id"                : "CMP-LZ-SECURITY-KEY",
+
         "buckets": {
             "BKT-LZ-SERVICE-CONNECTOR": {
-                "cis_level"                     : "2",
+                "name"                          : "bkt-lz-service-connector",
                 "compartment_id"                : "CMP-LZ-SECURITY-KEY",
-                "kms_key_id"                    : "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY",
-                "name"                          : "bkt-lz-service-connector"
+                "cis_level"                     : "2",
+                "kms_key_id"                    : "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY"
             }
         },
-        "default_compartment_id"                : "CMP-LZ-SECURITY-KEY",
 
         "service_connectors": {
             "SCH-LZ-MONITOR-KEY": {
                 "display_name"                  : "sch-lz-monitor",
 
                 "policy": {
-                    "compartment_id"            : "CMP-LZ-SECURITY-KEY",
+                    "name"                      : "service-connector-audit-policy",
                     "description"               : "IAM policy for letting Service Connector to push data to target resource.",
-                    "name"                      : "service-connector-audit-policy"
+                    "compartment_id"            : "CMP-LZ-SECURITY-KEY"
                 },
 
                 "source": {
+                    "kind"                      : "logging",
+
                     "audit_logs": [
                         {
                             "cmp_id"            : "ALL"
                         }
-                    ],
-                    "kind"                      : "logging"
+                    ]
                 },
 
                 "target": {
