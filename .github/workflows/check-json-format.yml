@@ -38,13 +38,26 @@ jobs:
           echo "$CHANGED_FILES"
           echo "---"
 
-          # Filter for JSON files only
+          # Filter for manually-maintained JSON files only (exclude generated files)
           JSON_FILES=""
+          SKIPPED_FILES=""
           for file in $CHANGED_FILES; do
             if [[ "$file" == *.json ]] && [ -f "$file" ]; then
-              JSON_FILES="$JSON_FILES $file"
+              # Check if this JSON file has a corresponding jsonnet template
+              template_file="gen/${file%.json}.jsonnet"
+              if [ -f "$template_file" ]; then
+                SKIPPED_FILES="$SKIPPED_FILES $file"
+              else
+                JSON_FILES="$JSON_FILES $file"
+              fi
             fi
           done
+
+          if [ -n "$SKIPPED_FILES" ]; then
+            echo "INFO: Skipping generated files (checked by regeneration workflow):"
+            echo "$SKIPPED_FILES"
+            echo "---"
+          fi
 
           if [ -z "$JSON_FILES" ]; then
             echo "INFO: No JSON files were modified in this PR. Skipping check."
