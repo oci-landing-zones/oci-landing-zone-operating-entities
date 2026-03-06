@@ -1,17 +1,12 @@
-local one_oe = import '../../../../blueprints/one-oe/runtime/one-stack/oneoe_iam.json';
-local exacc_identity = import './exacc_identity.libsonnet';
+local exacc_identity = import '../exacc_identity.libsonnet';
 
-one_oe + exacc_identity + {
+exacc_identity {
   compartments_configuration+: {
     enable_delete: 'true',
 
     compartments+: {
-      'CMP-LANDINGZONE-KEY'+: {
+       'CMP-LZ-PROD-PLATFORM-KEY'+: {
         children+: {
-          'CMP-LZ-PROD-KEY'+: {
-            children+: {
-              'CMP-LZ-PROD-PLATFORM-KEY'+: {
-                children+: {
                   'CMP-LZ-PROD-PLATFORM-EXACC-KEY': {
                     name: 'cmp-lz-exacc',
                     description: 'ExaCC Shared Platform',
@@ -35,10 +30,6 @@ one_oe + exacc_identity + {
                       },
                     },
                   },
-                },
-              },
-            },
-          },
         },
       },
     },
@@ -46,8 +37,3 @@ one_oe + exacc_identity + {
 }
 
 
-
-
-
-
- 

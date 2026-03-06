@@ -1,0 +1,1129 @@
+{
+    "alarms_configuration": {
+        "alarms": {
+            "AL-LZ-NETWORK-LB-KEY": {
+                "destination_topic_ids"                       : ["NOTT-LZ-NETWORK-KEY"],
+                "display_name"                                : "al-lz-network-lb",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_lbaas",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "UnHealthyBackendServers[1m].mean() >= 0"
+                }
+            },
+
+            "AL-LZP-P-PROJ2-DB-CLUSTER-CPUUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-P-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-P-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-p-proj2-vmc-cpuutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database_cluster",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-P-PROJ2-DB-CLUSTER-DISKUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-P-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-P-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-p-proj2-vmc-dgutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database_cluster",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "ASMDiskgroupUtilization[1m].mean() <= 90",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-P-PROJ2-DB-CLUSTER-FSUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-P-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-P-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-p-proj2-vmc-fsutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database_cluster",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "FilesystemUtilization[1m].mean() >= 90",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-P-PROJ2-DB-CLUSTER-MEMUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-P-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-P-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-p-proj2-vmc-memutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database_cluster",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "MemoryUtilization[1m].mean() >= 80",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-P-PROJ2-DB-CLUSTER-SWAPUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-P-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-P-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-p-proj2-vmc-swaputil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database_cluster",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "SwapUtilization[1m].mean() >= 75",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-P-PROJ2-DB-DB-CPUUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-P-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-P-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-p-proj2-db-cpuutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-P-PROJ2-DB-DB-STORAGEUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-P-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-P-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-p-proj2-db-storageutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "StorageUtilization[1m].mean() >= 90",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-PP-PROJ2-DB-CLUSTER-CPUUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-PP-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PP-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-pp-proj2-vmc-cpuutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database_cluster",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-PP-PROJ2-DB-CLUSTER-DISKUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-PP-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PP-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-pp-proj2-vmc-dgutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database_cluster",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "ASMDiskgroupUtilization[1m].mean() <= 90",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-PP-PROJ2-DB-CLUSTER-FSUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-PP-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PP-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-pp-proj2-vmc-fsutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database_cluster",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "FilesystemUtilization[1m].mean() >= 90",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-PP-PROJ2-DB-CLUSTER-MEMUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-PP-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PP-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-pp-proj2-vmc-memutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database_cluster",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "MemoryUtilization[1m].mean() >= 80",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-PP-PROJ2-DB-CLUSTER-SWAPUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-PP-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PP-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-pp-proj2-vmc-swaputil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database_cluster",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "SwapUtilization[1m].mean() >= 75",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-PP-PROJ2-DB-DB-CPUUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-PP-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PP-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-pp-proj2-db-cpuutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                : "CRITICAL"
+                }
+            },
+
+            "AL-LZP-PP-PROJ2-DB-DB-STORAGEUTIL-KEY": {
+                "compartment_id"                              : "CMP-LZP-PP-PROJ2-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PP-WORKLOADS-KEY"],
+                "display_name"                                : "al-lzp-pp-proj2-db-storageutil",
+                "is_enabled"                                  : "false",
+
+                "supplied_alarm": {
+                    "message_format"                          : "PRETTY_JSON",
+                    "namespace"                               : "oci_database",
+                    "pending_duration"                        : "PT5M",
+                    "query"                                   : "StorageUtilization[1m].mean() >= 90",
+                    "severity"                                : "CRITICAL"
+                }
+            }
+        },
+        "default_compartment_id"                              : "CMP-LZP-P-PROJECTS-KEY"
+    },
+
+    "events_configuration": {
+        "default_compartment_id"                              : "CMP-LZP-SECURITY-KEY",
+
+        "event_rules": {
+            "RUL-LZ-NOTIFY-NETWORK-KEY": {
+                "compartment_id"                              : "CMP-LZ-NETWORK-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZ-NETWORK-KEY"],
+                "event_display_name"                          : "rul-lz-notify-network",
+
+                "supplied_events": [
+                    "com.oraclecloud.virtualnetwork.createvcn",
+                    "com.oraclecloud.virtualnetwork.deletevcn",
+                    "com.oraclecloud.virtualnetwork.updatevcn",
+                    "com.oraclecloud.virtualnetwork.createroutetable",
+                    "com.oraclecloud.virtualnetwork.deleteroutetable",
+                    "com.oraclecloud.virtualnetwork.updateroutetable",
+                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
+                    "com.oraclecloud.virtualnetwork.createsecuritylist",
+                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
+                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
+                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
+                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
+                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
+                    "com.oraclecloud.virtualnetwork.createdrg",
+                    "com.oraclecloud.virtualnetwork.deletedrg",
+                    "com.oraclecloud.virtualnetwork.updatedrg",
+                    "com.oraclecloud.virtualnetwork.createdrgattachment",
+                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
+                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
+                    "com.oraclecloud.virtualnetwork.createinternetgateway",
+                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
+                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
+                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
+                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
+                    "com.oraclecloud.natgateway.createnatgateway",
+                    "com.oraclecloud.natgateway.deletenatgateway",
+                    "com.oraclecloud.natgateway.updatenatgateway",
+                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
+                    "com.oraclecloud.servicegateway.createservicegateway",
+                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
+                    "com.oraclecloud.servicegateway.attachserviceid",
+                    "com.oraclecloud.servicegateway.detachserviceid",
+                    "com.oraclecloud.servicegateway.updateservicegateway",
+                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
+                    "com.oraclecloud.virtualnetwork.createpublicip",
+                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
+                ]
+            },
+
+            "RUL-LZ-NOTIFY-SECURITY-KEY": {
+                "compartment_id"                              : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"                          : "rul-lz-notify-security",
+
+                "supplied_events": [
+                    "com.oraclecloud.notification.createsubscription",
+                    "com.oraclecloud.notification.deletesubscription",
+                    "com.oraclecloud.notification.getunsubscription",
+                    "com.oraclecloud.notification.movesubscription",
+                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
+                    "com.oraclecloud.notification.updatesubscription"
+                ]
+            },
+
+            "RUL-LZ-PREPROD-NOTIFY-NETWORK-KEY": {
+                "compartment_id"                              : "CMP-LZ-PREPROD-NETWORK-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZ-NETWORK-KEY"],
+                "event_display_name"                          : "rul-lz-preprod-notify-network",
+
+                "supplied_events": [
+                    "com.oraclecloud.virtualnetwork.createvcn",
+                    "com.oraclecloud.virtualnetwork.deletevcn",
+                    "com.oraclecloud.virtualnetwork.updatevcn",
+                    "com.oraclecloud.virtualnetwork.createroutetable",
+                    "com.oraclecloud.virtualnetwork.deleteroutetable",
+                    "com.oraclecloud.virtualnetwork.updateroutetable",
+                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
+                    "com.oraclecloud.virtualnetwork.createsecuritylist",
+                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
+                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
+                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
+                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
+                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
+                    "com.oraclecloud.virtualnetwork.createdrg",
+                    "com.oraclecloud.virtualnetwork.deletedrg",
+                    "com.oraclecloud.virtualnetwork.updatedrg",
+                    "com.oraclecloud.virtualnetwork.createdrgattachment",
+                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
+                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
+                    "com.oraclecloud.virtualnetwork.createinternetgateway",
+                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
+                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
+                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
+                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
+                    "com.oraclecloud.natgateway.createnatgateway",
+                    "com.oraclecloud.natgateway.deletenatgateway",
+                    "com.oraclecloud.natgateway.updatenatgateway",
+                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
+                    "com.oraclecloud.servicegateway.createservicegateway",
+                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
+                    "com.oraclecloud.servicegateway.attachserviceid",
+                    "com.oraclecloud.servicegateway.detachserviceid",
+                    "com.oraclecloud.servicegateway.updateservicegateway",
+                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
+                    "com.oraclecloud.virtualnetwork.createpublicip",
+                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
+                ]
+            },
+
+            "RUL-LZ-PREPROD-NOTIFY-SECURITY-KEY": {
+                "compartment_id"                              : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"                          : "rul-lz-preprod-notify-security",
+
+                "supplied_events": [
+                    "com.oraclecloud.notification.createsubscription",
+                    "com.oraclecloud.notification.deletesubscription",
+                    "com.oraclecloud.notification.getunsubscription",
+                    "com.oraclecloud.notification.movesubscription",
+                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
+                    "com.oraclecloud.notification.updatesubscription"
+                ]
+            },
+
+            "RUL-LZ-PROD-NOTIFY-NETWORK-KEY": {
+                "compartment_id"                              : "CMP-LZ-PROD-NETWORK-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZ-NETWORK-KEY"],
+                "event_display_name"                          : "rul-lz-prod-notify-network",
+
+                "supplied_events": [
+                    "com.oraclecloud.virtualnetwork.createvcn",
+                    "com.oraclecloud.virtualnetwork.deletevcn",
+                    "com.oraclecloud.virtualnetwork.updatevcn",
+                    "com.oraclecloud.virtualnetwork.createroutetable",
+                    "com.oraclecloud.virtualnetwork.deleteroutetable",
+                    "com.oraclecloud.virtualnetwork.updateroutetable",
+                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
+                    "com.oraclecloud.virtualnetwork.createsecuritylist",
+                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
+                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
+                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
+                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
+                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
+                    "com.oraclecloud.virtualnetwork.createdrg",
+                    "com.oraclecloud.virtualnetwork.deletedrg",
+                    "com.oraclecloud.virtualnetwork.updatedrg",
+                    "com.oraclecloud.virtualnetwork.createdrgattachment",
+                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
+                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
+                    "com.oraclecloud.virtualnetwork.createinternetgateway",
+                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
+                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
+                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
+                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
+                    "com.oraclecloud.natgateway.createnatgateway",
+                    "com.oraclecloud.natgateway.deletenatgateway",
+                    "com.oraclecloud.natgateway.updatenatgateway",
+                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
+                    "com.oraclecloud.servicegateway.createservicegateway",
+                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
+                    "com.oraclecloud.servicegateway.attachserviceid",
+                    "com.oraclecloud.servicegateway.detachserviceid",
+                    "com.oraclecloud.servicegateway.updateservicegateway",
+                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
+                    "com.oraclecloud.virtualnetwork.createpublicip",
+                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
+                ]
+            },
+
+            "RUL-LZ-PROD-NOTIFY-SECURITY-KEY": {
+                "compartment_id"                              : "CMP-LZ-PROD-SECURITY-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"                          : "rul-lz-prod-notify-security",
+
+                "supplied_events": [
+                    "com.oraclecloud.notification.createsubscription",
+                    "com.oraclecloud.notification.deletesubscription",
+                    "com.oraclecloud.notification.getunsubscription",
+                    "com.oraclecloud.notification.movesubscription",
+                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
+                    "com.oraclecloud.notification.updatesubscription"
+                ]
+            },
+
+            "RUL-LZP-NOTIFICATION-OPERATOR-ACCESS-CONTROL-KEY": {
+                "compartment_id"                              : "CMP-LZP-SECURITY-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-SECURITY-KEY"],
+                "event_display_name"                          : "rul-lzp-notify-on-opctl-events",
+
+                "supplied_events": [
+                    "com.oraclecloud.operatorcontrol.UpdateOperatorControl",
+                    "com.oraclecloud.operatorcontrol.DeleteOperatorControl",
+                    "com.oraclecloud.operatorcontrol.UpdateOperatorControlAssignment",
+                    "com.oraclecloud.operatorcontrol.DeleteOperatorControlAssignment",
+                    "com.oraclecloud.operatorcontrol.ApproveAccessRequest",
+                    "com.oraclecloud.operatorcontrol.AutoApproveAccessRequest",
+                    "com.oraclecloud.operatorcontrol.CreateAccessRequest",
+                    "com.oraclecloud.operatoraccesscontrol.AddSharedOperator",
+                    "com.oraclecloud.operatorcontrol.RejectAccessRequest",
+                    "com.oraclecloud.operatorcontrol.RevokeAccessRequest",
+                    "com.oraclecloud.operatorcontrol.ExpiredAccessRequest",
+                    "com.oraclecloud.operatorcontrol.ClosedAccessRequest",
+                    "com.oraclecloud.operatorcontrol.ExtendAccessRequest",
+                    "com.oraclecloud.operatorcontrol.OperatorLogin",
+                    "com.oraclecloud.operatorcontrol.OperatorLogout"
+                ]
+            },
+
+            "RUL-LZP-NOTIFICATION-PLATFORM-EXACC-KEY": {
+                "compartment_id"                              : "CMP-LZP-PLATFORM-EXACC-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PLATFORM-KEY"],
+                "event_display_name"                          : "rul-lzp-notify-on-exacc-events",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
+                    "com.oraclecloud.databaseservice.deleteexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.deleteexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.updateexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.updateexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.exadatainfrastructureconnectstatus",
+                    "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
+                    "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
+                    "com.oraclecloud.databaseservice.changevmclustercompartment",
+                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
+                    "com.oraclecloud.databaseservice.deletevmcluster.end",
+                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
+                    "com.oraclecloud.databaseservice.updatevmcluster.end",
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
+                    "com.oraclecloud.databaseservice.dbnodeaction.end",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
+                    "com.oraclecloud.databaseservice.patchvmcluster.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
+                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
+                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancereminder",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.start",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            },
+
+            "RUL-LZP-P-NOTIFICATION-PLATFORM-EXACC-KEY": {
+                "compartment_id"                              : "CMP-LZP-P-PLATFORM-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-P-PLATFORM-KEY"],
+                "event_display_name"                          : "rul-lzp-p-notify-on-notifications-platform-changes-rule",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
+                    "com.oraclecloud.databaseservice.deleteexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.deleteexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.updateexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.updateexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.exadatainfrastructureconnectstatus",
+                    "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
+                    "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
+                    "com.oraclecloud.databaseservice.changevmclustercompartment",
+                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
+                    "com.oraclecloud.databaseservice.deletevmcluster.end",
+                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
+                    "com.oraclecloud.databaseservice.updatevmcluster.end",
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
+                    "com.oraclecloud.databaseservice.dbnodeaction.end",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
+                    "com.oraclecloud.databaseservice.patchvmcluster.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
+                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
+                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancereminder",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.start",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            },
+
+            "RUL-LZP-P-NOTIFICATION-PROJECTS-KEY": {
+                "compartment_id"                              : "CMP-LZP-P-PROJECTS-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-P-WORKLOADS-KEY"],
+                "event_display_name"                          : "rul-lzp-p-notify-on-notifications-projects",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.changevmclustercompartment",
+                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
+                    "com.oraclecloud.databaseservice.deletevmcluster.end",
+                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
+                    "com.oraclecloud.databaseservice.updatevmcluster.end",
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
+                    "com.oraclecloud.databaseservice.patchvmcluster.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
+                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
+                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            },
+
+            "RUL-LZP-PP-NOTIFICATION-PLATFORM-EXACC-KEY": {
+                "compartment_id"                              : "CMP-LZP-PP-PLATFORM-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PP-PLATFORM-KEY"],
+                "event_display_name"                          : "rul-lzp-pp-notify-on-notifications-platform-changes-rule",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
+                    "com.oraclecloud.databaseservice.deleteexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.deleteexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.updateexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.updateexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.exadatainfrastructureconnectstatus",
+                    "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
+                    "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
+                    "com.oraclecloud.databaseservice.changevmclustercompartment",
+                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
+                    "com.oraclecloud.databaseservice.deletevmcluster.end",
+                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
+                    "com.oraclecloud.databaseservice.updatevmcluster.end",
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
+                    "com.oraclecloud.databaseservice.dbnodeaction.end",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
+                    "com.oraclecloud.databaseservice.patchvmcluster.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
+                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
+                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancereminder",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.begin",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.start",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            },
+
+            "RUL-LZP-PP-NOTIFICATION-PROJECTS-KEY": {
+                "compartment_id"                              : "CMP-LZP-PP-PROJECTS-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PP-WORKLOADS-KEY"],
+                "event_display_name"                          : "rul-lzp-pp-notify-on-notifications-projects",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.changevmclustercompartment",
+                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
+                    "com.oraclecloud.databaseservice.deletevmcluster.end",
+                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
+                    "com.oraclecloud.databaseservice.updatevmcluster.end",
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
+                    "com.oraclecloud.databaseservice.patchvmcluster.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
+                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
+                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            }
+        }
+    },
+
+    "home_region_events_configuration": {
+        "default_compartment_id"                              : "TENANCY-ROOT",
+
+        "event_rules": {
+            "RUL-LZ-CLOUDGUARD-KEY": {
+                "destination_topic_ids"                       : ["NOTT-LZ-CLOUDGUARD-KEY"],
+                "event_display_name"                          : "rul-lz-notify-on-cloudguard-changes",
+
+                "supplied_events": [
+                    "com.oraclecloud.cloudguard.problemdetected",
+                    "com.oraclecloud.cloudguard.problemdismissed",
+                    "com.oraclecloud.cloudguard.problemremediated",
+                    "com.oraclecloud.cloudguard.announcements",
+                    "com.oraclecloud.cloudguard.status",
+                    "com.oraclecloud.cloudguard.problemthresholdreached"
+                ]
+            },
+
+            "RUL-LZ-IAM-KEY": {
+                "destination_topic_ids"                       : ["NOTT-LZ-IAM-KEY"],
+                "event_display_name"                          : "rul-lz-notify-on-iam-changes",
+
+                "supplied_events": [
+                    "com.oraclecloud.identitycontrolplane.createidentityprovider",
+                    "com.oraclecloud.identitycontrolplane.deleteidentityprovider",
+                    "com.oraclecloud.identitycontrolplane.updateidentityprovider",
+                    "com.oraclecloud.identitycontrolplane.createidpgroupmapping",
+                    "com.oraclecloud.identitycontrolplane.deleteidpgroupmapping",
+                    "com.oraclecloud.identitycontrolplane.updateidpgroupmapping",
+                    "com.oraclecloud.identitycontrolplane.addusertogroup",
+                    "com.oraclecloud.identitycontrolplane.creategroup",
+                    "com.oraclecloud.identitycontrolplane.deletegroup",
+                    "com.oraclecloud.identitycontrolplane.removeuserfromgroup",
+                    "com.oraclecloud.identitycontrolplane.updategroup",
+                    "com.oraclecloud.identitycontrolplane.createpolicy",
+                    "com.oraclecloud.identitycontrolplane.deletepolicy",
+                    "com.oraclecloud.identitycontrolplane.updatepolicy",
+                    "com.oraclecloud.identitycontrolplane.createuser",
+                    "com.oraclecloud.identitycontrolplane.deleteuser",
+                    "com.oraclecloud.identitycontrolplane.updateuser",
+                    "com.oraclecloud.identitycontrolplane.updateusercapabilities",
+                    "com.oraclecloud.identitycontrolplane.updateuserstate",
+                    "com.oraclecloud.identityControlPlane.UpdateSwiftPassword",
+                    "com.oraclecloud.identityControlPlane.CreateOrResetPassword"
+                ]
+            }
+        }
+    },
+
+    "logging_configuration": {
+        "default_compartment_id"                              : "CMP-LZ-SECURITY-KEY",
+
+        "flow_logs": {
+            "LOG-LZ-PREPROD-SUBNET-FLOW-KEY": {
+                "log_group_id"                                : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
+                "target_compartment_ids"                      : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"                        : "subnet"
+            },
+
+            "LOG-LZ-PREPROD-VCN-FLOW-KEY": {
+                "log_group_id"                                : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
+                "target_compartment_ids"                      : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"                        : "vcn"
+            },
+
+            "LOG-LZ-PROD-SUBNET-FLOW-KEY": {
+                "log_group_id"                                : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "target_compartment_ids"                      : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"                        : "subnet"
+            },
+
+            "LOG-LZ-PROD-VCN-FLOW-KEY": {
+                "log_group_id"                                : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "target_compartment_ids"                      : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"                        : "vcn"
+            },
+
+            "LOG-LZ-SUBNET-FLOW-KEY": {
+                "log_group_id"                                : "LGRP-LZ-VCN-FLOW-KEY",
+                "target_compartment_ids"                      : ["CMP-LZ-NETWORK-KEY"],
+                "target_resource_type"                        : "subnet"
+            },
+
+            "LOG-LZ-VCN-FLOW-KEY": {
+                "log_group_id"                                : "LGRP-LZ-VCN-FLOW-KEY",
+                "target_compartment_ids"                      : ["CMP-LZ-NETWORK-KEY"],
+                "target_resource_type"                        : "vcn"
+            }
+        },
+
+        "log_groups": {
+            "LGRP-LZ-PREPROD-VCN-FLOW-KEY": {
+                "compartment_id"                              : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "name"                                        : "lgrp-lz-preprod-vcn-flow"
+            },
+
+            "LGRP-LZ-PROD-VCN-FLOW-KEY": {
+                "compartment_id"                              : "CMP-LZ-PROD-SECURITY-KEY",
+                "name"                                        : "lgrp-lz-prod-vcn-flow"
+            },
+
+            "LGRP-LZ-VCN-FLOW-KEY": {
+                "name"                                        : "lgrp-lz-vcn-flow"
+            }
+        }
+    },
+
+    "notifications_configuration": {
+        "default_compartment_id"                              : "CMP-LZ-SECURITY-KEY",
+
+        "topics": {
+            "NOTT-LZ-CLOUDGUARD-KEY": {
+                "compartment_id"                              : "CMP-LZ-SECURITY-KEY",
+                "description"                                 : "Topic for Cloud Guard related notifications.",
+                "name"                                        : "nott-lz-cloudguard",
+
+                "subscriptions": [
+                    {
+                        "protocol"                            : "EMAIL",
+                        "values"                              : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-IAM-KEY": {
+                "compartment_id"                              : "CMP-LZ-SECURITY-KEY",
+                "description"                                 : "Topic for IAM related notifications.",
+                "name"                                        : "nott-lz-iam",
+
+                "subscriptions": [
+                    {
+                        "protocol"                            : "EMAIL",
+                        "values"                              : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-NETWORK-KEY": {
+                "compartment_id"                              : "CMP-LZ-SECURITY-KEY",
+                "description"                                 : "Topic for network related notifications.",
+                "name"                                        : "nott-lz-network",
+
+                "subscriptions": [
+                    {
+                        "protocol"                            : "EMAIL",
+                        "values"                              : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-SECURITY-KEY": {
+                "compartment_id"                              : "CMP-LZ-SECURITY-KEY",
+                "description"                                 : "Topic for notifications.",
+                "name"                                        : "nott-lz-security",
+
+                "subscriptions": [
+                    {
+                        "protocol"                            : "EMAIL",
+                        "values"                              : ["email.address@example.com"]
+                    }
+                ]
+            }
+        }
+    },
+
+    "service_connectors_configuration": {
+        "buckets": {
+            "BKT-LZ-SERVICE-CONNECTOR": {
+                "cis_level"                                   : "2",
+                "compartment_id"                              : "CMP-LZ-SECURITY-KEY",
+                "kms_key_id"                                  : "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY",
+                "name"                                        : "bkt-lz-service-connector"
+            }
+        },
+        "default_compartment_id"                              : "CMP-LZ-SECURITY-KEY",
+
+        "service_connectors": {
+            "SCH-LZ-MONITOR-KEY": {
+                "display_name"                                : "sch-lz-monitor",
+
+                "policy": {
+                    "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                    "description"                             : "IAM policy for letting Service Connector to push data to target resource.",
+                    "name"                                    : "service-connector-audit-policy"
+                },
+
+                "source": {
+                    "audit_logs": [
+                        {
+                            "cmp_id"                          : "ALL"
+                        }
+                    ],
+                    "kind"                                    : "logging"
+                },
+
+                "target": {
+                    "bucket_name"                             : "bkt-lz-service-connector",
+                    "bucket_object_name_prefix"               : "sch",
+                    "kind"                                    : "objectstorage"
+                }
+            }
+        }
+    }
+}

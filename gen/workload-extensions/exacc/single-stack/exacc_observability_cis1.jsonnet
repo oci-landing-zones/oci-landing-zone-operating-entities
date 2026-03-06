@@ -1,8 +1,11 @@
-{
-    "alarms_configuration": {
-        "default_compartment_id"                              : "CMP-LZP-P-PROJECTS-KEY",
+local one_oe = import '../../../blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1.jsonnet';
 
-        "alarms": {
+
+one_oe+ {
+  alarms_configuration+: {
+    default_compartment_id: "CMP-LZP-P-PROJECTS-KEY",
+
+    alarms+: {
             "AL-LZP-P-PROJ2-DB-CLUSTER-CPUUTIL-KEY": {
                 "display_name"                                : "al-lzp-p-proj2-vmc-cpuutil",
                 "compartment_id"                              : "CMP-LZP-P-PROJ2-DB-KEY",
@@ -214,11 +217,11 @@
             }
         }
     },
+  
+    events_configuration+: {
+        default_compartment_id                              : "CMP-LZP-SECURITY-KEY",
 
-    "events_configuration": {
-        "default_compartment_id"                              : "CMP-LZP-SECURITY-KEY",
-
-        "event_rules": {
+        event_rules+: {
             "RUL-LZP-NOTIFICATION-OPERATOR-ACCESS-CONTROL-KEY": {
                 "compartment_id"                              : "CMP-LZP-SECURITY-KEY",
                 "destination_topic_ids"                       : ["NOTT-LZP-SECURITY-KEY"],
