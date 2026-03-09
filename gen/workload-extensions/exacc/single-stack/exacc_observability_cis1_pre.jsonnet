@@ -712,5 +712,37 @@ one_oe+ {
                 ]
             }
         }
+    },
+
+    notifications_configuration+: {
+    default_compartment_id                            : "CMP-LZ-SECURITY-KEY",
+
+    topics+: {
+            "NOTT-LZ-PROD-PLATFORM-KEY": {
+                "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
+                "description"                                : "Topic for prod platform notifications.",
+                "name"                                       : "nott-lz-prod-platform",
+
+                "subscriptions": [
+                    {
+                        "protocol"                           : "EMAIL",
+                        "values"                             : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-PREPROD-PLATFORM-KEY": {
+                "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "description"                                : "Topic for prod platform notifications.",
+                "name"                                       : "nott-lz-prod-platform",
+
+                "subscriptions": [
+                    {
+                        "protocol"                           : "EMAIL",
+                        "values"                             : ["email.address@example.com"]
+                    }
+                ]
+            }
+        }
     }
 }
