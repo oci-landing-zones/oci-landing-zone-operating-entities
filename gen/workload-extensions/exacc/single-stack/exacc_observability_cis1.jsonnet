@@ -219,11 +219,11 @@ one_oe+ {
     },
   
     events_configuration+: {
-        default_compartment_id                              : "CMP-LZP-SECURITY-KEY",
+        default_compartment_id                              : "CMP-LZ-SECURITY-KEY",
 
         event_rules+: {
             "RUL-LZP-NOTIFICATION-OPERATOR-ACCESS-CONTROL-KEY": {
-                "compartment_id"                              : "CMP-LZP-SECURITY-KEY",
+                "compartment_id"                              : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                       : ["NOTT-LZP-SECURITY-KEY"],
                 "event_display_name"                          : "rul-lzp-notify-on-opctl-events",
 
