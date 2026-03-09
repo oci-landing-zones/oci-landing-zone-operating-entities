@@ -2,220 +2,221 @@ local one_oe = import '../../../blueprints/one-oe/runtime/one-stack/oneoe_observ
 
 
 one_oe+ {
-  alarms_configuration+: {
-    default_compartment_id: "CMP-LZ-P-PROJECTS-KEY",
+  
+    alarms_configuration+: {
+        default_compartment_id: "CMP-LZ-PROD-PROJECTS-KEY",
+        alarms+: {           
+            "AL-LZ-PROD-PROJ2-DB-CLUSTER-CPUUTIL-KEY": {
+                        "display_name"                                : "al-lz-p-proj2-vmc-cpuutil",
+                        "compartment_id"                              : "CMP-LZ-PROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-    alarms+: {
-            "AL-LZ-P-PROJ2-DB-CLUSTER-CPUUTIL-KEY": {
-                "display_name"                                : "al-lzp-p-proj2-vmc-cpuutil",
-                "compartment_id"                              : "CMP-LZ-P-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-P-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
-
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database_cluster",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "CpuUtilization[1m].mean() >= 90",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database_cluster",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "CpuUtilization[1m].mean() >= 90",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-P-PROJ2-DB-CLUSTER-DISKUTIL-KEY": {
-                "display_name"                                : "al-lzp-p-proj2-vmc-dgutil",
-                "compartment_id"                              : "CMP-LZ-P-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-P-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PROD-PROJ2-DB-CLUSTER-DISKUTIL-KEY": {
+                        "display_name"                                : "al-lz-p-proj2-vmc-dgutil",
+                        "compartment_id"                              : "CMP-LZ-PROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database_cluster",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "ASMDiskgroupUtilization[1m].mean() <= 90",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database_cluster",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "ASMDiskgroupUtilization[1m].mean() <= 90",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-P-PROJ2-DB-CLUSTER-FSUTIL-KEY": {
-                "display_name"                                : "al-lzp-p-proj2-vmc-fsutil",
-                "compartment_id"                              : "CMP-LZ-P-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-P-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PROD-PROJ2-DB-CLUSTER-FSUTIL-KEY": {
+                        "display_name"                                : "al-lz-p-proj2-vmc-fsutil",
+                        "compartment_id"                              : "CMP-LZ-PROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database_cluster",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "FilesystemUtilization[1m].mean() >= 90",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database_cluster",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "FilesystemUtilization[1m].mean() >= 90",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-P-PROJ2-DB-CLUSTER-MEMUTIL-KEY": {
-                "display_name"                                : "al-lzp-p-proj2-vmc-memutil",
-                "compartment_id"                              : "CMP-LZ-P-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-P-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PROD-PROJ2-DB-CLUSTER-MEMUTIL-KEY": {
+                        "display_name"                                : "al-lz-p-proj2-vmc-memutil",
+                        "compartment_id"                              : "CMP-LZ-PROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database_cluster",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "MemoryUtilization[1m].mean() >= 80",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database_cluster",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "MemoryUtilization[1m].mean() >= 80",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-P-PROJ2-DB-CLUSTER-SWAPUTIL-KEY": {
-                "display_name"                                : "al-lzp-p-proj2-vmc-swaputil",
-                "compartment_id"                              : "CMP-LZ-P-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-P-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PROD-PROJ2-DB-CLUSTER-SWAPUTIL-KEY": {
+                        "display_name"                                : "al-lz-p-proj2-vmc-swaputil",
+                        "compartment_id"                              : "CMP-LZ-PROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database_cluster",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "SwapUtilization[1m].mean() >= 75",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database_cluster",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "SwapUtilization[1m].mean() >= 75",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-P-PROJ2-DB-DB-CPUUTIL-KEY": {
-                "display_name"                                : "al-lzp-p-proj2-db-cpuutil",
-                "compartment_id"                              : "CMP-LZ-P-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-P-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PROD-PROJ2-DB-DB-CPUUTIL-KEY": {
+                        "display_name"                                : "al-lz-p-proj2-db-cpuutil",
+                        "compartment_id"                              : "CMP-LZ-PROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "CpuUtilization[1m].mean() >= 90",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "CpuUtilization[1m].mean() >= 90",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-P-PROJ2-DB-DB-STORAGEUTIL-KEY": {
-                "display_name"                                : "al-lzp-p-proj2-db-storageutil",
-                "compartment_id"                              : "CMP-LZ-P-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-P-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PROD-PROJ2-DB-DB-STORAGEUTIL-KEY": {
+                        "display_name"                                : "al-lz-p-proj2-db-storageutil",
+                        "compartment_id"                              : "CMP-LZ-PROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "StorageUtilization[1m].mean() >= 90",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "StorageUtilization[1m].mean() >= 90",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-PP-PROJ2-DB-CLUSTER-CPUUTIL-KEY": {
-                "display_name"                                : "al-lzp-pp-proj2-vmc-cpuutil",
-                "compartment_id"                              : "CMP-LZ-PP-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PP-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PREPROD-PROJ2-DB-CLUSTER-CPUUTIL-KEY": {
+                        "display_name"                                : "al-lz-pp-proj2-vmc-cpuutil",
+                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database_cluster",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "CpuUtilization[1m].mean() >= 90",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database_cluster",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "CpuUtilization[1m].mean() >= 90",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-PP-PROJ2-DB-CLUSTER-DISKUTIL-KEY": {
-                "display_name"                                : "al-lzp-pp-proj2-vmc-dgutil",
-                "compartment_id"                              : "CMP-LZ-PP-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PP-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PREPROD-PROJ2-DB-CLUSTER-DISKUTIL-KEY": {
+                        "display_name"                                : "al-lz-pp-proj2-vmc-dgutil",
+                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database_cluster",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "ASMDiskgroupUtilization[1m].mean() <= 90",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database_cluster",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "ASMDiskgroupUtilization[1m].mean() <= 90",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-PP-PROJ2-DB-CLUSTER-FSUTIL-KEY": {
-                "display_name"                                : "al-lzp-pp-proj2-vmc-fsutil",
-                "compartment_id"                              : "CMP-LZ-PP-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PP-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PREPROD-PROJ2-DB-CLUSTER-FSUTIL-KEY": {
+                        "display_name"                                : "al-lz-pp-proj2-vmc-fsutil",
+                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database_cluster",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "FilesystemUtilization[1m].mean() >= 90",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database_cluster",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "FilesystemUtilization[1m].mean() >= 90",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-PP-PROJ2-DB-CLUSTER-MEMUTIL-KEY": {
-                "display_name"                                : "al-lzp-pp-proj2-vmc-memutil",
-                "compartment_id"                              : "CMP-LZ-PP-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PP-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PREPROD-PROJ2-DB-CLUSTER-MEMUTIL-KEY": {
+                        "display_name"                                : "al-lz-pp-proj2-vmc-memutil",
+                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database_cluster",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "MemoryUtilization[1m].mean() >= 80",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database_cluster",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "MemoryUtilization[1m].mean() >= 80",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-PP-PROJ2-DB-CLUSTER-SWAPUTIL-KEY": {
-                "display_name"                                : "al-lzp-pp-proj2-vmc-swaputil",
-                "compartment_id"                              : "CMP-LZ-PP-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PP-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PREPROD-PROJ2-DB-CLUSTER-SWAPUTIL-KEY": {
+                        "display_name"                                : "al-lz-pp-proj2-vmc-swaputil",
+                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database_cluster",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "SwapUtilization[1m].mean() >= 75",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database_cluster",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "SwapUtilization[1m].mean() >= 75",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-PP-PROJ2-DB-DB-CPUUTIL-KEY": {
-                "display_name"                                : "al-lzp-pp-proj2-db-cpuutil",
-                "compartment_id"                              : "CMP-LZ-PP-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PP-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PREPROD-PROJ2-DB-DB-CPUUTIL-KEY": {
+                        "display_name"                                : "al-lz-pp-proj2-db-cpuutil",
+                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "CpuUtilization[1m].mean() >= 90",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "CpuUtilization[1m].mean() >= 90",
+                            "severity"                                : "CRITICAL"
+                        }
             },
 
-            "AL-LZ-PP-PROJ2-DB-DB-STORAGEUTIL-KEY": {
-                "display_name"                                : "al-lzp-pp-proj2-db-storageutil",
-                "compartment_id"                              : "CMP-LZ-PP-PROJ2-DB-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PP-WORKLOADS-KEY"],
-                "is_enabled"                                  : "false",
+            "AL-LZ-PREPROD-PROJ2-DB-DB-STORAGEUTIL-KEY": {
+                        "display_name"                                : "al-lz-pp-proj2-db-storageutil",
+                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ2-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
+                        "is_enabled"                                  : "false",
 
-                "supplied_alarm": {
-                    "message_format"                          : "PRETTY_JSON",
-                    "namespace"                               : "oci_database",
-                    "pending_duration"                        : "PT5M",
-                    "query"                                   : "StorageUtilization[1m].mean() >= 90",
-                    "severity"                                : "CRITICAL"
-                }
+                        "supplied_alarm": {
+                            "message_format"                          : "PRETTY_JSON",
+                            "namespace"                               : "oci_database",
+                            "pending_duration"                        : "PT5M",
+                            "query"                                   : "StorageUtilization[1m].mean() >= 90",
+                            "severity"                                : "CRITICAL"
+                        }
             }
-        }
+
+            },
     },
   
     events_configuration+: {
@@ -225,7 +226,7 @@ one_oe+ {
             "RUL-LZ-NOTIFICATION-OPERATOR-ACCESS-CONTROL-KEY": {
                 "compartment_id"                              : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                       : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"                          : "rul-lzp-notify-on-opctl-events",
+                "event_display_name"                          : "rul-lz-notify-on-opctl-events",
 
                 "supplied_events": [
                     "com.oraclecloud.operatorcontrol.UpdateOperatorControl",
@@ -249,7 +250,7 @@ one_oe+ {
             "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-KEY": {
                 "compartment_id"                              : "CMP-LZ-PLATFORM-EXACC-KEY",
                 "destination_topic_ids"                       : ["NOTT-LZ-PLATFORM-KEY"],
-                "event_display_name"                          : "rul-lzp-notify-on-exacc-events",
+                "event_display_name"                          : "rul-lz-notify-on-exacc-events",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
@@ -352,7 +353,7 @@ one_oe+ {
             "RUL-LZ-P-NOTIFICATION-PLATFORM-EXACC-KEY": {
                 "compartment_id"                              : "CMP-LZ-P-PLATFORM-KEY",
                 "destination_topic_ids"                       : ["NOTT-LZ-P-PLATFORM-KEY"],
-                "event_display_name"                          : "rul-lzp-p-notify-on-notifications-platform-changes-rule",
+                "event_display_name"                          : "rul-lz-p-notify-on-notifications-platform-changes-rule",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
@@ -455,7 +456,7 @@ one_oe+ {
             "RUL-LZ-P-NOTIFICATION-PROJECTS-KEY": {
                 "compartment_id"                              : "CMP-LZ-P-PROJECTS-KEY",
                 "destination_topic_ids"                       : ["NOTT-LZ-P-WORKLOADS-KEY"],
-                "event_display_name"                          : "rul-lzp-p-notify-on-notifications-projects",
+                "event_display_name"                          : "rul-lz-p-notify-on-notifications-projects",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changevmclustercompartment",
@@ -533,7 +534,7 @@ one_oe+ {
             "RUL-LZ-PP-NOTIFICATION-PLATFORM-EXACC-KEY": {
                 "compartment_id"                              : "CMP-LZ-PP-PLATFORM-KEY",
                 "destination_topic_ids"                       : ["NOTT-LZ-PP-PLATFORM-KEY"],
-                "event_display_name"                          : "rul-lzp-pp-notify-on-notifications-platform-changes-rule",
+                "event_display_name"                          : "rul-lz-pp-notify-on-notifications-platform-changes-rule",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
@@ -636,7 +637,7 @@ one_oe+ {
             "RUL-LZ-PP-NOTIFICATION-PROJECTS-KEY": {
                 "compartment_id"                              : "CMP-LZ-PP-PROJECTS-KEY",
                 "destination_topic_ids"                       : ["NOTT-LZ-PP-WORKLOADS-KEY"],
-                "event_display_name"                          : "rul-lzp-pp-notify-on-notifications-projects",
+                "event_display_name"                          : "rul-lz-pp-notify-on-notifications-projects",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changevmclustercompartment",
@@ -710,6 +711,14 @@ one_oe+ {
                     "com.oraclecloud.databaseservice.dbsystem.information"
                 ]
             }
+        }
+    },
+
+    notifications_configuration+: {
+        default_compartment_id: "CMP-LZ-SECURITY-KEY",
+        "topics": {
+            "NOTT-LZ-PROD-WORKLOADS-KEY": {"name": "nott-lz-prod-workload", "description": "Topic for prod workload related notifications.", "compartment_id": "CMP-LZ-PROD-SECURITY-KEY", "subscriptions": [{"protocol": "EMAIL", "values": ["email.address@example.com"]}]},
+            "NOTT-LZ-PREPROD-WORKLOADS-KEY": {"name": "nott-lz-preprod-workload", "description": "Topic for preprod workload related notifications.", "compartment_id": "CMP-LZ-PREPROD-SECURITY-KEY", "subscriptions": [{"protocol": "EMAIL", "values": ["email.address@example.com"]}]},
         }
     }
 }
