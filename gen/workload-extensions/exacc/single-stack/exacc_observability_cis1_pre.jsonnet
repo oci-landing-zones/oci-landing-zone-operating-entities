@@ -718,6 +718,19 @@ one_oe+ {
     default_compartment_id                            : "CMP-LZ-SECURITY-KEY",
 
     topics+: {
+            "NOTT-LZ-PLATFORM-KEY": {
+                "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
+                "description"                                : "Topic for prod platform notifications.",
+                "name"                                       : "nott-lz-platform",
+
+                "subscriptions": [
+                    {
+                        "protocol"                           : "EMAIL",
+                        "values"                             : ["email.address@example.com"]
+                    }
+                ]
+            },
+
             "NOTT-LZ-PROD-PLATFORM-KEY": {
                 "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
                 "description"                                : "Topic for prod platform notifications.",
@@ -733,8 +746,34 @@ one_oe+ {
 
             "NOTT-LZ-PREPROD-PLATFORM-KEY": {
                 "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "description"                                : "Topic for preprod platform notifications.",
+                "name"                                       : "nott-lz-preprod-platform",
+
+                "subscriptions": [
+                    {
+                        "protocol"                           : "EMAIL",
+                        "values"                             : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-PROD-PROJECTS-KEY": {
+                "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
                 "description"                                : "Topic for prod platform notifications.",
-                "name"                                       : "nott-lz-prod-platform",
+                "name"                                       : "nott-lz-prod-projects",
+
+                "subscriptions": [
+                    {
+                        "protocol"                           : "EMAIL",
+                        "values"                             : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-PREPROD-PROJECTS-KEY": {
+                "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "description"                                : "Topic for prod platform notifications.",
+                "name"                                       : "nott-lz-preprod-projects",
 
                 "subscriptions": [
                     {
