@@ -1015,32 +1015,6 @@
                 ]
             },
 
-            "NOTT-LZ-PREPROD-WORKLOADS-KEY": {
-                "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
-                "description"                                : "Topic for preprod workload related notifications.",
-                "name"                                       : "nott-lz-preprod-workload",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-PROD-WORKLOADS-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
-                "description"                                : "Topic for prod workload related notifications.",
-                "name"                                       : "nott-lz-prod-workload",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
             "NOTT-LZ-SECURITY-KEY": {
                 "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
                 "description"                                : "Topic for notifications.",
