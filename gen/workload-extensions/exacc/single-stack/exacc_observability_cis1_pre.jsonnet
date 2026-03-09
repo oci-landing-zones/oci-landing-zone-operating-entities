@@ -716,12 +716,11 @@ one_oe+ {
 
     notifications_configuration+: {
         default_compartment_id: "CMP-LZ-SECURITY-KEY",
-        "topics": {
+        topics+: {
             "NOTT-LZ-PROD-WORKLOADS-KEY": {"name": "nott-lz-prod-workload", "description": "Topic for prod workload related notifications.", "compartment_id": "CMP-LZ-PROD-SECURITY-KEY", "subscriptions": [{"protocol": "EMAIL", "values": ["email.address@example.com"]}]},
             "NOTT-LZ-PREPROD-WORKLOADS-KEY": {"name": "nott-lz-preprod-workload", "description": "Topic for preprod workload related notifications.", "compartment_id": "CMP-LZ-PREPROD-SECURITY-KEY", "subscriptions": [{"protocol": "EMAIL", "values": ["email.address@example.com"]}]},
         }
     }
 }
-
 
 
