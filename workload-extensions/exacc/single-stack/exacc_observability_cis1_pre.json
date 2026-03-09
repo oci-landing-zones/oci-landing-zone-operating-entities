@@ -17,7 +17,7 @@
             "AL-LZ-PREPROD-PROJ1-DB-CLUSTER-CPUUTIL-KEY": {
                 "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-pp-proj2-vmc-cpuutil",
+                "display_name"                               : "al-lz-preprod-proj1-vmc-cpuutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -30,9 +30,9 @@
             },
 
             "AL-LZ-PREPROD-PROJ1-DB-CLUSTER-DISKUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
+                "compartment_id"                             : "CMP-LZ-PREPROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-pp-proj2-vmc-dgutil",
+                "display_name"                               : "al-lz-preprod-proj1-vmc-dgutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -45,9 +45,9 @@
             },
 
             "AL-LZ-PREPROD-PROJ1-DB-CLUSTER-FSUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
+                "compartment_id"                             : "CMP-LZ-PREPROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-pp-proj2-vmc-fsutil",
+                "display_name"                               : "al-lz-preprod-proj1-vmc-fsutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -60,9 +60,9 @@
             },
 
             "AL-LZ-PREPROD-PROJ1-DB-CLUSTER-MEMUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
+                "compartment_id"                             : "CMP-LZ-PREPROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-pp-proj2-vmc-memutil",
+                "display_name"                               : "al-lz-preprod-proj1-vmc-memutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -75,9 +75,9 @@
             },
 
             "AL-LZ-PREPROD-PROJ1-DB-CLUSTER-SWAPUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
+                "compartment_id"                             : "CMP-LZ-PREPROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-pp-proj2-vmc-swaputil",
+                "display_name"                               : "al-lz-preprod-proj1-vmc-swaputil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -90,9 +90,9 @@
             },
 
             "AL-LZ-PREPROD-PROJ1-DB-DB-CPUUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
+                "compartment_id"                             : "CMP-LZ-PREPROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-pp-proj2-db-cpuutil",
+                "display_name"                               : "al-lz-preprod-proj1-db-cpuutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -105,9 +105,9 @@
             },
 
             "AL-LZ-PREPROD-PROJ1-DB-DB-STORAGEUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
+                "compartment_id"                             : "CMP-LZ-PREPROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-pp-proj2-db-storageutil",
+                "display_name"                               : "al-lz-preprod-proj1-db-storageutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -120,9 +120,9 @@
             },
 
             "AL-LZ-PROD-PROJ1-DB-CLUSTER-CPUUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-p-proj2-vmc-cpuutil",
+                "display_name"                               : "al-lz-prod-proj1-vmc-cpuutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -135,9 +135,9 @@
             },
 
             "AL-LZ-PROD-PROJ1-DB-CLUSTER-DISKUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-p-proj2-vmc-dgutil",
+                "display_name"                               : "al-lz-prod-proj1-vmc-dgutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -150,9 +150,9 @@
             },
 
             "AL-LZ-PROD-PROJ1-DB-CLUSTER-FSUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-p-proj2-vmc-fsutil",
+                "display_name"                               : "al-lz-prod-proj1-vmc-fsutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -165,9 +165,9 @@
             },
 
             "AL-LZ-PROD-PROJ1-DB-CLUSTER-MEMUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-p-proj2-vmc-memutil",
+                "display_name"                               : "al-lz-prod-proj1-vmc-memutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -180,9 +180,9 @@
             },
 
             "AL-LZ-PROD-PROJ1-DB-CLUSTER-SWAPUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-p-proj2-vmc-swaputil",
+                "display_name"                               : "al-lz-prod-proj1-vmc-swaputil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -195,9 +195,9 @@
             },
 
             "AL-LZ-PROD-PROJ1-DB-DB-CPUUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-p-proj2-db-cpuutil",
+                "display_name"                               : "al-lz-prod-proj1-db-cpuutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -210,9 +210,9 @@
             },
 
             "AL-LZ-PROD-PROJ1-DB-DB-STORAGEUTIL-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-PROD-PROJ1-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
-                "display_name"                               : "al-lz-p-proj2-db-storageutil",
+                "display_name"                               : "al-lz-prod-proj1-db-storageutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -428,7 +428,7 @@
             "RUL-LZ-PREPROD-NOTIFICATION-PLATFORM-EXACC-KEY": {
                 "compartment_id"                             : "CMP-LZ-PREPROD-PLATFORM-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PREPROD-PLATFORM-KEY"],
-                "event_display_name"                         : "rul-lz-pp-notify-on-notifications-platform-changes-rule",
+                "event_display_name"                         : "rul-lz-preprod-notify-on-notifications-platform-changes-rule",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
@@ -531,7 +531,7 @@
             "RUL-LZ-PREPROD-NOTIFICATION-PROJECTS-KEY": {
                 "compartment_id"                             : "CMP-LZ-PREPROD-PROJECTS-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                "event_display_name"                         : "rul-lz-pp-notify-on-notifications-projects",
+                "event_display_name"                         : "rul-lz-preprod-notify-on-notifications-projects",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changevmclustercompartment",
@@ -676,7 +676,7 @@
             "RUL-LZ-PROD-NOTIFICATION-PLATFORM-EXACC-KEY": {
                 "compartment_id"                             : "CMP-LZ-PROD-PLATFORM-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-PLATFORM-KEY"],
-                "event_display_name"                         : "rul-lz-p-notify-on-notifications-platform-changes-rule",
+                "event_display_name"                         : "rul-lz-prod-notify-on-notifications-platform-changes-rule",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
@@ -779,7 +779,7 @@
             "RUL-LZ-PROD-NOTIFICATION-PROJECTS-KEY": {
                 "compartment_id"                             : "CMP-LZ-PROD-PROJECTS-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
-                "event_display_name"                         : "rul-lz-p-notify-on-notifications-projects",
+                "event_display_name"                         : "rul-lz-prod-notify-on-notifications-projects",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changevmclustercompartment",
