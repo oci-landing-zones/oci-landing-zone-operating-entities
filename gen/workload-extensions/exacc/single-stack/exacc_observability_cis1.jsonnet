@@ -350,9 +350,9 @@ one_oe+ {
                 ]
             },
 
-            "RUL-LZP-P-NOTIFICATION-PLATFORM-EXACC-KEY": {
-                "compartment_id"                              : "CMP-LZP-P-PLATFORM-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZP-P-PLATFORM-KEY"],
+            "RUL-LZP-PROD-NOTIFICATION-PLATFORM-EXACC-KEY": {
+                "compartment_id"                              : "CMP-LZP-PROD-PLATFORM-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PROD-PLATFORM-KEY"],
                 "event_display_name"                          : "rul-lz-p-notify-on-notifications-platform-changes-rule",
 
                 "supplied_events": [
@@ -453,9 +453,9 @@ one_oe+ {
                 ]
             },
 
-            "RUL-LZP-P-NOTIFICATION-PROJECTS-KEY": {
-                "compartment_id"                              : "CMP-LZP-P-PROJECTS-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZP-P-WORKLOADS-KEY"],
+            "RUL-LZP-PROD-NOTIFICATION-PROJECTS-KEY": {
+                "compartment_id"                              : "CMP-LZP-PROD-PROJECTS-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PROD-WORKLOADS-KEY"],
                 "event_display_name"                          : "rul-lz-p-notify-on-notifications-projects",
 
                 "supplied_events": [
@@ -531,9 +531,9 @@ one_oe+ {
                 ]
             },
 
-            "RUL-LZP-PP-NOTIFICATION-PLATFORM-EXACC-KEY": {
-                "compartment_id"                              : "CMP-LZP-PP-PLATFORM-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZP-PP-PLATFORM-KEY"],
+            "RUL-LZP-PREPROD-NOTIFICATION-PLATFORM-EXACC-KEY": {
+                "compartment_id"                              : "CMP-LZP-PREPROD-PLATFORM-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PREPROD-PLATFORM-KEY"],
                 "event_display_name"                          : "rul-lz-pp-notify-on-notifications-platform-changes-rule",
 
                 "supplied_events": [
@@ -634,9 +634,9 @@ one_oe+ {
                 ]
             },
 
-            "RUL-LZP-PP-NOTIFICATION-PROJECTS-KEY": {
-                "compartment_id"                              : "CMP-LZP-PP-PROJECTS-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZP-PP-WORKLOADS-KEY"],
+            "RUL-LZP-PREPROD-NOTIFICATION-PROJECTS-KEY": {
+                "compartment_id"                              : "CMP-LZP-PREPROD-PROJECTS-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZP-PREPROD-WORKLOADS-KEY"],
                 "event_display_name"                          : "rul-lz-pp-notify-on-notifications-projects",
 
                 "supplied_events": [
