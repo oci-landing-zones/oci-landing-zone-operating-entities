@@ -113,7 +113,7 @@ one_oe + exacc_identity + {
                   
                 },
               },
-                  'CMP-LZ-PREPROD-PROJECTS-KEY'+: {
+                'CMP-LZ-PREPROD-PROJECTS-KEY'+: {
                 children+: {
                   'CMP-LZ-PREPROD-PROJ1-KEY'+: {
                    children+: {

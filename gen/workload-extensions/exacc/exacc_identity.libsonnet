@@ -11,6 +11,16 @@
         name: 'grp-lz-exacc-db-admin',
         description: 'Global DBA team admin group',
       },
+
+      "GRP-LZ-PROD-EXACC-PROJ1-ADMINS-KEY": { 
+        name: 'grp-lz-prod-proj1-exacc-admin',
+        description: 'Dedicated team to manage exacc db layer in proj1, prod environment',
+      },
+
+       "GRP-LZ-PREPROD-EXACC-PROJ1-ADMINS-KEY": { 
+        name: 'grp-lz-preprod-proj1-exacc-admin',
+        description: 'Dedicated team to manage exacc db layer in proj1, prod environmen',
+      },
     },
   },
 
@@ -56,7 +66,7 @@
         ],
         },
 
-      "PCY-LZ-PLATFORM-EXACS-INFRA-ADMIN-KEY": {
+      "PCY-LZ-PLATFORM-EXACC-INFRA-ADMIN-KEY": {
        name: "pcy-lz-exacc-infra-admin",
        description: "Example policy which allows the grp-lz-exacc-infra-admin group users to manage the DB infra in sharead exacc platform compartment.",
        compartment_id: "CMP-LANDINGZONE-KEY",
@@ -77,6 +87,24 @@
           "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
           "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to use dns in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
           "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage db-nodes in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))"
+          ]
+      },
+
+      "PCY-LZ-PROD-EXACC-PROJECTS-PROJ1-ADMIN-KEY": {
+       name: "pcy-lz-prod-exacc-proj1-admin",
+       description: "Example policy which allows the grp-lz-prod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
+       compartment_id: "CMP-LZ-PROD-PROJ1-DB-KEY",
+       statements: [
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read all-resources cmp-lz-prod-proj1:cmp-lz-prod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage alarms in compartment cmp-lz-prod-proj1:cmp-lz-prod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage metrics in compartment cmp-lz-prod-proj1:cmp-lz-prod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read audit-events in compartment cmp-lz-prod-proj1:cmp-lz-prod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read work-requests in compartment cmp-lz-prod-proj1:cmp-lz-prod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage cloudevents-rules in compartment cmp-lz-prod-proj1:cmp-lz-prod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage ons-family in compartment cmp-lz-prod-proj1:cmp-lz-prod-proj1-db",          
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage autonomous-databases in compartment cmp-lz-prod-proj1:cmp-lz-prod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage autonomous-backups in compartment cmp-lz-prod-proj1:cmp-lz-prod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage autonomous-container-databases in compartment cmp-lz-prod-proj1:cmp-lz-prod-proj1-db",
           ]
       },
     },
