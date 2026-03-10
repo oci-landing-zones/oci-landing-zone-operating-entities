@@ -119,7 +119,7 @@ one_oe+ {
         event_rules+: {
             "RUL-LZ-NOTIFICATION-OPERATOR-ACCESS-CONTROL-KEY": {
                 "compartment_id"                              : "CMP-LZ-SECURITY-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-EXACC-WORKLOADS-KEY"],
+                "destination_topic_ids"                       : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
                 "event_display_name"                          : "rul-lz-notify-on-opctl-events",
 
                 "supplied_events": [
