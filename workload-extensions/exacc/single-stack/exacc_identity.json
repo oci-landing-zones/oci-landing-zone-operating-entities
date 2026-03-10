@@ -13,7 +13,7 @@
 
                     "CMP-LZ-PLATFORM-KEY": {
                         "children": {
-                            "CMP-LZ-PLATFORM-EXACC-KEY": {
+                            "CMP-LZ-EXACC-KEY": {
                                 "children": {
                                     "CMP-LZ-EXACC-DB-KEY": {
                                         "defined_tags": {

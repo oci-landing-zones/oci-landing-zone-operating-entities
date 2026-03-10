@@ -10,7 +10,7 @@ one_oe + exacc_identity + {
         children+: {
           'CMP-LZ-PLATFORM-KEY'+: {
             children+: {
-              'CMP-LZ-PLATFORM-EXACC-KEY': {
+              'CMP-LZ-EXACC-KEY': {
                 name: 'cmp-lz-exacc',
                 description: 'ExaCC shared Platform',
                 defined_tags: {
