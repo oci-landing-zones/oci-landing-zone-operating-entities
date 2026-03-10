@@ -42,7 +42,7 @@
           "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
           "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
         ],
-        },
+      },
 
       "PCY-LZ-PLATFORM-EXACS-DB-ADMIN-KEY": {
         name: 'pcy-lz-exacc-db-admin',
@@ -64,7 +64,7 @@
           "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage autonomous-container-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
           "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
         ],
-        },
+      },
 
       "PCY-LZ-PLATFORM-EXACC-INFRA-ADMIN-KEY": {
        name: "pcy-lz-exacc-infra-admin",
