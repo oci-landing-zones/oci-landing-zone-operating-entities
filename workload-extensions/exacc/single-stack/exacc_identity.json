@@ -250,7 +250,7 @@
             },
 
             "GRP-LZ-NETWORK-ADMIN-KEY": {
-                "description"                                                  : "One-OE Landing Zone, Shared network administration group, including common OE network elements.",
+                "description"                                                  : "One-OE Landing Zone, Shared network administration group.",
                 "name"                                                         : "grp-lz-network-admin"
             },
 
@@ -265,7 +265,7 @@
             },
 
             "GRP-LZ-SECURITY-ADMIN-KEY": {
-                "description"                                                  : "One-OE Landing Zone, Shared security administration group, including common OE network elements.",
+                "description"                                                  : "One-OE Landing Zone, Shared security administration group",
                 "name"                                                         : "grp-lz-security-admin"
             },
 
