@@ -107,6 +107,24 @@
           "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage autonomous-container-databases in compartment cmp-lz-prod-proj1-db"
           ]
       },
+
+       "PCY-LZ-PREPROD-EXACC-PROJECTS-PROJ1-ADMIN-KEY": {
+       name: "pcy-lz-preprod-exacc-proj1-admin",
+       description: "Example policy which allows the grp-lz-preprod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
+       compartment_id: "CMP-LZ-PREPROD-PROJ1-DB-KEY",
+       statements: [
+          "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to read all-resources in compartment cmp-lz-preprod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to manage alarms in compartment cmp-lz-preprod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to manage metrics in compartment cmp-lz-preprod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to read audit-events in compartment cmp-lz-preprod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to read work-requests in compartment cmp-lz-preprod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to manage cloudevents-rules in compartment cmp-lz-preprod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to manage ons-family in compartment cmp-lz-preprod-proj1-db",          
+          "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to manage autonomous-databases in compartment cmp-lz-preprod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to manage autonomous-backups in compartment cmp-lz-preprod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to manage autonomous-container-databases in compartment cmp-lz-preprod-proj1-db"
+          ]
+      },
     },
   },
 }
