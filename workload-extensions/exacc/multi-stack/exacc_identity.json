@@ -166,7 +166,7 @@
 
     "policies_configuration": {
         "supplied_policies": {
-            "PCY-LZ-PLATFORM-EXACC-INFRA-ADMIN-KEY": {
+            "PCY-LZ-EXACC-INFRA-ADMIN-KEY": {
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
                 "description"                                                  : "Example policy which allows the grp-lz-exacc-infra-admin group users to manage the DB infra in sharead exacc platform compartment.",
                 "name"                                                         : "pcy-lz-exacc-infra-admin",
@@ -191,7 +191,7 @@
                 ]
             },
 
-            "PCY-LZ-PLATFORM-EXACS-DB-ADMIN-KEY": {
+            "PCY-LZ-EXACS-DB-ADMIN-KEY": {
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
                 "description"                                                  : "Policy which allows the groups grp-lz-exacc-infra-admin and grp-lz-exacc-db-admin to have shared privilegies in all exacc compartments",
                 "name"                                                         : "pcy-lz-exacc-db-admin",
@@ -214,7 +214,7 @@
                 ]
             },
 
-            "PCY-LZ-PLATFORM-EXACS-GENERIC-ADMIN-KEY": {
+            "PCY-LZ-EXACS-GENERIC-ADMIN-KEY": {
                 "compartment_id"                                               : "TENANCY-ROOT",
                 "description"                                                  : "Policy which allows the groups grp-lz-exacc-infra-admin and grp-lz-exacc-db-admin to have shared privilegies in all exacc compartments",
                 "name"                                                         : "pcy-lz-exacc-generic",
