@@ -4,12 +4,12 @@ local one_oe = import '../../../blueprints/one-oe/runtime/one-stack/oneoe_observ
 one_oe+ {
 
     alarms_configuration+: {
-        default_compartment_id: "CMP-LZ-PROD-PROJECTS-KEY",
+        default_compartment_id: "CMP-LZ-EXACC-DB-KEY",
         alarms+: {           
-            "AL-LZ-PROD-PROJ1-DB-CLUSTER-CPUUTIL-KEY": {
-                        "display_name"                                : "al-lz-prod-proj1-vmc-cpuutil",
-                        "compartment_id"                              : "CMP-LZ-PROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+            "AL-LZ-DB-CLUSTER-CPUUTIL-KEY": {
+                        "display_name"                                : "al-lz-vmc-cpuutil",
+                        "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
@@ -21,10 +21,10 @@ one_oe+ {
                         }
             },
 
-            "AL-LZ-PROD-PROJ1-DB-CLUSTER-DISKUTIL-KEY": {
-                        "display_name"                                : "al-lz-prod-proj1-vmc-dgutil",
-                        "compartment_id"                              : "CMP-LZ-PROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+            "AL-LZ-DB-CLUSTER-DISKUTIL-KEY": {
+                        "display_name"                                : "al-lz-vmc-dgutil",
+                        "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
@@ -36,10 +36,10 @@ one_oe+ {
                         }
             },
 
-            "AL-LZ-PROD-PROJ1-DB-CLUSTER-FSUTIL-KEY": {
-                        "display_name"                                : "al-lz-prod-proj1-vmc-fsutil",
-                        "compartment_id"                              : "CMP-LZ-PROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+            "AL-LZ-DB-CLUSTER-FSUTIL-KEY": {
+                        "display_name"                                : "al-lz-vmc-fsutil",
+                        "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
@@ -51,10 +51,10 @@ one_oe+ {
                         }
             },
 
-            "AL-LZ-PROD-PROJ1-DB-CLUSTER-MEMUTIL-KEY": {
-                        "display_name"                                : "al-lz-prod-proj1-vmc-memutil",
-                        "compartment_id"                              : "CMP-LZ-PROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+            "AL-LZ-DB-CLUSTER-MEMUTIL-KEY": {
+                        "display_name"                                : "al-lz-vmc-memutil",
+                        "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
@@ -66,10 +66,10 @@ one_oe+ {
                         }
             },
 
-            "AL-LZ-PROD-PROJ1-DB-CLUSTER-SWAPUTIL-KEY": {
-                        "display_name"                                : "al-lz-prod-proj1-vmc-swaputil",
-                        "compartment_id"                              : "CMP-LZ-PROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+            "AL-LZ-DB-CLUSTER-SWAPUTIL-KEY": {
+                        "display_name"                                : "al-lz-vmc-swaputil",
+                        "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
@@ -81,10 +81,10 @@ one_oe+ {
                         }
             },
 
-            "AL-LZ-PROD-PROJ1-DB-DB-CPUUTIL-KEY": {
-                        "display_name"                                : "al-lz-prod-proj1-db-cpuutil",
-                        "compartment_id"                              : "CMP-LZ-PROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+            "AL-LZ-CPUUTIL-KEY": {
+                        "display_name"                                : "al-lz-db-cpuutil",
+                        "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
@@ -96,115 +96,10 @@ one_oe+ {
                         }
             },
 
-            "AL-LZ-PROD-PROJ1-DB-DB-STORAGEUTIL-KEY": {
-                        "display_name"                                : "al-lz-prod-proj1-db-storageutil",
-                        "compartment_id"                              : "CMP-LZ-PROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
-                        "is_enabled"                                  : "false",
-
-                        "supplied_alarm": {
-                            "message_format"                          : "PRETTY_JSON",
-                            "namespace"                               : "oci_database",
-                            "pending_duration"                        : "PT5M",
-                            "query"                                   : "StorageUtilization[1m].mean() >= 90",
-                            "severity"                                : "CRITICAL"
-                        }
-            },
-
-            "AL-LZ-PREPROD-PROJ1-DB-CLUSTER-CPUUTIL-KEY": {
-                        "display_name"                                : "al-lz-preprod-proj1-vmc-cpuutil",
-                        "compartment_id"                              : "CMP-LZ-PROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                        "is_enabled"                                  : "false",
-
-                        "supplied_alarm": {
-                            "message_format"                          : "PRETTY_JSON",
-                            "namespace"                               : "oci_database_cluster",
-                            "pending_duration"                        : "PT5M",
-                            "query"                                   : "CpuUtilization[1m].mean() >= 90",
-                            "severity"                                : "CRITICAL"
-                        }
-            },
-
-            "AL-LZ-PREPROD-PROJ1-DB-CLUSTER-DISKUTIL-KEY": {
-                        "display_name"                                : "al-lz-preprod-proj1-vmc-dgutil",
-                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                        "is_enabled"                                  : "false",
-
-                        "supplied_alarm": {
-                            "message_format"                          : "PRETTY_JSON",
-                            "namespace"                               : "oci_database_cluster",
-                            "pending_duration"                        : "PT5M",
-                            "query"                                   : "ASMDiskgroupUtilization[1m].mean() <= 90",
-                            "severity"                                : "CRITICAL"
-                        }
-            },
-
-            "AL-LZ-PREPROD-PROJ1-DB-CLUSTER-FSUTIL-KEY": {
-                        "display_name"                                : "al-lz-preprod-proj1-vmc-fsutil",
-                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                        "is_enabled"                                  : "false",
-
-                        "supplied_alarm": {
-                            "message_format"                          : "PRETTY_JSON",
-                            "namespace"                               : "oci_database_cluster",
-                            "pending_duration"                        : "PT5M",
-                            "query"                                   : "FilesystemUtilization[1m].mean() >= 90",
-                            "severity"                                : "CRITICAL"
-                        }
-            },
-
-            "AL-LZ-PREPROD-PROJ1-DB-CLUSTER-MEMUTIL-KEY": {
-                        "display_name"                                : "al-lz-preprod-proj1-vmc-memutil",
-                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                        "is_enabled"                                  : "false",
-
-                        "supplied_alarm": {
-                            "message_format"                          : "PRETTY_JSON",
-                            "namespace"                               : "oci_database_cluster",
-                            "pending_duration"                        : "PT5M",
-                            "query"                                   : "MemoryUtilization[1m].mean() >= 80",
-                            "severity"                                : "CRITICAL"
-                        }
-            },
-
-            "AL-LZ-PREPROD-PROJ1-DB-CLUSTER-SWAPUTIL-KEY": {
-                        "display_name"                                : "al-lz-preprod-proj1-vmc-swaputil",
-                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                        "is_enabled"                                  : "false",
-
-                        "supplied_alarm": {
-                            "message_format"                          : "PRETTY_JSON",
-                            "namespace"                               : "oci_database_cluster",
-                            "pending_duration"                        : "PT5M",
-                            "query"                                   : "SwapUtilization[1m].mean() >= 75",
-                            "severity"                                : "CRITICAL"
-                        }
-            },
-
-            "AL-LZ-PREPROD-PROJ1-DB-DB-CPUUTIL-KEY": {
-                        "display_name"                                : "al-lz-preprod-proj1-db-cpuutil",
-                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
-                        "is_enabled"                                  : "false",
-
-                        "supplied_alarm": {
-                            "message_format"                          : "PRETTY_JSON",
-                            "namespace"                               : "oci_database",
-                            "pending_duration"                        : "PT5M",
-                            "query"                                   : "CpuUtilization[1m].mean() >= 90",
-                            "severity"                                : "CRITICAL"
-                        }
-            },
-
-            "AL-LZ-PREPROD-PROJ1-DB-DB-STORAGEUTIL-KEY": {
-                        "display_name"                                : "al-lz-preprod-proj1-db-storageutil",
-                        "compartment_id"                              : "CMP-LZ-PREPROD-PROJ1-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
+            "AL-LZ-STORAGEUTIL-KEY": {
+                        "display_name"                                : "al-lz-db-storageutil",
+                        "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
@@ -215,7 +110,6 @@ one_oe+ {
                             "severity"                                : "CRITICAL"
                         }
             }
-
             },
     },
 
@@ -225,7 +119,7 @@ one_oe+ {
         event_rules+: {
             "RUL-LZ-NOTIFICATION-OPERATOR-ACCESS-CONTROL-KEY": {
                 "compartment_id"                              : "CMP-LZ-SECURITY-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-SECURITY-KEY"],
+                "destination_topic_ids"                       : ["NOTT-LZ-EXACC-WORKLOADS-KEY"],
                 "event_display_name"                          : "rul-lz-notify-on-opctl-events",
 
                 "supplied_events": [
@@ -247,10 +141,10 @@ one_oe+ {
                 ]
             },
 
-            "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-KEY": {
-                "compartment_id"                              : "CMP-LZ-PLATFORM-EXACC-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PLATFORM-KEY"],
-                "event_display_name"                          : "rul-lz-notify-on-exacc-events",
+            "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-INFRA-KEY": {
+                "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
+                "event_display_name"                          : "rul-lz-notify-on-exacc-infra-events",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
@@ -266,71 +160,16 @@ one_oe+ {
                     "com.oraclecloud.databaseservice.deletevmcluster.end",
                     "com.oraclecloud.databaseservice.updatevmcluster.begin",
                     "com.oraclecloud.databaseservice.updatevmcluster.end",
-                    "com.oraclecloud.databaseservice.deletebackupdestination",
-                    "com.oraclecloud.databaseservice.updatebackupdestination",
-                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
-                    "com.oraclecloud.databaseservice.dbnodeaction.end",
-                    "com.oraclecloud.databaseservice.deletedbhome.begin",
-                    "com.oraclecloud.databaseservice.deletedbhome.end",
-                    "com.oraclecloud.databaseservice.updatedbhome.begin",
-                    "com.oraclecloud.databaseservice.updatedbhome.end",
-                    "com.oraclecloud.databaseservice.deletebackup.begin",
-                    "com.oraclecloud.databaseservice.deletebackup.end",
-                    "com.oraclecloud.databaseservice.restoredatabase.begin",
-                    "com.oraclecloud.databaseservice.restoredatabase.end",
-                    "com.oraclecloud.databaseservice.deletedatabase.begin",
-                    "com.oraclecloud.databaseservice.deletedatabase.end",
-                    "com.oraclecloud.databaseservice.updatedatabase.begin",
-                    "com.oraclecloud.databaseservice.updatedatabase.end",
                     "com.oraclecloud.databaseservice.patchvmcluster.begin",
                     "com.oraclecloud.databaseservice.patchvmcluster.end",
-                    "com.oraclecloud.databaseservice.patchdbhome.begin",
-                    "com.oraclecloud.databaseservice.patchdbhome.end",
-                    "com.oraclecloud.databaseservice.movedatabase.end",
-                    "com.oraclecloud.databaseservice.movedatabase.end",
                     "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
                     "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
                     "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
                     "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
                     "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
-                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
-                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
-                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
-                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
-                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
-                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
-                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
-                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
-                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
-                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
-                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
-                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
-                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
-                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
-                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
-                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
-                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
-                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
-                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
-                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
-                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
-                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
-                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
-                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
-                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancereminder",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.begin",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.begin",
@@ -338,37 +177,16 @@ one_oe+ {
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.start",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.end",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
-                    "com.oraclecloud.databaseservice.dbnode.critical",
-                    "com.oraclecloud.databaseservice.dbnode.information",
-                    "com.oraclecloud.databaseservice.database.critical",
-                    "com.oraclecloud.databaseservice.database.information",
-                    "com.oraclecloud.databaseservice.dbsystem.critical",
-                    "com.oraclecloud.databaseservice.dbsystem.information"
+                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end"
                 ]
             },
 
-            "RUL-LZ-PROD-NOTIFICATION-PLATFORM-EXACC-KEY": {
-                "compartment_id"                              : "CMP-LZ-PROD-PLATFORM-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PROD-PLATFORM-KEY"],
-                "event_display_name"                          : "rul-lz-prod-notify-on-notifications-platform-changes-rule",
+            "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-DB-KEY": {
+                "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
+                "event_display_name"                          : "rul-lz-notify-on-exacc-db-events",
 
                 "supplied_events": [
-                    "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
-                    "com.oraclecloud.databaseservice.deleteexadatainfrastructure.begin",
-                    "com.oraclecloud.databaseservice.deleteexadatainfrastructure.end",
-                    "com.oraclecloud.databaseservice.updateexadatainfrastructure.begin",
-                    "com.oraclecloud.databaseservice.updateexadatainfrastructure.end",
-                    "com.oraclecloud.databaseservice.exadatainfrastructureconnectstatus",
-                    "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
-                    "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
-                    "com.oraclecloud.databaseservice.changevmclustercompartment",
-                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
-                    "com.oraclecloud.databaseservice.deletevmcluster.end",
-                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
-                    "com.oraclecloud.databaseservice.updatevmcluster.end",
                     "com.oraclecloud.databaseservice.deletebackupdestination",
                     "com.oraclecloud.databaseservice.updatebackupdestination",
                     "com.oraclecloud.databaseservice.dbnodeaction.begin",
@@ -385,17 +203,9 @@ one_oe+ {
                     "com.oraclecloud.databaseservice.deletedatabase.end",
                     "com.oraclecloud.databaseservice.updatedatabase.begin",
                     "com.oraclecloud.databaseservice.updatedatabase.end",
-                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
-                    "com.oraclecloud.databaseservice.patchvmcluster.end",
                     "com.oraclecloud.databaseservice.patchdbhome.begin",
                     "com.oraclecloud.databaseservice.patchdbhome.end",
                     "com.oraclecloud.databaseservice.movedatabase.end",
-                    "com.oraclecloud.databaseservice.movedatabase.end",
-                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
                     "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
@@ -407,7 +217,6 @@ one_oe+ {
                     "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
                     "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
                     "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
                     "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
                     "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
                     "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
@@ -429,21 +238,6 @@ one_oe+ {
                     "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
                     "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
                     "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancereminder",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.begin",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.begin",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.start",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
                     "com.oraclecloud.databaseservice.dbnode.critical",
                     "com.oraclecloud.databaseservice.dbnode.information",
                     "com.oraclecloud.databaseservice.database.critical",
@@ -454,41 +248,11 @@ one_oe+ {
             },
 
             "RUL-LZ-PROD-NOTIFICATION-PROJECTS-KEY": {
-                "compartment_id"                              : "CMP-LZ-PROD-PROJECTS-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PROD-WORKLOADS-KEY"],
+                "compartment_id"                              : "CMP-LZ-PROD-PROJ1-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZ-PROD-EXACC-PROJECTS-KEY"],
                 "event_display_name"                          : "rul-lz-prod-notify-on-notifications-projects",
 
                 "supplied_events": [
-                    "com.oraclecloud.databaseservice.changevmclustercompartment",
-                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
-                    "com.oraclecloud.databaseservice.deletevmcluster.end",
-                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
-                    "com.oraclecloud.databaseservice.updatevmcluster.end",
-                    "com.oraclecloud.databaseservice.deletebackupdestination",
-                    "com.oraclecloud.databaseservice.updatebackupdestination",
-                    "com.oraclecloud.databaseservice.deletedbhome.begin",
-                    "com.oraclecloud.databaseservice.deletedbhome.end",
-                    "com.oraclecloud.databaseservice.updatedbhome.begin",
-                    "com.oraclecloud.databaseservice.updatedbhome.end",
-                    "com.oraclecloud.databaseservice.deletebackup.begin",
-                    "com.oraclecloud.databaseservice.deletebackup.end",
-                    "com.oraclecloud.databaseservice.restoredatabase.begin",
-                    "com.oraclecloud.databaseservice.restoredatabase.end",
-                    "com.oraclecloud.databaseservice.deletedatabase.begin",
-                    "com.oraclecloud.databaseservice.deletedatabase.end",
-                    "com.oraclecloud.databaseservice.updatedatabase.begin",
-                    "com.oraclecloud.databaseservice.updatedatabase.end",
-                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
-                    "com.oraclecloud.databaseservice.patchvmcluster.end",
-                    "com.oraclecloud.databaseservice.patchdbhome.begin",
-                    "com.oraclecloud.databaseservice.patchdbhome.end",
-                    "com.oraclecloud.databaseservice.movedatabase.end",
-                    "com.oraclecloud.databaseservice.movedatabase.end",
-                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
                     "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
@@ -501,82 +265,6 @@ one_oe+ {
                     "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
                     "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
                     "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
-                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
-                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
-                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
-                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
-                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
-                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
-                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
-                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
-                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
-                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
-                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
-                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
-                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
-                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
-                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
-                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
-                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
-                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
-                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
-                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
-                    "com.oraclecloud.databaseservice.dbnode.critical",
-                    "com.oraclecloud.databaseservice.dbnode.information",
-                    "com.oraclecloud.databaseservice.database.critical",
-                    "com.oraclecloud.databaseservice.database.information",
-                    "com.oraclecloud.databaseservice.dbsystem.critical",
-                    "com.oraclecloud.databaseservice.dbsystem.information"
-                ]
-            },
-
-            "RUL-LZ-PREPROD-NOTIFICATION-PLATFORM-EXACC-KEY": {
-                "compartment_id"                              : "CMP-LZ-PREPROD-PLATFORM-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-PLATFORM-KEY"],
-                "event_display_name"                          : "rul-lz-preprod-notify-on-notifications-platform-changes-rule",
-
-                "supplied_events": [
-                    "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
-                    "com.oraclecloud.databaseservice.deleteexadatainfrastructure.begin",
-                    "com.oraclecloud.databaseservice.deleteexadatainfrastructure.end",
-                    "com.oraclecloud.databaseservice.updateexadatainfrastructure.begin",
-                    "com.oraclecloud.databaseservice.updateexadatainfrastructure.end",
-                    "com.oraclecloud.databaseservice.exadatainfrastructureconnectstatus",
-                    "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
-                    "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
-                    "com.oraclecloud.databaseservice.changevmclustercompartment",
-                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
-                    "com.oraclecloud.databaseservice.deletevmcluster.end",
-                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
-                    "com.oraclecloud.databaseservice.updatevmcluster.end",
-                    "com.oraclecloud.databaseservice.deletebackupdestination",
-                    "com.oraclecloud.databaseservice.updatebackupdestination",
-                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
-                    "com.oraclecloud.databaseservice.dbnodeaction.end",
-                    "com.oraclecloud.databaseservice.deletedbhome.begin",
-                    "com.oraclecloud.databaseservice.deletedbhome.end",
-                    "com.oraclecloud.databaseservice.updatedbhome.begin",
-                    "com.oraclecloud.databaseservice.updatedbhome.end",
-                    "com.oraclecloud.databaseservice.deletebackup.begin",
-                    "com.oraclecloud.databaseservice.deletebackup.end",
-                    "com.oraclecloud.databaseservice.restoredatabase.begin",
-                    "com.oraclecloud.databaseservice.restoredatabase.end",
-                    "com.oraclecloud.databaseservice.deletedatabase.begin",
-                    "com.oraclecloud.databaseservice.deletedatabase.end",
-                    "com.oraclecloud.databaseservice.updatedatabase.begin",
-                    "com.oraclecloud.databaseservice.updatedatabase.end",
-                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
-                    "com.oraclecloud.databaseservice.patchvmcluster.end",
-                    "com.oraclecloud.databaseservice.patchdbhome.begin",
-                    "com.oraclecloud.databaseservice.patchdbhome.end",
-                    "com.oraclecloud.databaseservice.movedatabase.end",
-                    "com.oraclecloud.databaseservice.movedatabase.end",
-                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
                     "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
@@ -589,62 +277,22 @@ one_oe+ {
                     "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
                     "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
                     "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
-                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
-                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
-                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
-                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
-                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
-                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
-                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
-                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
-                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
-                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
-                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
-                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
-                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
-                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
                     "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
                     "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
                     "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
                     "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
                     "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
-                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancereminder",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.begin",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.begin",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancecustomactiontime.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.begin",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancenetworkswitches.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.start",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancestorageservers.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.start",
-                    "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancedbservers.end",
-                    "com.oraclecloud.databaseservice.dbnode.critical",
-                    "com.oraclecloud.databaseservice.dbnode.information",
-                    "com.oraclecloud.databaseservice.database.critical",
-                    "com.oraclecloud.databaseservice.database.information",
-                    "com.oraclecloud.databaseservice.dbsystem.critical",
-                    "com.oraclecloud.databaseservice.dbsystem.information"
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end"
+
                 ]
             },
 
             "RUL-LZ-PREPROD-NOTIFICATION-PROJECTS-KEY": {
-                "compartment_id"                              : "CMP-LZ-PREPROD-PROJECTS-KEY",
-                "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-WORKLOADS-KEY"],
+                "compartment_id"                              : "CMP-LZ-PREPROD-PROJ1-DB-KEY",
+                "destination_topic_ids"                       : ["NOTT-LZ-PREPROD-EXACC-PROJECTS-KEY"],
                 "event_display_name"                          : "rul-lz-preprod-notify-on-notifications-projects",
 
                 "supplied_events": [
-                    "com.oraclecloud.databaseservice.changevmclustercompartment",
-                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
-                    "com.oraclecloud.databaseservice.deletevmcluster.end",
-                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
-                    "com.oraclecloud.databaseservice.updatevmcluster.end",
                     "com.oraclecloud.databaseservice.deletebackupdestination",
                     "com.oraclecloud.databaseservice.updatebackupdestination",
                     "com.oraclecloud.databaseservice.deletedbhome.begin",
@@ -659,17 +307,10 @@ one_oe+ {
                     "com.oraclecloud.databaseservice.deletedatabase.end",
                     "com.oraclecloud.databaseservice.updatedatabase.begin",
                     "com.oraclecloud.databaseservice.updatedatabase.end",
-                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
-                    "com.oraclecloud.databaseservice.patchvmcluster.end",
                     "com.oraclecloud.databaseservice.patchdbhome.begin",
                     "com.oraclecloud.databaseservice.patchdbhome.end",
                     "com.oraclecloud.databaseservice.movedatabase.end",
                     "com.oraclecloud.databaseservice.movedatabase.end",
-                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
                     "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
@@ -711,6 +352,7 @@ one_oe+ {
                     "com.oraclecloud.databaseservice.dbsystem.information"
                 ]
             }
+
         }
     },
 
@@ -718,75 +360,37 @@ one_oe+ {
     default_compartment_id                            : "CMP-LZ-SECURITY-KEY",
 
     topics+: {
-            "NOTT-LZ-PLATFORM-KEY": {
+
+            "NOTT-LZ-PROD-EXACC-PROJECTS-KEY": {
+                "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
+                "description"                                : "Topic for prod platform notifications.",
+                "name"                                       : "nott-lz-prod-exacc-projects",
+
+                "subscriptions": [
+                    {
+                        "protocol"                           : "EMAIL",
+                        "values"                             : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-PREPROD-EXACC-PROJECTS-KEY": {
+                "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "description"                                : "Topic for prod platform notifications.",
+                "name"                                       : "nott-lz-preprod-exacc-projects",
+
+                "subscriptions": [
+                    {
+                        "protocol"                           : "EMAIL",
+                        "values"                             : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY": {
                 "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
-                "description"                                : "Topic for prod platform notifications.",
-                "name"                                       : "nott-lz-platform",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-PROD-PLATFORM-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
-                "description"                                : "Topic for prod platform notifications.",
-                "name"                                       : "nott-lz-prod-platform",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-PREPROD-PLATFORM-KEY": {
-                "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
-                "description"                                : "Topic for preprod platform notifications.",
-                "name"                                       : "nott-lz-preprod-platform",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-PROD-PROJECTS-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
-                "description"                                : "Topic for prod platform notifications.",
-                "name"                                       : "nott-lz-prod-projects",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-PREPROD-PROJECTS-KEY": {
-                "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
-                "description"                                : "Topic for prod platform notifications.",
-                "name"                                       : "nott-lz-preprod-projects",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-PROD-WORKLOADS-KEY": {
-                "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
                 "description"                                : "Topic for prod workloads notifications.",
-                "name"                                       : "nott-lz-prod-workloads",
+                "name"                                       : "nott-lz-exacc-infra-workloads",
 
                 "subscriptions": [
                     {
@@ -796,10 +400,10 @@ one_oe+ {
                 ]
             },
 
-            "NOTT-LZ-PREPROD-WORKLOADS-KEY": {
-                "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
+            "NOTT-LZ-EXACC-DB-WORKLOADS-KEY": {
+                "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
                 "description"                                : "Topic for prod workloads notifications.",
-                "name"                                       : "nott-lz-preprod-workloads",
+                "name"                                       : "nott-lz-exacc-db-workloads",
 
                 "subscriptions": [
                     {
@@ -808,6 +412,7 @@ one_oe+ {
                     }
                 ]
             }
+
         }
     }
 }
