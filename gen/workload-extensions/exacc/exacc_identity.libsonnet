@@ -95,7 +95,7 @@
        description: "Example policy which allows the grp-lz-prod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
        compartment_id: "CMP-LZ-PROD-PROJ1-DB-KEY",
        statements: [
-          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read all-resources cmp-lz-prod-proj1-db",
+          "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read all-resources in compartment cmp-lz-prod-proj1-db",
           "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage alarms in compartment cmp-lz-prod-proj1-db",
           "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage metrics in compartment cmp-lz-prod-proj1-db",
           "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read audit-events in compartment cmp-lz-prod-proj1-db",

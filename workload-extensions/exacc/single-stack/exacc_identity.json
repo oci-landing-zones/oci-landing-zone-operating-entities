@@ -563,7 +563,7 @@
                 "name"                                                         : "pcy-lz-prod-exacc-proj1-admin",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read all-resources cmp-lz-prod-proj1-db",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read all-resources in compartment cmp-lz-prod-proj1-db",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage alarms in compartment cmp-lz-prod-proj1-db",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to manage metrics in compartment cmp-lz-prod-proj1-db",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read audit-events in compartment cmp-lz-prod-proj1-db",
