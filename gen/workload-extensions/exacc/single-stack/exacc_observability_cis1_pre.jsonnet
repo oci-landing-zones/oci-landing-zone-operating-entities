@@ -355,11 +355,11 @@ one_oe+ {
 
         }
     },
-
+    
     notifications_configuration+: {
-    default_compartment_id                            : "CMP-LZ-SECURITY-KEY",
-
-    topics+: {
+        default_compartment_id                            : "CMP-LZ-SECURITY-KEY",
+    
+        topics+: {
 
             "NOTT-LZ-PROD-EXACC-PROJECTS-KEY": {
                 "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
