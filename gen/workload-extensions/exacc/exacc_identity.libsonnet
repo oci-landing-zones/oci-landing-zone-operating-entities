@@ -93,7 +93,7 @@
           ]
       },
 
-      "PCY-LZ-PROD-EXACC-PROJECTS-PROJ1-ADMIN-KEY": {
+      "PCY-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
        name: "pcy-lz-prod-exacc-proj1-admin",
        description: "Example policy which allows the grp-lz-prod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
        compartment_id: "CMP-LZ-PROD-PROJ1-DB-KEY",
@@ -111,7 +111,7 @@
           ]
       },
 
-      "PCY-LZ-PREPROD-EXACC-PROJECTS-PROJ1-ADMIN-KEY": {
+      "PCY-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
        name: "pcy-lz-preprod-exacc-proj1-admin",
        description: "Example policy which allows the grp-lz-preprod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
        compartment_id: "CMP-LZ-PREPROD-PROJ1-DB-KEY",
