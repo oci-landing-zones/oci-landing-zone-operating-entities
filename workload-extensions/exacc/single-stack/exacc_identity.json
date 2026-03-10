@@ -55,7 +55,7 @@
 
                             "CMP-LZ-PREPROD-PLATFORM-KEY": {
                                 "children": {
-                                    "CMP-LZ-PREPROD-PLATFORM-EXACC-KEY": {
+                                    "CMP-LZ-PREPROD-EXACC-KEY": {
                                         "children": {
                                             "CMP-LZ-PREPROD-EXACC-DB-KEY": {
                                                 "defined_tags": {
@@ -129,7 +129,7 @@
 
                             "CMP-LZ-PROD-PLATFORM-KEY": {
                                 "children": {
-                                    "CMP-LZ-PROD-PLATFORM-EXACC-KEY": {
+                                    "CMP-LZ-PROD-EXACC-KEY": {
                                         "children": {
                                             "CMP-LZ-PROD-EXACC-DB-KEY": {
                                                 "defined_tags": {

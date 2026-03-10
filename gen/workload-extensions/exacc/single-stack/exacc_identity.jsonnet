@@ -39,7 +39,7 @@ one_oe + exacc_identity + {
             children+: {
               'CMP-LZ-PROD-PLATFORM-KEY'+: {
                 children+: {
-                  'CMP-LZ-PROD-PLATFORM-EXACC-KEY': {
+                  'CMP-LZ-PROD-EXACC-KEY': {
                     name: 'cmp-lz-prod-exacc',
                     description: 'ExaCC Shared Platform',
                     defined_tags: {
@@ -87,7 +87,7 @@ one_oe + exacc_identity + {
             children+: {
               'CMP-LZ-PREPROD-PLATFORM-KEY'+: {
                 children+: {
-                  'CMP-LZ-PREPROD-PLATFORM-EXACC-KEY': {
+                  'CMP-LZ-PREPROD-EXACC-KEY': {
                     name: 'cmp-lz-preprod-exacc',
                     description: 'ExaCC Shared Platform',
                     defined_tags: {
