@@ -142,22 +142,22 @@
         "default_identity_domain_id"                                           : "COMMON-DOMAIN",
 
         "groups": {
-            "GRP-LZ-GLOBAL-DB-ADMINS-KEY": {
+            "GRP-LZ-GLOBAL-DB-ADMIN-KEY": {
                 "description"                                                  : "Global DBA team admin group",
                 "name"                                                         : "grp-lz-exacc-db-admin"
             },
 
-            "GRP-LZ-GLOBAL-INFRA-ADMINS-KEY": {
+            "GRP-LZ-GLOBAL-INFRA-ADMIN-KEY": {
                 "description"                                                  : "Global Infra Team admin group",
                 "name"                                                         : "grp-lz-exacc-infra-admin"
             },
 
-            "GRP-LZ-PREPROD-EXACC-PROJ1-ADMINS-KEY": {
+            "GRP-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
                 "description"                                                  : "Dedicated team to manage exacc db layer in proj1, prod environment",
                 "name"                                                         : "grp-lz-preprod-proj1-exacc-admin"
             },
 
-            "GRP-LZ-PROD-EXACC-PROJ1-ADMINS-KEY": {
+            "GRP-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
                 "description"                                                  : "Dedicated team to manage exacc db layer in proj1, prod environment",
                 "name"                                                         : "grp-lz-prod-proj1-exacc-admin"
             }

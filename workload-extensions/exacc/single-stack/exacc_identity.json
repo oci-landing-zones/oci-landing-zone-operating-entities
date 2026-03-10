@@ -210,24 +210,64 @@
         "default_identity_domain_id"                                           : "COMMON-DOMAIN",
 
         "groups": {
-            "GRP-LZ-GLOBAL-DB-ADMINS-KEY": {
+            "GRP-AUDITORS-ADMIN-KEY": {
+                "description"                                                  : "Tenancy global read access group(for security auditing or health checks).",
+                "name"                                                         : "grp-auditors-admin"
+            },
+
+            "GRP-COST-ADMIN-KEY": {
+                "description"                                                  : "Tenancy global cost control group.",
+                "name"                                                         : "grp-cost-admin"
+            },
+
+            "GRP-IAM-ADMIN-KEY": {
+                "description"                                                  : "Tenancy global Identity and access management administrator group.",
+                "name"                                                         : "grp-iam-admin"
+            },
+
+            "GRP-LZ-GLOBAL-DB-ADMIN-KEY": {
                 "description"                                                  : "Global DBA team admin group",
                 "name"                                                         : "grp-lz-exacc-db-admin"
             },
 
-            "GRP-LZ-GLOBAL-INFRA-ADMINS-KEY": {
+            "GRP-LZ-GLOBAL-INFRA-ADMIN-KEY": {
                 "description"                                                  : "Global Infra Team admin group",
                 "name"                                                         : "grp-lz-exacc-infra-admin"
             },
 
-            "GRP-LZ-PREPROD-EXACC-PROJ1-ADMINS-KEY": {
+            "GRP-LZ-NETWORK-ADMIN-KEY": {
+                "description"                                                  : "One-OE Landing Zone, Shared network administration group.",
+                "name"                                                         : "grp-lz-network-admin"
+            },
+
+            "GRP-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
                 "description"                                                  : "Dedicated team to manage exacc db layer in proj1, prod environment",
                 "name"                                                         : "grp-lz-preprod-proj1-exacc-admin"
             },
 
-            "GRP-LZ-PROD-EXACC-PROJ1-ADMINS-KEY": {
+            "GRP-LZ-PREPROD-PROJ1-ADMIN-KEY": {
+                "description"                                                  : "One-OE Landing Zone, Pre-Production environment, Project 1, Administrators.",
+                "name"                                                         : "grp-lz-preprod-proj1-admin"
+            },
+
+            "GRP-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
                 "description"                                                  : "Dedicated team to manage exacc db layer in proj1, prod environment",
                 "name"                                                         : "grp-lz-prod-proj1-exacc-admin"
+            },
+
+            "GRP-LZ-PROD-PROJ1-ADMIN-KEY": {
+                "description"                                                  : "One-OE Landing Zone, Production environment, Project 1, Administrators.",
+                "name"                                                         : "grp-lz-prod-proj1-admin"
+            },
+
+            "GRP-LZ-SECURITY-ADMIN-KEY": {
+                "description"                                                  : "One-OE Landing Zone, Shared security administration group",
+                "name"                                                         : "grp-lz-security-admin"
+            },
+
+            "GRP-SECURITY-ADMIN-KEY": {
+                "description"                                                  : "Tenancy Security Administrators for global resources as Cloud Guard.",
+                "name"                                                         : "grp-security-admin"
             }
         }
     },

@@ -4,23 +4,23 @@
   identity_domain_groups_configuration+: {
         default_identity_domain_id   : "COMMON-DOMAIN",
 
-        "groups": {
-           "GRP-LZ-GLOBAL-INFRA-ADMINS-KEY": { 
+        groups+: {
+           "GRP-LZ-GLOBAL-INFRA-ADMIN-KEY": { 
             name: 'grp-lz-exacc-infra-admin',
             description: 'Global Infra Team admin group',
             },
 
-            "GRP-LZ-GLOBAL-DB-ADMINS-KEY": { 
+            "GRP-LZ-GLOBAL-DB-ADMIN-KEY": { 
               name: 'grp-lz-exacc-db-admin',
               description: 'Global DBA team admin group',
             },
 
-            "GRP-LZ-PROD-EXACC-PROJ1-ADMINS-KEY": { 
+            "GRP-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": { 
               name: 'grp-lz-prod-proj1-exacc-admin',
               description: 'Dedicated team to manage exacc db layer in proj1, prod environment',
             },
 
-             "GRP-LZ-PREPROD-EXACC-PROJ1-ADMINS-KEY": { 
+             "GRP-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": { 
               name: 'grp-lz-preprod-proj1-exacc-admin',
               description: 'Dedicated team to manage exacc db layer in proj1, prod environment',
             },
