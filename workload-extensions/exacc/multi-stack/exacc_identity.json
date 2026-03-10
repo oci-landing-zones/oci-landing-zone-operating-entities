@@ -1,49 +1,153 @@
 {
     "compartments_configuration": {
         "compartments": {
-            "CMP-LZ-PROD-PLATFORM-KEY": {
+            "CMP-LANDINGZONE-KEY": {
                 "children": {
-                    "CMP-LZ-PROD-PLATFORM-EXACC-KEY": {
+                    "CMP-LZ-PLATFORM-KEY": {
                         "children": {
-                            "CMP-LZ-EXACC-DB-KEY": {
-                                "defined_tags": {
-                                    "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
+                            "CMP-LZ-PLATFORM-EXACC-KEY": {
+                                "children": {
+                                    "CMP-LZ-EXACC-DB-KEY": {
+                                        "defined_tags": {
+                                            "tagns-lz-role.tag-lz-role"        : "lz-exacc-db-admin"
+                                        },
+                                        "description"                          : "Shared exacc Platform, db compartment",
+                                        "name"                                 : "cmp-lz-exacc-db"
+                                    },
+
+                                    "CMP-LZ-EXACC-INFRA-KEY": {
+                                        "defined_tags": {
+                                            "tagns-lz-role.tag-lz-role"        : "lz-exacc-infra-admin"
+                                        },
+                                        "description"                          : "Shared exacc Platform, infra compartment",
+                                        "name"                                 : "cmp-lz-exacc-infra"
+                                    }
                                 },
-                                "description"                  : "Shared exacc Platform, db compartment",
-                                "name"                         : "cmp-lz-exacc-db"
+
+                                "defined_tags": {
+                                    "tagns-lz-role.tag-lz-role"                : "lz-exacc-admin"
+                                },
+                                "description"                                  : "ExaCC shared Platform",
+                                "name"                                         : "cmp-lz-exacc"
+                            }
+                        }
+                    },
+
+                    "CMP-LZ-PREPROD-KEY": {
+                        "children": {
+                            "CMP-LZ-PREPROD-PLATFORM-KEY": {
+                                "children": {
+                                    "CMP-LZ-PREPROD-PLATFORM-EXACC-KEY": {
+                                        "children": {
+                                            "CMP-LZ-PREPROD-EXACC-DB-KEY": {
+                                                "defined_tags": {
+                                                    "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
+                                                },
+                                                "description"                  : "Shared exacc Platform, db compartment",
+                                                "name"                         : "cmp-lz-preprod-exacc-db"
+                                            },
+
+                                            "CMP-LZ-PREPROD-EXACC-INFRA-KEY": {
+                                                "defined_tags": {
+                                                    "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
+                                                },
+                                                "description"                  : "Shared exacc Platform, infra compartment",
+                                                "name"                         : "cmp-lz-preprod-exacc-infra"
+                                            }
+                                        },
+
+                                        "defined_tags": {
+                                            "tagns-lz-role.tag-lz-role"        : "lz-exacc-admin"
+                                        },
+                                        "description"                          : "ExaCC Shared Platform",
+                                        "name"                                 : "cmp-lz-preprod-exacc"
+                                    }
+                                }
                             },
 
-                            "CMP-LZ-EXACC-INFRA-KEY": {
-                                "defined_tags": {
-                                    "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
-                                },
-                                "description"                  : "Shared exacc Platform, infra compartment",
-                                "name"                         : "cmp-lz-exacc-infra"
+                            "CMP-LZ-PREPROD-PROJECTS-KEY": {
+                                "children": {
+                                    "CMP-LZ-PREPROD-PROJ1-KEY": {
+                                        "children": {
+                                            "CMP-LZ-PREPROD-PROJ1-DB-KEY": {
+                                                "defined_tags": {
+                                                    "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
+                                                },
+                                                "description"                  : "ExaCC PreProd env database layer",
+                                                "name"                         : "cmp-lz-preprod-proj1-exacc-db"
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                        },
+                        }
+                    },
 
-                        "defined_tags": {
-                            "tagns-lz-role.tag-lz-role"        : "lz-exacc-admin"
-                        },
-                        "description"                          : "ExaCC Shared Platform",
-                        "name"                                 : "cmp-lz-exacc"
+                    "CMP-LZ-PROD-KEY": {
+                        "children": {
+                            "CMP-LZ-PROD-PLATFORM-KEY": {
+                                "children": {
+                                    "CMP-LZ-PROD-PLATFORM-EXACC-KEY": {
+                                        "children": {
+                                            "CMP-LZ-PROD-EXACC-DB-KEY": {
+                                                "defined_tags": {
+                                                    "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
+                                                },
+                                                "description"                  : "Shared exacc Platform, db compartment",
+                                                "name"                         : "cmp-lz-prod-exacc-db"
+                                            },
+
+                                            "CMP-LZ-PROD-EXACC-INFRA-KEY": {
+                                                "defined_tags": {
+                                                    "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
+                                                },
+                                                "description"                  : "Shared exacc Platform, infra compartment",
+                                                "name"                         : "cmp-lz-prod-exacc-infra"
+                                            }
+                                        },
+
+                                        "defined_tags": {
+                                            "tagns-lz-role.tag-lz-role"        : "lz-exacc-admin"
+                                        },
+                                        "description"                          : "ExaCC Shared Platform",
+                                        "name"                                 : "cmp-lz-prod-exacc"
+                                    }
+                                }
+                            },
+
+                            "CMP-LZ-PROD-PROJECTS-KEY": {
+                                "children": {
+                                    "CMP-LZ-PROD-PROJ1-KEY": {
+                                        "children": {
+                                            "CMP-LZ-PROD-PROJ1-DB-KEY": {
+                                                "defined_tags": {
+                                                    "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
+                                                },
+                                                "description"                  : "ExaCC Prod env database layer",
+                                                "name"                         : "cmp-lz-prod-proj1-exacc-db"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         },
-        "enable_delete"                                        : "true"
+        "enable_delete"                                                        : "true"
     },
 
     "groups_configuration": {
         "groups": {
             "GRP-LZ-GLOBAL-DB-ADMINS-KEY": {
-                "description"                                  : "Global DBA team admin group",
-                "name"                                         : "grp-lz-exacc-db-admin"
+                "description"                                                  : "Global DBA team admin group",
+                "name"                                                         : "grp-lz-exacc-db-admin"
             },
 
             "GRP-LZ-GLOBAL-INFRA-ADMINS-KEY": {
-                "description"                                  : "Global Infra Team admin group",
-                "name"                                         : "grp-lz-exacc-infra-admin"
+                "description"                                                  : "Global Infra Team admin group",
+                "name"                                                         : "grp-lz-exacc-infra-admin"
             }
         }
     },
@@ -51,9 +155,9 @@
     "policies_configuration": {
         "supplied_policies": {
             "PCY-LZ-PLATFORM-EXACS-DB-ADMIN-KEY": {
-                "compartment_id"                               : "CMP-LANDINGZONE-KEY",
-                "description"                                  : "Policy which allows the groups grp-lz-exacc-infra-admin and grp-lz-exacc-db-admin to have shared privilegies in all exacc compartments",
-                "name"                                         : "pcy-lz-exacc-db-admin",
+                "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
+                "description"                                                  : "Policy which allows the groups grp-lz-exacc-infra-admin and grp-lz-exacc-db-admin to have shared privilegies in all exacc compartments",
+                "name"                                                         : "pcy-lz-exacc-db-admin",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
@@ -74,9 +178,9 @@
             },
 
             "PCY-LZ-PLATFORM-EXACS-GENERIC-ADMIN-KEY": {
-                "compartment_id"                               : "TENANCY-ROOT",
-                "description"                                  : "Policy which allows the groups grp-lz-exacc-infra-admin and grp-lz-exacc-db-admin to have shared privilegies in all exacc compartments",
-                "name"                                         : "pcy-lz-exacc-generic",
+                "compartment_id"                                               : "TENANCY-ROOT",
+                "description"                                                  : "Policy which allows the groups grp-lz-exacc-infra-admin and grp-lz-exacc-db-admin to have shared privilegies in all exacc compartments",
+                "name"                                                         : "pcy-lz-exacc-generic",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to use cloud-shell in tenancy",
@@ -92,9 +196,9 @@
             },
 
             "PCY-LZ-PLATFORM-EXACS-INFRA-ADMIN-KEY": {
-                "compartment_id"                               : "CMP-LANDINGZONE-KEY",
-                "description"                                  : "Example policy which allows the grp-lz-exacc-infra-admin group users to manage the DB infra in sharead exacc platform compartment.",
-                "name"                                         : "pcy-lz-exacc-infra-admin",
+                "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
+                "description"                                                  : "Example policy which allows the grp-lz-exacc-infra-admin group users to manage the DB infra in sharead exacc platform compartment.",
+                "name"                                                         : "pcy-lz-exacc-infra-admin",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage exadata-infrastructures in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",

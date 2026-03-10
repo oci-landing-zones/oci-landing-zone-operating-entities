@@ -94,7 +94,7 @@
                                                     "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
                                                 },
                                                 "description"                  : "ExaCC PreProd env database layer",
-                                                "name"                         : "cmp-lz-preprod-exacc-db"
+                                                "name"                         : "cmp-lz-preprod-proj1-exacc-db"
                                             }
                                         },
                                         "description"                          : "Pre-Production environment, Project 1 compartment",
@@ -168,7 +168,7 @@
                                                     "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
                                                 },
                                                 "description"                  : "ExaCC Prod env database layer",
-                                                "name"                         : "cmp-lz-prod-exacc-db"
+                                                "name"                         : "cmp-lz-prod-proj1-exacc-db"
                                             }
                                         },
                                         "description"                          : "Production environment, Project 1 Compartment",
