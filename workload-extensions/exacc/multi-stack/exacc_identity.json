@@ -138,7 +138,9 @@
         "enable_delete"                                                        : "true"
     },
 
-    "groups_configuration": {
+    "identity_domain_groups_configuration": {
+        "default_identity_domain_id"                                           : "COMMON-DOMAIN",
+
         "groups": {
             "GRP-LZ-GLOBAL-DB-ADMINS-KEY": {
                 "description"                                                  : "Global DBA team admin group",
@@ -151,7 +153,7 @@
             },
 
             "GRP-LZ-PREPROD-EXACC-PROJ1-ADMINS-KEY": {
-                "description"                                                  : "Dedicated team to manage exacc db layer in proj1, prod environmen",
+                "description"                                                  : "Dedicated team to manage exacc db layer in proj1, prod environment",
                 "name"                                                         : "grp-lz-preprod-proj1-exacc-admin"
             },
 

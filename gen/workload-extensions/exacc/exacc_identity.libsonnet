@@ -1,27 +1,30 @@
 {
-  groups_configuration+: {
-    groups: {
 
-      "GRP-LZ-GLOBAL-INFRA-ADMINS-KEY": { 
-        name: 'grp-lz-exacc-infra-admin',
-        description: 'Global Infra Team admin group',
-      },
 
-      "GRP-LZ-GLOBAL-DB-ADMINS-KEY": { 
-        name: 'grp-lz-exacc-db-admin',
-        description: 'Global DBA team admin group',
-      },
+  identity_domain_groups_configuration+: {
+        default_identity_domain_id   : "COMMON-DOMAIN",
 
-      "GRP-LZ-PROD-EXACC-PROJ1-ADMINS-KEY": { 
-        name: 'grp-lz-prod-proj1-exacc-admin',
-        description: 'Dedicated team to manage exacc db layer in proj1, prod environment',
-      },
+        "groups": {
+           "GRP-LZ-GLOBAL-INFRA-ADMINS-KEY": { 
+            name: 'grp-lz-exacc-infra-admin',
+            description: 'Global Infra Team admin group',
+            },
 
-       "GRP-LZ-PREPROD-EXACC-PROJ1-ADMINS-KEY": { 
-        name: 'grp-lz-preprod-proj1-exacc-admin',
-        description: 'Dedicated team to manage exacc db layer in proj1, prod environmen',
-      },
-    },
+            "GRP-LZ-GLOBAL-DB-ADMINS-KEY": { 
+              name: 'grp-lz-exacc-db-admin',
+              description: 'Global DBA team admin group',
+            },
+
+            "GRP-LZ-PROD-EXACC-PROJ1-ADMINS-KEY": { 
+              name: 'grp-lz-prod-proj1-exacc-admin',
+              description: 'Dedicated team to manage exacc db layer in proj1, prod environment',
+            },
+
+             "GRP-LZ-PREPROD-EXACC-PROJ1-ADMINS-KEY": { 
+              name: 'grp-lz-preprod-proj1-exacc-admin',
+              description: 'Dedicated team to manage exacc db layer in proj1, prod environment',
+            },
+        }
   },
 
   policies_configuration+: {
@@ -108,7 +111,7 @@
           ]
       },
 
-       "PCY-LZ-PREPROD-EXACC-PROJECTS-PROJ1-ADMIN-KEY": {
+      "PCY-LZ-PREPROD-EXACC-PROJECTS-PROJ1-ADMIN-KEY": {
        name: "pcy-lz-preprod-exacc-proj1-admin",
        description: "Example policy which allows the grp-lz-preprod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
        compartment_id: "CMP-LZ-PREPROD-PROJ1-DB-KEY",
