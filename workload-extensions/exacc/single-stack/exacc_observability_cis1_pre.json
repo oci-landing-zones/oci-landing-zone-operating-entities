@@ -18,7 +18,7 @@
 
             "AL-LZ-DB-CLUSTER-CPUUTIL-KEY": {
                 "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
+                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
                 "display_name"                               : "al-lz-vmc-cpuutil",
                 "is_enabled"                                 : "false",
 
@@ -33,7 +33,7 @@
 
             "AL-LZ-DB-CLUSTER-DISKUTIL-KEY": {
                 "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
+                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
                 "display_name"                               : "al-lz-vmc-dgutil",
                 "is_enabled"                                 : "false",
 
@@ -63,7 +63,7 @@
 
             "AL-LZ-DB-CLUSTER-MEMUTIL-KEY": {
                 "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
+                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
                 "display_name"                               : "al-lz-vmc-memutil",
                 "is_enabled"                                 : "false",
 
@@ -78,7 +78,7 @@
 
             "AL-LZ-DB-CLUSTER-SWAPUTIL-KEY": {
                 "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
+                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
                 "display_name"                               : "al-lz-vmc-swaputil",
                 "is_enabled"                                 : "false",
 

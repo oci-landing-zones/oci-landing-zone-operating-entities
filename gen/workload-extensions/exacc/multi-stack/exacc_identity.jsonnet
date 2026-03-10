@@ -69,7 +69,7 @@ exacc_identity  {
                   'CMP-LZ-PROD-PROJ1-KEY'+: {
                    children+: {
                   'CMP-LZ-PROD-PROJ1-DB-KEY': {
-                    name: 'cmp-lz-prod-proj1-exacc-db',
+                    name: 'cmp-lz-prod-proj1-db',
                     description: 'ExaCC Prod env database layer',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
@@ -117,7 +117,7 @@ exacc_identity  {
                   'CMP-LZ-PREPROD-PROJ1-KEY'+: {
                    children+: {
                   'CMP-LZ-PREPROD-PROJ1-DB-KEY': {
-                    name: 'cmp-lz-preprod-proj1-exacc-db',
+                    name: 'cmp-lz-preprod-proj1-db',
                     description: 'ExaCC PreProd env database layer',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',

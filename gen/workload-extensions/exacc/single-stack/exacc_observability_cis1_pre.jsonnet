@@ -9,7 +9,7 @@ one_oe+ {
             "AL-LZ-DB-CLUSTER-CPUUTIL-KEY": {
                         "display_name"                                : "al-lz-vmc-cpuutil",
                         "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
@@ -24,7 +24,7 @@ one_oe+ {
             "AL-LZ-DB-CLUSTER-DISKUTIL-KEY": {
                         "display_name"                                : "al-lz-vmc-dgutil",
                         "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
@@ -54,7 +54,7 @@ one_oe+ {
             "AL-LZ-DB-CLUSTER-MEMUTIL-KEY": {
                         "display_name"                                : "al-lz-vmc-memutil",
                         "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
@@ -69,7 +69,7 @@ one_oe+ {
             "AL-LZ-DB-CLUSTER-SWAPUTIL-KEY": {
                         "display_name"                                : "al-lz-vmc-swaputil",
                         "compartment_id"                              : "CMP-LZ-EXACC-DB-KEY",
-                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
+                        "destination_topic_ids"                       : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
                         "is_enabled"                                  : "false",
 
                         "supplied_alarm": {
