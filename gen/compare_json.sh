@@ -35,8 +35,8 @@ different=0
 errors=0
 
 # Arrays for tracking results
-declare -a different_files
-declare -a error_files
+different_files=()
+error_files=()
 
 # Show help message
 show_help() {
@@ -127,8 +127,11 @@ discover_modified_files() {
     return 1
   fi
 
-  # Convert to array
-  mapfile -t FILES < <(echo "$files")
+  # Convert to array (bash 3.x compatible, avoids mapfile)
+  FILES=()
+  while IFS= read -r file; do
+    [[ -n "$file" ]] && FILES+=("$file")
+  done <<< "$files"
 }
 
 # Create temporary file and track it for cleanup
@@ -141,9 +144,11 @@ create_temp_file() {
 
 # Cleanup temporary files
 cleanup() {
-  for temp_file in "${TEMP_FILES[@]}"; do
-    [[ -f "$temp_file" ]] && rm -f "$temp_file"
-  done
+  if [[ ${#TEMP_FILES[@]} -gt 0 ]]; then
+    for temp_file in "${TEMP_FILES[@]}"; do
+      [[ -f "$temp_file" ]] && rm -f "$temp_file"
+    done
+  fi
 }
 
 # Compare a single file
