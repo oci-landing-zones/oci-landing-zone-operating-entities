@@ -127,8 +127,8 @@
 
                 "listeners": {
                     "LISTENER-1": {
-                        "protocol"                         : "ANY",
                         "port"                             : 0,
+                        "protocol"                         : "ANY",
 
                         "backend_set": {
                             "name"                         : "default-backend-set",
@@ -136,20 +136,20 @@
                             "backends": {
                                 "BACKEND-1": {
                                     "name"                 : "backend-1",
-                                    "port"                 : 0,
-                                    "ip_address"           : "PANF-1.INDOOR"
+                                    "ip_address"           : "PANF-1.INDOOR",
+                                    "port"                 : 0
                                 },
 
                                 "BACKEND-2": {
                                     "name"                 : "backend-2",
-                                    "port"                 : 0,
-                                    "ip_address"           : "PANF-2.INDOOR"
+                                    "ip_address"           : "PANF-2.INDOOR",
+                                    "port"                 : 0
                                 }
                             },
 
                             "health_checker": {
-                                "protocol"                 : "TCP",
-                                "port"                     : 22
+                                "port"                     : 22,
+                                "protocol"                 : "TCP"
                             }
                         }
                     }
@@ -164,8 +164,8 @@
 
                 "listeners": {
                     "LISTENER-1": {
-                        "protocol"                         : "ANY",
                         "port"                             : 0,
+                        "protocol"                         : "ANY",
 
                         "backend_set": {
                             "name"                         : "default-backend-set",
@@ -173,20 +173,20 @@
                             "backends": {
                                 "BACKEND-1": {
                                     "name"                 : "backend-1",
-                                    "port"                 : 0,
-                                    "ip_address"           : "PANF-1.OUTDOOR"
+                                    "ip_address"           : "PANF-1.OUTDOOR",
+                                    "port"                 : 0
                                 },
 
                                 "BACKEND-2": {
                                     "name"                 : "backend-2",
-                                    "port"                 : 0,
-                                    "ip_address"           : "PANF-2.OUTDOOR"
+                                    "ip_address"           : "PANF-2.OUTDOOR",
+                                    "port"                 : 0
                                 }
                             },
 
                             "health_checker": {
-                                "protocol"                 : "TCP",
-                                "port"                     : 22
+                                "port"                     : 22,
+                                "protocol"                 : "TCP"
                             }
                         }
                     }

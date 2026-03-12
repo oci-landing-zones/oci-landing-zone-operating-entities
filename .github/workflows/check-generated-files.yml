@@ -8,124 +8,43 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Fetch base commit
+      - name: Install jsonnet
         run: |
-          # Fetch the specific base commit from the PR (minimal transfer)
-          git fetch origin ${{ github.event.pull_request.base.sha }} --depth=1
+          JSONNET_VERSION="v0.20.0"
+          curl -sL "https://github.com/google/go-jsonnet/releases/download/${JSONNET_VERSION}/go-jsonnet_${JSONNET_VERSION#v}_Linux_x86_64.tar.gz" \
+            | tar xz -C /usr/local/bin jsonnet
+          jsonnet --version
 
-      - name: Verify Template Modification
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+
+      - name: Regenerate and verify
         run: |
           set -eou pipefail
-          echo "INFO: Determining changed files in this PR..."
-
-          # Get changed files using the PR base SHA (no merge base needed)
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} HEAD)
-
-          if [ -z "$CHANGED_FILES" ]; then
-            echo "INFO: No file changes detected. Skipping check."
-            exit 0
-          fi
-
-          echo "INFO: Found the following changed files:"
-          echo "$CHANGED_FILES"
-          echo "---"
-
-          # This variable will store any error messages we find.
-          ERRORS=""
-
-          # Function to check if a template's dependencies were modified
-          check_template_dependencies() {
-            local template_file="$1"
-            local changed_files="$2"
-
-            # Extract import statements from the template
-            # Matches: import 'path' or import "path"
-            local imports=$(grep -oE "import ['\"]([^'\"]+)['\"]" "$template_file" 2>/dev/null | sed -E "s/import ['\"]([^'\"]+)['\"]/\1/")
-
-            if [ -z "$imports" ]; then
-              return 1  # No imports found
-            fi
-
-            # Get the directory of the template file for resolving relative paths
-            local template_dir=$(dirname "$template_file")
-
-            # Check each imported file
-            while IFS= read -r import_path; do
-              # Resolve the relative path by combining template directory with import path
-              # Then normalize it to remove .. and . components
-              local full_path="$template_dir/$import_path"
-
-              # Normalize the path using Python (works on both Linux and macOS)
-              local resolved_path=$(python3 -c "import os; print(os.path.normpath('$full_path'))" 2>/dev/null)
-
-              if [ -n "$resolved_path" ] && [ -f "$resolved_path" ]; then
-                # Check if this imported file was modified
-                if echo "$changed_files" | grep -Fxq "$resolved_path"; then
-                  echo "   [OK] The imported dependency '$resolved_path' was modified."
-                  return 0  # Dependency was modified, validation passes
-                fi
-
-                # Recursively check if the imported file has dependencies that changed
-                if check_template_dependencies "$resolved_path" "$changed_files"; then
-                  return 0  # Nested dependency was modified
-                fi
-              fi
-            done <<< "$imports"
-
-            return 1  # No dependencies were modified
-          }
-
-          # Loop through each changed file to check for violations.
-          for file in $CHANGED_FILES; do
-            # RULE 1: We only care about generated files. Generated files live
-            # outside the 'gen/' directory. If a file is in 'gen/', it's a
-            # template, so we skip it in this main loop.
-            if [[ "$file" == gen/* ]]; then
-              continue
-            fi
-
-            # RULE 2: Based on repo structure, a '.json' file might be generated
-            # from a '.jsonnet' template. We'll check for this pattern.
-            if [[ "$file" == *.json ]]; then
-              # Construct the expected path of the template file.
-              # Example: 'addon/a.json' -> 'gen/addon/a.jsonnet'
-              template_file="gen/${file%.json}.jsonnet"
-
-              # Check if this template file actually exists in the repository.
-              # If it doesn't, then the modified .json file is not a generated
-              # file that we need to track, so we do nothing.
-              if [ -f "$template_file" ]; then
-                echo "-> Found modified file '$file' which appears to be generated from a template."
-
-                # Check if the template is in our list of changed files.
-                if ! echo "$CHANGED_FILES" | grep -Fxq "$template_file"; then
-                  # Template was not directly modified, check dependencies
-                  if check_template_dependencies "$template_file" "$CHANGED_FILES"; then
-                    # A dependency was modified, so this is valid
-                    continue
-                  else
-                    # VIOLATION! Neither template nor dependencies were changed.
-                    echo "   [ERROR] The template '$template_file' and its dependencies were NOT modified."
-                    ERRORS="${ERRORS}Violation: Generated file '$file' was modified, but its template '$template_file' and dependencies were not.\n"
-                  fi
-                else
-                  # The template was also modified, which is the correct workflow.
-                  echo "   [OK] The template '$template_file' was also modified."
-                fi
-              fi
-            fi
-          done
+          echo "INFO: Running ./gen/generate.sh to regenerate all files from templates..."
+          ./gen/generate.sh
 
           echo "---"
+          echo "INFO: Checking for differences between committed and regenerated files..."
 
-          # Report the final status of the check.
-          if [ -n "$ERRORS" ]; then
-            echo -e "ERROR: Found one or more violations:\n"
-            echo -e "$ERRORS"
-            # This special command formats the message as an error in the GitHub UI.
-            echo "::error::Generated files were modified without updating their templates. Please modify the .jsonnet file and regenerate the .json file."
-            exit 1
+          if git diff --exit-code; then
+            echo "---"
+            echo "SUCCESS: All generated files are up to date."
           else
-            echo "SUCCESS: All checks passed."
-            exit 0
+            echo "---"
+            echo "ERROR: Generated files are out of date."
+            echo ""
+            echo "This can happen when:"
+            echo "  1. A .jsonnet template was modified without regenerating"
+            echo "  2. A .libsonnet dependency was modified without regenerating"
+            echo "  3. gen/format_json.py was modified without regenerating"
+            echo "  4. A generated .json file was manually edited"
+            echo ""
+            echo "To fix, run:"
+            echo "  ./gen/generate.sh"
+            echo "Then commit the updated files."
+            echo "::error::Generated files are out of date. Run ./gen/generate.sh and commit the result."
+            exit 1
           fi

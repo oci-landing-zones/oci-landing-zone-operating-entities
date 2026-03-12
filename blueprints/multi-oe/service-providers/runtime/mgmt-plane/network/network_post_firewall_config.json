@@ -14,46 +14,46 @@
                         "is_oracle_gua_allocation_enabled"                    : false,
 
                         "subnets": {
-                            "INDOOR-SUB": {
-                                "display_name"                                : "indoor-subnet",
-                                "dns_label"                                   : "indoor",
-                                "cidr_block"                                  : "192.168.0.16/29",
-                                "dhcp_options_key"                            : "default_dhcp_options",
-                                "ipv6cidr_blocks"                             : [],
-                                "prohibit_internet_ingress"                   : true,
-                                "route_table_key"                             : "INDOOR-SUB-ROUTE"
-                            },
-
                             "LBR-SUB": {
                                 "display_name"                                : "lbr-subnet",
-                                "dns_label"                                   : "lbr",
                                 "cidr_block"                                  : "192.168.0.0/29",
+                                "dns_label"                                   : "lbr",
                                 "dhcp_options_key"                            : "default_dhcp_options",
                                 "ipv6cidr_blocks"                             : [],
                                 "prohibit_internet_ingress"                   : false,
                                 "route_table_key"                             : "LBR-SUB-ROUTE"
                             },
 
+                            "OUTDOOR-SUB": {
+                                "display_name"                                : "outdoor-subnet",
+                                "cidr_block"                                  : "192.168.0.8/29",
+                                "dns_label"                                   : "outdoor",
+                                "dhcp_options_key"                            : "default_dhcp_options",
+                                "ipv6cidr_blocks"                             : [],
+                                "prohibit_internet_ingress"                   : true,
+                                "route_table_key"                             : "OUTDOOR-SUB-ROUTE"
+                            },
+
+                            "INDOOR-SUB": {
+                                "display_name"                                : "indoor-subnet",
+                                "cidr_block"                                  : "192.168.0.16/29",
+                                "dns_label"                                   : "indoor",
+                                "dhcp_options_key"                            : "default_dhcp_options",
+                                "ipv6cidr_blocks"                             : [],
+                                "prohibit_internet_ingress"                   : true,
+                                "route_table_key"                             : "INDOOR-SUB-ROUTE"
+                            },
+
                             "MGMT-SUB": {
                                 "display_name"                                : "mgmt-subnet",
-                                "dns_label"                                   : "mgmt",
                                 "cidr_block"                                  : "192.168.0.24/29",
+                                "dns_label"                                   : "mgmt",
                                 "dhcp_options_key"                            : "default_dhcp_options",
                                 "ipv6cidr_blocks"                             : [],
                                 "prohibit_internet_ingress"                   : true,
                                 "prohibit_public_ip_on_vnic"                  : true,
                                 "route_table_key"                             : "MGMT-SUB-ROUTE",
                                 "security_list_keys"                          : ["MGMT-SUB-SL"]
-                            },
-
-                            "OUTDOOR-SUB": {
-                                "display_name"                                : "outdoor-subnet",
-                                "dns_label"                                   : "outdoor",
-                                "cidr_block"                                  : "192.168.0.8/29",
-                                "dhcp_options_key"                            : "default_dhcp_options",
-                                "ipv6cidr_blocks"                             : [],
-                                "prohibit_internet_ingress"                   : true,
-                                "route_table_key"                             : "OUTDOOR-SUB-ROUTE"
                             }
                         },
 
@@ -169,26 +169,26 @@
                             "MGMT-SUB-SL": {
                                 "display_name"                                : "mgmt-subnet-sl",
 
-                                "egress_rules": [
+                                "ingress_rules": [
                                     {
-                                        "description"                         : "Egress to Mgmt subnet on HTTP port. Required by Bastion port forwarding session.",
-                                        "protocol"                            : "TCP",
-                                        "dst"                                 : "192.168.0.24/29",
-                                        "dst_port_max"                        : "443",
-                                        "dst_port_min"                        : "443",
-                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "description"                         : "Ingress on UDP type 3 code 4.",
+                                        "src"                                 : "0.0.0.0/0",
+                                        "src_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "ICMP",
+                                        "icmp_type"                           : 3,
+                                        "icmp_code"                           : 4,
                                         "stateless"                           : false
                                     }
                                 ],
 
-                                "ingress_rules": [
+                                "egress_rules": [
                                     {
-                                        "description"                         : "Ingress on UDP type 3 code 4.",
-                                        "protocol"                            : "ICMP",
-                                        "icmp_code"                           : 4,
-                                        "icmp_type"                           : 3,
-                                        "src"                                 : "0.0.0.0/0",
-                                        "src_type"                            : "CIDR_BLOCK",
+                                        "description"                         : "Egress to Mgmt subnet on HTTP port. Required by Bastion port forwarding session.",
+                                        "dst"                                 : "192.168.0.24/29",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : "443",
+                                        "dst_port_max"                        : "443",
+                                        "protocol"                            : "TCP",
                                         "stateless"                           : false
                                     }
                                 ]
@@ -199,46 +199,46 @@
                             "INDOOR-FW-NSG": {
                                 "display_name"                                : "indoor-fw-nsg",
 
-                                "egress_rules": {
-                                    "TO-ANYWHERE": {
-                                        "description"                         : "Egress to anywhere.",
-                                        "protocol"                            : "ALL",
-                                        "dst"                                 : "0.0.0.0/0",
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "stateless"                           : false
-                                    }
-                                },
-
                                 "ingress_rules": {
                                     "FROM-CUSTOMER-VCNS": {
                                         "description"                         : "Overall ingress from customer VCNs.",
-                                        "protocol"                            : "ALL",
                                         "src"                                 : "10.0.0.0/16",
                                         "src_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "ALL",
                                         "stateless"                           : false
                                     },
 
                                     "FROM-INDOOR-NSG": {
                                         "description"                         : "Ingress from Indoor NSG.",
-                                        "protocol"                            : "ALL",
                                         "src"                                 : "INDOOR-NLB-NSG",
                                         "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "ALL",
                                         "stateless"                           : false
                                     },
 
                                     "FROM-SECURITY-VCN": {
                                         "description"                         : "Ingress from Mgmt Plane Security VCN.",
-                                        "protocol"                            : "ALL",
                                         "src"                                 : "192.168.0.64/26",
                                         "src_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "ALL",
                                         "stateless"                           : false
                                     },
 
                                     "FROM-SHARED-SERVICES-VCN": {
                                         "description"                         : "Ingress from Mgmt Plane Shared Services VCN.",
-                                        "protocol"                            : "ALL",
                                         "src"                                 : "192.168.0.128/26",
                                         "src_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "ALL",
+                                        "stateless"                           : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "TO-ANYWHERE": {
+                                        "description"                         : "Egress to anywhere.",
+                                        "dst"                                 : "0.0.0.0/0",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "ALL",
                                         "stateless"                           : false
                                     }
                                 }
@@ -247,38 +247,38 @@
                             "INDOOR-NLB-NSG": {
                                 "display_name"                                : "indoor-nlb-nsg",
 
-                                "egress_rules": {
-                                    "TO-ANYWHERE": {
-                                        "description"                         : "Egress to anywhere.",
-                                        "protocol"                            : "ALL",
-                                        "dst"                                 : "0.0.0.0/0",
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "stateless"                           : false
-                                    }
-                                },
-
                                 "ingress_rules": {
                                     "FROM-CUSTOMER-VCNS": {
                                         "description"                         : "Overall ingress from customer VCNs.",
-                                        "protocol"                            : "ALL",
                                         "src"                                 : "10.0.0.0/16",
                                         "src_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "ALL",
                                         "stateless"                           : false
                                     },
 
                                     "FROM-SECURITY-VCN": {
                                         "description"                         : "Ingress from Mgmt Plane Security VCN.",
-                                        "protocol"                            : "ALL",
                                         "src"                                 : "192.168.0.64/26",
                                         "src_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "ALL",
                                         "stateless"                           : false
                                     },
 
                                     "FROM-SHARED-SERVICES-VCN": {
                                         "description"                         : "Ingress from Mgmt Plane Shared Services VCN.",
-                                        "protocol"                            : "ALL",
                                         "src"                                 : "192.168.0.128/26",
                                         "src_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "ALL",
+                                        "stateless"                           : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "TO-ANYWHERE": {
+                                        "description"                         : "Egress to anywhere.",
+                                        "dst"                                 : "0.0.0.0/0",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "ALL",
                                         "stateless"                           : false
                                     }
                                 }
@@ -287,24 +287,24 @@
                             "LBR-NSG": {
                                 "display_name"                                : "lbr-nsg",
 
-                                "egress_rules": {
-                                    "TO-ANYWHERE": {
-                                        "description"                         : "Egress to anywhere.",
+                                "ingress_rules": {
+                                    "FROM-ANYWHERE-HTTPS": {
+                                        "description"                         : "Ingress from anywhere over HTTPS port 443.",
+                                        "src"                                 : "0.0.0.0/0",
+                                        "src_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 443,
+                                        "dst_port_max"                        : 443,
                                         "protocol"                            : "TCP",
-                                        "dst"                                 : "0.0.0.0/0",
-                                        "dst_type"                            : "CIDR_BLOCK",
                                         "stateless"                           : false
                                     }
                                 },
 
-                                "ingress_rules": {
-                                    "FROM-ANYWHERE-HTTPS": {
-                                        "description"                         : "Ingress from anywhere over HTTPS port 443.",
+                                "egress_rules": {
+                                    "TO-ANYWHERE": {
+                                        "description"                         : "Egress to anywhere.",
+                                        "dst"                                 : "0.0.0.0/0",
+                                        "dst_type"                            : "CIDR_BLOCK",
                                         "protocol"                            : "TCP",
-                                        "dst_port_max"                        : 443,
-                                        "dst_port_min"                        : 443,
-                                        "src"                                 : "0.0.0.0/0",
-                                        "src_type"                            : "CIDR_BLOCK",
                                         "stateless"                           : false
                                     }
                                 }
@@ -313,34 +313,34 @@
                             "MGMT-NSG": {
                                 "display_name"                                : "mgmt-nsg",
 
-                                "egress_rules": {
-                                    "TO-ANYWHERE": {
-                                        "description"                         : "Egress to anywhere",
-                                        "protocol"                            : "TCP",
-                                        "dst"                                 : "0.0.0.0/0",
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "stateless"                           : false
-                                    }
-                                },
-
                                 "ingress_rules": {
                                     "FROM-JUMP-HOST-NSG-SSH": {
                                         "description"                         : "Ingress from mgmt-vcn jump-host-subnet to SSH port.",
-                                        "protocol"                            : "TCP",
-                                        "dst_port_max"                        : 22,
-                                        "dst_port_min"                        : 22,
                                         "src"                                 : "192.168.0.64/28",
                                         "src_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 22,
+                                        "dst_port_max"                        : 22,
+                                        "protocol"                            : "TCP",
                                         "stateless"                           : false
                                     },
 
                                     "FROM-MGMT-SUBNET-HTTP": {
                                         "description"                         : "Ingress from Mgmt subnet to HTTP port. Required by Bastion port forwarding session.",
-                                        "protocol"                            : "TCP",
-                                        "dst_port_max"                        : 443,
-                                        "dst_port_min"                        : 443,
                                         "src"                                 : "192.168.0.24/29",
                                         "src_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 443,
+                                        "dst_port_max"                        : 443,
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "TO-ANYWHERE": {
+                                        "description"                         : "Egress to anywhere",
+                                        "dst"                                 : "0.0.0.0/0",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
                                         "stateless"                           : false
                                     }
                                 }
@@ -349,30 +349,30 @@
                             "OUTDOOR-FW-NSG": {
                                 "display_name"                                : "outdoor-fw-nsg",
 
-                                "egress_rules": {
-                                    "TO-ANYWHERE": {
-                                        "description"                         : "Egress to anywhere.",
-                                        "protocol"                            : "TCP",
-                                        "dst"                                 : "0.0.0.0/0",
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "stateless"                           : false
-                                    }
-                                },
-
                                 "ingress_rules": {
                                     "FROM-LBR-NSG": {
                                         "description"                         : "Ingress from LBR NSG.",
-                                        "protocol"                            : "TCP",
                                         "src"                                 : "LBR-NSG",
                                         "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
                                         "stateless"                           : false
                                     },
 
                                     "FROM-OUTDOOR-NSG": {
                                         "description"                         : "Ingress from Outdoor NLB NSG (for health checks).",
-                                        "protocol"                            : "TCP",
                                         "src"                                 : "OUTDOOR-NLB-NSG",
                                         "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "TO-ANYWHERE": {
+                                        "description"                         : "Egress to anywhere.",
+                                        "dst"                                 : "0.0.0.0/0",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
                                         "stateless"                           : false
                                     }
                                 }
@@ -381,22 +381,22 @@
                             "OUTDOOR-NLB-NSG": {
                                 "display_name"                                : "outdoor-nlb-nsg",
 
-                                "egress_rules": {
-                                    "TO-ANYWHERE": {
-                                        "description"                         : "Egress to anywhere.",
+                                "ingress_rules": {
+                                    "FROM-LBR-NSG": {
+                                        "description"                         : "Ingress from LBR NSG.",
+                                        "src"                                 : "LBR-NSG",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
                                         "protocol"                            : "TCP",
-                                        "dst"                                 : "0.0.0.0/0",
-                                        "dst_type"                            : "CIDR_BLOCK",
                                         "stateless"                           : false
                                     }
                                 },
 
-                                "ingress_rules": {
-                                    "FROM-LBR-NSG": {
-                                        "description"                         : "Ingress from LBR NSG.",
+                                "egress_rules": {
+                                    "TO-ANYWHERE": {
+                                        "description"                         : "Egress to anywhere.",
+                                        "dst"                                 : "0.0.0.0/0",
+                                        "dst_type"                            : "CIDR_BLOCK",
                                         "protocol"                            : "TCP",
-                                        "src"                                 : "LBR-NSG",
-                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
                                         "stateless"                           : false
                                     }
                                 }
@@ -421,8 +421,8 @@
                             "service_gateways": {
                                 "CENTRAL-HUB-VCN-SGW": {
                                     "display_name"                            : "central-hub-vcn-sgw",
-                                    "route_table_key"                         : "SERVICE-GATEWAY-ROUTE",
-                                    "services"                                : "all-services"
+                                    "services"                                : "all-services",
+                                    "route_table_key"                         : "SERVICE-GATEWAY-ROUTE"
                                 }
                             }
                         }
@@ -437,10 +437,21 @@
                         "is_oracle_gua_allocation_enabled"                    : false,
 
                         "subnets": {
+                            "DEV-MGMT-VCN-JUMP-HOST-SUB": {
+                                "display_name"                                : "jump-host-subnet",
+                                "cidr_block"                                  : "192.168.0.64/28",
+                                "dns_label"                                   : "jumphost",
+                                "dhcp_options_key"                            : "default_dhcp_options",
+                                "ipv6cidr_blocks"                             : [],
+                                "prohibit_internet_ingress"                   : true,
+                                "route_table_key"                             : "DRG-OSN-ROUTE",
+                                "security_list_keys"                          : ["DEV-MGMT-VCN-JUMP-HOST-SUB-SL"]
+                            },
+
                             "DEV-MGMT-VCN-APP-OPERATOR-SUB": {
                                 "display_name"                                : "app-operator-subnet",
-                                "dns_label"                                   : "appoperator",
                                 "cidr_block"                                  : "192.168.0.80/28",
+                                "dns_label"                                   : "appoperator",
                                 "dhcp_options_key"                            : "default_dhcp_options",
                                 "ipv6cidr_blocks"                             : [],
                                 "prohibit_internet_ingress"                   : true,
@@ -450,24 +461,13 @@
 
                             "DEV-MGMT-VCN-DB-OPERATOR-SUB": {
                                 "display_name"                                : "db-operator-subnet",
-                                "dns_label"                                   : "dboperator",
                                 "cidr_block"                                  : "192.168.0.96/28",
+                                "dns_label"                                   : "dboperator",
                                 "dhcp_options_key"                            : "default_dhcp_options",
                                 "ipv6cidr_blocks"                             : [],
                                 "prohibit_internet_ingress"                   : true,
                                 "route_table_key"                             : "DRG-ONLY-ROUTE",
                                 "security_list_keys"                          : ["DEV-MGMT-VCN-DB-OPERATOR-SUB-SL"]
-                            },
-
-                            "DEV-MGMT-VCN-JUMP-HOST-SUB": {
-                                "display_name"                                : "jump-host-subnet",
-                                "dns_label"                                   : "jumphost",
-                                "cidr_block"                                  : "192.168.0.64/28",
-                                "dhcp_options_key"                            : "default_dhcp_options",
-                                "ipv6cidr_blocks"                             : [],
-                                "prohibit_internet_ingress"                   : true,
-                                "route_table_key"                             : "DRG-OSN-ROUTE",
-                                "security_list_keys"                          : ["DEV-MGMT-VCN-JUMP-HOST-SUB-SL"]
                             }
                         },
 
@@ -510,24 +510,24 @@
                             "DEV-MGMT-VCN-APP-OPERATOR-SUB-SL": {
                                 "display_name"                                : "app-operator-subnet-sl",
 
-                                "egress_rules": [
+                                "ingress_rules": [
                                     {
-                                        "description"                         : "Egress to anywhere over TCP.",
+                                        "description"                         : "Ingress from jump-host-subnet to SSH port.",
+                                        "src"                                 : "192.168.0.64/28",
+                                        "src_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 22,
+                                        "dst_port_max"                        : 22,
                                         "protocol"                            : "TCP",
-                                        "dst"                                 : "0.0.0.0/0",
-                                        "dst_type"                            : "CIDR_BLOCK",
                                         "stateless"                           : false
                                     }
                                 ],
 
-                                "ingress_rules": [
+                                "egress_rules": [
                                     {
-                                        "description"                         : "Ingress from jump-host-subnet to SSH port.",
+                                        "description"                         : "Egress to anywhere over TCP.",
+                                        "dst"                                 : "0.0.0.0/0",
+                                        "dst_type"                            : "CIDR_BLOCK",
                                         "protocol"                            : "TCP",
-                                        "dst_port_max"                        : 22,
-                                        "dst_port_min"                        : 22,
-                                        "src"                                 : "192.168.0.64/28",
-                                        "src_type"                            : "CIDR_BLOCK",
                                         "stateless"                           : false
                                     }
                                 ]
@@ -536,24 +536,24 @@
                             "DEV-MGMT-VCN-DB-OPERATOR-SUB-SL": {
                                 "display_name"                                : "db-operator-subnet-sl",
 
-                                "egress_rules": [
+                                "ingress_rules": [
                                     {
-                                        "description"                         : "Egress to anywhere over TCP.",
+                                        "description"                         : "Ingress from jump-host-subnet to SSH port.",
+                                        "src"                                 : "192.168.0.64/28",
+                                        "src_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 22,
+                                        "dst_port_max"                        : 22,
                                         "protocol"                            : "TCP",
-                                        "dst"                                 : "0.0.0.0/0",
-                                        "dst_type"                            : "CIDR_BLOCK",
                                         "stateless"                           : false
                                     }
                                 ],
 
-                                "ingress_rules": [
+                                "egress_rules": [
                                     {
-                                        "description"                         : "Ingress from jump-host-subnet to SSH port.",
+                                        "description"                         : "Egress to anywhere over TCP.",
+                                        "dst"                                 : "0.0.0.0/0",
+                                        "dst_type"                            : "CIDR_BLOCK",
                                         "protocol"                            : "TCP",
-                                        "dst_port_max"                        : 22,
-                                        "dst_port_min"                        : 22,
-                                        "src"                                 : "192.168.0.64/28",
-                                        "src_type"                            : "CIDR_BLOCK",
                                         "stateless"                           : false
                                     }
                                 ]
@@ -562,69 +562,69 @@
                             "DEV-MGMT-VCN-JUMP-HOST-SUB-SL": {
                                 "display_name"                                : "jump-host-subnet-sl",
 
-                                "egress_rules": [
+                                "ingress_rules": [
                                     {
-                                        "description"                         : "Egress to jump-host-subnet on SSH port. Required by Bastion service session.",
-                                        "protocol"                            : "TCP",
-                                        "dst"                                 : "192.168.0.64/28",
-                                        "dst_port_max"                        : 22,
+                                        "description"                         : "Ingress from jump-host-subnet to SSH port. Required by Bastion service session.",
+                                        "src"                                 : "192.168.0.64/28",
+                                        "src_type"                            : "CIDR_BLOCK",
                                         "dst_port_min"                        : 22,
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "stateless"                           : false
-                                    },
-                                    {
-                                        "description"                         : "Egress to jump-host-subnet on HTTP port. Required by Bastion port forwarding session.",
-                                        "protocol"                            : "TCP",
-                                        "dst"                                 : "192.168.0.64/28",
-                                        "dst_port_max"                        : 443,
-                                        "dst_port_min"                        : 443,
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "stateless"                           : false
-                                    },
-                                    {
-                                        "description"                         : "Egress to app-operator-subnet on SSH port.",
-                                        "protocol"                            : "TCP",
-                                        "dst"                                 : "192.168.0.80/28",
                                         "dst_port_max"                        : 22,
-                                        "dst_port_min"                        : 22,
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "stateless"                           : false
-                                    },
-                                    {
-                                        "description"                         : "Egress to db-operator-subnet on SSH port.",
                                         "protocol"                            : "TCP",
-                                        "dst"                                 : "192.168.0.96/28",
-                                        "dst_port_max"                        : 22,
-                                        "dst_port_min"                        : 22,
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "stateless"                           : false
-                                    },
-                                    {
-                                        "description"                         : "Egress to central-hub-vcn mgmt-subnet on SSH port.",
-                                        "protocol"                            : "TCP",
-                                        "dst"                                 : "192.168.0.24/29",
-                                        "dst_port_max"                        : 22,
-                                        "dst_port_min"                        : 22,
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "stateless"                           : false
-                                    },
-                                    {
-                                        "description"                         : "Egress to Oracle Services Network.",
-                                        "protocol"                            : "TCP",
-                                        "dst"                                 : "all-services",
-                                        "dst_type"                            : "SERVICE_CIDR_BLOCK",
                                         "stateless"                           : false
                                     }
                                 ],
 
-                                "ingress_rules": [
+                                "egress_rules": [
                                     {
-                                        "description"                         : "Ingress from jump-host-subnet to SSH port. Required by Bastion service session.",
-                                        "protocol"                            : "TCP",
-                                        "dst_port_max"                        : 22,
+                                        "description"                         : "Egress to jump-host-subnet on SSH port. Required by Bastion service session.",
+                                        "dst"                                 : "192.168.0.64/28",
+                                        "dst_type"                            : "CIDR_BLOCK",
                                         "dst_port_min"                        : 22,
-                                        "src"                                 : "192.168.0.64/28",
-                                        "src_type"                            : "CIDR_BLOCK",
+                                        "dst_port_max"                        : 22,
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : false
+                                    },
+                                    {
+                                        "description"                         : "Egress to jump-host-subnet on HTTP port. Required by Bastion port forwarding session.",
+                                        "dst"                                 : "192.168.0.64/28",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 443,
+                                        "dst_port_max"                        : 443,
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : false
+                                    },
+                                    {
+                                        "description"                         : "Egress to app-operator-subnet on SSH port.",
+                                        "dst"                                 : "192.168.0.80/28",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 22,
+                                        "dst_port_max"                        : 22,
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : false
+                                    },
+                                    {
+                                        "description"                         : "Egress to db-operator-subnet on SSH port.",
+                                        "dst"                                 : "192.168.0.96/28",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 22,
+                                        "dst_port_max"                        : 22,
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : false
+                                    },
+                                    {
+                                        "description"                         : "Egress to central-hub-vcn mgmt-subnet on SSH port.",
+                                        "dst"                                 : "192.168.0.24/29",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 22,
+                                        "dst_port_max"                        : 22,
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : false
+                                    },
+                                    {
+                                        "description"                         : "Egress to Oracle Services Network.",
+                                        "dst"                                 : "all-services",
+                                        "dst_type"                            : "SERVICE_CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
                                         "stateless"                           : false
                                     }
                                 ]
@@ -681,9 +681,9 @@
                                             "priority"                        : 1,
 
                                             "match_criteria": {
+                                                "match_type"                  : "DRG_ATTACHMENT_ID",
                                                 "attachment_type"             : "VCN",
-                                                "drg_attachment_key"          : "CENTRAL-HUB-VCN-ATTACH",
-                                                "match_type"                  : "DRG_ATTACHMENT_ID"
+                                                "drg_attachment_key"          : "CENTRAL-HUB-VCN-ATTACH"
                                             }
                                         }
                                     }
