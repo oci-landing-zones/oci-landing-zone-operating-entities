@@ -1,6 +1,5 @@
 local cis1 = import 'oneoe_observability_cis1_pre.jsonnet';
 
-
 cis1 {
     "logging_configuration": {
         "default_compartment_id": "CMP-LZ-SECURITY-KEY",
