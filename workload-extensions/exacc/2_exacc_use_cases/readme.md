@@ -4,14 +4,15 @@
 
 - [**1. Summary**](#1-summary)
 - [**2. Use Cases**](#2-use-cases)
-  - [**2.1 Global Shared ExaCC Platform**](#21-global-shared-exacc-platform)
-  - [**2.2 Dedicated Worload Environment ExaDB-C@C Platform**](#22-dedicated-worload-environment-exadb-cc-platform)
-  - [**2.3 Workload Environment Project with Production \& Disaster Recovery Regular VM Clusters**](#23-workload-environment-project-with-production--disaster-recovery-regular-vm-clusters)
-  - [**2.4 Workload Environment Project with AVMCs and Primary/DR ACDs**](#24-workload-environment-project-with-avmcs-and-primarydr-acds)
-  - [**2.5 Workload Environment Project with ADBs**](#25-workload-environment-project-with-adbs)
-  - [**2.6 Worload Environment Project with a Regular VMCs managed by Global and Environment Dedicated Teams**](#26-worload-environment-project-with-a-regular-vmcs-managed-by-global-and-environment-dedicated-teams)
-  - [**2.7 Workload Environment Project with an AVMC and ACD managed by Global and Environment Dedicated Teams**](#27-workload-environment-project-with-an-avmc-and-acd-managed-by-global-and-environment-dedicated-teams)
-  - [**2.8 Workload Environment Project with an AVMC managed by Global and Project Dedicated Teams**](#28-workload-environment-project-with-an-avmc-managed-by-global-and-project-dedicated-teams)
+  - [\*\*2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs)
+    - [**ExaDB-C@C Resoruces**](#exadb-cc-resoruces)
+    - [**ExaDB-C@C Groups**](#exadb-cc-groups)
+  - [**2.2 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#22-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
+    - [**ExaDB-C@C Resoruces**](#exadb-cc-resoruces-1)
+    - [**ExaDB-C@C Groups**](#exadb-cc-groups-1)
+  - [**2.3 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#23-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
+    - [**ExaDB-C@C Resoruces**](#exadb-cc-resoruces-2)
+    - [**ExaDB-C@C Groups**](#exadb-cc-groups-2)
 - [**3. Management of other resources**](#3-management-of-other-resources)
   - [**3.1 Operator Access Control**](#31-operator-access-control)
   - [**3.2 Software Images**](#32-software-images)
@@ -28,7 +29,25 @@ We provide in this *Landing Zone Workload Extension* an example that brings some
 
 This section is intended to guide you on some of the different scenarios.
 
-The diagram below illustrates the ***ExaDB-C@C Workload Extension*** example:
+We have identified 3 main uses cases. 
+
+1. ExaDB-C@C Shared Platorm. Shared Infra and Shared VMCs.
+2. ExaDB-C@C Environment Dedicated Platforms. Dedicated Infra and Dedicated VMCs.
+3. Hibrid ExaDB-C@C Platforms. Infra shared and Dedicated enviroments VMCs.
+
+Not all possibilities are covered here, but these are likely the most common ones you’ll encounter. These three scenarios address the majority of use cases. If your situation involves a combination, you can draw on elements from the existing scenarios to create a custom solution.
+
+The diagrams below illustrates these escenarios:
+
+ ***ExaDB-C@C Workload Extension** [escenario 1:](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs):
+
+<img src="../content/exacc_example.jpg" width="1000" height="auto">
+
+ ***ExaDB-C@C Workload Extension*** [escenario 2:](#22-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs):
+
+<img src="../content/exacc_example.jpg" width="1000" height="auto">
+
+ ***ExaDB-C@C Workload Extension*** [escenario 3:](#23-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs):
 
 <img src="../content/exacc_example.jpg" width="1000" height="auto">
 
@@ -44,18 +63,18 @@ We use this approach in this ExaDB-C@C extention, as some component's operations
 
 Every AVMC can also be created on top of an ExaDB-C@C Infrastructure. On each AVMC you can create multiple *Autonomous Container Databases (ACDs)* and on each of every ACDs you can create multiple *Autonomous Databases (ADB-Ds, dedicated)*. In contrast to regular VMCs, you can place every Autonomous component in different compartments, which gives you more flexibility and ease of use to create and maintain the IAM policies. You'll have also less operations to do with these components, as they are autonomously operated.
 
-Below you can see a table with the summary of use-cases:
+Below you can see a table with the summary of the building blocks used in the previous scenarios:
 
 | Use Case Number | Use Case| Description              | When to use |
 | ------------------------- | --------------------------------- | ---| --- |
-| **1** | **Global Shared ExaCC Platform** | ExaDB-C@C Infrastructure and common elements to be ***shared*** across Workload Environments. | You have an infrastructure that can be shared between environments, like a Non-Prod Infrastructure |
-| **2** | **Dedicated Worload Environment ExaDB-C@C Platform** | ExaDB-C@C Infrastructure and common elements **dedicated to a Workload Environment** but shared by multiple same environment projects" | You need a dedicated infrastructure for Production, for example. |
-| **3** | **Workload Environment Project with Production & Disaster Recovery Regular VM Clusters** | VMCs dedicated to one or many applications, with HA between infrastructures. | You have a same team managing different Production VMCs, highly available for Mission Critical DBs |
-| **4** | **Workload Environment Project with AVMCs and Primary/DR ACDs** | AVMCs and ACDs are shared for different ADBs managed by other Project Teams | You have a same team managing the AVMCs of highly available ACDs for your organization or to support different customer's applications | 
-| **5** | **Workload Environment Project with ADBs** | ADB **managed by a Project Team** | You have an ADB than can hold 1 or many applications based of different schemas  |
-| **6** | **Worload Environment Project with a Regular VMCs managed by Global and Environment Dedicated Teams** | You have a Project where **Global Infra & DBA teams can manage** the resources but you have a **Project Dedicatent team** | Non-prod environment managed by outsourced teams for you, but you also have access as owner. |
-| **7** | **Workload Environment Project with an AVMC and ACD managed by Global and Environment Dedicated Teams** | You have a Project where **Global Infra & DBA teams can manage** the resources but you have a **dedicated Workload Environment team** | Non-prod environment where you have outsourced teams that admins the environments for you, but you also have access as owner. |
-| **8** | **Workload Environment Project with an ADB managed by Global and Project Dedicated Teams** | You have a Project where Global Infra & DBA teams can manage the resources but you have a dedicated Workload Environment team | Non-prod environment where you have outsourced project teams that admins the environments for you, but you also have access as owner. |
+| **a** | **Global Shared ExaCC Platform** | ExaDB-C@C Infrastructure and common elements to be ***shared*** across Workload Environments. | You have an infrastructure that can be shared between environments, like a Non-Prod Infrastructure |
+| **b** | **Dedicated Worload Environment ExaDB-C@C Platform** | ExaDB-C@C Infrastructure and common elements **dedicated to a Workload Environment** but shared by multiple same environment projects" | You need a dedicated infrastructure for Production, for example. |
+| **c** | **Workload Environment Project with Production & Disaster Recovery Regular VM Clusters** | VMCs dedicated to one or many applications, with HA between infrastructures. | You have a same team managing different Production VMCs, highly available for Mission Critical DBs |
+| **d** | **Workload Environment Project with AVMCs and Primary/DR ACDs** | AVMCs and ACDs are shared for different ADBs managed by other Project Teams | You have a same team managing the AVMCs of highly available ACDs for your organization or to support different customer's applications | 
+| **e** | **Workload Environment Project with ADBs** | ADB **managed by a Project Team** | You have an ADB than can hold 1 or many applications based of different schemas  |
+| **f** | **Worload Environment Project with a Regular VMCs managed by Global and Environment Dedicated Teams** | You have a Project where **Global Infra & DBA teams can manage** the resources but you have a **Project Dedicatent team** | Non-prod environment managed by outsourced teams for you, but you also have access as owner. |
+| **g** | **Workload Environment Project with an AVMC and ACD managed by Global and Environment Dedicated Teams** | You have a Project where **Global Infra & DBA teams can manage** the resources but you have a **dedicated Workload Environment team** | Non-prod environment where you have outsourced teams that admins the environments for you, but you also have access as owner. |
+| **h** | **Workload Environment Project with an ADB managed by Global and Project Dedicated Teams** | You have a Project where Global Infra & DBA teams can manage the resources but you have a dedicated Workload Environment team | Non-prod environment where you have outsourced project teams that admins the environments for you, but you also have access as owner. |
 
 &nbsp; 
 
@@ -63,39 +82,48 @@ Below you can see a table with the summary of use-cases:
 
 In this section we will comment of the different use case scenarios identified, bringing additional information that might be useful for you, from the **Separation of Duties** of the different Operations Teams, to the different **architecture design decissions** for placing the resources and related ExaDB-C@C components.
 
-Not all the possibilities are identified here, but probably the most common ones you might find.
+&nbsp;
+
+### **2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs
+
+
+#### **ExaDB-C@C Resoruces**
+In this scenario all the ExaDB-C@C stack can be sean as shared resources.
+There are two infras one for production and his conrrespondent DR placed in the shared exacc compartmetn. and dedicated VMCs for production and DR also.
+
+#### **ExaDB-C@C Groups**
+
 
 &nbsp;
 
-### **2.1 Global Shared ExaCC Platform** 
+### **2.2 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**
 
-In a Global Shared ExaDB-C@C Platform, the infrastructure and common Database components (as Software Images), are *shared among different workload environments*. Global infra & DBA teams manages the different resources located in the DB & Infra layered compartments and the workload environment projects compartments, using the infrastructure to be able to create VMCs or AVMCs.
+#### **ExaDB-C@C Resoruces**
 
-Other Landing Zone Baseline Blueprints (as the Multi-OE), can share the infrastructure between different *Operating Entities and workload environments*.
-
-In our example, we have an ExaDB-C@C Non-Production infrastructure, that is used by Pre-Production projects and can be potentially used by other non-prod environments as it could be dev, test, UAT, etc., with each environment using its one or more VMCs. 
-
-The Database common resources, as the Software Images, allows you to create centrally these images that can be used by different workload environments of a same project or application(s). See the section 3.2 in this page to know more.
-
-In the example:
-
-<img src="../content/1_use_case.jpg" width="400" height="auto">
-
-&nbsp;
-
-### **2.2 Dedicated Worload Environment ExaDB-C@C Platform**
-
-In a Dedicated Worload Environment ExaDB-C@C Platform, the infrastructure is *dedicated to the workload environment* (as Production), but it is *shared between the different environment projects*. This is a typical use case where you have a Production or DR infrastructure where you don't allow to mix the infrastructure with non-prod environments. You typically has a non-prod infrastructure or cheaper, less capable hardware for those environments.
+In a Dedicated Worload Environment ExaDB-C@C Platform, the infrastructure is *dedicated to the workload environment* , but it is *shared between the different environment projects*. This is a typical use case where you have a Production or DR infrastructure where you don't allow to mix the infrastructure with non-prod environments. You typically has a non-prod infrastructure or cheaper, less capable hardware for those environments.
 
 This use case allows you to test in non-prod environments the software changes made periodically by Oracle Operators before you schedule the quarterly patching in your production infrastructure once you're confortable how the patching procedure affects to your business application databases.
 
-In the example: 
-
-<img src="../content/2_use_case.jpg" width="200" height="auto">
-
+#### **ExaDB-C@C Groups**
 &nbsp;
 
-### **2.3 Workload Environment Project with Production & Disaster Recovery Regular VM Clusters**
+
+### **2.3 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**
+
+#### **ExaDB-C@C Resoruces**
+
+#### **ExaDB-C@C Groups**
+&nbsp;
+
+
+
+
+
+
+
+
+
+
 
 You can place VMCs in the same compartment that you plan for Production and Disaster Recovery (DR) purposes. Both are usually managed by the same teams, so there is no reason to create separated compartments for DR. If you need to allocate costs, this can be filtered by OCI tags specific to the VMCs. The Database replication is done thanks to Oracle Data Guard associations created between CDBs. There are different options to create the standby with the creation of a new VMC in an infrastructure or by re-using an existing VMC and/or OH.
 
@@ -105,47 +133,13 @@ Dedicated VMC Networks are created in the Infrastructure compartment (as this ca
 
 While you have to create dedicated VMC Network component in the ExaDB-C@C, this does not mean that you can use the same VLANs for many different VMCs that you plan to have in the same backend subnets. You can see that you use the same PROD and DR subnets for the VMC and AVMCs in the projects 2 & 3 in the different workload environments.
 
-In the example: 
-
-<img src="../content/3_use_case.jpg" width="200" height="auto">
-
-&nbsp;
-
-### **2.4 Workload Environment Project with AVMCs and Primary/DR ACDs**
-
 In this use case, we have AVMCs dedicated for Primary and DR ACDs in the same compartment, coming from different, dedicated, ExaDB-C@C infrastructures. In this case, we're assuming that a same DBA team is going to manage these resources. On top of every AVMC you can create different ACDs, that can hold also different ADBs. You can use the AVMC/ACD for massive database consolidation, with dedicated ADBs per project that you can delegate to specific project teams while a central team is managing the consolidation platform. 
 
 This global team can decide which ACDs are created on which AVM, to create Autonomous Data Guard associations between ACDs to protect the databases and to perform some operations for sizing, scaling or operating backups on the environments.
 
-In the example: 
-
-<img src="../content/4_use_case.jpg" width="200" height="auto">
-
-&nbsp;
-
-### **2.5 Workload Environment Project with ADBs**
-
 You can assign an ADB to an specific project. In this way, you can have a dedicated Project Team to be able to manage the database independently. This is typical for service providers that allows its customers to manage their own database while the rest of infrastructure is maintained by them (or Oracle Cloud Ops), customers that delegates this environments to outsourced projects teams (as external development teams), or any other reason.
 
-In the example: 
-
-<img src="../content/5_use_case.jpg" width="200" height="auto">
-
-&nbsp;
-
-### **2.6 Worload Environment Project with a Regular VMCs managed by Global and Environment Dedicated Teams**
-
 This use case is similar to the use case 3, but with the difference that we're assuming that non only the global DBA & Infra teams can manage the environment, but also a dedicated team for the workload environment. As you can see in the overall example diagram, we have Global Infra & DBA teams. They have IAM policies that allows them to manage all the database compartments in the Landing Zone environment. In this example we use also an specific group for the Pre-Prod environment that can also manage all the Database compartments for all the projects. This is an example of how you can leverage the delegation of duties in a workload environment for an outsourced team. They can manage the ExaDB-C@C VMCs, AVMCs and the rest of the elements in the Pre-prod projects, but they don't have permissions to do it in another environments like Production.
-
-&nbsp;
-
-### **2.7 Workload Environment Project with an AVMC and ACD managed by Global and Environment Dedicated Teams**
-
-This use case is identical to be previous one but focused in the Autonomous resources.
-
-&nbsp;
-
-### **2.8 Workload Environment Project with an AVMC managed by Global and Project Dedicated Teams**
 
 This use case is to allow the management of the resources for an specific Project Team, formed by people for Infra & DBAs. They can only manage the resources located in the specific project.
 

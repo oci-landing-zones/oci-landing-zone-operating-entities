@@ -5,7 +5,6 @@
 - [**1. Summary**](#1-summary)
 - [**2. Design Overview**](#2-design-overview)
 - [**3. Deployment Options**](#3-deployment-options)
-  - [**Choosing the Right Approach**](#choosing-the-right-approach)
 
 &nbsp; 
 
@@ -26,7 +25,7 @@ If you have not reviewed it yet, we recommend checking the ExaDB-C@C use cases s
 
 ## **3. Deployment Options**
 
-This Landing Zone Extension provides **two deployment approaches**, [single-stack](single-stack/) and  [multi-stack](multi-stack/), to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator) for automated dependency resolution with configuration keys.
+This Landing Zone Extension provides **two deployment approaches**, [single-stack](single-stack/) and  [multi-stack](multi-stack/), to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator).
 
 
 ### **Choosing the Right Approach**
@@ -37,7 +36,7 @@ This Landing Zone Extension provides **two deployment approaches**, [single-stac
 | **Landing Zone** | One-oe + ExaDB-C@C WE | ExaDB-C@C WE to extend a existing One-oe |
 | **Deployment Steps** | Single deployment operation | Deploy LZ first, then ExaDB-C@C WE |
 | **Terraform State** |  Combined (1 state) | Separate (2 states) |
-| **Deployment components** | lz identity domain, One-oe + ExaDB-C@C groups, policies & obs |   ExaDB-C@C groups, policies & obs | 
+| **Deployment components** | lz identity domain, One-oe + ExaDB-C@C groups, One-oe + ExaDB-C@C policies &  One-oe + ExaDB-C@C Observability resources |   ExaDB-C@C groups, policies & obs. resoruces | 
 | **Resource Lifecycle** | Coupled | Independent |
 | **Complexity** | Self-contained | Requires key coordination across stacks |
 
