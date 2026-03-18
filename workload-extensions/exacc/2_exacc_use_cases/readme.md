@@ -4,7 +4,7 @@
 
 - [**1. Summary**](#1-summary)
 - [**2. Use Cases**](#2-use-cases)
-  - [\*\*2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs)
+  - [**2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs**](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs)
     - [**ExaDB-C@C Resoruces**](#exadb-cc-resoruces)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups)
   - [**2.2 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#22-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
@@ -13,10 +13,12 @@
   - [**2.3 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#23-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
     - [**ExaDB-C@C Resoruces**](#exadb-cc-resoruces-2)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups-2)
+- [**3. Design Decisions**](#3-design-decisions)
 - [**3. Management of other resources**](#3-management-of-other-resources)
-  - [**3.1 Operator Access Control**](#31-operator-access-control)
-  - [**3.2 Software Images**](#32-software-images)
-  - [**3.3 Backup Destinations**](#33-backup-destinations)
+  - [**3.1 DR**](#31-dr)
+  - [**3.2 Operator Access Control**](#32-operator-access-control)
+  - [**3.3 Software Images**](#33-software-images)
+  - [**3.4 Backup Destinations**](#34-backup-destinations)
 
 &nbsp; 
 
@@ -84,7 +86,7 @@ In this section we will comment of the different use case scenarios identified, 
 
 &nbsp;
 
-### **2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs
+### **2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs**
 
 
 #### **ExaDB-C@C Resoruces**
@@ -121,11 +123,12 @@ This use case allows you to test in non-prod environments the software changes m
 
 
 
+## **3. Design Decisions**
 
 
 
 
-You can place VMCs in the same compartment that you plan for Production and Disaster Recovery (DR) purposes. Both are usually managed by the same teams, so there is no reason to create separated compartments for DR. If you need to allocate costs, this can be filtered by OCI tags specific to the VMCs. The Database replication is done thanks to Oracle Data Guard associations created between CDBs. There are different options to create the standby with the creation of a new VMC in an infrastructure or by re-using an existing VMC and/or OH.
+
 
 In this example shown in the below diagram or the general diagram, you can see that the VMCs has a background color with the same color of the infrastructure they're created on, so this can help you to identify the infrastructure. 
 
@@ -147,7 +150,14 @@ This use case is to allow the management of the resources for an specific Projec
 
 ## **3. Management of other resources**
 
-### **3.1 Operator Access Control**
+
+### **3.1 DR**
+
+
+You can place VMCs in the same compartment that you plan for Production and Disaster Recovery (DR) purposes. Both are usually managed by the same teams, so there is no reason to create separated compartments for DR. If you need to allocate costs, this can be filtered by OCI tags specific to the VMCs. The Database replication is done thanks to Oracle Data Guard associations created between CDBs. There are different options to create the standby with the creation of a new VMC in an infrastructure or by re-using an existing VMC and/or OH.
+
+
+### **3.2 Operator Access Control**
 
 *Oracle Operator Access Control* is an OCI compliance audit service that allows you to know when an access from Oracle operators is needed to check or fixed any problem in the ExaDB-C@C underlying infrastructure. It provides audit trails of all actions that Oracle operators performs on your Exadata Infrastructure in a near real-time manner.
 
@@ -159,7 +169,7 @@ An alternate design could be to place the Operator Access Controls for specific 
 
 To know more about the Oracle Operator Access Control you can check the public document [Oracle Operator Access Control](https://docs.oracle.com/en-us/iaas/operator-access-control/index.html).
 
-### **3.2 Software Images**
+### **3.3 Software Images**
 
 You can define your own Oracle Database and Grid Infrastructure binaries golden images in OCI. This is called *Database Software Images* and *Grid Infrastructure Software Images*.
 
@@ -173,7 +183,7 @@ An alternate design could be to place the Software Images in the dedicated ExaDB
 
 To know more about the Software Images you can check the public document [Manage Software Images](https://docs.oracle.com/en/engineered-systems/exadata-cloud-at-customer/ecccm/ecc-oracle-database-software-images.html#GUID-93D6419A-DD43-45E0-BF69-92E8907C6652).
 
-### **3.3 Backup Destinations**
+### **3.4 Backup Destinations**
 
 There are different automatic backup options for the ExaDB-C@C Databases. One of them is to be able to define on-premises Network File Storage (NFS) mountpoint or a Zero Data Loss Recovery Appliance (ZDLRA).
 
