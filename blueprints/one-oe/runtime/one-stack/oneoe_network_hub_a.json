@@ -1076,7 +1076,7 @@
                             "SN-FRA-LZ-PROD-INFRA-KEY": {
                                 "display_name"                            : "sn-fra-lz-prod-infra",
                                 "cidr_block"                              : "10.0.67.0/24",
-                                "dns_label"                               : "snfralzpinfr",
+                                "dns_label"                               : "snfralzpinfra",
                                 "dhcp_options_key"                        : "default_dhcp_options",
                                 "prohibit_internet_ingress"               : true,
                                 "prohibit_public_ip_on_vnic"              : true,
@@ -1350,7 +1350,7 @@
                             "SN-FRA-LZ-PREPROD-INFRA-KEY": {
                                 "display_name"                            : "sn-fra-lz-preprod-infra",
                                 "cidr_block"                              : "10.0.131.0/24",
-                                "dns_label"                               : "snfralzppinfr",
+                                "dns_label"                               : "snfralzppinfra",
                                 "dhcp_options_key"                        : "default_dhcp_options",
                                 "prohibit_internet_ingress"               : true,
                                 "prohibit_public_ip_on_vnic"              : true,

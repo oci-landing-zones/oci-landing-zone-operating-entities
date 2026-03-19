@@ -21,7 +21,7 @@
 | **NAME**         | OKE Cluster Deployment with Orchestrator                                    |
 | **OBJECTIVE**        | Deploy OCI OKE cluster with spoke network infrastructure using the Landing Zone Orchestrator module. |
 | **TARGET RESOURCES** | IAM (Compartments, Groups, Policies), Network (VCN, Subnets, NSGs, Gateways), OKE Cluster |
-| **DEPLOYMENT**          | [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_workers.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_network.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_identity.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_clusters.auto.tfvars.json"}) </br> **Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_OKE-LZ-EXT_deployment_steps.md). [Terraform CLI](/commons/content/terraform.md)  can be also used.           |
+| **DEPLOYMENT**          | [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_workers.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_network.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_identity.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_clusters.json"}) </br> **Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_OKE-LZ-EXT_deployment_steps.md). [Terraform CLI](/commons/content/terraform.md)  can be also used.           |
 
 
 &nbsp;
@@ -44,10 +44,10 @@ The deployment uses four JSON configuration files:
 
 | File | Purpose |
 | --- | --- |
-| `oke_identity.auto.tfvars.json` | IAM resources: compartments, groups, and policies for OKE |
-| `oke_network.auto.tfvars.json` | Network infrastructure: VCN, subnets, NSGs, route tables, service gateway, DRG attachment |
-| `oke_clusters.auto.tfvars.json` | OKE cluster configuration: cluster settings, Kubernetes version, CNI type, networking |
-| `oke_workers.auto.tfvars.json` | Node pool configuration: worker nodes, shape, size, networking, cloud-init |
+| `oke_identity.json` | IAM resources: compartments, groups, and policies for OKE |
+| `oke_network.json` | Network infrastructure: VCN, subnets, NSGs, route tables, service gateway, DRG attachment |
+| `oke_clusters.json` | OKE cluster configuration: cluster settings, Kubernetes version, CNI type, networking |
+| `oke_workers.json` | Node pool configuration: worker nodes, shape, size, networking, cloud-init |
 
 &nbsp;
 
@@ -63,17 +63,17 @@ The deployment uses four JSON configuration files:
 
 1. **Create ORM Stack**
    
-   Using one-click deployment. [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_workers.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_network.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_identity.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_clusters.auto.tfvars.json"}) change working directory to `rms-facade`.
+   Using one-click deployment. [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_workers.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_network.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_identity.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/multi-stack/oke_clusters.json"}) change working directory to `rms-facade`.
 
 2. **Review Configuration Keys**
 
    Before deployment, verify these configuration keys match your Landing Zone:
 
-   **In `oke_identity.auto.tfvars.json`:**
+   **In `oke_identity.json`:**
    - `CMP-LZP-P-PLATFORM-KEY` - Parent platform compartment
    - Adjust compartment/group/policy names to match your naming convention
 
-   **In `oke_network.auto.tfvars.json`:**
+   **In `oke_network.json`:**
    - `CMP-LZP-P-NETWORK-KEY` - Network compartment
    - `DRG-FRA-LZP-HUB-KEY` - Your DRG key
    - `DRGRT-FRA-LZP-SPOKES-KEY` - Your DRG route table key
@@ -99,7 +99,7 @@ The deployment uses four JSON configuration files:
 
 2. **Copy Configuration Files**
    ```bash
-   cp /path/to/oke/*.auto.tfvars.json .
+   cp /path/to/oke/*.json .
    ```
 
 3. **Initialize and Deploy**
@@ -151,7 +151,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 ### Cluster Configuration <!-- omit from toc -->
 
-Edit `oke_clusters.auto.tfvars.json`:
+Edit `oke_clusters.json`:
 
 - **Kubernetes Version**: Change `kubernetes_version` to upgrade/downgrade
 - **Cluster Type**: Set `is_enhanced: false` for basic clusters
@@ -160,7 +160,7 @@ Edit `oke_clusters.auto.tfvars.json`:
 
 ### Worker Pool Configuration <!-- omit from toc -->
 
-Edit `oke_workers.auto.tfvars.json`:
+Edit `oke_workers.json`:
 
 - **Node Count**: Change `size` to scale worker nodes
 - **Instance Shape**: Modify `node_shape`, `ocpus`, `memory` for different compute resources
@@ -170,7 +170,7 @@ Edit `oke_workers.auto.tfvars.json`:
 
 ### Network Configuration <!-- omit from toc -->
 
-Edit `oke_network.auto.tfvars.json`:
+Edit `oke_network.json`:
 
 - **CIDR Blocks**: Adjust VCN and subnet CIDR blocks to avoid conflicts
 - **NSG Rules**: Add/modify network security group rules for specific security requirements
@@ -207,11 +207,11 @@ terraform destroy
 
 **Issue**: CIDR block conflicts
 - **Solution**: Ensure VCN CIDR (`10.0.80.0/21`) doesn't overlap with existing VCNs
-- Adjust subnet CIDRs in `oke_network.auto.tfvars.json`
+- Adjust subnet CIDRs in `oke_network.json`
 
 **Issue**: Cluster creation fails
 - **Solution**: Check IAM policies are correctly configured
-- Verify VCN-native CNI policy grants required permissions (see `oke_identity.auto.tfvars.json`)
+- Verify VCN-native CNI policy grants required permissions (see `oke_identity.json`)
 
 **Issue**: Nodes not joining cluster
 - **Solution**: Verify NSG rules allow required traffic

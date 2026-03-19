@@ -148,12 +148,12 @@ function(mgmt_cidr, lb_cidr, has_spoke_natgw=false) {
     local sl_key = 'SL-FRA-LZ-%s-PROJ-GENERIC-KEY' % key;
     local web_nsg_key = 'NSG-FRA-LZ-%s-PROJ1-WEB-KEY' % key;
     local app_nsg_key = 'NSG-FRA-LZ-%s-PROJ1-APP-KEY' % key;
-    local sn(suffix, cidr, dns_suffix=null) =
+    local sn(suffix, cidr) =
       {
         ['SN-FRA-LZ-%s-%s-KEY' % [key, std.asciiUpper(suffix)]]: {
           display_name: 'sn-fra-lz-%s-%s' % [name, suffix],
           cidr_block: cidr,
-          dns_label: 'snfralz%s%s' % [dns, if dns_suffix != null then dns_suffix else suffix],
+          dns_label: 'snfralz%s%s' % [dns, suffix],
           dhcp_options_key: 'default_dhcp_options',
           prohibit_internet_ingress: true,
           prohibit_public_ip_on_vnic: true,
@@ -347,7 +347,7 @@ function(mgmt_cidr, lb_cidr, has_spoke_natgw=false) {
             sn('web', ip[name + '_web_sn'])
             + sn('app', ip[name + '_app_sn'])
             + sn('db', ip[name + '_db_sn'])
-            + sn('infra', ip[name + '_infra_sn'], dns_suffix='infr'),
+            + sn('infra', ip[name + '_infra_sn']),
 
           vcn_specific_gateways: {
               service_gateways: {
