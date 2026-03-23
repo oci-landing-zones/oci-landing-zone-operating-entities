@@ -34,24 +34,24 @@ This section is intended to guide you on some of the different scenarios.
 We have identified 3 main uses cases. 
 
 1. ExaDB-C@C Shared Platorm. Shared Infra and Shared VMCs.
-2. ExaDB-C@C Environment Dedicated Platforms. Dedicated Infra and Dedicated VMCs.
-3. Hibrid ExaDB-C@C Platforms. Infra shared and Dedicated enviroments VMCs.
+2. Hibrid ExaDB-C@C Platforms. Infra shared and Dedicated enviroments VMCs.
+3. ExaDB-C@C Environment Dedicated Platforms. Dedicated Infra and Dedicated VMCs per Environment.
 
 Not all possibilities are covered here, but these are likely the most common ones you’ll encounter. These three scenarios address the majority of use cases. If your situation involves a combination, you can draw on elements from the existing scenarios to create a custom solution.
 
-The diagrams below illustrates these escenarios:
+The diagrams below illustrates the most 3 commoun uses cases:
 
- ***ExaDB-C@C Workload Extension** [escenario 1:](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs):
+ **ExaDB-C@C Workload Extension** [**Use Case 1**:](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs):
 
-<img src="../content/exacc_example.jpg" width="1000" height="auto">
+<img src="../content/use_case_1.png" width="1000" height="auto">
 
- ***ExaDB-C@C Workload Extension*** [escenario 2:](#22-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs):
+ **ExaDB-C@C Workload Extension*** [**Use Case 2**:](#23-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs):
 
-<img src="../content/exacc_example.jpg" width="1000" height="auto">
+ **ExaDB-C@C Workload Extension*** [ **Use Case 3**:](#22-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs):
 
- ***ExaDB-C@C Workload Extension*** [escenario 3:](#23-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs):
 
-<img src="../content/exacc_example.jpg" width="1000" height="auto">
+
+
 
 &nbsp; 
 
@@ -65,18 +65,6 @@ We use this approach in this ExaDB-C@C extention, as some component's operations
 
 Every AVMC can also be created on top of an ExaDB-C@C Infrastructure. On each AVMC you can create multiple *Autonomous Container Databases (ACDs)* and on each of every ACDs you can create multiple *Autonomous Databases (ADB-Ds, dedicated)*. In contrast to regular VMCs, you can place every Autonomous component in different compartments, which gives you more flexibility and ease of use to create and maintain the IAM policies. You'll have also less operations to do with these components, as they are autonomously operated.
 
-Below you can see a table with the summary of the building blocks used in the previous scenarios:
-
-| Use Case Number | Use Case| Description              | When to use |
-| ------------------------- | --------------------------------- | ---| --- |
-| **a** | **Global Shared ExaCC Platform** | ExaDB-C@C Infrastructure and common elements to be ***shared*** across Workload Environments. | You have an infrastructure that can be shared between environments, like a Non-Prod Infrastructure |
-| **b** | **Dedicated Worload Environment ExaDB-C@C Platform** | ExaDB-C@C Infrastructure and common elements **dedicated to a Workload Environment** but shared by multiple same environment projects" | You need a dedicated infrastructure for Production, for example. |
-| **c** | **Workload Environment Project with Production & Disaster Recovery Regular VM Clusters** | VMCs dedicated to one or many applications, with HA between infrastructures. | You have a same team managing different Production VMCs, highly available for Mission Critical DBs |
-| **d** | **Workload Environment Project with AVMCs and Primary/DR ACDs** | AVMCs and ACDs are shared for different ADBs managed by other Project Teams | You have a same team managing the AVMCs of highly available ACDs for your organization or to support different customer's applications | 
-| **e** | **Workload Environment Project with ADBs** | ADB **managed by a Project Team** | You have an ADB than can hold 1 or many applications based of different schemas  |
-| **f** | **Worload Environment Project with a Regular VMCs managed by Global and Environment Dedicated Teams** | You have a Project where **Global Infra & DBA teams can manage** the resources but you have a **Project Dedicatent team** | Non-prod environment managed by outsourced teams for you, but you also have access as owner. |
-| **g** | **Workload Environment Project with an AVMC and ACD managed by Global and Environment Dedicated Teams** | You have a Project where **Global Infra & DBA teams can manage** the resources but you have a **dedicated Workload Environment team** | Non-prod environment where you have outsourced teams that admins the environments for you, but you also have access as owner. |
-| **h** | **Workload Environment Project with an ADB managed by Global and Project Dedicated Teams** | You have a Project where Global Infra & DBA teams can manage the resources but you have a dedicated Workload Environment team | Non-prod environment where you have outsourced project teams that admins the environments for you, but you also have access as owner. |
 
 &nbsp; 
 
@@ -124,11 +112,6 @@ This use case allows you to test in non-prod environments the software changes m
 
 
 ## **3. Design Decisions**
-
-
-
-
-
 
 In this example shown in the below diagram or the general diagram, you can see that the VMCs has a background color with the same color of the infrastructure they're created on, so this can help you to identify the infrastructure. 
 

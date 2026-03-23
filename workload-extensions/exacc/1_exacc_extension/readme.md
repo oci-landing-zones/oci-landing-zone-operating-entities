@@ -25,7 +25,7 @@ If you have not reviewed it yet, we recommend checking the ExaDB-C@C use cases s
 
 ## **3. Deployment Options**
 
-This Landing Zone Extension provides **two deployment approaches**, [single-stack](single-stack/) and  [multi-stack](multi-stack/), to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator).
+This Landing Zone Extension provides **two deployment approaches**, [single-stack](../single-stack/readme.md) and  [multi-stack](../multi-stack/readme.mdmulti-stack/), to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator).
 
 
 ### **Choosing the Right Approach**
