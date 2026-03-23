@@ -5,13 +5,13 @@
 - [**1. Summary**](#1-summary)
 - [**2. Use Cases**](#2-use-cases)
   - [**2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs**](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs)
-    - [**ExaDB-C@C Resoruces**](#exadb-cc-resoruces)
+    - [**ExaDB-C@C Resources**](#exadb-cc-resources)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups)
   - [**2.2 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#22-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
-    - [**ExaDB-C@C Resoruces**](#exadb-cc-resoruces-1)
+    - [**ExaDB-C@C Resources**](#exadb-cc-resources-1)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups-1)
   - [**2.3 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#23-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
-    - [**ExaDB-C@C Resoruces**](#exadb-cc-resoruces-2)
+    - [**ExaDB-C@C Resources**](#exadb-cc-resources-2)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups-2)
 - [**3. Design Decisions**](#3-design-decisions)
 - [**3. Management of other resources**](#3-management-of-other-resources)
@@ -77,22 +77,27 @@ In this section we will comment of the different use case scenarios identified, 
 ### **2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs**
 
 
-#### **ExaDB-C@C Resoruces**
-In this scenario all the ExaDB-C@C stack can be sean as shared resources.
-There are two infras one for production and his conrrespondent DR placed in the shared exacc compartmetn. and dedicated VMCs for production and DR also.
+#### **ExaDB-C@C Resources**
+
+In this scenario, the entire ExaDB-C@C stack can be considered as shared resources. There are two infrastructures: one for production and its corresponding disaster recovery (DR), both located in shared ExaCC compartments <img src="../content/a.png">, as well as dedicated VM clusters for production and DR <img src="../content/b.png">.
+
+In the case of VM clusters, the CDBs and PDBs are created within the same compartment.
+
+If the customer wants to test an Autonomous VM Cluster (AVMC), it would be placed in the same compartment. However, for CDBs and PDBs, a different approach can be used. In this case, they can be set up in separate compartments from the AVM cluster, allowing the ACDB or APDBs to be assigned to specific projects.
+
+For example, as shown in options <img src="../content/e.png"> and <img src="../content/f.png">, we can have a PDB for Project 1 in production and another PDB for Project 1 in pre-production.
 
 #### **ExaDB-C@C Groups**
+
+
 
 
 &nbsp;
 
 ### **2.2 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**
 
-#### **ExaDB-C@C Resoruces**
-
-In a Dedicated Worload Environment ExaDB-C@C Platform, the infrastructure is *dedicated to the workload environment* , but it is *shared between the different environment projects*. This is a typical use case where you have a Production or DR infrastructure where you don't allow to mix the infrastructure with non-prod environments. You typically has a non-prod infrastructure or cheaper, less capable hardware for those environments.
-
-This use case allows you to test in non-prod environments the software changes made periodically by Oracle Operators before you schedule the quarterly patching in your production infrastructure once you're confortable how the patching procedure affects to your business application databases.
+#### **ExaDB-C@C Resources**
+&nbsp;
 
 #### **ExaDB-C@C Groups**
 &nbsp;
@@ -100,7 +105,7 @@ This use case allows you to test in non-prod environments the software changes m
 
 ### **2.3 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**
 
-#### **ExaDB-C@C Resoruces**
+#### **ExaDB-C@C Resources**
 
 #### **ExaDB-C@C Groups**
 &nbsp;
