@@ -7,12 +7,15 @@
   - [**2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs**](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs)
     - [**ExaDB-C@C Resources**](#exadb-cc-resources)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups)
+    - [**ExaDB-C@C Observability**](#exadb-cc-observability)
   - [**2.2 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#22-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
     - [**ExaDB-C@C Resources**](#exadb-cc-resources-1)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups-1)
+    - [**ExaDB-C@C Observability**](#exadb-cc-observability-1)
   - [**2.3 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#23-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
     - [**ExaDB-C@C Resources**](#exadb-cc-resources-2)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups-2)
+    - [**ExaDB-C@C Observability**](#exadb-cc-observability-2)
 - [**3. Design Decisions**](#3-design-decisions)
 - [**3. Management of other resources**](#3-management-of-other-resources)
   - [**3.1 DR**](#31-dr)
@@ -39,22 +42,6 @@ We have identified 3 main uses cases.
 
 Not all possibilities are covered here, but these are likely the most common ones you’ll encounter. These three scenarios address the majority of use cases. If your situation involves a combination, you can draw on elements from the existing scenarios to create a custom solution.
 
-The diagrams below illustrates the most 3 commoun uses cases:
-
- **ExaDB-C@C Workload Extension** [**Use Case 1**:](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs):
-
-<img src="../content/use_case_1.png" width="1000" height="auto">
-
- **ExaDB-C@C Workload Extension*** [**Use Case 2**:](#23-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs):
-
- **ExaDB-C@C Workload Extension*** [ **Use Case 3**:](#22-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs):
-
-
-
-
-
-&nbsp; 
-
 Consider that the ExaDB-C@C Infrastructure is formed of Database and Storage Servers, connected through a RoCE switches fabric, that supports different *Virtual Machine Clusters (VMC)*, known as "regular" VMCs, and/or *Autonomous Virtual Machine Clusters (AVMC)*.
 
 Every VMC is a set of one or many Virtual Machines running in different Database Servers for high availability given by Grid Infrastructure clusterware software. On top of a VMC, you can deploy several *Oracle Homes (OHs)*, which can be used to create/run *Oracle Container Databases (CDBs)*. In every CDB, you can run multiple *Pluggable Databases (PDBs)*. While creating VMCs, you can select the compartment where you want to place it, for logical, functional or security reasons. The rest of components, can not be placed in different compartments, so consider that where you place the VMC will be the place where you will find all these elements, and the teams who are going to manage them, will have access to all of them. It is possible to fine-tune the IAM policies to grant the access of different teams to OHs, CDBs or even PDBs based on tags, but it would require a high effort after the deployment of any of these resources to create the needed, restricted IAM policies and something really hard to maintain.
@@ -77,6 +64,8 @@ In this section we will comment of the different use case scenarios identified, 
 ### **2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs**
 
 
+<img src="../content/use_case_1.png" width="1000" height="auto">
+
 #### **ExaDB-C@C Resources**
 
 In this scenario, the entire ExaDB-C@C stack can be considered as shared resources. There are two infrastructures: one for production and its corresponding disaster recovery (DR), both located in shared ExaCC compartments <img src="../content/a.png">, as well as dedicated VM clusters for production and DR <img src="../content/b.png">.
@@ -90,6 +79,8 @@ For example, as shown in options <img src="../content/e.png"> and <img src="../c
 #### **ExaDB-C@C Groups**
 
 
+#### **ExaDB-C@C Observability**
+
 
 
 &nbsp;
@@ -102,12 +93,20 @@ For example, as shown in options <img src="../content/e.png"> and <img src="../c
 #### **ExaDB-C@C Groups**
 &nbsp;
 
+#### **ExaDB-C@C Observability**
+&nbsp;
+
+
 
 ### **2.3 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**
 
 #### **ExaDB-C@C Resources**
+&nbsp;
 
 #### **ExaDB-C@C Groups**
+&nbsp;
+
+#### **ExaDB-C@C Observability**
 &nbsp;
 
 
