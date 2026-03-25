@@ -5,15 +5,15 @@
 - [**1. Summary**](#1-summary)
 - [**2. Use Cases**](#2-use-cases)
   - [**2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs**](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs)
-    - [**ExaDB-C@C Resources**](#exadb-cc-resources)
+    - [**ExaDB-C@C Resources LLF**](#exadb-cc-resources-llf)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups)
     - [**ExaDB-C@C Observability**](#exadb-cc-observability)
   - [**2.2 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#22-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
-    - [**ExaDB-C@C Resources**](#exadb-cc-resources-1)
+    - [**ExaDB-C@C Resources**](#exadb-cc-resources)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups-1)
     - [**ExaDB-C@C Observability**](#exadb-cc-observability-1)
   - [**2.3 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#23-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
-    - [**ExaDB-C@C Resources**](#exadb-cc-resources-2)
+    - [**ExaDB-C@C Resources**](#exadb-cc-resources-1)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups-2)
     - [**ExaDB-C@C Observability**](#exadb-cc-observability-2)
 - [**3. Design Decisions**](#3-design-decisions)
@@ -66,7 +66,7 @@ In this section we will comment of the different use case scenarios identified, 
 
 <img src="../content/use_case_1.png" width="1000" height="auto">
 
-#### **ExaDB-C@C Resources**
+#### **ExaDB-C@C Resources LLF**
 
 In this scenario, the entire ExaDB-C@C stack can be considered as shared resources. There are two infrastructures: one for production and its corresponding disaster recovery (DR), both located in shared ExaCC compartments <img src="../content/a.png">, as well as dedicated VM clusters for production and DR <img src="../content/b.png">.
 
