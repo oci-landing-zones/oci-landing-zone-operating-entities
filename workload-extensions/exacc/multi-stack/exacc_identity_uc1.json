@@ -11,7 +11,7 @@
                         "name"                         : "cmp-lz-shared-exacc-db"
                     },
 
-                    "CMP-LZ-EXACC-INFRA-KEY": {
+                    "CMP-LZ-SHARED-EXACC-INFRA-KEY": {
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role": "lz-shared-exacc-infra-admin"
                         },
@@ -26,7 +26,28 @@
                 "description"                          : "ExaCC shared Platform",
                 "name"                                 : "cmp-lz-shared-exacc",
                 "parent_id"                            : "CMP-LZ-PLATFORM-KEY"
-            }
+            },
+
+            "CMP-LZ-PREPROD-PROJ1-DB-KEY": {
+                "defined_tags": {
+                    "tagns-lz-role.tag-lz-role": "lz-shared-exacc-db-admin"
+                },
+                "description"                  : "ExaCC PreProd env database layer",
+                "name"                         : "cmp-lz-preprod-proj1-db",
+                "parent_id"                    : "CMP-LZ-PREPROD-PROJ1-KEY"
+
+            },
+
+            "CMP-LZ-PROD-PROJ1-DB-KEY": {
+                "defined_tags": {
+                    "tagns-lz-role.tag-lz-role": "lz-shared-exacc-db-admin"
+                },
+                "description"                  : "ExaCC PreProd env database layer",
+                "name"                         : "cmp-lz-prod-proj1-db",
+                "parent_id"                    : "CMP-LZ-PROD-PROJ1-KEY"
+
+            }                              
+
         },
         "enable_delete"                                : "true"
     },
@@ -37,12 +58,12 @@
         "groups": {
             "GRP-LZ-GLOBAL-DB-ADMIN-KEY": {
                 "description"                          : "Global DBA team admin group",
-                "name"                                 : "grp-lz-shared-exacc-db-admin"
+                "name"                                 : "grp-lz-global-exacc-db-admin"
             },
 
             "GRP-LZ-GLOBAL-INFRA-ADMIN-KEY": {
                 "description"                          : "Global Infra Team admin group",
-                "name"                                 : "grp-lz-shared-exacc-infra-admin"
+                "name"                                 : "grp-lz-global-exacc-infra-admin"
             },
 
             "GRP-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
@@ -61,67 +82,67 @@
         "supplied_policies": {
             "PCY-LZ-EXACC-DB-ADMIN-KEY": {
                 "compartment_id"                       : "CMP-LANDINGZONE-KEY",
-                "description"                          : "Policy which allows the groups grp-lz-shared-exacc-infra-admin and grp-lz-shared-exacc-db-admin to have shared privilegies in all exacc compartments",
+                "description"                          : "Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privilegies in all exacc compartments",
                 "name"                                 : "pcy-lz-shared-exacc-db-admin",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage data-safe-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to use exadata-infrastructures in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin')), request.operation !='ValidateVmClusterNetwork',request.operation !='ActivateExadataInfrastructure',request.operation !='ChangeExadataInfrastructureCompartment',request.operation !='AddStorageCapacityExadataInfrastructure',request.operation !='CreateVmClusterNetwork',request.operation !='CreateVmClusterNetwork',request.operation !='UpdateVmClusterNetwork',request.operation !='DeleteVmClusterNetwork'}",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to use vmclusters in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin')), request.permission !='VM_CLUSTER_UPDATE_SSH_KEY', request.permission !='VM_CLUSTER_UPDATE_CPU',request.permission !='VM_CLUSTER_UPDATE_MEMORY',request.permission !='VM_CLUSTER_UPDATE_LOCAL_STORAGE',request.permission !='VM_CLUSTER_UPDATE_FILE_SYSTEM'}",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage backups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage database-software-image in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage db-homes in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage pluggable-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage autonomous-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage autonomous-backups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage autonomous-container-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-db-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))"
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage data-safe-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to use exadata-infrastructures in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin')), request.operation !='ValidateVmClusterNetwork',request.operation !='ActivateExadataInfrastructure',request.operation !='ChangeExadataInfrastructureCompartment',request.operation !='AddStorageCapacityExadataInfrastructure',request.operation !='CreateVmClusterNetwork',request.operation !='CreateVmClusterNetwork',request.operation !='UpdateVmClusterNetwork',request.operation !='DeleteVmClusterNetwork'}",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to use vmclusters in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin')), request.permission !='VM_CLUSTER_UPDATE_SSH_KEY', request.permission !='VM_CLUSTER_UPDATE_CPU',request.permission !='VM_CLUSTER_UPDATE_MEMORY',request.permission !='VM_CLUSTER_UPDATE_LOCAL_STORAGE',request.permission !='VM_CLUSTER_UPDATE_FILE_SYSTEM'}",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage backups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage database-software-image in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage db-homes in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage pluggable-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage autonomous-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage autonomous-backups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage autonomous-container-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))"
                 ]
             },
 
             "PCY-LZ-EXACC-GENERIC-ADMIN-KEY": {
                 "compartment_id"                       : "TENANCY-ROOT",
-                "description"                          : "Policy which allows the groups grp-lz-shared-exacc-infra-admin and grp-lz-shared-exacc-db-admin to have shared privilegies in all exacc compartments",
+                "description"                          : "Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privilegies in all exacc compartments",
                 "name"                                 : "pcy-lz-shared-exacc-generic",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin','id_lz_common'/'grp-lz-shared-exacc-db-admin' to use cloud-shell in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin','id_lz_common'/'grp-lz-shared-exacc-db-admin' to read compartments in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin','id_lz_common'/'grp-lz-shared-exacc-db-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin','id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin','id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin','id_lz_common'/'grp-lz-shared-exacc-db-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin','id_lz_common'/'grp-lz-shared-exacc-db-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin','id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin','id_lz_common'/'grp-lz-shared-exacc-db-admin' to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))"
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to use cloud-shell in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to read compartments in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-admin'))"
                 ]
             },
 
             "PCY-LZ-EXACC-INFRA-ADMIN-KEY": {
                 "compartment_id"                       : "CMP-LANDINGZONE-KEY",
-                "description"                          : "Example policy which allows the grp-lz-shared-exacc-infra-admin group users to manage the DB infra in sharead exacc platform compartment.",
+                "description"                          : "Example policy which allows the grp-lz-global-exacc-infra-admin group users to manage the DB infra in sharead exacc platform compartment.",
                 "name"                                 : "pcy-lz-shared-exacc-infra-admin",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage exadata-infrastructures in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage scheduling-policies in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage scheduling-windows in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage execution-windows in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage vmclusters in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin')), request.permission !='VM_CLUSTER_UPDATE_GI_SOFTWARE', request.permission !='VM_CLUSTER_UPDATE_EXADATA_STORAGE'}",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to use dbServers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage dbnode-console-connection in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage dbnode-console-history in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage autonomous-vmclusters in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to use subnets in compartment cmp-landingzone  where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to use dns in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-shared-exacc-infra-admin' to manage db-nodes in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))"
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage exadata-infrastructures in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage scheduling-policies in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage scheduling-windows in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage execution-windows in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage vmclusters in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin')), request.permission !='VM_CLUSTER_UPDATE_GI_SOFTWARE', request.permission !='VM_CLUSTER_UPDATE_EXADATA_STORAGE'}",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to use dbServers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage dbnode-console-connection in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage dbnode-console-history in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage autonomous-vmclusters in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to use subnets in compartment cmp-landingzone  where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to use dns in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage db-nodes in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-shared-exacc-db-admin'))"
                 ]
             },
 
