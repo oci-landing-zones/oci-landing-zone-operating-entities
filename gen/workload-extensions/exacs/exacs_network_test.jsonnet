@@ -1,0 +1,217 @@
+{
+  network_configuration+: {
+
+    network_configuration_categories+: {
+      exacs: {
+        category_compartment_id: 'CMP-LZ-NETWORK-KEY',
+
+        vcns: {
+          'VCN-FRA-LZ-SHARED-EXACS-KEY': {
+            display_name: 'vcn-fra-lz-shared-exacs',
+            cidr_blocks: ['10.0.24.0/21'],
+            dns_label: 'vcnfralzsexacs',
+            block_nat_traffic: false,
+            is_attach_drg: false,
+            is_create_igw: false,
+            is_ipv6enabled: false,
+            is_oracle_gua_allocation_enabled: false,
+
+            subnets: {
+              'SN-FRA-LZ-SHARED-EXACS-DB-KEY': {
+                display_name: 'sn-fra-lz-exacs-db',
+                dns_label: 'snfralpexacsdb',
+                cidr_block: '10.0.24.0/24',
+                dhcp_options_key: 'default_dhcp_options',
+                prohibit_internet_ingress: true,
+                prohibit_public_ip_on_vnic: true,
+                route_table_key: 'RT-FRA-LZ-SHARED-EXACS-DB-KEY',
+                security_list_keys: ['SL-FRA-LZ-SHARED-EXACS-DB-KEY'],
+              },
+
+              'SN-FRA-LZ-SHARED-EXACS-DB-BCK-KEY': {
+                display_name: 'sn-fra-lzp-exacs-db-bck',
+                dns_label: 'snfralsexacsbck',
+                cidr_block: '10.0.24.0/24',
+                dhcp_options_key: 'default_dhcp_options',
+                prohibit_internet_ingress: true,
+                prohibit_public_ip_on_vnic: true,
+                route_table_key: 'RT-FRA-LZ-SHARED-EXACS-DB-BCK-KEY',
+                security_list_keys: ['SL-FRA-LZ-SHARED-EXACS-DB-BCK-KEY'],
+              },
+
+            },
+
+            route_tables: {
+              'RT-FRA-LZ-SHARED-EXACS-DB-KEY': {
+                display_name: 'rt-fra-lz-shared-exacs-db',
+
+                route_rules: {
+                  sgw_route: {
+                    description: 'Route for OCI services',
+                    destination: 'all-services',
+                    destination_type: 'SERVICE_CIDR_BLOCK',
+                    network_entity_key: 'SGW-FRA-LZ-SHARED-EXACS-KEY',
+                  },
+                  drg_route: {
+                    description: 'Route to DRG',
+                    destination: '0.0.0.0/0',
+                    destination_type: 'CIDR_BLOCK',
+                    network_entity_key: 'DRG-FRA-LZP-HUB-KEY',
+                  },
+                },
+              },
+
+              'RT-FRA-LZ-SHARED-EXACS-DB-BCK-KEY': {
+                display_name: 'rt-fra-lz-shated-exacs-db-bck',
+
+                route_rules: {
+                  sgw_route: {
+                    description: 'Route for OCI services',
+                    destination: 'all-services',
+                    destination_type: 'SERVICE_CIDR_BLOCK',
+                    network_entity_key: 'SGW-FRA-LZ-SHARED-EXACS-KEY',
+                  },
+                },
+              },
+
+            },
+
+            security_lists: {
+
+              'SL-FRA-LZ-SHARED-EXACS-BD-KEY': {
+                display_name: 'sl-fra-lz-shared-exacs-db',
+                defined_tags: null,
+                freeform_tags: null,
+                ingress_rules: [
+                  {
+                      description                  : 'ICMP type 3 code 4',
+                      src                          : '0.0.0.0/0',
+                      src_type                     : 'CIDR_BLOCK',
+                      protocol                     : 'ICMP',
+                      icmp_type                    : 3,
+                      icmp_code                    : 4,
+                      stateless                    : false,
+                  },
+                  {
+                      description                  : 'ICMP type 3',
+                      src                          : '10.0.24.0/21',
+                      src_type                     : 'CIDR_BLOCK',
+                      protocol                     : 'ICMP',
+                      icmp_type                    : 3,
+                      stateless                    : false,
+                  },
+                  {
+                      description                  : 'Allow inbound ICMP type 8 (Echo) from Hub VCN',
+                      src                          : '10.0.0.0/21',
+                      src_type                     : 'CIDR_BLOCK',
+                      protocol                     : 'ICMP',
+                      icmp_type                    : 8,
+                      icmp_code                    : 0,
+                      stateless                    : false,
+                  },
+                ],
+                egress_rules: [
+                    {
+                        description                  : 'Allow all outbound traffic to 0.0.0.0/0 over ALL protocols',
+                        dst                          : '0.0.0.0/0',
+                        dst_type                     : 'CIDR_BLOCK',
+                        protocol                     : 'ALL',
+                        stateless                    : false,
+                    },
+                    {
+                        description                  : 'Allow outbound traffic to Oracle Services Network over ALL protocols',
+                        dst                          : 'all-services',
+                        dst_type                     : 'SERVICE_CIDR_BLOCK',
+                        protocol                     : 'ALL',
+                        stateless                    : false,
+                    }
+                ],
+              },
+              'SL-FRA-LZ-SHARED-EXACS-BD-BCK-KEY': {
+                display_name: 'sl-fra-lz-shared-exacs-db-bck',
+                defined_tags: null,
+                freeform_tags: null,
+                ingress_rules: [
+                  {
+                      description                  : 'ICMP type 3 code 4',
+                      src                          : '0.0.0.0/0',
+                      src_type                     : 'CIDR_BLOCK',
+                      protocol                     : 'ICMP',
+                      icmp_type                    : 3,
+                      icmp_code                    : 4,
+                      stateless                    : false,
+                  },
+                  {
+                      description                  : 'ICMP type 3',
+                      src                          : '10.0.24.0/21',
+                      src_type                     : 'CIDR_BLOCK',
+                      protocol                     : 'ICMP',
+                      icmp_type                    : 3,
+                      stateless                    : false,
+                  },
+                  {
+                      description                  : 'Allow inbound ICMP type 8 (Echo) from Hub VCN',
+                      src                          : '10.0.0.0/21',
+                      src_type                     : 'CIDR_BLOCK',
+                      protocol                     : 'ICMP',
+                      icmp_type                    : 8,
+                      icmp_code                    : 0,
+                      stateless                    : false,
+                  },
+                ],
+                egress_rules: [
+                    {
+                        description                  : 'Allow all outbound traffic to 0.0.0.0/0 over ALL protocols',
+                        dst                          : '0.0.0.0/0',
+                        dst_type                     : 'CIDR_BLOCK',
+                        protocol                     : 'ALL',
+                        stateless                    : false,
+                    },
+                    {
+                        description                  : 'Allow outbound traffic to Oracle Services Network over ALL protocols',
+                        dst                          : 'all-services',
+                        dst_type                     : 'SERVICE_CIDR_BLOCK',
+                        protocol                     : 'ALL',
+                        stateless                    : false,
+                    }
+                ],
+              },
+            },
+
+            network_security_groups: {
+              'NSG-FRA-LZ-SHARED-EXACS-DB-KEY': {
+                display_name: 'nsg-fra-lz-shared-exacs-db',
+
+                egress_rules: {
+                   anywhere: {
+                                        description                  : 'Allow all outbound traffic to 0.0.0.0/0 over all protocols',
+                                        dst                          : '0.0.0.0/0',
+                                        dst_type                     : 'CIDR_BLOCK',
+                                        protocol                     : 'TCP',
+                                        stateless                    : false
+                  },
+                },
+
+                ingress_rules: {
+               
+                },
+              },
+
+            },
+
+            vcn_specific_gateways: {
+              service_gateways: {
+                'SGW-FRA-LZ-SHARED-EXACS-KEY': {
+                  display_name: 'sgw-fra-lz-shared-exacs',
+                  services: 'all-services',
+                },
+              },
+            },
+          },
+        },
+
+    
+      },
+    },
+  },
+}

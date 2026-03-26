@@ -30,7 +30,7 @@
   policies_configuration+: {
     supplied_policies+: {
 
-      "PCY-LZ-EXACS-GENERIC-ADMIN-KEY": {
+      "PCY-LZ-EXACC-GENERIC-ADMIN-KEY": {
         name: 'pcy-lz-exacc-generic',
         description: 'Policy which allows the groups grp-lz-exacc-infra-admin and grp-lz-exacc-db-admin to have shared privilegies in all exacc compartments',
         compartment_id: 'TENANCY-ROOT',
@@ -47,7 +47,7 @@
         ],
       },
 
-      "PCY-LZ-EXACS-DB-ADMIN-KEY": {
+      "PCY-LZ-EXACC-DB-ADMIN-KEY": {
         name: 'pcy-lz-exacc-db-admin',
         description: 'Policy which allows the groups grp-lz-exacc-infra-admin and grp-lz-exacc-db-admin to have shared privilegies in all exacc compartments',
         compartment_id: 'CMP-LANDINGZONE-KEY',

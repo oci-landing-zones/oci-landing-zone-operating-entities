@@ -21,6 +21,16 @@
                                         "attached_resource_key"        : "VCN-FRA-LZ-HUB-KEY",
                                         "type"                         : "VCN"
                                     }
+                                },
+
+                                "DRGATT-FRA-LZ-SHARED-EXACS-PROJ-KEY": {
+                                    "display_name"                     : "drgatt-fra-lz-shared-exacs-proj",
+                                    "drg_route_table_key"              : "DRGRT-FRA-LZ-SPOKES-KEY",
+
+                                    "network_details": {
+                                        "attached_resource_key"        : "VCN-FRA-LZ-SHARED-EXACS-KEY",
+                                        "type"                         : "VCN"
+                                    }
                                 }
                             },
 
@@ -28,7 +38,19 @@
                                 "DRGRD-FRA-LZ-HUB-KEY": {
                                     "display_name"                     : "drgrd-fra-lz-hub",
                                     "distribution_type"                : "IMPORT",
-                                    "statements"                       : {}
+
+                                    "statements": {
+                                        "ROUTE-TO-VCN-SHARED-EXACS-KEY": {
+                                            "action"                   : "ACCEPT",
+
+                                            "match_criteria": {
+                                                "attachment_type"      : "VCN",
+                                                "drg_attachment_key"   : "DRGATT-FRA-LZ-SHARED-EXACS-PROJ-KEY",
+                                                "match_type"           : "DRG_ATTACHMENT_ID"
+                                            },
+                                            "priority"                 : 10
+                                        }
+                                    }
                                 },
 
                                 "DRGRD-FRA-LZ-SPOKE-KEY": {
@@ -192,6 +214,40 @@
                         "is_oracle_gua_allocation_enabled"             : false,
 
                         "network_security_groups": {
+                            "NSG-FRA-LZ-HUB-FW-INT-KEY": {
+                                "ingress_rules": {
+                                    "from_shared-exacs_http": {
+                                        "description"                  : "Allow inbound traffic from Shared-EXACS VCN over HTTP",
+                                        "dst_port_max"                 : 80,
+                                        "dst_port_min"                 : 80,
+                                        "protocol"                     : "TCP",
+                                        "src"                          : "10.0.24.0/21",
+                                        "src_type"                     : "CIDR_BLOCK",
+                                        "stateless"                    : false
+                                    },
+
+                                    "from_shared-exacs_https": {
+                                        "description"                  : "Allow inbound traffic from Shared-EXACS VCN over HTTPS",
+                                        "dst_port_max"                 : 443,
+                                        "dst_port_min"                 : 443,
+                                        "protocol"                     : "TCP",
+                                        "src"                          : "10.0.24.0/21",
+                                        "src_type"                     : "CIDR_BLOCK",
+                                        "stateless"                    : false
+                                    },
+
+                                    "from_shared-exacs_icmp": {
+                                        "description"                  : "Allow ICMP type 8 (Echo) from Shared-EXACS VCN",
+                                        "icmp_code"                    : 0,
+                                        "icmp_type"                    : 8,
+                                        "protocol"                     : "ICMP",
+                                        "src"                          : "10.0.24.0/21",
+                                        "src_type"                     : "CIDR_BLOCK",
+                                        "stateless"                    : false
+                                    }
+                                }
+                            },
+
                             "NSG-FRA-LZ-HUB-LB-KEY": {
                                 "display_name"                         : "nsg-fra-lz-hub-lb",
 
@@ -230,10 +286,28 @@
                         },
 
                         "route_tables": {
+                            "RT-FRA-LZ-HUB-FW-INT-KEY": {
+                                "route_rules": {
+                                    "rt-fra-shared-exacs-projects": {
+                                        "description"                  : "Route to VCN Shared-EXACS Projects through DRG",
+                                        "destination"                  : "10.0.24.0/21",
+                                        "destination_type"             : "CIDR_BLOCK",
+                                        "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
                             "RT-FRA-LZ-HUB-LB-KEY": {
                                 "display_name"                         : "rt-fra-lz-hub-lb",
 
                                 "route_rules": {
+                                    "rt-fra-shared-exacs-projects": {
+                                        "description"                  : "Route to VCN Shared-EXACS Projects through DRG",
+                                        "destination"                  : "10.0.24.0/21",
+                                        "destination_type"             : "CIDR_BLOCK",
+                                        "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
                                     "rt-internet": {
                                         "description"                  : "Route to the Internet through Internet GW",
                                         "destination"                  : "0.0.0.0/0",
@@ -247,6 +321,13 @@
                                 "display_name"                         : "rt-fra-lz-hub-mgmt",
 
                                 "route_rules": {
+                                    "rt-fra-shared-exacs-projects": {
+                                        "description"                  : "Route to VCN Shared-EXACS Projects through DRG",
+                                        "destination"                  : "10.0.24.0/21",
+                                        "destination_type"             : "CIDR_BLOCK",
+                                        "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
                                     "rt-natgw": {
                                         "description"                  : "Route to Internet through NAT GW",
                                         "destination"                  : "0.0.0.0/0",
@@ -414,6 +495,258 @@
                             "service_gateways": {
                                 "SGW-FRA-LZ-HUB-KEY": {
                                     "display_name"                     : "sgw-fra-lz-hub",
+                                    "services"                         : "all-services"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "1-shared-exacs": {
+                "category_compartment_id"                              : "CMP-LZ-NETWORK-KEY",
+
+                "vcns": {
+                    "VCN-FRA-LZ-SHARED-EXACS-KEY": {
+                        "block_nat_traffic"                            : false,
+                        "cidr_blocks"                                  : ["10.0.24.0/21"],
+
+                        "default_security_list": {
+                            "egress_rules"                             : [],
+                            "ingress_rules"                            : []
+                        },
+                        "display_name"                                 : "vcn-fra-lz-shared-exacs",
+                        "dns_label"                                    : "vcnfralzsexacs",
+                        "is_attach_drg"                                : false,
+                        "is_create_igw"                                : false,
+                        "is_ipv6enabled"                               : false,
+                        "is_oracle_gua_allocation_enabled"             : false,
+
+                        "network_security_groups": {
+                            "NSG-FRA-LZ-SHARED_EXACS-PROJ1-APP-KEY": {
+                                "compartment_id"                       : "CMP-LZ-SHARED_EXACS-PROJ1-KEY",
+                                "display_name"                         : "nsg-fra-lz-shared-exacs-proj1-app",
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "dst"                          : "0.0.0.0/0",
+                                        "dst_type"                     : "CIDR_BLOCK",
+                                        "protocol"                     : "TCP",
+                                        "stateless"                    : false
+                                    }
+                                },
+
+                                "ingress_rules": {
+                                    "http_80": {
+                                        "description"                  : "Allow inbound from NSG nsg-fra-lz-shared-exacs-proj1-web over HTTP",
+                                        "dst_port_max"                 : 80,
+                                        "dst_port_min"                 : 80,
+                                        "protocol"                     : "TCP",
+                                        "src"                          : "NSG-FRA-LZ-SHARED_EXACS-PROJ1-WEB-KEY",
+                                        "src_type"                     : "NETWORK_SECURITY_GROUP",
+                                        "stateless"                    : false
+                                    },
+
+                                    "https_443": {
+                                        "description"                  : "Allow inbound from NSG nsg-fra-lz-shared-exacs-proj1-web over HTTPS",
+                                        "dst_port_max"                 : 443,
+                                        "dst_port_min"                 : 443,
+                                        "protocol"                     : "TCP",
+                                        "src"                          : "NSG-FRA-LZ-SHARED_EXACS-PROJ1-WEB-KEY",
+                                        "src_type"                     : "NETWORK_SECURITY_GROUP",
+                                        "stateless"                    : false
+                                    },
+
+                                    "ssh_22": {
+                                        "description"                  : "Allow inbound traffic from Hub management subnet over SSH",
+                                        "dst_port_max"                 : 22,
+                                        "dst_port_min"                 : 22,
+                                        "protocol"                     : "TCP",
+                                        "src"                          : "10.0.1.0/24",
+                                        "src_type"                     : "CIDR_BLOCK",
+                                        "stateless"                    : false
+                                    }
+                                }
+                            },
+
+                            "NSG-FRA-LZ-SHARED_EXACS-PROJ1-DB-KEY": {
+                                "compartment_id"                       : "CMP-LZ-SHARED_EXACS-PROJ1-KEY",
+                                "display_name"                         : "nsg-fra-lz-shared-exacs-proj1-app",
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "dst"                          : "0.0.0.0/0",
+                                        "dst_type"                     : "CIDR_BLOCK",
+                                        "protocol"                     : "TCP",
+                                        "stateless"                    : false
+                                    }
+                                },
+
+                                "ingress_rules": {
+                                    "db_1521": {
+                                        "description"                  : "Allow inbound from NSG nsg-fra-lz-shared-exacs-proj1-app over TCP 1521",
+                                        "dst_port_max"                 : 1521,
+                                        "dst_port_min"                 : 1521,
+                                        "protocol"                     : "TCP",
+                                        "src"                          : "NSG-FRA-LZ-SHARED_EXACS-PROJ1-APP-KEY",
+                                        "src_type"                     : "NETWORK_SECURITY_GROUP",
+                                        "stateless"                    : false
+                                    }
+                                }
+                            },
+
+                            "NSG-FRA-LZ-SHARED_EXACS-PROJ1-WEB-KEY": {
+                                "compartment_id"                       : "CMP-LZ-SHARED_EXACS-PROJ1-KEY",
+                                "display_name"                         : "nsg-fra-lz-shared-exacs-proj1-web",
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "dst"                          : "0.0.0.0/0",
+                                        "dst_type"                     : "CIDR_BLOCK",
+                                        "protocol"                     : "TCP",
+                                        "stateless"                    : false
+                                    }
+                                },
+
+                                "ingress_rules": {
+                                    "http_80": {
+                                        "description"                  : "Allow inbound traffic from Hub LB subnet over HTTP",
+                                        "dst_port_max"                 : 80,
+                                        "dst_port_min"                 : 80,
+                                        "protocol"                     : "TCP",
+                                        "src"                          : "10.0.0.0/24",
+                                        "src_type"                     : "CIDR_BLOCK",
+                                        "stateless"                    : false
+                                    },
+
+                                    "https_443": {
+                                        "description"                  : "Allow inbound traffic from Hub LB subnet over over HTTPS",
+                                        "dst_port_max"                 : 443,
+                                        "dst_port_min"                 : 443,
+                                        "protocol"                     : "TCP",
+                                        "src"                          : "10.0.0.0/24",
+                                        "src_type"                     : "CIDR_BLOCK",
+                                        "stateless"                    : false
+                                    },
+
+                                    "ssh_22": {
+                                        "description"                  : "Allow inbound traffic from Hub management subnet over SSH",
+                                        "dst_port_max"                 : 22,
+                                        "dst_port_min"                 : 22,
+                                        "protocol"                     : "TCP",
+                                        "src"                          : "10.0.1.0/24",
+                                        "src_type"                     : "CIDR_BLOCK",
+                                        "stateless"                    : false
+                                    }
+                                }
+                            }
+                        },
+
+                        "route_tables": {
+                            "RT-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY": {
+                                "display_name"                         : "nsg-fra-lz-shared-exacs-proj1-db",
+
+                                "route_rules": {
+                                    "drg_route": {
+                                        "description"                  : "Route to the 0.0.0.0/0 through DRG",
+                                        "destination"                  : "0.0.0.0/0",
+                                        "destination_type"             : "CIDR_BLOCK",
+                                        "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "sgw_route": {
+                                        "description"                  : "Route to Oracle Services Network through Service GW",
+                                        "destination"                  : "all-services",
+                                        "destination_type"             : "SERVICE_CIDR_BLOCK",
+                                        "network_entity_key"           : "SGW-FRA-LZ-SHARED_EXACS-KEY"
+                                    }
+                                }
+                            }
+                        },
+
+                        "security_lists": {
+                            "SL-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY": {
+                                "display_name"                         : "rt-fra-lz-shared-exacs-exacs-generic",
+
+                                "egress_rules": [
+                                    {
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over ALL protocols",
+                                        "dst"                          : "0.0.0.0/0",
+                                        "dst_type"                     : "CIDR_BLOCK",
+                                        "protocol"                     : "ALL",
+                                        "stateless"                    : false
+                                    },
+                                    {
+                                        "description"                  : "Allow outbound traffic to Oracle Services Network over ALL protocols",
+                                        "dst"                          : "all-services",
+                                        "dst_type"                     : "SERVICE_CIDR_BLOCK",
+                                        "protocol"                     : "ALL",
+                                        "stateless"                    : false
+                                    }
+                                ],
+
+                                "ingress_rules": [
+                                    {
+                                        "description"                  : "ICMP type 3 code 4",
+                                        "icmp_code"                    : 4,
+                                        "icmp_type"                    : 3,
+                                        "protocol"                     : "ICMP",
+                                        "src"                          : "0.0.0.0/0",
+                                        "src_type"                     : "CIDR_BLOCK",
+                                        "stateless"                    : false
+                                    },
+                                    {
+                                        "description"                  : "ICMP type 3",
+                                        "icmp_type"                    : 3,
+                                        "protocol"                     : "ICMP",
+                                        "src"                          : "10.0.24.0/21",
+                                        "src_type"                     : "CIDR_BLOCK",
+                                        "stateless"                    : false
+                                    },
+                                    {
+                                        "description"                  : "Allow inbound ICMP type 8 (Echo) from Hub VCN",
+                                        "icmp_code"                    : 0,
+                                        "icmp_type"                    : 8,
+                                        "protocol"                     : "ICMP",
+                                        "src"                          : "10.0.0.0/21",
+                                        "src_type"                     : "CIDR_BLOCK",
+                                        "stateless"                    : false
+                                    }
+                                ]
+                            }
+                        },
+
+                        "subnets": {
+                            "SN-FRA-LZ-SHARED_EXACS-BCK-KEY": {
+                                "cidr_block"                           : "10.0.25.0/24",
+                                "dhcp_options_key"                     : "default_dhcp_options",
+                                "display_name"                         : "sn-fra-lz-shared-exacs-bck",
+                                "dns_label"                            : "snfralzsexacsbck",
+                                "prohibit_internet_ingress"            : true,
+                                "prohibit_public_ip_on_vnic"           : true,
+                                "route_table_key"                      : "RT-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY",
+                                "security_list_keys"                   : ["SL-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY"]
+                            },
+
+                            "SN-FRA-LZ-SHARED_EXACS-DB-KEY": {
+                                "cidr_block"                           : "10.0.24.0/24",
+                                "dhcp_options_key"                     : "default_dhcp_options",
+                                "display_name"                         : "sn-fra-lz-shared-exacs-db",
+                                "dns_label"                            : "snfralzsexacsdb",
+                                "prohibit_internet_ingress"            : true,
+                                "prohibit_public_ip_on_vnic"           : true,
+                                "route_table_key"                      : "RT-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY",
+                                "security_list_keys"                   : ["SL-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY"]
+                            }
+                        },
+
+                        "vcn_specific_gateways": {
+                            "service_gateways": {
+                                "SGW-FRA-LZ-SHARED_EXACS-EXACS-KEY": {
+                                    "display_name"                     : "sl-fra-lz-shared-exacs-exacs-generic",
                                     "services"                         : "all-services"
                                 }
                             }
