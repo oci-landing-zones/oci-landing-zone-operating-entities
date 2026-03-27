@@ -6,29 +6,36 @@
 
                 "vcns": {
                     "VCN-FRA-LZ-SHARED-EXACS-KEY": {
-                        "block_nat_traffic"                    : false,
-                        "cidr_blocks"                          : ["10.0.24.0/21"],
                         "display_name"                         : "vcn-fra-lz-shared-exacs",
+                        "cidr_blocks"                          : ["10.0.24.0/21"],
                         "dns_label"                            : "vcnfralzsexacs",
+                        "block_nat_traffic"                    : false,
                         "is_attach_drg"                        : false,
                         "is_create_igw"                        : false,
                         "is_ipv6enabled"                       : false,
                         "is_oracle_gua_allocation_enabled"     : false,
 
-                        "network_security_groups": {
-                            "NSG-FRA-LZ-SHARED-EXACS-DB-KEY": {
-                                "display_name"                 : "nsg-fra-lz-shared-exacs-db",
+                        "subnets": {
+                            "SN-FRA-LZ-SHARED-EXACS-DB-BCK-KEY": {
+                                "display_name"                 : "sn-fra-lzp-exacs-db-bck",
+                                "cidr_block"                   : "10.0.24.0/24",
+                                "dns_label"                    : "snfralsexacsbck",
+                                "dhcp_options_key"             : "default_dhcp_options",
+                                "prohibit_internet_ingress"    : true,
+                                "prohibit_public_ip_on_vnic"   : true,
+                                "route_table_key"              : "RT-FRA-LZ-SHARED-EXACS-DB-BCK-KEY",
+                                "security_list_keys"           : ["SL-FRA-LZ-SHARED-EXACS-DB-BCK-KEY"]
+                            },
 
-                                "egress_rules": {
-                                    "anywhere": {
-                                        "description"          : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
-                                        "dst"                  : "0.0.0.0/0",
-                                        "dst_type"             : "CIDR_BLOCK",
-                                        "protocol"             : "TCP",
-                                        "stateless"            : false
-                                    }
-                                },
-                                "ingress_rules"                : {}
+                            "SN-FRA-LZ-SHARED-EXACS-DB-KEY": {
+                                "display_name"                 : "sn-fra-lz-exacs-db",
+                                "cidr_block"                   : "10.0.24.0/24",
+                                "dns_label"                    : "snfralpexacsdb",
+                                "dhcp_options_key"             : "default_dhcp_options",
+                                "prohibit_internet_ingress"    : true,
+                                "prohibit_public_ip_on_vnic"   : true,
+                                "route_table_key"              : "RT-FRA-LZ-SHARED-EXACS-DB-KEY",
+                                "security_list_keys"           : ["SL-FRA-LZ-SHARED-EXACS-DB-KEY"]
                             }
                         },
 
@@ -69,8 +76,38 @@
 
                         "security_lists": {
                             "SL-FRA-LZ-SHARED-EXACS-BD-BCK-KEY": {
-                                "defined_tags"                 : null,
                                 "display_name"                 : "sl-fra-lz-shared-exacs-db-bck",
+                                "defined_tags"                 : null,
+                                "freeform_tags"                : null,
+
+                                "ingress_rules": [
+                                    {
+                                        "description"          : "ICMP type 3 code 4",
+                                        "src"                  : "0.0.0.0/0",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "protocol"             : "ICMP",
+                                        "icmp_type"            : 3,
+                                        "icmp_code"            : 4,
+                                        "stateless"            : false
+                                    },
+                                    {
+                                        "description"          : "ICMP type 3",
+                                        "src"                  : "10.0.24.0/21",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "protocol"             : "ICMP",
+                                        "icmp_type"            : 3,
+                                        "stateless"            : false
+                                    },
+                                    {
+                                        "description"          : "Allow inbound ICMP type 8 (Echo) from Hub VCN",
+                                        "src"                  : "10.0.0.0/21",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "protocol"             : "ICMP",
+                                        "icmp_type"            : 8,
+                                        "icmp_code"            : 0,
+                                        "stateless"            : false
+                                    }
+                                ],
 
                                 "egress_rules": [
                                     {
@@ -85,44 +122,44 @@
                                         "dst"                  : "all-services",
                                         "dst_type"             : "SERVICE_CIDR_BLOCK",
                                         "protocol"             : "ALL",
-                                        "stateless"            : false
-                                    }
-                                ],
-                                "freeform_tags"                : null,
-
-                                "ingress_rules": [
-                                    {
-                                        "description"          : "ICMP type 3 code 4",
-                                        "icmp_code"            : 4,
-                                        "icmp_type"            : 3,
-                                        "protocol"             : "ICMP",
-                                        "src"                  : "0.0.0.0/0",
-                                        "src_type"             : "CIDR_BLOCK",
-                                        "stateless"            : false
-                                    },
-                                    {
-                                        "description"          : "ICMP type 3",
-                                        "icmp_type"            : 3,
-                                        "protocol"             : "ICMP",
-                                        "src"                  : "10.0.24.0/21",
-                                        "src_type"             : "CIDR_BLOCK",
-                                        "stateless"            : false
-                                    },
-                                    {
-                                        "description"          : "Allow inbound ICMP type 8 (Echo) from Hub VCN",
-                                        "icmp_code"            : 0,
-                                        "icmp_type"            : 8,
-                                        "protocol"             : "ICMP",
-                                        "src"                  : "10.0.0.0/21",
-                                        "src_type"             : "CIDR_BLOCK",
                                         "stateless"            : false
                                     }
                                 ]
                             },
 
                             "SL-FRA-LZ-SHARED-EXACS-BD-KEY": {
-                                "defined_tags"                 : null,
                                 "display_name"                 : "sl-fra-lz-shared-exacs-db",
+                                "defined_tags"                 : null,
+                                "freeform_tags"                : null,
+
+                                "ingress_rules": [
+                                    {
+                                        "description"          : "ICMP type 3 code 4",
+                                        "src"                  : "0.0.0.0/0",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "protocol"             : "ICMP",
+                                        "icmp_type"            : 3,
+                                        "icmp_code"            : 4,
+                                        "stateless"            : false
+                                    },
+                                    {
+                                        "description"          : "ICMP type 3",
+                                        "src"                  : "10.0.24.0/21",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "protocol"             : "ICMP",
+                                        "icmp_type"            : 3,
+                                        "stateless"            : false
+                                    },
+                                    {
+                                        "description"          : "Allow inbound ICMP type 8 (Echo) from Hub VCN",
+                                        "src"                  : "10.0.0.0/21",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "protocol"             : "ICMP",
+                                        "icmp_type"            : 8,
+                                        "icmp_code"            : 0,
+                                        "stateless"            : false
+                                    }
+                                ],
 
                                 "egress_rules": [
                                     {
@@ -139,61 +176,24 @@
                                         "protocol"             : "ALL",
                                         "stateless"            : false
                                     }
-                                ],
-                                "freeform_tags"                : null,
-
-                                "ingress_rules": [
-                                    {
-                                        "description"          : "ICMP type 3 code 4",
-                                        "icmp_code"            : 4,
-                                        "icmp_type"            : 3,
-                                        "protocol"             : "ICMP",
-                                        "src"                  : "0.0.0.0/0",
-                                        "src_type"             : "CIDR_BLOCK",
-                                        "stateless"            : false
-                                    },
-                                    {
-                                        "description"          : "ICMP type 3",
-                                        "icmp_type"            : 3,
-                                        "protocol"             : "ICMP",
-                                        "src"                  : "10.0.24.0/21",
-                                        "src_type"             : "CIDR_BLOCK",
-                                        "stateless"            : false
-                                    },
-                                    {
-                                        "description"          : "Allow inbound ICMP type 8 (Echo) from Hub VCN",
-                                        "icmp_code"            : 0,
-                                        "icmp_type"            : 8,
-                                        "protocol"             : "ICMP",
-                                        "src"                  : "10.0.0.0/21",
-                                        "src_type"             : "CIDR_BLOCK",
-                                        "stateless"            : false
-                                    }
                                 ]
                             }
                         },
 
-                        "subnets": {
-                            "SN-FRA-LZ-SHARED-EXACS-DB-BCK-KEY": {
-                                "cidr_block"                   : "10.0.24.0/24",
-                                "dhcp_options_key"             : "default_dhcp_options",
-                                "display_name"                 : "sn-fra-lzp-exacs-db-bck",
-                                "dns_label"                    : "snfralsexacsbck",
-                                "prohibit_internet_ingress"    : true,
-                                "prohibit_public_ip_on_vnic"   : true,
-                                "route_table_key"              : "RT-FRA-LZ-SHARED-EXACS-DB-BCK-KEY",
-                                "security_list_keys"           : ["SL-FRA-LZ-SHARED-EXACS-DB-BCK-KEY"]
-                            },
+                        "network_security_groups": {
+                            "NSG-FRA-LZ-SHARED-EXACS-DB-KEY": {
+                                "display_name"                 : "nsg-fra-lz-shared-exacs-db",
+                                "ingress_rules"                : {},
 
-                            "SN-FRA-LZ-SHARED-EXACS-DB-KEY": {
-                                "cidr_block"                   : "10.0.24.0/24",
-                                "dhcp_options_key"             : "default_dhcp_options",
-                                "display_name"                 : "sn-fra-lz-exacs-db",
-                                "dns_label"                    : "snfralpexacsdb",
-                                "prohibit_internet_ingress"    : true,
-                                "prohibit_public_ip_on_vnic"   : true,
-                                "route_table_key"              : "RT-FRA-LZ-SHARED-EXACS-DB-KEY",
-                                "security_list_keys"           : ["SL-FRA-LZ-SHARED-EXACS-DB-KEY"]
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"          : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                  : "0.0.0.0/0",
+                                        "dst_type"             : "CIDR_BLOCK",
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    }
+                                }
                             }
                         },
 
