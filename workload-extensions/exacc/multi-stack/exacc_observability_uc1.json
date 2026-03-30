@@ -203,8 +203,27 @@
                 ]
             },
 
-            "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-INFRA-KEY": {
+            "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-VMC-KEY": {
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
+                "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACC-INFRA-WORKLOADS-KEY"],
+                "event_display_name"                         : "rul-lz-notify-on-exacc-vmc-events",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
+                    "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
+                    "com.oraclecloud.databaseservice.changevmclustercompartment",
+                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
+                    "com.oraclecloud.databaseservice.deletevmcluster.end",
+                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
+                    "com.oraclecloud.databaseservice.updatevmcluster.end",
+                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
+                    "com.oraclecloud.databaseservice.patchvmcluster.end"
+            
+                ]
+            },
+
+            "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-INFRA-KEY": {
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACC-INFRA-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACC-INFRA-WORKLOADS-KEY"],
                 "event_display_name"                         : "rul-lz-notify-on-exacc-infra-events",
 
@@ -215,20 +234,6 @@
                     "com.oraclecloud.databaseservice.updateexadatainfrastructure.begin",
                     "com.oraclecloud.databaseservice.updateexadatainfrastructure.end",
                     "com.oraclecloud.databaseservice.exadatainfrastructureconnectstatus",
-                    "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
-                    "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
-                    "com.oraclecloud.databaseservice.changevmclustercompartment",
-                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
-                    "com.oraclecloud.databaseservice.deletevmcluster.end",
-                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
-                    "com.oraclecloud.databaseservice.updatevmcluster.end",
-                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
-                    "com.oraclecloud.databaseservice.patchvmcluster.end",
-                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenancereminder",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.begin",
                     "com.oraclecloud.databaseservice.exaccinfrastructuremaintenance.end",
