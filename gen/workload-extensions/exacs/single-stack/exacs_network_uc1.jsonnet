@@ -4,4 +4,5 @@ local ip = import '../../../../gen/addons/oci-hub-models/subnetting.libsonnet';
 
 compose(hub, ip.hub_e,
   spoke_route_tables=['RT-FRA-LZ-HUB-LB-KEY', 'RT-FRA-LZ-HUB-FW-INT-KEY', 'RT-FRA-LZ-HUB-MGMT-KEY'],
-  fw_nsg_key='NSG-FRA-LZ-HUB-FW-INT-KEY')
+  fw_nsg_key='NSG-FRA-LZ-HUB-FW-INT-KEY',
+  has_spoke_natgw=true)

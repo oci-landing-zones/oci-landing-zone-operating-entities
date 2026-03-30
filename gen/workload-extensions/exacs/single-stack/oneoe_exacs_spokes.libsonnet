@@ -55,7 +55,7 @@ function(mgmt_cidr, lb_cidr, has_spoke_natgw=false) {
       match_criteria: {
         match_type: 'DRG_ATTACHMENT_ID',
         attachment_type: 'VCN',
-        drg_attachment_key: 'DRGATT-FRA-LZ-%s-PROJ-KEY' % std.asciiUpper(s.name),
+        drg_attachment_key: 'DRGATT-FRA-LZ-%s-KEY' % std.asciiUpper(s.name),
       },
     }
     for s in spokes
@@ -70,7 +70,7 @@ function(mgmt_cidr, lb_cidr, has_spoke_natgw=false) {
       match_criteria: {
         match_type: 'DRG_ATTACHMENT_ID',
         attachment_type: 'VCN',
-        drg_attachment_key: 'DRGATT-FRA-LZ-%s-PROJ-KEY' % std.asciiUpper(s.name),
+        drg_attachment_key: 'DRGATT-FRA-LZ-%s-KEY' % std.asciiUpper(s.name),
       },
     }
     for s in spokes
@@ -139,7 +139,7 @@ function(mgmt_cidr, lb_cidr, has_spoke_natgw=false) {
   //   Empty for Hub A/B/C where cross-spoke traffic goes through the firewall.
   //   Format: [{ name: 'PreProd', vcn: '<cidr>' }]
   local spoke_category(name, resource_name, direct_spoke_peers=[]) =
-    local key = std.asciiUpper(std.strReplace(resource_name, '-', '_'));
+    local key = std.asciiUpper(resource_name);
     local key_hyphen = std.asciiUpper(resource_name);
     local dns =
       if name == 'prod' then 'p'
@@ -155,7 +155,7 @@ function(mgmt_cidr, lb_cidr, has_spoke_natgw=false) {
     local rt_key = 'RT-FRA-LZ-%s-PROJ-GENERIC-KEY' % key;
     local sl_key = 'SL-FRA-LZ-%s-PROJ-GENERIC-KEY' % key;
     local web_nsg_key = 'NSG-FRA-LZ-%s-PROJ1-WEB-KEY' % key;
-    local app_nsg_key = 'NSG-FRA-LZ-%s-PROJ1-APP-KEY' % key;
+    local app_nsg_key = 'NSG-FRA-LZ-%s-APP-KEY' % key;
     local sn(suffix, cidr) =
       {
         ['SN-FRA-LZ-%s-%s-KEY' % [key, std.asciiUpper(suffix)]]: {
@@ -283,6 +283,12 @@ function(mgmt_cidr, lb_cidr, has_spoke_natgw=false) {
                     destination: '0.0.0.0/0',
                     destination_type: 'CIDR_BLOCK',
                     network_entity_key: 'DRG-FRA-LZ-HUB-KEY',
+                  },
+                  natgw_route: {
+                    description: 'Route to the Internet through NAT GW',
+                    destination: '0.0.0.0/0',
+                    destination_type: 'CIDR_BLOCK',
+                    network_entity_key: 'NGW-FRA-LZ-SHARED-EXACS-KEY',
                   },
                 },
             },

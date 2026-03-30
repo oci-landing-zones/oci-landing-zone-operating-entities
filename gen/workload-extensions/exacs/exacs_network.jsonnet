@@ -25,18 +25,18 @@
                 prohibit_internet_ingress: true,
                 prohibit_public_ip_on_vnic: true,
                 route_table_key: 'RT-FRA-LZ-SHARED-EXACS-DB-KEY',
-                security_list_keys: ['SL-FRA-LZ-SHARED-EXACS-DB-KEY'],
+                security_list_keys: ['SL-FRA-LZ-SHARED-EXACS-BD-KEY'],
               },
 
               'SN-FRA-LZ-SHARED-EXACS-DB-BCK-KEY': {
                 display_name: 'sn-fra-lzp-exacs-db-bck',
                 dns_label: 'snfralsexacsbck',
-                cidr_block: '10.0.24.0/24',
+                cidr_block: '10.0.25.0/24',
                 dhcp_options_key: 'default_dhcp_options',
                 prohibit_internet_ingress: true,
                 prohibit_public_ip_on_vnic: true,
                 route_table_key: 'RT-FRA-LZ-SHARED-EXACS-DB-BCK-KEY',
-                security_list_keys: ['SL-FRA-LZ-SHARED-EXACS-DB-BCK-KEY'],
+                security_list_keys: ['SL-FRA-LZ-SHARED-EXACS-BD-BCK-KEY'],
               },
 
             },
@@ -44,7 +44,6 @@
             route_tables: {
               'RT-FRA-LZ-SHARED-EXACS-DB-KEY': {
                 display_name: 'rt-fra-lz-shared-exacs-db',
-
                 route_rules: {
                   sgw_route: {
                     description: 'Route for OCI services',
@@ -52,12 +51,13 @@
                     destination_type: 'SERVICE_CIDR_BLOCK',
                     network_entity_key: 'SGW-FRA-LZ-SHARED-EXACS-KEY',
                   },
-                  drg_route: {
-                    description: 'Route to DRG',
+                
+                  natgw_route: {
+                    description: 'Route to the Internet through NAT GW',
                     destination: '0.0.0.0/0',
-                    destination_type: 'CIDR_BLOCK',
-                    network_entity_key: 'DRG-FRA-LZP-HUB-KEY',
-                  },
+                    destination_type : 'CIDR_BLOCK',
+                    network_entity_key : 'NGW-FRA-LZ-SHARED-EXACS-KEY'
+                    },
                 },
               },
 
@@ -65,12 +65,18 @@
                 display_name: 'rt-fra-lz-shated-exacs-db-bck',
 
                 route_rules: {
-                  sgw_route: {
+                   sgw_route: {
                     description: 'Route for OCI services',
                     destination: 'all-services',
                     destination_type: 'SERVICE_CIDR_BLOCK',
                     network_entity_key: 'SGW-FRA-LZ-SHARED-EXACS-KEY',
                   },
+                  natgw_route: {
+                    description: 'Route to the Internet through NATGW',
+                    destination: '0.0.0.0/0',
+                    destination_type : 'CIDR_BLOCK',
+                    network_entity_key : 'NGW-FRA-LZ-SHARED-EXACS-KEY'
+                    },
                 },
               },
 
@@ -205,12 +211,16 @@
                   display_name: 'sgw-fra-lz-shared-exacs',
                   services: 'all-services',
                 },
+                
+              },
+              nat_gateways: {
+                'NGW-FRA-LZ-SHARED-EXACS-KEY': {
+                  display_name: 'ngw-fra-lz-shared-exacs',
+                },
               },
             },
           },
         },
-
-    
       },
     },
   },

@@ -1,6 +1,4 @@
 {
-
-
   identity_domain_groups_configuration+: {
         default_identity_domain_id   : "COMMON-DOMAIN",
 
@@ -30,8 +28,8 @@
   policies_configuration+: {
     supplied_policies+: {
 
-      "PCY-LZ-EXACC-GENERIC-ADMIN-KEY": {
-        name: 'pcy-lz-shared-exacc-generic',
+      "PCY-LZ-GLOBAL-EXACC-GENERIC-ADMIN-KEY": {
+        name: 'pcy-lz-global-exacc-generic',
         description: 'Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privilegies in all exacc compartments',
         compartment_id: 'TENANCY-ROOT',
         statements: [
@@ -47,8 +45,8 @@
         ],
       },
 
-      "PCY-LZ-EXACC-DB-ADMIN-KEY": {
-        name: 'pcy-lz-shared-exacc-db-admin',
+      "PCY-LZ-GLOBAL-EXACC-DB-ADMIN-KEY": {
+        name: 'pcy-lz-global-exacc-db-admin',
         description: 'Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privilegies in all exacc compartments',
         compartment_id: 'CMP-LANDINGZONE-KEY',
         statements: [
@@ -69,8 +67,8 @@
         ],
       },
 
-      "PCY-LZ-EXACC-INFRA-ADMIN-KEY": {
-       name: "pcy-lz-shared-exacc-infra-admin",
+      "PCY-LZ-GLOBAL-EXACC-INFRA-ADMIN-KEY": {
+       name: "pcy-lz-global-exacc-infra-admin",
        description: "Example policy which allows the grp-lz-global-exacc-infra-admin group users to manage the DB infra in sharead exacc platform compartment.",
        compartment_id: "CMP-LANDINGZONE-KEY",
        statements: [

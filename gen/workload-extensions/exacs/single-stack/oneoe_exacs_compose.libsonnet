@@ -16,7 +16,7 @@
 //   This function uses Jsonnet deep merge (+:) to overlay spoke infrastructure onto the hub addon.
 //   The hub addon is the base, and spoke VCNs are added as separate categories (1-prod, 2-preprod).
 //   See gen/CONVENTIONS.md for the full pre/post deployment pattern.
-function(hub, ip_config, spoke_route_tables, fw_nsg_key=null, has_spoke_natgw=false)
+function(hub, ip_config, spoke_route_tables, fw_nsg_key=null, has_spoke_natgw=true)
   local spokes = (import 'oneoe_exacs_spokes.libsonnet')(ip_config.mgmt_sn, ip_config.lb_sn, has_spoke_natgw);
   hub {
     network_configuration+: {

@@ -352,7 +352,7 @@
                                             "match_criteria": {
                                                 "match_type"           : "DRG_ATTACHMENT_ID",
                                                 "attachment_type"      : "VCN",
-                                                "drg_attachment_key"   : "DRGATT-FRA-LZ-SHARED-EXACS-PROJ-KEY"
+                                                "drg_attachment_key"   : "DRGATT-FRA-LZ-SHARED-EXACS-KEY"
                                             }
                                         }
                                     }
@@ -371,6 +371,17 @@
                                                 "match_type"           : "DRG_ATTACHMENT_ID",
                                                 "attachment_type"      : "VCN",
                                                 "drg_attachment_key"   : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                            }
+                                        },
+
+                                        "ROUTE-TO-VCN-SHARED-EXACS-KEY": {
+                                            "action"                   : "ACCEPT",
+                                            "priority"                 : 20,
+
+                                            "match_criteria": {
+                                                "match_type"           : "DRG_ATTACHMENT_ID",
+                                                "attachment_type"      : "VCN",
+                                                "drg_attachment_key"   : "DRGATT-FRA-LZ-SHARED-EXACS-KEY"
                                             }
                                         }
                                     }
@@ -524,31 +535,31 @@
                         "is_oracle_gua_allocation_enabled"             : false,
 
                         "subnets": {
-                            "SN-FRA-LZ-SHARED_EXACS-DB-KEY": {
+                            "SN-FRA-LZ-SHARED-EXACS-DB-KEY": {
                                 "display_name"                         : "sn-fra-lz-shared-exacs-db",
                                 "cidr_block"                           : "10.0.24.0/24",
                                 "dns_label"                            : "snfralzsexacsdb",
                                 "dhcp_options_key"                     : "default_dhcp_options",
                                 "prohibit_internet_ingress"            : true,
                                 "prohibit_public_ip_on_vnic"           : true,
-                                "route_table_key"                      : "RT-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY",
-                                "security_list_keys"                   : ["SL-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY"]
+                                "route_table_key"                      : "RT-FRA-LZ-SHARED-EXACS-PROJ-GENERIC-KEY",
+                                "security_list_keys"                   : ["SL-FRA-LZ-SHARED-EXACS-PROJ-GENERIC-KEY"]
                             },
 
-                            "SN-FRA-LZ-SHARED_EXACS-BCK-KEY": {
+                            "SN-FRA-LZ-SHARED-EXACS-BCK-KEY": {
                                 "display_name"                         : "sn-fra-lz-shared-exacs-bck",
                                 "cidr_block"                           : "10.0.25.0/24",
                                 "dns_label"                            : "snfralzsexacsbck",
                                 "dhcp_options_key"                     : "default_dhcp_options",
                                 "prohibit_internet_ingress"            : true,
                                 "prohibit_public_ip_on_vnic"           : true,
-                                "route_table_key"                      : "RT-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY",
-                                "security_list_keys"                   : ["SL-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY"]
+                                "route_table_key"                      : "RT-FRA-LZ-SHARED-EXACS-PROJ-GENERIC-KEY",
+                                "security_list_keys"                   : ["SL-FRA-LZ-SHARED-EXACS-PROJ-GENERIC-KEY"]
                             }
                         },
 
                         "route_tables": {
-                            "RT-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY": {
+                            "RT-FRA-LZ-SHARED-EXACS-PROJ-GENERIC-KEY": {
                                 "display_name"                         : "nsg-fra-lz-shared-exacs-db",
 
                                 "route_rules": {
@@ -559,11 +570,18 @@
                                         "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
+                                    "natgw_route": {
+                                        "description"                  : "Route to the Internet through NAT GW",
+                                        "destination"                  : "0.0.0.0/0",
+                                        "destination_type"             : "CIDR_BLOCK",
+                                        "network_entity_key"           : "NGW-FRA-LZ-SHARED-EXACS-KEY"
+                                    },
+
                                     "sgw_route": {
                                         "description"                  : "Route to Oracle Services Network through Service GW",
                                         "destination"                  : "all-services",
                                         "destination_type"             : "SERVICE_CIDR_BLOCK",
-                                        "network_entity_key"           : "SGW-FRA-LZ-SHARED_EXACS-KEY"
+                                        "network_entity_key"           : "SGW-FRA-LZ-SHARED-EXACS-KEY"
                                     }
                                 }
                             }
@@ -575,7 +593,7 @@
                         },
 
                         "security_lists": {
-                            "SL-FRA-LZ-SHARED_EXACS-PROJ-GENERIC-KEY": {
+                            "SL-FRA-LZ-SHARED-EXACS-PROJ-GENERIC-KEY": {
                                 "display_name"                         : "rt-fra-lz-shared-exacs-exacs-generic",
 
                                 "ingress_rules": [
@@ -627,9 +645,9 @@
                         },
 
                         "network_security_groups": {
-                            "NSG-FRA-LZ-SHARED_EXACS-APP-KEY": {
+                            "NSG-FRA-LZ-SHARED-EXACS-APP-KEY": {
                                 "display_name"                         : "nsg-fra-lz-shared-exacs-db",
-                                "compartment_id"                       : "CMP-LZ-SHARED_EXACS-KEY",
+                                "compartment_id"                       : "CMP-LZ-SHARED-EXACS-KEY",
 
                                 "ingress_rules": {
                                     "http_80": {
@@ -674,14 +692,14 @@
                                 }
                             },
 
-                            "NSG-FRA-LZ-SHARED_EXACS-DB-KEY": {
+                            "NSG-FRA-LZ-SHARED-EXACS-DB-KEY": {
                                 "display_name"                         : "nsg-fra-lz-shared-exacs-db",
-                                "compartment_id"                       : "CMP-LZ-SHARED_EXACS-KEY",
+                                "compartment_id"                       : "CMP-LZ-SHARED-EXACS-KEY",
 
                                 "ingress_rules": {
                                     "db_1521": {
                                         "description"                  : "Allow inbound from NSG nsg-fra-lz-shared-exacs-db over TCP 1521",
-                                        "src"                          : "NSG-FRA-LZ-SHARED_EXACS-PROJ1-APP-KEY",
+                                        "src"                          : "NSG-FRA-LZ-SHARED-EXACS-APP-KEY",
                                         "src_type"                     : "NETWORK_SECURITY_GROUP",
                                         "dst_port_min"                 : 1521,
                                         "dst_port_max"                 : 1521,
@@ -704,7 +722,7 @@
 
                         "vcn_specific_gateways": {
                             "service_gateways": {
-                                "SGW-FRA-LZ-SHARED_EXACS-EXACS-KEY": {
+                                "SGW-FRA-LZ-SHARED-EXACS-EXACS-KEY": {
                                     "display_name"                     : "sl-fra-lz-shared-exacs-exacs-generic",
                                     "services"                         : "all-services"
                                 }
