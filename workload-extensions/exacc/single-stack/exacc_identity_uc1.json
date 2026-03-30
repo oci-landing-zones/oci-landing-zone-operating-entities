@@ -1,209 +1,237 @@
 {
     "compartments_configuration": {
+        "enable_delete"                                                        : "true",
+
         "compartments": {
             "CMP-LANDINGZONE-KEY": {
+                "name"                                                         : "cmp-landingzone",
+                "description"                                                  : "Enclosing Production Landing Zone Compartment",
+
                 "children": {
                     "CMP-LZ-NETWORK-KEY": {
+                        "name"                                                 : "cmp-lz-network",
+                        "description"                                          : "Shared Network Compartment",
+
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role"                        : "lz-network-admin"
-                        },
-                        "description"                                          : "Shared Network Compartment",
-                        "name"                                                 : "cmp-lz-network"
+                        }
                     },
 
                     "CMP-LZ-PLATFORM-KEY": {
+                        "name"                                                 : "cmp-lz-platform",
+                        "description"                                          : "Shared Platform Compartment",
+
                         "children": {
                             "CMP-LZ-EXACC-KEY": {
+                                "name"                                         : "cmp-lz-exacc",
+                                "description"                                  : "ExaCC shared Platform",
+
                                 "children": {
                                     "CMP-LZ-EXACC-DB-KEY": {
+                                        "name"                                 : "cmp-lz-exacc-db",
+                                        "description"                          : "Shared exacc Platform, db compartment",
+
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role"        : "lz-exacc-db-admin"
-                                        },
-                                        "description"                          : "Shared exacc Platform, db compartment",
-                                        "name"                                 : "cmp-lz-exacc-db"
+                                        }
                                     },
 
                                     "CMP-LZ-EXACC-INFRA-KEY": {
+                                        "name"                                 : "cmp-lz-exacc-infra",
+                                        "description"                          : "Shared exacc Platform, infra compartment",
+
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role"        : "lz-exacc-infra-admin"
-                                        },
-                                        "description"                          : "Shared exacc Platform, infra compartment",
-                                        "name"                                 : "cmp-lz-exacc-infra"
+                                        }
                                     }
                                 },
 
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role"                : "lz-exacc-admin"
-                                },
-                                "description"                                  : "ExaCC shared Platform",
-                                "name"                                         : "cmp-lz-exacc"
+                                }
                             }
-                        },
-                        "description"                                          : "Shared Platform Compartment",
-                        "name"                                                 : "cmp-lz-platform"
+                        }
                     },
 
                     "CMP-LZ-PREPROD-KEY": {
+                        "name"                                                 : "cmp-lz-preprod",
+                        "description"                                          : "Pre-Production Environment Compartment",
+
                         "children": {
                             "CMP-LZ-PREPROD-NETWORK-KEY": {
+                                "name"                                         : "cmp-lz-preprod-network",
+                                "description"                                  : "Pre-Production Workload Environment, Common Network Compartment",
+
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role"                : "lz-network-admin"
-                                },
-                                "description"                                  : "Pre-Production Workload Environment, Common Network Compartment",
-                                "name"                                         : "cmp-lz-preprod-network"
+                                }
                             },
 
                             "CMP-LZ-PREPROD-PLATFORM-KEY": {
+                                "name"                                         : "cmp-lz-preprod-platform",
+                                "description"                                  : "Pre-Production Workload Environment, Common Platform Compartment",
+
                                 "children": {
                                     "CMP-LZ-PREPROD-EXACC-KEY": {
+                                        "name"                                 : "cmp-lz-preprod-exacc",
+                                        "description"                          : "ExaCC Shared Platform",
+
                                         "children": {
                                             "CMP-LZ-PREPROD-EXACC-DB-KEY": {
+                                                "name"                         : "cmp-lz-preprod-exacc-db",
+                                                "description"                  : "Shared exacc Platform, db compartment",
+
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
-                                                },
-                                                "description"                  : "Shared exacc Platform, db compartment",
-                                                "name"                         : "cmp-lz-preprod-exacc-db"
+                                                }
                                             },
 
                                             "CMP-LZ-PREPROD-EXACC-INFRA-KEY": {
+                                                "name"                         : "cmp-lz-preprod-exacc-infra",
+                                                "description"                  : "Shared exacc Platform, infra compartment",
+
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
-                                                },
-                                                "description"                  : "Shared exacc Platform, infra compartment",
-                                                "name"                         : "cmp-lz-preprod-exacc-infra"
+                                                }
                                             }
                                         },
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role"        : "lz-exacc-admin"
-                                        },
-                                        "description"                          : "ExaCC Shared Platform",
-                                        "name"                                 : "cmp-lz-preprod-exacc"
+                                        }
                                     }
-                                },
-                                "description"                                  : "Pre-Production Workload Environment, Common Platform Compartment",
-                                "name"                                         : "cmp-lz-preprod-platform"
+                                }
                             },
 
                             "CMP-LZ-PREPROD-PROJECTS-KEY": {
+                                "name"                                         : "cmp-lz-preprod-projects",
+                                "description"                                  : "One-OE Pre-Production Workload Environment, Common Projects Compartment",
+
                                 "children": {
                                     "CMP-LZ-PREPROD-PROJ1-KEY": {
+                                        "name"                                 : "cmp-lz-preprod-proj1",
+                                        "description"                          : "Pre-Production environment, Project 1 compartment",
+
                                         "children": {
                                             "CMP-LZ-PREPROD-PROJ1-DB-KEY": {
+                                                "name"                         : "cmp-lz-preprod-proj1-db",
+                                                "description"                  : "ExaCC PreProd env database layer",
+
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
-                                                },
-                                                "description"                  : "ExaCC PreProd env database layer",
-                                                "name"                         : "cmp-lz-preprod-proj1-db"
+                                                }
                                             }
-                                        },
-                                        "description"                          : "Pre-Production environment, Project 1 compartment",
-                                        "name"                                 : "cmp-lz-preprod-proj1"
+                                        }
                                     }
-                                },
-                                "description"                                  : "One-OE Pre-Production Workload Environment, Common Projects Compartment",
-                                "name"                                         : "cmp-lz-preprod-projects"
+                                }
                             },
 
                             "CMP-LZ-PREPROD-SECURITY-KEY": {
+                                "name"                                         : "cmp-lz-preprod-security",
+                                "description"                                  : "Pre-Production Workload Environment, Common Security Compartment",
+
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role"                : "lz-security-admin"
-                                },
-                                "description"                                  : "Pre-Production Workload Environment, Common Security Compartment",
-                                "name"                                         : "cmp-lz-preprod-security"
+                                }
                             }
-                        },
-                        "description"                                          : "Pre-Production Environment Compartment",
-                        "name"                                                 : "cmp-lz-preprod"
+                        }
                     },
 
                     "CMP-LZ-PROD-KEY": {
+                        "name"                                                 : "cmp-lz-prod",
+                        "description"                                          : "Production Environment Compartment",
+
                         "children": {
                             "CMP-LZ-PROD-NETWORK-KEY": {
+                                "name"                                         : "cmp-lz-prod-network",
+                                "description"                                  : "Prod Workload Environment, Common Network Compartment",
+
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role"                : "lz-network-admin"
-                                },
-                                "description"                                  : "Prod Workload Environment, Common Network Compartment",
-                                "name"                                         : "cmp-lz-prod-network"
+                                }
                             },
 
                             "CMP-LZ-PROD-PLATFORM-KEY": {
+                                "name"                                         : "cmp-lz-prod-platform",
+                                "description"                                  : "Production Workload Environment, Common Platform Compartment",
+
                                 "children": {
                                     "CMP-LZ-PROD-EXACC-KEY": {
+                                        "name"                                 : "cmp-lz-prod-exacc",
+                                        "description"                          : "ExaCC Shared Platform",
+
                                         "children": {
                                             "CMP-LZ-PROD-EXACC-DB-KEY": {
+                                                "name"                         : "cmp-lz-prod-exacc-db",
+                                                "description"                  : "Shared exacc Platform, db compartment",
+
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
-                                                },
-                                                "description"                  : "Shared exacc Platform, db compartment",
-                                                "name"                         : "cmp-lz-prod-exacc-db"
+                                                }
                                             },
 
                                             "CMP-LZ-PROD-EXACC-INFRA-KEY": {
+                                                "name"                         : "cmp-lz-prod-exacc-infra",
+                                                "description"                  : "Shared exacc Platform, infra compartment",
+
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
-                                                },
-                                                "description"                  : "Shared exacc Platform, infra compartment",
-                                                "name"                         : "cmp-lz-prod-exacc-infra"
+                                                }
                                             }
                                         },
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role"        : "lz-exacc-admin"
-                                        },
-                                        "description"                          : "ExaCC Shared Platform",
-                                        "name"                                 : "cmp-lz-prod-exacc"
+                                        }
                                     }
-                                },
-                                "description"                                  : "Production Workload Environment, Common Platform Compartment",
-                                "name"                                         : "cmp-lz-prod-platform"
+                                }
                             },
 
                             "CMP-LZ-PROD-PROJECTS-KEY": {
+                                "name"                                         : "cmp-lz-prod-projects",
+                                "description"                                  : "One-OE Production Workload Environment, Common Projects Compartment",
+
                                 "children": {
                                     "CMP-LZ-PROD-PROJ1-KEY": {
+                                        "name"                                 : "cmp-lz-prod-proj1",
+                                        "description"                          : "Production environment, Project 1 Compartment",
+
                                         "children": {
                                             "CMP-LZ-PROD-PROJ1-DB-KEY": {
+                                                "name"                         : "cmp-lz-prod-proj1-db",
+                                                "description"                  : "ExaCC Prod env database layer",
+
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
-                                                },
-                                                "description"                  : "ExaCC Prod env database layer",
-                                                "name"                         : "cmp-lz-prod-proj1-db"
+                                                }
                                             }
-                                        },
-                                        "description"                          : "Production environment, Project 1 Compartment",
-                                        "name"                                 : "cmp-lz-prod-proj1"
+                                        }
                                     }
-                                },
-                                "description"                                  : "One-OE Production Workload Environment, Common Projects Compartment",
-                                "name"                                         : "cmp-lz-prod-projects"
+                                }
                             },
 
                             "CMP-LZ-PROD-SECURITY-KEY": {
+                                "name"                                         : "cmp-lz-prod-security",
+                                "description"                                  : "Production Workload Environment, Common Security Compartment",
+
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role"                : "lz-security-admin"
-                                },
-                                "description"                                  : "Production Workload Environment, Common Security Compartment",
-                                "name"                                         : "cmp-lz-prod-security"
+                                }
                             }
-                        },
-                        "description"                                          : "Production Environment Compartment",
-                        "name"                                                 : "cmp-lz-prod"
+                        }
                     },
 
                     "CMP-LZ-SECURITY-KEY": {
+                        "name"                                                 : "cmp-lz-security",
+                        "description"                                          : "Shared Security Compartment",
+
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role"                        : "lz-security-admin"
-                        },
-                        "description"                                          : "Shared Security Compartment",
-                        "name"                                                 : "cmp-lz-security"
+                        }
                     }
-                },
-                "description"                                                  : "Enclosing Production Landing Zone Compartment",
-                "name"                                                         : "cmp-landingzone"
+                }
             }
-        },
-        "enable_delete"                                                        : "true"
+        }
     },
 
     "identity_domain_groups_configuration": {
@@ -211,63 +239,63 @@
 
         "groups": {
             "GRP-AUDITORS-ADMIN-KEY": {
-                "description"                                                  : "Tenancy global read access group(for security auditing or health checks).",
-                "name"                                                         : "grp-auditors-admin"
+                "name"                                                         : "grp-auditors-admin",
+                "description"                                                  : "Tenancy global read access group(for security auditing or health checks)."
             },
 
             "GRP-COST-ADMIN-KEY": {
-                "description"                                                  : "Tenancy global cost control group.",
-                "name"                                                         : "grp-cost-admin"
+                "name"                                                         : "grp-cost-admin",
+                "description"                                                  : "Tenancy global cost control group."
             },
 
             "GRP-IAM-ADMIN-KEY": {
-                "description"                                                  : "Tenancy global Identity and access management administrator group.",
-                "name"                                                         : "grp-iam-admin"
+                "name"                                                         : "grp-iam-admin",
+                "description"                                                  : "Tenancy global Identity and access management administrator group."
             },
 
             "GRP-LZ-GLOBAL-DB-ADMIN-KEY": {
-                "description"                                                  : "Global DBA team admin group",
-                "name"                                                         : "grp-lz-exacc-db-admin"
+                "name"                                                         : "grp-lz-global-exacc-db-admin",
+                "description"                                                  : "Global DBA team admin group"
             },
 
             "GRP-LZ-GLOBAL-INFRA-ADMIN-KEY": {
-                "description"                                                  : "Global Infra Team admin group",
-                "name"                                                         : "grp-lz-exacc-infra-admin"
+                "name"                                                         : "grp-lz-global-exacc-infra-admin",
+                "description"                                                  : "Global Infra Team admin group"
             },
 
             "GRP-LZ-NETWORK-ADMIN-KEY": {
-                "description"                                                  : "One-OE Landing Zone, Shared network administration group.",
-                "name"                                                         : "grp-lz-network-admin"
+                "name"                                                         : "grp-lz-network-admin",
+                "description"                                                  : "One-OE Landing Zone, Shared network administration group."
             },
 
             "GRP-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
-                "description"                                                  : "Dedicated team to manage exacc db layer in proj1, prod environment",
-                "name"                                                         : "grp-lz-preprod-proj1-exacc-admin"
+                "name"                                                         : "grp-lz-preprod-proj1-exacc-admin",
+                "description"                                                  : "Dedicated team to manage exacc db layer in proj1, prod environment"
             },
 
             "GRP-LZ-PREPROD-PROJ1-ADMIN-KEY": {
-                "description"                                                  : "One-OE Landing Zone, Pre-Production environment, Project 1, Administrators.",
-                "name"                                                         : "grp-lz-preprod-proj1-admin"
+                "name"                                                         : "grp-lz-preprod-proj1-admin",
+                "description"                                                  : "One-OE Landing Zone, Pre-Production environment, Project 1, Administrators."
             },
 
             "GRP-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
-                "description"                                                  : "Dedicated team to manage exacc db layer in proj1, prod environment",
-                "name"                                                         : "grp-lz-prod-proj1-exacc-admin"
+                "name"                                                         : "grp-lz-prod-proj1-exacc-admin",
+                "description"                                                  : "Dedicated team to manage exacc db layer in proj1, prod environment"
             },
 
             "GRP-LZ-PROD-PROJ1-ADMIN-KEY": {
-                "description"                                                  : "One-OE Landing Zone, Production environment, Project 1, Administrators.",
-                "name"                                                         : "grp-lz-prod-proj1-admin"
+                "name"                                                         : "grp-lz-prod-proj1-admin",
+                "description"                                                  : "One-OE Landing Zone, Production environment, Project 1, Administrators."
             },
 
             "GRP-LZ-SECURITY-ADMIN-KEY": {
-                "description"                                                  : "One-OE Landing Zone, Shared security administration group",
-                "name"                                                         : "grp-lz-security-admin"
+                "name"                                                         : "grp-lz-security-admin",
+                "description"                                                  : "One-OE Landing Zone, Shared security administration group"
             },
 
             "GRP-SECURITY-ADMIN-KEY": {
-                "description"                                                  : "Tenancy Security Administrators for global resources as Cloud Guard.",
-                "name"                                                         : "grp-security-admin"
+                "name"                                                         : "grp-security-admin",
+                "description"                                                  : "Tenancy Security Administrators for global resources as Cloud Guard."
             }
         }
     },
@@ -279,14 +307,14 @@
 
         "identity_domains": {
             "COMMON-DOMAIN": {
+                "display_name"                                                 : "id_lz_common",
+                "description"                                                  : "One-OE LZ common Identity Domain",
+                "compartment_id"                                               : null,
                 "admin_email"                                                  : null,
                 "admin_first_name"                                             : null,
                 "admin_last_name"                                              : null,
                 "admin_user_name"                                              : null,
                 "allow_signing_cert_public_access"                             : false,
-                "compartment_id"                                               : null,
-                "description"                                                  : "One-OE LZ common Identity Domain",
-                "display_name"                                                 : "id_lz_common",
                 "home_region"                                                  : null,
                 "is_hidden_on_login"                                           : false,
                 "is_notification_bypassed"                                     : false,
@@ -302,9 +330,9 @@
 
         "supplied_policies": {
             "PCY-AUDITING-ADMIN-KEY": {
-                "compartment_id"                                               : "TENANCY-ROOT",
-                "description"                                                  : "Allow grp-auditors-admin group users to read all the resources in the tenancy.",
                 "name"                                                         : "pcy-auditing-admin",
+                "description"                                                  : "Allow grp-auditors-admin group users to read all the resources in the tenancy.",
+                "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-auditors-admin' to inspect all-resources in tenancy",
@@ -333,9 +361,9 @@
             },
 
             "PCY-COST-ADMIN-KEY": {
-                "compartment_id"                                               : "TENANCY-ROOT",
-                "description"                                                  : "Allow grp-cost-admin group users to manage all budget resources in the tenancy.",
                 "name"                                                         : "pcy-cost-admin",
+                "description"                                                  : "Allow grp-cost-admin group users to manage all budget resources in the tenancy.",
+                "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
                     "define tenancy usage-report as ocid1.tenancy.oc1..aaaaaaaaned4fkpkisbwjlr56u7cj63lf3wffbilvqknstgtvzub7vhqkggq",
@@ -346,9 +374,9 @@
             },
 
             "PCY-GENERIC-ADMIN-KEY": {
-                "compartment_id"                                               : "TENANCY-ROOT",
-                "description"                                                  : "Allow defined groups to use generic services.",
                 "name"                                                         : "pcy-generic-admin",
+                "description"                                                  : "Allow defined groups to use generic services.",
+                "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-iam-admin', 'id_lz_common'/'grp-auditors-admin', 'id_lz_common'/'grp-security-admin', 'id_lz_common'/'grp-lz-network-admin' to use cloud-shell in tenancy",
@@ -361,9 +389,9 @@
             },
 
             "PCY-IAM-ADMIN-KEY": {
-                "compartment_id"                                               : "TENANCY-ROOT",
-                "description"                                                  : "Allow grp-iam-admin group users to manage IAM resources in the tenancy.",
                 "name"                                                         : "pcy-iam-admin",
+                "description"                                                  : "Allow grp-iam-admin group users to manage IAM resources in the tenancy.",
+                "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-iam-admin' to manage policies in tenancy",
@@ -382,76 +410,76 @@
                 ]
             },
 
-            "PCY-LZ-EXACC-INFRA-ADMIN-KEY": {
+            "PCY-LZ-EXACC-DB-ADMIN-KEY": {
+                "name"                                                         : "pcy-lz-shared-exacc-db-admin",
+                "description"                                                  : "Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privilegies in all exacc compartments",
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
-                "description"                                                  : "Example policy which allows the grp-lz-exacc-infra-admin group users to manage the DB infra in sharead exacc platform compartment.",
-                "name"                                                         : "pcy-lz-exacc-infra-admin",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage exadata-infrastructures in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage scheduling-policies in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage scheduling-windows in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage execution-windows in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage vmclusters in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin')), request.permission !='VM_CLUSTER_UPDATE_GI_SOFTWARE', request.permission !='VM_CLUSTER_UPDATE_EXADATA_STORAGE'}",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to use dbServers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage dbnode-console-connection in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage dbnode-console-history in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage autonomous-vmclusters in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to use subnets in compartment cmp-landingzone  where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to use dns in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin' to manage db-nodes in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))"
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage data-safe-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to use exadata-infrastructures in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin')), request.operation !='ValidateVmClusterNetwork',request.operation !='ActivateExadataInfrastructure',request.operation !='ChangeExadataInfrastructureCompartment',request.operation !='AddStorageCapacityExadataInfrastructure',request.operation !='CreateVmClusterNetwork',request.operation !='CreateVmClusterNetwork',request.operation !='UpdateVmClusterNetwork',request.operation !='DeleteVmClusterNetwork'}",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to use vmclusters in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin')), request.permission !='VM_CLUSTER_UPDATE_SSH_KEY', request.permission !='VM_CLUSTER_UPDATE_CPU',request.permission !='VM_CLUSTER_UPDATE_MEMORY',request.permission !='VM_CLUSTER_UPDATE_LOCAL_STORAGE',request.permission !='VM_CLUSTER_UPDATE_FILE_SYSTEM'}",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage backups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage database-software-image in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage db-homes in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage pluggable-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage autonomous-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage autonomous-backups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage autonomous-container-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))"
                 ]
             },
 
-            "PCY-LZ-EXACS-DB-ADMIN-KEY": {
-                "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
-                "description"                                                  : "Policy which allows the groups grp-lz-exacc-infra-admin and grp-lz-exacc-db-admin to have shared privilegies in all exacc compartments",
-                "name"                                                         : "pcy-lz-exacc-db-admin",
-
-                "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage data-safe-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to use exadata-infrastructures in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin')), request.operation !='ValidateVmClusterNetwork',request.operation !='ActivateExadataInfrastructure',request.operation !='ChangeExadataInfrastructureCompartment',request.operation !='AddStorageCapacityExadataInfrastructure',request.operation !='CreateVmClusterNetwork',request.operation !='CreateVmClusterNetwork',request.operation !='UpdateVmClusterNetwork',request.operation !='DeleteVmClusterNetwork'}",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to use vmclusters in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin')), request.permission !='VM_CLUSTER_UPDATE_SSH_KEY', request.permission !='VM_CLUSTER_UPDATE_CPU',request.permission !='VM_CLUSTER_UPDATE_MEMORY',request.permission !='VM_CLUSTER_UPDATE_LOCAL_STORAGE',request.permission !='VM_CLUSTER_UPDATE_FILE_SYSTEM'}",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage backups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage database-software-image in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage db-homes in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage pluggable-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage autonomous-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage autonomous-backups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to manage autonomous-container-databases in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-db-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))"
-                ]
-            },
-
-            "PCY-LZ-EXACS-GENERIC-ADMIN-KEY": {
+            "PCY-LZ-EXACC-GENERIC-ADMIN-KEY": {
+                "name"                                                         : "pcy-lz-shared-exacc-generic",
+                "description"                                                  : "Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privilegies in all exacc compartments",
                 "compartment_id"                                               : "TENANCY-ROOT",
-                "description"                                                  : "Policy which allows the groups grp-lz-exacc-infra-admin and grp-lz-exacc-db-admin to have shared privilegies in all exacc compartments",
-                "name"                                                         : "pcy-lz-exacc-generic",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to use cloud-shell in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to read compartments in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-exacc-infra-admin','id_lz_common'/'grp-lz-exacc-db-admin' to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))"
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to use cloud-shell in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to read compartments in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-admin'))"
+                ]
+            },
+
+            "PCY-LZ-EXACC-INFRA-ADMIN-KEY": {
+                "name"                                                         : "pcy-lz-shared-exacc-infra-admin",
+                "description"                                                  : "Example policy which allows the grp-lz-global-exacc-infra-admin group users to manage the DB infra in sharead exacc platform compartment.",
+                "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage exadata-infrastructures in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage scheduling-policies in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage scheduling-windows in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage execution-windows in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage vmclusters in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin')), request.permission !='VM_CLUSTER_UPDATE_GI_SOFTWARE', request.permission !='VM_CLUSTER_UPDATE_EXADATA_STORAGE'}",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to use dbServers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage dbnode-console-connection in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage dbnode-console-history in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage autonomous-vmclusters in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to use subnets in compartment cmp-landingzone  where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to use dns in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage db-nodes in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))"
                 ]
             },
 
             "PCY-LZ-NETWORK-ADMIN-KEY": {
-                "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
-                "description"                                                  : "Allow grp-lz-network-admin group users to manage all network resources in the child compartments of cmp-landingzone with the matching tags.",
                 "name"                                                         : "pcy-lz-network-admin",
+                "description"                                                  : "Allow grp-lz-network-admin group users to manage all network resources in the child compartments of cmp-landingzone with the matching tags.",
+                "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-network-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
@@ -486,9 +514,9 @@
             },
 
             "PCY-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
-                "compartment_id"                                               : "CMP-LZ-PREPROD-PROJ1-DB-KEY",
-                "description"                                                  : "Example policy which allows the grp-lz-preprod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
                 "name"                                                         : "pcy-lz-preprod-exacc-proj1-admin",
+                "description"                                                  : "Example policy which allows the grp-lz-preprod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
+                "compartment_id"                                               : "CMP-LZ-PREPROD-PROJ1-DB-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to read all-resources in compartment cmp-lz-preprod-proj1-db",
@@ -505,9 +533,9 @@
             },
 
             "PCY-LZ-PREPROD-PROJ1-ADMIN-KEY": {
-                "compartment_id"                                               : "CMP-LZ-PREPROD-PROJ1-KEY",
-                "description"                                                  : "Allow grp-lz-preprod-proj1-admin group to manage their dedicated project 1 compartment",
                 "name"                                                         : "pcy-lz-preprod-proj1-admin",
+                "description"                                                  : "Allow grp-lz-preprod-proj1-admin group to manage their dedicated project 1 compartment",
+                "compartment_id"                                               : "CMP-LZ-PREPROD-PROJ1-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read all-resources in compartment cmp-lz-preprod-proj1",
@@ -545,9 +573,9 @@
             },
 
             "PCY-LZ-PREPROD-PROJ1-ADMIN-NET-KEY": {
-                "compartment_id"                                               : "CMP-LZ-PREPROD-NETWORK-KEY",
-                "description"                                                  : "Allow grp-lz-preprod-proj1-admin group to use shared network resources",
                 "name"                                                         : "pcy-lz-preprod-proj1-admin-net",
+                "description"                                                  : "Allow grp-lz-preprod-proj1-admin group to use shared network resources",
+                "compartment_id"                                               : "CMP-LZ-PREPROD-NETWORK-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use virtual-network-family in compartment cmp-lz-preprod-network",
@@ -558,9 +586,9 @@
             },
 
             "PCY-LZ-PREPROD-PROJ1-ADMIN-SEC-KEY": {
-                "compartment_id"                                               : "CMP-LZ-PREPROD-SECURITY-KEY",
-                "description"                                                  : "Allow grp-lz-preprod-proj1-admin group to use shared security resources",
                 "name"                                                         : "pcy-lz-preprod-proj1-admin-sec",
+                "description"                                                  : "Allow grp-lz-preprod-proj1-admin group to use shared security resources",
+                "compartment_id"                                               : "CMP-LZ-PREPROD-SECURITY-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read ons-topics in compartment cmp-lz-preprod-security",
@@ -573,9 +601,9 @@
             },
 
             "PCY-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
-                "compartment_id"                                               : "CMP-LZ-PROD-PROJ1-DB-KEY",
-                "description"                                                  : "Example policy which allows the grp-lz-prod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
                 "name"                                                         : "pcy-lz-prod-exacc-proj1-admin",
+                "description"                                                  : "Example policy which allows the grp-lz-prod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
+                "compartment_id"                                               : "CMP-LZ-PROD-PROJ1-DB-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read all-resources in compartment cmp-lz-prod-proj1-db",
@@ -592,9 +620,9 @@
             },
 
             "PCY-LZ-PROD-PROJ1-ADMIN-KEY": {
-                "compartment_id"                                               : "CMP-LZ-PROD-PROJ1-KEY",
-                "description"                                                  : "Allow grp-lz-prod-proj1-admin group to manage their dedicated project 1 compartment",
                 "name"                                                         : "pcy-lz-prod-proj1-admin",
+                "description"                                                  : "Allow grp-lz-prod-proj1-admin group to manage their dedicated project 1 compartment",
+                "compartment_id"                                               : "CMP-LZ-PROD-PROJ1-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read all-resources in compartment cmp-lz-prod-proj1",
@@ -632,9 +660,9 @@
             },
 
             "PCY-LZ-PROD-PROJ1-ADMIN-NET-KEY": {
-                "compartment_id"                                               : "CMP-LZ-PROD-NETWORK-KEY",
-                "description"                                                  : "Allow grp-lz-prod-proj1-admin group to use shared network resources",
                 "name"                                                         : "pcy-lz-prod-proj1-admin-net",
+                "description"                                                  : "Allow grp-lz-prod-proj1-admin group to use shared network resources",
+                "compartment_id"                                               : "CMP-LZ-PROD-NETWORK-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use virtual-network-family in compartment cmp-lz-prod-network",
@@ -645,9 +673,9 @@
             },
 
             "PCY-LZ-PROD-PROJ1-ADMIN-SEC-KEY": {
-                "compartment_id"                                               : "CMP-LZ-PROD-SECURITY-KEY",
-                "description"                                                  : "Allow grp-lz-prod-proj1-admin group to use shared security resources",
                 "name"                                                         : "pcy-lz-prod-proj1-admin-sec",
+                "description"                                                  : "Allow grp-lz-prod-proj1-admin group to use shared security resources",
+                "compartment_id"                                               : "CMP-LZ-PROD-SECURITY-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read ons-topics in compartment cmp-lz-prod-security",
@@ -660,9 +688,9 @@
             },
 
             "PCY-LZ-SECURITY-ADMIN-KEY": {
-                "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
-                "description"                                                  : "Allow grp-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
                 "name"                                                         : "pcy-lz-security-admin",
+                "description"                                                  : "Allow grp-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
+                "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-namespaces in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
@@ -709,9 +737,9 @@
             },
 
             "PCY-SECURITY-ADMIN-KEY": {
-                "compartment_id"                                               : "TENANCY-ROOT",
-                "description"                                                  : "Allow grp-security-admin group users to manage all security resources in the security compartment.",
                 "name"                                                         : "pcy-security-admin",
+                "description"                                                  : "Allow grp-security-admin group users to manage all security resources in the security compartment.",
+                "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-security-admin' to manage cloudevents-rules in tenancy",
@@ -721,9 +749,9 @@
             },
 
             "PCY-SERVICES-ADMIN-KEY": {
-                "compartment_id"                                               : "TENANCY-ROOT",
-                "description"                                                  : "Policy for all supported services in the tenancy.",
                 "name"                                                         : "pcy-services-admin",
+                "description"                                                  : "Policy for all supported services in the tenancy.",
+                "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
                     "allow service cloudguard to manage cloudevents-rules in tenancy where target.rule.type='managed'",
