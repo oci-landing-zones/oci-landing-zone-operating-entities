@@ -4,16 +4,16 @@
 
 - [**1. Summary**](#1-summary)
 - [**2. Use Cases**](#2-use-cases)
-  - [**2.1 Shared ExaDB-C@C Platorm. Shared Infra and VMCs/AVMCs among environments**](#21-shared-exadb-cc-platorm-shared-infra-and-vmcsavmcs-among-environments)
-    - [**ExaDB-C@C Resources**](#exadb-cc-resources)
+  - [**2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs**](#21-shared-exadb-cc-platform-shared-infra-and-shared-vmcs)
+    - [**ExaDB-C@C Resources LLF**](#exadb-cc-resources-llf)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups)
     - [**ExaDB-C@C Observability**](#exadb-cc-observability)
-  - [**2.2 Hibrid ExaDB-C@C Platforms. Infra shared and Dedicated enviroments VMCs/AVMCs**](#22-hibrid-exadb-cc-platforms-infra-shared-and-dedicated-enviroments-vmcsavmcs)
-    - [**ExaDB-C@C Resources**](#exadb-cc-resources-1)
+  - [**2.2 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#22-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
+    - [**ExaDB-C@C Resources**](#exadb-cc-resources)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups-1)
     - [**ExaDB-C@C Observability**](#exadb-cc-observability-1)
-  - [**2.3 Dedicated ExaDB-C@C Platforms. Dedicated Infra and VMCs/AVMCs per Environment**](#23-dedicated-exadb-cc-platforms-dedicated-infra-and-vmcsavmcs-per-environment)
-    - [**ExaDB-C@C Resources**](#exadb-cc-resources-2)
+  - [**2.3 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**](#23-dedicated-exadb-cc-platform-prod-and-preprod-infra-and-vmcs)
+    - [**ExaDB-C@C Resources**](#exadb-cc-resources-1)
     - [**ExaDB-C@C Groups**](#exadb-cc-groups-2)
     - [**ExaDB-C@C Observability**](#exadb-cc-observability-2)
 - [**3. Design Decisions**](#3-design-decisions)
@@ -36,47 +36,45 @@ This section is intended to guide you on some of the different scenarios.
 
 We have identified 3 main uses cases. 
 
-1. Shared ExaDB-C@C Platorm. Shared Infra and VMCs/AVMCs among environments.
-2. Hibrid ExaDB-C@C Platforms. Infra shared and Dedicated enviroments VMCs/AVMCs.
-3. Dedicated ExaDB-C@C Platforms. Dedicated Infra and VMCs/AVMCs per Environment.
+1. ExaDB-C@C Shared Platorm. Shared Infra and Shared VMCs.
+2. Hibrid ExaDB-C@C Platforms. Infra shared and Dedicated enviroments VMCs.
+3. ExaDB-C@C Environment Dedicated Platforms. Dedicated Infra and Dedicated VMCs per Environment.
 
 Not all possibilities are covered here, but these are likely the most common ones you’ll encounter. These three scenarios address the majority of use cases. If your situation involves a combination, you can draw on elements from the existing scenarios to create a custom solution.
 
-Consider that the ExaDB-C@C Infrastructure is formed of Database and Storage Servers, connected through a RoCE switches fabric, that supports different *Virtual Machine Clusters (VMC)*, known as "regular" VMCs, and/or *Autonomous Virtual Machine Clusters (AVMC)*. Every VMC/AVMC is a set of one or many Virtual Machines running in different Database Servers for high availability given by Grid Infrastructure clusterware software. 
+Consider that the ExaDB-C@C Infrastructure is formed of Database and Storage Servers, connected through a RoCE switches fabric, that supports different *Virtual Machine Clusters (VMC)*, known as "regular" VMCs, and/or *Autonomous Virtual Machine Clusters (AVMC)*.
 
-On top of the regular VCMs, you can deploy several *Oracle Homes (OHs)*, which can be used to create/run *Oracle Container Databases (CDBs)*. In every CDB, you can run multiple *Pluggable Databases (PDBs)*. While creating VMCs, you can select the compartment where you want to place it, for logical, functional or security reasons. The rest of components, can not be placed in different compartments, so consider that where you place the VMC will be the place where you will find all these elements, and the teams who are going to manage them, will have access to all of them. It is possible to fine-tune the IAM policies to grant the access of different teams to OHs, CDBs or even PDBs based on tags, but it would require a high effort after the deployment of any of these resources to create the needed, restricted IAM policies and something really hard to maintain.
-
-On every AVMC can also be created on top of an ExaDB-C@C Infrastructure. On each AVMC you can create multiple *Autonomous Container Databases (ACDs)* and on each of every ACDs you can create multiple *Autonomous Databases (ADB-Ds, dedicated)*. In contrast to regular VMCs, you can place every Autonomous component in different compartments, which gives you more flexibility and ease of use to create and maintain the IAM policies. You'll have also less operations to do with these components, as they are autonomously operated.
+Every VMC is a set of one or many Virtual Machines running in different Database Servers for high availability given by Grid Infrastructure clusterware software. On top of a VMC, you can deploy several *Oracle Homes (OHs)*, which can be used to create/run *Oracle Container Databases (CDBs)*. In every CDB, you can run multiple *Pluggable Databases (PDBs)*. While creating VMCs, you can select the compartment where you want to place it, for logical, functional or security reasons. The rest of components, can not be placed in different compartments, so consider that where you place the VMC will be the place where you will find all these elements, and the teams who are going to manage them, will have access to all of them. It is possible to fine-tune the IAM policies to grant the access of different teams to OHs, CDBs or even PDBs based on tags, but it would require a high effort after the deployment of any of these resources to create the needed, restricted IAM policies and something really hard to maintain.
 
 The IAM policies for the ExaDB-C@C gives you the flexibility to create policies per *resource types* (exadata-infrastructures, vmclusters, backup-destinations, db-nodes, etc.). For each of them you can also use advance IAM policies syntax to be able to create fine tuned IAM policies by playing with *permissions* and with *API operations*. These detailed use of IAM policies is described in the [Policy Details for Oracle Exadata Database Service on Cloud@Customer](https://docs.oracle.com/en/engineered-systems/exadata-cloud-at-customer/ecccm/ecc-policy-details.html#GUID-523EBAE0-C17F-435A-97A6-374DE2F94747).
 
 We use this approach in this ExaDB-C@C extention, as some component's operations, as the VMCs, are more suitable for infrastructure/systems teams (as scaling OCPUs, system memory or local filesystems), and other operations be more suitable for DBA teams (as scaling ASM Storage or every operation related to Databases). Sometimes an operation might fail for different reasons and every team has different skills to troubleshoot the problem, more suitable to them.
 
+Every AVMC can also be created on top of an ExaDB-C@C Infrastructure. On each AVMC you can create multiple *Autonomous Container Databases (ACDs)* and on each of every ACDs you can create multiple *Autonomous Databases (ADB-Ds, dedicated)*. In contrast to regular VMCs, you can place every Autonomous component in different compartments, which gives you more flexibility and ease of use to create and maintain the IAM policies. You'll have also less operations to do with these components, as they are autonomously operated.
+
+
 &nbsp; 
 
 ## **2. Use Cases**
 
-In this section, we will discuss the different use case scenarios identified, providing additional information that may be useful, from the **Separation of Duties** of the different Operations Teams, to the different **architecture design decissions** for placing the resources and related ExaDB-C@C components.
+In this section we will comment of the different use case scenarios identified, bringing additional information that might be useful for you, from the **Separation of Duties** of the different Operations Teams, to the different **architecture design decissions** for placing the resources and related ExaDB-C@C components.
 
 &nbsp;
 
-### **2.1 Shared ExaDB-C@C Platorm. Shared Infra and VMCs/AVMCs among environments**
+### **2.1 Shared ExaDB-C@C Platform. Shared Infra and shared VMCs**
 
-&nbsp;
-<p align="center">
+
 <img src="../content/use_case_1.png" width="1000" height="auto">
-</p>
 
-#### **ExaDB-C@C Resources**
+#### **ExaDB-C@C Resources LLF**
 
-In this scenario, the entire ExaDB-C@C stack can be considered a shared resource. There are two infrastructures (B) <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, one primary and one for disaster recovery (DR), both located in the shared ExaCC infra compartment. 
+In this scenario, the entire ExaDB-C@C stack can be considered as shared resources. There are two infrastructures: one for production and its corresponding disaster recovery (DR), both located in shared ExaCC compartments <img src="../content/a.png">, as well as dedicated VM clusters for production and DR <img src="../content/b.png">.
 
-The images used to provision the different Oracle Homes (for both Grid Infrastructure and the databases) are stored in the ExaCC DB compartment. <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">
+In the case of VM clusters, the CDBs and PDBs are created within the same compartment.
 
-Regular VMCs (together with their CDBs and PDBs, since they cannot be placed in different compartments) will also reside in the ExaCC DB compartment.<img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> 
+If the customer wants to test an Autonomous VM Cluster (AVMC), it would be placed in the same compartment. However, for CDBs and PDBs, a different approach can be used. In this case, they can be set up in separate compartments from the AVM cluster, allowing the ACDB or APDBs to be assigned to specific projects.
 
-For Autonomous resources, the AVMCs and ACDs will likewise be located in the ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, while the ADBs can be placed in the individual project compartments <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> to simplify and restrict administrators’ access to those resources.
-
+For example, as shown in options <img src="../content/e.png"> and <img src="../content/f.png">, we can have a PDB for Project 1 in production and another PDB for Project 1 in pre-production.
 
 #### **ExaDB-C@C Groups**
 
@@ -87,22 +85,10 @@ For Autonomous resources, the AVMCs and ACDs will likewise be located in the Exa
 
 &nbsp;
 
-### **2.2 Hibrid ExaDB-C@C Platforms. Infra shared and Dedicated enviroments VMCs/AVMCs**
-
-&nbsp;
-<p align="center">
-<img src="../content/use_case_2.png" width="1000" height="auto">
-</p>
+### **2.2 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**
 
 #### **ExaDB-C@C Resources**
 &nbsp;
-In this scenario, only the ExaDB-C@C infrastructure can be considered a shared resource. There are two infrastructures <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, one primary and one for disaster recovery (DR), both located in the shared ExaCC infra compartment. 
-
-The images used to provision the different Oracle Homes (for both Grid Infrastructure and the databases) are stored in the corresponding ExaCC compartments for each environment (production and pre-production). <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">
-
-Regular VMCs (together with their CDBs and PDBs, since they cannot be placed in different compartments) will reside in the ExaCC compartments corresponding to their environment (production or pre-production).<img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> 
-
-For Autonomous resources, the AVMCs and ACDs will likewise be located in the ExaCC compartments for their respective environments <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, while the ADBs can be placed in the individual project compartments <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> to simplify and restrict administrators’ access to those resources.
 
 #### **ExaDB-C@C Groups**
 &nbsp;
@@ -112,23 +98,10 @@ For Autonomous resources, the AVMCs and ACDs will likewise be located in the Exa
 
 
 
-### **2.3 Dedicated ExaDB-C@C Platforms. Dedicated Infra and VMCs/AVMCs per Environment**
-
-&nbsp;
-<p align="center">
-<img src="../content/use_case_3.png" width="1000" height="auto">
-</p>
+### **2.3 Dedicated ExaDB-C@C Platform. Prod and preprod Infra and VMCs**
 
 #### **ExaDB-C@C Resources**
 &nbsp;
-
-In this scenario, each environment has its own dedicated ExaDB-C@C infrastructure. For every environment, there are two infrastructures <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: a primary site and a disaster recovery (DR) site. Both are hosted in the corresponding environment’s ExaCC infrastructure compartment.
-
-The images used to provision the different Oracle Homes (for both Grid Infrastructure and the databases) are stored in the corresponding ExaCC compartments for each environment (production and pre-production). <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">
-
-Regular VMCs (together with their CDBs and PDBs, since they cannot be placed in different compartments) will reside in the ExaCC compartments corresponding to their environment (production or pre-production).<img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> 
-
-For Autonomous resources, the AVMCs and ACDs will likewise be located in the ExaCC compartments for their respective environments <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, while the ADBs can be placed in the individual project compartments <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> to simplify and restrict administrators’ access to those resources.
 
 #### **ExaDB-C@C Groups**
 &nbsp;
