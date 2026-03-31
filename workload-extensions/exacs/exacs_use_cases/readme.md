@@ -69,7 +69,7 @@ In this section, we describe the identified use case scenarios, providing additi
 
 &nbsp;
 <p align="center">
-<img src="../content/exacc_use_case_1.png" width="1000" height="auto">
+<img src="../content/exacs_use_case_1.png" width="1000" height="auto">
 </p>
 
 #### **ExaDB-D Resources**
@@ -163,7 +163,7 @@ This model provides a consistent and scalable observability approach, combining 
 
 &nbsp;
 <p align="center">
-<img src="../content/exacc_use_case_2.png" width="1000" height="auto">
+<img src="../content/exacs_use_case_2.png" width="1000" height="auto">
 </p>
 
 #### **ExaDB-D Resources**
@@ -269,7 +269,7 @@ This model provides a consistent and scalable observability approach, combining 
 
 &nbsp;
 <p align="center">
-<img src="../content/exacc_use_case_3.png" width="1000" height="auto">
+<img src="../content/exacs_use_case_3.png" width="1000" height="auto">
 </p>
 
 #### **ExaDB-D Resources**
