@@ -9,7 +9,7 @@ exacc_identity + {
 
           'CMP-LZ-SHARED-EXACC-KEY': {
                 name: 'cmp-lz-shared-exacc',
-                description: 'Exacc shared Platform',
+                description: 'Shared Exacc Platform',
                 parent_id: 'CMP-LZ-PLATFORM-KEY',
 
                 defined_tags: {

@@ -218,7 +218,7 @@
             },
 
             "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY": {
-                "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACS-INFRA-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
                 "event_display_name"                         : "rul-lz-notify-on-exacs-infra-events",
 
@@ -229,11 +229,6 @@
                     "com.oraclecloud.databaseservice.updateexadatainfrastructure.begin",
                     "com.oraclecloud.databaseservice.updateexadatainfrastructure.end",
                     "com.oraclecloud.databaseservice.exadatainfrastructureconnectstatus",
-                    "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
-                    "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
                     "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancereminder",
                     "com.oraclecloud.databaseservice.exacsinfrastructuremaintenance.begin",
                     "com.oraclecloud.databaseservice.exacsinfrastructuremaintenance.end",
@@ -250,8 +245,8 @@
 
             "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-VMC-KEY": {
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-DB-WORKLOADS-KEY"],
-                "event_display_name"                         : "rul-lz-notify-on-exacs-infra-events",
+                "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
+                "event_display_name"                         : "rul-lz-notify-on-exacs-vmc-events",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
@@ -361,7 +356,6 @@
                     "com.oraclecloud.databaseservice.patchdbhome.begin",
                     "com.oraclecloud.databaseservice.patchdbhome.end",
                     "com.oraclecloud.databaseservice.movedatabase.end",
-                    "com.oraclecloud.databaseservice.movedatabase.end",
                     "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
@@ -373,7 +367,6 @@
                     "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
                     "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
                     "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
                     "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
                     "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
                     "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
@@ -477,18 +470,6 @@
                 "event_display_name"                         : "rul-lz-prod-notify-on-notifications-projects",
 
                 "supplied_events": [
-                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
-                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
-                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
-                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
-                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
                     "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
@@ -669,19 +650,23 @@
             },
 
             "LOG-LZ-SUBNET-FLOW-KEY": {
-                "log_group_id"                               : "LGRP-LZ-VCN-FLOW-KEY",
+                "log_group_id"                               : "LGRP-LZ-HUB-VCN-FLOW-KEY",
                 "target_compartment_ids"                     : ["CMP-LZ-NETWORK-KEY"],
                 "target_resource_type"                       : "subnet"
             },
 
             "LOG-LZ-VCN-FLOW-KEY": {
-                "log_group_id"                               : "LGRP-LZ-VCN-FLOW-KEY",
+                "log_group_id"                               : "LGRP-LZ-HUB-VCN-FLOW-KEY",
                 "target_compartment_ids"                     : ["CMP-LZ-NETWORK-KEY"],
                 "target_resource_type"                       : "vcn"
             }
         },
 
         "log_groups": {
+            "LGRP-LZ-HUB-VCN-FLOW-KEY": {
+                "name"                                       : "lgrp-lz-hub-vcn-flow"
+            },
+
             "LGRP-LZ-PREPROD-VCN-FLOW-KEY": {
                 "name"                                       : "lgrp-lz-preprod-vcn-flow",
                 "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY"
@@ -692,7 +677,7 @@
                 "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY"
             },
 
-            "LGRP-LZ-VCN-FLOW-KEY": {
+            "LGRP-LZ-SHARED-EXACS-VCN-FLOW-KEY": {
                 "name"                                       : "lgrp-lz-shared-exacs-vcn-flow"
             }
         }
@@ -781,7 +766,7 @@
             },
 
             "NOTT-LZ-SHARED-EXACS-DB-WORKLOADS-KEY": {
-                "name"                                       : "nott-lz-exacs-db-workloads",
+                "name"                                       : "nott-lz-shared-exacs-db-workloads",
                 "description"                                : "Topic for prod workloads notifications.",
                 "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
 
@@ -794,7 +779,7 @@
             },
 
             "NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY": {
-                "name"                                       : "nott-lz-exacs-infra-workloads",
+                "name"                                       : "nott-lz-shared-exacs-infra-workloads",
                 "description"                                : "Topic for prod workloads notifications.",
                 "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
 

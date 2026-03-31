@@ -8,7 +8,7 @@ exacs_identity + {
 
           'CMP-LZ-SHARED-EXACS-KEY': {
                 name: 'cmp-lz-shared-exacs',
-                description: 'Exacs shared Platform',
+                description: 'Shared Exacs Platform',
                 parent_id: 'CMP-LZ-PLATFORM-KEY',
 
                 defined_tags: {

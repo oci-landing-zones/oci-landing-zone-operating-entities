@@ -138,10 +138,36 @@
         ]
       },
 
+      "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY": {
+        "compartment_id": "CMP-LZ-SHARED-EXACS-INFRA-KEY",
+        "destination_topic_ids": ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
+        "event_display_name": "rul-lz-notify-on-exacs-infra-events",
+
+        "supplied_events": [
+          "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
+          "com.oraclecloud.databaseservice.deleteexadatainfrastructure.begin",
+          "com.oraclecloud.databaseservice.deleteexadatainfrastructure.end",
+          "com.oraclecloud.databaseservice.updateexadatainfrastructure.begin",
+          "com.oraclecloud.databaseservice.updateexadatainfrastructure.end",
+          "com.oraclecloud.databaseservice.exadatainfrastructureconnectstatus",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancereminder",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenance.begin",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenance.end",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancecustomactiontime.begin",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancecustomactiontime.end",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancenetworkswitches.begin",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancenetworkswitches.end",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancestorageservers.start",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancestorageservers.end",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancedbservers.start",
+          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancedbservers.end"
+        ]
+      },
+
       "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-VMC-KEY": {
         "compartment_id": "CMP-LZ-SHARED-EXACS-DB-KEY",
-        "destination_topic_ids": ["NOTT-LZ-SHARED-EXACS-DB-WORKLOADS-KEY"],
-        "event_display_name": "rul-lz-notify-on-exacs-infra-events",
+        "destination_topic_ids": ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
+        "event_display_name": "rul-lz-notify-on-exacs-vmc-events",
 
         "supplied_events": [
           "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
@@ -157,38 +183,7 @@
           "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
           "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
           "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
-          "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
-        ]
-      },
-
-        "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY": {
-        "compartment_id": "CMP-LZ-SHARED-EXACS-DB-KEY",
-        "destination_topic_ids": ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
-        "event_display_name": "rul-lz-notify-on-exacs-infra-events",
-
-        "supplied_events": [
-          "com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment",
-          "com.oraclecloud.databaseservice.deleteexadatainfrastructure.begin",
-          "com.oraclecloud.databaseservice.deleteexadatainfrastructure.end",
-          "com.oraclecloud.databaseservice.updateexadatainfrastructure.begin",
-          "com.oraclecloud.databaseservice.updateexadatainfrastructure.end",
-          "com.oraclecloud.databaseservice.exadatainfrastructureconnectstatus",
-          "com.oraclecloud.databaseservice.changeautonomousvmclustercompartment",
-          "com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin",
-          "com.oraclecloud.databaseservice.deleteautonomousvmcluster.end",
-          "com.oraclecloud.databaseservice.updateautonomousvmcluster.begin",
-          "com.oraclecloud.databaseservice.updateautonomousvmcluster.end",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancereminder",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenance.begin",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenance.end",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancecustomactiontime.begin",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancecustomactiontime.end",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancenetworkswitches.begin",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancenetworkswitches.end",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancestorageservers.start",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancestorageservers.end",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancedbservers.start",
-          "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancedbservers.end"
+          "com.oraclecloud.databaseservice.updateautonomousvmcluster.end"
         ]
       },
 
@@ -276,18 +271,6 @@
           "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
           "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
           "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
-          "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
-          "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
-          "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
-          "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
-          "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
-          "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
-          "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
-          "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
-          "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
-          "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
-          "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-          "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
           "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
           "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
           "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
@@ -320,7 +303,6 @@
           "com.oraclecloud.databaseservice.patchdbhome.begin",
           "com.oraclecloud.databaseservice.patchdbhome.end",
           "com.oraclecloud.databaseservice.movedatabase.end",
-          "com.oraclecloud.databaseservice.movedatabase.end",
           "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
           "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
           "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
@@ -332,7 +314,6 @@
           "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
           "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
           "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-          "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
           "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
           "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
           "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
@@ -398,7 +379,7 @@
       "NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY": {
         "compartment_id": "CMP-LZ-SECURITY-KEY",
         "description": "Topic for prod workloads notifications.",
-        "name": "nott-lz-exacs-infra-workloads",
+        "name": "nott-lz-shared-exacs-infra-workloads",
 
         "subscriptions": [
           {
@@ -411,7 +392,7 @@
       "NOTT-LZ-SHARED-EXACS-DB-WORKLOADS-KEY": {
         "compartment_id": "CMP-LZ-SECURITY-KEY",
         "description": "Topic for prod workloads notifications.",
-        "name": "nott-lz-exacs-db-workloads",
+        "name": "nott-lz-shared-exacs-db-workloads",
 
         "subscriptions": [
           {
@@ -421,6 +402,5 @@
         ]
       }
     }
-  },
-
+  }
 }

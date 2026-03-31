@@ -137,7 +137,7 @@ function(mgmt_cidr, lb_cidr, has_spoke_natgw=false) {
   // Spoke VCN category generator.
   // direct_spoke_peers: Direct spoke-to-spoke DRG routes (Hub E only, no firewall).
   //   Empty for Hub A/B/C where cross-spoke traffic goes through the firewall.
-  //   Format: [{ name: 'PreProd', vcn: '<cidr>' }]
+  //   Format: [{ name: 'Preprod', vcn: '<cidr>' }]
   local spoke_category(name, resource_name, direct_spoke_peers=[]) =
     local key = std.asciiUpper(resource_name);
     local key_hyphen = std.asciiUpper(resource_name);

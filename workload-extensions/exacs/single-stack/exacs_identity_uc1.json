@@ -22,13 +22,13 @@
                         "description"                                          : "Shared Platform Compartment",
 
                         "children": {
-                            "CMP-LZ-EXACS-KEY": {
-                                "name"                                         : "cmp-lz-exacs",
-                                "description"                                  : "Exacs shared Platform",
+                            "CMP-LZ-SHARED-EXACS-KEY": {
+                                "name"                                         : "cmp-lz-shared-exacs",
+                                "description"                                  : "Shared Exacs Platform",
 
                                 "children": {
-                                    "CMP-LZ-EXACS-DB-KEY": {
-                                        "name"                                 : "cmp-lz-exacs-db",
+                                    "CMP-LZ-SHARED-EXACS-DB-KEY": {
+                                        "name"                                 : "cmp-lz-shared-exacs-db",
                                         "description"                          : "Shared Exacs Platform, db compartment",
 
                                         "defined_tags": {
@@ -36,8 +36,8 @@
                                         }
                                     },
 
-                                    "CMP-LZ-EXACS-INFRA-KEY": {
-                                        "name"                                 : "cmp-lz-exacs-infra",
+                                    "CMP-LZ-SHARED-EXACS-INFRA-KEY": {
+                                        "name"                                 : "cmp-lz-shared-exacs-infra",
                                         "description"                          : "Shared Exacs Platform, infra compartment",
 
                                         "defined_tags": {
@@ -74,12 +74,12 @@
                                 "children": {
                                     "CMP-LZ-PREPROD-EXACS-KEY": {
                                         "name"                                 : "cmp-lz-preprod-exacs",
-                                        "description"                          : "Exacs Shared Platform",
+                                        "description"                          : "Preprod Exacs Platform",
 
                                         "children": {
                                             "CMP-LZ-PREPROD-EXACS-DB-KEY": {
                                                 "name"                         : "cmp-lz-preprod-exacs-db",
-                                                "description"                  : "Shared Exacs Platform, db compartment",
+                                                "description"                  : "Preprod Exacs Platform, db compartment",
 
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacs-db-admin"
@@ -88,7 +88,7 @@
 
                                             "CMP-LZ-PREPROD-EXACS-INFRA-KEY": {
                                                 "name"                         : "cmp-lz-preprod-exacs-infra",
-                                                "description"                  : "Shared Exacs Platform, infra compartment",
+                                                "description"                  : "Preprod Exacs Platform, infra compartment",
 
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacs-infra-admin"
@@ -115,7 +115,7 @@
                                         "children": {
                                             "CMP-LZ-PREPROD-PROJ1-DB-KEY": {
                                                 "name"                         : "cmp-lz-preprod-proj1-db",
-                                                "description"                  : "Exacs PreProd env database layer",
+                                                "description"                  : "Exacs Preprod env database layer",
 
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacs-db-admin"
@@ -158,12 +158,12 @@
                                 "children": {
                                     "CMP-LZ-PROD-EXACS-KEY": {
                                         "name"                                 : "cmp-lz-prod-exacs",
-                                        "description"                          : "Exacs Shared Platform",
+                                        "description"                          : "Prod Exacs Platform",
 
                                         "children": {
                                             "CMP-LZ-PROD-EXACS-DB-KEY": {
                                                 "name"                         : "cmp-lz-prod-exacs-db",
-                                                "description"                  : "Shared Exacs Platform, db compartment",
+                                                "description"                  : "Prod Exacs Platform, db compartment",
 
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacs-db-admin"
@@ -172,7 +172,7 @@
 
                                             "CMP-LZ-PROD-EXACS-INFRA-KEY": {
                                                 "name"                         : "cmp-lz-prod-exacs-infra",
-                                                "description"                  : "Shared Exacs Platform, infra compartment",
+                                                "description"                  : "Prod Exacs Platform, infra compartment",
 
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacs-infra-admin"
@@ -412,14 +412,14 @@
 
             "PCY-LZ-GLOBAL-EXACS-DB-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-global-exacs-db-admin",
-                "description"                                                  : "Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privilegies in all Exacs compartments",
+                "description"                                                  : "Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privileges in all Exacs compartments",
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacs-db-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacs-db-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to manage data-safe-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacs-db-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to use cloud-exadata-infrastructures in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacs-db-admin')), request.operation !='ValidateVmClusterNetwork',request.operation !='ActivateExadataInfrastructure',request.operation !='ChangeExadataInfrastructureCompartment',request.operation !='AddStorageCapacityExadataInfrastructure',request.operation !='CreateVmClusterNetwork',request.operation !='CreateVmClusterNetwork',request.operation !='UpdateVmClusterNetwork',request.operation !='DeleteVmClusterNetwork'}",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to use cloud-exadata-infrastructures in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacs-db-admin')), request.operation !='ValidateVmClusterNetwork',request.operation !='ActivateExadataInfrastructure',request.operation !='ChangeExadataInfrastructureCompartment',request.operation !='AddStorageCapacityExadataInfrastructure',request.operation !='CreateVmClusterNetwork',request.operation !='UpdateVmClusterNetwork',request.operation !='DeleteVmClusterNetwork'}",
                     "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to use cloud-vmclusters in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacs-db-admin')), request.permission !='VM_CLUSTER_UPDATE_SSH_KEY', request.permission !='VM_CLUSTER_UPDATE_CPU',request.permission !='VM_CLUSTER_UPDATE_MEMORY',request.permission !='VM_CLUSTER_UPDATE_LOCAL_STORAGE',request.permission !='VM_CLUSTER_UPDATE_FILE_SYSTEM'}",
                     "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to manage backups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacs-db-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to manage database-software-image in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacs-db-admin'))",
@@ -435,7 +435,7 @@
 
             "PCY-LZ-GLOBAL-EXACS-GENERIC-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-global-exacs-generic",
-                "description"                                                  : "Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privilegies in all Exacs compartments",
+                "description"                                                  : "Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privileges in all Exacs compartments",
                 "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -453,7 +453,7 @@
 
             "PCY-LZ-GLOBAL-EXACS-INFRA-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-global-exacs-infra-admin",
-                "description"                                                  : "Example policy which allows the grp-lz-global-exacs-infra-admin group users to manage the DB infra in shared Exacs platform compartment.",
+                "description"                                                  : "Policy which allows the grp-lz-global-exacs-infra-admin group users to manage the DB infra in the shared Exacs platform compartment.",
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -513,7 +513,7 @@
 
             "PCY-LZ-PREPROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-preprod-exacs-proj1-admin",
-                "description"                                                  : "Example policy which allows the grp-lz-preprod-proj1-exacs-admin group users to manage the autonomous database layer in proj1.",
+                "description"                                                  : "Policy which allows the grp-lz-preprod-proj1-exacs-admin group users to manage the autonomous database layer in proj1.",
                 "compartment_id"                                               : "CMP-LZ-PREPROD-PROJ1-DB-KEY",
 
                 "statements": [
@@ -600,7 +600,7 @@
 
             "PCY-LZ-PROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-prod-exacs-proj1-admin",
-                "description"                                                  : "Example policy which allows the grp-lz-prod-proj1-exacs-admin group users to manage the autonomous database layer in proj1.",
+                "description"                                                  : "Policy which allows the grp-lz-prod-proj1-exacs-admin group users to manage the autonomous database layer in proj1.",
                 "compartment_id"                                               : "CMP-LZ-PROD-PROJ1-DB-KEY",
 
                 "statements": [

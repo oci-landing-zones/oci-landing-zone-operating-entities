@@ -164,26 +164,24 @@
         ]
       },
 
-
       "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-VMC-KEY": {
-            "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
-            "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACC-INFRA-WORKLOADS-KEY"],
-            "event_display_name"                         : "rul-lz-notify-on-exacc-vmc-events",
+        "compartment_id": "CMP-LZ-SHARED-EXACC-DB-KEY",
+        "destination_topic_ids": ["NOTT-LZ-SHARED-EXACC-INFRA-WORKLOADS-KEY"],
+        "event_display_name": "rul-lz-notify-on-exacc-vmc-events",
 
-            "supplied_events": [
-                "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
-                "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
-                "com.oraclecloud.databaseservice.changevmclustercompartment",
-                "com.oraclecloud.databaseservice.deletevmcluster.begin",
-                "com.oraclecloud.databaseservice.deletevmcluster.end",
-                "com.oraclecloud.databaseservice.updatevmcluster.begin",
-                "com.oraclecloud.databaseservice.updatevmcluster.end",
-                "com.oraclecloud.databaseservice.patchvmcluster.begin",
-                "com.oraclecloud.databaseservice.patchvmcluster.end"
-            ]
+        "supplied_events": [
+          "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
+          "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
+          "com.oraclecloud.databaseservice.changevmclustercompartment",
+          "com.oraclecloud.databaseservice.deletevmcluster.begin",
+          "com.oraclecloud.databaseservice.deletevmcluster.end",
+          "com.oraclecloud.databaseservice.updatevmcluster.begin",
+          "com.oraclecloud.databaseservice.updatevmcluster.end",
+          "com.oraclecloud.databaseservice.patchvmcluster.begin",
+          "com.oraclecloud.databaseservice.patchvmcluster.end"
+        ]
       },
 
-      
       "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-DB-KEY": {
         "compartment_id": "CMP-LZ-SHARED-EXACC-DB-KEY",
         "destination_topic_ids": ["NOTT-LZ-SHARED-EXACC-DB-WORKLOADS-KEY"],
@@ -268,18 +266,6 @@
           "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
           "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
           "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
-          "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
-          "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
-          "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
-          "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
-          "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
-          "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
-          "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
-          "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
-          "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
-          "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
-          "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-          "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
           "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
           "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
           "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
@@ -312,7 +298,6 @@
           "com.oraclecloud.databaseservice.patchdbhome.begin",
           "com.oraclecloud.databaseservice.patchdbhome.end",
           "com.oraclecloud.databaseservice.movedatabase.end",
-          "com.oraclecloud.databaseservice.movedatabase.end",
           "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
           "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
           "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
@@ -324,7 +309,6 @@
           "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
           "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
           "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-          "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
           "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
           "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
           "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",

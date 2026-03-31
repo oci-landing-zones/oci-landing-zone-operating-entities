@@ -10,22 +10,22 @@ one_oe + exacc_identity + {
         children+: {
           'CMP-LZ-PLATFORM-KEY'+: {
             children+: {
-              'CMP-LZ-EXACC-KEY': {
-                name: 'cmp-lz-exacc',
-                description: 'Exacc shared Platform',
+              'CMP-LZ-SHARED-EXACC-KEY': {
+                name: 'cmp-lz-shared-exacc',
+                description: 'Shared Exacc Platform',
                 defined_tags: {
                   'tagns-lz-role.tag-lz-role': 'lz-exacc-admin',
                 },
                 children: {
-                  'CMP-LZ-EXACC-DB-KEY': {
-                    name: 'cmp-lz-exacc-db',
+                  'CMP-LZ-SHARED-EXACC-DB-KEY': {
+                    name: 'cmp-lz-shared-exacc-db',
                     description: 'Shared Exacc Platform, db compartment',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                     },
                   },
-                  'CMP-LZ-EXACC-INFRA-KEY': {
-                    name: 'cmp-lz-exacc-infra',
+                  'CMP-LZ-SHARED-EXACC-INFRA-KEY': {
+                    name: 'cmp-lz-shared-exacc-infra',
                     description: 'Shared Exacc Platform, infra compartment',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-infra-admin',
@@ -41,21 +41,21 @@ one_oe + exacc_identity + {
                 children+: {
                   'CMP-LZ-PROD-EXACC-KEY': {
                     name: 'cmp-lz-prod-exacc',
-                    description: 'Exacc Shared Platform',
+                    description: 'Prod Exacc Platform',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-admin',
                     },
                     children: {
                       'CMP-LZ-PROD-EXACC-DB-KEY': {
                         name: 'cmp-lz-prod-exacc-db',
-                        description: 'Shared Exacc Platform, db compartment',
+                        description: 'Prod Exacc Platform, db compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                         },
                       },
                       'CMP-LZ-PROD-EXACC-INFRA-KEY': {
                         name: 'cmp-lz-prod-exacc-infra',
-                        description: 'Shared Exacc Platform, infra compartment',
+                        description: 'Prod Exacc Platform, infra compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacc-infra-admin',
                         },
@@ -89,21 +89,21 @@ one_oe + exacc_identity + {
                 children+: {
                   'CMP-LZ-PREPROD-EXACC-KEY': {
                     name: 'cmp-lz-preprod-exacc',
-                    description: 'Exacc Shared Platform',
+                    description: 'Preprod Exacc Platform',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-admin',
                     },
                     children: {
                       'CMP-LZ-PREPROD-EXACC-DB-KEY': {
                         name: 'cmp-lz-preprod-exacc-db',
-                        description: 'Shared Exacc Platform, db compartment',
+                        description: 'Preprod Exacc Platform, db compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                         },
                       },
                       'CMP-LZ-PREPROD-EXACC-INFRA-KEY': {
                         name: 'cmp-lz-preprod-exacc-infra',
-                        description: 'Shared Exacc Platform, infra compartment',
+                        description: 'Preprod Exacc Platform, infra compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacc-infra-admin',
                         },
@@ -119,7 +119,7 @@ one_oe + exacc_identity + {
                    children+: {
                   'CMP-LZ-PREPROD-PROJ1-DB-KEY': {
                     name: 'cmp-lz-preprod-proj1-db',
-                    description: 'Exacc PreProd env database layer',
+                    description: 'Exacc Preprod env database layer',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                     }
