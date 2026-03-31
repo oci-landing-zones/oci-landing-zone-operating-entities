@@ -17,12 +17,12 @@
 
             "GRP-LZ-PROD-EXACS-PROJ1-ADMIN-KEY": { 
               name: 'grp-lz-prod-proj1-exacs-admin',
-              description: 'Dedicated team to manage exacs db layer in proj1, prod environment',
+              description: 'Dedicated team to manage Exacs db layer in proj1, prod environment',
             },
 
              "GRP-LZ-PREPROD-EXACS-PROJ1-ADMIN-KEY": { 
               name: 'grp-lz-preprod-proj1-exacs-admin',
-              description: 'Dedicated team to manage exacs db layer in proj1, preprod environment',
+              description: 'Dedicated team to manage Exacs db layer in proj1, preprod environment',
             },
         }
   },
@@ -32,7 +32,7 @@
 
       "PCY-LZ-GLOBAL-EXACS-GENERIC-ADMIN-KEY": {
         name: 'pcy-lz-global-exacs-generic',
-        description: 'Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privilegies in all exacs compartments',
+        description: 'Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privilegies in all Exacs compartments',
         compartment_id: 'TENANCY-ROOT',
         statements: [
           "allow group 'id_lz_common'/'grp-lz-global-exacs-infra-admin','id_lz_common'/'grp-lz-global-exacs-db-admin' to use cloud-shell in tenancy",
@@ -49,7 +49,7 @@
 
       "PCY-LZ-GLOBAL-EXACS-DB-ADMIN-KEY": {
         name: 'pcy-lz-global-exacs-db-admin',
-        description: 'Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privilegies in all exacs compartments',
+        description: 'Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privilegies in all Exacs compartments',
         compartment_id: 'CMP-LANDINGZONE-KEY',
         statements: [
           "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacs-db-admin'))",
@@ -71,7 +71,7 @@
 
       "PCY-LZ-GLOBAL-EXACS-INFRA-ADMIN-KEY": {
        name: "pcy-lz-global-exacs-infra-admin",
-       description: "Example policy which allows the grp-lz-global-exacs-infra-admin group users to manage the DB infra in shared exacs platform compartment.",
+       description: "Example policy which allows the grp-lz-global-exacs-infra-admin group users to manage the DB infra in shared Exacs platform compartment.",
        compartment_id: "CMP-LANDINGZONE-KEY",
        statements: [
           "allow group 'id_lz_common'/'grp-lz-global-exacs-infra-admin' to manage cloud-exadata-infrastructures in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacs-infra-admin'))",

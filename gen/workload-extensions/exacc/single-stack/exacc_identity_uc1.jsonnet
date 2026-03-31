@@ -19,14 +19,14 @@ one_oe + exacc_identity + {
                 children: {
                   'CMP-LZ-EXACC-DB-KEY': {
                     name: 'cmp-lz-exacc-db',
-                    description: 'Shared exacc Platform, db compartment',
+                    description: 'Shared Exacc Platform, db compartment',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                     },
                   },
                   'CMP-LZ-EXACC-INFRA-KEY': {
                     name: 'cmp-lz-exacc-infra',
-                    description: 'Shared exacc Platform, infra compartment',
+                    description: 'Shared Exacc Platform, infra compartment',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-infra-admin',
                     },
@@ -48,14 +48,14 @@ one_oe + exacc_identity + {
                     children: {
                       'CMP-LZ-PROD-EXACC-DB-KEY': {
                         name: 'cmp-lz-prod-exacc-db',
-                        description: 'Shared exacc Platform, db compartment',
+                        description: 'Shared Exacc Platform, db compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                         },
                       },
                       'CMP-LZ-PROD-EXACC-INFRA-KEY': {
                         name: 'cmp-lz-prod-exacc-infra',
-                        description: 'Shared exacc Platform, infra compartment',
+                        description: 'Shared Exacc Platform, infra compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacc-infra-admin',
                         },
@@ -96,14 +96,14 @@ one_oe + exacc_identity + {
                     children: {
                       'CMP-LZ-PREPROD-EXACC-DB-KEY': {
                         name: 'cmp-lz-preprod-exacc-db',
-                        description: 'Shared exacc Platform, db compartment',
+                        description: 'Shared Exacc Platform, db compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                         },
                       },
                       'CMP-LZ-PREPROD-EXACC-INFRA-KEY': {
                         name: 'cmp-lz-preprod-exacc-infra',
-                        description: 'Shared exacc Platform, infra compartment',
+                        description: 'Shared Exacc Platform, infra compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacc-infra-admin',
                         },

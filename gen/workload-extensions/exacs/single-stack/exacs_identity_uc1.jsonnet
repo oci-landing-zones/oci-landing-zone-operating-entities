@@ -19,14 +19,14 @@ one_oe + exacs_identity + {
                 children: {
                   'CMP-LZ-EXACS-DB-KEY': {
                     name: 'cmp-lz-exacs-db',
-                    description: 'Shared exacs Platform, db compartment',
+                    description: 'Shared Exacs Platform, db compartment',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacs-db-admin',
                     },
                   },
                   'CMP-LZ-EXACS-INFRA-KEY': {
                     name: 'cmp-lz-exacs-infra',
-                    description: 'Shared exacs Platform, infra compartment',
+                    description: 'Shared Exacs Platform, infra compartment',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacs-infra-admin',
                     },
@@ -48,14 +48,14 @@ one_oe + exacs_identity + {
                     children: {
                       'CMP-LZ-PROD-EXACS-DB-KEY': {
                         name: 'cmp-lz-prod-exacs-db',
-                        description: 'Shared exacs Platform, db compartment',
+                        description: 'Shared Exacs Platform, db compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacs-db-admin',
                         },
                       },
                       'CMP-LZ-PROD-EXACS-INFRA-KEY': {
                         name: 'cmp-lz-prod-exacs-infra',
-                        description: 'Shared exacs Platform, infra compartment',
+                        description: 'Shared Exacs Platform, infra compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacs-infra-admin',
                         },
@@ -96,14 +96,14 @@ one_oe + exacs_identity + {
                     children: {
                       'CMP-LZ-PREPROD-EXACS-DB-KEY': {
                         name: 'cmp-lz-preprod-exacs-db',
-                        description: 'Shared exacs Platform, db compartment',
+                        description: 'Shared Exacs Platform, db compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacs-db-admin',
                         },
                       },
                       'CMP-LZ-PREPROD-EXACS-INFRA-KEY': {
                         name: 'cmp-lz-preprod-exacs-infra',
-                        description: 'Shared exacs Platform, infra compartment',
+                        description: 'Shared Exacs Platform, infra compartment',
                         defined_tags: {
                           'tagns-lz-role.tag-lz-role': 'lz-exacs-infra-admin',
                         },

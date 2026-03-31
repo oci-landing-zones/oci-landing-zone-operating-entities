@@ -17,14 +17,14 @@ exacs_identity + {
                 children: {
                   'CMP-LZ-SHARED-EXACS-DB-KEY': {
                     name: 'cmp-lz-shared-exacs-db',
-                    description: 'Shared exacs Platform, db compartment',
+                    description: 'Shared Exacs Platform, db compartment',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacs-db-admin',
                     },
                   },
                   'CMP-LZ-SHARED-EXACS-INFRA-KEY': {
                     name: 'cmp-lz-shared-exacs-infra',
-                    description: 'Shared exacs Platform, infra compartment',
+                    description: 'Shared Exacs Platform, infra compartment',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacs-infra-admin',
                     },
@@ -64,7 +64,7 @@ exacs_identity + {
 
           'CMP-LZ-PREPROD-EXACS-KEY': {
                 name: 'cmp-lz-preprod-exacs',
-                description: 'Preprod exacs Platform',
+                description: 'Preprod Exacs Platform',
                 parent_id: 'CMP-LZ-PREPROD-PLATFORM-KEY',
 
                 defined_tags: {
@@ -73,14 +73,14 @@ exacs_identity + {
                 children: {
                   'CMP-LZ-PREPROD-EXACS-DB-KEY': {
                     name: 'cmp-lz-preprod-exacs-db',
-                    description: 'Preprod exacs Platform, db compartment',
+                    description: 'Preprod Exacs Platform, db compartment',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacs-db-admin',
                     },
                   },
                   'CMP-LZ-PREPROD-EXACS-INFRA-KEY': {
                     name: 'cmp-lz-preprod-exacs-infra',
-                    description: 'Preprod exacs Platform, infra compartment',
+                    description: 'Preprod Exacs Platform, infra compartment',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacs-infra-admin',
                     },

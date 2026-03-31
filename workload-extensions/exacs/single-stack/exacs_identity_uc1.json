@@ -29,7 +29,7 @@
                                 "children": {
                                     "CMP-LZ-EXACS-DB-KEY": {
                                         "name"                                 : "cmp-lz-exacs-db",
-                                        "description"                          : "Shared exacs Platform, db compartment",
+                                        "description"                          : "Shared Exacs Platform, db compartment",
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role"        : "lz-exacs-db-admin"
@@ -38,7 +38,7 @@
 
                                     "CMP-LZ-EXACS-INFRA-KEY": {
                                         "name"                                 : "cmp-lz-exacs-infra",
-                                        "description"                          : "Shared exacs Platform, infra compartment",
+                                        "description"                          : "Shared Exacs Platform, infra compartment",
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role"        : "lz-exacs-infra-admin"
@@ -79,7 +79,7 @@
                                         "children": {
                                             "CMP-LZ-PREPROD-EXACS-DB-KEY": {
                                                 "name"                         : "cmp-lz-preprod-exacs-db",
-                                                "description"                  : "Shared exacs Platform, db compartment",
+                                                "description"                  : "Shared Exacs Platform, db compartment",
 
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacs-db-admin"
@@ -88,7 +88,7 @@
 
                                             "CMP-LZ-PREPROD-EXACS-INFRA-KEY": {
                                                 "name"                         : "cmp-lz-preprod-exacs-infra",
-                                                "description"                  : "Shared exacs Platform, infra compartment",
+                                                "description"                  : "Shared Exacs Platform, infra compartment",
 
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacs-infra-admin"
@@ -163,7 +163,7 @@
                                         "children": {
                                             "CMP-LZ-PROD-EXACS-DB-KEY": {
                                                 "name"                         : "cmp-lz-prod-exacs-db",
-                                                "description"                  : "Shared exacs Platform, db compartment",
+                                                "description"                  : "Shared Exacs Platform, db compartment",
 
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacs-db-admin"
@@ -172,7 +172,7 @@
 
                                             "CMP-LZ-PROD-EXACS-INFRA-KEY": {
                                                 "name"                         : "cmp-lz-prod-exacs-infra",
-                                                "description"                  : "Shared exacs Platform, infra compartment",
+                                                "description"                  : "Shared Exacs Platform, infra compartment",
 
                                                 "defined_tags": {
                                                     "tagns-lz-role.tag-lz-role": "lz-exacs-infra-admin"
@@ -270,7 +270,7 @@
 
             "GRP-LZ-PREPROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-preprod-proj1-exacs-admin",
-                "description"                                                  : "Dedicated team to manage exacs db layer in proj1, preprod environment"
+                "description"                                                  : "Dedicated team to manage Exacs db layer in proj1, preprod environment"
             },
 
             "GRP-LZ-PREPROD-PROJ1-ADMIN-KEY": {
@@ -280,7 +280,7 @@
 
             "GRP-LZ-PROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-prod-proj1-exacs-admin",
-                "description"                                                  : "Dedicated team to manage exacs db layer in proj1, prod environment"
+                "description"                                                  : "Dedicated team to manage Exacs db layer in proj1, prod environment"
             },
 
             "GRP-LZ-PROD-PROJ1-ADMIN-KEY": {
@@ -412,7 +412,7 @@
 
             "PCY-LZ-GLOBAL-EXACS-DB-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-global-exacs-db-admin",
-                "description"                                                  : "Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privilegies in all exacs compartments",
+                "description"                                                  : "Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privilegies in all Exacs compartments",
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -435,7 +435,7 @@
 
             "PCY-LZ-GLOBAL-EXACS-GENERIC-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-global-exacs-generic",
-                "description"                                                  : "Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privilegies in all exacs compartments",
+                "description"                                                  : "Policy which allows the groups grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin to have shared privilegies in all Exacs compartments",
                 "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -453,7 +453,7 @@
 
             "PCY-LZ-GLOBAL-EXACS-INFRA-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-global-exacs-infra-admin",
-                "description"                                                  : "Example policy which allows the grp-lz-global-exacs-infra-admin group users to manage the DB infra in shared exacs platform compartment.",
+                "description"                                                  : "Example policy which allows the grp-lz-global-exacs-infra-admin group users to manage the DB infra in shared Exacs platform compartment.",
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
