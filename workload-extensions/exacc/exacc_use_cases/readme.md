@@ -23,9 +23,6 @@
   - [**3.3 Software Images**](#33-software-images)
   - [**3.4 Backup Destinations**](#34-backup-destinations)
 
-&nbsp; 
-
-
 ## **1. Summary**
 
 The ExaDB-C@C infrastructure is a platform designed for large-scale Oracle Database consolidation. A single infrastructure can support multiple Virtual Machine Clusters (VMCs) and Autonomous Virtual Machine Clusters (AVMCs), which may be shared or dedicated across different workload environments, operating entities, organizational units, lines of business, departments, and more.
@@ -56,18 +53,12 @@ IAM policies for ExaDB-C@C provide flexibility to define permissions by *resourc
 
 This extension adopts such an approach, as certain operations (e.g., scaling OCPUs, system memory, or local file systems in VMCs) are typically handled by infrastructure or systems teams, while others (e.g., ASM storage scaling or database-related operations) are more suited to DBA teams. In some cases, operations may fail for different reasons, and each team’s expertise is better aligned with troubleshooting within their domain.
 
-
-&nbsp; 
-
 ## **2. Use Cases**
 
 In this section, we describe the identified use case scenarios, providing additional guidance on key aspects such as the **separation of duties** across operations teams and the **architectural design decisions** involved in placing resources and ExaDB-C@C components.
 
-&nbsp;
-
 ### **2.1 Shared ExaDB-C@C Platform: Shared infrastructure and shared VMCs/AVMCs across multiple environments**
 
-&nbsp;
 <p align="center">
 <img src="../content/exacc_use_case_1.png" width="1000" height="auto">
 </p>
@@ -140,7 +131,7 @@ At the global level, the following notification topics are defined to support sh
 - nott-lz-exacc-infra-workloads
 - nott-lz-exacc-db-workloads
 
-At the environment level, dedicated notification topics are defined for each project scope:
+At the environment level, dedicated notification topics are defined for each environment scope:
 
 - **Production**: nott-lz-prod-projects-exacc
 - **Pre-Production**: nott-lz-preprod-projects-exacc
@@ -157,17 +148,14 @@ The observability components operate in an integrated manner:
 
 This model provides a consistent and scalable observability approach, combining centralized monitoring of shared ExaDB-C@C resources with environment-specific visibility and control.
 
-&nbsp;
-
 ### **2.2 Hybrid ExaDB-C@C Platform: Shared infrastructure with dedicated VMCs/AVMCs per environment**
 
-&nbsp;
 <p align="center">
 <img src="../content/exacc_use_case_2.png" width="1000" height="auto">
 </p>
 
 #### **ExaDB-C@C Resources**
-&nbsp;
+
 In this scenario, the ExaDB-C@C stack follows a **hybrid model**, where the infrastructure layer is shared while compute resources (VMCs/AVMCs) are dedicated per environment.
 
 There are two infrastructures, <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: one primary and one disaster recovery (DR), both deployed in the shared ExaCC infra compartment.
@@ -181,7 +169,7 @@ Autonomous Databases (ADB-Dedicated) is deployed in project-level compartments <
 The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
 
 #### **ExaDB-C@C Groups**
-&nbsp;
+
 The administrative groups <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined following a hybrid model, combining global, environment-level, and project-level responsibilities to balance central governance with environment isolation.
 
 At the global level, shared administration groups are defined:
@@ -202,7 +190,7 @@ These project-level DBA groups are scoped at the project level within each envir
 This model enforces a layered separation of duties, where infrastructure governance is partially centralized at the global level, environment-specific resources are managed at the environment level, and Autonomous Databases (ADB-Dedicated) are managed at the project level providing a balanced approach between central control, environment isolation, and project-level autonomy.
 
 #### **ExaDB-C@C Observability**
-&nbsp;
+
 The observability framework for this scenario is based on the combined use of **Events, Alarms, and Notifications**, enabling centralized monitoring and controlled dissemination of operational signals across both shared and environment-specific resources.
 
 **Events** 
@@ -247,7 +235,7 @@ At the global level, the following notification topics are defined to support sh
 - nott-lz-exacc-infra-workloads
 - nott-lz-exacc-db-workloads
 
-At the environment level, dedicated notification topics are defined for each project scope:
+At the environment level, dedicated notification topics are defined for each environment scope:
 
 - **Production**: nott-lz-prod-projects-exacc
 - **Pre-Production**: nott-lz-preprod-projects-exacc
@@ -267,13 +255,11 @@ This model provides a consistent and scalable observability approach, combining 
 
 ### **2.3 Dedicated ExaDB-C@C Platform: Fully dedicated infrastructure and VMCs/AVMCs per environment**
 
-&nbsp;
 <p align="center">
 <img src="../content/exacc_use_case_3.png" width="1000" height="auto">
 </p>
 
 #### **ExaDB-C@C Resources**
-&nbsp;
 
 In this scenario, the ExaDB-C@C stack follows a **fully dedicated model**, where both the infrastructure and compute layers are isolated per environment.
 
@@ -288,7 +274,6 @@ Autonomous Databases (ADB-Dedicated) are deployed in project-level compartments 
 The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
 
 #### **ExaDB-C@C Groups**
-&nbsp;
 
 The administrative groups <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined following a fully dedicated model, where responsibilities are primarily scoped at the environment level, with additional segregation at the project level for Autonomous databases.
 
@@ -306,7 +291,7 @@ These project-level DBA groups are not scoped at the environment level, but rath
 This model enforces a clear multi-level separation of duties, where infrastructure and core database layers are managed at the environment level and Autonomous Databases (ADB-Dedicated) are managed at the project level ensuring strong isolation, governance, and operational ownership across both environments and projects.
 
 #### **ExaDB-C@C Observability**
-&nbsp;
+
 The observability framework for this scenario is based on the combined use of **Events, Alarms, and Notifications**, enabling centralized monitoring and controlled dissemination of operational signals across both shared and environment-specific resources.
 
 **Events** 
@@ -348,7 +333,7 @@ At the global level, the following notification topics are defined to support sh
 - nott-lz-exacc-infra-workloads
 - nott-lz-exacc-db-workloads
 
-At the environment level, dedicated notification topics are defined for each project scope:
+At the environment level, dedicated notification topics are defined for each environment scope:
 
 - **Production**: nott-lz-prod-projects-exacc
 - **Pre-Production**: nott-lz-preprod-projects-exacc
@@ -422,8 +407,6 @@ Based on this capability, a deliberate design decision has been made to always d
 
 By combining these two approaches, the architecture acknowledges the structural constraints of VMC-based deployments—where the cluster defines the boundary—while leveraging the flexibility of Autonomous Databases to achieve project-level isolation and delegation.
 
-&nbsp;
-
 ## **3. Management of other resources**
 
 
@@ -488,7 +471,6 @@ IAM policies are defined accordingly, allowing DBA teams to manage backup config
 
 For more information, refer to the official documentation [Creating Database Backup Destinations for Oracle Exadata Database Service on Cloud@Customer](https://docs.oracle.com/en/engineered-systems/exadata-cloud-at-customer/ecccm/ecc-create-bkup-dest.html#GUID-24E43ABF-29D3-4660-BB2C-3FCAF8424293).
 
-&nbsp;
 &nbsp; 
 
 # License <!-- omit from toc -->
