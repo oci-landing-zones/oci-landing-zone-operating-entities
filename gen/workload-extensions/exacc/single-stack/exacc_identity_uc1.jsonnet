@@ -12,7 +12,7 @@ one_oe + exacc_identity + {
             children+: {
               'CMP-LZ-EXACC-KEY': {
                 name: 'cmp-lz-exacc',
-                description: 'ExaCC shared Platform',
+                description: 'Exacc shared Platform',
                 defined_tags: {
                   'tagns-lz-role.tag-lz-role': 'lz-exacc-admin',
                 },
@@ -41,7 +41,7 @@ one_oe + exacc_identity + {
                 children+: {
                   'CMP-LZ-PROD-EXACC-KEY': {
                     name: 'cmp-lz-prod-exacc',
-                    description: 'ExaCC Shared Platform',
+                    description: 'Exacc Shared Platform',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-admin',
                     },
@@ -71,7 +71,7 @@ one_oe + exacc_identity + {
                    children+: {
                   'CMP-LZ-PROD-PROJ1-DB-KEY': {
                     name: 'cmp-lz-prod-proj1-db',
-                    description: 'ExaCC Prod env database layer',
+                    description: 'Exacc Prod env database layer',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                     }
@@ -89,7 +89,7 @@ one_oe + exacc_identity + {
                 children+: {
                   'CMP-LZ-PREPROD-EXACC-KEY': {
                     name: 'cmp-lz-preprod-exacc',
-                    description: 'ExaCC Shared Platform',
+                    description: 'Exacc Shared Platform',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-admin',
                     },
@@ -119,7 +119,7 @@ one_oe + exacc_identity + {
                    children+: {
                   'CMP-LZ-PREPROD-PROJ1-DB-KEY': {
                     name: 'cmp-lz-preprod-proj1-db',
-                    description: 'ExaCC PreProd env database layer',
+                    description: 'Exacc PreProd env database layer',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                     }
