@@ -52,7 +52,7 @@ Although it is possible to fine-tune IAM policies to grant access to specific OH
 
 Similarly, AVMCs can be created on top of an ExaDB-D infrastructure. Within each AVMC, you can create multiple *Autonomous Container Databases (ACDs)*, and within each ACD, multiple *Autonomous Databases (ADB-Dedicated)*. Unlike regular VMCs, Autonomous components can be placed in different compartments, providing greater flexibility and simplifying IAM policy management. Additionally, these components require fewer operational tasks, as they are autonomously managed.
 
-IAM policies for ExaDB-D provide flexibility to define permissions by *resource type* (e.g., exadata-infrastructures, vmclusters, backup-destinations, db-nodes, etc.). Advanced IAM policy syntax can also be used to create fine-grained access control based on *permissions* and *API operations*. More details can be found in the [Policy Details for Oracle Exadata Database Service on Cloud@Customer](https://docs.oracle.com/en/engineered-systems/exadata-cloud-at-customer/ecccm/ecc-policy-details.html#GUID-523EBAE0-C17F-435A-97A6-374DE2F94747) documentation.
+IAM policies for ExaDB-D provide flexibility to define permissions by *resource type* (e.g., exadata-infrastructures, vmclusters, backup-destinations, db-nodes, etc.). Advanced IAM policy syntax can also be used to create fine-grained access control based on *permissions* and *API operations*. More details can be found in the [Policy Details for Exadata Cloud Infrastructure](https://docs.oracle.com/en-us/iaas/exadatacloud/doc/ecs-policy-details.html) documentation.
 
 This extension adopts such an approach, as certain operations (e.g., scaling OCPUs, system memory, or local file systems in VMCs) are typically handled by infrastructure or systems teams, while others (e.g., ASM storage scaling or database-related operations) are more suited to DBA teams. In some cases, operations may fail for different reasons, and each team’s expertise is better aligned with troubleshooting within their domain.
 
@@ -74,19 +74,23 @@ In this section, we describe the identified use case scenarios, providing additi
 
 #### **ExaDB-D Resources**
 
-In this scenario, the ExaDB-D stack is treated as a **shared platform** from the infrastructure perspective. There are two infrastructures, <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: one primary and one disaster recovery (DR), both deployed in the shared ExaCC infra compartment.
+In this scenario, the ExaDB-D stack is treated as a **shared platform** from the infrastructure perspective. 
 
-Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs) are all deployed within the same ExaCC DB compartment <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, as these resources cannot be distributed across multiple compartments. This model simplifies management but implies that access control must be handled carefully, as all resources reside in a shared scope.
+A Virtual Cloud Network (VCN) <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> is defined within the Landing Zone network compartment to support ExaDB-D deployments. This VCN is designed to host the database workloads and includes two subnets: a client subnet, used for application connectivity to the databases, and a backup subnet, dedicated to backup and recovery traffic.
 
-For Autonomous deployments AVMCs and Autonomous Container Databases (ACDs) are also created within the ExaCC DB compartment <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. However, Autonomous Databases (ADB-Dedicated) can be deployed in separate project compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This provides greater flexibility, allowing better isolation between environments, more granular IAM policy control, and easier delegation of administrative responsibilities.
+There are two infrastructures, <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: one primary and one disaster recovery (DR), both deployed in the shared ExaCS infra compartment.
 
-The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in the ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
+Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs) are all deployed within the same ExaCS DB compartment <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, as these resources cannot be distributed across multiple compartments. This model simplifies management but implies that access control must be handled carefully, as all resources reside in a shared scope.
+
+For Autonomous deployments AVMCs and Autonomous Container Databases (ACDs) are also created within the ExaCS DB compartment <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. However, Autonomous Databases (ADB-Dedicated) can be deployed in separate project compartments <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This provides greater flexibility, allowing better isolation between environments, more granular IAM policy control, and easier delegation of administrative responsibilities.
+
+The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in the ExaCS DB compartment <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
 
 #### **ExaDB-D Groups**
 
-The administrative groups <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined to align with the operational model of this shared platform and enforce a clear separation of responsibilities.
+The administrative groups <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined to align with the operational model of this shared platform and enforce a clear separation of responsibilities.
 
-The groups associated with the shared ExaCC environment are:
+The groups associated with the shared ExaCS environment are:
 
 - **Global Infra Admin Team**, responsible for the management and maintenance of the ExaDB-D infrastructure, including VMCs and AVMCs, as well as related infrastructure-level operations
 - **Global DBA Team**, responsible for database administration tasks within the shared compartment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs
@@ -103,12 +107,12 @@ The observability framework for this scenario is based on the combined use of **
 
 **Events** 
 
-Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured to capture relevant lifecycle and operational events generated by ExaDB-D resources. These rules are defined across both shared and environment-specific compartments and are responsible for routing events to the corresponding notification topics.
+Event rules <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured to capture relevant lifecycle and operational events generated by ExaDB-D resources. These rules are defined across both shared and environment-specific compartments and are responsible for routing events to the corresponding notification topics.
 
 At the shared level:
 
-- **ExaCC Infrastructure Compartment**: rul-lz-prod-notify-on-exacc-infra-events
-- **ExaCC Database Compartment**: rul-lz-prod-notify-on-exacc-db-events
+- **ExaCS Infrastructure Compartment**: rul-lz-prod-notify-on-exacs-infra-events
+- **ExaCS Database Compartment**: rul-lz-prod-notify-on-exacs-db-events
 
 At the project level:
 
@@ -119,7 +123,7 @@ These event rules ensure that operational changes, failures, or state transition
 
 **Alarms**
 
-Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within the shared ExaCC Database compartment to monitor key performance and utilization metrics of the database clusters.
+Alarms <img src="../content/i.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within the shared ExaCS Database compartment to monitor key performance and utilization metrics of the database clusters.
 
 The following alarms are configured:
 
@@ -133,17 +137,17 @@ These alarms continuously evaluate defined thresholds and, upon breach, generate
 
 **Notifications**
 
-Notification topics <img src="../content/i.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
+Notification topics <img src="../content/j.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
 
 At the global level, the following notification topics are defined to support shared infrastructure and database workloads:
 
-- nott-lz-exacc-infra-workloads
-- nott-lz-exacc-db-workloads
+- nott-lz-exacs-infra-workloads
+- nott-lz-exacs-db-workloads
 
 At the environment level, dedicated notification topics are defined for each project scope:
 
-- **Production**: nott-lz-prod-projects-exacc
-- **Pre-Production**: nott-lz-preprod-projects-exacc
+- **Production**: nott-lz-prod-projects-exacs
+- **Pre-Production**: nott-lz-preprod-projects-exacs
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 
@@ -170,19 +174,21 @@ This model provides a consistent and scalable observability approach, combining 
 &nbsp;
 In this scenario, the ExaDB-D stack follows a **hybrid model**, where the infrastructure layer is shared while compute resources (VMCs/AVMCs) are dedicated per environment.
 
-There are two infrastructures, <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: one primary and one disaster recovery (DR), both deployed in the shared ExaCC infra compartment.
+A Virtual Cloud Network (VCN) <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> is defined within the Landing Zone network compartment to support ExaDB-D deployments. This VCN is designed to host the database workloads and includes two subnets: a client subnet, used for application connectivity to the databases, and a backup subnet, dedicated to backup and recovery traffic.
 
-Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs), are deployed in environment-specific compartments <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This allows each environment to have dedicated database stacks, improving isolation, governance, and operational control compared to the fully shared model.
+There are two infrastructures, <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: one primary and one disaster recovery (DR), both deployed in the shared ExaCS infra compartment.
 
-For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are also created within their respective environment-specific compartments <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
+Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs), are deployed in environment-specific compartments <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This allows each environment to have dedicated database stacks, improving isolation, governance, and operational control compared to the fully shared model.
 
-Autonomous Databases (ADB-Dedicated) is deployed in project-level compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, maintaining a clear separation between projects within the same environment and enabling fine-grained IAM control.
+For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are also created within their respective environment-specific compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
 
-The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
+Autonomous Databases (ADB-Dedicated) is deployed in project-level compartments <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, maintaining a clear separation between projects within the same environment and enabling fine-grained IAM control.
+
+The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCS DB compartment <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
 
 #### **ExaDB-D Groups**
 &nbsp;
-The administrative groups <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined following a hybrid model, combining global, environment-level, and project-level responsibilities to balance central governance with environment isolation.
+The administrative groups <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined following a hybrid model, combining global, environment-level, and project-level responsibilities to balance central governance with environment isolation.
 
 At the global level, shared administration groups are defined:
 
@@ -207,15 +213,15 @@ The observability framework for this scenario is based on the combined use of **
 
 **Events** 
 
-Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured to capture relevant lifecycle and operational events generated by ExaDB-D resources. These rules are defined across both shared and environment-specific compartments and are responsible for routing events to the corresponding notification topics.
+Event rules <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured to capture relevant lifecycle and operational events generated by ExaDB-D resources. These rules are defined across both shared and environment-specific compartments and are responsible for routing events to the corresponding notification topics.
 
 At the shared level:
 
-- **ExaCC Infrastructure Compartment**: rul-lz-prod-notify-on-exacc-infra-events
+- **ExaCS Infrastructure Compartment**: rul-lz-prod-notify-on-exacs-infra-events
 
 At the environment level:
 
-- **ExaCC Prod/PreProd Database Compartment**: rul-lz-prod-notify-on-exacc-db-events
+- **ExaCS Prod/PreProd Database Compartment**: rul-lz-prod-notify-on-exacs-db-events
 
 At the project level:
 
@@ -226,7 +232,7 @@ These event rules ensure that operational changes, failures, or state transition
 
 **Alarms**
 
-Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within each environment-specific ExaCC Database compartment to monitor key performance and utilization metrics of the database clusters.
+Alarms <img src="../content/i.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within each environment-specific ExaCS Database compartment to monitor key performance and utilization metrics of the database clusters.
 
 The following alarms are configured:
 
@@ -240,17 +246,17 @@ These alarms continuously evaluate defined thresholds and, upon breach, generate
 
 **Notifications**
 
-Notification topics <img src="../content/i.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
+Notification topics <img src="../content/j.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
 
 At the global level, the following notification topics are defined to support shared infrastructure and database workloads:
 
-- nott-lz-exacc-infra-workloads
-- nott-lz-exacc-db-workloads
+- nott-lz-exacs-infra-workloads
+- nott-lz-exacs-db-workloads
 
 At the environment level, dedicated notification topics are defined for each project scope:
 
-- **Production**: nott-lz-prod-projects-exacc
-- **Pre-Production**: nott-lz-preprod-projects-exacc
+- **Production**: nott-lz-prod-projects-exacs
+- **Pre-Production**: nott-lz-preprod-projects-exacs
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 
@@ -277,20 +283,22 @@ This model provides a consistent and scalable observability approach, combining 
 
 In this scenario, the ExaDB-D stack follows a **fully dedicated model**, where both the infrastructure and compute layers are isolated per environment.
 
-Each environment is provisioned with its own ExaDB-D infrastructure <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, including both primary and disaster recovery (DR) deployments, ensuring complete isolation across environments.
+A Virtual Cloud Network (VCN) per environment <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> is defined within each environment network compartment to support ExaDB-D deployments. This VCN is designed to host the database workloads and includes two subnets: a client subnet, used for application connectivity to the databases, and a backup subnet, dedicated to backup and recovery traffic.
 
-Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs), are deployed within environment-specific compartments <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This ensures that each environment operates its own fully isolated database stack, with no shared resources across environments.
+Each environment is provisioned with its own ExaDB-D infrastructure <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, including both primary and disaster recovery (DR) deployments, ensuring complete isolation across environments.
 
-For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are also created within their respective environment-specific compartments <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, maintaining full separation between environments.
+Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs), are deployed within environment-specific compartments <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This ensures that each environment operates its own fully isolated database stack, with no shared resources across environments.
 
-Autonomous Databases (ADB-Dedicated) are deployed in project-level compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, providing isolation between projects within the same environment and enabling fine-grained IAM control.
+For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are also created within their respective environment-specific compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, maintaining full separation between environments.
 
-The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
+Autonomous Databases (ADB-Dedicated) are deployed in project-level compartments <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, providing isolation between projects within the same environment and enabling fine-grained IAM control.
+
+The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCS DB compartment <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
 
 #### **ExaDB-D Groups**
 &nbsp;
 
-The administrative groups <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined following a fully dedicated model, where responsibilities are primarily scoped at the environment level, with additional segregation at the project level for Autonomous databases.
+The administrative groups <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined following a fully dedicated model, where responsibilities are primarily scoped at the environment level, with additional segregation at the project level for Autonomous databases.
 
 For each environment, dedicated groups are defined:
 
@@ -311,12 +319,12 @@ The observability framework for this scenario is based on the combined use of **
 
 **Events** 
 
-Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured per environment to capture lifecycle and operational events generated by ExaDB-D resources.
+Event rules <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured per environment to capture lifecycle and operational events generated by ExaDB-D resources.
 
 At the environment level:
 
-- **ExaCC Infrastructure Compartment**: rul-lz-prod-notify-on-exacc-infra-events
-- **ExaCC Prod/PreProd Database Compartment**: rul-lz-prod-notify-on-exacc-db-events
+- **ExaCS Infrastructure Compartment**: rul-lz-prod-notify-on-exacs-infra-events
+- **ExaCS Prod/PreProd Database Compartment**: rul-lz-prod-notify-on-exacs-db-events
 
 At the project level:
 
@@ -327,7 +335,7 @@ This ensures that all events are handled within the scope of their corresponding
 
 **Alarms**
 
-Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within each environment-specific ExaCC Database compartment to monitor key performance and utilization metrics of the database clusters.
+Alarms <img src="../content/i.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within each environment-specific ExaCS Database compartment to monitor key performance and utilization metrics of the database clusters.
 
 The following alarms are configured:
 
@@ -341,17 +349,17 @@ These alarms continuously evaluate defined thresholds and, upon breach, generate
 
 **Notifications**
 
-Notification topics <img src="../content/i.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
+Notification topics <img src="../content/j.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
 
 At the global level, the following notification topics are defined to support shared infrastructure and database workloads:
 
-- nott-lz-exacc-infra-workloads
-- nott-lz-exacc-db-workloads
+- nott-lz-exacs-infra-workloads
+- nott-lz-exacs-db-workloads
 
 At the environment level, dedicated notification topics are defined for each project scope:
 
-- **Production**: nott-lz-prod-projects-exacc
-- **Pre-Production**: nott-lz-preprod-projects-exacc
+- **Production**: nott-lz-prod-projects-exacs
+- **Pre-Production**: nott-lz-preprod-projects-exacs
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 
@@ -400,15 +408,15 @@ This visual distinction allows quick identification of level of isolation (globa
 
 **Networking Strategy**
 
-Networking for ExaDB-D is designed to align with infrastructure constraints while enabling reuse and flexibility across environments.
+Networking for ExaDB-D is based on OCI-native constructs, enabling flexible and scalable connectivity across different deployment models.
 
-VMC Networks must be created within the ExaDB-D Infrastructure compartment, as they cannot reside in a different compartment from the infrastructure itself. Each VMC requires connectivity to on-premises networks through both client VLANs, used for application traffic, and backup VLANs, used for backup and replication purposes. These VLANs are trunked through the database server network interfaces.
+In this architecture, one or more Virtual Cloud Networks (VCNs) are defined to host ExaDB-D resources. The placement of these VCNs depends on the selected use case and organizational model. Depending on the design, VCNs may be defined as shared resources or at the environment level, providing different degrees of isolation and governance.
 
-In this design, separate VLANs are typically defined for Primary (PROD) and Disaster Recovery (DR) environments. However, depending on the customer’s network architecture, VLANs may be extended across data centers or availability locations, allowing the same VLANs to be reused across multiple ExaDB-D infrastructures.
+Each VCN is designed to include, at minimum, two subnets: a client subnet, used for application connectivity to the databases, and a backup subnet, dedicated to backup and recovery traffic. This separation ensures proper traffic isolation and aligns with Oracle recommendations for Exadata deployments in OCI.
 
-Although each VMC requires its own VMC Network resource, this does not imply that network segmentation must be unique per cluster. Multiple VMCs and AVMCs can share the same backend subnets and VLANs when operating within the same network domain. This enables efficient reuse of network configurations across environments and projects while still complying with ExaDB-D networking requirements.
+ExaDB-D deployments are provisioned within these VCNs, and all associated resources, including VMCs, leverage the defined subnets for communication. Multiple database clusters can operate within the same VCN and subnets, provided that appropriate segmentation and security controls are implemented using OCI constructs such as Network Security Groups (NSGs) and route tables.
 
-This approach ensures consistency, optimizes network resource utilization, and aligns with enterprise networking standards while respecting platform constraints.
+This approach allows network resources to be reused across environments when appropriate, or isolated per environment when required, depending on the chosen architectural pattern. It provides a balance between operational simplicity, resource efficiency, and the level of isolation needed for each workload.
 
 **Resource Placement Strategy**
 
@@ -474,19 +482,19 @@ For more information, refer to the official documentation [Manage Software Image
 
 ### **3.4 Backup Destinations**
 
-ExaDB-D supports multiple backup options, including integration with external systems such as on-premises Network File Systems (NFS) and Zero Data Loss Recovery Appliance (ZDLRA), allowing organizations to align database backups with their enterprise backup strategy.
+ExaDB-D supports multiple backup options, based on integration with OCI Autonomous Recovery Service and OCI Object Storage. Autonomous Recovery Service is the recommended backup destination for database workloads, providing advanced data protection, automated validation, and point-in-time recovery capabilities.
 
-OCI provides the Backup Destination resource to register and use these external systems within ExaDB-D. Backup configuration is defined in relation to the database platforms rather than as an independent resource.
+OCI provides the necessary mechanisms to configure backup destinations and policies as part of the database platform configuration. Backup configuration is therefore defined in relation to the database resources rather than as an independent resource.
 
-In this architecture, it is a design decision to define Backup Destinations in the same compartment as their associated database platforms ensuring alignment between backup configuration and the administrative scope of the databases.
+In this architecture, it has been chosen to represent Autonomous Recovery Service as the backup destination in the architecture diagrams, reflecting the recommended approach for ExaDB-D deployments.
 
-In VMC-based deployments, backup configuration is managed at the CDB level, following the scope of the VMC. In Autonomous deployments, backup configuration is defined at the ACD level and inherited by all ADB-Dedicated databases, even when these are deployed in project-level compartments. This creates a clear separation between database placement and backup configuration.
+In VMC-based deployments, backup configuration is managed at the Container Database (CDB) level, following the scope of the VMC where the database is hosted. In Autonomous Database deployments, backup configuration is defined at the Autonomous Container Database (ACD) level and inherited by all ADB-Dedicated databases, even when these are deployed in project-level compartments. This introduces a clear separation between database placement and backup configuration.
 
-This approach is recommended as it simplifies IAM policy management, maintains clear ownership boundaries, and ensures consistency with the operational model of the database platforms. Alternative placements may be considered, but they typically introduce additional complexity without clear benefits.
+This approach is recommended as it simplifies IAM policy management, maintains clear ownership boundaries, and ensures consistency with the operational model of the database platforms. Alternative designs, such as using Object Storage as the backup destination, may be considered depending on requirements, although they typically provide fewer advanced capabilities compared to Autonomous Recovery Service.
 
 IAM policies are defined accordingly, allowing DBA teams to manage backup configuration within the scope of the database resources they administer.
 
-For more information, refer to the official documentation [Creating Database Backup Destinations for Oracle Exadata Database Service on Cloud@Customer](https://docs.oracle.com/en/engineered-systems/exadata-cloud-at-customer/ecccm/ecc-create-bkup-dest.html#GUID-24E43ABF-29D3-4660-BB2C-3FCAF8424293).
+For more information, refer to the official documentation [Manage Database Backup and Recovery on Oracle Exadata Database Service on Dedicated Infrastructure](https://docs.oracle.com/en-us/iaas/exadatacloud/doc/ecs-managing-db-backup-and-recovery.html).
 
 &nbsp;
 &nbsp; 
