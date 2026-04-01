@@ -33,9 +33,9 @@ This Landing Zone Extension provides **two deployment approaches**, [single-stac
 
 <table style="width:100%; table-layout:fixed; word-break:break-word;">
   <colgroup>
-    <col style="width:25%;">
-    <col style="width:37.5%;">
-    <col style="width:37.5%;">
+    <col style="width:20%;">
+    <col style="width:40%;">
+    <col style="width:40%;">
   </colgroup>
   <thead>
     <tr>
