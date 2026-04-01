@@ -1,6 +1,4 @@
 {
-
-
   identity_domain_groups_configuration+: {
         default_identity_domain_id   : "COMMON-DOMAIN",
 
@@ -17,12 +15,12 @@
 
             "GRP-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": { 
               name: 'grp-lz-prod-proj1-exacc-admin',
-              description: 'Dedicated team to manage exacc db layer in proj1, prod environment',
+              description: 'Dedicated team to manage Exacc db layer in proj1, prod environment',
             },
 
              "GRP-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": { 
               name: 'grp-lz-preprod-proj1-exacc-admin',
-              description: 'Dedicated team to manage exacc db layer in proj1, prod environment',
+              description: 'Dedicated team to manage Exacc db layer in proj1, preprod environment',
             },
         }
   },
@@ -30,9 +28,9 @@
   policies_configuration+: {
     supplied_policies+: {
 
-      "PCY-LZ-EXACC-GENERIC-ADMIN-KEY": {
-        name: 'pcy-lz-shared-exacc-generic',
-        description: 'Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privilegies in all exacc compartments',
+      "PCY-LZ-GLOBAL-EXACC-GENERIC-ADMIN-KEY": {
+        name: 'pcy-lz-global-exacc-generic',
+        description: 'Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privileges in all Exacc compartments',
         compartment_id: 'TENANCY-ROOT',
         statements: [
           "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to use cloud-shell in tenancy",
@@ -47,15 +45,15 @@
         ],
       },
 
-      "PCY-LZ-EXACC-DB-ADMIN-KEY": {
-        name: 'pcy-lz-shared-exacc-db-admin',
-        description: 'Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privilegies in all exacc compartments',
+      "PCY-LZ-GLOBAL-EXACC-DB-ADMIN-KEY": {
+        name: 'pcy-lz-global-exacc-db-admin',
+        description: 'Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privileges in all Exacc compartments',
         compartment_id: 'CMP-LANDINGZONE-KEY',
         statements: [
           "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
           "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
           "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage data-safe-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
-          "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to use exadata-infrastructures in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin')), request.operation !='ValidateVmClusterNetwork',request.operation !='ActivateExadataInfrastructure',request.operation !='ChangeExadataInfrastructureCompartment',request.operation !='AddStorageCapacityExadataInfrastructure',request.operation !='CreateVmClusterNetwork',request.operation !='CreateVmClusterNetwork',request.operation !='UpdateVmClusterNetwork',request.operation !='DeleteVmClusterNetwork'}",
+          "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to use exadata-infrastructures in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin')), request.operation !='ValidateVmClusterNetwork',request.operation !='ActivateExadataInfrastructure',request.operation !='ChangeExadataInfrastructureCompartment',request.operation !='AddStorageCapacityExadataInfrastructure',request.operation !='CreateVmClusterNetwork',request.operation !='UpdateVmClusterNetwork',request.operation !='DeleteVmClusterNetwork'}",
           "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to use vmclusters in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin')), request.permission !='VM_CLUSTER_UPDATE_SSH_KEY', request.permission !='VM_CLUSTER_UPDATE_CPU',request.permission !='VM_CLUSTER_UPDATE_MEMORY',request.permission !='VM_CLUSTER_UPDATE_LOCAL_STORAGE',request.permission !='VM_CLUSTER_UPDATE_FILE_SYSTEM'}",
           "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage backups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
           "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage database-software-image in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
@@ -69,9 +67,9 @@
         ],
       },
 
-      "PCY-LZ-EXACC-INFRA-ADMIN-KEY": {
-       name: "pcy-lz-shared-exacc-infra-admin",
-       description: "Example policy which allows the grp-lz-global-exacc-infra-admin group users to manage the DB infra in sharead exacc platform compartment.",
+      "PCY-LZ-GLOBAL-EXACC-INFRA-ADMIN-KEY": {
+       name: "pcy-lz-global-exacc-infra-admin",
+       description: "Policy which allows the grp-lz-global-exacc-infra-admin group users to manage the DB infra in the shared Exacc platform compartment.",
        compartment_id: "CMP-LANDINGZONE-KEY",
        statements: [
           "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage exadata-infrastructures in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",
@@ -95,7 +93,7 @@
 
       "PCY-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
        name: "pcy-lz-prod-exacc-proj1-admin",
-       description: "Example policy which allows the grp-lz-prod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
+       description: "Policy which allows the grp-lz-prod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
        compartment_id: "CMP-LZ-PROD-PROJ1-DB-KEY",
        statements: [
           "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacc-admin' to read all-resources in compartment cmp-lz-prod-proj1-db",
@@ -113,7 +111,7 @@
 
       "PCY-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
        name: "pcy-lz-preprod-exacc-proj1-admin",
-       description: "Example policy which allows the grp-lz-preprod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
+       description: "Policy which allows the grp-lz-preprod-proj1-exacc-admin group users to manage the autonomous database layer in proj1.",
        compartment_id: "CMP-LZ-PREPROD-PROJ1-DB-KEY",
        statements: [
           "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacc-admin' to read all-resources in compartment cmp-lz-preprod-proj1-db",
