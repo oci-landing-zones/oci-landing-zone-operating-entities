@@ -1,11 +1,11 @@
 {
     "alarms_configuration": {
-        "default_compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
+        "default_compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
 
         "alarms": {
             "AL-LZ-CPUUTIL-KEY": {
                 "display_name"                               : "al-lz-db-cpuutil",
-                "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                 "is_enabled"                                 : "false",
 
@@ -20,8 +20,8 @@
 
             "AL-LZ-DB-CLUSTER-CPUUTIL-KEY": {
                 "display_name"                               : "al-lz-vmc-cpuutil",
-                "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
+                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-SHARED-INFRA-WORKLOADS-KEY"],
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -35,8 +35,8 @@
 
             "AL-LZ-DB-CLUSTER-DISKUTIL-KEY": {
                 "display_name"                               : "al-lz-vmc-dgutil",
-                "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
+                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-SHARED-INFRA-WORKLOADS-KEY"],
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -50,7 +50,7 @@
 
             "AL-LZ-DB-CLUSTER-FSUTIL-KEY": {
                 "display_name"                               : "al-lz-vmc-fsutil",
-                "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                 "is_enabled"                                 : "false",
 
@@ -65,8 +65,8 @@
 
             "AL-LZ-DB-CLUSTER-MEMUTIL-KEY": {
                 "display_name"                               : "al-lz-vmc-memutil",
-                "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
+                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-SHARED-INFRA-WORKLOADS-KEY"],
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -80,8 +80,8 @@
 
             "AL-LZ-DB-CLUSTER-SWAPUTIL-KEY": {
                 "display_name"                               : "al-lz-vmc-swaputil",
-                "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
+                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-SHARED-INFRA-WORKLOADS-KEY"],
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -108,7 +108,7 @@
 
             "AL-LZ-STORAGEUTIL-KEY": {
                 "display_name"                               : "al-lz-db-storageutil",
-                "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                 "is_enabled"                                 : "false",
 
@@ -129,7 +129,7 @@
         "event_rules": {
             "RUL-LZ-NOTIFICATION-OPERATOR-ACCESS-CONTROL-KEY": {
                 "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
+                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-SHARED-INFRA-WORKLOADS-KEY"],
                 "event_display_name"                         : "rul-lz-notify-on-opctl-events",
 
                 "supplied_events": [
@@ -152,7 +152,7 @@
             },
 
             "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-DB-KEY": {
-                "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-EXACC-DB-WORKLOADS-KEY"],
                 "event_display_name"                         : "rul-lz-notify-on-exacc-db-events",
 
@@ -218,8 +218,8 @@
             },
 
             "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-INFRA-KEY": {
-                "compartment_id"                             : "CMP-LZ-EXACC-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY"],
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACC-DB-KEY",
+                "destination_topic_ids"                      : ["NOTT-LZ-EXACC-SHARED-INFRA-WORKLOADS-KEY"],
                 "event_display_name"                         : "rul-lz-notify-on-exacc-infra-events",
 
                 "supplied_events": [
@@ -644,7 +644,7 @@
                 ]
             },
 
-            "NOTT-LZ-EXACC-INFRA-WORKLOADS-KEY": {
+            "NOTT-LZ-EXACC-SHARED-INFRA-WORKLOADS-KEY": {
                 "name"                                       : "nott-lz-exacc-infra-workloads",
                 "description"                                : "Topic for prod workloads notifications.",
                 "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
