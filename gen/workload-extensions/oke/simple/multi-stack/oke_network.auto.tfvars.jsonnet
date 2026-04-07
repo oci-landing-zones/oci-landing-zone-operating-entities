@@ -5,9 +5,9 @@ oke_network {
     network_configuration_categories+: {
       oke+: {
         non_vcn_specific_gateways+: {
-          inject_into_existing_drg+: {
+          inject_into_existing_drgs+: {
             'DRG-FRA-LZ-HUB-KEY'+: {
-              drg_key: 'DRG-FRA-LZ-HUB-KEY',
+              drg_id: 'DRG-FRA-LZ-HUB-KEY',
 
               drg_attachments+: {
                 'DRG-VCN-OKE-PROD-KEY': {
