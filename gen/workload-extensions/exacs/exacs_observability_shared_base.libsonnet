@@ -1,12 +1,10 @@
 {
     "alarms_configuration": {
-        "default_compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
-
         "alarms": {
             "AL-LZ-CPUUTIL-KEY": {
-                "display_name"                               : "al-lz-db-cpuutil",
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-DB-WORKLOADS-KEY"],
+                "display_name"                               : "al-lz-db-cpuutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -19,9 +17,9 @@
             },
 
             "AL-LZ-DB-CLUSTER-CPUUTIL-KEY": {
-                "display_name"                               : "al-lz-vmc-cpuutil",
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
+                "display_name"                               : "al-lz-vmc-cpuutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -34,9 +32,9 @@
             },
 
             "AL-LZ-DB-CLUSTER-DISKUTIL-KEY": {
-                "display_name"                               : "al-lz-vmc-dgutil",
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
+                "display_name"                               : "al-lz-vmc-dgutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -49,9 +47,9 @@
             },
 
             "AL-LZ-DB-CLUSTER-FSUTIL-KEY": {
-                "display_name"                               : "al-lz-vmc-fsutil",
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-DB-WORKLOADS-KEY"],
+                "display_name"                               : "al-lz-vmc-fsutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -64,9 +62,9 @@
             },
 
             "AL-LZ-DB-CLUSTER-MEMUTIL-KEY": {
-                "display_name"                               : "al-lz-vmc-memutil",
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
+                "display_name"                               : "al-lz-vmc-memutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -79,9 +77,9 @@
             },
 
             "AL-LZ-DB-CLUSTER-SWAPUTIL-KEY": {
-                "display_name"                               : "al-lz-vmc-swaputil",
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
+                "display_name"                               : "al-lz-vmc-swaputil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -94,9 +92,9 @@
             },
 
             "AL-LZ-STORAGEUTIL-KEY": {
-                "display_name"                               : "al-lz-db-storageutil",
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-DB-WORKLOADS-KEY"],
+                "display_name"                               : "al-lz-db-storageutil",
                 "is_enabled"                                 : "false",
 
                 "supplied_alarm": {
@@ -107,7 +105,8 @@
                     "severity"                               : "CRITICAL"
                 }
             }
-        }
+        },
+        "default_compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY"
     },
 
     "events_configuration": {
@@ -204,6 +203,24 @@
                 ]
             },
 
+                "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-VMC-KEY": {
+                "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
+                "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
+                "event_display_name"                         : "rul-lz-notify-on-exacs-vcm-events",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
+                    "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
+                    "com.oraclecloud.databaseservice.changevmclustercompartment",
+                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
+                    "com.oraclecloud.databaseservice.deletevmcluster.end",
+                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
+                    "com.oraclecloud.databaseservice.updatevmcluster.end",
+                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
+                    "com.oraclecloud.databaseservice.patchvmcluster.end"
+                ]
+            },
+
             "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY": {
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACS-INFRA-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
@@ -241,24 +258,6 @@
                     "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancestorageservers.end",
                     "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancedbservers.start",
                     "com.oraclecloud.databaseservice.exacsinfrastructuremaintenancedbservers.end"
-                ]
-            },
-
-            "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-VMC-KEY": {
-                "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
-                "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
-                "event_display_name"                         : "rul-lz-notify-on-exacs-vcm-events",
-
-                "supplied_events": [
-                    "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
-                    "com.oraclecloud.databaseservice.deletevmclusternetwork.end",
-                    "com.oraclecloud.databaseservice.changevmclustercompartment",
-                    "com.oraclecloud.databaseservice.deletevmcluster.begin",
-                    "com.oraclecloud.databaseservice.deletevmcluster.end",
-                    "com.oraclecloud.databaseservice.updatevmcluster.begin",
-                    "com.oraclecloud.databaseservice.updatevmcluster.end",
-                    "com.oraclecloud.databaseservice.patchvmcluster.begin",
-                    "com.oraclecloud.databaseservice.patchvmcluster.end"
                 ]
             },
 
@@ -369,141 +368,14 @@
         }
     },
 
-    "home_region_events_configuration": {
-        "default_compartment_id"                             : "TENANCY-ROOT",
-
-        "event_rules": {
-            "RUL-LZ-CLOUDGUARD-KEY": {
-                "destination_topic_ids"                      : ["NOTT-LZ-CLOUDGUARD-KEY"],
-                "event_display_name"                         : "rul-lz-notify-on-cloudguard-changes",
-
-                "supplied_events": [
-                    "com.oraclecloud.cloudguard.problemdetected",
-                    "com.oraclecloud.cloudguard.problemdismissed",
-                    "com.oraclecloud.cloudguard.problemremediated",
-                    "com.oraclecloud.cloudguard.announcements",
-                    "com.oraclecloud.cloudguard.status",
-                    "com.oraclecloud.cloudguard.problemthresholdreached"
-                ]
-            },
-
-            "RUL-LZ-IAM-KEY": {
-                "destination_topic_ids"                      : ["NOTT-LZ-IAM-KEY"],
-                "event_display_name"                         : "rul-lz-notify-on-iam-changes",
-
-                "supplied_events": [
-                    "com.oraclecloud.identitycontrolplane.createidentityprovider",
-                    "com.oraclecloud.identitycontrolplane.deleteidentityprovider",
-                    "com.oraclecloud.identitycontrolplane.updateidentityprovider",
-                    "com.oraclecloud.identitycontrolplane.createidpgroupmapping",
-                    "com.oraclecloud.identitycontrolplane.deleteidpgroupmapping",
-                    "com.oraclecloud.identitycontrolplane.updateidpgroupmapping",
-                    "com.oraclecloud.identitycontrolplane.addusertogroup",
-                    "com.oraclecloud.identitycontrolplane.creategroup",
-                    "com.oraclecloud.identitycontrolplane.deletegroup",
-                    "com.oraclecloud.identitycontrolplane.removeuserfromgroup",
-                    "com.oraclecloud.identitycontrolplane.updategroup",
-                    "com.oraclecloud.identitycontrolplane.createpolicy",
-                    "com.oraclecloud.identitycontrolplane.deletepolicy",
-                    "com.oraclecloud.identitycontrolplane.updatepolicy",
-                    "com.oraclecloud.identitycontrolplane.createuser",
-                    "com.oraclecloud.identitycontrolplane.deleteuser",
-                    "com.oraclecloud.identitycontrolplane.updateuser",
-                    "com.oraclecloud.identitycontrolplane.updateusercapabilities",
-                    "com.oraclecloud.identitycontrolplane.updateuserstate",
-                    "com.oraclecloud.identityControlPlane.UpdateSwiftPassword",
-                    "com.oraclecloud.identityControlPlane.CreateOrResetPassword"
-                ]
-            }
-        }
-    },
-
-    "notifications_configuration": {
+    "notifications_configuration"+: {
         "default_compartment_id"                             : "CMP-LZ-SECURITY-KEY",
 
-        "topics": {
-            "NOTT-LZ-CLOUDGUARD-KEY": {
-                "name"                                       : "nott-lz-cloudguard",
-                "description"                                : "Topic for Cloud Guard related notifications.",
-                "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-IAM-KEY": {
-                "name"                                       : "nott-lz-iam",
-                "description"                                : "Topic for IAM related notifications.",
-                "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-NETWORK-KEY": {
-                "name"                                       : "nott-lz-network",
-                "description"                                : "Topic for network related notifications.",
-                "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY": {
-                "name"                                       : "nott-lz-preprod-exacs-projects",
-                "description"                                : "Topic for prod platform notifications.",
-                "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-PROD-EXACS-PROJECTS-KEY": {
-                "name"                                       : "nott-lz-prod-exacs-projects",
-                "description"                                : "Topic for prod platform notifications.",
-                "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-SECURITY-KEY": {
-                "name"                                       : "nott-lz-security",
-                "description"                                : "Topic for notifications.",
-                "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
-
-                "subscriptions": [
-                    {
-                        "protocol"                           : "EMAIL",
-                        "values"                             : ["email.address@example.com"]
-                    }
-                ]
-            },
-
+        "topics"+: {
             "NOTT-LZ-SHARED-EXACS-DB-WORKLOADS-KEY": {
-                "name"                                       : "nott-lz-shared-exacs-db-workloads",
-                "description"                                : "Topic for prod workloads notifications.",
                 "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
+                "description"                                : "Topic for prod workloads notifications.",
+                "name"                                       : "nott-lz-shared-exacs-db-workloads",
 
                 "subscriptions": [
                     {
@@ -514,9 +386,9 @@
             },
 
             "NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY": {
-                "name"                                       : "nott-lz-shared-exacs-infra-workloads",
-                "description"                                : "Topic for prod workloads notifications.",
                 "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
+                "description"                                : "Topic for prod workloads notifications.",
+                "name"                                       : "nott-lz-shared-exacs-infra-workloads",
 
                 "subscriptions": [
                     {
@@ -524,46 +396,32 @@
                         "values"                             : ["email.address@example.com"]
                     }
                 ]
-            }
-        }
-    },
+            },
 
-    "service_connectors_configuration": {
-        "default_compartment_id"                             : "CMP-LZ-SECURITY-KEY",
+            "NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY": {
+                "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "description"                                : "Topic for prod platform notifications.",
+                "name"                                       : "nott-lz-preprod-exacs-projects",
 
-        "buckets": {
-            "BKT-LZ-SERVICE-CONNECTOR": {
-                "name"                                       : "bkt-lz-service-connector",
-                "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
-                "cis_level"                                  : "1"
-            }
-        },
+                "subscriptions": [
+                    {
+                        "protocol"                           : "EMAIL",
+                        "values"                             : ["email.address@example.com"]
+                    }
+                ]
+            },
 
-        "service_connectors": {
-            "SCH-LZ-MONITOR-KEY": {
-                "display_name"                               : "sch-lz-monitor",
+            "NOTT-LZ-PROD-EXACS-PROJECTS-KEY": {
+                "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
+                "description"                                : "Topic for prod platform notifications.",
+                "name"                                       : "nott-lz-prod-exacs-projects",
 
-                "policy": {
-                    "name"                                   : "service-connector-audit-policy",
-                    "description"                            : "IAM policy for letting Service Connector to push data to target resource.",
-                    "compartment_id"                         : "CMP-LZ-SECURITY-KEY"
-                },
-
-                "source": {
-                    "kind"                                   : "logging",
-
-                    "audit_logs": [
-                        {
-                            "cmp_id"                         : "ALL"
-                        }
-                    ]
-                },
-
-                "target": {
-                    "bucket_name"                            : "bkt-lz-service-connector",
-                    "bucket_object_name_prefix"              : "sch",
-                    "kind"                                   : "objectstorage"
-                }
+                "subscriptions": [
+                    {
+                        "protocol"                           : "EMAIL",
+                        "values"                             : ["email.address@example.com"]
+                    }
+                ]
             }
         }
     }
