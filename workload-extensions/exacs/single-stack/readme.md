@@ -64,7 +64,6 @@
         pcy-lz-global-exacs-db-admin,<br>
         pcy-lz-global-exacs-generic,<br>
         pcy-lz-global-exacs-infra-admin,<br>
-        pcy-lz-global-exacs-vmc-admin,<br>
         pcy-lz-preprod-exacs-proj1-admin,<br>
         pcy-lz-prod-exacs-proj1-admin
       </td>
