@@ -91,6 +91,7 @@
       <td><strong>WE Events</strong></td>
       <td>
         rul-lz-notify-on-opctl-events,<br>
+        rul-lz-notify-on-exacc-vmc-events,<br>
         rul-lz-notify-on-exacc-db-events,<br>
         rul-lz-notify-on-exacc-infra-events
       </td>
