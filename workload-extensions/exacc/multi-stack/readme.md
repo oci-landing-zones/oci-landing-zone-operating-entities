@@ -39,9 +39,9 @@
     <tr>
       <td><strong>WE compartments</strong></td>
       <td>
-        cmp-lz-platform &gt; cmp-lz-shared-exacc &gt; cmp-lz-shared-exacc-db<br><br>
-        cmp-lz-platform &gt; cmp-lz-shared-exacc &gt; cmp-lz-shared-exacc-infra<br><br>
-        cmp-lz-platform &gt; cmp-lz-prod-projects &gt; cmp-lz-prod-proj1 &gt; cmp-lz-prod-proj1-db<br><br>
+        cmp-lz-platform &gt; cmp-lz-shared-exacc &gt; cmp-lz-shared-exacc-db<br>
+        cmp-lz-platform &gt; cmp-lz-shared-exacc &gt; cmp-lz-shared-exacc-infra<br>
+        cmp-lz-platform &gt; cmp-lz-prod-projects &gt; cmp-lz-prod-proj1 &gt; cmp-lz-prod-proj1-db<br>
         cmp-lz-platform &gt; cmp-lz-preprod-projects &gt; cmp-lz-preprod-proj1 &gt; cmp-lz-preprod-proj1-db
       </td>
       <td></td>
@@ -106,7 +106,8 @@
 | USE CASE | 1 | 2 | 3 |
 |----------|---|---|---|
 | Description | [Shared exacc platform](../exacc_use_cases/readme.md/#21-shared-exadb-cc-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments) |  |  |
-| Deployment | | Soon | Soon |
+| Deployment | [<img src="../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacc/multi-stack/exacc_identity_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacc/multi-stack/exacc_observability_uc1.json"}). To deploy with ORM, you’ll need to configure outputs and dependencies, since pre-existing resources will be used. To learn more about this, go here.| Soon | Soon |
+|Files|  [iam](./exacc_identity_uc1.json), [observability](./exacc_observability_uc1.json) |
 
 
 &nbsp;
