@@ -68,7 +68,7 @@ This Landing Zone Extension provides **two deployment approaches**, [single-stac
     <tr>
       <td><strong>Deployment components</strong></td>
       <td>lz identity domain, One-oe + ExaDB-D groups, One-oe + ExaDB-D policies &amp; One-oe + ExaDB-D Observability resources</td>
-      <td>ExaDB-D groups, policies &amp; obs. resoruces</td>
+      <td>ExaDB-D groups, policies &amp; obs. resources</td>
     </tr>
     <tr>
       <td><strong>Resource Lifecycle</strong></td>
