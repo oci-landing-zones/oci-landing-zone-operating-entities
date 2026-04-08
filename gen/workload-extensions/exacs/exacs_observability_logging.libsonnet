@@ -17,7 +17,7 @@
     },
 
     log_groups+: {
-      "LGRP-LZ-VCN-FLOW-KEY": {
+      "LGRP-LZ-SHARED-EXACS-VCN-FLOW-KEY": {
         "name": "lgrp-lz-shared-exacs-vcn-flow",
       },
     },

@@ -45,13 +45,6 @@
                                 "display_name"                  : "nsg-fra-lz-shared-exacs-db",
 
                                 "route_rules": {
-                                    "drg_route": {
-                                        "description"           : "Route to the 0.0.0.0/0 through DRG",
-                                        "destination"           : "0.0.0.0/0",
-                                        "destination_type"      : "CIDR_BLOCK",
-                                        "network_entity_key"    : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
                                     "sgw_route": {
                                         "description"           : "Route to Oracle Services Network through Service GW",
                                         "destination"           : "all-services",
