@@ -5,7 +5,7 @@
 
 | | |
 | -------------------- | ----------------------------------------------------- |
-| **NAME**         | WE EXACC Deployment to extend a existing One-oe LZ (Multi-Stack)                                    |
+| **NAME**         | WE EXACC Deployment to extend an existing One-oe LZ (Multi-Stack)                                    |
 | **OBJECTIVE**        |  WE EXACC   |
 | **TARGET RESOURCES** | compartments, groups, policies, events, alarms and notifications |
 

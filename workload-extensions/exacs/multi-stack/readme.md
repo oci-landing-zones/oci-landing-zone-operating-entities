@@ -5,7 +5,7 @@
 
 | | |
 | -------------------- | ----------------------------------------------------- |
-| **NAME**         | WE ExaDB-D Deployment to extend a existing One-oe LZ (Multi-Stack)                                    |
+| **NAME**         | WE ExaDB-D Deployment to extend an existing One-oe LZ (Multi-Stack)                                    |
 | **OBJECTIVE**        |  WE ExaDB-D   |
 | **TARGET RESOURCES** | compartments, groups, policies, network, events, alarms and notifications |
 
@@ -98,9 +98,11 @@
        <td>-</td>
       <td>-</td>
     </tr>
-        <td colspan="4"><strong>NETWORK</strong></td>
     <tr>
-      <td><strong>WE VCN and Subets</strong></td>
+      <td colspan="4"><strong>NETWORK</strong></td>
+    </tr>
+    <tr>
+      <td><strong>WE VCN and Subnets</strong></td>
       <td>
       </td>
       <td>-</td>
@@ -124,9 +126,9 @@
 
 | USE CASE | 1 | 2 | 3 |
 |----------|---|---|---|
-| Description | [Shared exacs platform](../exacs_use_cases/readme.md/#21-shared-exadb-cc-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments) |  |  |
-| Deployment | [<img src="../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacs_update/workload-extensions/exacs/multi-stack/exacs_identity_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacs_update/workload-extensions/exacs/multi-stack/exacs_observability_uc1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacs_update/workload-extensions/exacs/multi-stack/exacs_network_uc1_pre.json"}). To deploy with ORM, you’ll need to configure outputs and dependencies, since pre-existing resources will be used. To learn more about this, go here.| Soon | Soon |
-|Files|  [iam](./exacs_identity_uc1.json), [observability without VCN Flow logs](./exacs_observability_uc1_pre.json) , [observability with VCN Flow logs](./exacs_observability_uc1_pre.json), [network, shared exacc spoke vcn](./exacs_network_uc1_pre.json) , [network, one-oe update to add attachment and RTs](./exacs_network_uc1_pre.json) |
+| Description | [Shared exacs platform](../exacs_use_cases/readme.md/#21-shared-exadb-d-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments) |  |  |
+| Deployment | [<img src="../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacs/multi-stack/exacs_identity_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacs/multi-stack/exacs_observability_uc1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacs/multi-stack/exacs_network_uc1_pre.json"}). To deploy with ORM, you’ll need to configure outputs and dependencies, since pre-existing resources will be used. To learn more about this, go here.| Soon | Soon |
+|Files|  [iam](./exacs_identity_uc1.json), [observability without VCN Flow logs](./exacs_observability_uc1_pre.json) , [observability with VCN Flow logs](./exacs_observability_uc1.json), [network, shared exacs spoke vcn](./exacs_network_uc1_pre.json) , [network, one-oe update to add attachment and RTs](./oneoe_network_hub_e_post.json) |
 
 
 &nbsp;

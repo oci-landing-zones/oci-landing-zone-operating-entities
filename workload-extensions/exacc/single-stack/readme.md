@@ -6,7 +6,7 @@
 | | |
 | -------------------- | ----------------------------------------------------- |
 | **NAME**         | Complete Landing Zone with EXACC (Single-Stack)                                    |
-| **OBJECTIVE**        | Deploy OneOE Landing Zone (No Network Layer) + WE EXACC  |
+| **OBJECTIVE**        | Deploy One-oe Landing Zone (No Network Layer) + WE EXACC  |
 | **TARGET RESOURCES** | Complete LZ Foundation, IAM, Security, Observability |
 
 

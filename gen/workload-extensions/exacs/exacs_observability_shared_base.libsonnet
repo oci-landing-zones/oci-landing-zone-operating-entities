@@ -206,7 +206,7 @@
                 "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-VMC-KEY": {
                 "compartment_id"                             : "CMP-LZ-SHARED-EXACS-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-SHARED-EXACS-INFRA-WORKLOADS-KEY"],
-                "event_display_name"                         : "rul-lz-notify-on-exacs-vcm-events",
+                "event_display_name"                         : "rul-lz-notify-on-exacs-vmc-events",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletevmclusternetwork.begin",
@@ -284,7 +284,6 @@
                     "com.oraclecloud.databaseservice.patchdbhome.begin",
                     "com.oraclecloud.databaseservice.patchdbhome.end",
                     "com.oraclecloud.databaseservice.movedatabase.end",
-                    "com.oraclecloud.databaseservice.movedatabase.end",
                     "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
                     "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
@@ -296,7 +295,6 @@
                     "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
                     "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
                     "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
                     "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
                     "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
                     "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
@@ -332,38 +330,7 @@
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "event_display_name"                         : "rul-lz-prod-notify-on-notifications-projects",
 
-                "supplied_events": [
-                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
-                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
-                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
-                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
-                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
-                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
-                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
-                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
-                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
-                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
-                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
-                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
-                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
-                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
-                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
-                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
-                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end"
-                ]
+                "supplied_events"                            : $.events_configuration.event_rules["RUL-LZ-PREPROD-NOTIFICATION-PROJECTS-KEY"].supplied_events
             }
         }
     },
