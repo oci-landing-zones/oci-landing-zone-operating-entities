@@ -21,85 +21,12 @@
 
 
 ## **3. Architecture Components**
-&nbsp;
+| JSON configurations | Configuration-defined components | Resources |
+|:-|:-|:-|
+| **IAM configuration**</br> [exacc_identity_uc1.json](exacc_identity_uc1.json) | • Exacc compartments</br> • Exacc IAM groups and policies | cmp-lz-preprod-exacc, cmp-lz-preprod-exacc-db, cmp-lz-preprod-exacc-infra, cmp-lz-preprod-proj1-db, cmp-lz-prod-exacc, cmp-lz-prod-exacc-db, cmp-lz-prod-exacc-infra, cmp-lz-prod-proj1-db, cmp-lz-shared-exacc, cmp-lz-shared-exacc-db, cmp-lz-shared-exacc-infra <br><br> grp-lz-global-exacc-db-admin, grp-lz-global-exacc-infra-admin, grp-lz-preprod-proj1-exacc-admin, grp-lz-prod-proj1-exacc-admin <br><br> pcy-lz-global-exacc-db-admin, pcy-lz-global-exacc-generic, pcy-lz-global-exacc-infra-admin, pcy-lz-preprod-exacc-proj1-admin, pcy-lz-prod-exacc-proj1-admin |
+| **Observability configuration**</br> [exacc_observability_uc1.json](exacc_observability_uc1.json) | • Events</br> • Alarms</br> • Notifications | rul-lz-notify-on-opctl-events, rul-lz-notify-on-exacc-vmc-events, rul-lz-notify-on-exacc-db-events, rul-lz-notify-on-exacc-infra-events, rul-lz-preprod-notify-on-notifications-projects, rul-lz-prod-notify-on-notifications-projects <br><br> al-lz-db-cpuutil, al-lz-vmc-cpuutil, al-lz-vmc-dgutil, al-lz-vmc-fsutil, al-lz-vmc-memutil, al-lz-vmc-swaputil, al-lz-db-storageutil <br><br> nott-lz-exacc-db-workloads, nott-lz-exacc-infra-workloads, nott-lz-preprod-exacc-projects, nott-lz-prod-exacc-projects |
 
-<table border="1">
-  <thead>
-    <tr>
-      <th>USE CASE</th>
-      <th>1</th>
-      <th>2</th>
-      <th>3</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td colspan="4"><strong>IAM</strong></td>
-    </tr>
-    <tr>
-      <td><strong>WE compartments</strong></td>
-      <td>
-        cmp-lz-platform &gt; cmp-lz-shared-exacc &gt; cmp-lz-shared-exacc-db<br>
-        cmp-lz-platform &gt; cmp-lz-shared-exacc &gt; cmp-lz-shared-exacc-infra<br>
-        cmp-lz-platform &gt; cmp-lz-prod-projects &gt; cmp-lz-prod-proj1 &gt; cmp-lz-prod-proj1-db<br>
-        cmp-lz-platform &gt; cmp-lz-preprod-projects &gt; cmp-lz-preprod-proj1 &gt; cmp-lz-preprod-proj1-db
-      </td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><strong>WE groups</strong></td>
-      <td>
-        grp-lz-global-exacc-db-admin,<br>
-        grp-lz-global-exacc-infra-admin,<br>
-        grp-lz-preprod-proj1-exacc-admin,<br>
-        grp-lz-preprod-proj1-exacc-admin
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td><strong>WE policies</strong></td>
-      <td>
-        pcy-lz-global-exacc-db-admin,<br>
-        pcy-lz-global-exacc-generic,<br>
-        pcy-lz-global-exacc-infra-admin,<br>
-        pcy-lz-preprod-exacc-proj1-admin,<br>
-        pcy-lz-prod-exacc-proj1-admin
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td colspan="4"><strong>OBSERVABILITY</strong></td>
-    </tr>
-    <tr>
-      <td><strong>WE Alarms</strong></td>
-      <td>
-        al-lz-db-cpuutil,<br>
-        al-lz-vmc-cpuutil,<br>
-        al-lz-vmc-dgutil,<br>
-        al-lz-vmc-fsutil,<br>
-        al-lz-vmc-memutil,<br>
-        al-lz-vmc-swaputil,<br>
-        al-lz-db-storageutil
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td><strong>WE Events</strong></td>
-      <td>
-        rul-lz-notify-on-opctl-events,<br>
-        rul-lz-notify-on-exacc-vmc-events,<br>
-        rul-lz-notify-on-exacc-db-events,<br>
-        rul-lz-notify-on-exacc-infra-events
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-  </tbody>
-</table>
+&nbsp;
 
 
 ## **5. Deployment Steps**

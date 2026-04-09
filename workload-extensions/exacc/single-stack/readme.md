@@ -21,85 +21,14 @@
 
 
 ## **3. Architecture Components**
-&nbsp;
+| JSON configurations | Configuration-defined components | Resources |
+|:-|:-|:-|
+| **IAM configuration**</br> [exacc_identity_uc1.json](exacc_identity_uc1.json) | • Landing Zone and Exacc compartments</br> • Landing Zone and Exacc IAM groups and policies | cmp-landingzone, cmp-lz-network, cmp-lz-platform, cmp-lz-preprod, cmp-lz-preprod-exacc, cmp-lz-preprod-exacc-db, cmp-lz-preprod-exacc-infra, cmp-lz-preprod-network, cmp-lz-preprod-platform, cmp-lz-preprod-proj1, cmp-lz-preprod-proj1-db, cmp-lz-preprod-projects, cmp-lz-preprod-security, cmp-lz-prod, cmp-lz-prod-exacc, cmp-lz-prod-exacc-db, cmp-lz-prod-exacc-infra, cmp-lz-prod-network, cmp-lz-prod-platform, cmp-lz-prod-proj1, cmp-lz-prod-proj1-db, cmp-lz-prod-projects, cmp-lz-prod-security, cmp-lz-security, cmp-lz-shared-exacc, cmp-lz-shared-exacc-db, cmp-lz-shared-exacc-infra <br><br> grp-auditors-admin, grp-cost-admin, grp-iam-admin, grp-lz-global-exacc-db-admin, grp-lz-global-exacc-infra-admin, grp-lz-network-admin, grp-lz-preprod-proj1-admin, grp-lz-preprod-proj1-exacc-admin, grp-lz-prod-proj1-admin, grp-lz-prod-proj1-exacc-admin, grp-lz-security-admin, grp-security-admin <br><br> pcy-auditing-admin, pcy-cost-admin, pcy-generic-admin, pcy-iam-admin, pcy-lz-global-exacc-db-admin, pcy-lz-global-exacc-generic, pcy-lz-global-exacc-infra-admin, pcy-lz-network-admin, pcy-lz-preprod-exacc-proj1-admin, pcy-lz-preprod-proj1-admin, pcy-lz-preprod-proj1-admin-net, pcy-lz-preprod-proj1-admin-sec, pcy-lz-prod-exacc-proj1-admin, pcy-lz-prod-proj1-admin, pcy-lz-prod-proj1-admin-net, pcy-lz-prod-proj1-admin-sec, pcy-lz-security-admin, pcy-security-admin, pcy-services-admin |
+| **Governance configuration**</br> [exacc_governance_uc1.json](exacc_governance_uc1.json) | • Tag namespace and tag definitions | tagns-lz-role, tag-lz-role |
+| **Security configuration**</br> **CIS v1**: [exacc_security_cis1_uc1.json](exacc_security_cis1_uc1.json)</br> **CIS v2**: [exacc_security_cis2_uc1.json](exacc_security_cis2_uc1.json) | • Cloud Guard target</br> • Security Zone recipes and targets</br> • Vulnerability scanning resources | cg-tgt-root, key-lz-shared-oss-audit-bkt, sz-rcp-lz-01-cis-l1, sz-rcp-lz-02-cis-l2, sz-rcp-lz-03-shared-network, sz-rcp-lz-04-environment-network, sz-rcp-lz-05-workload, sz-tgt-lz-cis-l1, sz-tgt-lz-cis-l2, vlt-lz-shared-security, vss-rcph-lz, vss-tgth-lz |
+| **Observability configuration**</br> **CIS v1**: [exacc_observability_cis1_uc1.json](exacc_observability_cis1_uc1.json)</br> **CIS v2**: [exacc_observability_cis2_uc1.json](exacc_observability_cis2_uc1.json) | • Events</br> • Alarms</br> • Notifications</br> • Service connector components | rul-lz-notify-network, rul-lz-notify-on-cloudguard-changes, rul-lz-notify-on-exacc-db-events, rul-lz-notify-on-exacc-infra-events, rul-lz-notify-on-exacc-vmc-events, rul-lz-notify-on-iam-changes, rul-lz-notify-on-opctl-events, rul-lz-notify-security, rul-lz-preprod-notify-network, rul-lz-preprod-notify-on-notifications-projects, rul-lz-preprod-notify-security, rul-lz-prod-notify-network, rul-lz-prod-notify-on-notifications-projects, rul-lz-prod-notify-security <br><br> al-lz-db-cpuutil, al-lz-db-storageutil, al-lz-network-lb, al-lz-vmc-cpuutil, al-lz-vmc-dgutil, al-lz-vmc-fsutil, al-lz-vmc-memutil, al-lz-vmc-swaputil <br><br> nott-lz-cloudguard, nott-lz-exacc-db-workloads, nott-lz-exacc-infra-workloads, nott-lz-iam, nott-lz-network, nott-lz-preprod-exacc-projects, nott-lz-prod-exacc-projects, nott-lz-security <br><br> bkt-lz-service-connector, sch-lz-monitor, service-connector-audit-policy |
 
-<table border="1">
-  <thead>
-    <tr>
-      <th>USE CASE</th>
-      <th>1</th>
-      <th>2</th>
-      <th>3</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td colspan="4"><strong>IAM</strong></td>
-    </tr>
-    <tr>
-      <td><strong>WE compartments</strong></td>
-      <td>
-        cmp-lz-platform &gt; cmp-lz-shared-exacc &gt; cmp-lz-shared-exacc-db<br>
-        cmp-lz-platform &gt; cmp-lz-shared-exacc &gt; cmp-lz-shared-exacc-infra<br>
-        cmp-lz-platform &gt; cmp-lz-prod-projects &gt; cmp-lz-prod-proj1 &gt; cmp-lz-prod-proj1-db<br>
-        cmp-lz-platform &gt; cmp-lz-preprod-projects &gt; cmp-lz-preprod-proj1 &gt; cmp-lz-preprod-proj1-db
-      </td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><strong>WE groups</strong></td>
-      <td>
-        grp-lz-global-exacc-db-admin,<br>
-        grp-lz-global-exacc-infra-admin,<br>
-        grp-lz-preprod-proj1-exacc-admin,<br>
-        grp-lz-preprod-proj1-exacc-admin
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td><strong>WE policies</strong></td>
-      <td>
-        pcy-lz-global-exacc-db-admin,<br>
-        pcy-lz-global-exacc-generic,<br>
-        pcy-lz-global-exacc-infra-admin,<br>
-        pcy-lz-preprod-exacc-proj1-admin,<br>
-        pcy-lz-prod-exacc-proj1-admin
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td colspan="4"><strong>OBSERVABILITY</strong></td>
-    </tr>
-    <tr>
-      <td><strong>WE Alarms</strong></td>
-      <td>
-        al-lz-db-cpuutil,<br>
-        al-lz-vmc-cpuutil,<br>
-        al-lz-vmc-dgutil,<br>
-        al-lz-vmc-fsutil,<br>
-        al-lz-vmc-memutil,<br>
-        al-lz-vmc-swaputil,<br>
-        al-lz-db-storageutil
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td><strong>WE Events</strong></td>
-      <td>
-        rul-lz-notify-on-opctl-events,<br>
-        rul-lz-notify-on-exacc-vmc-events,<br>
-        rul-lz-notify-on-exacc-db-events,<br>
-        rul-lz-notify-on-exacc-infra-events
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-  </tbody>
-</table>
+&nbsp;
 
 
 ## **5. Deployment Steps**

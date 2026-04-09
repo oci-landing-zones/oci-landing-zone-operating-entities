@@ -5,7 +5,7 @@
 
 | | |
 | -------------------- | ----------------------------------------------------- |
-| **NAME**         | WE ExaDB-D Deployment to extend an existing One-oe LZ (Multi-Stack)                                    |
+| **NAME**         | WE ExaDB-D deployment to extend an existing One-OE LZ (Multi-Stack)                                    |
 | **OBJECTIVE**        |  WE ExaDB-D   |
 | **TARGET RESOURCES** | compartments, groups, policies, network, events, alarms and notifications |
 
@@ -21,102 +21,15 @@
 
 
 ## **3. Architecture Components**
-&nbsp;
 
-<table border="1">
-  <thead>
-    <tr>
-      <th>USE CASE</th>
-      <th>1</th>
-      <th>2</th>
-      <th>3</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td colspan="4"><strong>IAM</strong></td>
-    </tr>
-    <tr>
-      <td><strong>WE compartments</strong></td>
-      <td>
-        cmp-lz-platform &gt; cmp-lz-shared-exacs &gt; cmp-lz-shared-exacs-db<br>
-        cmp-lz-platform &gt; cmp-lz-shared-exacs &gt; cmp-lz-shared-exacs-infra<br>
-        cmp-lz-platform &gt; cmp-lz-prod-projects &gt; cmp-lz-prod-proj1 &gt; cmp-lz-prod-proj1-db<br>
-        cmp-lz-platform &gt; cmp-lz-preprod-projects &gt; cmp-lz-preprod-proj1 &gt; cmp-lz-preprod-proj1-db
-      </td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><strong>WE groups</strong></td>
-      <td>
-        grp-lz-global-exacs-db-admin,<br>
-        grp-lz-global-exacs-infra-admin,<br>
-        grp-lz-preprod-proj1-exacs-admin,<br>
-        grp-lz-preprod-proj1-exacs-admin
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td><strong>WE policies</strong></td>
-      <td>
-        pcy-lz-global-exacs-db-admin,<br>
-        pcy-lz-global-exacs-generic,<br>
-        pcy-lz-global-exacs-infra-admin,<br>
-        pcy-lz-preprod-exacs-proj1-admin,<br>
-        pcy-lz-prod-exacs-proj1-admin
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td colspan="4"><strong>OBSERVABILITY</strong></td>
-    </tr>
-    <tr>
-      <td><strong>WE Alarms</strong></td>
-      <td>
-        al-lz-db-cpuutil,<br>
-        al-lz-vmc-cpuutil,<br>
-        al-lz-vmc-dgutil,<br>
-        al-lz-vmc-fsutil,<br>
-        al-lz-vmc-memutil,<br>
-        al-lz-vmc-swaputil,<br>
-        al-lz-db-storageutil
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td><strong>WE Events</strong></td>
-      <td>
-        rul-lz-notify-on-opctl-events,<br>
-        rul-lz-notify-on-exacs-vmc-events,<br>
-        rul-lz-notify-on-exacs-db-events,<br>
-        rul-lz-notify-on-exacs-infra-events
-      </td>
-       <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td colspan="4"><strong>NETWORK</strong></td>
-    </tr>
-    <tr>
-      <td><strong>WE VCN and Subnets</strong></td>
-      <td>
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td><strong>WE RTs and SLs</strong></td>
-      <td>
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-  </tbody>
-</table>
+
+| JSON configurations | Configuration-defined components | Resources |
+|:-|:-|:-|
+| **IAM configuration**</br> [exacs_identity.json](exacs_identity_uc1.json) | • Exacs compartments</br> • Exacs IAM groups and policies | cmp-lz-platform > cmp-lz-shared-exacs > cmp-lz-shared-exacs-db, cmp-lz-platform > cmp-lz-shared-exacs > cmp-lz-shared-exacs-infra, cmp-lz-prod-platform > cmp-lz-prod-exacs > cmp-lz-prod-exacs-db, cmp-lz-prod-platform > cmp-lz-prod-exacs > cmp-lz-prod-exacs-infra, cmp-lz-prod-projects > cmp-lz-prod-proj1 > cmp-lz-prod-proj1-db, cmp-lz-preprod-platform > cmp-lz-preprod-exacs > cmp-lz-preprod-exacs-db, cmp-lz-preprod-platform > cmp-lz-preprod-exacs > cmp-lz-preprod-exacs-infra, cmp-lz-preprod-projects > cmp-lz-preprod-proj1 > cmp-lz-preprod-proj1-db <br><br> grp-lz-global-exacs-db-admin, grp-lz-global-exacs-infra-admin, grp-lz-preprod-proj1-exacs-admin, grp-lz-prod-proj1-exacs-admin <br><br> pcy-lz-global-exacs-db-admin, pcy-lz-global-exacs-generic, pcy-lz-global-exacs-infra-admin, pcy-lz-preprod-exacs-proj1-admin, pcy-lz-prod-exacs-proj1-admin |
+| **Network configuration** for </br> **Step 1**: [exacs_network_uc1_pre.json](exacs_network_uc1_pre.json) </br> and</br> **Step 2**: [exacs_network_uc1.json](exacs_network_uc1.json) | • [Hub E](/addons/oci-hub-models/hub_e/readme.md) VCN with associated subnets, Internet, NAT and Service Gateways</br> • Dynamic Routing Gateway (DRG)</br> • Route Tables with corresponding route rules</br> • Three spoke VCNs (Prod, Preprod, and Shared Exacs) with private-only subnets </br> • Service Gateways and NAT Gateways in the spoke VCNs</br> • Security Lists (SLs) and Network Security Groups (NSGs) </br> • Public Load Balancer ([free tier LBaaS](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm#loadbalancing)) with two example backend IP addresses from the production web tier: 10.0.64.10 and 10.0.64.20. The LBaaS and backend configurations are provided solely for example purposes and should be updated to reference actual workload instances | vcn-fra-lz-shared-exacs, sn-fra-lz-shared-exacs-db, sn-fra-lz-shared-exacs-bck, nsg-fra-lz-shared-exacs-db, rt-fra-lz-shared-exacs-generic, sl-fra-lz-shared-exacs-generic |
+| **Observability configuration** for</br> **Step 1**: [exacs_observability_uc1_pre.json](exacs_observability_uc1_pre.json)</br> and</br> **Step 2**: [exacs_observability_uc1.json](exacs_observability_uc1.json) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | • Events</br> • Alarms</br> • Logging</br> • Notifications | rul-lz-notify-on-opctl-events, rul-lz-notify-on-exacs-vmc-events, rul-lz-notify-on-exacs-db-events, rul-lz-notify-on-exacs-infra-events, rul-lz-preprod-notify-on-notifications-projects, rul-lz-prod-notify-on-notifications-projects <br><br> al-lz-db-cpuutil, al-lz-vmc-cpuutil, al-lz-vmc-dgutil, al-lz-vmc-fsutil, al-lz-vmc-memutil, al-lz-vmc-swaputil, al-lz-db-storageutil <br><br> nott-lz-shared-exacs-db-workloads, nott-lz-shared-exacs-infra-workloads, nott-lz-preprod-exacs-projects, nott-lz-prod-exacs-projects, lgrp-lz-shared-exacs-vcn-flow |
+
+&nbsp;
 
 
 
@@ -124,11 +37,13 @@
 
 ## **5. Deployment Steps**
 
+
 | USE CASE | 1 | 2 | 3 |
 |----------|---|---|---|
-| Description | [Shared exacs platform](../exacs_use_cases/readme.md/#21-shared-exadb-d-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments) |  |  |
-| Deployment | [<img src="../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacs/multi-stack/exacs_identity_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacs/multi-stack/exacs_observability_uc1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacs/multi-stack/exacs_network_uc1_pre.json"}). To deploy with ORM, you’ll need to configure outputs and dependencies, since pre-existing resources will be used. To learn more about this, go here.| Soon | Soon |
-|Files|  [iam](./exacs_identity_uc1.json), [observability without VCN Flow logs](./exacs_observability_uc1_pre.json) , [observability with VCN Flow logs](./exacs_observability_uc1.json), [network, shared exacs spoke vcn](./exacs_network_uc1_pre.json) , [network, one-oe update to add attachment and RTs](./oneoe_network_hub_e_post.json) |
+| Description | [Shared Exacs platform](../exacs_use_cases/readme.md/#21-shared-exadb-d-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments) |  |  |
+| Deployment | <br> [<img src="../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacs/multi-stack/exacs_identity_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacs/multi-stack/exacs_observability_uc1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/we_exacc_update/workload-extensions/exacs/multi-stack/exacs_network_uc1_pre.json"}). <br><br> To deploy with ORM, you'll need to configure outputs and dependencies, since pre-existing resources will be used. To learn more about this, go here. <br><br> In addition to ORM, the Terraform CLI can also be integrated with third-party pipelines. To learn more about this, go here. | Soon | Soon |
+
+
 
 
 &nbsp;
