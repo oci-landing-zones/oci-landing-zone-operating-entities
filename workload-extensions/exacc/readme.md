@@ -5,7 +5,7 @@
 - [**1. Summary**](#1-summary)
 - [**2. Design Overview**](#2-design-overview)
 - [**3. Deployment Options**](#3-deployment-options)
-  - [**Choosing the Right Approach**](#choosing-the-right-approach)
+
 
 &nbsp; 
 
