@@ -53,8 +53,8 @@ This Landing Zone Extension provides **two deployment approaches**, [single-stac
     </tr>
     <tr>
       <td><strong>Landing Zone</strong></td>
-      <td>One-oe + ExaDB-D WE</td>
-      <td>ExaDB-D WE to extend an existing One-oe</td>
+      <td>One-oe & Hub E + ExaDB-D WE</td>
+      <td>ExaDB-D WE to extend an existing One-oe & Hub A</td>
     </tr>
     <tr>
       <td><strong>Deployment Steps</strong></td>

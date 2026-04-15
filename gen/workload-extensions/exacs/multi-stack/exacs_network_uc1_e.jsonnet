@@ -1,4 +1,4 @@
-local exacs_network_hub_e_pre_patch = import 'exacs_network_uc1_pre.jsonnet';
+local exacs_network_hub_e_pre_patch = import 'exacs_network_uc1_e_pre.jsonnet';
 
 local pre_route_rules =
   exacs_network_hub_e_pre_patch.network_configuration.network_configuration_categories['1-shared-exacs']
