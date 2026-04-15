@@ -30,9 +30,13 @@ These are the main advantages of using ORM in OCI, especially for secure, consis
 
 ## Orchestrator Dependencies and Output
 
-If you are running a Workload Extension (WE) with a multi-stack approach, you must use two stacks.
-In the first stack, deploy One-OE and enable the output feature to generate external dependency files such as compartments_output.json, network_output.json, or tags_output.json.
-Then, in the Workload Extension (WE) stack, include all required files in the Dependencies Source for URL-based Configuration field.
+If you are running a Workload Extension (WE) with a multi-stack approach and you want to avoid maintaining dependency documents manually, you should enable the output feature in the first stack and use the orchestrator `output/dependencies` flow between stacks.
+
+In this model, the first stack deploys One-OE with output enabled so that the orchestrator generates the key/OCID dependency files required by the second stack, such as `compartments_output.json`, `network_output.json`, or `tags_output.json`.
+
+This is the recommended approach when you want to use cross-stack dependencies based on generated outputs instead of manually editing or maintaining dependency files.
+
+In the second stack, include the generated dependency files in the **Dependencies Source for URL-based Configuration** field.
 
 > Note: Official orchestrator reference for external dependencies and generated outputs: https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator#external-dependencies
 
