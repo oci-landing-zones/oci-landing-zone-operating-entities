@@ -2,7 +2,10 @@
 // Internal OKE builder used by the generic extension wrapper and published adapters.
 //
 // Contract:
-//   { render(params, published_view=null):: { metadata, contributions, published } }
+//   {
+//     metadata(params):: { default_subnets, subnet_order },
+//     render(params, published_view=null):: { metadata, contributions, published },
+//   }
 //   params.config_params — {kubernetes_version, services_cidr, pods_cidr}
 //   params.network       — {vcn: 'cidr', subnets: {name: cidr}}
 //   params.naming        — naming object
@@ -10,12 +13,24 @@
 //   params.routing       — explicit DRG route targets (null when not hub-backed)
 
 {
+  metadata(params):: {
+    default_subnets: {
+      'control-plane': '/25',
+      'int-lb': '/25',
+      pods: '/23',
+      workers: '/23',
+    },
+    // Order for auto-subnet allocation (determines CIDR assignment order)
+    subnet_order: ['int-lb', 'control-plane', 'workers', 'pods'],
+  },
+
   render(params, published_view=null)::
   assert std.objectHas(params.config_params, 'kubernetes_version') : 'oke_simple requires config_params.kubernetes_version';
   assert std.objectHas(params.config_params, 'pods_cidr') : 'oke_simple requires config_params.pods_cidr';
   assert std.objectHas(params.config_params, 'services_cidr') : 'oke_simple requires config_params.services_cidr';
   assert std.objectHas(params, 'topology') : 'oke_simple requires topology scope semantics';
 
+  local metadata = self.metadata(params);
   local n = params.naming;
   local scope = params.topology;
   local env = scope.scope_name;
@@ -211,16 +226,7 @@
     };
 
   {
-    metadata: {
-      default_subnets: {
-        'control-plane': '/25',
-        'int-lb': '/25',
-        pods: '/23',
-        workers: '/23',
-      },
-      // Order for auto-subnet allocation (determines CIDR assignment order)
-      subnet_order: ['int-lb', 'control-plane', 'workers', 'pods'],
-    },
+    metadata: metadata,
 
     // Shared security zone target (identical for CIS1 and CIS2)
     local security_zone_contribution =

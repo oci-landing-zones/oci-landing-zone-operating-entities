@@ -14,14 +14,16 @@ local platforms = import 'platforms.libsonnet';
             pe.scope.platform_name,
             std.join(', ', std.objectFields(extension_registry)),
           ];
-          local ext_builder = extension_registry[ext_type];
-          local ext_meta = ext_builder({
+          local ext_def = extension_registry[ext_type];
+          assert std.objectHasAll(ext_def, 'metadata') :
+                 'Extension "%s" must define metadata(params)' % ext_type;
+          assert std.objectHasAll(ext_def, 'render') :
+                 'Extension "%s" must define render(params)' % ext_type;
+          local ext_meta = ext_def.metadata({
             config_params: pe.platform_config.extension.params,
-            network: { vcn: '', subnets: {} },
             naming: n,
             topology: pe.scope,
-            routing: null,
-          }).metadata;
+          });
           local subnet_names =
             if std.objectHas(ext_meta, 'subnet_order') then ext_meta.subnet_order
             else std.objectFields(ext_meta.default_subnets);
@@ -42,13 +44,18 @@ local platforms = import 'platforms.libsonnet';
               ]
             );
           local routing = platforms.build_extension_route_targets(pe, routed_vcn_entries, n, hub_vcn_cidr);
-          ext_builder({
+          local ext_contributions = ext_def.render({
             config_params: pe.platform_config.extension.params,
             network: { vcn: pe.platform_config.network.vcn, subnets: resolved_subnets },
             naming: n,
             topology: pe.scope,
             routing: routing,
-          })
+          });
+          {
+            type: ext_type,
+            metadata: ext_meta,
+            contributions: ext_contributions,
+          }
           for i in std.range(0, std.length(extension_entries) - 1)
         ]
       else [];
@@ -66,7 +73,7 @@ local platforms = import 'platforms.libsonnet';
             acc + ext.contributions[spec.key]
           else
             assert !spec.required :
-                   'Extension "%s" is missing required contribution "%s"' % [ext.metadata.extension_type, spec.key];
+                   'Extension "%s" is missing required contribution "%s"' % [ext.type, spec.key];
             acc,
         results,
         {}

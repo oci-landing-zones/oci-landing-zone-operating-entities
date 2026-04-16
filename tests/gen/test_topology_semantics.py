@@ -11,4 +11,4 @@ class TopologySemanticsTests(unittest.TestCase):
         )
         self.assertEqual(rendered["ordered_env_names"], ["prod", "preprod", "dev", "qa"])
         self.assertEqual(rendered["ordered_spoke_env_names"], ["prod", "preprod", "dev", "qa"])
-        self.assertEqual(rendered["security_target_env_names"], ["prod"])
+        self.assertEqual(rendered["security_target_env_names"], ["prod", "preprod", "dev", "qa"])

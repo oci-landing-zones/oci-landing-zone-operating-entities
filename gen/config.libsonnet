@@ -83,11 +83,16 @@
     assert std.objectHas(config, 'environments') : 'config.environments is required';
     assert std.length(std.objectFields(config.environments)) > 0 : 'config.environments must have at least one environment';
 
+    local has_region = std.objectHas(config, 'region') && config.region != null;
+    local has_region_short_name =
+      std.objectHas(config, 'region_short_name') && config.region_short_name != null;
+    assert has_region == has_region_short_name :
+      'config.region and config.region_short_name must either both be provided or both be omitted';
     local region =
-      if std.objectHas(config, 'region') && config.region != null then config.region
+      if has_region then config.region
       else 'eu-frankfurt-1';
     local region_short_name =
-      if std.objectHas(config, 'region_short_name') && config.region_short_name != null then config.region_short_name
+      if has_region_short_name then config.region_short_name
       else 'fra';
     local realm =
       if std.objectHas(config, 'realm') && config.realm != null then config.realm

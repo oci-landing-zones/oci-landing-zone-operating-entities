@@ -15,18 +15,15 @@ local network_spokes_builder = import 'builders/network_spokes.libsonnet';
 local observability_builder = import 'builders/observability.libsonnet';
 local security_builder = import 'builders/security.libsonnet';
 local cfg_lib = import 'config.libsonnet';
-local constants = import 'constants.libsonnet';
 local extensions = import 'extensions.libsonnet';
-local naming = import 'naming.libsonnet';
 local platforms = import 'platforms.libsonnet';
-local topology = import 'topology.libsonnet';
+local render_context = import 'render_context.libsonnet';
 local hub_builders = {
   hub_a: import 'hub/hub_a.libsonnet',
   hub_b: import 'hub/hub_b.libsonnet',
   hub_c: import 'hub/hub_c.libsonnet',
   hub_e: import 'hub/hub_e.libsonnet',
 };
-local common = import 'hub/hub_common.libsonnet';
 
 // Extension registry: maps extension type names to extension builder functions.
 local extension_registry = {
@@ -34,24 +31,21 @@ local extension_registry = {
 };
 
 function(raw_config)
-  local config = cfg_lib.normalize(raw_config);
-  local n = naming(config.region_short_name);
-  local topo = topology(config, n);
-  local realm = constants[config.realm];
+  local ctx = render_context.from_raw_config(raw_config);
+  local config = ctx.config;
+  local n = ctx.n;
+  local topo = ctx.topo;
+  local realm = ctx.realm_constants;
+  local spoke_envs = ctx.spoke_envs;
+  local all_platform_entries = ctx.all_platform_entries;
+  local extension_entries = ctx.extension_entries;
+  local network_only_platforms = ctx.network_only_platforms;
+  local all_vcn_entries = ctx.all_vcn_entries;
+  local all_vcns = ctx.all_vcns;
+  local lb_backends = ctx.lb_backends;
 
   // Hub CIDRs needed for spoke NSG/security list rules
   local hub_vcn_cidr = config.hub.network.vcn;
-  local hub_subnets = config.hub.network.subnets;
-  local mgmt_cidr = hub_subnets.mgmt;
-  local lb_cidr = hub_subnets.lb;
-
-  // --- Collect environments with shared_project_network ---
-  local ordered_env_names = topo.ordered_env_names();
-  local spoke_env_names = topo.ordered_spoke_env_names();
-  local spoke_envs = [
-    { name: name, env: config.environments[name] }
-    for name in spoke_env_names
-  ];
 
   // Number categories starting from 1 using the spoke-environment semantic order.
   local spoke_env_indexed = std.mapWithIndex(
@@ -65,13 +59,6 @@ function(raw_config)
     for s in spoke_envs
   ];
 
-  local platform_state = platforms.collect_entries(config, ordered_env_names, topo);
-  local all_platform_entries = platform_state.all_platform_entries;
-  local extension_entries = platform_state.extension_entries;
-  local network_only_platforms = platform_state.network_only_platforms;
-  local routed_vcn_state = platforms.build_routed_vcn_entries(config, all_platform_entries, topo, n);
-  local all_vcn_entries = routed_vcn_state.all_vcn_entries;
-
   // All VCN CIDRs for spoke-to-spoke+platform peer routing (Hub E with NAT GW)
   local all_peer_vcn_cidrs = all_spoke_vcn_cidrs + [
     local label = platforms.vcn_label(pe);
@@ -81,27 +68,6 @@ function(raw_config)
       vcn: pe.platform_config.network.vcn,
     }
     for pe in all_platform_entries
-  ];
-
-  // LB example backends follow the first ordered spoke environment's web subnet.
-  // This preserves the documented prod examples for default configs and degrades
-  // to explicit placeholders only when no workload spoke exists.
-  local lb_backends =
-    if std.length(spoke_envs) > 0 then
-      local web_subnet = spoke_envs[0].env.shared_project_network.network.subnets.web;
-      {
-        backend1_ip: common.host_ip_from_subnet(web_subnet, 10),
-        backend2_ip: common.host_ip_from_subnet(web_subnet, 20),
-      }
-    else {
-      backend1_ip: '0.0.0.0',
-      backend2_ip: '0.0.0.0',
-    };
-
-  // All VCN entries for hub builders: [{name: 'prod', cidr: '10.0.64.0/21'}, ...]
-  local all_vcns = [
-    { name: e.name, cidr: e.vcn }
-    for e in all_vcn_entries
   ];
 
   // Build hub with vcn_list for NFW policies

@@ -43,7 +43,7 @@
 
   _nfw_service_lists(n):: {
     [n.key('NFW', ['SERLIST', '01'])]: {
-      name: n.display('nfw', ['serlist', '01']),
+      name: n.display('nfw', ['servicelist', '01']),
       services: [n.key('NFW', ['SERVICE', '01']), n.key('NFW', ['SERVICE', '02'])],
     },
   },

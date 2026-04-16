@@ -129,6 +129,21 @@ The deployment uses five JSON configuration files:
 | `oke_clusters.json` | OKE cluster configuration |
 | `oke_workers.json` | OKE Node pool configuration | 
 
+### Additional Published Security & Observability Outputs <!-- omit from toc -->
+
+The published package also includes companion JSONs that capture CIS-aligned security and observability settings for reference or downstream consumption. The one-click ORM link above wires only the core deployment inputs; it does **not** consume these companion files. If you want to apply them, fetch and handle them separately in your own workflow.
+
+| File | Purpose |
+| --- | --- |
+| `oke_security_cis1.json` | Baseline security controls (CIS profile 1) |
+| `oke_security_cis1_pre.json` | Pre-requisites for `oke_security_cis1.json` |
+| `oke_security_cis2.json` | Baseline security controls (CIS profile 2) |
+| `oke_security_cis2_pre.json` | Pre-requisites for `oke_security_cis2.json` |
+| `oke_observability_cis1.json` | Observability settings (CIS profile 1) |
+| `oke_observability_cis1_pre.json` | Pre-requisites for `oke_observability_cis1.json` |
+| `oke_observability_cis2.json` | Observability settings (CIS profile 2) |
+| `oke_observability_cis2_pre.json` | Pre-requisites for `oke_observability_cis2.json` |
+
 &nbsp;
 
 ## **5. Deployment Steps**

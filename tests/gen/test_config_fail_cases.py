@@ -27,6 +27,14 @@ class GeneratorConfigFailCases(unittest.TestCase):
                 "shared_project_network_null.jsonnet",
                 "Environment prod.shared_project_network.network is required",
             ),
+            (
+                "region_missing_region_short_name.jsonnet",
+                "config.region and config.region_short_name must either both be provided or both be omitted",
+            ),
+            (
+                "region_short_name_missing_region.jsonnet",
+                "config.region and config.region_short_name must either both be provided or both be omitted",
+            ),
         ]
         expected_fixtures = {fixture_name for fixture_name, _ in cases}
         discovered_fixtures = {path.name for path in fail_fixtures_dir.glob("*.jsonnet")}

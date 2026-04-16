@@ -1,0 +1,103 @@
+// gen/render_context.libsonnet — Shared normalized render-time context helper.
+//
+// Purpose:
+//   Centralize the one-time normalization and derived helper state needed by
+//   render-time consumers. This keeps the main landing-zone orchestrator and
+//   published add-on adapters from reimplementing config normalization,
+//   topology ordering, platform collection, routed VCN derivation, and example
+//   load-balancer backend calculation.
+//
+// Public contract:
+//   from_raw_config(raw_config) -> {
+//     config,
+//     n,
+//     topo,
+//     realm_constants,
+//     ordered_env_names,
+//     spoke_env_names,
+//     spoke_envs,
+//     spoke_vcns,
+//     platform_state,
+//     all_platform_entries,
+//     extension_entries,
+//     network_only_platforms,
+//     all_vcn_entries,
+//     all_vcns,
+//     lb_backends,
+//     shared_only_config,
+//   }
+//
+// Key semantics:
+//   - `config` is always normalized via `config.libsonnet`.
+//   - `spoke_envs` and all dependent lists follow topology ordering, not raw
+//     object-field order.
+//   - `spoke_vcns` and `all_vcns` are semantic `{name, cidr}` lists intended
+//     for hub/adaptor consumers that only need rendered VCN metadata.
+//   - `lb_backends` derives stable example backend IPs from the first spoke's
+//     web subnet when available; otherwise it falls back to `0.0.0.0`
+//     placeholders so hub-only publications can still render.
+//   - `shared_only_config` keeps the normalized shared services/root state but
+//     removes environments for consumers that intentionally publish only
+//     shared-only IAM/governance views.
+//
+// Scope guardrail:
+//   This helper should expose reusable inputs. It should not assemble final
+//   output documents or own profile-specific publication logic.
+local cfg_lib = import 'config.libsonnet';
+local constants = import 'constants.libsonnet';
+local naming = import 'naming.libsonnet';
+local platforms = import 'platforms.libsonnet';
+local topology = import 'topology.libsonnet';
+local common = import 'hub/hub_common.libsonnet';
+
+{
+  from_raw_config(raw_config)::
+    local config = cfg_lib.normalize(raw_config);
+    local n = naming(config.region_short_name);
+    local topo = topology(config, n);
+    local ordered_env_names = topo.ordered_env_names();
+    local spoke_env_names = topo.ordered_spoke_env_names();
+    local spoke_envs = [
+      { name: name, env: config.environments[name] }
+      for name in spoke_env_names
+    ];
+    local platform_state = platforms.collect_entries(config, ordered_env_names, topo);
+    local all_platform_entries = platform_state.all_platform_entries;
+    local routed_vcn_state =
+      platforms.build_routed_vcn_entries(config, all_platform_entries, topo, n);
+    local all_vcn_entries = routed_vcn_state.all_vcn_entries;
+    {
+      config: config,
+      n: n,
+      topo: topo,
+      realm_constants: constants[config.realm],
+      ordered_env_names: ordered_env_names,
+      spoke_env_names: spoke_env_names,
+      spoke_envs: spoke_envs,
+      spoke_vcns: [
+        { name: s.name, cidr: s.env.shared_project_network.network.vcn }
+        for s in spoke_envs
+      ],
+      platform_state: platform_state,
+      all_platform_entries: all_platform_entries,
+      extension_entries: platform_state.extension_entries,
+      network_only_platforms: platform_state.network_only_platforms,
+      all_vcn_entries: all_vcn_entries,
+      all_vcns: [
+        { name: entry.name, cidr: entry.vcn }
+        for entry in all_vcn_entries
+      ],
+      lb_backends:
+        if std.length(spoke_envs) > 0 then
+          local web_subnet = spoke_envs[0].env.shared_project_network.network.subnets.web;
+          {
+            backend1_ip: common.host_ip_from_subnet(web_subnet, 10),
+            backend2_ip: common.host_ip_from_subnet(web_subnet, 20),
+          }
+        else {
+          backend1_ip: '0.0.0.0',
+          backend2_ip: '0.0.0.0',
+        },
+      shared_only_config: config { environments: {} },
+    },
+}

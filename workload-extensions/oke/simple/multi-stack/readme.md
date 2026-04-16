@@ -49,6 +49,21 @@ The deployment uses four JSON configuration files:
 | `oke_clusters.json` | OKE cluster configuration: cluster settings, Kubernetes version, CNI type, networking |
 | `oke_workers.json` | Node pool configuration: worker nodes, shape, size, networking, cloud-init |
 
+### Additional Published Security & Observability Outputs <!-- omit from toc -->
+
+The published surface includes companion JSONs with CIS-aligned security and observability settings. The one-click ORM link above consumes only the core deployment inputs; use these additional files as needed for your security and monitoring baselines.
+
+| File | Purpose |
+| --- | --- |
+| `oke_security_cis1.json` | Baseline security controls (CIS profile 1) |
+| `oke_security_cis1_pre.json` | Pre-requisites for `oke_security_cis1.json` |
+| `oke_security_cis2.json` | Baseline security controls (CIS profile 2) |
+| `oke_security_cis2_pre.json` | Pre-requisites for `oke_security_cis2.json` |
+| `oke_observability_cis1.json` | Observability settings (CIS profile 1) |
+| `oke_observability_cis1_pre.json` | Pre-requisites for `oke_observability_cis1.json` |
+| `oke_observability_cis2.json` | Observability settings (CIS profile 2) |
+| `oke_observability_cis2_pre.json` | Pre-requisites for `oke_observability_cis2.json` |
+
 &nbsp;
 
 ## **4. Deployment Steps** 

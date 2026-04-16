@@ -7,6 +7,7 @@ gen/
 ├── landing_zone.libsonnet       # Main orchestrator: config -> all outputs
 ├── landing_zone_multi.jsonnet   # --multi wrapper for config mode
 ├── config.libsonnet             # Config normalization & auto-subnet calculation
+├── render_context.libsonnet     # Shared normalized render context for orchestration/adapters
 ├── constants.libsonnet          # Realm-specific constants (service labels, etc.)
 ├── defaults.libsonnet           # Generic default configs per hub type (for default mode)
 ├── naming.libsonnet             # Single naming template for all resources
@@ -67,7 +68,7 @@ flowchart TD
 
     C --> E["Entrypoint imports defaults.libsonnet or local profiles.libsonnet"]
     E --> F["Entrypoint calls landing_zone.libsonnet"]
-    F --> G["Select one result field<br/>network, iam, security_*, observability_*, governance"]
+    F --> G["Select one result field<br/>network, iam, security variants, observability variants, governance"]
 
     D --> H["landing_zone_multi.jsonnet wrapper"]
     H --> I["Normalize config via config.libsonnet<br/>and auto-fill subnets when omitted"]
@@ -78,9 +79,9 @@ flowchart TD
     J --> L
 
     L --> M["Helpers<br/>naming.libsonnet<br/>topology.libsonnet<br/>constants.libsonnet"]
-    L --> N["Hub builders<br/>hub/*.libsonnet"]
-    L --> O["Domain builders<br/>builders/*.libsonnet"]
-    L --> P["Extensions<br/>workload-extensions/*"]
+    L --> N["Hub builders<br/>files under hub/"]
+    L --> O["Domain builders<br/>files under builders/"]
+    L --> P["Extensions<br/>files under workload-extensions/"]
 
     G --> Q["Jsonnet emits raw JSON"]
     K --> Q
@@ -99,6 +100,7 @@ flowchart TD
 
 - `generate.sh` handles mode selection, file discovery, Jsonnet invocation, and formatting orchestration (it invokes `format_json.py`).
 - `config.libsonnet` handles normalization and auto-subnet calculation.
+- `render_context.libsonnet` centralizes normalized config, topology, spoke ordering, VCN lists, shared-only config, and example LB backend derivation for render-time consumers.
 - `landing_zone.libsonnet` is the shared composition engine, merge owner, and output assembler.
 - Detailed spoke rendering is delegated to `gen/builders/network_spokes.libsonnet`.
 - DRG and hub integration overlays are delegated to `gen/builders/hub_integration.libsonnet`.
@@ -144,7 +146,7 @@ Rules:
 
 Current adapters:
 
-- `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. Also exposes shared-only IAM and governance projections (workload environments are stripped out before rendering).
+- `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. It reuses `gen/render_context.libsonnet` for normalization/topology-derived inputs while preserving the hub-only network contract and shared-only IAM/governance projections.
 - `gen/workload-extensions/oke/simple/multi-stack/published.libsonnet` — owns the multi-stack publication-only OKE network and identity projections used by the multi-stack OKE entrypoints.
 
 ## 3. Config Schema
@@ -153,9 +155,10 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 
 ```jsonnet
 {
-  region: 'eu-frankfurt-1',            // optional, defaults to 'eu-frankfurt-1'
-  region_short_name: 'fra',            // optional, defaults to 'fra'
+  region: 'eu-frankfurt-1',            // optional, but must be paired with region_short_name when set
+  region_short_name: 'fra',            // optional, but must be paired with region when set
   realm: 'oc1',                         // optional, defaults to 'oc1'
+  security_targets: ['prod'],          // optional, defaults to all environments in config mode
   hub: {
     kind: 'hub_a' | 'hub_b' | 'hub_c' | 'hub_e',
     network: {
@@ -181,7 +184,7 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 }
 ```
 
-Config normalization (`config.libsonnet`) defaults `region` to `eu-frankfurt-1`, `region_short_name` to `fra`, and `realm` to `oc1` (including when `realm` is explicitly set to `null`). It also auto-calculates missing subnets from VCN CIDRs using `auto_subnets()`.
+Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`). `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need narrower legacy behavior. Missing subnets are still auto-calculated from VCN CIDRs using `auto_subnets()`.
 
 ## 4. Naming Convention
 
@@ -242,10 +245,20 @@ LB example backends are derived centrally from the first ordered workload spoke'
 
 ## 6. Extension Contract
 
-Extensions live in `workload-extensions/` and are registered in `landing_zone.libsonnet`'s `extension_registry`. Each extension is a function:
+Extensions live in `workload-extensions/` and are registered in `landing_zone.libsonnet`'s `extension_registry`. Each extension exports an explicit contract object:
 
 ```
-function(params) -> { metadata, contributions }
+{
+  metadata(params):: { default_subnets, subnet_order }
+  render(params):: {
+    network_pre,
+    iam,
+    security_cis1,
+    security_cis2,
+    oke_clusters,
+    oke_workers,
+  }
+}
 
 params.config_params  -- extension-specific parameters (e.g. kubernetes_version)
 params.network        -- { vcn: 'cidr', subnets: { name: cidr } }
@@ -255,9 +268,9 @@ params.routing        -- routing context for extension route rules:
                         -- { hub: object|null, peers: object }
 ```
 
-Return value:
-- `metadata`: `{ default_subnets: { name: '/prefix' }, subnet_order: [...] }` -- used for auto-subnet calculation when subnets are not specified in config
-- `contributions`: outputs keyed by domain:
+Contract phases:
+- `metadata(params)`: returns `{ default_subnets: { name: '/prefix' }, subnet_order: [...] }` used for auto-subnet calculation when subnets are not specified in config.
+- `render(params)`: returns contributions keyed by domain:
   - `network_pre`: merged into `network_configuration_categories`
   - `iam`: merged into IAM output
   - `security_cis1`, `security_cis2`: merged into security outputs

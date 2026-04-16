@@ -18,7 +18,7 @@ To connect OKE clusters as a spoke to the hub, we need to perform the following 
 - **2.** You'll need to update Hub routing to the cluster network (spoke VCN). For an example of fully configured Hub A - Light model see the POST network JSON configuration [**oci_open_lz_hub_a_network_light_post.auto.tfvars.json**](/addons/oci-hub-models/hub_a/oci_open_lz_hub_a_network_light_post.auto.tfvars.json):
   - **2.1** Add route entry for the destination of cluster network range (10.0.80.0/21 in our example) to route tables: rt-\<region>-hub-natgw,  rt-\<region>-hub-ingress. And next hop as OCID of the respective Firewall IP from the step 1. 
   - **2.2** Add route entry for the destination of cluster network range (10.0.80.0/21 in our example) to route tables:  rt-\<region>-hub-lb,  rt-\<region>-hub-internal,  rt-\<region>-hub-mgmt. And next hop as Hub DRG.
-  - **2.3.** Create DRG Attachment to the cluster network using the drg_route_table_key "DRGRT-FRA-LZP-SPOKES-KEY". After the attachment is created DRG will automatically import routes from the spokes to the DRG Route Table.
+- **2.3.** Create DRG Attachment to the cluster network using the drg_route_table_key "DRGRT-FRA-LZ-SPOKES-KEY". After the attachment is created DRG will automatically import routes from the spokes to the DRG Route Table.
 - **3.** You'll need to update cluster network routing (spoke VCN) to Hub.
   - **3.1** Modify all route tables in VCN (rt-\<region>-sn-p-oke-lb, rt-\<region>-sn-p-oke-cp, rt-\<region>-sn-p-oke-workers, rt-\<region>-sn-p-oke-pods) with new entry adding destination of 0.0.0.0/0 and next hop DRG. Resulting in sending all traffic outside of the VCN to DRG.
 - **4.** Save and deploy all changes.

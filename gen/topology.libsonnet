@@ -14,11 +14,26 @@ function(config, n)
     for env_name in ordered_env_names
     if std.objectHas(config.environments[env_name], 'shared_project_network')
   ];
-  // TODO: Make configurable via config.security_targets and default to all environments.
-  local security_target_env_names = std.filter(
-    function(env_name) env_name == 'prod',
-    ordered_env_names
-  );
+  local security_target_env_names =
+    if std.objectHas(config, 'security_targets') && config.security_targets != null then
+      assert std.type(config.security_targets) == 'array' :
+        'config.security_targets must be an array';
+      assert std.all([
+        std.member(raw_env_names, env_name)
+        for env_name in config.security_targets
+      ]) :
+        'config.security_targets must only reference defined environments: %s' % std.join(', ', [
+          env_name
+          for env_name in config.security_targets
+          if !std.member(raw_env_names, env_name)
+        ]);
+      [
+        env_name
+        for env_name in ordered_env_names
+        if std.member(config.security_targets, env_name)
+      ]
+    else
+      ordered_env_names;
 
   local env_labels = {
     prod: { short: 'Prod', long: 'Production', network: 'Prod', dns: 'p' },

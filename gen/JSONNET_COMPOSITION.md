@@ -1,10 +1,10 @@
 # Jsonnet Composition Guide
 
-This guide complements `CONVENTIONS.md`. Read it when you want to understand how the generator composes files and functions in practice; switch to `CONVENTIONS.md` when you need the broader architecture, schema, naming rules, or builder contracts.
+This guide complements `AGENTS.md`. Read it when you want to understand how the generator composes files and functions in practice; switch to `AGENTS.md` when you need the broader architecture, schema, naming rules, or builder contracts.
 
 ## Why This File Exists
 
-`CONVENTIONS.md` explains what lives in `gen/` and what each major part is responsible for. This file answers a narrower onboarding question: when you follow a real generation path, which files compose into which functions and objects?
+`AGENTS.md` explains what lives in `gen/` and what each major part is responsible for. This file answers a narrower onboarding question: when you follow a real generation path, which files compose into which functions and objects?
 
 The important mental model is:
 
@@ -28,25 +28,25 @@ That order reflects composition ownership, not importance. Read the small select
 
 ```mermaid
 flowchart TD
-    A["`gen/generate.sh`"] --> B{Mode}
+    A["gen/generate.sh"] --> B{Mode}
 
-    B -->|default| C["thin `*.jsonnet` entrypoint"]
-    B -->|--config| D["`landing_zone_multi.jsonnet`"]
+    B -->|default| C["thin .jsonnet entrypoint"]
+    B -->|--config| D["landing_zone_multi.jsonnet"]
 
-    C --> E["import profile/config<br/>usually `profiles.libsonnet`"]
-    E --> F["profile wraps `defaults.libsonnet`"]
-    C --> G["import `landing_zone.libsonnet`"]
-    F --> H["call `lz(profile.config)`"]
+    C --> E["import profile/config<br/>usually profiles.libsonnet"]
+    E --> F["profile wraps defaults.libsonnet"]
+    C --> G["import landing_zone.libsonnet"]
+    F --> H["call lz(profile.config)"]
     G --> H
 
     D --> I["receive config via TLA"]
-    I --> J["call `lz(config)`"]
+    I --> J["call lz(config)"]
 
-    H --> K["`landing_zone.libsonnet`"]
+    H --> K["landing_zone.libsonnet"]
     J --> K
 
-    K --> L["normalize once<br/>`config.normalize(raw_config)`"]
-    L --> M["build shared context<br/>`naming`, `topology`, `constants`"]
+    K --> L["normalize once<br/>config.normalize(raw_config)"]
+    L --> M["build shared context<br/>naming, topology, constants"]
     M --> N["collect semantic entries<br/>spokes, platforms, VCNs"]
     N --> O["hub builders"]
     N --> P["domain builders"]
@@ -54,19 +54,19 @@ flowchart TD
 
     O --> R["partial network fragments"]
     P --> S["partial IAM / security / observability / governance fragments"]
-    Q --> T["partial standard fragments<br/>+ optional `extra` fragments"]
+    Q --> T["partial standard fragments<br/>+ optional extra fragments"]
 
     R --> U["assemble result object"]
     S --> U
     T --> U
 
-    U --> V["default mode selects one field<br/>`.network`, `.iam`, ..."]
+    U --> V["default mode selects one field<br/>.network, .iam, ..."]
     U --> W["config mode maps fields to filenames"]
 
     V --> X["single JSON document"]
     W --> Y["multi-file output set"]
 
-    X --> Z["`format_json.py`"]
+    X --> Z["format_json.py"]
     Y --> Z
 ```
 
@@ -117,6 +117,15 @@ Read these as semantic context, not as incidental locals:
 - `realm` owns realm-specific constants
 
 When several later expressions look dense, check whether they are really just using `n` or `topo` rather than inventing new behavior locally.
+
+That shared setup now lives behind `render_context.libsonnet`, which exposes one stable entrypoint:
+
+```jsonnet
+local render_context = import 'render_context.libsonnet';
+local ctx = render_context.from_raw_config(raw_config);
+```
+
+Use that helper when a renderer or publication adapter needs normalized config plus derived semantic lists such as ordered spoke environments, platform entries, VCN metadata, example LB backends, or the shared-only config view. Keep final document assembly in the caller. `render_context.libsonnet` is the input-preparation layer, not the merge owner.
 
 ### Collect Semantic Entries Before Building Objects
 

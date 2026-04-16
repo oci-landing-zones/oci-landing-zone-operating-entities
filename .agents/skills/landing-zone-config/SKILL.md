@@ -29,7 +29,7 @@ Do not use this skill for legacy checked-in JSON output edits unless the task is
    - `gen/landing_zone.libsonnet` for orchestration and topology behavior
    - `gen/landing_zone_multi.jsonnet` for config-mode outputs
 2. Build the config as a Jsonnet object, not raw JSON, so imports and composition stay available.
-3. Keep only the smallest top-level shape first: `hub` and non-empty `environments`, plus `region` / `region_short_name` only when overriding their defaults.
+3. Keep only the smallest top-level shape first: `hub` and non-empty `environments`, plus `region` / `region_short_name` only when overriding their defaults as a pair.
 4. Add environments and platforms incrementally, then run config mode and inspect the generated outputs.
 5. When behavior is unclear, prefer reading the normalization and extension code over guessing from checked-in JSON.
 
@@ -38,7 +38,8 @@ Do not use this skill for legacy checked-in JSON output edits unless the task is
 | Topic | Rule |
 |---|---|
 | Required fields | `hub.kind`, `hub.network.vcn`, and non-empty `environments` are mandatory. |
-| Region defaults | `region` defaults to `eu-frankfurt-1` and `region_short_name` defaults to `fra`; both also default when explicitly set to `null`. |
+| Region defaults | `region` and `region_short_name` must be provided together or omitted together; when omitted (or both explicitly set to `null`) they default to `eu-frankfurt-1` and `fra`. |
+| Security targets | Omit `security_targets` to target all environments; set it explicitly to narrow which environments get security-zone targeting. |
 | Hub kinds | Only `hub_a`, `hub_b`, `hub_c`, and `hub_e` are valid. |
 | Hub subnets | Omit `hub.network.subnets` to auto-generate canonical hub subnets from the hub VCN. |
 | Spoke subnets | Omit `shared_project_network.network.subnets` to auto-generate `web`, `app`, `db`, and `infra`. |
@@ -72,5 +73,5 @@ Do not use this skill for legacy checked-in JSON output edits unless the task is
 - Editing generated JSON and forgetting to fix the config or Jsonnet source.
 - Assuming every platform can auto-generate subnets. Plain platforms without an extension cannot.
 - Forgetting that only environments with `shared_project_network` become spokes.
-- Expecting non-prod environments to inherit every security-target behavior. Topology rules are centralized in `gen/topology.libsonnet`.
+- Forgetting that omitted `security_targets` now means all environments. Narrow it explicitly when you need a subset.
 - Adding an extension `type` in config without registering it in `gen/landing_zone.libsonnet`.

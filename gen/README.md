@@ -5,7 +5,7 @@ Run `bash gen/generate.sh` the first time you work on the generator. It sets up 
 ## Documentation Map
 
 - [`../AGENTS.md`](../AGENTS.md): repo-specific workflow rules and generator guardrails.
-- [`CONVENTIONS.md`](CONVENTIONS.md): architecture, schema, naming rules, publication rules, and stable generator contracts.
+- [`AGENTS.md`](AGENTS.md): architecture, schema, naming rules, publication rules, and stable generator contracts.
 - [`JSONNET_COMPOSITION.md`](JSONNET_COMPOSITION.md): how the Jsonnet files compose and where to edit for common change types.
 - [`../tests/gen/`](../tests/gen/): generator test modules and fixtures.
 

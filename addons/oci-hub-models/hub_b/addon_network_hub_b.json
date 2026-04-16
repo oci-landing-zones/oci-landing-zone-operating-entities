@@ -576,7 +576,7 @@
 
                                 "service_lists": {
                                     "NFW-FRA-LZ-SERLIST-01-KEY": {
-                                        "name"                            : "nfw-fra-lz-serlist-01",
+                                        "name"                            : "nfw-fra-lz-servicelist-01",
                                         "services"                        : ["NFW-FRA-LZ-SERVICE-01-KEY", "NFW-FRA-LZ-SERVICE-02-KEY"]
                                     }
                                 },

@@ -5,6 +5,7 @@ local base = {
   region: 'eu-frankfurt-1',
   region_short_name: 'fra',
   realm: 'oc1',
+  security_targets: ['prod'],
   environments: {
     prod: {
       shared_project_network: { network: { vcn: '10.0.64.0/21' } },

@@ -128,9 +128,8 @@ function(config, n, realm_constants, topo)
   };
 
   // --- Per-env security zone targets (shared network + env network + project workloads) ---
-  // Only prod environments get security zone targets in the existing blueprints.
-  // Looking at the existing Jsonnet: cis1.jsonnet adds targets for shared-network,
-  // prod-environment-network, and prod-proj1.
+  // The topology helper decides which environments are security targets.
+  // Config mode defaults this to all environments; published profiles can pin a narrower list.
   local env_zone_targets = {
     [n.key_global('SZ-TGT', ['SHARED', 'NETWORK'])]: {
       name: n.display_global('sz-tgt', ['shared', 'network']),

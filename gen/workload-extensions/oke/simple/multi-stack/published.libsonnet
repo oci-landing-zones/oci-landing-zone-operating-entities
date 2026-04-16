@@ -19,13 +19,11 @@ local oke_builder = import '../oke_builder.libsonnet';
       platform_config: platform,
     };
 
-    local metadata = oke_builder.render({
+    local metadata = oke_builder.metadata({
       config_params: platform.extension.params,
-      network: { vcn: platform.network.vcn, subnets: {} },
       naming: n,
       topology: platform_entry.scope,
-      routing: null,
-    }).metadata;
+    });
 
     local subnet_names =
       if std.objectHas(metadata, 'subnet_order') then metadata.subnet_order

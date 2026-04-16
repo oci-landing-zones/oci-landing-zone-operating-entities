@@ -5,6 +5,23 @@ from tests.gen.helpers import REPO_ROOT, run_cmd
 
 
 class LandingZoneStructureTests(unittest.TestCase):
+    def test_landing_zone_and_addon_adapter_share_render_context_helper(self) -> None:
+        landing_zone = (REPO_ROOT / "gen/landing_zone.libsonnet").read_text(encoding="utf-8")
+        addon_published = (
+            REPO_ROOT / "gen/addons/oci-hub-models/published.libsonnet"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            "local render_context = import 'render_context.libsonnet';",
+            landing_zone,
+        )
+        self.assertIn(
+            "local render_context = import '../../render_context.libsonnet';",
+            addon_published,
+        )
+        self.assertNotIn("local config = cfg_lib.normalize(raw_config);", landing_zone)
+        self.assertNotIn("local normalized = cfg_lib.normalize(config);", addon_published)
+
     def test_spoke_rendering_is_extracted_from_landing_zone_orchestrator(self) -> None:
         landing_zone = (REPO_ROOT / "gen/landing_zone.libsonnet").read_text(encoding="utf-8")
         self.assertIn(

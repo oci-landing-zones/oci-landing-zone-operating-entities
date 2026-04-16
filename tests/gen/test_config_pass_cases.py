@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 import unittest
 
@@ -65,12 +67,27 @@ class GeneratorConfigPassCases(unittest.TestCase):
             "eu-frankfurt-1",
         )
 
-    def assert_nonprod_outputs(self, outputs: dict) -> None:
+    def assert_nondefault_region_pair(self, outputs: dict) -> None:
+        network = self.assert_single_stage_network_output(outputs)
+        categories = network["network_configuration"]["network_configuration_categories"]
+        drgs = categories["0-shared"]["non_vcn_specific_gateways"]["dynamic_routing_gateways"]
+        self.assertIn("DRG-PHX-LZ-HUB-KEY", drgs)
+
+        prod_projects_vcn = categories["1-prod"]["vcns"]["VCN-PHX-LZ-PROD-PROJECTS-KEY"]
+        prod_projects_routes = prod_projects_vcn["route_tables"]["RT-PHX-LZ-PROD-PROJ-GENERIC-KEY"]["route_rules"]
+        self.assertIn("rr-phx-hub", prod_projects_routes)
+        self.assertIn("rr-phx-natgw", prod_projects_routes)
+        self.assertEqual(
+            outputs["security_cis1.json"]["cloud_guard_configuration"]["reporting_region"],
+            "us-phoenix-1",
+        )
+
+    def assert_preprod_security_targets(self, outputs: dict) -> None:
         self.assertIn("security_cis1.json", outputs)
         security_zone_keys = set(outputs["security_cis1.json"]["security_zones_configuration"]["security_zones"].keys())
-        self.assertNotIn("SZ-TGT-LZ-PREPROD-ENVIRONMENT-NETWORK-KEY", security_zone_keys)
-        self.assertNotIn("SZ-TGT-LZ-PREPROD-PROJ1-KEY", security_zone_keys)
-        self.assertNotIn("SZ-TGT-LZ-PREPROD-PLATFORM-OKE-KEY", security_zone_keys)
+        self.assertIn("SZ-TGT-LZ-PREPROD-ENVIRONMENT-NETWORK-KEY", security_zone_keys)
+        self.assertIn("SZ-TGT-LZ-PREPROD-PROJ1-KEY", security_zone_keys)
+        self.assertIn("SZ-TGT-LZ-PREPROD-PLATFORM-OKE-KEY", security_zone_keys)
 
     def assert_plain_platform_network_compartment(
         self, outputs: dict, category_key: str, expected_compartment: str
@@ -145,6 +162,27 @@ class GeneratorConfigPassCases(unittest.TestCase):
         final_categories = network["network_configuration"]["network_configuration_categories"]
         self.assertIn("0-shared", final_categories)
 
+        security_zone_keys = set(outputs["security_cis1.json"]["security_zones_configuration"]["security_zones"].keys())
+        self.assertIn("SZ-TGT-LZ-PREPROD-ENVIRONMENT-NETWORK-KEY", security_zone_keys)
+        self.assertIn("SZ-TGT-LZ-PREPROD-PROJ1-KEY", security_zone_keys)
+        self.assertIn("SZ-TGT-LZ-PREPROD-PLATFORM-OKE-KEY", security_zone_keys)
+
+    def assert_prod_preprod_hub_c(self, outputs: dict) -> None:
+        network_pre, network = self.assert_staged_network_outputs(outputs)
+        self.assertIn("network_backends.json", outputs)
+        network_backends = outputs["network_backends.json"]
+
+        categories = network_pre["network_configuration"]["network_configuration_categories"]
+        self.assertEqual(list(categories.keys()), ["0-shared", "1-prod", "2-preprod"])
+
+        final_categories = network["network_configuration"]["network_configuration_categories"]
+        self.assertEqual(list(final_categories.keys()), ["0-shared", "1-prod", "2-preprod"])
+        self.assertEqual(network["network_configuration"], network_backends["network_configuration"])
+
+        nlbs = network_backends["nlb_configuration"]["nlbs"]
+        self.assertIn("NLB-FRA-LZ-HUB-TRUST-KEY", nlbs)
+        self.assertIn("NLB-FRA-LZ-HUB-UNTRUST-KEY", nlbs)
+
     def assert_null_realm_defaults(self, outputs: dict) -> None:
         self.assert_default_region_outputs(outputs)
         self.assertIn("iam.json", outputs)
@@ -176,10 +214,12 @@ class GeneratorConfigPassCases(unittest.TestCase):
             ("mixed_platform_types.jsonnet", self.assert_mixed_platform_types),
             ("null_realm_defaults.jsonnet", self.assert_null_realm_defaults),
             ("null_region_defaults.jsonnet", self.assert_default_region_outputs),
-            ("preprod_oke.jsonnet", self.assert_nonprod_outputs),
+            ("phoenix_region_pair.jsonnet", self.assert_nondefault_region_pair),
+            ("preprod_oke.jsonnet", self.assert_preprod_security_targets),
             ("prod_oke.jsonnet", self.assert_default_region_outputs),
             ("prod_plain_platform.jsonnet", self.assert_prod_plain_platform),
             ("prod_preprod_hub_a.jsonnet", self.assert_prod_preprod_hub_a),
+            ("prod_preprod_hub_c.jsonnet", self.assert_prod_preprod_hub_c),
             ("shared_platform_oke.jsonnet", self.assert_shared_platform_oke),
             ("shared_platform_plain.jsonnet", self.assert_shared_plain_platform),
             ("unordered_envs_oke.jsonnet", self.assert_default_region_outputs),

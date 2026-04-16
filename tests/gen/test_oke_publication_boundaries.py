@@ -5,7 +5,7 @@ from tests.gen.helpers import REPO_ROOT, render_config_outputs, render_jsonnet_o
 
 
 class OkePublicationBoundaryTests(unittest.TestCase):
-    def test_removed_oke_legacy_helpers_are_not_part_of_live_surface(self) -> None:
+    def test_agents_guide_does_not_reference_removed_oke_legacy_helpers(self) -> None:
         self.assertFalse(
             (REPO_ROOT / "gen/workload-extensions/oke/simple/oke_network.libsonnet").exists()
         )
@@ -13,10 +13,10 @@ class OkePublicationBoundaryTests(unittest.TestCase):
             (REPO_ROOT / "gen/workload-extensions/oke/simple/oke_identity.libsonnet").exists()
         )
 
-        conventions = (REPO_ROOT / "gen/CONVENTIONS.md").read_text(encoding="utf-8")
-        self.assertNotIn("oke_network.libsonnet", conventions)
-        self.assertNotIn("oke_identity.libsonnet", conventions)
-        self.assertNotIn("oke_*.libsonnet", conventions)
+        agents_guide = (REPO_ROOT / "gen/AGENTS.md").read_text(encoding="utf-8")
+        self.assertNotIn("oke_network.libsonnet", agents_guide)
+        self.assertNotIn("oke_identity.libsonnet", agents_guide)
+        self.assertNotIn("oke_*.libsonnet", agents_guide)
 
     def test_published_profiles_do_not_inject_publication_mode_into_extension_params(self) -> None:
         rendered = render_jsonnet_object(
@@ -103,13 +103,116 @@ class OkePublicationBoundaryTests(unittest.TestCase):
                 self.assertIn("local published = import './published.libsonnet';", contents)
                 self.assertNotIn("../published.libsonnet", contents)
 
-    def test_conventions_document_multistack_owned_oke_published_adapter(self) -> None:
-        conventions = (REPO_ROOT / "gen/CONVENTIONS.md").read_text(encoding="utf-8")
+    def test_agents_guide_documents_multistack_owned_oke_published_adapter(self) -> None:
+        agents_guide = (REPO_ROOT / "gen/AGENTS.md").read_text(encoding="utf-8")
         self.assertIn(
             "gen/workload-extensions/oke/simple/multi-stack/published.libsonnet",
-            conventions,
+            agents_guide,
         )
         self.assertNotIn(
             "gen/workload-extensions/oke/simple/published.libsonnet",
-            conventions,
+            agents_guide,
         )
+
+    def test_multistack_docs_use_live_drg_spokes_key(self) -> None:
+        expected_key = "DRGRT-FRA-LZ-SPOKES-KEY"
+        readme = (
+            REPO_ROOT / "workload-extensions/oke/simple/multi-stack/readme.md"
+        ).read_text(encoding="utf-8")
+        hub_updates = (
+            REPO_ROOT / "workload-extensions/oke/simple/multi-stack/network-hub-updates.md"
+        ).read_text(encoding="utf-8")
+        network = (
+            REPO_ROOT / "workload-extensions/oke/simple/multi-stack/oke_network.json"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(expected_key, readme)
+        self.assertIn(expected_key, network)
+        self.assertIn(expected_key, hub_updates)
+        self.assertNotIn("DRGRT-FRA-LZP-SPOKES-KEY", hub_updates)
+
+    def test_single_stack_published_surface_includes_security_and_observability_outputs(self) -> None:
+        single_stack_dir = REPO_ROOT / "workload-extensions/oke/simple/single-stack"
+        json_files = {path.name for path in single_stack_dir.glob("*.json")}
+
+        expected_files = {
+            # core deployment inputs
+            "oke_identity.json",
+            "oke_network.json",
+            "oke_governance.json",
+            "oke_clusters.json",
+            "oke_workers.json",
+            # published companion security/observability outputs
+            "oke_security_cis1.json",
+            "oke_security_cis1_pre.json",
+            "oke_security_cis2.json",
+            "oke_security_cis2_pre.json",
+            "oke_observability_cis1.json",
+            "oke_observability_cis1_pre.json",
+            "oke_observability_cis2.json",
+            "oke_observability_cis2_pre.json",
+        }
+
+        self.assertEqual(expected_files, json_files)
+
+    def test_multi_stack_published_surface_includes_security_and_observability_outputs(self) -> None:
+        multi_stack_dir = REPO_ROOT / "workload-extensions/oke/simple/multi-stack"
+        json_files = {path.name for path in multi_stack_dir.glob("*.json")}
+
+        expected_files = {
+            # core deployment inputs
+            "oke_identity.json",
+            "oke_network.json",
+            "oke_clusters.json",
+            "oke_workers.json",
+            # published companion security/observability outputs
+            "oke_security_cis1.json",
+            "oke_security_cis1_pre.json",
+            "oke_security_cis2.json",
+            "oke_security_cis2_pre.json",
+            "oke_observability_cis1.json",
+            "oke_observability_cis1_pre.json",
+            "oke_observability_cis2.json",
+            "oke_observability_cis2_pre.json",
+        }
+
+        self.assertEqual(expected_files, json_files)
+
+    def test_readmes_document_security_and_observability_companion_outputs(self) -> None:
+        readmes = {
+            "single": {
+                "text": (
+                    REPO_ROOT / "workload-extensions/oke/simple/single-stack/readme.md"
+                ).read_text(encoding="utf-8"),
+                "companions": (
+                    "oke_security_cis1.json",
+                    "oke_security_cis1_pre.json",
+                    "oke_security_cis2.json",
+                    "oke_security_cis2_pre.json",
+                    "oke_observability_cis1.json",
+                    "oke_observability_cis1_pre.json",
+                    "oke_observability_cis2.json",
+                    "oke_observability_cis2_pre.json",
+                ),
+            },
+            "multi": {
+                "text": (
+                    REPO_ROOT / "workload-extensions/oke/simple/multi-stack/readme.md"
+                ).read_text(encoding="utf-8"),
+                "companions": (
+                    "oke_security_cis1.json",
+                    "oke_security_cis1_pre.json",
+                    "oke_security_cis2.json",
+                    "oke_security_cis2_pre.json",
+                    "oke_observability_cis1.json",
+                    "oke_observability_cis1_pre.json",
+                    "oke_observability_cis2.json",
+                    "oke_observability_cis2_pre.json",
+                ),
+            },
+        }
+
+        for label, data in readmes.items():
+            for companion in data["companions"]:
+                with self.subTest(readme=label, file=companion):
+                    self.assertIn(companion, data["text"])

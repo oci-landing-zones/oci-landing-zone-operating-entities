@@ -81,7 +81,7 @@ Move the customer to the config-driven path for anything non-standard or customi
 Start from:
 
 1. `gen/README.md`
-2. `gen/CONVENTIONS.md`
+2. `gen/AGENTS.md`
 3. `gen/JSONNET_COMPOSITION.md`
 
 When a customer uses config mode, the deployable working set becomes the files produced by that customer's own config generation.
@@ -116,7 +116,7 @@ When helping customers, make no assumptions and do not hallucinate data, file pa
 
 IMPORTANT, following sections applies only to developers of landing, standard request for creating or changing landing zone shouldn't make changes in `gen/` folder, this folder ensures the landing zone generated are based on best design and security practices.
 
-- Published entrypoints must stay thin and profile-owned. Follow the `Published Profiles` section in `gen/CONVENTIONS.md`.
+- Published entrypoints must stay thin and profile-owned. Follow the `Published Profiles` section in `gen/AGENTS.md`.
 - Use `jsonnet --multi` only for config-mode fan-out and debugging. Do not use it to regenerate committed snapshot families under `blueprints/` or `workload-extensions/`.
 - When changing generator contracts, publication boundaries, or topology semantics, update the relevant docs and tests in the same change.
 - If you are unsure where a change belongs, start at `gen/landing_zone.libsonnet` and read outward.
