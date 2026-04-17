@@ -30,7 +30,7 @@
 | **NAME**         | Complete Landing Zone with OKE (Single-Stack)                                    |
 | **OBJECTIVE**        | Deploy OneOE Landing Zone + Hub Model E + OKE cluster in a single unified Terraform deployment. |
 | **TARGET RESOURCES** | Complete LZ Foundation, IAM, Hub Network, DRG, OKE VCN, OKE Cluster with all components integrated |
-| **DEPLOYMENT**          | [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_workers.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_network.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_identity.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_clusters.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_governance.json"}) </br> **Note**: To understand how to perform this operation with ORM, follow these [steps](ORM_OKE-LZ-EXT_deployment_steps.md). [Terraform CLI](/commons/content/terraform.md)  can be also used.           |
+| **DEPLOYMENT**          | Use the JSON files in this folder with Terraform CLI, or stage them in a customer-controlled private source for OCI Resource Manager as described in [Deployment Steps](#5-deployment-steps). [Terraform CLI](/commons/content/terraform.md) can also be used. |
 
 
 &nbsp;
@@ -109,10 +109,10 @@ The deployment includes the complete OneOE blueprint with:
 
 ### **3.5 OKE Cluster** <!-- omit from toc -->
 
-- **Kubernetes Version**: 1.31.1
+- **Kubernetes Version**: v1.35.2
 - **Cluster Type**: Enhanced cluster with native pod networking
 - **Control Plane**: Private endpoint in dedicated subnet
-- **Worker Pool**: 1x VM.Standard.E4.Flex (1 OCPU, 8GB RAM) - easily scalable
+- **Worker Pool**: 1x VM.Standard.E5.Flex (1 OCPU, 8GB RAM, Oracle Linux 8.10) - easily scalable
 - **CNI**: VCN-native pod networking (OCI VCN-Native Pod Networking CNI)
 
 &nbsp;
@@ -127,7 +127,7 @@ The deployment uses five JSON configuration files:
 | `oke_network.json` | OneOE + Hub E + OKE network |
 | `oke_governance.json` | Tag namespaces and governance definitions |
 | `oke_clusters.json` | OKE cluster configuration |
-| `oke_workers.json` | OKE Node pool configuration | 
+| `oke_workers.json` | OKE Node pool configuration |
 
 ### Additional Published Security & Observability Outputs <!-- omit from toc -->
 
@@ -160,13 +160,17 @@ The published package also includes companion JSONs that capture CIS-aligned sec
 - No pre-configured DRG or compartments
 - Everything is created from scratch
 
-### Option A: Deploy via OCI Resource Manager (ORM) 
+### Option A: Deploy via OCI Resource Manager (ORM)
 
 1. **Create ORM Stack**
-   
-   Using one-click deployment. [<img src="../../../../commons/images/DeployToOCI.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_workers.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_network.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_identity.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_clusters.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/master/workload-extensions/oke/simple/single-stack/oke_governance.json"}) change working directory to `rms-facade`.
 
-2. **Review Configuration** (Optional Customization)
+   Create the stack from the pinned orchestrator release and set the working directory to `rms-facade`.
+
+2. **Stage Configuration Files in a Private Source**
+   - Upload `oke_governance.json`, `oke_identity.json`, `oke_network.json`, `oke_clusters.json`, and `oke_workers.json` to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
+   - The previous public repo-hosted one-click example is not the recommended customer deployment path.
+
+3. **Review Configuration** (Optional Customization)
 
    Before deployment, you may want to review the JSON configuration files and customize them as needed:
 
@@ -178,12 +182,12 @@ The published package also includes companion JSONs that capture CIS-aligned sec
      - Adjust these in the JSON files if they conflict with existing networks
    - **Configuration Keys**: Ensure keys like `DRG-FRA-LZ-HUB-KEY` match your naming convention
 
-3. **Run Terraform Plan**
+4. **Run Terraform Plan**
    - Click **Next** → **Create**
    - Click **Plan** to preview resources
 
 
-4. **Apply Configuration**
+5. **Apply Configuration**
    - Click **Apply**
    - Deployment takes approximately **20-30 minutes**
    - Monitor progress in the logs
@@ -247,7 +251,7 @@ terraform apply tfplan
 
 ## **6. Post-Deployment Configuration**
 
-### 6.1 Access the OKE Cluster 
+### 6.1 Access the OKE Cluster
 OKE Cluster is deploying with private IP for the control plane, for accessing control plane you need to be on the same / routable network as OKE.
 
 #### Generate kubeconfig <!-- omit from toc -->
@@ -335,9 +339,9 @@ Edit the JSON file to modify CIDR blocks:
 
 ```json
 {
-  "node_pools_configuration": {
+  "oke_workers_configuration": {
     "node_pools": {
-      "NP-FRA-P-PLATFORM-OKE-01-KEY": {
+      "NDP-FRA-LZ-PROD-PLATFORM-OKE-1-KEY": {
         "size": 3,  // Changed from 1 to 3 nodes
         ...
       }
@@ -352,13 +356,16 @@ Edit the JSON file to modify CIDR blocks:
 
 ```json
 {
-  "node_pools_configuration": {
+  "oke_workers_configuration": {
     "node_pools": {
-      "NP-FRA-P-PLATFORM-OKE-01-KEY": {
-        "node_shape": "VM.Standard.E4.Flex",
-        "node_shape_config": {
-          "ocpus": 2,        // Changed from 1 to 2
-          "memory": 16       // Changed from 8 to 16 GB
+      "NDP-FRA-LZ-PROD-PLATFORM-OKE-1-KEY": {
+        "node_config_details": {
+          "image": "8.10",
+          "node_shape": "VM.Standard.E5.Flex",
+          "flex_shape_settings": {
+            "ocpus": 2,        // Changed from 1 to 2
+            "memory": 16       // Changed from 8 to 16 GB
+          }
         },
         ...
       }
@@ -373,16 +380,22 @@ Edit the JSON file to modify CIDR blocks:
 
 ```json
 {
-  "clusters_configuration": {
+  "oke_clusters_configuration": {
     "clusters": {
-      "OKE-FRA-P-PLATFORM-KEY": {
+      "CLR-FRA-LZ-PROD-OKE-KEY": {
         "kubernetes_version": "v1.35.2",  // Updated version
-        ...
+        "options": {
+          "kubernetes_network_config": {
+            "services_cidr": "10.96.0.0/16"
+          }
+        }
       }
     }
   }
 }
 ```
+
+**Note**: Keep `options.kubernetes_network_config.services_cidr` aligned with your Kubernetes service network plan. It remains required for the published native OKE payload even though `pods_cidr` is no longer part of the standard single-stack example.
 
 **Important**: [Check Supported Images, Shapes for Worker Nodes](https://docs.oracle.com/en-us/iaas/Content/ContEng/Reference/contengimagesshapes.htm) and [OKE supported versions](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengaboutk8sversions.htm) before upgrading.
 

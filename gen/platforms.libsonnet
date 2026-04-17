@@ -1,7 +1,8 @@
 local common = import 'hub/hub_common.libsonnet';
 
 {
-  collect_entries(config, ordered_env_names, topo)::
+  collect_entries(config, topo)::
+    local ordered_env_names = topo.ordered_env_names();
     local env_platform_entries = std.flatMap(
       function(env_name)
         local env = config.environments[env_name];
@@ -91,7 +92,14 @@ local common = import 'hub/hub_common.libsonnet';
       all_vcn_entries: spoke_vcn_entries + platform_vcn_entries,
     },
 
-  build_extension_route_targets(pe, routed_vcn_entries, n, hub_vcn_cidr)::
+  build_extension_route_targets(inputs)::
+    local pe = inputs.platform_entry;
+    local routed_vcn_entries = inputs.routed_vcn_entries;
+    local n = inputs.naming;
+    local hub_vcn_cidr = inputs.hub_vcn_cidr;
+    local hub_has_spoke_natgw =
+      if std.objectHas(inputs, 'hub_has_spoke_natgw') then inputs.hub_has_spoke_natgw
+      else true;
     if hub_vcn_cidr == null then null
     else
       local target_vcn_key = n.key('VCN', [pe.scope.scope_name, 'PLATFORM', pe.scope.platform_name]);
@@ -109,9 +117,13 @@ local common = import 'hub/hub_common.libsonnet';
           for e in routed_vcn_entries
           if e.vcn_key != target_vcn_key
         },
+        internet_default_target: if hub_has_spoke_natgw then 'local_natgw' else 'drg',
       },
 
-  build_network_category(pe, n, hub_vcn_cidr)::
+  build_network_category(inputs)::
+    local pe = inputs.platform_entry;
+    local n = inputs.naming;
+    local hub_vcn_cidr = inputs.hub_vcn_cidr;
     local scope = pe.scope;
     local env_name = scope.scope_name;
     local plat = scope.platform_name;

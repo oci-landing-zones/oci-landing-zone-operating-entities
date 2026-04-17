@@ -1,0 +1,26 @@
+{
+  "backend_ips": {
+    "prod01": "10.0.64.10",
+    "prod02": "10.0.64.20"
+  },
+  "final_categories": [
+    "0-shared",
+    "1-prod",
+    "2-preprod",
+    "preprod-platform-oke",
+    "prod-platform-oke"
+  ],
+  "pre_categories": [
+    "0-shared",
+    "1-prod",
+    "2-preprod",
+    "preprod-platform-oke",
+    "prod-platform-oke"
+  ],
+  "route_statement_priorities": {
+    "preprod": 20,
+    "preprod_oke": 40,
+    "prod": 10,
+    "prod_oke": 30
+  }
+}

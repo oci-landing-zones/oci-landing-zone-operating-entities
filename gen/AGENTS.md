@@ -175,7 +175,7 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
           network: { vcn: '10.0.96.0/22' },
           extension: {
             type: 'oke_simple',
-            params: { kubernetes_version: 'v1.30.1', pods_cidr: '...', services_cidr: '...' },
+            params: { kubernetes_version: 'v1.30.1', services_cidr: '...' },
           },
         },
       },
@@ -184,7 +184,9 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 }
 ```
 
-Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`). `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need narrower legacy behavior. Missing subnets are still auto-calculated from VCN CIDRs using `auto_subnets()`.
+Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`). `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Missing subnets are still auto-calculated from VCN CIDRs using `auto_subnets()`.
+
+When debugging how generated JSON is applied at deploy time, inspect the downstream deployer contract in `terraform-oci-modules-orchestrator` in addition to this repo. `gen/` defines what this repository emits; the orchestrator defines how those generated configs are consumed. For published OKE investigations, use the exact orchestrator tag referenced by the published OKE docs rather than `HEAD`.
 
 ## 4. Naming Convention
 
@@ -216,7 +218,7 @@ Examples:
 Each hub builder in `hub/` is a function with this signature:
 
 ```
-function(n, hub_config, vcn_list, lb_backends) -> {
+function(hub_ctx) -> {
   pre:                 object,      // network_configuration for pre-deploy
   post:                object|null, // network_configuration for post-deploy (null if no firewall)
   spoke_route_tables:  [string],    // RT keys that need spoke CIDR routes via DRG
@@ -228,10 +230,11 @@ function(n, hub_config, vcn_list, lb_backends) -> {
 }
 ```
 
-- `n`: naming object from `naming(region_short_name)`
-- `hub_config`: `{ kind, network: { vcn, subnets } }`
-- `vcn_list`: `[{name, cidr}]` -- spoke/platform VCN CIDRs for NFW policies
-- `lb_backends`: `{ backend1_ip, backend2_ip }` -- example LB backend IPs supplied by the orchestrator
+- `hub_ctx.naming`: naming object from `naming(region_short_name)`
+- `hub_ctx.hub_config`: `{ kind, network: { vcn, subnets } }`
+- `hub_ctx.vcn_list`: `[{name, cidr}]` -- spoke/platform VCN CIDRs for NFW policies
+- `hub_ctx.lb_backends`: `{ backend1_ip, backend2_ip }` -- example LB backend IPs supplied by the orchestrator
+- `hub_ctx.lb_env_name`: first ordered workload spoke name used for example LB naming
 
 The orchestrator (`landing_zone.libsonnet`) dispatches to the correct hub builder, delegates spoke category rendering to `gen/builders/network_spokes.libsonnet`, and delegates DRG and hub overlays to `gen/builders/hub_integration.libsonnet`.
 
@@ -312,6 +315,8 @@ Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes f
 
 **Config mode** (`bash gen/generate.sh --config my_config.libsonnet [output_dir]`):
 Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json`, `iam.json`, `security_*.json`, `observability_*.json`, and `governance.json` for every config. Staged hubs also emit `network_pre.json`, Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs.
+
+For customer-use work, ask where the source config file should live and where the generated output directory should be before creating artifacts. Keep those locations explicit and separate. Do not default customer configs or generated landing zone outputs into `tests/` or repo fixture paths unless the task is explicitly repo-development work for tests or fixtures.
 
 Config mode validates required fields during normalization. `config.environments` must be present and non-empty; omitted environments are a hard error rather than an implicit default.
 

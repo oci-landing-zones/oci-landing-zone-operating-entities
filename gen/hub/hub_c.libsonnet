@@ -2,12 +2,12 @@
 // Subnets: untrust, trust, lb, mgmt, mon, dns.
 // DRG ingress route table, NLBs (trust + untrust), L7 LB.
 //
-// function(n, hub_config, vcn_list, lb_backends) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc, backends }
+// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc, backends }
 //
-// n:          naming object from naming('fra')
-// hub_config: { kind: 'hub_c', network: { vcn: '...', subnets: { untrust, trust, lb, mgmt, mon, dns } } }
-// vcn_list:   [{name: 'prod', cidr: '10.0.64.0/21'}, ...] — (unused by Hub C, no NFW)
-// lb_backends: { backend1_ip: '10.0.64.10', backend2_ip: '10.0.64.20' } — example LB backend IPs
+// hub_ctx.naming: naming object from naming('fra')
+// hub_ctx.hub_config: { kind: 'hub_c', network: { vcn: '...', subnets: { untrust, trust, lb, mgmt, mon, dns } } }
+// hub_ctx.lb_backends: { backend1_ip: '10.0.64.10', backend2_ip: '10.0.64.20' } — example LB backend IPs
+// hub_ctx.lb_env_name: first ordered workload spoke name used for example LB naming
 local common = import 'hub_common.libsonnet';
 local lb = import 'hub_lb.libsonnet';
 
@@ -58,7 +58,11 @@ local nlb(n, zone, backends={}) = {
   },
 };
 
-function(n, hub_config, vcn_list=[], lb_backends=null)
+function(hub_ctx)
+  local n = hub_ctx.naming;
+  local hub_config = hub_ctx.hub_config;
+  local lb_backends = if std.objectHas(hub_ctx, 'lb_backends') then hub_ctx.lb_backends else null;
+  local lb_env_name = if std.objectHas(hub_ctx, 'lb_env_name') then hub_ctx.lb_env_name else 'prod';
   local vcn_cidr = hub_config.network.vcn;
   local subnets = hub_config.network.subnets;
   local bastion_ip = common.bastion_ip_from_mgmt(subnets.mgmt);
@@ -274,7 +278,7 @@ function(n, hub_config, vcn_list=[], lb_backends=null)
 
             non_vcn_specific_gateways: {
               dynamic_routing_gateways: common._firewall_hub_drg(n),
-              l7_load_balancers: lb._l7_load_balancer(n, lb_backends),
+              l7_load_balancers: lb._l7_load_balancer(n, lb_backends, lb_env_name),
             },
           },
         },
@@ -366,13 +370,25 @@ function(n, hub_config, vcn_list=[], lb_backends=null)
     backends: {
       nlb_backends:: nlb_backends,
       nlb:: nlb,
+      placeholder_targets:: {
+        trust: [
+          'NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrr...',
+          'NETWORK FIREWALL-2 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrt...',
+        ],
+        untrust: [
+          'NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsm...',
+          'NETWORK FIREWALL-2 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsh...',
+        ],
+      },
 
-      build(fw1_trust_ip, fw2_trust_ip, fw1_untrust_ip, fw2_untrust_ip):: {
+      build(targets):: {
         nlb_configuration+: {
           nlbs:
-            nlb(n, 'trust', nlb_backends(n, 'trust', fw1_trust_ip, fw2_trust_ip))
-            + nlb(n, 'untrust', nlb_backends(n, 'untrust', fw1_untrust_ip, fw2_untrust_ip)),
+            nlb(n, 'trust', nlb_backends(n, 'trust', targets.trust[0], targets.trust[1]))
+            + nlb(n, 'untrust', nlb_backends(n, 'untrust', targets.untrust[0], targets.untrust[1])),
         },
       },
+
+      build_placeholders():: self.build(self.placeholder_targets),
     },
   }

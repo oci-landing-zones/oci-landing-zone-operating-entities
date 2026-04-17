@@ -11,6 +11,8 @@ Use this skill when work should go through the new config-driven generator inste
 
 Core principle: treat the landing zone config as the source of truth, then verify behavior against the generator's normalization and orchestration code before changing schema assumptions.
 
+If the request starts as customer design or deployment guidance and the customer path is not yet chosen, use `landing-zone-customer-guidance` first. This skill starts after the conversation has reached the config-driven path or the user explicitly asks for config-mode details.
+
 ## When to Use
 
 - Creating a new config file for `bash gen/generate.sh --config ...`
@@ -20,6 +22,7 @@ Core principle: treat the landing zone config as the source of truth, then verif
 - Debugging why config mode generated an unexpected JSON output or omitted a file
 
 Do not use this skill for legacy checked-in JSON output edits unless the task is explicitly about the config-driven path.
+Do not use this skill as the first response to an open-ended customer request such as "I want landing zone to run OKE" when the required customer discovery decisions are still unknown.
 
 ## Workflow
 
@@ -28,10 +31,11 @@ Do not use this skill for legacy checked-in JSON output edits unless the task is
    - `gen/config.libsonnet` for required fields and normalization rules
    - `gen/landing_zone.libsonnet` for orchestration and topology behavior
    - `gen/landing_zone_multi.jsonnet` for config-mode outputs
-2. Build the config as a Jsonnet object, not raw JSON, so imports and composition stay available.
-3. Keep only the smallest top-level shape first: `hub` and non-empty `environments`, plus `region` / `region_short_name` only when overriding their defaults as a pair.
-4. Add environments and platforms incrementally, then run config mode and inspect the generated outputs.
-5. When behavior is unclear, prefer reading the normalization and extension code over guessing from checked-in JSON.
+2. Before creating files, ask where the config source file should live and where the generated landing zone outputs should go. Use separate paths.
+3. Build the config as a Jsonnet object, not raw JSON, so imports and composition stay available.
+4. Keep only the smallest top-level shape first: `hub` and non-empty `environments`, plus `region` / `region_short_name` only when overriding their defaults as a pair.
+5. Add environments and platforms incrementally, then run config mode and inspect the generated outputs.
+6. When behavior is unclear, prefer reading the normalization and extension code over guessing from checked-in JSON.
 
 ## Quick Rules
 
@@ -47,19 +51,24 @@ Do not use this skill for legacy checked-in JSON output edits unless the task is
 | Realm | `realm` is optional and defaults to `oc1`, including when explicitly set to `null`. |
 | Extensions | Extension `type` must be registered in `gen/landing_zone.libsonnet`. |
 | Config-mode network outputs | `network.json` is canonical final output; `network_pre.json` appears only for staged hubs. |
+| Artifact placement | Ask for both the config file location and the output directory before creating customer artifacts; do not default them into `tests/`. |
 
 ## Authoring Guidance
 
 - Prefer one small config file per scenario and compose from imports if reuse is needed.
+- For customer-use work, keep config sources and generated outputs in customer-chosen or explicitly approved working directories. Reserve `tests/gen/testdata/...` for repo-development fixtures and automated tests, not customer artifact placement.
 - Use `shared_project_network` only for environments that should produce spoke VCN outputs.
 - Put environment-scoped platforms under `environments.<env>.platforms`.
 - Put shared platforms under top-level `shared_platforms`.
 - Keep CIDRs explicit even when subnets are auto-generated. Auto-subnetting helps with subnet layout, not top-level network planning.
+- When selecting CIDRs, check whether the landing zone will connect to on-premises or other clouds; any routed OCI or Kubernetes ranges must avoid overlap with those external networks.
 - When adding a new extension-backed platform, verify both the config schema and the extension contract.
+- For customer deployment guidance, Prefer Terraform CLI locally or from customer-controlled CI/CD. If ORM is used, stage the generated files in a customer-controlled private OCI Object Storage bucket or approved private GitHub source and use the orchestrator `rms-facade` workflow instead of repo-hosted public raw URLs.
 
 ## Verification
 
 - Run `bash gen/generate.sh --config <config_file> [output_dir]` for normal config-mode generation.
+- When validating a customer config, point generation at a separate output directory such as a temp directory or customer-approved working directory rather than a repo test fixture path.
 - If you need raw multi-output behavior without formatting, run `jsonnet --multi <output_dir>/ --tla-code-file config=<config_file> gen/landing_zone_multi.jsonnet`.
 - Compare generated files with the expected output set from `gen/landing_zone_multi.jsonnet`: `network.json` and common domain outputs are always emitted, `network_pre.json` is emitted only for staged hubs, and `network_backends.json` plus extension outputs remain conditional.
 
@@ -67,10 +76,12 @@ Do not use this skill for legacy checked-in JSON output edits unless the task is
 
 - For the schema and behavior map, read `references/schema-and-behavior.md`.
 - For starter patterns and repo-native examples, read `references/examples.md`.
+- For config-driven OKE semantics and CIDR guardrails, read `gen/workload-extensions/oke/AGENTS.md`.
 
 ## Common Mistakes
 
 - Editing generated JSON and forgetting to fix the config or Jsonnet source.
+- Dropping customer configs or generated landing zone outputs into `tests/gen/testdata/...` just because those directories already exist.
 - Assuming every platform can auto-generate subnets. Plain platforms without an extension cannot.
 - Forgetting that only environments with `shared_project_network` become spokes.
 - Forgetting that omitted `security_targets` now means all environments. Narrow it explicitly when you need a subset.

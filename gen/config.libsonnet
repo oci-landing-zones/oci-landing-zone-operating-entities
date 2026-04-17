@@ -1,6 +1,8 @@
 // gen/config.libsonnet
 // Config normalization and auto-subnet calculation for OCI Landing Zone.
 // Handles CIDR allocation with proper alignment and config defaults.
+local subnet_utils = import 'lib/subnets.libsonnet';
+
 {
   local ip_to_int(octets) =
     octets[0] * 16777216
@@ -30,11 +32,7 @@
     local vcn_limit = base.base_int + total_size;
     local allocated = std.foldl(
       function(acc, def)
-        local size = std.parseInt(std.stripChars(def.size, '/'));
-        local block_sizes = { '21': 2048, '22': 1024, '23': 512, '24': 256, '25': 128, '26': 64, '27': 32, '28': 16 };
-        assert std.objectHas(block_sizes, std.toString(size)) :
-          'Unsupported subnet prefix /%d. Supported: /21 through /28' % size;
-        local block_size = block_sizes[std.toString(size)];
+        local block_size = subnet_utils.block_size_for_prefix(def.size);
         // Align to block boundary
         local raw_offset = acc.offset;
         local aligned_offset =
@@ -98,11 +96,12 @@
       if std.objectHas(config, 'realm') && config.realm != null then config.realm
       else 'oc1';
 
+    local hub_subnet_keys = hub_subnet_order[config.hub.kind];
+    local hub_subnet_label = 'config.hub.network.subnets for %s' % config.hub.kind;
     local hub_subnets =
-      if std.objectHas(config.hub.network, 'subnets') then config.hub.network.subnets
-      else self.auto_subnets_24(config.hub.network.vcn, hub_subnet_order[config.hub.kind]);
-    assert std.objectHas(hub_subnets, 'mgmt') : 'config.hub.network.subnets must contain "mgmt"';
-    assert std.objectHas(hub_subnets, 'lb') : 'config.hub.network.subnets must contain "lb"';
+      if std.objectHas(config.hub.network, 'subnets') then
+        subnet_utils.validate_subnet_map(config.hub.network.subnets, hub_subnet_keys, hub_subnet_label)
+      else self.auto_subnets_24(config.hub.network.vcn, hub_subnet_keys);
 
     local norm_platform(plat, p_name) =
       assert std.objectHas(plat, 'network') : 'Platform %s.network is required' % p_name;

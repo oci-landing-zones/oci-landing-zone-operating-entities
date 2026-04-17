@@ -37,11 +37,10 @@ function(raw_config)
   local topo = ctx.topo;
   local realm = ctx.realm_constants;
   local spoke_envs = ctx.spoke_envs;
-  local all_platform_entries = ctx.all_platform_entries;
   local extension_entries = ctx.extension_entries;
   local network_only_platforms = ctx.network_only_platforms;
   local all_vcn_entries = ctx.all_vcn_entries;
-  local all_vcns = ctx.all_vcns;
+  local lb_env_name = ctx.lb_env_name;
   local lb_backends = ctx.lb_backends;
 
   // Hub CIDRs needed for spoke NSG/security list rules
@@ -52,26 +51,17 @@ function(raw_config)
     function(i, s) s { index: i + 1 },
     spoke_envs
   );
-
-  // Collect all spoke VCN CIDRs for peer routing (Hub E)
-  local all_spoke_vcn_cidrs = [
-    { name: topo.env_display(s.name), raw_name: s.name, vcn: s.env.shared_project_network.network.vcn }
-    for s in spoke_envs
-  ];
-
-  // All VCN CIDRs for spoke-to-spoke+platform peer routing (Hub E with NAT GW)
-  local all_peer_vcn_cidrs = all_spoke_vcn_cidrs + [
-    local label = platforms.vcn_label(pe);
-    {
-      name: label.display,
-      raw_name: label.raw_name,
-      vcn: pe.platform_config.network.vcn,
-    }
-    for pe in all_platform_entries
-  ];
-
-  // Build hub with vcn_list for NFW policies
-  local hub = hub_builders[config.hub.kind](n, config.hub, all_vcns, lb_backends);
+  // Build hub with semantic VCN list for NFW policies and example LB backends.
+  local hub = hub_builders[config.hub.kind]({
+    naming: n,
+    hub_config: config.hub,
+    vcn_list: [
+      { name: entry.name, cidr: entry.vcn }
+      for entry in all_vcn_entries
+    ],
+    lb_backends: lb_backends,
+    lb_env_name: lb_env_name,
+  });
 
   local hub_integration = hub_integration_builder({
     naming: n,
@@ -86,7 +76,7 @@ function(raw_config)
     topology: topo,
     hub_network: config.hub.network,
     spoke_env_indexed: spoke_env_indexed,
-    all_peer_vcn_cidrs: all_peer_vcn_cidrs,
+    all_peer_vcn_entries: all_vcn_entries,
     hub_has_spoke_natgw: hub.has_spoke_natgw,
   });
 
@@ -96,18 +86,23 @@ function(raw_config)
       network_only_platforms[i].scope.scope_name,
       network_only_platforms[i].scope.platform_name,
     ]]:
-      platforms.build_network_category(network_only_platforms[i], n, hub_vcn_cidr)
+      platforms.build_network_category({
+        platform_entry: network_only_platforms[i],
+        naming: n,
+        hub_vcn_cidr: hub_vcn_cidr,
+      })
     for i in std.range(0, std.length(network_only_platforms) - 1)
   } else {};
 
-  local extension_state = extensions.resolve(
-    cfg_lib,
-    extension_registry,
-    extension_entries,
-    n,
-    hub_vcn_cidr,
-    all_vcn_entries
-  );
+  local extension_state = extensions.resolve({
+    cfg_lib: cfg_lib,
+    extension_registry: extension_registry,
+    extension_entries: extension_entries,
+    naming: n,
+    hub_vcn_cidr: hub_vcn_cidr,
+    routed_vcn_entries: all_vcn_entries,
+    hub_has_spoke_natgw: hub.has_spoke_natgw,
+  });
   local extension_network_pre = extension_state.network_pre;
   local extension_iam = extension_state.iam;
   local extension_security_cis1 = extension_state.security_cis1;
@@ -137,12 +132,7 @@ function(raw_config)
     // Hub C backends: full network config with NLB backend configuration.
     network_backends:
       if hub.post != null && std.objectHas(hub, 'backends') then
-        assembled_network + hub.backends.build(
-          'NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrr...',
-          'NETWORK FIREWALL-2 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrt...',
-          'NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsm...',
-          'NETWORK FIREWALL-2 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsh...',
-        )
+        assembled_network + hub.backends.build_placeholders()
       else null,
 
     // IAM output: compartments, groups, identity domains, policies

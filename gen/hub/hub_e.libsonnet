@@ -1,16 +1,20 @@
 // hub_e.libsonnet — Hub E builder (no firewall, DRG-only routing).
 // Simplest hub: 4 subnets (LB, MGMT, MON, DNS), direct DRG spoke-to-spoke routing.
 //
-// function(n, hub_config, vcn_list, lb_backends) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc }
+// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc }
 //
-// n:          naming object from naming('fra')
-// hub_config: { kind: 'hub_e', network: { vcn: '...', subnets: { lb, mgmt, mon, dns } } }
-// vcn_list:   [{name: 'prod', cidr: '10.0.64.0/21'}, ...] — (unused by Hub E, no NFW)
-// lb_backends: { backend1_ip: '10.0.64.10', backend2_ip: '10.0.64.20' } — example LB backend IPs
+// hub_ctx.naming: naming object from naming('fra')
+// hub_ctx.hub_config: { kind: 'hub_e', network: { vcn: '...', subnets: { lb, mgmt, mon, dns } } }
+// hub_ctx.lb_backends: { backend1_ip: '10.0.64.10', backend2_ip: '10.0.64.20' } — example LB backend IPs
+// hub_ctx.lb_env_name: first ordered workload spoke name used for example LB naming
 local common = import 'hub_common.libsonnet';
 local lb = import 'hub_lb.libsonnet';
 
-function(n, hub_config, vcn_list=[], lb_backends=null)
+function(hub_ctx)
+  local n = hub_ctx.naming;
+  local hub_config = hub_ctx.hub_config;
+  local lb_backends = if std.objectHas(hub_ctx, 'lb_backends') then hub_ctx.lb_backends else null;
+  local lb_env_name = if std.objectHas(hub_ctx, 'lb_env_name') then hub_ctx.lb_env_name else 'prod';
   local vcn_cidr = hub_config.network.vcn;
   local subnets = hub_config.network.subnets;
   local bastion_ip = common.bastion_ip_from_mgmt(subnets.mgmt);
@@ -123,7 +127,7 @@ function(n, hub_config, vcn_list=[], lb_backends=null)
                 },
               },
 
-              l7_load_balancers: lb._l7_load_balancer(n, lb_backends),
+              l7_load_balancers: lb._l7_load_balancer(n, lb_backends, lb_env_name),
             },
           },
         },

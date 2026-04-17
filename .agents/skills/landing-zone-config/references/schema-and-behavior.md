@@ -82,7 +82,6 @@ An extension-backed platform config looks like this:
     params: {
       kubernetes_version: 'v1.31.1',
       services_cidr: '10.96.0.0/16',
-      pods_cidr: '10.244.0.0/16',
     },
   },
 }
@@ -91,9 +90,10 @@ An extension-backed platform config looks like this:
 `gen/workload-extensions/oke/simple/oke_simple.libsonnet` enforces:
 
 - `config_params.kubernetes_version`
-- `config_params.pods_cidr`
 - `config_params.services_cidr`
+- `config_params.pods_cidr` only as an optional passthrough when you explicitly want to set it
 
+For the current native OKE contract, pod IPs come from the generated or explicit pod subnet inside the OKE VCN. `services_cidr` remains the explicit Kubernetes-internal service range, and `pods_cidr` is not required for the standard native path even though the downstream `cis-oke` module can still accept it if you deliberately pass it through. In the emitted cluster payload, those values belong under `options.kubernetes_network_config`.
 It also contributes default platform subnets when the platform omits explicit `network.subnets`.
 
 ## Output Model

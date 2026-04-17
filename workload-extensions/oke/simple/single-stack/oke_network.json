@@ -653,18 +653,18 @@
                                         "network_entity_key"                : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rr-fra-prod-platform-oke-projects": {
-                                        "description"                       : "Route to the VCN Prod OKE Projects through DRG",
-                                        "destination"                       : "10.0.80.0/21",
-                                        "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_key"                : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
                                     "rr-fra-sgw": {
                                         "description"                       : "Route to Oracle Services Network through Service GW",
                                         "destination"                       : "all-services",
                                         "destination_type"                  : "SERVICE_CIDR_BLOCK",
                                         "network_entity_key"                : "SGW-FRA-LZ-PROD-PROJ-KEY"
+                                    },
+
+                                    "rr-fra-vcn-prod-platform-oke": {
+                                        "description"                       : "Route to VCN Prod OKE through DRG",
+                                        "destination"                       : "10.0.80.0/21",
+                                        "destination_type"                  : "CIDR_BLOCK",
+                                        "network_entity_key"                : "DRG-FRA-LZ-HUB-KEY"
                                     }
                                 }
                             }
@@ -954,18 +954,18 @@
                                         "network_entity_key"                : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rr-fra-prod-platform-oke-projects": {
-                                        "description"                       : "Route to the VCN Prod OKE Projects through DRG",
-                                        "destination"                       : "10.0.80.0/21",
-                                        "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_key"                : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
                                     "rr-fra-sgw": {
                                         "description"                       : "Route to Oracle Services Network through Service GW",
                                         "destination"                       : "all-services",
                                         "destination_type"                  : "SERVICE_CIDR_BLOCK",
                                         "network_entity_key"                : "SGW-FRA-LZ-PREPROD-PROJ-KEY"
+                                    },
+
+                                    "rr-fra-vcn-prod-platform-oke": {
+                                        "description"                       : "Route to VCN Prod OKE through DRG",
+                                        "destination"                       : "10.0.80.0/21",
+                                        "destination_type"                  : "CIDR_BLOCK",
+                                        "network_entity_key"                : "DRG-FRA-LZ-HUB-KEY"
                                     }
                                 }
                             }

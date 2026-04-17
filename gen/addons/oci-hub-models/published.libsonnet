@@ -12,12 +12,16 @@ local hub_builders = {
 {
   render(config)::
     local ctx = render_context.from_raw_config(config);
-    local hub = hub_builders[ctx.config.hub.kind](
-      ctx.n,
-      ctx.config.hub,
-      ctx.spoke_vcns,
-      ctx.lb_backends
-    );
+    local hub = hub_builders[ctx.config.hub.kind]({
+      naming: ctx.n,
+      hub_config: ctx.config.hub,
+      vcn_list: [
+        { name: s.name, cidr: s.env.shared_project_network.network.vcn }
+        for s in ctx.spoke_envs
+      ],
+      lb_backends: ctx.lb_backends,
+      lb_env_name: ctx.lb_env_name,
+    });
     {
       network:
         if hub.post != null then hub.pre + hub.post
@@ -26,12 +30,7 @@ local hub_builders = {
       [if hub.post != null then 'network_pre']: hub.pre,
 
       [if hub.post != null && std.objectHas(hub, 'backends') then 'network_backends']:
-        hub.pre + hub.backends.build(
-          'NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrr...',
-          'NETWORK FIREWALL-2 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrt...',
-          'NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsm...',
-          'NETWORK FIREWALL-2 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsh...',
-        ),
+        hub.pre + hub.backends.build_placeholders(),
     },
 
   render_iam(config)::

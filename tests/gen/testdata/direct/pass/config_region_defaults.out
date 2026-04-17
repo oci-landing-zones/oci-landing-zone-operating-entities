@@ -1,0 +1,57 @@
+{
+  "default_region": {
+    "drg_keys": [
+      "DRG-FRA-LZ-HUB-KEY"
+    ],
+    "hub_destination": "10.0.0.0/21",
+    "internet_destination": "0.0.0.0/0",
+    "reporting_region": "eu-frankfurt-1",
+    "route_keys": [
+      "rr-fra-hub",
+      "rr-fra-natgw",
+      "rr-fra-sgw"
+    ]
+  },
+  "null_realm": {
+    "has_network_admin_policy": true,
+    "summary": {
+      "drg_keys": [
+        "DRG-FRA-LZ-HUB-KEY"
+      ],
+      "hub_destination": "10.0.0.0/21",
+      "internet_destination": "0.0.0.0/0",
+      "reporting_region": "eu-frankfurt-1",
+      "route_keys": [
+        "rr-fra-hub",
+        "rr-fra-natgw",
+        "rr-fra-sgw"
+      ]
+    }
+  },
+  "null_region": {
+    "drg_keys": [
+      "DRG-FRA-LZ-HUB-KEY"
+    ],
+    "hub_destination": "10.0.0.0/21",
+    "internet_destination": "0.0.0.0/0",
+    "reporting_region": "eu-frankfurt-1",
+    "route_keys": [
+      "rr-fra-hub",
+      "rr-fra-natgw",
+      "rr-fra-sgw"
+    ]
+  },
+  "phoenix": {
+    "drg_keys": [
+      "DRG-PHX-LZ-HUB-KEY"
+    ],
+    "hub_destination": "10.0.0.0/21",
+    "internet_destination": "0.0.0.0/0",
+    "reporting_region": "us-phoenix-1",
+    "route_keys": [
+      "rr-phx-hub",
+      "rr-phx-natgw",
+      "rr-phx-sgw"
+    ]
+  }
+}

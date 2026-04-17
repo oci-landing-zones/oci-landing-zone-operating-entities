@@ -1,0 +1,16 @@
+{
+  "mixed_category_keys": [
+    "0-shared",
+    "1-prod",
+    "2-prod-platform-data",
+    "prod-platform-oke"
+  ],
+  "prod_plain_compartment": "CMP-LZ-PROD-NETWORK-KEY",
+  "shared_oke": {
+    "category_compartment_id": "CMP-LZ-NETWORK-KEY",
+    "platform_children": [
+      "CMP-LZ-SHARED-PLATFORM-OKE-KEY"
+    ]
+  },
+  "shared_plain_compartment": "CMP-LZ-NETWORK-KEY"
+}

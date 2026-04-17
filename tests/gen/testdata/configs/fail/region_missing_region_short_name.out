@@ -1,0 +1,1 @@
+config.region and config.region_short_name must either both be provided or both be omitted

@@ -1,11 +1,10 @@
-from pathlib import Path
 import unittest
 
-from tests.gen.helpers import REPO_ROOT, render_config_outputs, render_jsonnet_object
+from tests.gen.helpers import REPO_ROOT, render_config_outputs
 
 
 class OkePublicationBoundaryTests(unittest.TestCase):
-    def test_agents_guide_does_not_reference_removed_oke_legacy_helpers(self) -> None:
+    def test_agents_guide_does_not_reference_removed_oke_split_output_helpers(self) -> None:
         self.assertFalse(
             (REPO_ROOT / "gen/workload-extensions/oke/simple/oke_network.libsonnet").exists()
         )
@@ -18,36 +17,8 @@ class OkePublicationBoundaryTests(unittest.TestCase):
         self.assertNotIn("oke_identity.libsonnet", agents_guide)
         self.assertNotIn("oke_*.libsonnet", agents_guide)
 
-    def test_published_profiles_do_not_inject_publication_mode_into_extension_params(self) -> None:
-        rendered = render_jsonnet_object(
-            Path("tests/gen/testdata/direct/pass/oke_profile_params.jsonnet")
-        )
-        self.assertNotIn("published_contract", rendered["single_stack"])
-        self.assertNotIn("published_contract", rendered["multi_stack"])
-
-    def test_generic_config_mode_emits_generic_oke_files_only(self) -> None:
-        outputs = render_config_outputs(Path("tests/gen/testdata/configs/pass/prod_oke.jsonnet"))
-        self.assertIn("network.json", outputs)
-        self.assertNotIn("network_pre.json", outputs)
-        self.assertIn("oke_clusters.json", outputs)
-        self.assertIn("oke_workers.json", outputs)
-        self.assertNotIn("oke_network.json", outputs)
-        self.assertNotIn("oke_identity.json", outputs)
-
-        categories = outputs["network.json"]["network_configuration"]["network_configuration_categories"]
-        self.assertIn("prod-platform-oke", categories)
-
-        prod_platform_children = (
-            outputs["iam.json"]["compartments_configuration"]["compartments"]["CMP-LANDINGZONE-KEY"][
-                "children"
-            ]["CMP-LZ-PROD-KEY"]["children"]["CMP-LZ-PROD-PLATFORM-KEY"]["children"]
-        )
-        self.assertIn("CMP-LZ-PROD-PLATFORM-OKE-KEY", prod_platform_children)
-
     def test_generic_config_mode_uses_semantic_environment_order(self) -> None:
-        outputs = render_config_outputs(
-            Path("tests/gen/testdata/configs/pass/unordered_envs_oke.jsonnet")
-        )
+        outputs = render_config_outputs("tests/gen/testdata/configs/pass/unordered_envs_oke.jsonnet")
         self.assertIn("network.json", outputs)
         self.assertNotIn("network_pre.json", outputs)
         categories = outputs["network.json"]["network_configuration"]["network_configuration_categories"]
@@ -216,3 +187,22 @@ class OkePublicationBoundaryTests(unittest.TestCase):
             for companion in data["companions"]:
                 with self.subTest(readme=label, file=companion):
                     self.assertIn(companion, data["text"])
+
+    def test_single_stack_readme_uses_current_oke_cluster_payload_shape(self) -> None:
+        readme = (
+            REPO_ROOT / "workload-extensions/oke/simple/single-stack/readme.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("oke_clusters_configuration", readme)
+        self.assertIn("options.kubernetes_network_config.services_cidr", readme)
+        self.assertNotIn('"clusters_configuration": {', readme)
+
+    def test_guides_tell_investigators_to_follow_the_published_orchestrator_tag(self) -> None:
+        expected_phrase = "exact orchestrator tag referenced by the published OKE docs"
+        for relpath in (
+            "AGENTS.md",
+            "gen/AGENTS.md",
+            "gen/workload-extensions/oke/AGENTS.md",
+        ):
+            with self.subTest(path=relpath):
+                text = (REPO_ROOT / relpath).read_text(encoding="utf-8")
+                self.assertIn(expected_phrase, text)

@@ -6,7 +6,7 @@
 //     metadata(params):: { default_subnets, subnet_order },
 //     render(params, published_view=null):: { metadata, contributions, published },
 //   }
-//   params.config_params — {kubernetes_version, services_cidr, pods_cidr}
+//   params.config_params — {kubernetes_version, services_cidr, pods_cidr?}
 //   params.network       — {vcn: 'cidr', subnets: {name: cidr}}
 //   params.naming        — naming object
 //   params.topology      — platform scope semantics from topology.libsonnet
@@ -26,7 +26,6 @@
 
   render(params, published_view=null)::
   assert std.objectHas(params.config_params, 'kubernetes_version') : 'oke_simple requires config_params.kubernetes_version';
-  assert std.objectHas(params.config_params, 'pods_cidr') : 'oke_simple requires config_params.pods_cidr';
   assert std.objectHas(params.config_params, 'services_cidr') : 'oke_simple requires config_params.services_cidr';
   assert std.objectHas(params, 'topology') : 'oke_simple requires topology scope semantics';
 
@@ -39,8 +38,18 @@
   local cmp_key = scope.compartment_key;
   local routing = if std.objectHas(params, 'routing') then params.routing else null;
   local has_hub = routing != null && routing.hub != null;
+  local internet_default_target =
+    if routing != null && std.objectHas(routing, 'internet_default_target')
+    then routing.internet_default_target
+    else 'local_natgw';
+  local use_local_natgw = internet_default_target == 'local_natgw';
   local emit_multi_stack_outputs = published_view == 'multi_stack';
   local category_key = '%s-platform-%s' % [std.asciiLower(env), std.asciiLower(plat)];
+  local optional_cluster_kubernetes_network_config =
+    if std.objectHas(params.config_params, 'pods_cidr') && params.config_params.pods_cidr != null then
+      { pods_cidr: params.config_params.pods_cidr }
+    else
+      {};
   local sn_key(suffix) =
     n.key('SN', [env, 'PLATFORM', plat, suffix]);
   local rt_key(suffix) =
@@ -192,12 +201,19 @@
     };
 
   local build_rt_rules(overlay_output=false) =
-    (if has_hub && !overlay_output then {
+    (if has_hub && !overlay_output && use_local_natgw then {
        [n.route_rule([n.region, 'default'])]: {
          description: 'Default route to internet through NAT Gateway',
          destination: '0.0.0.0/0',
          destination_type: 'CIDR_BLOCK',
          network_entity_key: ngw_key,
+       },
+     } else if has_hub && !overlay_output then {
+       [n.route_rule([n.region, 'default'])]: {
+         description: 'Default route to internet through DRG',
+         destination: '0.0.0.0/0',
+         destination_type: 'CIDR_BLOCK',
+         network_entity_key: drg_key,
        },
      } else {})
     + drg_route_rules
@@ -576,7 +592,7 @@
                     services: 'all-services',
                   },
                 },
-              } + if has_hub && !overlay_output then {
+              } + if has_hub && !overlay_output && use_local_natgw then {
                 nat_gateways: {
                   [ngw_key]: {
                     display_name: n.display('ngw', [env, 'platform', plat]),
@@ -621,7 +637,7 @@
     local build_oke_identity() =
       {
         groups_configuration+: {
-          groups: {
+          groups+: {
             [n.key_global('GRP', [env, 'PLATFORM', plat, 'ADMINS'])]: {
               name: n.display_global('grp', [env, 'platform', plat, 'admins']),
               description: '%s OKE Cluster Management Admin' % env_title,
@@ -730,30 +746,34 @@
           default_compartment_id: cmp_key,
 
           clusters+: {
-            [cluster_key]: {
-              name: cluster_name,
-              cni_type: 'native',
-              is_enhanced: true,
-              kubernetes_version: params.config_params.kubernetes_version,
-              pods_cidr: params.config_params.pods_cidr,
-              services_cidr: params.config_params.services_cidr,
+            [cluster_key]:
+              {
+                name: cluster_name,
+                cni_type: 'native',
+                is_enhanced: true,
+                kubernetes_version: params.config_params.kubernetes_version,
+              } + {
+                networking: {
+                  api_endpoint_nsg_ids: [nsg_cp_key],
+                  api_endpoint_subnet_id: sn_cp_key,
+                  assign_public_ip_to_control_plane: false,
+                  is_api_endpoint_public: false,
+                  services_subnet_id: [sn_lb_key],
+                  vcn_id: vcn_key,
+                },
 
-              networking: {
-                api_endpoint_nsg_ids: [nsg_cp_key],
-                api_endpoint_subnet_id: sn_cp_key,
-                assign_public_ip_to_control_plane: false,
-                is_api_endpoint_public: false,
-                services_subnet_id: [sn_lb_key],
-                vcn_id: vcn_key,
-              },
-
-              options: {
-                add_ons: {
-                  dashboard_enabled: false,
-                  tiller_enabled: false,
+                options: {
+                  add_ons: {
+                    dashboard_enabled: false,
+                    tiller_enabled: false,
+                  },
+                } + {
+                  kubernetes_network_config:
+                    {
+                      services_cidr: params.config_params.services_cidr,
+                    } + optional_cluster_kubernetes_network_config,
                 },
               },
-            },
           },
         },
       },

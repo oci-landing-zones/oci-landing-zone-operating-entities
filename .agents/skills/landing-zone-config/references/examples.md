@@ -43,7 +43,6 @@ Based on `gen/testdata/platform_topology/preprod_oke.jsonnet`.
             params: {
               kubernetes_version: 'v1.31.1',
               services_cidr: '10.96.0.0/16',
-              pods_cidr: '10.244.0.0/16',
             },
           },
         },
@@ -79,7 +78,6 @@ Based on `gen/testdata/platform_topology/shared_platform_oke.jsonnet`.
         params: {
           kubernetes_version: 'v1.31.1',
           services_cidr: '10.96.0.0/16',
-          pods_cidr: '10.244.0.0/16',
         },
       },
     },
@@ -111,7 +109,6 @@ Based on `gen/testdata/platform_topology/prod_preprod_hub_a.jsonnet`.
             params: {
               kubernetes_version: 'v1.31.1',
               services_cidr: '10.96.0.0/16',
-              pods_cidr: '10.244.0.0/16',
             },
           },
         },
@@ -128,7 +125,6 @@ Based on `gen/testdata/platform_topology/prod_preprod_hub_a.jsonnet`.
             params: {
               kubernetes_version: 'v1.31.1',
               services_cidr: '10.97.0.0/16',
-              pods_cidr: '10.245.0.0/16',
             },
           },
         },

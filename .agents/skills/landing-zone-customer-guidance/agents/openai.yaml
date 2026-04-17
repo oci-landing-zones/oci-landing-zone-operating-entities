@@ -1,0 +1,4 @@
+interface:
+  display_name: "Landing Zone Customer Guidance"
+  short_description: "Guide customers through landing zone choices in plain language"
+  default_prompt: "Use $landing-zone-customer-guidance to guide customer-facing OCI landing zone discovery one decision at a time before recommending repo paths, blueprints, or config files."

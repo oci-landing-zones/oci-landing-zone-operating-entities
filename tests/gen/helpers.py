@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
@@ -78,9 +80,37 @@ def render_config_failure(config_file: Path) -> str:
     return proc.stderr or proc.stdout
 
 
+def normalize_jsonnet_error(text: str) -> str:
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    for line in lines:
+        if "ERROR:" in line:
+            message = line.split("ERROR:", 1)[1].strip()
+            return re.sub(r"\s+", " ", message)
+    if not lines:
+        return ""
+    return re.sub(r"\s+", " ", lines[0])
+
+
+def render_direct_failure_message(jsonnet_file: Path) -> str:
+    jsonnet_path = (REPO_ROOT / jsonnet_file).resolve()
+    proc = run_cmd(
+        ["jsonnet", "-J", str(REPO_ROOT), str(jsonnet_path)],
+        expect_success=False,
+    )
+    if proc.returncode == 0:
+        raise AssertionError(
+            f"Expected direct render to fail but command succeeded: {' '.join(proc.args)}"
+        )
+    return normalize_jsonnet_error(proc.stderr or proc.stdout)
+
+
+def render_config_failure_message(config_file: Path) -> str:
+    return normalize_jsonnet_error(render_config_failure(config_file))
+
+
 def render_jsonnet_object(jsonnet_file: Path) -> dict:
     jsonnet_path = (REPO_ROOT / jsonnet_file).resolve()
-    proc = run_cmd(["jsonnet", str(jsonnet_path)])
+    proc = run_cmd(["jsonnet", "-J", str(REPO_ROOT), str(jsonnet_path)])
     try:
         return json.loads(proc.stdout)
     except json.JSONDecodeError as exc:
@@ -89,8 +119,55 @@ def render_jsonnet_object(jsonnet_file: Path) -> dict:
         ) from exc
 
 
+def render_canonical_json(jsonnet_file: Path) -> str:
+    rendered = render_jsonnet_object(jsonnet_file)
+    return json.dumps(rendered, indent=2) + "\n"
+
+
+def render_text_for_contains(jsonnet_file: Path) -> str:
+    rendered = render_jsonnet_object(jsonnet_file)
+    if isinstance(rendered, str):
+        return rendered
+    return json.dumps(rendered, indent=2) + "\n"
+
+
 def render_formatted_json(jsonnet_file: Path) -> str:
     jsonnet_path = (REPO_ROOT / jsonnet_file).resolve()
-    rendered = run_cmd(["jsonnet", str(jsonnet_path)])
+    rendered = run_cmd(["jsonnet", "-J", str(REPO_ROOT), str(jsonnet_path)])
     formatted = run_cmd(["python3", "gen/format_json.py"], input_text=rendered.stdout)
     return formatted.stdout
+
+
+@dataclass
+class FixtureDirectives:
+    contains: list[str] = field(default_factory=list)
+    error_contains: list[str] = field(default_factory=list)
+
+
+def parse_fixture_directives(jsonnet_file: Path) -> FixtureDirectives:
+    content = (REPO_ROOT / jsonnet_file).read_text(encoding="utf-8")
+    directives = FixtureDirectives()
+    for line in content.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("//"):
+            body = stripped[2:].strip()
+            if not body:
+                continue
+            key, sep, value = body.partition(":")
+            if not sep:
+                continue
+            key = key.strip()
+            value = value.strip()
+            if not value:
+                raise AssertionError(
+                    f"{jsonnet_file.name}: directive '{key}' requires a non-empty value"
+                )
+            if key == "contains":
+                directives.contains.append(value)
+            elif key == "error_contains":
+                directives.error_contains.append(value)
+            continue
+        break
+    return directives

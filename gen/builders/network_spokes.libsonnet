@@ -10,7 +10,7 @@ function(inputs)
   local topo = inputs.topology;
   local hub_network = inputs.hub_network;
   local spoke_env_indexed = inputs.spoke_env_indexed;
-  local all_peer_vcn_cidrs = inputs.all_peer_vcn_cidrs;
+  local all_peer_vcn_entries = inputs.all_peer_vcn_entries;
   local hub_has_spoke_natgw = inputs.hub_has_spoke_natgw;
   local hub_vcn_cidr = hub_network.vcn;
   local mgmt_cidr = hub_network.subnets.mgmt;
@@ -154,8 +154,12 @@ function(inputs)
             network_entity_key: n.key('NGW', [env_name, 'PROJ']),
           },
         } + (if std.length(direct_spoke_peers) > 0 then {
-               [n.route_rule([n.region, p.raw_name, 'projects'])]: {
-                 description: 'Route to the VCN %s Projects through DRG' % p.name,
+               [p.route_key]: {
+                 description:
+                   if p.kind == 'spoke' then
+                     'Route to the VCN %s Projects through DRG' % p.display
+                   else
+                     '%s through DRG' % p.route_desc,
                  destination: p.vcn,
                  destination_type: 'CIDR_BLOCK',
                  network_entity_key: n.key('DRG', ['HUB']),
@@ -243,10 +247,11 @@ function(inputs)
     ['%d-%s' % [s.index, s.name]]: spoke_category(
       s.name,
       s.env,
+      local current_spoke_vcn_key = n.key('VCN', [s.name, 'PROJECTS']);
       if hub_has_spoke_natgw then [
         p
-        for p in all_peer_vcn_cidrs
-        if p.name != topo.env_display(s.name)
+        for p in all_peer_vcn_entries
+        if p.vcn_key != current_spoke_vcn_key
       ] else []
     )
     for s in spoke_env_indexed

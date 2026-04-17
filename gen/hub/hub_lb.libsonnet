@@ -6,7 +6,7 @@
 //
 // Exports:
 //   _lb_nsg(n)                      — NSG for LB (TCP egress, HTTP/HTTPS ingress from 0.0.0.0/0)
-//   _l7_load_balancer(n, backends) — L7 LB with routing policies and backend sets
+//   _l7_load_balancer(n, backends, env_name='prod') — L7 LB with routing policies and backend sets
 //
 // Architecture notes:
 //   All hubs share the same LB components. Hub-specific NSG rules for
@@ -50,12 +50,13 @@ local common = import 'hub_common.libsonnet';
   // backends: required object { backend1_ip, backend2_ip }.
   // Callers must decide whether to provide subnet-derived examples or explicit placeholders.
 
-  _l7_load_balancer(n, backends)::
+  _l7_load_balancer(n, backends, env_name='prod')::
     assert backends != null : 'L7 load balancer backends must be provided explicitly';
     local be = backends;
+    local env = if env_name == null then 'prod' else env_name;
     {
-      [n.key('LB', ['PROD', '01'])]: {
-        display_name: n.display('lb', ['prod', '01']),
+      [n.key('LB', [env, '01'])]: {
+        display_name: n.display('lb', [env, '01']),
         ip_mode: 'IPV4',
         is_private: false,
         subnet_ids: [],
@@ -69,25 +70,25 @@ local common = import 'hub_common.libsonnet';
         },
 
         listeners: {
-          [n.key('LBLSNR', ['PROD', '01'])]: {
+          [n.key('LBLSNR', [env, '01'])]: {
             connection_configuration: {
               idle_timeout_in_seconds: 1200,
             },
-            name: n.display('lblsnr', ['prod', '01']),
-            default_backend_set_key: n.key('LBBKST', ['PROD', '01']),
+            name: n.display('lblsnr', [env, '01']),
+            default_backend_set_key: n.key('LBBKST', [env, '01']),
             port: '80',
             protocol: 'HTTP',
-            routing_policy_key: n.key('LBRT', ['PROD', '01']),
+            routing_policy_key: n.key('LBRT', [env, '01']),
           },
         },
 
         backend_sets: {
-          [n.key('LBBKST', ['PROD', '01'])]: {
-            name: n.display('lbbkst', ['prod', '01']),
+          [n.key('LBBKST', [env, '01'])]: {
+            name: n.display('lbbkst', [env, '01']),
             policy: 'ROUND_ROBIN',
 
             backends: {
-              [n.key('LBBE', ['PROD', '01'])]: {
+              [n.key('LBBE', [env, '01'])]: {
                 ip_address: be.backend1_ip,
                 port: 80,
               },
@@ -105,12 +106,12 @@ local common = import 'hub_common.libsonnet';
             },
           },
 
-          [n.key('LBBKST', ['PROD', '02'])]: {
-            name: n.display('lbbkst', ['prod', '02']),
+          [n.key('LBBKST', [env, '02'])]: {
+            name: n.display('lbbkst', [env, '02']),
             policy: 'ROUND_ROBIN',
 
             backends: {
-              [n.key('LBBE', ['PROD', '02'])]: {
+              [n.key('LBBE', [env, '02'])]: {
                 ip_address: be.backend2_ip,
                 port: 80,
               },
@@ -130,15 +131,15 @@ local common = import 'hub_common.libsonnet';
         },
 
         routing_policies: {
-          [n.key('LBRT', ['PROD', '01'])]: {
-            name: std.strReplace(n.display('lbrt', ['prod', '01']), '-', '_'),
+          [n.key('LBRT', [env, '01'])]: {
+            name: std.strReplace(n.display('lbrt', [env, '01']), '-', '_'),
             condition_language_version: 'V1',
 
             rules: {
               lbrouterule_testapp1: {
                 actions: {
                   'action-1': {
-                    backend_set_key: n.key('LBBKST', ['PROD', '01']),
+                    backend_set_key: n.key('LBBKST', [env, '01']),
                     name: 'FORWARD_TO_BACKENDSET',
                   },
                 },
@@ -149,7 +150,7 @@ local common = import 'hub_common.libsonnet';
               lbrouterule_testapp2: {
                 actions: {
                   'action-2': {
-                    backend_set_key: n.key('LBBKST', ['PROD', '02']),
+                    backend_set_key: n.key('LBBKST', [env, '02']),
                     name: 'FORWARD_TO_BACKENDSET',
                   },
                 },
