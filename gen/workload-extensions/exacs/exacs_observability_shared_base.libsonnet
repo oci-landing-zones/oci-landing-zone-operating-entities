@@ -41,7 +41,7 @@
                     "message_format"                         : "PRETTY_JSON",
                     "namespace"                              : "oci_database_cluster",
                     "pending_duration"                       : "PT5M",
-                    "query"                                  : "ASMDiskgroupUtilization[1m].mean() <= 90",
+                    "query"                                  : "ASMDiskgroupUtilization[1m].mean() >= 90",
                     "severity"                               : "CRITICAL"
                 }
             },
