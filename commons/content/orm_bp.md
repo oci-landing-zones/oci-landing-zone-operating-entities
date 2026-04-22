@@ -34,9 +34,15 @@ If you are running a Workload Extension (WE) with a multi-stack approach and you
 
 In this model, the first stack deploys One-OE with output enabled so that the orchestrator generates the key/OCID dependency files required by the second stack, such as `compartments_output.json`, `network_output.json`, or `tags_output.json`.
 
+For quick testing, enable the output feature and store the generated files in a dedicated bucket. For production environments, use GitHub.
+
+<img src="../images/output.png" width="600">
+
 This is the recommended approach when you want to use cross-stack dependencies based on generated outputs instead of manually editing or maintaining dependency files.
 
 In the second stack, include the generated dependency files in the **Dependencies Source for URL-based Configuration** field.
+
+<img src="../images/Dependencies.png" width="600">
 
 > Note: Official orchestrator reference for external dependencies and generated outputs: https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator#external-dependencies
 
