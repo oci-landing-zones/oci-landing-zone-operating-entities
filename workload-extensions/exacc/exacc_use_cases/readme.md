@@ -98,13 +98,13 @@ Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: te
 
 At the shared level:
 
-- **ExaCC Infrastructure Compartment**: rul-lz-prod-notify-on-exacc-infra-events
-- **ExaCC Database Compartment**: rul-lz-prod-notify-on-exacc-db-events
+- **ExaCC Infrastructure Compartment**: rul-lz-notify-on-exacc-infra-events
+- **ExaCC Database Compartment**: rul-lz-notify-on-exacc-db-events
 
 At the project level:
 
-- **Production Project Compartments**: rul-lz-prod-notify-on-notific-projects
-- **Pre-Production Project Compartments**: rul-lz-preprod-notify-on-notific-projects
+- **Production Project Compartments**: rul-lz-prod-notify-on-notifications-projects
+- **Pre-Production Project Compartments**: rul-lz-preprod-notify-on-notifications-projects
 
 These event rules ensure that operational changes, failures, or state transitions are automatically propagated to the appropriate notification channels.
 
@@ -114,11 +114,13 @@ Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bo
 
 The following alarms are configured:
 
-- al-lz-db-cluster-cpuutil
-- al-lz-db-cluster-diskutil
-- al-lz-db-cluster-fsutil
-- al-lz-db-cluster-memutil
-- al-lz-db-swaputil-memutil
+- al-lz-db-cpuutil
+- al-lz-db-storageutil
+- al-lz-vmc-cpuutil
+- al-lz-vmc-dgutil
+- al-lz-vmc-fsutil
+- al-lz-vmc-memutil
+- al-lz-vmc-swaputil
 
 These alarms continuously evaluate defined thresholds and, upon breach, generate alerts that are forwarded to the corresponding notification topics.
 
@@ -133,8 +135,8 @@ At the global level, the following notification topics are defined to support sh
 
 At the environment level, dedicated notification topics are defined for each environment scope:
 
-- **Production**: nott-lz-prod-projects-exacc
-- **Pre-Production**: nott-lz-preprod-projects-exacc
+- **Production**: nott-lz-prod-exacc-projects
+- **Pre-Production**: nott-lz-preprod-exacc-projects
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 
@@ -199,16 +201,16 @@ Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: te
 
 At the shared level:
 
-- **ExaCC Infrastructure Compartment**: rul-lz-prod-notify-on-exacc-infra-events
+- **ExaCC Infrastructure Compartment**: rul-lz-notify-on-exacc-infra-events
 
 At the environment level:
 
-- **ExaCC Prod/PreProd Database Compartment**: rul-lz-prod-notify-on-exacc-db-events
+- **ExaCC Prod/PreProd Database Compartment**: rul-lz-notify-on-exacc-db-events
 
 At the project level:
 
-- **Production Project Compartments**: rul-lz-prod-notify-on-notific-projects
-- **Pre-Production Project Compartments**: rul-lz-preprod-notify-on-notific-projects
+- **Production Project Compartments**: rul-lz-prod-notify-on-notifications-projects
+- **Pre-Production Project Compartments**: rul-lz-preprod-notify-on-notifications-projects
 
 These event rules ensure that operational changes, failures, or state transitions are automatically propagated to the appropriate notification channels.
 
@@ -218,11 +220,13 @@ Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bo
 
 The following alarms are configured:
 
-- al-lz-db-cluster-cpuutil
-- al-lz-db-cluster-diskutil
-- al-lz-db-cluster-fsutil
-- al-lz-db-cluster-memutil
-- al-lz-db-swaputil-memutil
+- al-lz-db-cpuutil
+- al-lz-db-storageutil
+- al-lz-vmc-cpuutil
+- al-lz-vmc-dgutil
+- al-lz-vmc-fsutil
+- al-lz-vmc-memutil
+- al-lz-vmc-swaputil
 
 These alarms continuously evaluate defined thresholds and, upon breach, generate alerts that are forwarded to the corresponding notification topics.
 
@@ -237,8 +241,8 @@ At the global level, the following notification topics are defined to support sh
 
 At the environment level, dedicated notification topics are defined for each environment scope:
 
-- **Production**: nott-lz-prod-projects-exacc
-- **Pre-Production**: nott-lz-preprod-projects-exacc
+- **Production**: nott-lz-prod-exacc-projects
+- **Pre-Production**: nott-lz-preprod-exacc-projects
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 
@@ -300,13 +304,13 @@ Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: te
 
 At the environment level:
 
-- **ExaCC Infrastructure Compartment**: rul-lz-prod-notify-on-exacc-infra-events
-- **ExaCC Prod/PreProd Database Compartment**: rul-lz-prod-notify-on-exacc-db-events
+- **ExaCC Infrastructure Compartment**: rul-lz-notify-on-exacc-infra-events
+- **ExaCC Prod/PreProd Database Compartment**: rul-lz-notify-on-exacc-db-events
 
 At the project level:
 
-- **Production Project Compartments**: rul-lz-prod-notify-on-notific-projects
-- **Pre-Production Project Compartments**: rul-lz-preprod-notify-on-notific-projects
+- **Production Project Compartments**: rul-lz-prod-notify-on-notifications-projects
+- **Pre-Production Project Compartments**: rul-lz-preprod-notify-on-notifications-projects
 
 This ensures that all events are handled within the scope of their corresponding environment.
 
@@ -316,11 +320,13 @@ Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bo
 
 The following alarms are configured:
 
-- al-lz-db-cluster-cpuutil
-- al-lz-db-cluster-diskutil
-- al-lz-db-cluster-fsutil
-- al-lz-db-cluster-memutil
-- al-lz-db-swaputil-memutil
+- al-lz-db-cpuutil
+- al-lz-db-storageutil
+- al-lz-vmc-cpuutil
+- al-lz-vmc-dgutil
+- al-lz-vmc-fsutil
+- al-lz-vmc-memutil
+- al-lz-vmc-swaputil
 
 These alarms continuously evaluate defined thresholds and, upon breach, generate alerts that are forwarded to the corresponding notification topics.
 
@@ -335,8 +341,8 @@ At the global level, the following notification topics are defined to support sh
 
 At the environment level, dedicated notification topics are defined for each environment scope:
 
-- **Production**: nott-lz-prod-projects-exacc
-- **Pre-Production**: nott-lz-preprod-projects-exacc
+- **Production**: nott-lz-prod-exacc-projects
+- **Pre-Production**: nott-lz-preprod-exacc-projects
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 
