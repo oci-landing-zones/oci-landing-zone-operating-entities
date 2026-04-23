@@ -153,7 +153,7 @@ These files can replace the default One-OE Blueprint's IAM file to switch to the
 
 |||
 |---|---|
-| **NAME**                | **Tab-Based Access Controls add-on** |
+| **NAME**                | **Tag-Based Access Controls add-on** |
 | **OBJECTIVE**           | Provision Identity and Tag resources |
 | **TARGET RESOURCES**    | - **Security**: Compartments, Groups, Dynamic Groups, and Policies</br>- **Governance**: Tags |
 | **PREREQUISITES**       | N/A |
