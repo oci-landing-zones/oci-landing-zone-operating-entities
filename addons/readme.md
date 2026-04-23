@@ -13,9 +13,10 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 | <img src="oci-hub-models/images/oci_hub_models_icon.png" height="32" align="center"> | **[OCI Network Hubs](/addons/oci-hub-models/readme.md)** | A set of **OCI Network Hub topologies** applicable to any landing zone or OCI deployment. |
 | <img src="oci-private-dns/images/oci-private-dns_icon.png" height="30" align="center"> | **[OCI Private DNS](/addons/oci-private-dns/README.md)** | A set of **OCI Private DNS configurations** applicable to any landing zone or OCI deployment. |
 | <img src="oci-x-rpc/images/rpc-icon.svg" height="30" align="center"> | **[OCI Remote Peering Connections](./oci-x-rpc/README.md)** | Guidelines and IaC templates to setup Remote Peering Connections between regions and tenancies and **reduce the cross region/tenancy network connectivity setup**. |
+| <img src="oci-sovereign-landing-zone/content/sovcloud_icon.png" height="30" align="center"> | **[OCI Sovereign Landing Zones](./oci-sovereign-landing-zone/)**| A set of **OCI Sovereign Controls** applicable to any OCI LZ deployment. |
 | <img src="oci-secure-desktops/content/sd_icon.png" height="40" align="center"> | **[OCI Secure Desktops](/addons/oci-secure-desktops/readme.md)** | Guidelines to enable and configure **OCI Secure Desktops** in your Landing Zone. 
 | <img src="oci-tbac/content/tbac_icon.svg" height="45" align="center"> | **[OCI TBAC](./oci-tbac/README.md)**| Use roles to manage IAM permissions for projects onboarding with **Tag-Based Access Controls**.|
-| <img src="oci-sovereign-landing-zone/content/sovcloud_icon.png" height="30" align="center"> | **[OCI Sovereign Landing Zones](./oci-sovereign-landing-zone/)**| A set of **OCI Sovereign Controls** applicable to any OCI LZ deployment. |
+| <img src="oci-finops/images/finops_icon.png" height="30" align="center"> | **[OCI FinOps](./oci-finops/)**| A set of **OCI FinOps** configurations with FOCUS to enable cost visibility, governance, and optimization. |
 
 &nbsp; 
 
