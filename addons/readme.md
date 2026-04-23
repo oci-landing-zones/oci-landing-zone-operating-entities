@@ -15,6 +15,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 | <img src="oci-x-rpc/images/rpc-icon.svg" height="30" align="center"> | **[OCI Remote Peering Connections](./oci-x-rpc/README.md)** | Guidelines and IaC templates to setup Remote Peering Connections between regions and tenancies and **reduce the cross region/tenancy network connectivity setup**. |
 | <img src="oci-secure-desktops/content/sd_icon.png" height="40" align="center"> | **[OCI Secure Desktops](/addons/oci-secure-desktops/readme.md)** | Guidelines to enable and configure **OCI Secure Desktops** in your Landing Zone. 
 | <img src="oci-tbac/content/tbac_icon.svg" height="45" align="center"> | **[OCI TBAC](./oci-tbac/README.md)**| Use roles to manage IAM permissions for projects onboarding with **Tag-Based Access Controls**.|
+| <img src="oci-sovereign-landing-zone/content/sovcloud_icon.png" height="30" align="center"> | **[OCI Sovereign Landing Zones](./oci-sovereign-landing-zone/)**| A set of **OCI Sovereign Controls** applicable to any OCI LZ deployment. |
 
 &nbsp; 
 
@@ -23,7 +24,6 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 | <img src="oci-learn-lz/diagrams/oci_learn_lz_icon.svg" height="28" align="center"> | **[OCI Learn LZ](/addons/oci-learn-lz/readme.md)**| A Landing Zone **training** to learn how to design and run a Landing Zone without code. |
 | </br><img src="oci-lz-subnetting/content/subnetting.png" height="28" align="center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | **[Subnetting Guide](/addons/oci-lz-subnetting/readme.md)** | Guidelines to design your network subnetting between tenancies, landing zone & workload environments, and regions, **improving your landing zone scalability and planning for your future growth**. |
 | <img src="oci-oag/images/oci_oag_icon.svg" height="35" align="center"> | **[Oracle Access Governance](/addons/oci-oag/README.md)** | Guidelines to increase the **security governance** of your Landing Zones with OAG. |
-| <img src="oci-sovereign-landing-zone/content/sovcloud_icon.png" height="30" align="center"> | **[OCI Sovereign Landing Zones](./oci-sovereign-landing-zone/)**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | A set of **OCI Sovereign Controls** applicable to any OCI LZ deployment. |
 
 &nbsp; 
 
