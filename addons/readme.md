@@ -23,7 +23,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 |:--:|:-|:-|
 | <img src="oci-learn-lz/diagrams/oci_learn_lz_icon.svg" height="28" align="center"> | **[OCI Learn LZ](/addons/oci-learn-lz/readme.md)**| A Landing Zone **training** to learn how to design and run a Landing Zone without code. |
 | </br><img src="oci-lz-subnetting/content/subnetting.png" height="28" align="center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | **[Subnetting Guide](/addons/oci-lz-subnetting/readme.md)** | Guidelines to design your network subnetting between tenancies, landing zone & workload environments, and regions, **improving your landing zone scalability and planning for your future growth**. |
-| <img src="oci-oag/images/oci_oag_icon.svg" height="35" align="center"> | **[Oracle Access Governance](/addons/oci-oag/README.md)** | Guidelines to increase the **security governance** of your Landing Zones with OAG. |
+| <img src="oci-oag/images/oci_oag_icon.svg" height="35" align="center"> | **[Oracle Access Governance](/addons/oci-oag/README.md)**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Guidelines to increase the **security governance** of your Landing Zones with OAG. |
 
 &nbsp; 
 
