@@ -47,11 +47,11 @@ When creating VMCs, you can select the compartment where they will reside, based
 
 Although it is possible to fine-tune IAM policies to grant access to specific OHs, CDBs, or PDBs using tags, this approach requires significant effort after deployment and can be difficult to maintain over time.
 
-Similarly, AVMCs can be created on top of an ExaDB-C@C infrastructure. Within each AVMC, you can create multiple *Autonomous Container Databases (ACDs)*, and within each ACD, multiple *Autonomous Databases (ADB-Dedicated)*. Unlike regular VMCs, Autonomous components can be placed in different compartments, providing greater flexibility and simplifying IAM policy management. Additionally, these components require fewer operational tasks, as they are autonomously managed.
+Similarly, AVMCs can be created on top of an ExaDB-C@C infrastructure. Within each AVMC, you can create multiple *Autonomous Container Databases (ACDs)*, and within each ACD, multiple *Autonomous Databases Dedicated (ADB-D)*. Unlike regular VMCs, Autonomous components can be placed in different compartments, providing greater flexibility and simplifying IAM policy management. Additionally, these components require fewer operational tasks, as they are autonomously managed.
 
 IAM policies for ExaDB-C@C provide flexibility to define permissions by *resource type* (e.g., exadata-infrastructures, vmclusters, backup-destinations, db-nodes, etc.). Advanced IAM policy syntax can also be used to create fine-grained access control based on *permissions* and *API operations*. More details can be found in the [Policy Details for Oracle Exadata Database Service on Cloud@Customer](https://docs.oracle.com/en/engineered-systems/exadata-cloud-at-customer/ecccm/ecc-policy-details.html#GUID-523EBAE0-C17F-435A-97A6-374DE2F94747) documentation.
 
-This extension adopts such an approach, as certain operations (e.g., scaling OCPUs, system memory, or local file systems in VMCs) are typically handled by infrastructure or systems teams, while others (e.g., ASM storage scaling or database-related operations) are more suited to DBA teams. In some cases, operations may fail for different reasons, and each team’s expertise is better aligned with troubleshooting within their domain.
+This extension adopts such approach, as certain operations (e.g., scaling OCPUs, system memory, or local file systems in VMCs) are typically handled by infrastructure or systems teams, while others (e.g., ASM storage scaling or database-related operations) are more suited to DBA teams. In some cases, operations may fail for different reasons, and each team’s expertise is better aligned with troubleshooting within their domain.
 
 ## **2. Use Cases**
 
@@ -69,7 +69,7 @@ In this scenario, the ExaDB-C@C stack is treated as a **shared platform** from t
 
 Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs) are all deployed within the same ExaCC DB compartment <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, as these resources cannot be distributed across multiple compartments. This model simplifies management but implies that access control must be handled carefully, as all resources reside in a shared scope.
 
-For Autonomous deployments AVMCs and Autonomous Container Databases (ACDs) are also created within the ExaCC DB compartment <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. However, Autonomous Databases (ADB-Dedicated) can be deployed in separate project compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This provides greater flexibility, allowing better isolation between environments, more granular IAM policy control, and easier delegation of administrative responsibilities.
+For Autonomous deployments AVMCs and Autonomous Container Databases (ACDs) are also created within the ExaCC DB compartment <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. However, Autonomous Databases Dedicated (ADB-D) can be deployed in separate project compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This provides greater flexibility, allowing better isolation between environments, more granular IAM policy control, and easier delegation of administrative responsibilities.
 
 The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in the ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
 
@@ -79,12 +79,12 @@ The administrative groups <img src="../content/f.png" style="height: 1.5em; vert
 
 The groups associated with the shared ExaCC environment are:
 
-- **Global Infra Admin Team**, responsible for the management and maintenance of the ExaDB-C@C infrastructure, including VMCs and AVMCs, as well as related infrastructure-level operations
-- **Global DBA Team**, responsible for database administration tasks within the shared compartment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs
+- **Global Infra Admin Team**, responsible for the management and maintenance of the ExaDB-C@C infrastructure, including VMCs and AVMCs, as well as related infrastructure-level operations.
+- **Global DBA Team**, responsible for database administration tasks within the shared compartment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs.
 
 In addition, environment-specific database administration is handled by dedicated groups:
 
-- **Project DBA Team (per environment and project)**, responsible exclusively for managing the ADB-Dedicated databases deployed within their respective project compartments
+- **Project DBA Team (per environment and project)**, responsible exclusively for managing the ADB-D databases deployed within their respective project compartments.
 
 This approach ensures that infrastructure and shared database layers are centrally managed, while granting each environment its own level of autonomy over its dedicated Autonomous Databases, reinforcing both governance and operational efficiency.
 
@@ -144,9 +144,9 @@ These topics act as targets for both alarm actions and event rules, ensuring con
 
 The observability components operate in an integrated manner:
 
-- *Alarms* evaluate metric thresholds and generate alerts
-- *Events* capture resource state changes and operational signals. Event Rules route events to notification topics
-- *Notifications* deliver messages to subscribed endpoints
+- *Alarms* evaluate metric thresholds and generate alerts.
+- *Events* capture resource state changes and operational signals. Event Rules route events to notification topics.
+- *Notifications* deliver messages to subscribed endpoints.
 
 This model provides a consistent and scalable observability approach, combining centralized monitoring of shared ExaDB-C@C resources with environment-specific visibility and control.
 
@@ -166,7 +166,7 @@ Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Home
 
 For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are also created within their respective environment-specific compartments <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
 
-Autonomous Databases (ADB-Dedicated) is deployed in project-level compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, maintaining a clear separation between projects within the same environment and enabling fine-grained IAM control.
+Autonomous Databases Dedicated (ADB-D) are deployed in project-level compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, maintaining a clear separation between projects within the same environment and enabling fine-grained IAM control.
 
 The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
 
@@ -176,20 +176,20 @@ The administrative groups <img src="../content/f.png" style="height: 1.5em; vert
 
 At the global level, shared administration groups are defined:
 
-- **Global Infra Admin Team**, responsible for managing infrastructure resources across the entire Landing Zone, including the ExaDB-C@C infrastructure and shared components
+- **Global Infra Admin Team**, responsible for managing infrastructure resources across the entire Landing Zone, including the ExaDB-C@C infrastructure and shared components.
 
 At the environment level, dedicated groups are defined per environment:
 
-- **Env Infra Admin Team (per environment)**, responsible for the management and maintenance of infrastructure resources within the environment, including VMCs and AVMCs
-- **Environment DBA Team (per environment)**, responsible for database administration within the environment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs
+- **Env Infra Admin Team (per environment)**, responsible for the management and maintenance of infrastructure resources within the environment, including VMCs and AVMCs.
+- **Environment DBA Team (per environment)**, responsible for database administration within the environment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs.
 
 In addition, project-scoped groups are defined:
 
-- **Project DBA Team (per environment and project)**, responsible exclusively for managing the ADB-Dedicated databases deployed within their respective project compartments
+- **Project DBA Team (per environment and project)**, responsible exclusively for managing the ADB-D databases deployed within their respective project compartments.
 
 These project-level DBA groups are scoped at the project level within each environment, enabling fine-grained ownership and access control.
 
-This model enforces a layered separation of duties, where infrastructure governance is partially centralized at the global level, environment-specific resources are managed at the environment level, and Autonomous Databases (ADB-Dedicated) are managed at the project level providing a balanced approach between central control, environment isolation, and project-level autonomy.
+This model enforces a layered separation of duties, where infrastructure governance is partially centralized at the global level, environment-specific resources are managed at the environment level, and Autonomous Databases Dedicated (ADB-D) are managed at the project level providing a balanced approach between central control, environment isolation, and project-level autonomy.
 
 #### **ExaDB-C@C Observability**
 
@@ -250,9 +250,9 @@ These topics act as targets for both alarm actions and event rules, ensuring con
 
 The observability components operate in an integrated manner:
 
-- *Alarms* evaluate metric thresholds and generate alerts
-- *Events* capture resource state changes and operational signals. Event Rules route events to notification topics
-- *Notifications* deliver messages to subscribed endpoints
+- *Alarms* evaluate metric thresholds and generate alerts.
+- *Events* capture resource state changes and operational signals. Event Rules route events to notification topics.
+- *Notifications* deliver messages to subscribed endpoints.
 
 This model provides a consistent and scalable observability approach, combining centralized monitoring of shared ExaDB-C@C resources with environment-specific visibility and control.
 
@@ -273,7 +273,7 @@ Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Home
 
 For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are also created within their respective environment-specific compartments <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, maintaining full separation between environments.
 
-Autonomous Databases (ADB-Dedicated) are deployed in project-level compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, providing isolation between projects within the same environment and enabling fine-grained IAM control.
+Autonomous Databases Dedicated (ADB-D) are deployed in project-level compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, providing isolation between projects within the same environment and enabling fine-grained IAM control.
 
 The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
 
@@ -283,16 +283,16 @@ The administrative groups <img src="../content/f.png" style="height: 1.5em; vert
 
 For each environment, dedicated groups are defined:
 
-- **Env Infra Admin Team (per environment)**, responsible for the management and maintenance of the ExaDB-C@C infrastructure within that environment, including VMCs and AVMCs, as well as all infrastructure-related operations
-- **Environment DBA Team (per environment)**, responsible for database administration within the environment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs
+- **Env Infra Admin Team (per environment)**, responsible for the management and maintenance of the ExaDB-C@C infrastructure within that environment, including VMCs and AVMCs, as well as all infrastructure-related operations.
+- **Environment DBA Team (per environment)**, responsible for database administration within the environment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs.
 
 In addition, project-scoped groups are defined:
 
-- **Project DBA Team (per environment and project)**, responsible exclusively for the ADB-Dedicated databases deployed within their respective project compartments
+- **Project DBA Team (per environment and project)**, responsible exclusively for the ADB-D databases deployed within their respective project compartments.
 
 These project-level DBA groups are not scoped at the environment level, but rather at the project level within each environment, ensuring fine-grained ownership and access control for Autonomous databases.
 
-This model enforces a clear multi-level separation of duties, where infrastructure and core database layers are managed at the environment level and Autonomous Databases (ADB-Dedicated) are managed at the project level ensuring strong isolation, governance, and operational ownership across both environments and projects.
+This model enforces a clear multi-level separation of duties, where infrastructure and core database layers are managed at the environment level and Autonomous Databases Dedicated (ADB-D) are managed at the project level ensuring strong isolation, governance, and operational ownership across both environments and projects.
 
 #### **ExaDB-C@C Observability**
 
@@ -350,9 +350,9 @@ These topics act as targets for both alarm actions and event rules, ensuring con
 
 The observability components operate in an integrated manner:
 
-- *Alarms* evaluate metric thresholds and generate alerts
-- *Events* capture resource state changes and operational signals. Event Rules route events to notification topics
-- *Notifications* deliver messages to subscribed endpoints
+- *Alarms* evaluate metric thresholds and generate alerts.
+- *Events* capture resource state changes and operational signals. Event Rules route events to notification topics.
+- *Notifications* deliver messages to subscribed endpoints.
 
 This model provides a consistent and scalable observability approach, combining centralized monitoring of shared ExaDB-C@C resources with environment-specific visibility and control.
 
@@ -366,17 +366,17 @@ The administrative model is structured across three levels: global, environment,
 
 At the global level, centralized teams are defined:
 
-- **Global Infra Admin Team**, responsible for the management and maintenance of ExaDB-C@C infrastructure components across the Landing Zone
-- **Global DBA Team**, responsible for governance, standards, and administration of shared database-related components
+- **Global Infra Admin Team**, responsible for the management and maintenance of ExaDB-C@C infrastructure components across the Landing Zone.
+- **Global DBA Team**, responsible for governance, standards, and administration of shared database-related components.
 
 At the environment level, dedicated teams are defined per environment:
 
-- **Env Infra Admin Team (per environment)**, responsible for infrastructure operations within the environment, including VMCs and AVMCs
-- **Env DBA Team (per environment)**, responsible for database administration within the environment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs
+- **Env Infra Admin Team (per environment)**, responsible for infrastructure operations within the environment, including VMCs and AVMCs.
+- **Env DBA Team (per environment)**, responsible for database administration within the environment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs.
 
 At the project level, administration is limited to database ownership:
 
-- **Project DBA Team (per project)**, responsible exclusively for managing ADB-Dedicated databases within their respective project compartments
+- **Project DBA Team (per project)**, responsible exclusively for managing ADB-D databases within their respective project compartments.
 
 This model enforces a multi-level separation of duties, aligning operational ownership with the scope of each resource.
 
@@ -384,8 +384,8 @@ This model enforces a multi-level separation of duties, aligning operational own
 
 The architecture diagrams use a color-based convention to represent the scope of resources:
 
-- Dark-colored elements represent globally shared components, managed at the global level
-- Light-colored elements represent environment-specific (dedicated) resources, regardless of the environment (e.g., Production or Pre-Production)
+- Dark-colored elements represent globally shared components, managed at the global level.
+- Light-colored elements represent environment-specific (dedicated) resources, regardless of the environment (e.g., Production or Pre-Production).
 
 This visual distinction allows quick identification of level of isolation (global vs environment).
 
@@ -407,7 +407,7 @@ A key design decision in this architecture is how database resources are placed 
 
 In the case of regular database clusters, the placement model is inherently constrained by the platform. A VMC, together with its associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs), must be deployed within a single compartment, and all dependent resources must remain within that same boundary. Since PDBs cannot be placed outside of their parent CDB and VMC, the cluster effectively defines both the administrative and placement scope. This means that any level of isolation or delegation must be defined at the level where the VMC is deployed (for example, global or environment level), as finer granularity at the database level is not possible.
 
-In contrast, Autonomous Databases (ADB-Dedicated) provide a fundamentally different model. Although they are hosted within AVMC/ACD structures, they can be deployed in independent compartments, separate from the underlying infrastructure components. This introduces true flexibility at the database level, allowing each database to be aligned with a specific ownership and operational boundary.
+In contrast, Autonomous Databases Dedicated (ADB-D) provide a fundamentally different model. Although they are hosted within AVMC/ACD structures, they can be deployed in independent compartments, separate from the underlying infrastructure components. This introduces true flexibility at the database level, allowing each database to be aligned with a specific ownership and operational boundary.
 
 Based on this capability, a deliberate design decision has been made to always deploy Autonomous Databases at the project level. This ensures that each ADB is associated with its corresponding project compartment, enabling clear ownership, fine-grained access control, and independent lifecycle management.
 
@@ -469,7 +469,7 @@ OCI provides the Backup Destination resource to register and use these external 
 
 In this architecture, it is a design decision to define Backup Destinations in the same compartment as their associated database platforms ensuring alignment between backup configuration and the administrative scope of the databases.
 
-In VMC-based deployments, backup configuration is managed at the CDB level, following the scope of the VMC. In Autonomous deployments, backup configuration is defined at the ACD level and inherited by all ADB-Dedicated databases, even when these are deployed in project-level compartments. This creates a clear separation between database placement and backup configuration.
+In VMC-based deployments, backup configuration is managed at the CDB level, following the scope of the VMC. In Autonomous deployments, backup configuration is defined at the ACD level and inherited by all ADB-D databases, even when these are deployed in project-level compartments. This creates a clear separation between database placement and backup configuration.
 
 This approach is recommended as it simplifies IAM policy management, maintains clear ownership boundaries, and ensures consistency with the operational model of the database platforms. Alternative placements may be considered, but they typically introduce additional complexity without clear benefits.
 

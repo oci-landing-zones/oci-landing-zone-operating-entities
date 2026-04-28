@@ -5,22 +5,22 @@
         groups+: {
            "GRP-LZ-GLOBAL-INFRA-ADMIN-KEY": { 
             name: 'grp-lz-global-exacc-infra-admin',
-            description: 'Global Infra Team admin group',
+            description: 'Global Infra Team admin group.',
             },
 
             "GRP-LZ-GLOBAL-DB-ADMIN-KEY": { 
               name: 'grp-lz-global-exacc-db-admin',
-              description: 'Global DBA team admin group',
+              description: 'Global DBA team admin group.',
             },
 
             "GRP-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": { 
               name: 'grp-lz-prod-proj1-exacc-admin',
-              description: 'Dedicated team to manage Exacc db layer in proj1, prod environment',
+              description: 'Dedicated team to manage ExaDB-C@C db layer in proj1, prod environment.',
             },
 
              "GRP-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": { 
               name: 'grp-lz-preprod-proj1-exacc-admin',
-              description: 'Dedicated team to manage Exacc db layer in proj1, preprod environment',
+              description: 'Dedicated team to manage ExaDB-C@C db layer in proj1, preprod environment.',
             },
         }
   },
@@ -30,7 +30,7 @@
 
       "PCY-LZ-GLOBAL-EXACC-GENERIC-ADMIN-KEY": {
         name: 'pcy-lz-global-exacc-generic',
-        description: 'Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privileges in all Exacc compartments',
+        description: 'Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privileges in all ExaDB-C@C compartments.',
         compartment_id: 'TENANCY-ROOT',
         statements: [
           "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin','id_lz_common'/'grp-lz-global-exacc-db-admin' to use cloud-shell in tenancy",
@@ -47,7 +47,7 @@
 
       "PCY-LZ-GLOBAL-EXACC-DB-ADMIN-KEY": {
         name: 'pcy-lz-global-exacc-db-admin',
-        description: 'Policy which allows the groups grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin to have shared privileges in all Exacc compartments',
+        description: 'Policy which allows the group grp-lz-global-exacc-db-admin to manage databases in all ExaDB-C@C db compartments.',
         compartment_id: 'CMP-LANDINGZONE-KEY',
         statements: [
           "allow group 'id_lz_common'/'grp-lz-global-exacc-db-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-db-admin'))",
@@ -69,7 +69,7 @@
 
       "PCY-LZ-GLOBAL-EXACC-INFRA-ADMIN-KEY": {
        name: "pcy-lz-global-exacc-infra-admin",
-       description: "Policy which allows the grp-lz-global-exacc-infra-admin group users to manage the DB infra in the shared Exacc platform compartment.",
+       description: "Policy which allows the grp-lz-global-exacc-infra-admin group users to manage the ExaDB-C@C infra in all ExaDB-C@C infra compartments.",
        compartment_id: "CMP-LANDINGZONE-KEY",
        statements: [
           "allow group 'id_lz_common'/'grp-lz-global-exacc-infra-admin' to manage exadata-infrastructures in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-exacc-infra-admin'))",

@@ -4,7 +4,7 @@
 
 [Oracle Resource Manager](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm) automates infrastructure deployment using Terraform with managed state handling, promotes consistency across environments through reusable version-controlled configurations, and is a free OCI service integrated with security and governance capabilities.
 
-This document provides general best practices for using Oracle Resource Manager (ORM) with OCI Operating Entities Landing Zones across different scenarios. You can deploy a standalone [One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe) foundation prepared to onboard production and preproduction projects, or you can extend One-OE with workload extensions (WEs) such as EXACS, OCVS, or OKE. You can also include additional features and configurations through [add-ons](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons).
+This document provides general best practices for using OCI Resource Manager (ORM) with OCI Operating Entities Landing Zones across different scenarios. You can deploy a standalone [One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe) foundation prepared to onboard production and preproduction projects, or you can extend One-OE with workload extensions (WEs) such as EXACS, OCVS, or OKE. You can also include additional features and configurations through [add-ons](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons).
 
 As a best practice, manage each asset with a dedicated ORM stack to avoid monolithic systems.
 
@@ -96,7 +96,7 @@ The Orchestrator provides an ORM Facade module allowing these three options:
 ## Workload Extension (WE) Multi-stack option
 
 ### Operation 1: Deploy Base One-OE
-1. Deploy the base One-OE stack enabling output generation, or if you already have a One-oe stack, enable output and re-run the apply job.
+1. Deploy the base One-OE stack enabling output generation, or if you already have a One-OE stack, enable output and re-run the apply job.
 2. Capture and store generated dependency artifacts.
 
 ### Operation 2: Deploy Workload Extension (WE)

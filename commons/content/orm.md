@@ -1,5 +1,5 @@
 
-## **Run with Oracle Resource Manager (ORM)**
+## **Run with OCI Resource Manager (ORM)**
 
 Use "Deploy to OCI" button on supported configuration steps. This will open new tab with Oracle Coud Console with pre-configured paths to configuration files.
 

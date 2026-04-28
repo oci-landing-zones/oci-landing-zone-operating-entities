@@ -269,7 +269,7 @@ The paths can change based on the modification in the previous [Compartments](#2
 
 ## **5. Deploy**
 
-Use the magic button provided in the summary section to deploy the EBS LZ extension using [Oracle Resource Manager (ORM)](/../../../commons/content/orm.md) or use [Terraform CLI](../../../commons/content/terraform.md).
+Use the magic button provided in the summary section to deploy the EBS LZ extension using [OCI Resource Manager (ORM)](/../../../commons/content/orm.md) or use [Terraform CLI](../../../commons/content/terraform.md).
 
 This operation creates a default routing configuration. To complete the network layer setup, deploy the firewalls and update the routing in the hub to prepare for deploying EBS Cloud Manager and EBS environments. All these steps are defined in this [POST operation](1.1_Network_post_updates/readme.md). Once completed, everything will be ready for onboarding EBS Cloud Manager.
 

@@ -27,7 +27,7 @@
 | **TARGET RESOURCES**    | - **Security**: Compartments, Groups, Policies</br>- **Network**: Spoke VCNs, Route tables, Security Lists                 |
 | **PREREQUISITES**       | The [One-OE](../../../blueprints/one-oe/) Blueprint deployed as a foundation.                                                                 |
 | **CONFIGURATION FILES** | - [identity.auto.tfvars.json](./identity.auto.tfvars.json)  </br> - [network.auto.tfvars.json](./network.auto.tfvars.json) |
-| **DEPLOYMENT**          | Use [Oracle Resource Manager (ORM)](/commons/content/orm.md) or [Terraform CLI](/commons/content/terraform.md).            |
+| **DEPLOYMENT**          | Use [OCI Resource Manager (ORM)](/commons/content/orm.md) or [Terraform CLI](/commons/content/terraform.md).            |
 
 &nbsp; 
 
@@ -122,7 +122,7 @@ The network layer covers the following resources:
 ## **4. Deploy**
 <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
 
-Use the link above to deploy using [Oracle Resource Manager (ORM)](/commons/content/orm.md) or use [Terraform CLI](/commons/content/terraform.md)
+Use the link above to deploy using [OCI Resource Manager (ORM)](/commons/content/orm.md) or use [Terraform CLI](/commons/content/terraform.md)
 
 You can now proceed with [Step 2](./../2_ocvs/README.md).
 

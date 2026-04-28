@@ -79,7 +79,7 @@ terraform {
 
 ### I5. Can I deploy the OCI Landing Zone using any OCI-native managed service?
 
-Yes! All blueprints support deployment via Oracle Resource Manager (ORM), which is OCI's managed Terraform service. ORM provides:
+Yes! All blueprints support deployment via OCI Resource Manager (ORM), which is OCI's managed Terraform service. ORM provides:
 
 * Built-in state management (no manual backend configuration needed)
 * Web-based UI for managing deployments

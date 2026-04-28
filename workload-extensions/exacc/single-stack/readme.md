@@ -3,11 +3,22 @@
 
 ## **1. Summary**
 
-| | |
-| -------------------- | ----------------------------------------------------- |
-| **NAME**         | Complete Landing Zone with EXACC (Single-Stack)                                    |
-| **OBJECTIVE**        | Deploy One-oe Landing Zone (No Network Layer) + WE EXACC  |
-| **TARGET RESOURCES** | Complete LZ Foundation, IAM, Security, Observability |
+<table>
+  <tbody>
+    <tr>
+      <td><strong>NAME</strong></td>
+      <td>Complete Landing Zone with EXACC (Single-Stack)</td>
+    </tr>
+    <tr>
+      <td><strong>OBJECTIVE</strong></td>
+      <td>Deploy One-OE Landing Zone (No Network Layer) + WE ExaDB-C@C</td>
+    </tr>
+    <tr>
+      <td><strong>TARGET RESOURCES</strong></td>
+      <td>Complete LZ Foundation, IAM, Security, Observability</td>
+    </tr>
+  </tbody>
+</table>
 
 
 
@@ -15,7 +26,7 @@
 
 ## **2. Architecture Overview**
 
- In a single-stack model in Oracle Resource Manager (ORM), the deployment is managed as a single operation that combines the required landing zone components into one stack. This approach is useful when you want a simpler execution model, with a single lifecycle for planning, applying, and managing the environment. 
+ In a single-stack model in OCI Resource Manager (ORM), the deployment is managed as a single operation that combines the required landing zone components into one stack. This approach is useful when you want a simpler execution model, with a single lifecycle for planning, applying, and managing the environment. 
  
  In this model, the Landing Zone Foundations, the One-OE fundation, and the required Workload Extension (WE) are deployed together as part of the same stack. While this model offers less modularity than a multi-stack approach, it can reduce operational overhead for simpler scenarios and provide a more straightforward deployment flow. It still benefits from ORM capabilities such as managed state, centralized job visibility, and controlled execution, but without the need to manage cross-stack dependencies between layers.
 &nbsp;

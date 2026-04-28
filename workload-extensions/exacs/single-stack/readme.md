@@ -6,7 +6,7 @@
 | | |
 | -------------------- | ----------------------------------------------------- |
 | **NAME**         | Complete Landing Zone with EXACS (Single-Stack)                                    |
-| **OBJECTIVE**        | Deploy One-oe Landing Zone (No Network Layer) + WE EXACS  |
+| **OBJECTIVE**        | Deploy One-OE Landing Zone (No Network Layer) + WE EXACS  |
 | **TARGET RESOURCES** | Complete LZ Foundation, IAM, Security, Observability, Network |
 
 
