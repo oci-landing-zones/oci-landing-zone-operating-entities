@@ -348,7 +348,7 @@
 
             "NOTT-LZ-PREPROD-EXACC-PROJECTS-KEY": {
                 "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
-                "description"                                : "Topic for Preprod platform notifications.",
+                "description"                                : "Topic for preprod platform notifications.",
                 "name"                                       : "nott-lz-preprod-exacc-projects",
 
                 "subscriptions": [
@@ -361,7 +361,7 @@
 
             "NOTT-LZ-EXACC-SHARED-INFRA-WORKLOADS-KEY": {
                 "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
-                "description"                                : "Topic for Shared ExaDB-C@C infra workloads notifications.",
+                "description"                                : "Topic for shared ExaDB-C@C infra workloads notifications.",
                 "name"                                       : "nott-lz-exacc-infra-workloads",
 
                 "subscriptions": [
@@ -374,7 +374,7 @@
 
             "NOTT-LZ-EXACC-DB-WORKLOADS-KEY": {
                 "compartment_id"                             : "CMP-LZ-SECURITY-KEY",
-                "description"                                : "Topic for Shared ExaDB-C@C db workloads notifications.",
+                "description"                                : "Topic for shared ExaDB-C@C db workloads notifications.",
                 "name"                                       : "nott-lz-exacc-db-workloads",
 
                 "subscriptions": [

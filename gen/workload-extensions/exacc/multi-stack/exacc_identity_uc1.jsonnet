@@ -9,7 +9,7 @@ exacc_identity + {
 
           'CMP-LZ-SHARED-EXACC-KEY': {
                 name: 'cmp-lz-shared-exacc',
-                description: 'Shared ExaDB-C@C Platform.',
+                description: 'shared ExaDB-C@C platform.',
                 parent_id: 'CMP-LZ-PLATFORM-KEY',
 
                 defined_tags: {
@@ -18,14 +18,14 @@ exacc_identity + {
                 children: {
                   'CMP-LZ-SHARED-EXACC-DB-KEY': {
                     name: 'cmp-lz-shared-exacc-db',
-                    description: 'Shared ExaDB-C@C Platform, db compartment.',
+                    description: 'shared ExaDB-C@C platform, db compartment.',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                     },
                   },
                   'CMP-LZ-SHARED-EXACC-INFRA-KEY': {
                     name: 'cmp-lz-shared-exacc-infra',
-                    description: 'Shared ExaDB-C@C Platform, infra compartment.',
+                    description: 'shared ExaDB-C@C platform, infra compartment.',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-infra-admin',
                     },
@@ -37,7 +37,7 @@ exacc_identity + {
 
           'CMP-LZ-PROD-EXACC-KEY': {
                 name: 'cmp-lz-prod-exacc',
-                description: 'Prod ExaDB-C@C Platform.',
+                description: 'prod ExaDB-C@C platform.',
                 parent_id: 'CMP-LZ-PROD-PLATFORM-KEY',
 
                 defined_tags: {
@@ -46,14 +46,14 @@ exacc_identity + {
                 children: {
                   'CMP-LZ-PROD-EXACC-DB-KEY': {
                     name: 'cmp-lz-prod-exacc-db',
-                    description: 'Prod ExaDB-C@C Platform, db compartment.',
+                    description: 'prod ExaDB-C@C platform, db compartment.',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                     },
                   },
                   'CMP-LZ-PROD-EXACC-INFRA-KEY': {
                     name: 'cmp-lz-prod-exacc-infra',
-                    description: 'Prod ExaDB-C@C Platform, infra compartment.',
+                    description: 'prod ExaDB-C@C platform, infra compartment.',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-infra-admin',
                     },
@@ -65,7 +65,7 @@ exacc_identity + {
 
           'CMP-LZ-PREPROD-EXACC-KEY': {
                 name: 'cmp-lz-preprod-exacc',
-                description: 'Preprod ExaDB-C@C Platform.',
+                description: 'preprod ExaDB-C@C platform.',
                 parent_id: 'CMP-LZ-PREPROD-PLATFORM-KEY',
 
                 defined_tags: {
@@ -74,14 +74,14 @@ exacc_identity + {
                 children: {
                   'CMP-LZ-PREPROD-EXACC-DB-KEY': {
                     name: 'cmp-lz-preprod-exacc-db',
-                    description: 'Preprod ExaDB-C@C Platform, db compartment.',
+                    description: 'preprod ExaDB-C@C platform, db compartment.',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
                     },
                   },
                   'CMP-LZ-PREPROD-EXACC-INFRA-KEY': {
                     name: 'cmp-lz-preprod-exacc-infra',
-                    description: 'Preprod ExaDB-C@C Platform, infra compartment.',
+                    description: 'preprod ExaDB-C@C platform, infra compartment.',
                     defined_tags: {
                       'tagns-lz-role.tag-lz-role': 'lz-exacc-infra-admin',
                     },
@@ -93,7 +93,7 @@ exacc_identity + {
 
           'CMP-LZ-PROD-PROJ1-DB-KEY': {
             name: 'cmp-lz-prod-proj1-db',
-            description: 'Prod ExaDB-C@C env database layer.',
+            description: 'prod ExaDB-C@C env database layer.',
             parent_id: 'CMP-LZ-PROD-PROJ1-KEY',
             defined_tags: {
               'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',
@@ -102,7 +102,7 @@ exacc_identity + {
 
           'CMP-LZ-PREPROD-PROJ1-DB-KEY': {
             name: 'cmp-lz-preprod-proj1-db',
-            description: 'Preprod ExaDB-C@C env database layer.',
+            description: 'preprod ExaDB-C@C env database layer.',
             parent_id: 'CMP-LZ-PREPROD-PROJ1-KEY',
             defined_tags: {
               'tagns-lz-role.tag-lz-role': 'lz-exacc-db-admin',

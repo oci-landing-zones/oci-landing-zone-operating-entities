@@ -65,19 +65,19 @@ In this section, we describe the identified use case scenarios, providing additi
 
 #### **ExaDB-C@C Resources**
 
-In this scenario, the ExaDB-C@C stack is treated as a **shared platform** from the infrastructure perspective. There are two infrastructures, <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: one primary and one disaster recovery (DR), both deployed in the shared ExaCC infra compartment.
+In this scenario, the ExaDB-C@C stack is treated as a **shared platform** from the infrastructure perspective. There are two infrastructures, <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: one primary and one disaster recovery (DR), both deployed in the shared ExaDB-C@C infra compartment.
 
-Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs) are all deployed within the same ExaCC DB compartment <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, as these resources cannot be distributed across multiple compartments. This model simplifies management but implies that access control must be handled carefully, as all resources reside in a shared scope.
+Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs) are all deployed within the same ExaDB-C@C DB compartment <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, as these resources cannot be distributed across multiple compartments. This model simplifies management but implies that access control must be handled carefully, as all resources reside in a shared scope.
 
-For Autonomous deployments AVMCs and Autonomous Container Databases (ACDs) are also created within the ExaCC DB compartment <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. However, Autonomous Databases Dedicated (ADB-D) can be deployed in separate project compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This provides greater flexibility, allowing better isolation between environments, more granular IAM policy control, and easier delegation of administrative responsibilities.
+For Autonomous deployments AVMCs and Autonomous Container Databases (ACDs) are also created within the ExaDB-C@C DB compartment <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. However, Autonomous Databases Dedicated (ADB-D) can be deployed in separate project compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This provides greater flexibility, allowing better isolation between environments, more granular IAM policy control, and easier delegation of administrative responsibilities.
 
-The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in the ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
+The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in the ExaDB-C@C DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
 
 #### **ExaDB-C@C Groups**
 
 The administrative groups <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined to align with the operational model of this shared platform and enforce a clear separation of responsibilities.
 
-The groups associated with the shared ExaCC environment are:
+The groups associated with the shared ExaDB-C@C environment are:
 
 - **Global Infra Admin Team**, responsible for the management and maintenance of the ExaDB-C@C infrastructure, including VMCs and AVMCs, as well as related infrastructure-level operations.
 - **Global DBA Team**, responsible for database administration tasks within the shared compartment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs.
@@ -98,8 +98,8 @@ Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: te
 
 At the shared level:
 
-- **ExaCC Infrastructure Compartment**: rul-lz-notify-on-exacc-infra-events
-- **ExaCC Database Compartment**: rul-lz-notify-on-exacc-db-events
+- **ExaDB-C@C infrastructure compartment**: rul-lz-notify-on-exacc-infra-events
+- **ExaDB-C@C database compartment**: rul-lz-notify-on-exacc-db-events
 
 At the project level:
 
@@ -110,7 +110,7 @@ These event rules ensure that operational changes, failures, or state transition
 
 **Alarms**
 
-Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within the shared ExaCC Database compartment to monitor key performance and utilization metrics of the database clusters.
+Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within the shared ExaDB-C@C Database compartment to monitor key performance and utilization metrics of the database clusters.
 
 The following alarms are configured:
 
@@ -160,7 +160,7 @@ This model provides a consistent and scalable observability approach, combining 
 
 In this scenario, the ExaDB-C@C stack follows a **hybrid model**, where the infrastructure layer is shared while compute resources (VMCs/AVMCs) are dedicated per environment.
 
-There are two infrastructures, <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: one primary and one disaster recovery (DR), both deployed in the shared ExaCC infra compartment.
+There are two infrastructures, <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: one primary and one disaster recovery (DR), both deployed in the shared ExaDB-C@C infra compartment.
 
 Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs), are deployed in environment-specific compartments <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This allows each environment to have dedicated database stacks, improving isolation, governance, and operational control compared to the fully shared model.
 
@@ -168,7 +168,7 @@ For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are 
 
 Autonomous Databases Dedicated (ADB-D) are deployed in project-level compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, maintaining a clear separation between projects within the same environment and enabling fine-grained IAM control.
 
-The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
+The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaDB-C@C DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
 
 #### **ExaDB-C@C Groups**
 
@@ -201,11 +201,11 @@ Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: te
 
 At the shared level:
 
-- **ExaCC Infrastructure Compartment**: rul-lz-notify-on-exacc-infra-events
+- **ExaDB-C@C infrastructure compartment**: rul-lz-notify-on-exacc-infra-events
 
 At the environment level:
 
-- **ExaCC Prod/PreProd Database Compartment**: rul-lz-notify-on-exacc-db-events
+- **ExaDB-C@C prod/preprod database compartment**: rul-lz-notify-on-exacc-db-events
 
 At the project level:
 
@@ -216,7 +216,7 @@ These event rules ensure that operational changes, failures, or state transition
 
 **Alarms**
 
-Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within each environment-specific ExaCC Database compartment to monitor key performance and utilization metrics of the database clusters.
+Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within each environment-specific ExaDB-C@C Database compartment to monitor key performance and utilization metrics of the database clusters.
 
 The following alarms are configured:
 
@@ -275,7 +275,7 @@ For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are 
 
 Autonomous Databases Dedicated (ADB-D) are deployed in project-level compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, providing isolation between projects within the same environment and enabling fine-grained IAM control.
 
-The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCC DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
+The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaDB-C@C DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
 
 #### **ExaDB-C@C Groups**
 
@@ -304,8 +304,8 @@ Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: te
 
 At the environment level:
 
-- **ExaCC Infrastructure Compartment**: rul-lz-notify-on-exacc-infra-events
-- **ExaCC Prod/PreProd Database Compartment**: rul-lz-notify-on-exacc-db-events
+- **ExaDB-C@C infrastructure compartment**: rul-lz-notify-on-exacc-infra-events
+- **ExaDB-C@C prod/preprod database compartment**: rul-lz-notify-on-exacc-db-events
 
 At the project level:
 
@@ -316,7 +316,7 @@ This ensures that all events are handled within the scope of their corresponding
 
 **Alarms**
 
-Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within each environment-specific ExaCC Database compartment to monitor key performance and utilization metrics of the database clusters.
+Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within each environment-specific ExaDB-C@C Database compartment to monitor key performance and utilization metrics of the database clusters.
 
 The following alarms are configured:
 
