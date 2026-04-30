@@ -2,9 +2,9 @@
 
 ## Overview
 
-[Oracle Resource Manager](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm) automates infrastructure deployment using Terraform with managed state handling, promotes consistency across environments through reusable version-controlled configurations, and is a free OCI service integrated with security and governance capabilities.
+[OCI Resource Manager](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm) automates infrastructure deployment using Terraform with managed state handling, promotes consistency across environments through reusable version-controlled configurations, and is a free OCI service integrated with security and governance capabilities.
 
-This document provides general best practices for using OCI Resource Manager (ORM) with OCI Operating Entities Landing Zones across different scenarios. You can deploy a standalone [One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe) foundation prepared to onboard production and preproduction projects, or you can extend One-OE with workload extensions (WEs) such as EXACS, OCVS, or OKE. You can also include additional features and configurations through [add-ons](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons).
+This document provides general best practices for using OCI Resource Manager (ORM) with OCI Operating Entities Landing Zones across different scenarios. Using ORM you can deploy all of the OCI Operating Entities Landing Zones (One-OE, Multi-OE or Multi-Tenancy). The example shown here is for deploying a standalone [One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe) foundation prepared to onboard production and preproduction projects. You can also include additional features and configurations through [add-ons](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons).
 
 As a best practice, manage each asset with a dedicated ORM stack to avoid monolithic systems.
 
@@ -111,7 +111,7 @@ This two-operation approach reduces coupling, clarifies ownership, and simplifie
 
 # License
 
-Copyright (c) 2025 Oracle and/or its affiliates.
+Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 

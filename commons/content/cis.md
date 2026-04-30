@@ -13,7 +13,7 @@ In this repository, `CIS v2` should be read as the `CIS v1` baseline plus additi
 
 ## CIS v1 vs CIS v2
 
-| Area | Common Baseline | CIS v1 | CIS v2 |
+| Area | Common Baseline | CIS LZ Level 1 compliant | CIS LZ Level 2 compliant |
 |---|---|---|---|
 | IAM and Governance | Compartments, Groups, Identity Domain, Policies | - | - |
 | Network | DRG, VCNs, Route Tables, Security Lists, NSGs, and related network components | - | - |
