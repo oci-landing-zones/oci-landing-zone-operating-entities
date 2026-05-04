@@ -360,7 +360,7 @@ Edit the JSON file to modify CIDR blocks:
   "clusters_configuration": {
     "clusters": {
       "OKE-FRA-P-PLATFORM-KEY": {
-        "kubernetes_version": "v1.32.1",  // Updated version
+        "kubernetes_version": "v1.35.2",  // Updated version
         ...
       }
     }

@@ -7,7 +7,7 @@
                 "name"                                 : "oke-quickstart",
                 "cni_type"                             : "native",
                 "is_enhanced"                          : true,
-                "kubernetes_version"                   : "v1.31.1",
+                "kubernetes_version"                   : "v1.35.2",
                 "pods_cidr"                            : "10.244.0.0/16",
                 "services_cidr"                        : "10.96.0.0/16",
 
