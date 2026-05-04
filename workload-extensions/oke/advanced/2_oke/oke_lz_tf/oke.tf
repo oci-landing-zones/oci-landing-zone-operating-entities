@@ -48,7 +48,7 @@ module "oke" {
   cluster_type       = "enhanced"
   cni_type           = "npn"
   image_signing_keys = []
-  kubernetes_version = "v1.29.1"
+  kubernetes_version = "v1.35.2"
   pods_cidr          = "10.244.0.0/16"
   services_cidr      = "10.96.0.0/16"
   use_signed_images  = false
