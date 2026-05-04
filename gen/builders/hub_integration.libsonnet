@@ -25,8 +25,8 @@ function(params)
   };
 
   // --- 2. DRG Route Distribution Statements ---
-  local drg_distribution_statements(priority_offset) = {
-    ['ROUTE-TO-VCN-%s-KEY' % std.asciiUpper(e.name)]: {
+  local drg_distribution_statements(priority_offset, key_suffix) = {
+    ['ROUTE-TO-VCN-%s%s-KEY' % [std.asciiUpper(e.name), key_suffix]]: {
       priority: e.priority + priority_offset,
       action: 'ACCEPT',
       match_criteria: {
@@ -39,11 +39,14 @@ function(params)
   };
 
   // Hub distribution (DRGRD-*-HUB-KEY): accept traffic from each spoke/platform VCN
-  local drg_hub_distribution_statements = drg_distribution_statements(0);
+  local drg_hub_distribution_statements = drg_distribution_statements(0, '');
 
   // Spoke distribution (Hub E only, DRGRD-*-SPOKE-KEY): hub VCN + all spoke/platform VCNs
   // The hub VCN statement is already there (priority 10), entries start at priority + 10
-  local drg_spoke_distribution_statements = drg_distribution_statements(10);
+  // Spoke statement keys append -S before -KEY. Terraform flattens route distribution
+  // statements by key across distributions, so hub and spoke statements cannot share
+  // the otherwise consistent ROUTE-TO-VCN-<name>-KEY naming standard.
+  local drg_spoke_distribution_statements = drg_distribution_statements(10, '-S');
 
   // --- 3. Hub Route Table Injection ---
   // Route rules for each VCN CIDR through DRG

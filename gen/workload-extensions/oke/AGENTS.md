@@ -14,9 +14,9 @@ When OKE networking semantics are in question, use sources in this order:
 2. the downstream module contract consumed by this repo
 3. this repo's generator source under `gen/workload-extensions/oke/simple/`
 4. tests and examples in this repo
-5. older blogs or examples
+5. non-authoritative blogs or examples
 
-Do not let older examples override official Oracle docs for current OKE-native semantics.
+Do not let non-authoritative examples override official Oracle docs for current OKE-native semantics.
 
 For published OKE deployment investigations, inspect the exact orchestrator tag referenced by the published OKE docs rather than `HEAD`, then trace the downstream `cis-oke` module contract from there.
 

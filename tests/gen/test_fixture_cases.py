@@ -7,6 +7,7 @@ import unittest
 from tests.gen.helpers import (
     REPO_ROOT,
     render_canonical_json,
+    render_config_outputs,
     render_config_failure_message,
     render_direct_failure_message,
     render_text_for_contains,
@@ -147,6 +148,22 @@ class FixtureCaseTests(unittest.TestCase):
                     case,
                     render_config_failure_message,
                 )
+
+    def test_config_pass_cases(self) -> None:
+        cases = sorted(CONFIG_PASS_DIR.glob("*.jsonnet"))
+        self.assertTrue(cases, "no config pass cases found")
+        for case in cases:
+            with self.subTest(case=case.relative_to(REPO_ROOT).as_posix()):
+                directives = parse_fixture_directives(case)
+                self.assert_directives_allow_only(
+                    case,
+                    directives,
+                    allow_contains=False,
+                    allow_error_contains=False,
+                )
+                outputs = render_config_outputs(case.relative_to(REPO_ROOT))
+                self.assertIn("network.json", outputs)
+                self.assertIn("iam.json", outputs)
 
 
 if __name__ == "__main__":

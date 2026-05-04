@@ -4,7 +4,7 @@
 
         "node_pools": {
             "NODEPOOL-FRA-LZ-PROD-PLATFORM-OKE-1-KEY": {
-                "name"                               : "nodepool-fra-lz-prod-platform-oke-1",
+                "name"                               : "np-fra-lz-prod-platform-oke-1",
                 "cluster_id"                         : "OKE-CLUSTER-FRA-LZ-PROD-PLATFORM-OKE-KEY",
                 "enable_cycling"                     : false,
                 "size"                               : 1,
@@ -17,7 +17,7 @@
                 ],
 
                 "freeform_tags": {
-                    "cluster"                        : "oke-cluster-fra-lz-prod-platform-oke"
+                    "cluster"                        : "cluster-fra-lz-prod-platform-oke"
                 },
 
                 "networking": {

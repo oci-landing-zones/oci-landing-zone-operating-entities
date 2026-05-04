@@ -3,14 +3,14 @@
     "descriptions_with_public_cidr": [],
     "rule_count": 1,
     "sources": [
-      "10.0.0.0/8"
+      "10.0.1.0/24"
     ]
   },
   "single_stack": {
     "descriptions_with_public_cidr": [],
     "rule_count": 1,
     "sources": [
-      "10.0.0.0/8"
+      "10.0.1.0/24"
     ]
   }
 }

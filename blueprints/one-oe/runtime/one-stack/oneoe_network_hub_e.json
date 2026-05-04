@@ -364,7 +364,7 @@
                                             }
                                         },
 
-                                        "ROUTE-TO-VCN-PROD-KEY": {
+                                        "ROUTE-TO-VCN-PROD-S-KEY": {
                                             "action"                   : "ACCEPT",
                                             "priority"                 : 20,
 
@@ -375,7 +375,7 @@
                                             }
                                         },
 
-                                        "ROUTE-TO-VCN-PREPROD-KEY": {
+                                        "ROUTE-TO-VCN-PREPROD-S-KEY": {
                                             "action"                   : "ACCEPT",
                                             "priority"                 : 30,
 

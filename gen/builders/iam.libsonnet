@@ -177,7 +177,7 @@ function(config, n, realm_constants, topo)
     compartments: {
       'CMP-LANDINGZONE-KEY': {
         name: 'cmp-landingzone',
-        description: 'Enclosing Production Landing Zone Compartment',
+        description: 'Enclosing Landing Zone Compartment',
         children: {
           [n.key_global('CMP', ['NETWORK'])]: {
             name: 'cmp-lz-network',

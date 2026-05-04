@@ -5,7 +5,7 @@
         "compartments": {
             "CMP-LANDINGZONE-KEY": {
                 "name"                                         : "cmp-landingzone",
-                "description"                                  : "Enclosing Production Landing Zone Compartment",
+                "description"                                  : "Enclosing Landing Zone Compartment",
 
                 "children": {
                     "CMP-LZ-NETWORK-KEY": {

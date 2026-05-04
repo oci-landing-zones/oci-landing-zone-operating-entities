@@ -90,6 +90,8 @@ function(raw_config)
         platform_entry: network_only_platforms[i],
         naming: n,
         hub_vcn_cidr: hub_vcn_cidr,
+        routed_vcn_entries: all_vcn_entries,
+        hub_has_spoke_natgw: hub.has_spoke_natgw,
       })
     for i in std.range(0, std.length(network_only_platforms) - 1)
   } else {};

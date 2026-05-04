@@ -1,4 +1,3 @@
- 
  # **One-OE + Hub C: One-Stack Deployment**
  
  ### Overview
@@ -99,7 +98,7 @@ Once all required updates are applied, rerun the ORM stack.
 |:-|:-|
 | **IAM configuration**</br> [oneoe_iam.json](oneoe_iam.json) | • Compartments</br> • Identity Domain</br> • IAM groups and policies |
 | **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespace </br> • Tag key definition|
-| **Network configuration** for </br> **Step 1**: [oneoe_network_hub_c_pre.json](oneoe_network_hub_c_pre.json) </br> and</br> **Step 2**: [oneoe_network_hub_c.json](oneoe_network_hub_c.json) or [oneoe_network_hub_c_backends.json](oneoe_network_hub_c_backends.json) | • [Hub C](/addons/oci-hub-models/hub_c/readme.md) VCN with associated subnets </br> • Private Network Load Balancers (trust and untrust) </br> • Internet, NAT and Service Gateways</br> • Dynamic Routing Gateway (DRG)</br> • Route Tables with corresponding route rules</br> • Two Spoke VCNs (Prod and PreProd) with private-only subnets </br> • Service gateways in the Spoke VCNs</br> • Security Lists (SLs) and Network Security Groups (NSGs) </br> • Public Load Balancer ([free tier LBaaS](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm#loadbalancing)) with two example backend IP addresses from the production web tier: 10.0.64.10 and 10.0.64.20. The LBaaS and backend configurations are provided solely for example purposes and should be updated to reference actual workload instances |
+| **Network configuration** for </br> **Step 1**: [oneoe_network_hub_c_pre.json](oneoe_network_hub_c_pre.json) </br> and</br> **Step 2**: [oneoe_network_hub_c.json](oneoe_network_hub_c.json) or [oneoe_network_hub_c_backends.json](oneoe_network_hub_c_backends.json) | • [Hub C](/addons/oci-hub-models/hub_c/readme.md) VCN with associated subnets </br> • Private Network Load Balancers (trust and untrust) </br> • Internet and Service Gateways</br> • Dynamic Routing Gateway (DRG)</br> • Route Tables with corresponding route rules</br> • Two Spoke VCNs (Prod and PreProd) with private-only subnets </br> • Service gateways in the Spoke VCNs</br> • Security Lists (SLs) and Network Security Groups (NSGs) </br> • Public Load Balancer ([free tier LBaaS](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm#loadbalancing)) with two example backend IP addresses from the production web tier: 10.0.64.10 and 10.0.64.20. The LBaaS and backend configurations are provided solely for example purposes and should be updated to reference actual workload instances |
 | **Security configuration** for </br> **Step 1**: [oneoe_security_cis2_pre.json](oneoe_security_cis2_pre.json)</br> and</br> **Step 2**: [oneoe_security_cis2.json](oneoe_security_cis2.json)</br></br> | • Cloud Guard</br> • Security Zones</br> • Vulnerability Scanning</br> • Vault and Software Key |
 | **Observability configuration** for</br> **Step 1**: [oneoe_observability_cis2_pre.json](oneoe_observability_cis2_pre.json)</br> and</br> **Step 2**: [oneoe_observability_cis2.json](oneoe_observability_cis2.json) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | • Events</br> • Alarms</br> • Logging</br> • Notifications |
 
@@ -133,9 +132,3 @@ Copyright (c) 2026 Oracle and/or its affiliates.
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
 See [LICENSE](/LICENSE.txt) for more details.
-
-
-
-
-
- 

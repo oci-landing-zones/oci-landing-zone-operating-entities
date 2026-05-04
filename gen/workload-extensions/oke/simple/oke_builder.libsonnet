@@ -4,13 +4,15 @@
 // Contract:
 //   {
 //     metadata(params):: { default_subnets, subnet_order },
-//     render(params, published_view=null):: { metadata, contributions, published },
+//     render(params):: { metadata, contributions },
 //   }
-//   params.config_params — {kubernetes_version, services_cidr, pods_cidr?}
+//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, pods_cidr?}
 //   params.network       — {vcn: 'cidr', subnets: {name: cidr}}
 //   params.naming        — naming object
 //   params.topology      — platform scope semantics from topology.libsonnet
 //   params.routing       — explicit DRG route targets (null when not hub-backed)
+
+local cidrs = import '../../../lib/cidrs.libsonnet';
 
 {
   metadata(params):: {
@@ -24,9 +26,11 @@
     subnet_order: ['int-lb', 'control-plane', 'workers', 'pods'],
   },
 
-  render(params, published_view=null)::
+  render(params)::
   assert std.objectHas(params.config_params, 'kubernetes_version') : 'oke_simple requires config_params.kubernetes_version';
   assert std.objectHas(params.config_params, 'services_cidr') : 'oke_simple requires config_params.services_cidr';
+  assert std.objectHas(params.config_params, 'api_endpoint_allowed_cidrs') :
+    'oke_simple requires config_params.api_endpoint_allowed_cidrs';
   assert std.objectHas(params, 'topology') : 'oke_simple requires topology scope semantics';
 
   local metadata = self.metadata(params);
@@ -43,25 +47,60 @@
     then routing.internet_default_target
     else 'local_natgw';
   local use_local_natgw = internet_default_target == 'local_natgw';
-  local emit_multi_stack_outputs = published_view == 'multi_stack';
   local category_key = '%s-platform-%s' % [std.asciiLower(env), std.asciiLower(plat)];
+  local services_cidr =
+    local validated = cidrs.validate('config_params.services_cidr', params.config_params.services_cidr);
+    assert !cidrs.overlaps(validated, params.network.vcn) :
+      'config_params.services_cidr must not overlap platform VCN';
+    validated;
+  local api_endpoint_allowed_cidrs_param = params.config_params.api_endpoint_allowed_cidrs;
+  assert api_endpoint_allowed_cidrs_param != null && std.type(api_endpoint_allowed_cidrs_param) == 'array' :
+    'config_params.api_endpoint_allowed_cidrs must be an array';
+  assert std.length(api_endpoint_allowed_cidrs_param) > 0 :
+    'config_params.api_endpoint_allowed_cidrs must contain at least one CIDR';
+  local api_endpoint_allowed_cidrs = [
+    cidrs.validate('config_params.api_endpoint_allowed_cidrs[%d]' % i, api_endpoint_allowed_cidrs_param[i])
+    for i in std.range(0, std.length(api_endpoint_allowed_cidrs_param) - 1)
+  ];
+  local api_endpoint_rule_key(i) =
+    if std.length(api_endpoint_allowed_cidrs) == 1 then 'nsg_api_6443'
+    else 'nsg_api_6443_%d' % (i + 1);
+  local api_endpoint_ingress_rules = {
+    [api_endpoint_rule_key(i)]: {
+      description: 'Allow TCP ingress to kube-apiserver from %s on port 6443' % api_endpoint_allowed_cidrs[i],
+      protocol: 'TCP',
+      dst_port_max: '6443',
+      dst_port_min: '6443',
+      src: api_endpoint_allowed_cidrs[i],
+      src_type: 'CIDR_BLOCK',
+      stateless: false,
+    }
+    for i in std.range(0, std.length(api_endpoint_allowed_cidrs) - 1)
+  };
   local optional_cluster_kubernetes_network_config =
     if std.objectHas(params.config_params, 'pods_cidr') && params.config_params.pods_cidr != null then
-      { pods_cidr: params.config_params.pods_cidr }
+      local pods_cidr = cidrs.validate('config_params.pods_cidr', params.config_params.pods_cidr);
+      assert !cidrs.overlaps(pods_cidr, services_cidr) :
+        'config_params.pods_cidr must not overlap config_params.services_cidr';
+      { pods_cidr: pods_cidr }
     else
       {};
   local sn_key(suffix) =
     n.key('SN', [env, 'PLATFORM', plat, suffix]);
   local rt_key(suffix) =
     n.key('RT', [env, 'PLATFORM', plat, suffix]);
+  local checked_oke_name(label, value, max_len) =
+    assert std.length(value) <= max_len :
+      '%s must be %d characters or less: %s (%d)' % [label, max_len, value, std.length(value)];
+    value;
   local cluster_key =
     n.key('OKE-CLUSTER', [env, 'PLATFORM', plat]);
   local cluster_name =
-    n.display('oke-cluster', [env, 'platform', plat]);
+    checked_oke_name('OKE cluster name', n.display('cluster', [env, 'platform', plat]), 32);
   local node_pool_key =
     n.key('NODEPOOL', [env, 'PLATFORM', plat, '1']);
   local node_pool_name =
-    n.display('nodepool', [env, 'platform', plat, '1']);
+    checked_oke_name('OKE node pool name', n.display('np', [env, 'platform', plat, '1']), 32);
 
   // Subnet CIDRs from params
   local subnets = params.network.subnets;
@@ -360,15 +399,7 @@
 
                 ingress_rules: {
                   nsg_cp_6443: nsg_tcp_ingress('Allow TCP ingress to kube-apiserver from control plane on port 6443', nsg_cp_key, '6443'),
-                  nsg_public_6443: {
-                    description: 'Allow TCP ingress to kube-apiserver from 10.0.0.0/8 on port 6443',
-                    protocol: 'TCP',
-                    dst_port_max: '6443',
-                    dst_port_min: '6443',
-                    src: '10.0.0.0/8',
-                    src_type: 'CIDR_BLOCK',
-                    stateless: false,
-                  },
+                } + api_endpoint_ingress_rules + {
                   nsg_pods_12250: nsg_tcp_ingress('Allow TCP ingress from pods to kube-apiserver on port 12250', nsg_pods_key, '12250'),
                   nsg_pods_6443: nsg_tcp_ingress('Allow TCP ingress to kube-apiserver from pods on port 6443', nsg_pods_key, '6443'),
                   nsg_workers_12250: nsg_tcp_ingress('Allow TCP ingress to kube-apiserver from workers on port 12250', nsg_workers_key, '12250'),
@@ -392,7 +423,7 @@
 
                 egress_rules: {
                   nsg_workers: {
-                    description: 'Allow TCP egress from public load balancers to workers nodes for NodePort traffic',
+                    description: 'Allow TCP egress from load balancers to worker nodes for NodePort traffic',
                     protocol: 'TCP',
                     dst: nsg_workers_key,
                     dst_port_max: '32767',
@@ -400,9 +431,9 @@
                     dst_type: 'NETWORK_SECURITY_GROUP',
                     stateless: false,
                   },
-                  nsg_workers_10256: nsg_tcp_egress('Allow TCP egress from public load balancers to worker nodes for health checks', nsg_workers_key, '10256'),
+                  nsg_workers_10256: nsg_tcp_egress('Allow TCP egress from load balancers to worker nodes for health checks', nsg_workers_key, '10256'),
                   nsg_workers_icmp: {
-                    description: 'Allow ICMP egress from public load balancers to worker nodes for path discovery',
+                    description: 'Allow ICMP egress from load balancers to worker nodes for path discovery',
                     protocol: 'ICMP',
                     dst: nsg_workers_key,
                     dst_type: 'NETWORK_SECURITY_GROUP',
@@ -565,7 +596,7 @@
                     stateless: false,
                   },
                   nsg_pub_lb_30000_30000: {
-                    description: 'Allow TCP ingress to workers from public load balancers',
+                    description: 'Allow TCP ingress to workers from load balancers',
                     protocol: 'TCP',
                     dst_port_max: '32767',
                     dst_port_min: '30000',
@@ -603,36 +634,6 @@
           },
         },
       },
-
-    local multi_stack_oke_network =
-      if emit_multi_stack_outputs then {
-        network_configuration: {
-          network_configuration_categories: {
-            [category_key]: build_oke_category(true) {
-              category_compartment_id: scope.network_compartment_key,
-              non_vcn_specific_gateways+: {
-                inject_into_existing_drgs+: {
-                  [drg_key]+: {
-                    drg_id: drg_key,
-
-                    drg_attachments+: {
-                      [n.key('DRGATT', [env, 'PLATFORM', plat])]: {
-                        display_name: n.display('drgatt', [env, 'platform', plat]),
-                        drg_route_table_key: n.key('DRGRT', ['SPOKES']),
-
-                        network_details: {
-                          type: 'VCN',
-                          attached_resource_key: vcn_key,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      } else null,
 
     local build_oke_identity() =
       {
@@ -709,22 +710,6 @@
         },
       },
 
-    local multi_stack_oke_identity =
-      if emit_multi_stack_outputs then
-        {
-          compartments_configuration: {
-            enable_delete: 'true',
-            compartments: {
-              [cmp_key]: {
-                name: scope.compartment_name,
-                description: scope.compartment_description,
-                parent_id: scope.parent_compartment_key,
-              },
-            },
-          },
-        } + build_oke_identity()
-      else null,
-
     contributions: {
       network_pre: {
         network_configuration+: {
@@ -770,7 +755,7 @@
                 } + {
                   kubernetes_network_config:
                     {
-                      services_cidr: params.config_params.services_cidr,
+                      services_cidr: services_cidr,
                     } + optional_cluster_kubernetes_network_config,
                 },
               },
@@ -821,10 +806,5 @@
         },
       },
     },
-    published:
-      if emit_multi_stack_outputs then {
-        oke_network: multi_stack_oke_network,
-        oke_identity: multi_stack_oke_identity,
-      } else {},
   },
 }

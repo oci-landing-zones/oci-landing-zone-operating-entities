@@ -1,66 +1,9 @@
 // gen/config.libsonnet
-// Config normalization and auto-subnet calculation for OCI Landing Zone.
-// Handles CIDR allocation with proper alignment and config defaults.
+// Config normalization and subnet policy selection for OCI Landing Zone.
+local cidrs = import 'lib/cidrs.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
 
 {
-  local ip_to_int(octets) =
-    octets[0] * 16777216
-    + octets[1] * 65536
-    + octets[2] * 256
-    + octets[3],
-
-  local int_to_octets(ip_int) = [
-    std.floor(ip_int / 16777216) % 256,
-    std.floor(ip_int / 65536) % 256,
-    std.floor(ip_int / 256) % 256,
-    ip_int % 256,
-  ],
-
-  local parse_cidr(cidr) =
-    local parts = std.split(cidr, '/');
-    local octets = std.map(std.parseInt, std.split(parts[0], '.'));
-    {
-      octets: octets,
-      base_int: ip_to_int(octets),
-      prefix: std.parseInt(parts[1]),
-    },
-
-  auto_subnets(vcn_cidr, subnet_defs)::
-    local base = parse_cidr(vcn_cidr);
-    local total_size = std.floor(std.pow(2, 32 - base.prefix));
-    local vcn_limit = base.base_int + total_size;
-    local allocated = std.foldl(
-      function(acc, def)
-        local block_size = subnet_utils.block_size_for_prefix(def.size);
-        // Align to block boundary
-        local raw_offset = acc.offset;
-        local aligned_offset =
-          if raw_offset % block_size == 0 then raw_offset
-          else (std.floor(raw_offset / block_size) + 1) * block_size;
-        local subnet_base = base.base_int + aligned_offset;
-        assert subnet_base + block_size <= vcn_limit :
-          'Subnet allocation exceeds VCN %s while allocating %s (%s)' % [vcn_cidr, def.name, def.size];
-        local subnet_octets = int_to_octets(subnet_base);
-        local cidr = '%d.%d.%d.%d%s' % [
-          subnet_octets[0],
-          subnet_octets[1],
-          subnet_octets[2],
-          subnet_octets[3],
-          def.size,
-        ];
-        acc {
-          offset: aligned_offset + block_size,
-          result+: { [def.name]: cidr },
-        },
-      subnet_defs,
-      { offset: 0, result: {} }
-    );
-    allocated.result,
-
-  auto_subnets_24(vcn_cidr, names)::
-    self.auto_subnets(vcn_cidr, [{ name: n, size: '/24' } for n in names]),
-
   local hub_subnet_order = {
     hub_e: ['lb', 'mgmt', 'mon', 'dns'],
     hub_b: ['lb', 'fw', 'mgmt', 'mon', 'dns'],
@@ -98,10 +41,11 @@ local subnet_utils = import 'lib/subnets.libsonnet';
 
     local hub_subnet_keys = hub_subnet_order[config.hub.kind];
     local hub_subnet_label = 'config.hub.network.subnets for %s' % config.hub.kind;
+    local hub_vcn = cidrs.validate('config.hub.network.vcn', config.hub.network.vcn);
     local hub_subnets =
       if std.objectHas(config.hub.network, 'subnets') then
-        subnet_utils.validate_subnet_map(config.hub.network.subnets, hub_subnet_keys, hub_subnet_label)
-      else self.auto_subnets_24(config.hub.network.vcn, hub_subnet_keys);
+        subnet_utils.validate_subnet_map(config.hub.network.subnets, hub_subnet_keys, hub_subnet_label, hub_vcn)
+      else subnet_utils.auto_subnets_24(hub_vcn, hub_subnet_keys);
 
     local norm_platform(plat, p_name) =
       assert std.objectHas(plat, 'network') : 'Platform %s.network is required' % p_name;
@@ -118,12 +62,20 @@ local subnet_utils = import 'lib/subnets.libsonnet';
             'Platform %s.extension.params must be an object' % p_name;
           plat.extension
         else null;
+      local platform_vcn = cidrs.validate('Platform %s.network.vcn' % p_name, plat.network.vcn);
       plat
       + (if extension != null then { extension: extension } else {})
       + {
-        network: plat.network + {
+        network: plat.network {
+          vcn: platform_vcn,
           subnets:
-            if std.objectHas(plat.network, 'subnets') then plat.network.subnets
+            if std.objectHas(plat.network, 'subnets') then
+              if extension != null then plat.network.subnets
+              else subnet_utils.validate_named_subnets(
+                plat.network.subnets,
+                'Platform %s.network.subnets' % p_name,
+                platform_vcn
+              )
             else if extension != null then null
             else error 'Platform %s requires explicit subnets (no extension to auto-compute from)' % p_name,
         },
@@ -137,11 +89,21 @@ local subnet_utils = import 'lib/subnets.libsonnet';
         'Environment %s.shared_project_network.network is required' % env_name;
       assert std.objectHas(spn.network, 'vcn') :
         'Environment %s.shared_project_network.network.vcn is required' % env_name;
+      local spn_vcn = cidrs.validate(
+        'Environment %s.shared_project_network.network.vcn' % env_name,
+        spn.network.vcn
+      );
       spn {
         network+: {
+          vcn: spn_vcn,
           subnets:
-            if std.objectHas(spn.network, 'subnets') then spn.network.subnets
-            else $.auto_subnets_24(spn.network.vcn, spoke_subnet_names),
+            if std.objectHas(spn.network, 'subnets') then
+              subnet_utils.validate_named_subnets(
+                spn.network.subnets,
+                'Environment %s.shared_project_network.network.subnets' % env_name,
+                spn_vcn
+              )
+            else subnet_utils.auto_subnets_24(spn_vcn, spoke_subnet_names),
         },
       };
 
@@ -163,6 +125,36 @@ local subnet_utils = import 'lib/subnets.libsonnet';
       for p_name in std.objectFields(config.shared_platforms)
     } else {};
 
+    local env_vcn_entries = std.flattenArrays([
+      local env = norm_envs[env_name];
+      (if std.objectHas(env, 'shared_project_network') then [
+        {
+          label: 'Environment %s shared project network' % env_name,
+          cidr: env.shared_project_network.network.vcn,
+        },
+      ] else [])
+      + (if std.objectHas(env, 'platforms') then [
+           {
+             label: 'Platform %s/%s' % [env_name, p_name],
+             cidr: env.platforms[p_name].network.vcn,
+           }
+           for p_name in std.objectFields(env.platforms)
+         ] else [])
+      for env_name in std.objectFields(norm_envs)
+    ]);
+    local shared_vcn_entries = [
+      {
+        label: 'Shared platform %s' % p_name,
+        cidr: norm_shared[p_name].network.vcn,
+      }
+      for p_name in std.objectFields(norm_shared)
+    ];
+    local validated_vcns = cidrs.assert_non_overlapping(
+      [{ label: 'Hub VCN', cidr: hub_vcn }] + env_vcn_entries + shared_vcn_entries,
+      'VCN CIDRs'
+    );
+
+    assert std.length(validated_vcns) > 0 : 'VCN CIDR validation failed';
     config {
       region: region,
       region_short_name: region_short_name,

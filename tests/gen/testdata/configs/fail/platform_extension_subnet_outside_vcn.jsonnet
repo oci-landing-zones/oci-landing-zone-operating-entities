@@ -1,17 +1,18 @@
-// OKE extension rejects subnet overrides that omit required subnet keys
+// Extension platform subnets must fit inside platform VCN
+// error_contains: Platform oke.network.subnets for extension oke_simple must be contained by 10.0.80.0/21
 {
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.72.0/21' } },
       platforms: {
         oke: {
           network: {
             vcn: '10.0.80.0/21',
             subnets: {
-              'int-lb': '10.0.80.0/25',
-              workers: '10.0.81.0/23',
-              pods: '10.0.83.0/23',
+              'control-plane': '10.0.80.0/26',
+              'int-lb': '10.0.81.0/24',
+              pods: '10.0.84.0/22',
+              workers: '10.0.88.0/23',
             },
           },
           extension: {

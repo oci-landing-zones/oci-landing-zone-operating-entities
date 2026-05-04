@@ -298,6 +298,16 @@
                                 "display_name"                        : "nsg-fra-lz-prod-platform-oke-cp",
 
                                 "ingress_rules": {
+                                    "nsg_api_6443": {
+                                        "description"                 : "Allow TCP ingress to kube-apiserver from 10.0.1.0/24 on port 6443",
+                                        "src"                         : "10.0.1.0/24",
+                                        "src_type"                    : "CIDR_BLOCK",
+                                        "dst_port_min"                : "6443",
+                                        "dst_port_max"                : "6443",
+                                        "protocol"                    : "TCP",
+                                        "stateless"                   : false
+                                    },
+
                                     "nsg_cp_6443": {
                                         "description"                 : "Allow TCP ingress to kube-apiserver from control plane on port 6443",
                                         "src"                         : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
@@ -322,16 +332,6 @@
                                         "description"                 : "Allow TCP ingress to kube-apiserver from pods on port 6443",
                                         "src"                         : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
                                         "src_type"                    : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                : "6443",
-                                        "dst_port_max"                : "6443",
-                                        "protocol"                    : "TCP",
-                                        "stateless"                   : false
-                                    },
-
-                                    "nsg_public_6443": {
-                                        "description"                 : "Allow TCP ingress to kube-apiserver from 10.0.0.0/8 on port 6443",
-                                        "src"                         : "10.0.0.0/8",
-                                        "src_type"                    : "CIDR_BLOCK",
                                         "dst_port_min"                : "6443",
                                         "dst_port_max"                : "6443",
                                         "protocol"                    : "TCP",
@@ -434,7 +434,7 @@
 
                                 "egress_rules": {
                                     "nsg_workers": {
-                                        "description"                 : "Allow TCP egress from public load balancers to workers nodes for NodePort traffic",
+                                        "description"                 : "Allow TCP egress from load balancers to worker nodes for NodePort traffic",
                                         "dst"                         : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
                                         "dst_type"                    : "NETWORK_SECURITY_GROUP",
                                         "dst_port_min"                : "30000",
@@ -444,7 +444,7 @@
                                     },
 
                                     "nsg_workers_10256": {
-                                        "description"                 : "Allow TCP egress from public load balancers to worker nodes for health checks",
+                                        "description"                 : "Allow TCP egress from load balancers to worker nodes for health checks",
                                         "dst"                         : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
                                         "dst_type"                    : "NETWORK_SECURITY_GROUP",
                                         "dst_port_min"                : "10256",
@@ -454,7 +454,7 @@
                                     },
 
                                     "nsg_workers_icmp": {
-                                        "description"                 : "Allow ICMP egress from public load balancers to worker nodes for path discovery",
+                                        "description"                 : "Allow ICMP egress from load balancers to worker nodes for path discovery",
                                         "dst"                         : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
                                         "dst_type"                    : "NETWORK_SECURITY_GROUP",
                                         "protocol"                    : "ICMP",
@@ -600,7 +600,7 @@
                                     },
 
                                     "nsg_pub_lb_30000_30000": {
-                                        "description"                 : "Allow TCP ingress to workers from public load balancers",
+                                        "description"                 : "Allow TCP ingress to workers from load balancers",
                                         "src"                         : "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
                                         "src_type"                    : "NETWORK_SECURITY_GROUP",
                                         "dst_port_min"                : "30000",

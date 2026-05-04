@@ -124,6 +124,12 @@ local common = import 'hub/hub_common.libsonnet';
     local pe = inputs.platform_entry;
     local n = inputs.naming;
     local hub_vcn_cidr = inputs.hub_vcn_cidr;
+    local routed_vcn_entries =
+      if std.objectHas(inputs, 'routed_vcn_entries') then inputs.routed_vcn_entries
+      else [];
+    local hub_has_spoke_natgw =
+      if std.objectHas(inputs, 'hub_has_spoke_natgw') then inputs.hub_has_spoke_natgw
+      else false;
     local scope = pe.scope;
     local env_name = scope.scope_name;
     local plat = scope.platform_name;
@@ -132,10 +138,51 @@ local common = import 'hub/hub_common.libsonnet';
     local plat_subnets = pe.platform_config.network.subnets;
     local rt_key = n.key('RT', [env_name, 'PLATFORM', plat, 'GENERIC']);
     local sl_key = n.key('SL', [env_name, 'PLATFORM', plat, 'GENERIC']);
+    local vcn_key = n.key('VCN', [env_name, 'PLATFORM', plat]);
+    local peer_routes = {
+      [e.route_key]: {
+        description: '%s through DRG' % e.route_desc,
+        destination: e.vcn,
+        destination_type: 'CIDR_BLOCK',
+        network_entity_key: n.key('DRG', ['HUB']),
+      }
+      for e in routed_vcn_entries
+      if e.vcn_key != vcn_key
+    };
+    local route_rules = {
+      [n.route_rule([n.region, 'sgw'])]: {
+        description: 'Route to Oracle Services Network through Service GW',
+        destination: 'all-services',
+        destination_type: 'SERVICE_CIDR_BLOCK',
+        network_entity_key: n.key('SGW', [env_name, 'PLATFORM', plat]),
+      },
+    } + if hub_has_spoke_natgw then
+      {
+        [n.route_rule([n.region, 'hub'])]: {
+          description: 'Route to the Hub VCN through DRG',
+          destination: hub_vcn_cidr,
+          destination_type: 'CIDR_BLOCK',
+          network_entity_key: n.key('DRG', ['HUB']),
+        },
+        [n.route_rule([n.region, 'natgw'])]: {
+          description: 'Route to the Internet through NAT GW',
+          destination: '0.0.0.0/0',
+          destination_type: 'CIDR_BLOCK',
+          network_entity_key: n.key('NGW', [env_name, 'PLATFORM', plat]),
+        },
+      } + peer_routes
+    else {
+      [n.route_rule([n.region, 'drg'])]: {
+        description: 'Route to 0.0.0.0/0 through DRG',
+        destination: '0.0.0.0/0',
+        destination_type: 'CIDR_BLOCK',
+        network_entity_key: n.key('DRG', ['HUB']),
+      },
+    };
     {
       category_compartment_id: scope.network_compartment_key,
       vcns: {
-        [n.key('VCN', [env_name, 'PLATFORM', plat])]: {
+        [vcn_key]: {
           display_name: n.display('vcn', [env_name, 'platform', plat]),
           cidr_blocks: [vcn_cidr],
           dns_label: n.dns_label(['vcn', n.region, 'lz', dns, plat]),
@@ -148,20 +195,7 @@ local common = import 'hub/hub_common.libsonnet';
           route_tables: {
             [rt_key]: {
               display_name: n.display('rt', [env_name, 'platform', plat, 'generic']),
-              route_rules: {
-                [n.route_rule([n.region, 'sgw'])]: {
-                  description: 'Route to Oracle Services Network through Service GW',
-                  destination: 'all-services',
-                  destination_type: 'SERVICE_CIDR_BLOCK',
-                  network_entity_key: n.key('SGW', [env_name, 'PLATFORM', plat]),
-                },
-                [n.route_rule([n.region, 'drg'])]: {
-                  description: 'Route to 0.0.0.0/0 through DRG',
-                  destination: '0.0.0.0/0',
-                  destination_type: 'CIDR_BLOCK',
-                  network_entity_key: n.key('DRG', ['HUB']),
-                },
-              },
+              route_rules: route_rules,
             },
           },
           security_lists: {
@@ -192,6 +226,12 @@ local common = import 'hub/hub_common.libsonnet';
             for sn_name in std.objectFields(plat_subnets)
           },
           vcn_specific_gateways: {
+            [if hub_has_spoke_natgw then 'nat_gateways']: {
+              [n.key('NGW', [env_name, 'PLATFORM', plat])]: {
+                display_name: n.display('ngw', [env_name, 'platform', plat]),
+                block_traffic: false,
+              },
+            },
             service_gateways: {
               [n.key('SGW', [env_name, 'PLATFORM', plat])]: {
                 display_name: n.display('sgw', [env_name, 'platform', plat]),

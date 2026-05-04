@@ -3,7 +3,6 @@ local subnet_utils = import 'lib/subnets.libsonnet';
 
 {
   resolve_entry(inputs)::
-    local cfg_lib = inputs.cfg_lib;
     local extension_registry = inputs.extension_registry;
     local pe = inputs.platform_entry;
     local n = inputs.naming;
@@ -44,8 +43,13 @@ local subnet_utils = import 'lib/subnets.libsonnet';
       'Platform %s.network.subnets for extension %s' % [pe.scope.platform_name, ext_type];
     local resolved_subnets =
       if pe.platform_config.network.subnets != null then
-        subnet_utils.validate_subnet_map(pe.platform_config.network.subnets, subnet_names, subnet_label)
-      else cfg_lib.auto_subnets(
+        subnet_utils.validate_subnet_map(
+          pe.platform_config.network.subnets,
+          subnet_names,
+          subnet_label,
+          pe.platform_config.network.vcn
+        )
+      else subnet_utils.auto_subnets(
         pe.platform_config.network.vcn,
         [
           { name: sn_name, size: ext_meta.default_subnets[sn_name] }
