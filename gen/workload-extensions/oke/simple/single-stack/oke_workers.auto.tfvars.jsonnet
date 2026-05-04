@@ -29,6 +29,7 @@
 
                 "node_config_details": {
                     "node_shape"         : "VM.Standard.E5.Flex",
+                    "image"              : "8.10",
 
                     "flex_shape_settings": {
                         "memory"         : 8,
