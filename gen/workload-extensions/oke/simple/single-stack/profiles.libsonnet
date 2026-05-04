@@ -5,7 +5,7 @@ local oke_platform = {
   extension: {
     type: 'oke_simple',
     params: {
-      kubernetes_version: 'v1.31.1',
+      kubernetes_version: 'v1.35.2',
       services_cidr: '10.96.0.0/16',
     },
   },
