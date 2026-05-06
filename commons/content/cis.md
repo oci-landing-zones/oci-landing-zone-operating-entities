@@ -13,7 +13,7 @@ In this repository, `CIS v2` should be read as the `CIS v1` baseline plus additi
 
 ## CIS v1 vs CIS v2
 
-| Area | Common Baseline | CIS LZ Level 1 compliant | CIS LZ Level 2 compliant |
+| Area | Common Baseline | CIS LZ Level 1 compliant  | CIS LZ Level 2 compliant |
 |---|---|---|---|
 | IAM and Governance | Compartments, Groups, Identity Domain, Policies | - | - |
 | Network | DRG, VCNs, Route Tables, Security Lists, NSGs, and related network components | - | - |
@@ -50,19 +50,15 @@ We strongly recommend running this assessment before the go-live phase to verify
 
 For a self-service security health-check experience, the EMEA OCI Technology Engineering team also provides a packaged wrapper for running the OCI CIS compliance assessment. This package generates an HTML summary report and simplifies the execution of OCI Security Health Checks:
 
-https://github.com/oracle-devrel/technology-engineering/tree/main/security/security-design/shared-assets/oci-security-health-check-standard
-
-
-
+https://github.com/oracle-devrel/technology-engineering/tree/main/security/security-design/shared-assets/oci-security-health-check-standard.
 
 
 
 ## Reference Documents
 
-- CIS Oracle Cloud Infrastructure Benchmark: `https://www.cisecurity.org/benchmark/Oracle_Cloud`<br>
-- Core Landing Zone example mapping: `https://github.com/oci-landing-zones/terraform-oci-core-landingzone/blob/main/ARCH-MAPPING-CIS.md`
-- One-OE Hub A CIS documentation: `../../blueprints/one-oe/runtime/one-stack/one_oe_hub_a.md`
-- General FAQ: `../../faq/faq_general.md`
+- [CIS Oracle Cloud Infrastructure Benchmark](https://www.cisecurity.org/benchmark/Oracle_Cloud)<br>
+- [Core Landing Zone example mapping](https://github.com/oci-landing-zones/terraform-oci-core-landingzone/blob/main/ARCH-MAPPING-CIS.md)
+- [Operating Entities LZ FAQ](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/faq)
 
 # License
 
