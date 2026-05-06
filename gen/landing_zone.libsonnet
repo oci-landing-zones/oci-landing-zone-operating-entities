@@ -28,6 +28,7 @@ local hub_builders = {
 // Extension registry: maps extension type names to extension builder functions.
 local extension_registry = {
   oke_simple: import 'workload-extensions/oke/simple/oke_simple.libsonnet',
+  exacc: import 'workload-extensions/exacc/exacc.libsonnet',
 };
 
 function(raw_config)
@@ -109,6 +110,8 @@ function(raw_config)
   local extension_iam = extension_state.iam;
   local extension_security_cis1 = extension_state.security_cis1;
   local extension_security_cis2 = extension_state.security_cis2;
+  local extension_observability_cis1 = extension_state.observability_cis1;
+  local extension_observability_cis2 = extension_state.observability_cis2;
   local extension_extra = extension_state.extra;
 
   // --- Build security, observability, governance ---
@@ -151,9 +154,9 @@ function(raw_config)
 
     // Observability outputs: 4 CIS variants
     observability_cis1_pre: observability.cis1_pre,
-    observability_cis1: observability.cis1,
+    observability_cis1: observability.cis1 + extension_observability_cis1,
     observability_cis2_pre: observability.cis2_pre,
-    observability_cis2: observability.cis2,
+    observability_cis2: observability.cis2 + extension_observability_cis2,
 
     // Extra outputs from extensions (e.g. oke_clusters, oke_workers)
     [if std.length(std.objectFields(extension_extra)) > 0 then 'extra']: extension_extra,

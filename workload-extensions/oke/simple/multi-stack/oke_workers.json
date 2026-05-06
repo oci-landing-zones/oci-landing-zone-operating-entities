@@ -1,6 +1,6 @@
 {
     "oke_workers_configuration": {
-        "default_compartment_id"                     : "CMP-LZ-PROD-PLATFORM-OKE-KEY",
+        "default_compartment_id"                     : "CMP-LZ-PROD-OKE-KEY",
 
         "node_pools": {
             "NODEPOOL-FRA-LZ-PROD-PLATFORM-OKE-1-KEY": {

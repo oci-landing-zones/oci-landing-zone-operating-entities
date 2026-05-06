@@ -17,7 +17,7 @@ Run `bash gen/generate.sh` the first time you work on the generator. It sets up 
 
 Config-mode network artifacts use one canonical final file: `network.json`. Only hubs that require staged deployment also emit `network_pre.json`.
 If you set `hub.network.subnets` explicitly, provide the full canonical subnet set for that hub kind; partial hub subnet overrides are rejected during normalization.
-For extension-backed platforms, explicit `platform.network.subnets` overrides must match the extension metadata-defined subnet set exactly; otherwise omit subnets and let the extension auto-allocate.
+For networked extension-backed platforms, explicit `platform.network.subnets` overrides must match the extension metadata-defined subnet set exactly; otherwise omit subnets and let the extension auto-allocate. Networkless extensions declare `metadata.requires_network: false`; those platforms may omit `platform.network` entirely.
 
 Change the Jsonnet sources under `gen/` first. Checked-in JSON under `blueprints/` and `workload-extensions/` are generated snapshots, not hand-maintained source files.
 

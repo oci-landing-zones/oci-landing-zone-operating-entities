@@ -31,7 +31,8 @@ gen/
 │   ├── observability.libsonnet
 │   └── governance.libsonnet
 │
-├── workload-extensions/         # Pluggable extensions (OKE, etc.)
+├── workload-extensions/         # Pluggable extensions (extension-specific docs may have AGENTS.md)
+│   ├── exacc/                   # ExaDB-C@C extension; see workload-extensions/exacc/AGENTS.md
 │   └── oke/simple/
 │       ├── oke_builder.libsonnet # Shared OKE builder internals
 │       ├── oke_simple.libsonnet # Generic extension wrapper
@@ -149,6 +150,8 @@ Current adapters:
 - `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. It reuses `gen/render_context.libsonnet` for normalization/topology-derived inputs while preserving the hub-only network contract and shared-only IAM/governance projections.
 - `gen/workload-extensions/oke/simple/multi-stack/published.libsonnet` — owns the multi-stack publication-only OKE network and identity projections used by the multi-stack OKE entrypoints.
 
+Extension-specific adapters are documented in the owning extension directory when an extension has its own `AGENTS.md`.
+
 ## 3. Config Schema
 
 A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
@@ -185,6 +188,8 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 ```
 
 Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`). `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Missing subnets are still auto-calculated from VCN CIDRs using `auto_subnets()`.
+
+Plain platforms still require `platform.network`. Extension-backed platforms may omit `platform.network` only when the registered extension metadata declares `requires_network: false`.
 
 When debugging how generated JSON is applied at deploy time, inspect the downstream deployer contract in `terraform-oci-modules-orchestrator` in addition to this repo. `gen/` defines what this repository emits; the orchestrator defines how those generated configs are consumed. For published OKE investigations, use the exact orchestrator tag referenced by the published OKE docs rather than `HEAD`.
 
@@ -252,31 +257,38 @@ Extensions live in `workload-extensions/` and are registered in `landing_zone.li
 
 ```
 {
-  metadata(params):: { default_subnets, subnet_order }
+  metadata(params):: {
+    requires_network: true|false, // optional, defaults to true
+    default_subnets,              // required when requires_network is true
+    subnet_order,                 // optional when requires_network is true
+  }
   render(params):: {
-    network_pre,
-    iam,
-    security_cis1,
-    security_cis2,
-    oke_clusters,
-    oke_workers,
+    network_pre,        // required when requires_network is true
+    iam,                // optional standard contribution
+    security_cis1,      // optional standard contribution
+    security_cis2,      // optional standard contribution
+    observability_cis1, // optional standard contribution
+    observability_cis2, // optional standard contribution
+    extra_key,          // optional generic extra output
   }
 }
 
 params.config_params  -- extension-specific parameters (e.g. kubernetes_version)
-params.network        -- { vcn: 'cidr', subnets: { name: cidr } }
+params.network        -- { vcn: 'cidr', subnets: { name: cidr } }, or null for networkless extensions
 params.naming         -- naming object
 params.topology       -- shared scope semantics from `topology.libsonnet`
+params.scope_config   -- scope-local context, such as projects in the same environment
 params.routing        -- routing context for extension route rules:
-                        -- { hub: object|null, peers: object }
+                        -- { hub: object|null, peers: object }, or null for networkless extensions
 ```
 
 Contract phases:
-- `metadata(params)`: returns `{ default_subnets: { name: '/prefix' }, subnet_order: [...] }` used for auto-subnet calculation when subnets are not specified in config.
+- `metadata(params)`: returns extension requirements. Networked extensions return `{ default_subnets: { name: '/prefix' }, subnet_order: [...] }` for auto-subnet calculation when subnets are not specified in config. Networkless extensions return `{ requires_network: false }`.
 - `render(params)`: returns contributions keyed by domain:
-  - `network_pre`: merged into `network_configuration_categories`
+  - `network_pre`: merged into `network_configuration_categories` for networked extensions
   - `iam`: merged into IAM output
   - `security_cis1`, `security_cis2`: merged into security outputs
+  - `observability_cis1`, `observability_cis2`: merged into observability outputs
   - Any other generic key (e.g. `oke_clusters`, `oke_workers`): collected into `result.extra`
 
 Generic extension contracts must not change emitted artifact sets based on repo publication mode. If a published family needs additional projections, create a dedicated adapter next to the published entrypoints and keep profile-local configs free of publication flags.
@@ -301,7 +313,7 @@ Current OKE ownership:
 
 1. Create `workload-extensions/<name>/<name>.libsonnet` following the extension contract above.
 2. Register in `landing_zone.libsonnet`'s `extension_registry`.
-3. Define `metadata.default_subnets` for auto-subnet calculation.
+3. Define `metadata.default_subnets` for auto-subnet calculation, or set `metadata.requires_network: false` if the extension does not create a platform VCN.
 4. Return `contributions` with the relevant domain keys.
 5. Create entry-point `.jsonnet` files if needed for multi-stack mode.
 6. Run `generate.sh` and diff output.
@@ -332,9 +344,9 @@ Config mode validates required fields during normalization. `config.environments
 - `topology.libsonnet` is the single source of truth for environment labels, DNS short codes, platform placement, and security-target eligibility.
 - `topology.libsonnet` owns both raw environment metadata and semantic ordering helpers such as preferred environment precedence.
 - `landing_zone.libsonnet` and builder modules may consume topology ordering helpers, but they must not define their own `preferred_env_names` list.
-- Environment platform compartments live under `CMP-LZ-<ENV>-PLATFORM-KEY`.
-- Shared platform compartments live under `CMP-LZ-PLATFORM-KEY`, but their child keys remain `CMP-LZ-SHARED-PLATFORM-<NAME>-KEY`.
-- Shared platform OCI compartment names and paths do not use a synthetic `shared` environment segment. Example: shared OKE uses `cmp-lz-platform-oke` and `cmp-landingzone:cmp-lz-platform:cmp-lz-platform-oke`.
+- Environment platform compartments live under `CMP-LZ-<ENV>-PLATFORM-KEY`, but their child keys omit the redundant parent segment: `CMP-LZ-<ENV>-<NAME>-KEY`.
+- Shared platform compartments live under `CMP-LZ-PLATFORM-KEY`, but their child keys omit the redundant parent segment: `CMP-LZ-SHARED-<NAME>-KEY`.
+- Shared platform OCI compartment names include the shared scope without repeating the parent platform segment. Example: shared OKE uses `cmp-lz-shared-oke` and `cmp-landingzone:cmp-lz-platform:cmp-lz-shared-oke`.
 - Platform identity/resources use platform compartments, while platform network categories use the scope's network compartment references.
 - Integrated IAM owns platform child compartments for config-driven outputs.
 - Standalone multi-stack OKE may overlay the same platform child compartment only to stay self-contained.

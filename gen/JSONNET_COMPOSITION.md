@@ -54,7 +54,7 @@ flowchart TD
 
     O --> R["partial network fragments"]
     P --> S["partial IAM / security / observability / governance fragments"]
-    Q --> T["partial standard fragments<br/>+ optional extra fragments"]
+    Q --> T["partial standard fragments<br/>network/IAM/security/observability<br/>+ optional extra fragments"]
 
     R --> U["assemble result object"]
     S --> U
@@ -181,7 +181,9 @@ Read `landing_zone.libsonnet` as the merge owner.
 
 ### Standard Outputs And Extension `extra` Outputs Are Different Channels
 
-Standard result fields have fixed names such as `network`, `network_pre`, `iam`, `security_cis1`, and `governance`.
+Standard result fields have fixed names such as `network`, `network_pre`, `iam`, `security_cis1`, `security_cis2`, `observability_cis1`, `observability_cis2`, and `governance`.
+
+Extensions can contribute standard fragments into those same domains. Networked extensions contribute `network_pre`; networkless extensions declare `metadata.requires_network: false` and skip network routing/subnet inputs while still contributing domains such as IAM or observability.
 
 Generic extension outputs that belong in config mode stay under `result.extra`, then `landing_zone_multi.jsonnet` turns them into files dynamically:
 

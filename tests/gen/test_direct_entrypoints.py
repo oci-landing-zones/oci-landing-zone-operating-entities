@@ -22,6 +22,14 @@ PARITY_CASE_DIRS = (
         Path("gen/workload-extensions/oke/simple/multi-stack"),
         Path("workload-extensions/oke/simple/multi-stack"),
     ),
+    (
+        Path("gen/workload-extensions/exacc/single-stack"),
+        Path("workload-extensions/exacc/single-stack"),
+    ),
+    (
+        Path("gen/workload-extensions/exacc/multi-stack"),
+        Path("workload-extensions/exacc/multi-stack"),
+    ),
 ) + ADDON_PARITY_CASE_DIRS
 
 

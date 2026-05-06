@@ -48,8 +48,6 @@ local subnet_utils = import 'lib/subnets.libsonnet';
       else subnet_utils.auto_subnets_24(hub_vcn, hub_subnet_keys);
 
     local norm_platform(plat, p_name) =
-      assert std.objectHas(plat, 'network') : 'Platform %s.network is required' % p_name;
-      assert std.objectHas(plat.network, 'vcn') : 'Platform %s.network.vcn is required' % p_name;
       local extension =
         if std.objectHas(plat, 'extension') then
           assert plat.extension != null && std.type(plat.extension) == 'object' :
@@ -62,24 +60,31 @@ local subnet_utils = import 'lib/subnets.libsonnet';
             'Platform %s.extension.params must be an object' % p_name;
           plat.extension
         else null;
-      local platform_vcn = cidrs.validate('Platform %s.network.vcn' % p_name, plat.network.vcn);
+      local has_network = std.objectHas(plat, 'network') && plat.network != null;
+      assert has_network || extension != null : 'Platform %s.network is required' % p_name;
+      local normalized_network =
+        if has_network then
+          assert std.objectHas(plat.network, 'vcn') : 'Platform %s.network.vcn is required' % p_name;
+          local platform_vcn = cidrs.validate('Platform %s.network.vcn' % p_name, plat.network.vcn);
+          {
+            network: plat.network {
+              vcn: platform_vcn,
+              subnets:
+                if std.objectHas(plat.network, 'subnets') then
+                  if extension != null then plat.network.subnets
+                  else subnet_utils.validate_named_subnets(
+                    plat.network.subnets,
+                    'Platform %s.network.subnets' % p_name,
+                    platform_vcn
+                  )
+                else if extension != null then null
+                else error 'Platform %s requires explicit subnets (no extension to auto-compute from)' % p_name,
+            },
+          }
+        else {};
       plat
       + (if extension != null then { extension: extension } else {})
-      + {
-        network: plat.network {
-          vcn: platform_vcn,
-          subnets:
-            if std.objectHas(plat.network, 'subnets') then
-              if extension != null then plat.network.subnets
-              else subnet_utils.validate_named_subnets(
-                plat.network.subnets,
-                'Platform %s.network.subnets' % p_name,
-                platform_vcn
-              )
-            else if extension != null then null
-            else error 'Platform %s requires explicit subnets (no extension to auto-compute from)' % p_name,
-        },
-      };
+      + normalized_network;
 
     local norm_spn(env_name, env) =
       local spn = env.shared_project_network;
@@ -139,6 +144,7 @@ local subnet_utils = import 'lib/subnets.libsonnet';
              cidr: env.platforms[p_name].network.vcn,
            }
            for p_name in std.objectFields(env.platforms)
+           if std.objectHas(env.platforms[p_name], 'network') && env.platforms[p_name].network != null
          ] else [])
       for env_name in std.objectFields(norm_envs)
     ]);
@@ -148,6 +154,7 @@ local subnet_utils = import 'lib/subnets.libsonnet';
         cidr: norm_shared[p_name].network.vcn,
       }
       for p_name in std.objectFields(norm_shared)
+      if std.objectHas(norm_shared[p_name], 'network') && norm_shared[p_name].network != null
     ];
     local validated_vcns = cidrs.assert_non_overlapping(
       [{ label: 'Hub VCN', cidr: hub_vcn }] + env_vcn_entries + shared_vcn_entries,

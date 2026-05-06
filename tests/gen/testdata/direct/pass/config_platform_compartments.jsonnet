@@ -99,9 +99,16 @@ local mixed = multi({
         shared_oke['iam.json'].compartments_configuration.compartments['CMP-LANDINGZONE-KEY']
           .children['CMP-LZ-PLATFORM-KEY'].children
       )),
+    platform_name:
+      shared_oke['iam.json'].compartments_configuration.compartments['CMP-LANDINGZONE-KEY']
+        .children['CMP-LZ-PLATFORM-KEY'].children['CMP-LZ-SHARED-OKE-KEY'].name,
     category_compartment_id:
       shared_oke['network.json'].network_configuration.network_configuration_categories['shared-platform-oke'].category_compartment_id,
   },
+  prod_oke:
+    mixed['iam.json'].compartments_configuration.compartments['CMP-LANDINGZONE-KEY']
+      .children['CMP-LZ-PROD-KEY'].children['CMP-LZ-PROD-PLATFORM-KEY']
+      .children['CMP-LZ-PROD-OKE-KEY'].name,
   mixed_category_keys:
     std.objectFields(mixed['network.json'].network_configuration.network_configuration_categories),
 }

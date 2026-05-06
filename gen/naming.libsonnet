@@ -44,8 +44,8 @@ function(region_short_name) {
     std.join('-', ['rr'] + [std.asciiLower(s) for s in segments]),
 
   // OCI compartment path: cmp-landingzone:cmp-lz-{seg1}:cmp-lz-{seg1}-{seg2}:...
-  // Usage: n.compartment_path(['prod', 'platform', 'oke'])
-  //   → 'cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-platform-oke'
+  // Usage: n.compartment_path(['prod', 'platform'])
+  //   → 'cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform'
   compartment_path(segments)::
     local lo = [std.asciiLower(s) for s in segments];
     std.join(':', ['cmp-landingzone'] + [

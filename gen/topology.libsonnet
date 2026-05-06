@@ -4,6 +4,7 @@
 // function(config, n) -> topology helper object
 
 function(config, n)
+  local labels = import './labels.libsonnet';
   local raw_env_names = std.objectFields(config.environments);
   local preferred_env_names = ['prod', 'preprod', 'staging', 'uat', 'dev', 'test'];
   local ordered_env_names =
@@ -44,7 +45,7 @@ function(config, n)
     test: { short: 'Test', long: 'Test', network: 'Test', dns: 't' },
   };
 
-  local title_case(name) = std.asciiUpper(name[0:1]) + name[1:];
+  local title_case(name) = labels.title_case(name);
   local env_label(env_name) =
     if std.objectHas(env_labels, env_name) then env_labels[env_name]
     else {
@@ -65,20 +66,25 @@ function(config, n)
       platform_name: platform_name,
 
       compartment_key:
-        if is_shared then n.key_global('CMP', ['SHARED', 'PLATFORM', platform_name])
-        else n.key_global('CMP', [scope_name, 'PLATFORM', platform_name]),
+        if is_shared then n.key_global('CMP', ['SHARED', platform_name])
+        else n.key_global('CMP', [scope_name, platform_name]),
       parent_compartment_key:
         if is_shared then n.key_global('CMP', ['PLATFORM'])
         else n.key_global('CMP', [scope_name, 'PLATFORM']),
       compartment_name:
-        if is_shared then 'cmp-lz-platform-%s' % std.asciiLower(platform_name)
-        else 'cmp-lz-%s-platform-%s' % [std.asciiLower(scope_name), std.asciiLower(platform_name)],
+        if is_shared then 'cmp-lz-shared-%s' % std.asciiLower(platform_name)
+        else 'cmp-lz-%s-%s' % [std.asciiLower(scope_name), std.asciiLower(platform_name)],
       compartment_description:
         if is_shared then 'Shared Platform %s Compartment' % platform_title
         else '%s Platform %s Compartment' % [env_label(scope_name).long, platform_title],
       compartment_path:
-        if is_shared then n.compartment_path(['platform', platform_name])
-        else n.compartment_path([scope_name, 'platform', platform_name]),
+        if is_shared then
+          '%s:%s' % [n.compartment_path(['platform']), 'cmp-lz-shared-%s' % std.asciiLower(platform_name)]
+        else
+          '%s:%s' % [
+            n.compartment_path([scope_name, 'platform']),
+            'cmp-lz-%s-%s' % [std.asciiLower(scope_name), std.asciiLower(platform_name)],
+          ],
 
       network_compartment_key:
         if is_shared then n.key_global('CMP', ['NETWORK'])

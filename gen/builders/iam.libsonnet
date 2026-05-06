@@ -7,28 +7,16 @@
 // function(config, n, realm_constants, topo) → IAM output object
 
 function(config, n, realm_constants, topo)
+  local labels = import '../labels.libsonnet';
 
   // --- Display-name helpers ---
   local env_desc(env_name) = topo.env_display_long(env_name);
 
   // Project display name for compartment/group descriptions: 'proj1' → 'Project 1'.
-  // Handles names matching /^proj\d+$/ and falls back to the raw name otherwise.
-  local proj_display(proj_name) =
-    local s = std.asciiLower(proj_name);
-    if std.startsWith(s, 'proj') then
-      local num = s[4:];
-      'Project ' + num
-    else
-      std.asciiUpper(proj_name[0:1]) + proj_name[1:];
+  local proj_display(proj_name) = labels.project_display(proj_name);
 
   // Lowercase project display for policy description sentences.
-  local proj_desc_lower(proj_name) =
-    local s = std.asciiLower(proj_name);
-    if std.startsWith(s, 'proj') then
-      local num = s[4:];
-      'project ' + num
-    else
-      proj_name;
+  local proj_desc_lower(proj_name) = labels.project_desc_lower(proj_name);
 
   local env_names = topo.ordered_env_names();
 

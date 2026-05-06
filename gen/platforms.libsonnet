@@ -1,6 +1,8 @@
 local common = import 'hub/hub_common.libsonnet';
 
 {
+  has_network(pe):: std.objectHas(pe.platform_config, 'network') && pe.platform_config.network != null,
+
   collect_entries(config, topo)::
     local ordered_env_names = topo.ordered_env_names();
     local env_platform_entries = std.flatMap(
@@ -10,6 +12,11 @@ local common = import 'hub/hub_common.libsonnet';
           [
             {
               scope: topo.env_platform(env_name, p_name),
+              scope_config: {
+                projects:
+                  if std.objectHas(env, 'projects') then std.objectFields(env.projects)
+                  else [],
+              },
               platform_config: env.platforms[p_name],
             }
             for p_name in std.objectFields(env.platforms)
@@ -22,6 +29,7 @@ local common = import 'hub/hub_common.libsonnet';
         [
           {
             scope: topo.shared_platform(p_name),
+            scope_config: { projects: [] },
             platform_config: config.shared_platforms[p_name],
           }
           for p_name in std.objectFields(config.shared_platforms)
@@ -38,7 +46,7 @@ local common = import 'hub/hub_common.libsonnet';
       network_only_platforms: [
         pe
         for pe in all_platform_entries
-        if !std.objectHas(pe.platform_config, 'extension')
+        if !std.objectHas(pe.platform_config, 'extension') && $.has_network(pe)
       ],
     },
 
@@ -70,6 +78,11 @@ local common = import 'hub/hub_common.libsonnet';
         },
       spoke_envs
     );
+    local network_platform_entries = [
+      pe
+      for pe in all_platform_entries
+      if $.has_network(pe)
+    ];
     local platform_vcn_entries = std.mapWithIndex(
       function(i, pe)
         local label = $.vcn_label(pe);
@@ -86,7 +99,7 @@ local common = import 'hub/hub_common.libsonnet';
           route_key: n.route_rule([n.region, 'vcn', label.raw_name]),
           route_desc: route_desc,
         },
-      all_platform_entries
+      network_platform_entries
     );
     {
       all_vcn_entries: spoke_vcn_entries + platform_vcn_entries,

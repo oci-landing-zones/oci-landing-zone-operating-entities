@@ -1,4 +1,5 @@
-// platform config requires network block before extension expansion
+// networked extension metadata rejects a platform that omits network.vcn
+// error_contains: Extension "oke_simple" for platform prod/data requires network.vcn
 {
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
