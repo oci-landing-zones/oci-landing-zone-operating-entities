@@ -23,8 +23,11 @@ local outputs = multi({
   },
 });
 local unexpected_split_output_files = ['network_pre.json', 'oke_identity.json', 'oke_network.json'];
+local node_pools = outputs['oke_workers.json'].oke_workers_configuration.node_pools;
+local node_pool = node_pools[std.objectFields(node_pools)[0]];
 {
   unexpected_split_output_files_present:
     [name for name in unexpected_split_output_files if std.objectHas(outputs, name)],
   output_files: std.sort(std.objectFields(outputs)),
+  worker_image: node_pool.node_config_details.image,
 }

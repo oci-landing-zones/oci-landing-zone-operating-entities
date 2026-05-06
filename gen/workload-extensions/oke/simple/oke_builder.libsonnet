@@ -6,7 +6,7 @@
 //     metadata(params):: { default_subnets, subnet_order },
 //     render(params):: { metadata, contributions },
 //   }
-//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, pods_cidr?}
+//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, pods_cidr?}
 //   params.network       — {vcn: 'cidr', subnets: {name: cidr}}
 //   params.naming        — naming object
 //   params.topology      — platform scope semantics from topology.libsonnet
@@ -85,6 +85,13 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
       { pods_cidr: pods_cidr }
     else
       {};
+  local worker_image =
+    if std.objectHas(params.config_params, 'worker_image') && params.config_params.worker_image != null then
+      assert std.type(params.config_params.worker_image) == 'string' :
+        'config_params.worker_image must be a string';
+      params.config_params.worker_image
+    else
+      '8.10';
   local sn_key(suffix) =
     n.key('SN', [env, 'PLATFORM', plat, suffix]);
   local rt_key(suffix) =
@@ -794,6 +801,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
               },
 
               node_config_details: {
+                image: worker_image,
                 node_shape: 'VM.Standard.E5.Flex',
 
                 flex_shape_settings: {

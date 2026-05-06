@@ -24,6 +24,7 @@ For published OKE deployment investigations, inspect the exact orchestrator tag 
 
 - `oke_simple` currently emits `cni_type: 'native'`.
 - The generator creates and wires a dedicated pod subnet in the OKE VCN through `pods_subnet_id`.
+- `oke_simple` defaults `worker_image` to `'8.10'`, which the generator emits as `node_config_details.image`.
 - `services_cidr` remains the explicit Kubernetes service CIDR in the repo's standard native examples and is emitted under `options.kubernetes_network_config` in the cluster payload consumed by `cis-oke`.
 - `pods_cidr` is not required for the standard native `oke_simple` path, but if a config explicitly sets it the generator preserves it under `options.kubernetes_network_config` as a passthrough to the downstream `cis-oke` module.
 - Do not make `pods_cidr` mandatory again for the native `oke_simple` path unless the downstream module contract truly requires it.

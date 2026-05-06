@@ -192,6 +192,7 @@ Edit `oke_workers.json`:
 
 - **Node Count**: Change `size` to scale worker nodes
 - **Instance Shape**: Modify `node_shape`, `ocpus`, `memory` for different compute resources
+- **Worker Image**: Update `node_config_details.image` after checking the supported OKE worker images for the target Kubernetes version
 - **Boot Volume**: Adjust `boot_volume.size` for storage requirements
 - **SSH Access**: Update `default_ssh_public_key_path` with your SSH public key path
 - **Cloud-init**: Customize `cloud_init` for additional node configuration

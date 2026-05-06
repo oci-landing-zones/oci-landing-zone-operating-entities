@@ -14,5 +14,6 @@
     "security_cis2.json",
     "security_cis2_pre.json"
   ],
-  "unexpected_split_output_files_present": []
+  "unexpected_split_output_files_present": [],
+  "worker_image": "8.10"
 }
