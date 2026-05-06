@@ -1,5 +1,3 @@
-local defaults = import '../../defaults.libsonnet';
-
 local notification_emails = {
   default: ['exacc-platform-team@example.com'],
   db_workloads: ['exacc-db-team@example.com'],
@@ -33,10 +31,29 @@ local env_exacc_platform(projects) = {
   },
 };
 
+local exacc_no_network_base = {
+  region: 'eu-frankfurt-1',
+  region_short_name: 'fra',
+  realm: 'oc1',
+  security_targets: ['prod'],
+  hub: {
+    kind: 'hub_e',
+    network: { vcn: '10.0.0.0/21' },
+  },
+  environments: {
+    prod: {
+      projects: { proj1: {} },
+    },
+    preprod: {
+      projects: { proj1: {} },
+    },
+  },
+};
+
 {
   notification_emails: notification_emails,
 
-  hub_e_prod_preprod_exacc_config: defaults.hub_e {
+  hub_e_prod_preprod_exacc_config: exacc_no_network_base {
     shared_platforms: {
       exacc: shared_exacc_platform,
     },

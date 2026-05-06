@@ -35,6 +35,11 @@ function(config, n)
       ]
     else
       ordered_env_names;
+  local security_target_networked_env_names = [
+    env_name
+    for env_name in ordered_spoke_env_names
+    if std.member(security_target_env_names, env_name)
+  ];
 
   local env_labels = {
     prod: { short: 'Prod', long: 'Production', network: 'Prod', dns: 'p' },
@@ -101,6 +106,12 @@ function(config, n)
   {
     ordered_env_names():: ordered_env_names,
     ordered_spoke_env_names():: ordered_spoke_env_names,
+    networked_env_names():: ordered_spoke_env_names,
+    security_target_networked_env_names():: security_target_networked_env_names,
+    project_names(env_name)::
+      if std.objectHas(config.environments[env_name], 'projects') then
+        std.objectFields(config.environments[env_name].projects)
+      else [],
 
     env_label(env_name):: env_label(env_name),
     env_display(env_name):: self.env_label(env_name).short,

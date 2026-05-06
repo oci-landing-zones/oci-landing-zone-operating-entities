@@ -7,7 +7,8 @@ Scope: this file covers `gen/workload-extensions/exacc/**` and the published Exa
 - `gen/workload-extensions/exacc/exacc_builder.libsonnet` owns reusable ExaDB-C@C IAM and observability rendering.
 - `gen/workload-extensions/exacc/exacc.libsonnet` is the generic extension wrapper used by config mode and integrated landing-zone assembly.
 - `gen/workload-extensions/exacc/published_profiles.libsonnet` owns repo-published ExaDB-C@C use-case config defaults.
-- `gen/workload-extensions/exacc/single-stack/*.jsonnet` are thin selectors over `landing_zone.libsonnet`.
+- `gen/workload-extensions/exacc/single-stack/published.libsonnet` owns the single-stack no-network publication projection used by repo entrypoints.
+- `gen/workload-extensions/exacc/single-stack/*.jsonnet` are thin selectors over the local single-stack publication adapter.
 - `gen/workload-extensions/exacc/multi-stack/published.libsonnet` owns the multi-stack publication-only identity and observability projection used by repo entrypoints.
 - Checked-in JSON files under `workload-extensions/exacc/{single-stack,multi-stack}/` are generated snapshots. Do not hand-edit them.
 

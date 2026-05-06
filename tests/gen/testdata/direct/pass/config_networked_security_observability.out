@@ -1,0 +1,9 @@
+{
+  "has_env_flow_log_group": true,
+  "has_env_network_rule": true,
+  "has_env_network_target": true,
+  "has_env_security_rule": true,
+  "has_env_subnet_flow_log": true,
+  "has_env_vcn_flow_log": true,
+  "has_project_target": true
+}

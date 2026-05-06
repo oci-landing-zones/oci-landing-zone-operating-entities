@@ -12,13 +12,7 @@
 // contains: exacc-db@example.com
 // contains: exacc-infra@example.com
 // contains: exacc-projects@example.com
-// contains: Shared Platform ExaDB-C@C Compartment
-// contains: Production Platform ExaDB-C@C Database Compartment
-// contains: Pre-Production environment, Project 1 ExaDB-C@C database compartment
-// contains: Allow grp-lz-prod-proj1-exacc-admin group users to manage the ExaDB-C@C Autonomous Database layer in Project 1.
-// contains: Topic for shared ExaDB-C@C database workload notifications.
-// contains: Topic for Production ExaDB-C@C project notifications.
-// contains: "db_admin_uses_infra_tag_for_exadata": true
+// contains: "db_admin_uses_db_tag_for_exadata": true
 local lz = import 'gen/landing_zone.libsonnet';
 
 local env_exacc_platform(projects=[]) = {
@@ -85,10 +79,10 @@ std.manifestJsonEx({
     prod_projects: result.observability_cis1.notifications_configuration.topics['NOTT-LZ-PROD-EXACC-PROJECTS-KEY'].description,
   },
   policy_description: result.iam.policies_configuration.supplied_policies['PCY-LZ-PROD-EXACC-PROJ1-ADMIN-KEY'].description,
-  db_admin_uses_infra_tag_for_exadata: std.length([
+  db_admin_uses_db_tag_for_exadata: std.length([
     statement
     for statement in global_db_policy.statements
     if std.length(std.findSubstr('use exadata-infrastructures', statement)) > 0
-       && std.length(std.findSubstr("'lz-exacc-infra-admin'", statement)) > 0
+       && std.length(std.findSubstr("'lz-exacc-db-admin'", statement)) > 0
   ]) == 1,
 }, '  ')

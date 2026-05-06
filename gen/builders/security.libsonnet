@@ -10,7 +10,7 @@
 // function(config, n, realm_constants, topo) → { cis1_pre, cis1, cis2_pre, cis2 }
 
 function(config, n, realm_constants, topo)
-  local security_target_env_names = topo.security_target_env_names();
+  local security_target_networked_env_names = topo.security_target_networked_env_names();
   local szp = realm_constants.security_zone_policy_ocids;
 
   // --- Base security (shared across all CIS levels) ---
@@ -138,10 +138,7 @@ function(config, n, realm_constants, topo)
     },
   } + std.foldl(
     function(acc, env_name)
-      local env = config.environments[env_name];
-    local project_names = if std.objectHas(env, 'projects')
-        then std.objectFields(env.projects)
-        else [];
+      local project_names = topo.project_names(env_name);
       acc + {
         [n.key_global('SZ-TGT', [env_name, 'ENVIRONMENT', 'NETWORK'])]: {
           name: n.display_global('sz-tgt', [env_name, 'environment', 'network']),
@@ -156,7 +153,7 @@ function(config, n, realm_constants, topo)
         }
         for proj in project_names
       },
-    security_target_env_names,
+    security_target_networked_env_names,
     {}
   );
 

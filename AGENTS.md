@@ -102,7 +102,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
 
 2. **Environment count and names**
    - Determine how many environments the landing zone needs and what they are called.
-   - Ask about separate stages such as development, test, preproduction, and production before using the repo term `environment`.
+   - Ask which environments are needed, using examples such as development, test, preproduction, and production when helpful.
    - Keep the environment names explicit. Do not assume only `prod` and `preprod` unless the customer confirms the standard One-OE shape fits.
 
 3. **Application and workload structure**

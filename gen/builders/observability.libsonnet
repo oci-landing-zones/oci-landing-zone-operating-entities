@@ -11,6 +11,7 @@
 
 function(config, n, realm_constants, topo)
   local env_names = topo.ordered_env_names();
+  local networked_env_names = topo.networked_env_names();
 
   // --- Event type constants ---
   local network_events = [
@@ -104,16 +105,11 @@ function(config, n, realm_constants, topo)
   local placeholder_email = 'email.address@example.com';
 
   // --- Per-env event rules ---
-  // Each env gets a network notify rule and a security notify rule.
-  local env_event_rules = std.foldl(
+  // Each env gets a security notify rule. Only envs with shared_project_network
+  // get network notify rules because only those envs have env network compartments.
+  local env_security_event_rules = std.foldl(
     function(acc, env_name)
       acc + {
-        [n.key_global('RUL', [env_name, 'NOTIFY', 'NETWORK'])]: {
-          compartment_id: n.key_global('CMP', [env_name, 'NETWORK']),
-          destination_topic_ids: [n.key_global('NOTT', ['NETWORK'])],
-          event_display_name: n.display_global('rul', [env_name, 'notify', 'network']),
-          supplied_events: network_events,
-        },
         [n.key_global('RUL', [env_name, 'NOTIFY', 'SECURITY'])]: {
           compartment_id: n.key_global('CMP', [env_name, 'SECURITY']),
           destination_topic_ids: [n.key_global('NOTT', ['SECURITY'])],
@@ -122,6 +118,19 @@ function(config, n, realm_constants, topo)
         },
       },
     env_names,
+    {}
+  );
+  local env_network_event_rules = std.foldl(
+    function(acc, env_name)
+      acc + {
+        [n.key_global('RUL', [env_name, 'NOTIFY', 'NETWORK'])]: {
+          compartment_id: n.key_global('CMP', [env_name, 'NETWORK']),
+          destination_topic_ids: [n.key_global('NOTT', ['NETWORK'])],
+          event_display_name: n.display_global('rul', [env_name, 'notify', 'network']),
+          supplied_events: network_events,
+        },
+      },
+    networked_env_names,
     {}
   );
 
@@ -163,7 +172,7 @@ function(config, n, realm_constants, topo)
           event_display_name: n.display_global('rul', ['notify', 'security']),
           supplied_events: security_events,
         },
-      } + env_event_rules,
+      } + env_security_event_rules + env_network_event_rules,
     },
 
     home_region_events_configuration: {
@@ -269,7 +278,7 @@ function(config, n, realm_constants, topo)
           target_resource_type: 'vcn',
         },
       },
-    env_names,
+    networked_env_names,
     {}
   );
 
@@ -281,7 +290,7 @@ function(config, n, realm_constants, topo)
           compartment_id: n.key_global('CMP', [env_name, 'SECURITY']),
         },
       },
-    env_names,
+    networked_env_names,
     {}
   );
 

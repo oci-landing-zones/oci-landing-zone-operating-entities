@@ -23,9 +23,19 @@ local outputs = multi({
   },
 });
 local unexpected_split_output_files = ['network_pre.json', 'oke_identity.json', 'oke_network.json'];
+local clusters = outputs['oke_clusters.json'].oke_clusters_configuration.clusters;
+local cluster_key = std.objectFields(clusters)[0];
+local cluster = clusters[cluster_key];
 local node_pools = outputs['oke_workers.json'].oke_workers_configuration.node_pools;
-local node_pool = node_pools[std.objectFields(node_pools)[0]];
+local node_pool_key = std.objectFields(node_pools)[0];
+local node_pool = node_pools[node_pool_key];
 {
+  cluster_key: cluster_key,
+  cluster_name: cluster.name,
+  node_pool_cluster_id: node_pool.cluster_id,
+  node_pool_key: node_pool_key,
+  node_pool_name: node_pool.name,
+  node_pool_cluster_tag: node_pool.freeform_tags.cluster,
   unexpected_split_output_files_present:
     [name for name in unexpected_split_output_files if std.objectHas(outputs, name)],
   output_files: std.sort(std.objectFields(outputs)),

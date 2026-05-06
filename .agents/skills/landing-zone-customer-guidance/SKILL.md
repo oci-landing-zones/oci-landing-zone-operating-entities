@@ -36,7 +36,7 @@ Do not use this skill for repo-development work. Once the request is clearly on 
 | Decision | Ask it like this | Avoid this |
 |---|---|---|
 | Landing zone choice | Explain that the first distinction is whether one main operations team will run the landing zone, or whether several operations teams will share responsibility inside the same tenancy. Explain that names such as department, business unit, country, or operating entity are just examples. If several teams have overlapping or clearly separated responsibilities, explain that the landing zone shape may need to reflect that. Then ask which operations model fits the customer. | "Are you using `One-OE`?" |
-| Environment count | Ask how many separate stages are needed, such as development, test, preproduction, or production. | "What are your environment names?" |
+| Environment count | Ask how many environments the landing zone needs and what each environment should be called, using examples such as development, test, preproduction, or production when helpful. | Asking for names before explaining that environments are the separate deployment areas such as development, test, preproduction, or production. |
 | Workload structure | Ask what business applications will run on Kubernetes and whether anything outside Kubernetes must also live in the landing zone. | "Do you need `projects` and `platforms`?" |
 | Firewall | Ask whether the deployment is production and whether inspected or tightly controlled traffic is required. Explain that firewall-based designs are recommended in general, required for production, and optional for non-production only when the customer accepts the simplicity or cost tradeoff. | "Is a firewall required?" |
 | Hub selection | Explain the relevant hub choices after the firewall answer, recommend one, then confirm the choice. | "Choose `Hub A`, `Hub B`, `Hub C`, or `Hub E`." |
@@ -46,7 +46,7 @@ Do not use this skill for repo-development work. Once the request is clearly on 
 
 Introduce these only after the plain-language explanation:
 
-- Separate stages such as dev, test, and prod -> `environments`
+- Deployment environments such as dev, test, and prod -> `environments`
 - Standard landing zone run mainly by one operations team -> `One-OE`
 - Landing zone for several operations teams sharing one tenancy -> `Multi-OE`
 - Network topology family -> hub model such as `Hub A` or `Hub B`

@@ -101,13 +101,13 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
       '%s must be %d characters or less: %s (%d)' % [label, max_len, value, std.length(value)];
     value;
   local cluster_key =
-    n.key('OKE-CLUSTER', [env, 'PLATFORM', plat]);
+    n.key('CLR', [env, plat]);
   local cluster_name =
-    checked_oke_name('OKE cluster name', n.display('cluster', [env, 'platform', plat]), 32);
+    checked_oke_name('OKE cluster name', n.display('clr', [env, plat]), 32);
   local node_pool_key =
-    n.key('NODEPOOL', [env, 'PLATFORM', plat, '1']);
+    n.key('NDP', [env, 'PLATFORM', plat, '1']);
   local node_pool_name =
-    checked_oke_name('OKE node pool name', n.display('np', [env, 'platform', plat, '1']), 32);
+    checked_oke_name('OKE node pool name', n.display('ndp', [env, 'platform', plat, '1']), 32);
 
   // Subnet CIDRs from params
   local subnets = params.network.subnets;

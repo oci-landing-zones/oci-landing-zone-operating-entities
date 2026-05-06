@@ -1,0 +1,11 @@
+{
+  "has_env_flow_log_group": false,
+  "has_env_network_rule": false,
+  "has_env_security_rule": true,
+  "has_env_subnet_flow_log": false,
+  "has_env_vcn_flow_log": false,
+  "has_shared_flow_log_group": true,
+  "has_shared_network_rule": true,
+  "has_shared_subnet_flow_log": true,
+  "has_shared_vcn_flow_log": true
+}
