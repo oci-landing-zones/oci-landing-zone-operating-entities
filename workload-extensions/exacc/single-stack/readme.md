@@ -11,7 +11,7 @@
     </tr>
     <tr>
       <td><strong>OBJECTIVE</strong></td>
-      <td>Deploy One-OE Landing Zone (No Network Layer) + WE ExaDB-C@C</td>
+      <td>Deploy One-OE Landing Zone (No VCN/network resources) + WE ExaDB-C@C</td>
     </tr>
     <tr>
       <td><strong>TARGET RESOURCES</strong></td>
@@ -48,11 +48,32 @@
 
 ## **4. Deployment Steps**
 
-| USE CASE | 1 | 2 | 3 |
-|----------|---|---|---|
-| Description | [shared ExaDB-C@C platform](../exacc_use_cases/readme.md/#21-shared-exadb-cc-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments) |  |  |
-| Deployment | CIS v1 [<img src="../../../commons/images/DeployToOCI_onestack.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_governance_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_identity_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_observability_cis1_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_security_cis1_uc1.json"})<br><br> CIS v2 [<img src="../../../commons/images/DeployToOCI_onestack.svg" height="30" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.0.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_governance_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_identity_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_observability_cis2_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_security_cis2_uc1.json"}) <br><br>To read some best practices about how to use ORM go [here](../../../commons/content/orm_bp.md). | coming soon | coming soon |
-| Files | CIS v1: [governance](./exacc_governance_uc1.json), [iam](./exacc_identity_uc1.json), [observability CIS v1](./exacc_observability_cis1_uc1.json), [security CIS v1](./exacc_security_cis1_uc1.json) <br> CIS v2:  [governance](./exacc_governance_uc1.json), [iam](./exacc_identity_uc1.json), [observability CIS v2](./exacc_observability_cis2_uc1.json), [security CIS v2](./exacc_security_cis2_uc1.json) |  |  |
+<table>
+  <thead>
+    <tr>
+      <th>USE CASE</th>
+      <th>1</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Description</td>
+      <td><a href="../exacc_use_cases/readme.md/#21-shared-exadb-cc-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments">shared ExaDB-C@C platform</a></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ORM</td>
+      <td><strong>CIS v1</strong><br><a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.0.zip&amp;zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_governance_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_identity_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_observability_cis1_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_security_cis1_uc1.json"}'><img src="../../../commons/images/DeployToOCI_onestack.svg" height="30" align="center"></a><br>Files: <a href="./exacc_governance_uc1.json">governance</a>, <a href="./exacc_identity_uc1.json">iam</a>, <a href="./exacc_observability_cis1_uc1.json">observability CIS v1</a>, <a href="./exacc_security_cis1_uc1.json">security CIS v1</a><br><br><strong>CIS v2</strong><br><a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.0.zip&amp;zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_governance_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_identity_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_observability_cis2_uc1.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/refs/heads/config-jsonnet/workload-extensions/exacc/single-stack/exacc_security_cis2_uc1.json"}'><img src="../../../commons/images/DeployToOCI_onestack.svg" height="30" align="center"></a><br>Files: <a href="./exacc_governance_uc1.json">governance</a>, <a href="./exacc_identity_uc1.json">iam</a>, <a href="./exacc_observability_cis2_uc1.json">observability CIS v2</a>, <a href="./exacc_security_cis2_uc1.json">security CIS v2</a></td>
+      <td>These ORM buttons are convenience links. For production or customer-controlled deployments, stage the configuration files in a private Object Storage bucket or approved private source. For ORM best practices, see <a href="../../../commons/content/orm_bp.md">ORM Best Practices</a>.</td>
+    </tr>
+    <tr>
+      <td>Terraform CLI</td>
+      <td></td>
+      <td>Use the same configuration files listed in the ORM row with Terraform CLI. For command examples and prerequisites, see <a href="../../../commons/content/terraform.md">Run with Terraform CLI</a>.</td>
+    </tr>
+  </tbody>
+</table>
 
 
 &nbsp;
