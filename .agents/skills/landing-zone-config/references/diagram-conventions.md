@@ -3,6 +3,13 @@
 Use these conventions when creating editable Excalidraw diagrams for generated landing zone artifacts.
 By default, create only the `.excalidraw` file. Do not create `.svg`, `.png`, `.dot`, Mermaid, or other preview/export files unless the user explicitly asks for those formats.
 
+## Baseline Example
+
+- Treat `/Users/paolajuarez/Desktop/IA/LZ/Profile-config-exacc/exacc_identity_uc1_compartments.excalidraw` as the visual baseline for compartment diagrams with IAM access information.
+- A finished compartment diagram must include both the compartment hierarchy and the right-side `Access groups` panel unless the user explicitly asks for a compartment-only diagram.
+- The `Access groups` panel is part of the standard, not an optional enhancement. Do not stop after drawing only compartment boxes and arrows.
+- Keep IAM/compartment diagrams and Network diagrams as separate diagram types. Do not apply IAM access-panel rules to network-only diagrams, and do not apply network VCN/subnet styling to IAM compartment diagrams.
+
 ## Source
 
 - Use generated JSON, especially `iam.json`, as the source of truth for compartment hierarchy.
@@ -61,4 +68,37 @@ By default, create only the `.excalidraw` file. Do not create `.svg`, `.png`, `.
 - For IAM group visibility, add a side panel rather than drawing many crossing connectors through the compartment tree. Order group cards by policy scope: first `TENANCY-ROOT`, then `cmp-landingzone`, then more specific child compartments.
 - In the group side panel, show a user icon, the group name, and the compartments the group can work with, including the statement count per compartment.
 - Mark every group that relies on tag-based policy conditions with a compact `TBAC` tag. Detect this from policy statements that reference compartment tags, such as `target.resource.compartment.tag...` or `sets-intersect(target.resource.compartment.tag...)`; do not limit the tag to Network and Security groups.
+- Match the right-side panel style from the ExaCC baseline: a transparent boundary box, title `Access groups`, compact subtitle, scope section headers, two-column cards when space allows, user icon shapes on each card, compartment/count text below the group name, and `TBAC` tags aligned on the card for tag-conditioned access.
 - Before finishing, validate: every child top edge is below the parent bottom edge, no compartment boxes overlap, all arrows have exactly three points, and no arrow crosses a compartment box other than its bound source or target.
+
+## Network Diagram Standard
+
+Use this standard when the user asks for a network graph, VCN/subnet graph, or a diagram based on a network JSON such as `oneoe_network_hub_a.json`. This is distinct from the IAM/compartment diagram standard above.
+
+- Use the network JSON as the source of truth. Extract VCNs, subnets, DRGs, and DRG attachments from `network_configuration.network_configuration_categories`.
+- Add OCI hierarchy boundary boxes when drawing full network views: `OCI Region`, `OCI Tenancy`, landing-zone compartment, shared network compartment, and environment network compartments when those scopes can be inferred from the network JSON and naming.
+- Show VCNs as large transparent rectangles with red dashed borders. Do not color-fill VCN boxes.
+- Show private subnets inside their parent VCN as transparent rectangles with red dashed borders.
+- If a subnet has `prohibit_public_ip_on_vnic: false`, treat it as public and use a very light green fill such as `#dcfce7`; keep its border dashed.
+- Represent VCN gateways as circles that sit on the VCN border, not as free-floating nodes fully inside the VCN.
+- For hub VCNs, place gateway circles on the left VCN border. For spoke VCNs, place gateway circles on the bottom VCN border.
+- Include Internet Gateway, NAT Gateway, and Service Gateway when present in the network JSON.
+- Label gateway circles with a compact type prefix such as `IGW`, `NAT`, or `SGW`, plus the generated gateway `display_name`.
+- Add a small auxiliary box on the right edge of each subnet box, overlapping the subnet border, matching the compact side-marker style used in OCI network diagrams.
+- When the network JSON includes route tables, add compact route-table cards near the related VCN/subnet branches. Include the route table display name, destination, and simplified next hop (`IGW`, `NGW`, `SGW`, `DRG`, `NFW private IP`, or attachment label).
+- For Hub A-style diagrams, include visible markers for major in-hub services such as load balancer and OCI Network Firewall when the JSON contains them. Place the load balancer marker inside the LB subnet and each firewall marker inside its corresponding firewall subnet. Add these markers without removing the VCN, subnet, gateway, or DRG elements.
+- Show DRG attachment labels such as `vcn-hub-attach`, `vcn-prod-attach`, and `vcn-preprod-attach` when the JSON exposes DRG attachment names.
+- Represent the DRG as a smaller grey circle labeled with the generated DRG `display_name` when present.
+- Connect each VCN to the DRG with plain lines, not arrows. Use no arrowheads for VCN-to-DRG links.
+- VCN-to-DRG lines must stop at the outside edge of the DRG circle, not continue into the center of the circle.
+- Do not draw VCN-to-VCN arrows for DRG connectivity; the DRG circle is the central connectivity object.
+- Keep network diagrams focused on network resources. Do not add IAM group panels, policy statement counts, or TBAC tags to network-only diagrams.
+- Add a concise legend with the official hub documentation link icon and a resource glossary only. Do not include styling prose in the legend.
+- The resource glossary should list abbreviations and descriptions, for example: `VCN = Virtual Cloud Network`, `SN = Subnet`, `IGW = Internet Gateway`, `NGW = NAT Gateway`, `SGW = Service Gateway`, and `DRG = Dynamic Routing Gateway`.
+- Add a clickable documentation icon in the legend for the hub model represented by the source file:
+  - `hub_a`: `https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_a`
+  - `hub_b`: `https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_b`
+  - `hub_c`: `https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_c`
+  - `hub_d`: `https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_d`
+  - `hub_e`: `https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_e`
+- Before finishing, validate the `.excalidraw` with `jq empty`, confirm all VCN/subnet boxes use dashed borders, confirm VCN/private-subnet borders are red, confirm public subnets are the only green subnet boxes, and confirm VCN-to-DRG connectors are `line` elements with no arrowheads.
