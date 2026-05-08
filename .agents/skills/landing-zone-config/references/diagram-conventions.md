@@ -77,18 +77,21 @@ Use this standard when the user asks for a network graph, VCN/subnet graph, or a
 
 - Use the network JSON as the source of truth. Extract VCNs, subnets, DRGs, and DRG attachments from `network_configuration.network_configuration_categories`.
 - Add OCI hierarchy boundary boxes when drawing full network views: `OCI Region`, `OCI Tenancy`, landing-zone compartment, shared network compartment, and environment network compartments when those scopes can be inferred from the network JSON and naming.
-- Show VCNs as large transparent rectangles with red dashed borders. Do not color-fill VCN boxes.
-- Show private subnets inside their parent VCN as transparent rectangles with red dashed borders.
-- If a subnet has `prohibit_public_ip_on_vnic: false`, treat it as public and use a very light green fill such as `#dcfce7`; keep its border dashed.
+- For network-only views, omit OCI hierarchy and compartment boundary boxes. Use a clear three-level layout: hub VCN on the first level, DRG on the second level, and environment spoke VCNs such as prod/preprod on the third level.
+- Show VCNs as large transparent rectangles with red dashed borders. Do not color-fill VCN boxes, including prod/preprod environment VCNs.
+- Show environment network boundary boxes as transparent dashed containers. Do not color-fill prod/preprod environment containers.
+- Show subnets inside their parent VCN as transparent rectangles with dashed borders. Use red dashed borders for private subnets. Do not color-fill subnets by default, including public subnets, unless the user explicitly asks for a highlight.
 - Represent VCN gateways as circles that sit on the VCN border, not as free-floating nodes fully inside the VCN.
 - For hub VCNs, place gateway circles on the left VCN border. For spoke VCNs, place gateway circles on the bottom VCN border.
 - Include Internet Gateway, NAT Gateway, and Service Gateway when present in the network JSON.
 - Label gateway circles with a compact type prefix such as `IGW`, `NAT`, or `SGW`, plus the generated gateway `display_name`.
-- Add a small auxiliary box on the right edge of each subnet box, overlapping the subnet border, matching the compact side-marker style used in OCI network diagrams.
+- Add a small auxiliary `RT` box on the right edge of each subnet box, overlapping the subnet border, matching the compact side-marker style used in OCI network diagrams.
 - When the network JSON includes route tables, add compact route-table cards near the related VCN/subnet branches. Include the route table display name, destination, and simplified next hop (`IGW`, `NGW`, `SGW`, `DRG`, `NFW private IP`, or attachment label).
+- Route-table cards are the only boxes that should use strong color fills in the default network diagram style.
+- Draw a plain connector line from each route-table card to the small `RT` box of every subnet that uses that route table.
 - For Hub A-style diagrams, include visible markers for major in-hub services such as load balancer and OCI Network Firewall when the JSON contains them. Place the load balancer marker inside the LB subnet and each firewall marker inside its corresponding firewall subnet. Add these markers without removing the VCN, subnet, gateway, or DRG elements.
 - Show DRG attachment labels such as `vcn-hub-attach`, `vcn-prod-attach`, and `vcn-preprod-attach` when the JSON exposes DRG attachment names.
-- Represent the DRG as a smaller grey circle labeled with the generated DRG `display_name` when present.
+- Represent the DRG as a smaller grey circle labeled with the generated DRG `display_name` when present. Keep the DRG separated from VCN boxes so it does not visually touch or crowd hub, prod, or preprod VCNs.
 - Connect each VCN to the DRG with plain lines, not arrows. Use no arrowheads for VCN-to-DRG links.
 - VCN-to-DRG lines must stop at the outside edge of the DRG circle, not continue into the center of the circle.
 - Do not draw VCN-to-VCN arrows for DRG connectivity; the DRG circle is the central connectivity object.
@@ -101,4 +104,4 @@ Use this standard when the user asks for a network graph, VCN/subnet graph, or a
   - `hub_c`: `https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_c`
   - `hub_d`: `https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_d`
   - `hub_e`: `https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_e`
-- Before finishing, validate the `.excalidraw` with `jq empty`, confirm all VCN/subnet boxes use dashed borders, confirm VCN/private-subnet borders are red, confirm public subnets are the only green subnet boxes, and confirm VCN-to-DRG connectors are `line` elements with no arrowheads.
+- Before finishing, validate the `.excalidraw` with `jq empty`, confirm all VCN/subnet boxes use dashed borders, confirm VCN/private-subnet borders are red, confirm subnet boxes are transparent unless explicitly highlighted, confirm route-table cards retain their colored headers/fills, and confirm VCN-to-DRG connectors are `line` elements with no arrowheads.
