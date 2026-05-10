@@ -4,6 +4,8 @@
 //
 // function(params) -> { pre, post }
 
+local common = import '../hub/hub_common.libsonnet';
+
 function(params)
   local n = params.naming;
   local hub = params.hub;
@@ -51,36 +53,23 @@ function(params)
   // --- 3. Hub Route Table Injection ---
   // Route rules for each VCN CIDR through DRG
   local hub_spoke_routes_via_drg = {
-    [e.route_key]: {
-      description: '%s through DRG' % e.route_desc,
-      destination: e.vcn,
-      destination_type: 'CIDR_BLOCK',
-      network_entity_key: drg_key,
-    }
+    [e.route_key]: common._route_via_key('%s through DRG' % e.route_desc, e.vcn, drg_key)
     for e in all_vcn_entries
   };
 
   // --- 4. Firewall NSG Ingress Rules ---
   local nsg_fw_spoke_ingress = std.foldl(
     function(acc, e) acc {
-      ['from_%s_http' % e.name]: {
-        description: 'Allow inbound traffic from %s VCN over HTTP' % e.display,
-        src: e.vcn,
-        src_type: 'CIDR_BLOCK',
-        dst_port_max: 80,
-        dst_port_min: 80,
-        protocol: 'TCP',
-        stateless: false,
-      },
-      ['from_%s_https' % e.name]: {
-        description: 'Allow inbound traffic from %s VCN over HTTPS' % e.display,
-        src: e.vcn,
-        src_type: 'CIDR_BLOCK',
-        dst_port_max: 443,
-        dst_port_min: 443,
-        protocol: 'TCP',
-        stateless: false,
-      },
+      ['from_%s_http' % e.name]: common._tcp_ingress_rule(
+        'Allow inbound traffic from %s VCN over HTTP' % e.display,
+        e.vcn,
+        80
+      ),
+      ['from_%s_https' % e.name]: common._tcp_ingress_rule(
+        'Allow inbound traffic from %s VCN over HTTPS' % e.display,
+        e.vcn,
+        443
+      ),
       ['from_%s_icmp' % e.name]: {
         description: 'Allow ICMP type 8 (Echo) from %s VCN' % e.display,
         src: e.vcn,
@@ -106,12 +95,11 @@ function(params)
   local has_post_route_entity =
     std.objectHas(hub, 'post_route_entity_id') && hub.post_route_entity_id != null;
   local hub_spoke_routes_via_nfw = if has_post_route_entity then {
-    [e.route_key]: {
-      description: '%s through %s' % [e.route_desc, post_route_entity_desc],
-      destination: e.vcn,
-      destination_type: 'CIDR_BLOCK',
-      network_entity_id: hub.post_route_entity_id,
-    }
+    [e.route_key]: common._route_via_id(
+      '%s through %s' % [e.route_desc, post_route_entity_desc],
+      e.vcn,
+      hub.post_route_entity_id
+    )
     for e in all_vcn_entries
   } else {};
 

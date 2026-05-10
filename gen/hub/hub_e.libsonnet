@@ -18,6 +18,24 @@ function(hub_ctx)
   local vcn_cidr = hub_config.network.vcn;
   local subnets = hub_config.network.subnets;
   local bastion_ip = common.bastion_ip_from_mgmt(subnets.mgmt);
+  local hub_route_tables = common._route_tables_from_descriptors(n, [
+    {
+      key_segments: ['HUB', 'LB'],
+      display_segments: ['hub', 'lb'],
+      route_rules: {
+        [n.route_rule([n.region, 'internet'])]: common._route_via_key(
+          'Route to the Internet through Internet GW',
+          '0.0.0.0/0',
+          n.key('IGW', ['HUB'])
+        ),
+      },
+    },
+    {
+      key_segments: ['HUB', 'MGMT'],
+      display_segments: ['hub', 'mgmt'],
+      route_rules: common._internet_route_via_natgw(n) + common._services_route_via_sgw(n),
+    },
+  ]);
 
   {
     pre: {
@@ -32,24 +50,7 @@ function(hub_ctx)
             vcns: {
               [n.key('VCN', ['HUB'])]: common._hub_vcn(n, vcn_cidr, subnets) + {
 
-                route_tables: {
-                  [n.key('RT', ['HUB', 'LB'])]: {
-                    display_name: n.display('rt', ['hub', 'lb']),
-                    route_rules: {
-                      [n.route_rule([n.region, 'internet'])]: {
-                        description: 'Route to the Internet through Internet GW',
-                        destination: '0.0.0.0/0',
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_key: n.key('IGW', ['HUB']),
-                      },
-                    },
-                  },
-
-                  [n.key('RT', ['HUB', 'MGMT'])]: {
-                    display_name: n.display('rt', ['hub', 'mgmt']),
-                    route_rules: common._internet_route_via_natgw(n) + common._services_route_via_sgw(n),
-                  },
-                },
+                route_tables: hub_route_tables,
 
                 default_security_list: common._empty_default_security_list,
 

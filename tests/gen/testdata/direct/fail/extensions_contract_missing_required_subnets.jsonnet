@@ -1,12 +1,6 @@
 // extension contract rejects platform subnet overrides that omit required keys
 local extensions = import 'gen/extensions.libsonnet';
 local naming = import 'gen/naming.libsonnet';
-local cfg_lib = {
-  auto_subnets(vcn, subnet_specs): {
-    [spec.name]: '%s::%s' % [vcn, spec.size]
-    for spec in subnet_specs
-  },
-};
 local registry = {
   fake: {
     metadata(params):: {
@@ -22,7 +16,6 @@ local registry = {
   },
 };
 extensions.resolve({
-  cfg_lib: cfg_lib,
   extension_registry: registry,
   extension_entries: [{
     scope: {

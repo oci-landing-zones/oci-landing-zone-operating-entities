@@ -1,4 +1,6 @@
 // intentionally unordered environments prove semantic ordering during render
+// contains: prod-platform-oke
+// contains: ROUTE-TO-VCN-PROD-PLATFORM-OKE-KEY
 {
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {

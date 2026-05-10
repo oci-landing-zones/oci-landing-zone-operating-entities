@@ -1,0 +1,307 @@
+local collections = import '../../lib/collections.libsonnet';
+local labels = import '../../labels.libsonnet';
+
+{
+  platform_db_key(product, n, scope)::
+    n.key_global('CMP', [scope.scope_name, scope.platform_name, 'DB']),
+
+  platform_infra_key(product, n, scope)::
+    n.key_global('CMP', [scope.scope_name, scope.platform_name, 'INFRA']),
+
+  project_db_key(product, n, env_name, project_name)::
+    if product.code == 'exacs' then n.key_global('CMP', [env_name, project_name, 'EXACS', 'DB'])
+    else n.key_global('CMP', [env_name, project_name, 'DB']),
+
+  project_db_name(product, env_name, project_name)::
+    if product.code == 'exacs' then
+      'cmp-lz-%s-%s-exacs-db' % [std.asciiLower(env_name), std.asciiLower(project_name)]
+    else
+      'cmp-lz-%s-%s-db' % [std.asciiLower(env_name), std.asciiLower(project_name)],
+
+  platform_compartment_overlay(inputs)::
+    local product = inputs.product;
+    local n = inputs.naming;
+    local descriptions = inputs.descriptions;
+    local scope = inputs.scope;
+    local tag_key = inputs.tag_key;
+    local platform_key = scope.compartment_key;
+    local platform_name = scope.compartment_name;
+    local db_key = n.key_global('CMP', [scope.scope_name, scope.platform_name, 'DB']);
+    local infra_key = n.key_global('CMP', [scope.scope_name, scope.platform_name, 'INFRA']);
+    local platform_children = {
+      [db_key]: {
+        name: '%s-db' % platform_name,
+        description: descriptions.platform_child_compartment(scope, 'Database'),
+        defined_tags: { [tag_key]: product.tags.db },
+      },
+      [infra_key]: {
+        name: '%s-infra' % platform_name,
+        description: descriptions.platform_child_compartment(scope, 'Infrastructure'),
+        defined_tags: { [tag_key]: product.tags.infra },
+      },
+    };
+    if scope.scope_type == 'shared' then {
+      'CMP-LANDINGZONE-KEY'+: {
+        children+: {
+          [n.key_global('CMP', ['PLATFORM'])]+: {
+            children+: {
+              [platform_key]+: {
+                description: descriptions.platform_compartment(scope),
+                defined_tags+: { [tag_key]: product.tags.admin },
+                children+: platform_children,
+              },
+            },
+          },
+        },
+      },
+    } else {
+      'CMP-LANDINGZONE-KEY'+: {
+        children+: {
+          [n.key_global('CMP', [scope.scope_name])]+: {
+            children+: {
+              [n.key_global('CMP', [scope.scope_name, 'PLATFORM'])]+: {
+                children+: {
+                  [platform_key]+: {
+                    description: descriptions.platform_compartment(scope),
+                    defined_tags+: { [tag_key]: product.tags.admin },
+                    children+: platform_children,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+
+  project_compartment_overlay(inputs)::
+    local product = inputs.product;
+    local n = inputs.naming;
+    local descriptions = inputs.descriptions;
+    local model = inputs.model;
+    local tag_key = inputs.tag_key;
+    if std.length(model.specs) > 0 then {
+      'CMP-LANDINGZONE-KEY'+: {
+        children+: {
+          [n.key_global('CMP', [env_name])]+: {
+            children+: {
+              [n.key_global('CMP', [env_name, 'PROJECTS'])]+: {
+                children+: {
+                  [n.key_global('CMP', [env_name, project_name])]+: {
+                    children+: {
+                      [$.project_db_key(product, n, env_name, project_name)]: {
+                        name: $.project_db_name(product, env_name, project_name),
+                        description: descriptions.project_db_compartment(
+                          model.environment_scope(env_name),
+                          project_name
+                        ),
+                        defined_tags: { [tag_key]: product.tags.db },
+                      },
+                    },
+                  }
+                  for project_name in model.by_environment[env_name]
+                },
+              },
+            },
+          }
+          for env_name in std.objectFields(model.by_environment)
+        },
+      },
+    } else {},
+
+  flat_platform_compartments(inputs)::
+    local product = inputs.product;
+    local n = inputs.naming;
+    local descriptions = inputs.descriptions;
+    local entries = inputs.entries;
+    local tag_key = inputs.tag_key;
+    {
+      [entry.scope.compartment_key]: {
+        local scope = entry.scope,
+        name: scope.compartment_name,
+        description: descriptions.platform_compartment(scope),
+        parent_id: scope.parent_compartment_key,
+        defined_tags: { [tag_key]: product.tags.admin },
+        children: {
+          [$.platform_db_key(product, n, scope)]: {
+            name: '%s-db' % scope.compartment_name,
+            description: descriptions.platform_child_compartment(scope, 'Database'),
+            defined_tags: { [tag_key]: product.tags.db },
+          },
+          [$.platform_infra_key(product, n, scope)]: {
+            name: '%s-infra' % scope.compartment_name,
+            description: descriptions.platform_child_compartment(scope, 'Infrastructure'),
+            defined_tags: { [tag_key]: product.tags.infra },
+          },
+        },
+      }
+      for entry in entries
+    },
+
+  flat_project_compartments(inputs)::
+    local product = inputs.product;
+    local n = inputs.naming;
+    local descriptions = inputs.descriptions;
+    local entries = inputs.entries;
+    local tag_key = inputs.tag_key;
+    local topo = if std.objectHas(inputs, 'topology') then inputs.topology else null;
+    local entry_project_db_map(entry) =
+      local params = entry.platform_config.extension.params;
+      if std.objectHas(params, 'project_db_compartments')
+         && params.project_db_compartments != null then
+        if product.code == 'exacs' && entry.scope.scope_type == 'shared' then
+          params.project_db_compartments
+        else
+          { [entry.scope.scope_name]: params.project_db_compartments }
+      else {};
+    local merged_project_db_map = std.foldl(
+      function(acc, entry)
+        local entry_map = entry_project_db_map(entry);
+        acc + {
+          [env_name]:
+            (if std.objectHas(acc, env_name) then acc[env_name] else [])
+            + entry_map[env_name]
+          for env_name in std.objectFields(entry_map)
+        },
+      entries,
+      {}
+    );
+    local project_db_compartments = {
+      [env_name]: collections.unique(merged_project_db_map[env_name])
+      for env_name in std.objectFields(merged_project_db_map)
+    };
+    local scope_for(env_name) =
+      local env_entries = [
+        entry.scope
+        for entry in entries
+        if entry.scope.scope_type == 'environment' && entry.scope.scope_name == env_name
+      ];
+      if std.length(env_entries) > 0 then env_entries[0]
+      else topo.env_platform(env_name, product.code);
+    {
+      [$.project_db_key(product, n, env_name, project_name)]: {
+        name: $.project_db_name(product, env_name, project_name),
+        description: descriptions.project_db_compartment(scope_for(env_name), project_name),
+        parent_id: n.key_global('CMP', [env_name, project_name]),
+        defined_tags: { [tag_key]: product.tags.db },
+      }
+      for env_name in std.objectFields(project_db_compartments)
+      for project_name in project_db_compartments[env_name]
+    },
+
+  normalize(inputs)::
+    local product = inputs.product;
+    local scope = inputs.scope;
+    local scope_config =
+      if std.objectHas(inputs, 'scope_config') then inputs.scope_config
+      else {};
+    local cfg = inputs.cfg;
+    local has_project_db =
+      std.objectHas(cfg, 'project_db_compartments') && cfg.project_db_compartments != null;
+    local raw_project_db_compartments =
+      if !has_project_db then {}
+      else if product.code == 'exacc' then
+        assert scope.scope_type == 'environment' :
+          'exacc project_db_compartments can only be set on environment platforms';
+        assert std.type(cfg.project_db_compartments) == 'array' :
+          'exacc project_db_compartments must be an array';
+        { [scope.scope_name]: cfg.project_db_compartments }
+      else if product.code == 'exacs' then
+        if scope.scope_type == 'shared' then
+          assert std.type(cfg.project_db_compartments) == 'object' :
+            'exacs project_db_compartments must be an object when set on shared platforms';
+          cfg.project_db_compartments
+        else
+          assert std.type(cfg.project_db_compartments) == 'array' :
+            'exacs project_db_compartments must be an array when set on environment platforms';
+          { [scope.scope_name]: cfg.project_db_compartments }
+      else error 'Unsupported ExaDB product: %s' % product.code;
+
+    local exacs_non_array_project_envs = [
+      env_name
+      for env_name in std.objectFields(raw_project_db_compartments)
+      if product.code == 'exacs' && std.type(raw_project_db_compartments[env_name]) != 'array'
+    ];
+    assert std.length(exacs_non_array_project_envs) == 0 :
+      'exacs project_db_compartments.%s must be an array' % exacs_non_array_project_envs[0];
+    local exacs_invalid_project_value_envs = [
+      env_name
+      for env_name in std.objectFields(raw_project_db_compartments)
+      if product.code == 'exacs' && std.length([
+        project_name
+        for project_name in raw_project_db_compartments[env_name]
+        if std.type(project_name) != 'string' || project_name == ''
+      ]) > 0
+    ];
+    assert std.length(exacs_invalid_project_value_envs) == 0 :
+      'exacs project_db_compartments.%s values must be non-empty strings' %
+      exacs_invalid_project_value_envs[0];
+
+    local by_environment = {
+      [env_name]: collections.unique(raw_project_db_compartments[env_name])
+      for env_name in std.objectFields(raw_project_db_compartments)
+    };
+    local environment_projects =
+      if std.objectHas(scope_config, 'environment_projects') then scope_config.environment_projects
+      else if std.objectHas(scope_config, 'projects') && scope.scope_type == 'environment' then
+        { [scope.scope_name]: scope_config.projects }
+      else {};
+    local environment_labels =
+      if std.objectHas(scope_config, 'environment_labels') then scope_config.environment_labels
+      else {};
+
+    local exacs_unknown_envs = [
+      env_name
+      for env_name in std.objectFields(by_environment)
+      if product.code == 'exacs' && !std.objectHas(environment_projects, env_name)
+    ];
+    assert std.length(exacs_unknown_envs) == 0 :
+      'exacs project_db_compartments must reference defined environments: %s' %
+      std.join(', ', exacs_unknown_envs);
+
+    local unknown_projects = std.flattenArrays([
+      [
+        project_name
+        for project_name in by_environment[env_name]
+        if !std.member(environment_projects[env_name], project_name)
+      ]
+      for env_name in std.objectFields(by_environment)
+    ]);
+    assert std.length(unknown_projects) == 0 :
+      '%s project_db_compartments must reference projects defined in the same environment: %s' % [
+        product.code,
+        std.join(', ', unknown_projects),
+      ];
+    local environment_scope(env_name) =
+      local env_label =
+        if std.objectHas(environment_labels, env_name) then environment_labels[env_name]
+        else { scope_title: labels.title_case(env_name), scope_long_title: labels.title_case(env_name) };
+      if scope.scope_type == 'environment' && scope.scope_name == env_name then scope
+      else scope {
+        scope_type: 'environment',
+        scope_name: env_name,
+        scope_title: env_label.scope_title,
+        scope_long_title: env_label.scope_long_title,
+      };
+
+    {
+      by_environment: by_environment,
+      scope_project_names:
+        if std.objectHas(by_environment, scope.scope_name) then by_environment[scope.scope_name]
+        else [],
+
+      environment_scope(env_name):: environment_scope(env_name),
+
+      specs: std.flattenArrays([
+        [
+          {
+            env_name: env_name,
+            project_name: project_name,
+            scope: environment_scope(env_name),
+          }
+          for project_name in by_environment[env_name]
+        ]
+        for env_name in std.objectFields(by_environment)
+      ]),
+    },
+}

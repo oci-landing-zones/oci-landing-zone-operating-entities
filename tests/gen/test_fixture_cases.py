@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Callable
 import unittest
@@ -158,12 +159,31 @@ class FixtureCaseTests(unittest.TestCase):
                 self.assert_directives_allow_only(
                     case,
                     directives,
-                    allow_contains=False,
+                    allow_contains=True,
                     allow_error_contains=False,
                 )
                 outputs = render_config_outputs(case.relative_to(REPO_ROOT))
                 self.assertIn("network.json", outputs)
                 self.assertIn("iam.json", outputs)
+                self.assertTrue(
+                    directives.contains or case.with_suffix(".out").exists(),
+                    f"{case.name} must use contains directives or a .out summary",
+                )
+                if directives.contains:
+                    expected = case.with_suffix(".out")
+                    self.assertFalse(
+                        expected.exists(),
+                        f"{case.name} uses contains directives and must not have a .out file",
+                    )
+                    actual = json.dumps(outputs, indent=2)
+                    for substring in directives.contains:
+                        self.assertIn(
+                            substring,
+                            actual,
+                            f"{case.name} expected config output to contain {substring}",
+                        )
+                else:
+                    self.assert_text_fixture_pair(case, json.dumps(outputs, indent=2) + "\n")
 
 
 if __name__ == "__main__":

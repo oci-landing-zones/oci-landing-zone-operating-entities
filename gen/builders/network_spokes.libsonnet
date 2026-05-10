@@ -39,29 +39,13 @@ function(inputs)
       },
     };
 
-    local hub_tcp_ingress_rule(description, src_cidr, port) = {
-      description: description,
-      src: src_cidr,
-      src_type: 'CIDR_BLOCK',
-      dst_port_max: port,
-      dst_port_min: port,
-      protocol: 'TCP',
-      stateless: false,
-    };
+    local hub_tcp_ingress_rule(description, src_cidr, port) =
+      common._tcp_ingress_rule(description, src_cidr, port);
 
-    local nsg_tcp_ingress_rule(description, src_nsg_key, port) = {
-      description: description,
-      src: src_nsg_key,
-      src_type: 'NETWORK_SECURITY_GROUP',
-      dst_port_max: port,
-      dst_port_min: port,
-      protocol: 'TCP',
-      stateless: false,
-    };
+    local nsg_tcp_ingress_rule(description, src_nsg_key, port) =
+      common._tcp_ingress_rule(description, src_nsg_key, port, src_type='NETWORK_SECURITY_GROUP');
 
-    local project_names = if std.objectHas(env_config, 'projects')
-    then std.objectFields(env_config.projects)
-    else [];
+    local project_names = topo.project_names(env_name);
 
     local project_nsgs = std.foldl(
       function(acc, proj_name)

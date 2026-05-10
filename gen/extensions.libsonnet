@@ -2,6 +2,35 @@ local platforms = import 'platforms.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
 
 {
+  entries_by_type(extension_entries, extension_type, publication_label)::
+    local entries = [
+      entry
+      for entry in extension_entries
+      if entry.platform_config.extension.type == extension_type
+    ];
+    assert std.length(entries) > 0 :
+      '%s publication requires at least one %s platform' % [publication_label, extension_type];
+    entries,
+
+  resolve_by_type(inputs)::
+    local extension_type = inputs.extension_type;
+    local extension_definition =
+      if std.objectHas(inputs, 'extension_definition') then inputs.extension_definition
+      else inputs.extension_def;
+    local entries = self.entries_by_type(
+      inputs.extension_entries,
+      extension_type,
+      inputs.publication_label
+    );
+    local state = self.resolve(inputs {
+      extension_registry: { [extension_type]: extension_definition },
+      extension_entries: entries,
+    });
+    {
+      entries: entries,
+      state: state,
+    },
+
   resolve_entry(inputs)::
     local extension_registry = inputs.extension_registry;
     local pe = inputs.platform_entry;
@@ -29,32 +58,52 @@ local subnet_utils = import 'lib/subnets.libsonnet';
       naming: n,
       topology: pe.scope,
     });
-    local requires_network =
-      if std.objectHas(raw_ext_meta, 'requires_network') then raw_ext_meta.requires_network
-      else true;
-    assert std.type(requires_network) == 'boolean' :
+    local has_legacy_requires_network = std.objectHas(raw_ext_meta, 'requires_network');
+    assert !has_legacy_requires_network || std.type(raw_ext_meta.requires_network) == 'boolean' :
            'Extension "%s" metadata.requires_network must be a boolean' % ext_type;
-    assert !requires_network || (std.objectHas(pe.platform_config, 'network') && pe.platform_config.network != null) :
+    local has_platform_network =
+      std.objectHas(pe.platform_config, 'network') && pe.platform_config.network != null;
+    local declared_network_mode =
+      if std.objectHas(raw_ext_meta, 'network_mode') then raw_ext_meta.network_mode
+      else if has_legacy_requires_network then
+        if raw_ext_meta.requires_network then 'required' else 'forbidden'
+      else 'required';
+    assert std.member(['required', 'forbidden', 'optional'], declared_network_mode) :
+           'Extension "%s" metadata.network_mode must be one of: required, forbidden, optional' % ext_type;
+    assert declared_network_mode != 'required' || has_platform_network :
            'Extension "%s" for platform %s/%s requires network.vcn' % [
       ext_type,
       pe.scope.scope_name,
       pe.scope.platform_name,
     ];
-    assert requires_network || !(std.objectHas(pe.platform_config, 'network') && pe.platform_config.network != null) :
-           'Extension "%s" for platform %s/%s does not accept platform.network because metadata.requires_network is false' % [
-      ext_type,
-      pe.scope.scope_name,
-      pe.scope.platform_name,
-    ];
-    assert !requires_network || std.objectHas(raw_ext_meta, 'default_subnets') :
-           'Extension "%s" must define metadata.default_subnets when requires_network is true' % ext_type;
-    local ext_meta = raw_ext_meta { requires_network: requires_network };
+    assert declared_network_mode != 'forbidden' || !has_platform_network :
+           if has_legacy_requires_network && !raw_ext_meta.requires_network &&
+              !std.objectHas(raw_ext_meta, 'network_mode') then
+             'Extension "%s" for platform %s/%s does not accept platform.network because metadata.requires_network is false' % [
+               ext_type,
+               pe.scope.scope_name,
+               pe.scope.platform_name,
+             ]
+           else
+             'Extension "%s" for platform %s/%s does not accept platform.network because metadata.network_mode is forbidden' % [
+               ext_type,
+               pe.scope.scope_name,
+               pe.scope.platform_name,
+             ];
+    local resolves_network = has_platform_network;
+    assert !resolves_network || std.objectHas(raw_ext_meta, 'default_subnets') :
+           'Extension "%s" must define metadata.default_subnets when network is used' % ext_type;
+    local ext_meta = raw_ext_meta {
+      network_mode: declared_network_mode,
+      requires_network: declared_network_mode == 'required',
+      has_network: resolves_network,
+    };
     local subnet_names =
-      if requires_network then
+      if resolves_network then
         if std.objectHas(ext_meta, 'subnet_order') then ext_meta.subnet_order
         else std.objectFields(ext_meta.default_subnets)
       else [];
-    assert !requires_network || std.all([
+    assert !resolves_network || std.all([
       std.objectHas(ext_meta.default_subnets, sn)
       for sn in subnet_names
     ]) : 'Extension "%s" subnet_order contains names not in default_subnets: %s' % [
@@ -64,7 +113,7 @@ local subnet_utils = import 'lib/subnets.libsonnet';
     local subnet_label =
       'Platform %s.network.subnets for extension %s' % [pe.scope.platform_name, ext_type];
     local resolved_subnets =
-      if requires_network then
+      if resolves_network then
         if pe.platform_config.network.subnets != null then
           subnet_utils.validate_subnet_map(
             pe.platform_config.network.subnets,
@@ -81,7 +130,7 @@ local subnet_utils = import 'lib/subnets.libsonnet';
         )
       else null;
     local routing =
-      if requires_network then
+      if resolves_network then
         platforms.build_extension_route_targets({
           platform_entry: pe,
           routed_vcn_entries: routed_vcn_entries,
@@ -93,13 +142,13 @@ local subnet_utils = import 'lib/subnets.libsonnet';
     {
       type: ext_type,
       definition: ext_def,
-      metadata: ext_meta,
+      metadata: ext_meta { resolved_subnets: resolved_subnets },
       resolved_subnets: resolved_subnets,
       routing: routing,
       render_params: {
         config_params: pe.platform_config.extension.params,
         network:
-          if requires_network then
+          if resolves_network then
             { vcn: pe.platform_config.network.vcn, subnets: resolved_subnets }
           else null,
         naming: n,
@@ -119,7 +168,7 @@ local subnet_utils = import 'lib/subnets.libsonnet';
         [
           local resolved = self.resolve_entry(inputs { platform_entry: extension_entries[i] });
           local ext_contributions = resolved.definition.render(resolved.render_params);
-          assert !resolved.metadata.requires_network || std.objectHas(ext_contributions, 'network_pre') :
+          assert !resolved.metadata.has_network || std.objectHas(ext_contributions, 'network_pre') :
                  'Extension "%s" is missing required contribution "network_pre"' % resolved.type;
           {
             type: resolved.type,

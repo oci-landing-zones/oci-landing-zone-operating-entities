@@ -26,6 +26,40 @@ function(hub_ctx)
 
   // Placeholder OCID string for post-deployment routes
   local nfw_ocid = 'OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs...';
+  local hub_route_tables = common._route_tables_from_descriptors(n, [
+    {
+      key_segments: ['HUB', 'FW'],
+      display_segments: ['hub', 'fw'],
+      route_rules: common._internet_route_via_natgw(n),
+    },
+    {
+      key_segments: ['HUB', 'INGRESS'],
+      display_segments: ['hub', 'ingress'],
+      route_rules: {},
+    },
+    {
+      key_segments: ['HUB', 'LB'],
+      display_segments: ['hub', 'lb'],
+      route_rules: {
+        [n.route_rule([n.region, 'internet'])]:
+          common._route_via_key(
+            'Route to the Internet through Internet GW',
+            '0.0.0.0/0',
+            n.key('IGW', ['HUB'])
+          ),
+      },
+    },
+    {
+      key_segments: ['HUB', 'MGMT'],
+      display_segments: ['hub', 'mgmt'],
+      route_rules: common._services_route_via_sgw(n),
+    },
+    {
+      key_segments: ['HUB', 'NATGW'],
+      display_segments: ['hub', 'natgw'],
+      route_rules: {},
+    },
+  ]);
 
   {
     pre: {
@@ -51,39 +85,7 @@ function(hub_ctx)
                 },
               }) + {
 
-                route_tables: {
-                  [n.key('RT', ['HUB', 'FW'])]: {
-                    display_name: n.display('rt', ['hub', 'fw']),
-                    route_rules: common._internet_route_via_natgw(n),
-                  },
-
-                  [n.key('RT', ['HUB', 'INGRESS'])]: {
-                    display_name: n.display('rt', ['hub', 'ingress']),
-                    route_rules: {},
-                  },
-
-                  [n.key('RT', ['HUB', 'LB'])]: {
-                    display_name: n.display('rt', ['hub', 'lb']),
-                    route_rules: {
-                      [n.route_rule([n.region, 'internet'])]: {
-                        description: 'Route to the Internet through Internet GW',
-                        destination: '0.0.0.0/0',
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_key: n.key('IGW', ['HUB']),
-                      },
-                    },
-                  },
-
-                  [n.key('RT', ['HUB', 'MGMT'])]: {
-                    display_name: n.display('rt', ['hub', 'mgmt']),
-                    route_rules: common._services_route_via_sgw(n),
-                  },
-
-                  [n.key('RT', ['HUB', 'NATGW'])]: {
-                    display_name: n.display('rt', ['hub', 'natgw']),
-                    route_rules: {},
-                  },
-                },
+                route_tables: hub_route_tables,
 
                 default_security_list: common._empty_default_security_list,
 

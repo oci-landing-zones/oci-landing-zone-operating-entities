@@ -2,87 +2,42 @@ local extensions = import '../../../extensions.libsonnet';
 local render_context = import '../../../render_context.libsonnet';
 local exacc = import '../exacc.libsonnet';
 local descriptions = import '../descriptions.libsonnet';
+local exadb_project_db = import '../../exadb/project_db.libsonnet';
+local products = import '../../exadb/products.libsonnet';
 
 {
   render(config)::
     local ctx = render_context.from_raw_config(config);
     local n = ctx.n;
-    local exacc_entries = [
-      entry
-      for entry in ctx.extension_entries
-      if entry.platform_config.extension.type == 'exacc'
-    ];
-    assert std.length(exacc_entries) > 0 :
-      'ExaCC multi-stack publication requires at least one exacc platform';
-    local extension_state = extensions.resolve({
-      extension_registry: { exacc: exacc },
-      extension_entries: exacc_entries,
-      naming: n,
-      hub_vcn_cidr: ctx.config.hub.network.vcn,
-      routed_vcn_entries: ctx.all_vcn_entries,
-      hub_has_spoke_natgw: true,
-    });
+    local resolved = extensions.resolve_by_type(
+      {
+        extension_entries: ctx.extension_entries,
+        extension_type: 'exacc',
+        extension_definition: exacc,
+        publication_label: 'ExaCC multi-stack',
+      } + ctx.extension_routing_context()
+    );
+    local exacc_entries = resolved.entries;
+    local extension_state = resolved.state;
 
     local tag_key = 'tagns-lz-role.tag-lz-role';
-    local tag_exacc = 'lz-exacc-admin';
-    local tag_exacc_db = 'lz-exacc-db-admin';
-    local tag_exacc_infra = 'lz-exacc-infra-admin';
-
+    local product = products.exacc;
     local platform_db_key(scope) =
-      n.key_global('CMP', [scope.scope_name, scope.platform_name, 'DB']);
-    local platform_infra_key(scope) =
-      n.key_global('CMP', [scope.scope_name, scope.platform_name, 'INFRA']);
-    local platform_compartments = std.foldl(
-      function(acc, entry)
-        local scope = entry.scope;
-        acc + {
-          [scope.compartment_key]: {
-            name: scope.compartment_name,
-            description: descriptions.platform_compartment(scope),
-            parent_id: scope.parent_compartment_key,
-            defined_tags: { [tag_key]: tag_exacc },
-            children: {
-              [platform_db_key(scope)]: {
-                name: '%s-db' % scope.compartment_name,
-                description: descriptions.platform_child_compartment(scope, 'Database'),
-                defined_tags: { [tag_key]: tag_exacc_db },
-              },
-              [platform_infra_key(scope)]: {
-                name: '%s-infra' % scope.compartment_name,
-                description: descriptions.platform_child_compartment(scope, 'Infrastructure'),
-                defined_tags: { [tag_key]: tag_exacc_infra },
-              },
-            },
-          },
-        },
-      exacc_entries,
-      {}
-    );
-
-    local env_project_names(entry) =
-      if std.objectHas(entry.platform_config.extension.params, 'project_db_compartments')
-         && entry.platform_config.extension.params.project_db_compartments != null then
-        entry.platform_config.extension.params.project_db_compartments
-      else [];
-    local project_db_compartments = std.foldl(
-      function(acc, entry)
-        local scope = entry.scope;
-        if scope.scope_type != 'environment' then acc
-        else acc + {
-          [n.key_global('CMP', [scope.scope_name, project_name, 'DB'])]: {
-            name: 'cmp-lz-%s-%s-db' % [
-              std.asciiLower(scope.scope_name),
-              std.asciiLower(project_name),
-            ],
-            description: descriptions.project_db_compartment(scope, project_name),
-            parent_id: n.key_global('CMP', [scope.scope_name, project_name]),
-            defined_tags: { [tag_key]: tag_exacc_db },
-          }
-          for project_name in env_project_names(entry)
-        },
-      exacc_entries,
-      {}
-    );
+      exadb_project_db.platform_db_key(product, n, scope);
+    local platform_compartments = exadb_project_db.flat_platform_compartments({
+      product: product,
+      naming: n,
+      descriptions: descriptions,
+      entries: exacc_entries,
+      tag_key: tag_key,
+    });
+    local project_db_compartments = exadb_project_db.flat_project_compartments({
+      product: product,
+      naming: n,
+      descriptions: descriptions,
+      entries: exacc_entries,
+      tag_key: tag_key,
+    });
 
     local shared_entries = [entry for entry in exacc_entries if entry.scope.scope_type == 'shared'];
     local default_alarm_compartment =

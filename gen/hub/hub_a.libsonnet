@@ -28,6 +28,43 @@ function(hub_ctx)
   // Placeholder OCID strings for post-deployment routes
   local nfw_dmz_ocid = 'DMZ OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.vrdnynvr...';
   local nfw_int_ocid = 'Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs...';
+  local hub_route_tables = common._route_tables_from_descriptors(n, [
+    {
+      key_segments: ['HUB', 'FW', 'DMZ'],
+      display_segments: ['hub', 'fw', 'dmz'],
+      route_rules: common._internet_route_via_igw(n),
+    },
+    {
+      key_segments: ['HUB', 'FW', 'INT'],
+      display_segments: ['hub', 'fw', 'int'],
+      route_rules: common._internet_route_via_natgw(n),
+    },
+    {
+      key_segments: ['HUB', 'IGW'],
+      display_segments: ['hub', 'igw'],
+      route_rules: {},
+    },
+    {
+      key_segments: ['HUB', 'INGRESS'],
+      display_segments: ['hub', 'ingress'],
+      route_rules: {},
+    },
+    {
+      key_segments: ['HUB', 'LB'],
+      display_segments: ['hub', 'lb'],
+      route_rules: {},
+    },
+    {
+      key_segments: ['HUB', 'MGMT'],
+      display_segments: ['hub', 'mgmt'],
+      route_rules: common._services_route_via_sgw(n),
+    },
+    {
+      key_segments: ['HUB', 'NATGW'],
+      display_segments: ['hub', 'natgw'],
+      route_rules: {},
+    },
+  ]);
 
   {
     pre: {
@@ -64,42 +101,7 @@ function(hub_ctx)
                 },
               }) + {
 
-                route_tables: {
-                  [n.key('RT', ['HUB', 'FW', 'DMZ'])]: {
-                    display_name: n.display('rt', ['hub', 'fw', 'dmz']),
-                    route_rules: common._internet_route_via_igw(n),
-                  },
-
-                  [n.key('RT', ['HUB', 'FW', 'INT'])]: {
-                    display_name: n.display('rt', ['hub', 'fw', 'int']),
-                    route_rules: common._internet_route_via_natgw(n),
-                  },
-
-                  [n.key('RT', ['HUB', 'IGW'])]: {
-                    display_name: n.display('rt', ['hub', 'igw']),
-                    route_rules: {},
-                  },
-
-                  [n.key('RT', ['HUB', 'INGRESS'])]: {
-                    display_name: n.display('rt', ['hub', 'ingress']),
-                    route_rules: {},
-                  },
-
-                  [n.key('RT', ['HUB', 'LB'])]: {
-                    display_name: n.display('rt', ['hub', 'lb']),
-                    route_rules: {},
-                  },
-
-                  [n.key('RT', ['HUB', 'MGMT'])]: {
-                    display_name: n.display('rt', ['hub', 'mgmt']),
-                    route_rules: common._services_route_via_sgw(n),
-                  },
-
-                  [n.key('RT', ['HUB', 'NATGW'])]: {
-                    display_name: n.display('rt', ['hub', 'natgw']),
-                    route_rules: {},
-                  },
-                },
+                route_tables: hub_route_tables,
 
                 default_security_list: common._empty_default_security_list,
 

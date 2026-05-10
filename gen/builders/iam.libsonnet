@@ -100,9 +100,7 @@ function(config, n, realm_constants, topo)
     local elo = std.asciiLower(env_name);
 
     // Per-project compartments inside PROJECTS
-    local project_names = if std.objectHas(env, 'projects')
-      then std.objectFields(env.projects)
-      else [];
+    local project_names = topo.project_names(env_name);
 
     local proj_children = {
       [n.key_global('CMP', [env_name, proj_name])]: {
@@ -200,10 +198,7 @@ function(config, n, realm_constants, topo)
   // Per-environment per-project admin groups
   local env_project_groups = std.foldl(
     function(acc, env_name)
-      local env = config.environments[env_name];
-      local project_names = if std.objectHas(env, 'projects')
-        then std.objectFields(env.projects)
-        else [];
+      local project_names = topo.project_names(env_name);
       acc + std.foldl(
         function(gacc, proj_name)
           gacc + {
@@ -364,10 +359,7 @@ function(config, n, realm_constants, topo)
   // Collect all per-env per-project policies
   local env_project_policies = std.foldl(
     function(acc, env_name)
-      local env = config.environments[env_name];
-      local project_names = if std.objectHas(env, 'projects')
-        then std.objectFields(env.projects)
-        else [];
+      local project_names = topo.project_names(env_name);
       acc + std.foldl(
         function(pacc, proj_name) pacc + proj_policies(env_name, proj_name),
         project_names,

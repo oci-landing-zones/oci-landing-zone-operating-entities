@@ -183,7 +183,13 @@ Read `landing_zone.libsonnet` as the merge owner.
 
 Standard result fields have fixed names such as `network`, `network_pre`, `iam`, `security_cis1`, `security_cis2`, `observability_cis1`, `observability_cis2`, and `governance`.
 
-Extensions can contribute standard fragments into those same domains. Networked extensions contribute `network_pre`; networkless extensions declare `metadata.requires_network: false` and skip network routing/subnet inputs while still contributing domains such as IAM or observability.
+Extensions can contribute standard fragments into those same domains. Extensions declare network behavior with `metadata.network_mode`:
+
+- `required`: `platform.network` must exist; the resolver validates or auto-allocates extension subnets and requires a `network_pre` contribution.
+- `forbidden`: `platform.network` must be omitted; the extension skips network routing/subnet inputs while still contributing domains such as IAM or observability.
+- `optional`: `platform.network` may exist or be omitted; when present it behaves like `required`, and when absent it behaves like `forbidden`.
+
+Legacy `metadata.requires_network: true|false` remains supported and maps to `required` or `forbidden`.
 
 Generic extension outputs that belong in config mode stay under `result.extra`, then `landing_zone_multi.jsonnet` turns them into files dynamically:
 

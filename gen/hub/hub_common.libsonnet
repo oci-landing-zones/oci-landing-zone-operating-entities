@@ -92,6 +92,16 @@
     },
   },
 
+  _tcp_ingress_rule(description, src, port=null, src_type='CIDR_BLOCK', stateless=false):: {
+    description: description,
+    src: src,
+    src_type: src_type,
+    [if port != null then 'dst_port_max']: port,
+    [if port != null then 'dst_port_min']: port,
+    protocol: 'TCP',
+    stateless: stateless,
+  },
+
   // --- Security lists ---
 
   _mgmt_security_list(n, hub_vcn_cidr, bastion_ip):: {
@@ -233,6 +243,33 @@
       network_entity_key: n.key('IGW', ['HUB']),
     },
   },
+
+  _route_via_key(description, destination, network_entity_key, destination_type='CIDR_BLOCK'):: {
+    description: description,
+    destination: destination,
+    destination_type: destination_type,
+    network_entity_key: network_entity_key,
+  },
+
+  _route_via_id(description, destination, network_entity_id, destination_type='CIDR_BLOCK'):: {
+    description: description,
+    destination: destination,
+    destination_type: destination_type,
+    network_entity_id: network_entity_id,
+  },
+
+  _route_table_from_descriptor(n, d):: {
+    [n.key('RT', d.key_segments)]: {
+      display_name: n.display('rt', d.display_segments),
+      route_rules: d.route_rules,
+    },
+  },
+
+  _route_tables_from_descriptors(n, descriptors):: std.foldl(
+    function(acc, d) acc + $._route_table_from_descriptor(n, d),
+    descriptors,
+    {}
+  ),
 
   // --- DRG ---
 

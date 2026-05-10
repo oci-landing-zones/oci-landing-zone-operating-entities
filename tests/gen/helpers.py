@@ -131,13 +131,6 @@ def render_text_for_contains(jsonnet_file: Path) -> str:
     return json.dumps(rendered, indent=2) + "\n"
 
 
-def render_formatted_json(jsonnet_file: Path) -> str:
-    jsonnet_path = (REPO_ROOT / jsonnet_file).resolve()
-    rendered = run_cmd(["jsonnet", "-J", str(REPO_ROOT), str(jsonnet_path)])
-    formatted = run_cmd(["python3", "gen/format_json.py"], input_text=rendered.stdout)
-    return formatted.stdout
-
-
 @dataclass
 class FixtureDirectives:
     contains: list[str] = field(default_factory=list)

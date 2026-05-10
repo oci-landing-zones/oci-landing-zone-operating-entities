@@ -5,6 +5,17 @@ local common = import 'hub/hub_common.libsonnet';
 
   collect_entries(config, topo)::
     local ordered_env_names = topo.ordered_env_names();
+    local environment_projects = {
+      [env_name]: topo.project_names(env_name)
+      for env_name in ordered_env_names
+    };
+    local environment_labels = {
+      [env_name]: {
+        scope_title: topo.env_display(env_name),
+        scope_long_title: topo.env_display_long(env_name),
+      }
+      for env_name in ordered_env_names
+    };
     local env_platform_entries = std.flatMap(
       function(env_name)
         local env = config.environments[env_name];
@@ -13,9 +24,9 @@ local common = import 'hub/hub_common.libsonnet';
             {
               scope: topo.env_platform(env_name, p_name),
               scope_config: {
-                projects:
-                  if std.objectHas(env, 'projects') then std.objectFields(env.projects)
-                  else [],
+                projects: environment_projects[env_name],
+                environment_projects: environment_projects,
+                environment_labels: environment_labels,
               },
               platform_config: env.platforms[p_name],
             }
@@ -29,7 +40,11 @@ local common = import 'hub/hub_common.libsonnet';
         [
           {
             scope: topo.shared_platform(p_name),
-            scope_config: { projects: [] },
+            scope_config: {
+              projects: [],
+              environment_projects: environment_projects,
+              environment_labels: environment_labels,
+            },
             platform_config: config.shared_platforms[p_name],
           }
           for p_name in std.objectFields(config.shared_platforms)
@@ -54,6 +69,42 @@ local common = import 'hub/hub_common.libsonnet';
     raw_name: '%s-platform-%s' % [pe.scope.scope_name, pe.scope.platform_name],
     display: '%s %s' % [pe.scope.scope_title, std.asciiUpper(pe.scope.platform_name)],
   },
+
+  publication_category_key(scope):: '%s-platform-%s' % [
+    std.asciiLower(scope.scope_name),
+    std.asciiLower(scope.platform_name),
+  ],
+
+  strip_publication_local_routes(vcn, n, route_keys_to_drop=[])::
+    local route_drop_keys = [n.route_rule([n.region, 'default'])] + route_keys_to_drop;
+    vcn {
+      route_tables: {
+        [rt_key]: vcn.route_tables[rt_key] {
+          route_rules: {
+            [route_key]: vcn.route_tables[rt_key].route_rules[route_key]
+            for route_key in std.objectFields(vcn.route_tables[rt_key].route_rules)
+            if !std.member(route_drop_keys, route_key)
+          },
+        }
+        for rt_key in std.objectFields(vcn.route_tables)
+      },
+      vcn_specific_gateways:
+        if std.objectHas(vcn.vcn_specific_gateways, 'nat_gateways') then
+          {
+            [gateway_type]: vcn.vcn_specific_gateways[gateway_type]
+            for gateway_type in std.objectFields(vcn.vcn_specific_gateways)
+            if gateway_type != 'nat_gateways'
+          }
+        else vcn.vcn_specific_gateways,
+    },
+
+  publication_network_category(category, n, route_keys_to_drop=[])::
+    category {
+      vcns: {
+        [key]: $.strip_publication_local_routes(category.vcns[key], n, route_keys_to_drop)
+        for key in std.objectFields(category.vcns)
+      },
+    },
 
   build_routed_vcn_entries(config, all_platform_entries, topo, n)::
     local spoke_env_names = topo.ordered_spoke_env_names();

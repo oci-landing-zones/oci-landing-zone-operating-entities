@@ -12,6 +12,7 @@
 function(config, n, realm_constants, topo)
   local env_names = topo.ordered_env_names();
   local networked_env_names = topo.networked_env_names();
+  local security_cmp_key = n.key_global('CMP', ['SECURITY']);
 
   // --- Event type constants ---
   local network_events = [
@@ -103,6 +104,12 @@ function(config, n, realm_constants, topo)
   ];
 
   local placeholder_email = 'email.address@example.com';
+  local notification_topic(name_segments, description) = {
+    name: n.display_global('nott', name_segments),
+    description: description,
+    compartment_id: security_cmp_key,
+    subscriptions: [{ protocol: 'EMAIL', values: [placeholder_email] }],
+  };
 
   // --- Per-env event rules ---
   // Each env gets a security notify rule. Only envs with shared_project_network
@@ -194,36 +201,13 @@ function(config, n, realm_constants, topo)
     },
 
     notifications_configuration: {
-      default_compartment_id: n.key_global('CMP', ['SECURITY']),
+      default_compartment_id: security_cmp_key,
 
       topics: {
-        [n.key_global('NOTT', ['CLOUDGUARD'])]: {
-          name: n.display_global('nott', ['cloudguard']),
-          description: 'Topic for Cloud Guard related notifications.',
-          compartment_id: n.key_global('CMP', ['SECURITY']),
-          subscriptions: [{ protocol: 'EMAIL', values: [placeholder_email] }],
-        },
-
-        [n.key_global('NOTT', ['IAM'])]: {
-          name: n.display_global('nott', ['iam']),
-          description: 'Topic for IAM related notifications.',
-          compartment_id: n.key_global('CMP', ['SECURITY']),
-          subscriptions: [{ protocol: 'EMAIL', values: [placeholder_email] }],
-        },
-
-        [n.key_global('NOTT', ['NETWORK'])]: {
-          name: n.display_global('nott', ['network']),
-          description: 'Topic for network related notifications.',
-          compartment_id: n.key_global('CMP', ['SECURITY']),
-          subscriptions: [{ protocol: 'EMAIL', values: [placeholder_email] }],
-        },
-
-        [n.key_global('NOTT', ['SECURITY'])]: {
-          name: n.display_global('nott', ['security']),
-          description: 'Topic for notifications.',
-          compartment_id: n.key_global('CMP', ['SECURITY']),
-          subscriptions: [{ protocol: 'EMAIL', values: [placeholder_email] }],
-        },
+        [n.key_global('NOTT', ['CLOUDGUARD'])]: notification_topic(['cloudguard'], 'Topic for Cloud Guard related notifications.'),
+        [n.key_global('NOTT', ['IAM'])]: notification_topic(['iam'], 'Topic for IAM related notifications.'),
+        [n.key_global('NOTT', ['NETWORK'])]: notification_topic(['network'], 'Topic for network related notifications.'),
+        [n.key_global('NOTT', ['SECURITY'])]: notification_topic(['security'], 'Topic for notifications.'),
       },
     },
 

@@ -189,7 +189,7 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 
 Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`). `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Missing subnets are still auto-calculated from VCN CIDRs using `auto_subnets()`.
 
-Plain platforms still require `platform.network`. Extension-backed platforms may omit `platform.network` only when the registered extension metadata declares `requires_network: false`.
+Plain platforms still require `platform.network`. Extension-backed platforms follow the registered extension's `metadata.network_mode`: `required` means `platform.network` must exist, `forbidden` means it must be omitted, and `optional` means the same extension can emit network when `platform.network` exists or non-network domains when it is absent. Legacy `metadata.requires_network: true|false` remains supported and maps to `required` or `forbidden`.
 
 When debugging how generated JSON is applied at deploy time, inspect the downstream deployer contract in `terraform-oci-modules-orchestrator` in addition to this repo. `gen/` defines what this repository emits; the orchestrator defines how those generated configs are consumed. For published OKE investigations, use the exact orchestrator tag referenced by the published OKE docs rather than `HEAD`.
 
@@ -258,12 +258,13 @@ Extensions live in `workload-extensions/` and are registered in `landing_zone.li
 ```
 {
   metadata(params):: {
-    requires_network: true|false, // optional, defaults to true
-    default_subnets,              // required when requires_network is true
-    subnet_order,                 // optional when requires_network is true
+    network_mode: 'required'|'forbidden'|'optional', // optional, defaults to legacy requires_network or required
+    requires_network: true|false, // legacy optional alias for required/forbidden
+    default_subnets,              // required when network is used
+    subnet_order,                 // optional when network is used
   }
   render(params):: {
-    network_pre,        // required when requires_network is true
+    network_pre,        // required when network is used
     iam,                // optional standard contribution
     security_cis1,      // optional standard contribution
     security_cis2,      // optional standard contribution
@@ -274,16 +275,20 @@ Extensions live in `workload-extensions/` and are registered in `landing_zone.li
 }
 
 params.config_params  -- extension-specific parameters (e.g. kubernetes_version)
-params.network        -- { vcn: 'cidr', subnets: { name: cidr } }, or null for networkless extensions
+params.network        -- { vcn: 'cidr', subnets: { name: cidr } }, or null when network is not used
 params.naming         -- naming object
 params.topology       -- shared scope semantics from `topology.libsonnet`
 params.scope_config   -- scope-local context, such as projects in the same environment
 params.routing        -- routing context for extension route rules:
-                        -- { hub: object|null, peers: object }, or null for networkless extensions
+                        -- { hub: object|null, peers: object }, or null when network is not used
 ```
 
 Contract phases:
-- `metadata(params)`: returns extension requirements. Networked extensions return `{ default_subnets: { name: '/prefix' }, subnet_order: [...] }` for auto-subnet calculation when subnets are not specified in config. Networkless extensions return `{ requires_network: false }`.
+- `metadata(params)`: returns extension requirements. Extensions should prefer `network_mode`:
+  - `required`: platform must include `network`; the resolver validates or auto-allocates extension subnets and requires a `network_pre` contribution.
+  - `forbidden`: platform must omit `network`; the extension contributes non-network domains only.
+  - `optional`: platform may include or omit `network`; when included, the resolver validates or auto-allocates subnets and requires `network_pre`; when omitted, the extension can still emit IAM, observability, or other non-network contributions.
+  Legacy `requires_network: true|false` remains supported and maps to `required` or `forbidden`.
 - `render(params)`: returns contributions keyed by domain:
   - `network_pre`: merged into `network_configuration_categories` for networked extensions
   - `iam`: merged into IAM output
@@ -313,12 +318,14 @@ Current OKE ownership:
 
 1. Create `workload-extensions/<name>/<name>.libsonnet` following the extension contract above.
 2. Register in `landing_zone.libsonnet`'s `extension_registry`.
-3. Define `metadata.default_subnets` for auto-subnet calculation, or set `metadata.requires_network: false` if the extension does not create a platform VCN.
+3. Set `metadata.network_mode` to `required`, `forbidden`, or `optional`. Define `metadata.default_subnets` for auto-subnet calculation when the extension can create a platform VCN.
 4. Return `contributions` with the relevant domain keys.
 5. Create entry-point `.jsonnet` files if needed for multi-stack mode.
 6. Run `generate.sh` and diff output.
 
 Keep `gen/defaults.libsonnet` limited to generic reusable hub defaults. If an extension needs published committed snapshots, keep those canonical published configs in local `profiles.libsonnet` files owned by the published family.
+
+EXACS uses `network_mode: 'optional'` because UC1 has one shared networked EXACS platform and environment EXACS platforms that only add project DB compartments, IAM, and observability. This avoids fake VCNs and keeps one extension type for the product family.
 
 ## 9. Generation Modes
 

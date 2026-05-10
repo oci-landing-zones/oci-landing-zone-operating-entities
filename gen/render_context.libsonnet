@@ -14,12 +14,19 @@
 //     topo,
 //     realm_constants,
 //     spoke_envs,
+//     all_platform_entries,
 //     extension_entries,
 //     network_only_platforms,
 //     all_vcn_entries,
 //     lb_backends,
 //     lb_env_name,
 //     shared_only_config,
+//     extension_entries_by_type(type),
+//     require_extension_entries(type, label),
+//     env_platform_entry(env_name, platform_name),
+//     extension_routing_context(hub_has_spoke_natgw=true),
+//     extension_resolve_inputs(registry, entries, hub_has_spoke_natgw=true),
+//     extension_resolve_entry_inputs(registry, entry, hub_has_spoke_natgw=true),
 //   }
 //
 // Key semantics:
@@ -67,6 +74,7 @@ local common = import 'hub/hub_common.libsonnet';
       topo: topo,
       realm_constants: constants[config.realm],
       spoke_envs: spoke_envs,
+      all_platform_entries: all_platform_entries,
       extension_entries: platform_state.extension_entries,
       network_only_platforms: platform_state.network_only_platforms,
       all_vcn_entries: all_vcn_entries,
@@ -85,5 +93,53 @@ local common = import 'hub/hub_common.libsonnet';
           backend2_ip: '0.0.0.0',
         },
       shared_only_config: config { environments: {} },
+
+      extension_entries_by_type(ext_type)::
+        [
+          entry
+          for entry in self.extension_entries
+          if entry.platform_config.extension.type == ext_type
+        ],
+
+      require_extension_entries(ext_type, label)::
+        local entries = self.extension_entries_by_type(ext_type);
+        assert std.length(entries) > 0 :
+          '%s publication requires at least one %s platform' % [label, ext_type];
+        entries,
+
+      env_platform_entry(env_name, platform_name)::
+        local matches = [
+          entry
+          for entry in self.all_platform_entries
+          if entry.scope.scope_type == 'environment' &&
+             entry.scope.scope_name == env_name &&
+             entry.scope.platform_name == platform_name
+        ];
+        assert std.length(matches) == 1 :
+          'Expected exactly one platform %s/%s, found %d' % [
+            env_name,
+            platform_name,
+            std.length(matches),
+          ];
+        matches[0],
+
+      extension_routing_context(hub_has_spoke_natgw=true):: {
+        naming: n,
+        hub_vcn_cidr: config.hub.network.vcn,
+        routed_vcn_entries: all_vcn_entries,
+        hub_has_spoke_natgw: hub_has_spoke_natgw,
+      },
+
+      extension_resolve_inputs(extension_registry, extension_entries, hub_has_spoke_natgw=true)::
+        {
+          extension_registry: extension_registry,
+          extension_entries: extension_entries,
+        } + self.extension_routing_context(hub_has_spoke_natgw),
+
+      extension_resolve_entry_inputs(extension_registry, platform_entry, hub_has_spoke_natgw=true)::
+        {
+          extension_registry: extension_registry,
+          platform_entry: platform_entry,
+        } + self.extension_routing_context(hub_has_spoke_natgw),
     },
 }

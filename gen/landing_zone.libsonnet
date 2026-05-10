@@ -14,7 +14,6 @@ local iam_builder = import 'builders/iam.libsonnet';
 local network_spokes_builder = import 'builders/network_spokes.libsonnet';
 local observability_builder = import 'builders/observability.libsonnet';
 local security_builder = import 'builders/security.libsonnet';
-local cfg_lib = import 'config.libsonnet';
 local extensions = import 'extensions.libsonnet';
 local platforms = import 'platforms.libsonnet';
 local render_context = import 'render_context.libsonnet';
@@ -29,6 +28,7 @@ local hub_builders = {
 local extension_registry = {
   oke_simple: import 'workload-extensions/oke/simple/oke_simple.libsonnet',
   exacc: import 'workload-extensions/exacc/exacc.libsonnet',
+  exacs: import 'workload-extensions/exacs/exacs.libsonnet',
 };
 
 function(raw_config)
@@ -98,7 +98,6 @@ function(raw_config)
   } else {};
 
   local extension_state = extensions.resolve({
-    cfg_lib: cfg_lib,
     extension_registry: extension_registry,
     extension_entries: extension_entries,
     naming: n,
@@ -152,10 +151,11 @@ function(raw_config)
     security_cis2_pre: security.cis2_pre,
     security_cis2: security.cis2 + extension_security_cis2,
 
-    // Observability outputs: 4 CIS variants
-    observability_cis1_pre: observability.cis1_pre,
+    // Observability outputs: 4 CIS variants. Extension observability is
+    // non-logging by contract, so it belongs in pre and final variants.
+    observability_cis1_pre: observability.cis1_pre + extension_observability_cis1,
     observability_cis1: observability.cis1 + extension_observability_cis1,
-    observability_cis2_pre: observability.cis2_pre,
+    observability_cis2_pre: observability.cis2_pre + extension_observability_cis2,
     observability_cis2: observability.cis2 + extension_observability_cis2,
 
     // Extra outputs from extensions (e.g. oke_clusters, oke_workers)
