@@ -11,6 +11,15 @@ Most customers want one of two things:
 
 Default to the standard published path for ordinary customer deployments. The most common case is `blueprints/one-oe/runtime/one-stack/`.
 
+## Local Instruction Ownership
+
+Use this file as the canonical policy source for request classification, the customer warning, discovery order, unsupported requirements, artifact placement, deployment defaults, and repository source-of-truth rules. Nested `AGENTS.md` files and repo-local skills should add local workflow or contract detail, not replace these rules.
+
+- `.agents/skills/landing-zone-customer-guidance/SKILL.md`: customer conversation workflow and short activation reminders.
+- `.agents/skills/landing-zone-config/SKILL.md`: config-mode authoring and verification workflow.
+- `gen/AGENTS.md`: generator architecture, publication boundaries, schema behavior, extension contracts, and code style.
+- `gen/workload-extensions/*/AGENTS.md`: extension-specific contracts, source files, discovery addenda, and tests.
+
 ## Request Classification
 
 Before applying the rest of this guide, classify the current request by intent.
@@ -40,7 +49,7 @@ Examples of `ambiguous-or-mixed` requests:
 
 - change the repo and also tell me what customers should deploy
 - update this OKE extension and tell me whether `0.0.0.0/0` is acceptable in my landing zone
-- request cannot be fulfiled by current generator and requires both changes to jsonnet files and also generate new LZ files from config
+- request cannot be fulfilled by current generator and requires both changes to jsonnet files and generated LZ files from config
 
 ## Mandatory AI Safety Gate For Customer-Use Requests
 
@@ -230,7 +239,7 @@ Move the customer to the config-driven path for anything non-standard or customi
 - adding environments
 - adding workload extensions across multiple environments
 - using multiple workload extensions at the same time
-- defining custom cidr ranges
+- defining custom CIDR ranges
 
 Do not move the customer to config mode merely to represent a resource that the config schema and generator do not support. For unsupported requirements, use config mode only for the supported landing zone prerequisites and document the unsupported resource as manual post-deployment configuration.
 
@@ -260,6 +269,7 @@ When helping customers, make no assumptions and do not hallucinate data, file pa
 - Check the repository first before giving commands, file names, workflow advice, or configuration guidance.
 - When the question is about public exposure, ingress, or load balancing, inspect the selected hub guide, published runtime artifact, or config-driven hub builder before advising. Never assume a hub model lacks a public load balancer pattern or needs an extra public edge layer without checking the repo first.
 - If the repository is not sufficient and the answer depends on external OCI behavior or current product guidance, verify with official OCI documentation or other reputable sources before advising.
+- If online search or external documentation conflicts with this repository, give the repository's recommendations and source-of-truth files slightly higher priority for what this landing zone framework supports. State the conflict clearly instead of silently replacing repo guidance with external guidance.
 - Do not infer OKE pod or service CIDR behavior from examples that predate the current OKE networking contract or generic defaults. Verify the selected OKE networking mode with current official OCI documentation before making CIDR recommendations.
 - For OKE-specific generator semantics and CIDR planning in config mode, consult `gen/workload-extensions/oke/AGENTS.md` before recommending a deployable config or exact CIDR split.
 - Never present a guess, memory, or inferred recommendation as a confirmed fact.
@@ -270,6 +280,7 @@ When helping customers, make no assumptions and do not hallucinate data, file pa
 - `terraform-oci-modules-orchestrator` is the source of truth for how generated configuration files are interpreted at deployment time. When a generated field seems unused, transformed, or contradictory, inspect the orchestrator and the downstream modules it invokes before changing this repo's contract. For published OKE behavior, inspect the exact orchestrator tag referenced by the published OKE docs.
 - `gen/workload-extensions/oke/AGENTS.md` plus `gen/workload-extensions/oke/simple/*` are the source of truth for config-driven `oke_simple` behavior and OKE-native networking semantics in this repo.
 - `gen/workload-extensions/exacs/AGENTS.md` plus `gen/workload-extensions/exacs/*` are the source of truth for config-driven ExaDB-D / ExaCS placement, component, network, and project DB tier semantics in this repo.
+- `gen/workload-extensions/exacc/AGENTS.md` plus `gen/workload-extensions/exacc/*` are the source of truth for config-driven ExaDB-C@C IAM, observability, notification email, and publication semantics in this repo.
 - Published JSON files under `blueprints/` and `workload-extensions/` are deployable artifacts for the standard published path, but they are not the source of truth for generator logic.
 - For config-driven changes, start from `gen/config.libsonnet`, `gen/landing_zone.libsonnet`, `gen/topology.libsonnet`, or `gen/workload-extensions/*` before touching generated outputs.
 
@@ -283,7 +294,7 @@ When helping customers, make no assumptions and do not hallucinate data, file pa
 
 ## Generator Guardrails
 
-IMPORTANT, following sections applies only to developers of landing, standard request for creating or changing landing zone shouldn't make changes in `gen/` folder, this folder ensures the landing zone generated are based on best design and security practices.
+These guardrails apply only to `repo-development` work on the generator. Standard customer-use requests for creating or changing a deployable landing zone should not modify `gen/`; that source controls the generated landing zone design and security baseline.
 
 - Published entrypoints must stay thin and profile-owned. Follow the `Published Profiles` section in `gen/AGENTS.md`.
 - Use `jsonnet --multi` only for config-mode fan-out and debugging. Do not use it to regenerate committed snapshot families under `blueprints/` or `workload-extensions/`.

@@ -4,19 +4,21 @@
 
 This guide applies to repo-development and customer-guidance work that depends on the config-driven OKE generator under `gen/workload-extensions/oke/`.
 
-Use this guide before recommending OKE-native CIDRs, answering whether the extension is native or overlay, or changing the `oke_simple` contract.
+Root `AGENTS.md` owns customer safety, landing-zone discovery, and deployment defaults. Use this guide after OKE is in scope, before recommending OKE-native CIDRs, answering whether the extension is native or overlay, or changing the `oke_simple` contract.
 
 ## Source Priority
 
 When OKE networking semantics are in question, use sources in this order:
 
-1. current official Oracle OKE documentation
+1. this repo's generator source under `gen/workload-extensions/oke/simple/`
 2. the downstream module contract consumed by this repo
-3. this repo's generator source under `gen/workload-extensions/oke/simple/`
-4. tests and examples in this repo
+3. tests and examples in this repo
+4. current official Oracle OKE documentation
 5. non-authoritative blogs or examples
 
-Do not let non-authoritative examples override official Oracle docs for current OKE-native semantics.
+Use official Oracle docs to verify current OCI service behavior, but do not let online sources silently override the repository contract for what this landing zone framework emits or recommends. If official docs appear to conflict with the repo contract, state the conflict and verify the downstream module contract before advising.
+
+Do not let non-authoritative examples override this repo's contract or official Oracle docs for current OKE-native semantics.
 
 For published OKE deployment investigations, inspect the exact orchestrator tag referenced by the published OKE docs rather than `HEAD`, then trace the downstream `cis-oke` module contract from there.
 

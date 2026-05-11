@@ -1,6 +1,6 @@
 # ExaDB-C@C Generator Agent Guide
 
-Scope: this file covers `gen/workload-extensions/exacc/**` and the published ExaDB-C@C snapshots/docs under `workload-extensions/exacc/**`.
+Scope: this file covers `gen/workload-extensions/exacc/**` and the published ExaDB-C@C snapshots/docs under `workload-extensions/exacc/**`. Root `AGENTS.md` owns customer safety, base landing-zone discovery, and deployment defaults; this file owns ExaDB-C@C extension semantics.
 
 ## Source Of Truth
 

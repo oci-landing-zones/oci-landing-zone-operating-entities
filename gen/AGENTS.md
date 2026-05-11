@@ -32,7 +32,9 @@ gen/
 │   └── governance.libsonnet
 │
 ├── workload-extensions/         # Pluggable extensions (extension-specific docs may have AGENTS.md)
+│   ├── exadb/                   # Shared ExaDB helpers used by ExaDB extensions
 │   ├── exacc/                   # ExaDB-C@C extension; see workload-extensions/exacc/AGENTS.md
+│   ├── exacs/                   # ExaDB-D / ExaCS extension; see workload-extensions/exacs/AGENTS.md
 │   └── oke/simple/
 │       ├── oke_builder.libsonnet # Shared OKE builder internals
 │       ├── oke_simple.libsonnet # Generic extension wrapper
@@ -127,6 +129,10 @@ Update this diagram when any of these change:
   - `gen/blueprints/one-oe/runtime/one-stack/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/multi-stack/profiles.libsonnet`
+  - `gen/workload-extensions/exacc/single-stack/profiles.libsonnet`
+  - `gen/workload-extensions/exacc/multi-stack/profiles.libsonnet`
+  - `gen/workload-extensions/exacs/single-stack/profiles.libsonnet`
+  - `gen/workload-extensions/exacs/multi-stack/profiles.libsonnet`
   - `gen/addons/oci-hub-models/profiles.libsonnet`
 - Published entrypoints must stay thin:
   - import the local `profiles.libsonnet`
@@ -149,6 +155,8 @@ Current adapters:
 
 - `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. It reuses `gen/render_context.libsonnet` for normalization/topology-derived inputs while preserving the hub-only network contract and shared-only IAM/governance projections.
 - `gen/workload-extensions/oke/simple/multi-stack/published.libsonnet` — owns the multi-stack publication-only OKE network and identity projections used by the multi-stack OKE entrypoints.
+- `gen/workload-extensions/exacc/{single-stack,multi-stack}/published.libsonnet` — own ExaDB-C@C stack-local publication projections.
+- `gen/workload-extensions/exacs/multi-stack/published.libsonnet` — owns ExaDB-D / ExaCS multi-stack publication projections.
 
 Extension-specific adapters are documented in the owning extension directory when an extension has its own `AGENTS.md`.
 
@@ -298,11 +306,13 @@ Contract phases:
 
 Generic extension contracts must not change emitted artifact sets based on repo publication mode. If a published family needs additional projections, create a dedicated adapter next to the published entrypoints and keep profile-local configs free of publication flags.
 
-Current OKE ownership:
+Current extension ownership:
 
 - `gen/workload-extensions/oke/simple/oke_builder.libsonnet` owns the reusable OKE rendering logic.
 - `gen/workload-extensions/oke/simple/oke_simple.libsonnet` is the active generic extension wrapper for config mode and integrated landing-zone assembly.
 - `gen/workload-extensions/oke/simple/multi-stack/published.libsonnet` owns the multi-stack publication-only OKE network and identity projections used by repo entrypoints.
+- `gen/workload-extensions/exacc/AGENTS.md` owns ExaDB-C@C extension-specific contracts, notification email semantics, publication layout, and tests.
+- `gen/workload-extensions/exacs/AGENTS.md` owns ExaDB-D / ExaCS placement mapping, component inference, network rules, and discovery addenda.
 
 ## 7. How to Add a New Hub Type
 
@@ -325,7 +335,7 @@ Current OKE ownership:
 
 Keep `gen/defaults.libsonnet` limited to generic reusable hub defaults. If an extension needs published committed snapshots, keep those canonical published configs in local `profiles.libsonnet` files owned by the published family.
 
-EXACS derives `network_mode` from placement and network presence. A shared ExaCS platform with `network` owns shared infrastructure plus shared AVMC/VMC placement. A shared ExaCS platform without `network` is infrastructure-only and must not emit AVMC/VMC permissions or database-scope observability. Environment ExaCS platforms with `network` own environment AVMC/VMC placement; if no shared ExaCS platform exists, they also own environment-specific infrastructure. Autonomous Dedicated project DB tiers use `project_db_compartments`; `shared_project_network` is only needed when that environment also needs project network resources.
+Keep extension-specific placement and parameter semantics in the extension's own `AGENTS.md`; for example, ExaDB-C@C lives in `gen/workload-extensions/exacc/AGENTS.md` and ExaDB-D / ExaCS lives in `gen/workload-extensions/exacs/AGENTS.md`.
 
 ## 9. Generation Modes
 
@@ -335,7 +345,7 @@ Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes f
 **Config mode** (`bash gen/generate.sh --config my_config.libsonnet [output_dir]`):
 Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json`, `iam.json`, `security_*.json`, `observability_*.json`, and `governance.json` for every config. Staged hubs also emit `network_pre.json`, Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs.
 
-For customer-use work, ask where the source config file should live and where the generated output directory should be before creating artifacts. Keep those locations explicit and separate. Do not default customer configs or generated landing zone outputs into `tests/` or repo fixture paths unless the task is explicitly repo-development work for tests or fixtures.
+For customer-use artifact placement and deployment defaults, follow root `AGENTS.md`. This generator guide defines emitted files and generator behavior only.
 
 Config mode validates required fields during normalization. `config.environments` must be present and non-empty; omitted environments are a hard error rather than an implicit default.
 

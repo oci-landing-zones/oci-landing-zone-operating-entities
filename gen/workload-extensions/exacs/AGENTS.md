@@ -1,19 +1,19 @@
-# EXACS Generator Agent Guide
+# ExaDB-D / ExaCS Generator Agent Guide
 
-Scope: this file covers `gen/workload-extensions/exacs/**` and published EXACS snapshots/docs under `workload-extensions/exacs/**`.
+Scope: this file covers `gen/workload-extensions/exacs/**` and published ExaCS snapshots/docs under `workload-extensions/exacs/**`. Root `AGENTS.md` owns customer safety, base landing-zone discovery, and deployment defaults; this file owns ExaDB-D / ExaCS extension semantics.
 
 ## Source Of Truth
 
-- `gen/workload-extensions/exacs/exacs_builder.libsonnet` owns reusable EXACS network, IAM, and observability rendering.
+- `gen/workload-extensions/exacs/exacs_builder.libsonnet` owns reusable ExaCS network, IAM, and observability rendering.
 - `gen/workload-extensions/exacs/exacs.libsonnet` is the generic extension wrapper used by config mode.
-- `gen/workload-extensions/exacs/published_profiles.libsonnet` owns repo-published EXACS use-case defaults.
+- `gen/workload-extensions/exacs/published_profiles.libsonnet` owns repo-published ExaCS use-case defaults.
 - Stack-local `published.libsonnet` files own publication-only projections.
 - Checked-in JSON under `workload-extensions/exacs/**` is generated snapshot output. Do not hand-edit it.
 
 ## Contract
 
 - Extension type is `exacs`.
-- EXACS component selection is inferred from platform placement, `platform.network`, and `project_db_compartments`.
+- ExaCS component selection is inferred from platform placement, `platform.network`, and `project_db_compartments`.
 - If database placement is inferred, the platform represents AVMC/VMC placement and requires `platform.network`. The extension emits a managed VCN with `db` and `backup` subnets.
 - If infrastructure-only placement is inferred, the platform must omit `platform.network`. It must not emit database child compartments, AVMC/VMC permissions, database alarms, or VMC event rules for that scope.
 - `project_db_compartments` is only for Autonomous Database Dedicated project tiers. It requires database placement but does not require `shared_project_network`.
@@ -29,9 +29,9 @@ Scope: this file covers `gen/workload-extensions/exacs/**` and published EXACS s
 - Autonomous Dedicated project tiers are added only through `project_db_compartments` for selected projects.
 - Shared ExaCS without `network` means shared infrastructure-only. Do not grant AVMC/VMC permissions for that shared scope.
 
-## AI Discovery
+## Extension Discovery Addendum
 
-When ExaCS is in scope, ask these decisions before authoring config:
+After root `AGENTS.md` base landing-zone discovery is complete and ExaCS is in scope, ask these decisions before authoring config:
 
 1. Is Exadata infrastructure shared across environments, or dedicated per environment?
 2. Will the customer use Autonomous Database Dedicated on AVMCs, regular Exadata Database Service on VMCs, or both?
