@@ -52,6 +52,7 @@ Do not use this skill as the first response to an open-ended customer request su
 | Extensions | Extension `type` must be registered in `gen/landing_zone.libsonnet`. |
 | Config-mode network outputs | `network.json` is canonical final output; `network_pre.json` appears only for staged hubs. |
 | Artifact placement | Ask for both the config file location and the output directory before creating customer artifacts; do not default them into `tests/`. |
+| Unsupported resources | Do not add unsupported config keys or fake extension types. Generate only supported prerequisites, then document the unsupported resource as manual post-deployment configuration. |
 
 ## Authoring Guidance
 
@@ -64,6 +65,7 @@ Do not use this skill as the first response to an open-ended customer request su
 - When selecting CIDRs, check whether the landing zone will connect to on-premises or other clouds; any routed OCI or Kubernetes ranges must avoid overlap with those external networks.
 - When adding a new extension-backed platform, verify both the config schema and the extension contract.
 - For customer deployment guidance, Prefer Terraform CLI locally or from customer-controlled CI/CD. If ORM is used, stage the generated files in a customer-controlled private OCI Object Storage bucket or approved private GitHub source and use the orchestrator `rms-facade` workflow instead of repo-hosted public raw URLs.
+- If the requested resource is not supported by config mode, say so clearly. Keep it out of generated files, use config mode only for adjacent supported items such as CIDRs, VCNs, subnets, DRG attachments, route tables, security rules, DNS, logging, or IAM, and provide separate manual post-deployment steps for the unsupported resource.
 
 ## Verification
 
@@ -86,3 +88,4 @@ Do not use this skill as the first response to an open-ended customer request su
 - Forgetting that only environments with `shared_project_network` become spokes.
 - Forgetting that omitted `security_targets` now means all environments. Narrow it explicitly when you need a subset.
 - Adding an extension `type` in config without registering it in `gen/landing_zone.libsonnet`.
+- Representing unsupported resources such as VPN or FastConnect by inventing config fields instead of marking them as manual post-deployment configuration.
