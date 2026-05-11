@@ -3,6 +3,42 @@ local validation = import 'lib/validation.libsonnet';
 local platforms = import 'platforms.libsonnet';
 
 {
+  local standard_contribution_keys = [
+    'network_pre',
+    'iam',
+    'security_cis1',
+    'security_cis2',
+    'observability_cis1',
+    'observability_cis2',
+  ],
+
+  local merge_contribution(results, key) =
+    std.foldl(
+      function(acc, ext)
+        if std.objectHas(ext.contributions, key) then acc + ext.contributions[key]
+        else acc,
+      results,
+      {}
+    ),
+
+  local merge_extra_contributions(results) =
+    std.foldl(
+      function(acc, ext)
+        std.foldl(
+          function(next, key)
+            if std.objectHas(next, key) then next { [key]+: ext.contributions[key] }
+            else next { [key]: ext.contributions[key] },
+          [
+            key
+            for key in std.objectFields(ext.contributions)
+            if !std.member(standard_contribution_keys, key)
+          ],
+          acc
+        ),
+      results,
+      {}
+    ),
+
   select_entries_by_type(extension_entries, extension_type)::
     [
       entry
@@ -82,10 +118,9 @@ local platforms = import 'platforms.libsonnet';
       naming: n,
       topology: pe.scope,
     });
-    validation.object(
+    validation.returned_object(
       meta,
-      'Extension "%s" metadata(params)' % ext_type,
-      return_contract=true
+      'Extension "%s" metadata(params)' % ext_type
     ),
 
   _normalize_metadata(ext_type, raw_ext_meta, pe)::
@@ -205,10 +240,9 @@ local platforms = import 'platforms.libsonnet';
     local results = std.map(
       function(entry)
         local resolved = self.resolve_entry(inputs { platform_entry: entry });
-        local ext_contributions = validation.object(
+        local ext_contributions = validation.returned_object(
           resolved.definition.render(resolved.render_params),
-          'Extension "%s" render(params)' % resolved.type,
-          return_contract=true
+          'Extension "%s" render(params)' % resolved.type
         );
         assert !resolved.metadata.has_network || std.objectHas(ext_contributions, 'network_pre') :
                'Extension "%s" is missing required contribution "network_pre"' % resolved.type;
@@ -219,48 +253,14 @@ local platforms = import 'platforms.libsonnet';
         },
       extension_entries
     );
-    local standard_keys = [
-      'network_pre',
-      'iam',
-      'security_cis1',
-      'security_cis2',
-      'observability_cis1',
-      'observability_cis2',
-    ];
-    local merge_standard_contribution(key) =
-      std.foldl(
-        function(acc, ext)
-          if std.objectHas(ext.contributions, key) then acc + ext.contributions[key]
-          else acc,
-        results,
-        {}
-      );
-    local standard_contributions =
-      {
-        [key]: merge_standard_contribution(key)
-        for key in standard_keys
-      };
     {
       results: results,
     }
-    + standard_contributions
     + {
-      extra: std.foldl(
-        function(acc, ext)
-          local extra_keys = [
-            k
-            for k in std.objectFields(ext.contributions)
-            if !std.member(standard_keys, k)
-          ];
-          std.foldl(
-            function(a, k)
-              if std.objectHas(a, k) then a { [k]+: ext.contributions[k] }
-              else a { [k]: ext.contributions[k] },
-            extra_keys,
-            acc
-          ),
-        results,
-        {}
-      ),
+      [key]: merge_contribution(results, key)
+      for key in standard_contribution_keys
+    }
+    + {
+      extra: merge_extra_contributions(results),
     },
 }

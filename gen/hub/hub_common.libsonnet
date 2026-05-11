@@ -24,7 +24,7 @@
 // Architecture notes:
 //   Hub-specific subnets (firewall, NLB) are defined in each hub's own file.
 //   Common subnets (LB, MGMT, MON, DNS) are shared via _hub_vcn.
-//   See gen/CONVENTIONS.md for composition patterns and design rationale.
+//   See gen/AGENTS.md for composition patterns and design rationale.
 
 {
   // --- ICMP ingress rules ---

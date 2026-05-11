@@ -10,6 +10,9 @@
            else '%s must be an object' % label;
     value,
 
+  returned_object(value, label)::
+    self.object(value, label, return_contract=true),
+
   required_object(parent, key, label)::
     self.object(self.required(parent, key, label), label),
 
@@ -19,9 +22,6 @@
     assert !require_non_empty || std.length(value) > 0 :
            '%s must contain at least one value' % label;
     value,
-
-  required_array(parent, key, label, require_non_empty=false)::
-    self.array(self.required(parent, key, label), label, require_non_empty),
 
   allowed_keys(values, label, supported_keys)::
     local extra = [

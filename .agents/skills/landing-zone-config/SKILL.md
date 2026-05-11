@@ -27,7 +27,7 @@ Do not use this skill as the first response to an open-ended customer request su
 ## Workflow
 
 1. Start with the source-of-truth files:
-   - `gen/CONVENTIONS.md` for architecture and schema intent
+   - `gen/AGENTS.md` for architecture, schema intent, and generator guardrails
    - `gen/config.libsonnet` for required fields and normalization rules
    - `gen/landing_zone.libsonnet` for orchestration and topology behavior
    - `gen/landing_zone_multi.jsonnet` for config-mode outputs

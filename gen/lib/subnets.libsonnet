@@ -1,6 +1,23 @@
 local cidrs = import 'cidrs.libsonnet';
+local validation = import 'validation.libsonnet';
 
 {
+  local validate_subnet_object(subnets, label) =
+    validation.object(subnets, label),
+
+  local validate_subnet_keys(subnets, required_keys, label) =
+    local missing = [k for k in required_keys if !std.objectHas(subnets, k)];
+    local extra = [k for k in std.objectFields(subnets) if !std.member(required_keys, k)];
+    assert std.length(missing) == 0 :
+      '%s missing required keys: %s' % [label, std.join(', ', missing)];
+    assert std.length(extra) == 0 :
+      '%s has unsupported keys: %s. Allowed: %s' % [
+        label,
+        std.join(', ', extra),
+        std.join(', ', required_keys),
+      ];
+    subnets,
+
   local validate_subnet_values(subnets, keys, label, parent_cidr=null) =
     assert std.all([
       subnets[k] != null && std.type(subnets[k]) == 'string'
@@ -57,25 +74,17 @@ local cidrs = import 'cidrs.libsonnet';
     self.auto_subnets(vcn_cidr, [{ name: n, size: '/24' } for n in names]),
 
   validate_subnet_map(subnets, required_keys, label, parent_cidr=null)::
-    assert subnets != null && std.type(subnets) == 'object' :
-      '%s must be an object' % label;
-    local missing = [k for k in required_keys if !std.objectHas(subnets, k)];
-    local extra = [k for k in std.objectFields(subnets) if !std.member(required_keys, k)];
-    assert std.length(missing) == 0 :
-      '%s missing required keys: %s' % [label, std.join(', ', missing)];
-    assert std.length(extra) == 0 :
-      '%s has unsupported keys: %s. Allowed: %s' % [
-        label,
-        std.join(', ', extra),
-        std.join(', ', required_keys),
-      ];
-    validate_subnet_values(subnets, required_keys, label, parent_cidr),
+    local checked_subnets = validate_subnet_keys(
+      validate_subnet_object(subnets, label),
+      required_keys,
+      label
+    );
+    validate_subnet_values(checked_subnets, required_keys, label, parent_cidr),
 
   validate_named_subnets(subnets, label, parent_cidr=null)::
-    assert subnets != null && std.type(subnets) == 'object' :
-      '%s must be an object' % label;
-    local keys = std.objectFields(subnets);
+    local checked_subnets = validate_subnet_object(subnets, label);
+    local keys = std.objectFields(checked_subnets);
     assert std.length(keys) > 0 :
       '%s must contain at least one subnet' % label;
-    validate_subnet_values(subnets, keys, label, parent_cidr),
+    validate_subnet_values(checked_subnets, keys, label, parent_cidr),
 }

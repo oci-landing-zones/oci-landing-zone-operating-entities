@@ -5,7 +5,7 @@
 - `gen/config.libsonnet` validates the required config shape and normalizes omitted values.
 - `gen/landing_zone.libsonnet` turns normalized config into hub, spoke, platform, IAM, governance, security, observability, and extension outputs.
 - `gen/landing_zone_multi.jsonnet` decides which output files appear in config mode.
-- `gen/CONVENTIONS.md` explains the intended architecture and naming conventions.
+- `gen/AGENTS.md` explains the intended architecture, naming conventions, and publication guardrails.
 
 ## Minimal Config Shape
 
@@ -62,15 +62,17 @@ Current topology behavior worth remembering:
 
 - Preferred environment ordering is `prod`, `preprod`, `staging`, `uat`, `dev`, `test`, then any remaining names
 - Sample load balancer backends are derived from the first ordered workload spoke's `web` subnet
-- Security-target selection is centralized in `gen/topology.libsonnet`; current behavior intentionally targets only `prod`
+- Security-target selection is centralized in `gen/topology.libsonnet`; omitted `security_targets` targets all defined environments
 
 ## Extension Contract
 
 Extensions are registered in `gen/landing_zone.libsonnet` under `extension_registry`.
 
-Current registered type:
+Current registered types:
 
 - `oke_simple`
+- `exacc`
+- `exacs`
 
 An extension-backed platform config looks like this:
 
@@ -80,8 +82,9 @@ An extension-backed platform config looks like this:
   extension: {
     type: 'oke_simple',
     params: {
-      kubernetes_version: 'v1.31.1',
+      kubernetes_version: 'v1.35.2',
       services_cidr: '10.96.0.0/16',
+      api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
     },
   },
 }
@@ -91,6 +94,7 @@ An extension-backed platform config looks like this:
 
 - `config_params.kubernetes_version`
 - `config_params.services_cidr`
+- `config_params.api_endpoint_allowed_cidrs`
 - `config_params.pods_cidr` only as an optional passthrough when you explicitly want to set it
 
 For the current native OKE contract, pod IPs come from the generated or explicit pod subnet inside the OKE VCN. `services_cidr` remains the explicit Kubernetes-internal service range, and `pods_cidr` is not required for the standard native path even though the downstream `cis-oke` module can still accept it if you deliberately pass it through. In the emitted cluster payload, those values belong under `options.kubernetes_network_config`.

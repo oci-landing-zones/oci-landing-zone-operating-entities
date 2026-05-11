@@ -23,7 +23,7 @@ This keeps hub and spoke subnets implicit, so normalization fills them in.
 
 ## Environment Platform Example
 
-Based on `gen/testdata/platform_topology/preprod_oke.jsonnet`.
+Based on `tests/gen/testdata/direct/pass/config_preprod_security_targets.jsonnet`.
 
 ```jsonnet
 {
@@ -41,8 +41,9 @@ Based on `gen/testdata/platform_topology/preprod_oke.jsonnet`.
           extension: {
             type: 'oke_simple',
             params: {
-              kubernetes_version: 'v1.31.1',
+              kubernetes_version: 'v1.35.2',
               services_cidr: '10.96.0.0/16',
+              api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
             },
           },
         },
@@ -56,7 +57,7 @@ Use this when the platform belongs to a specific environment and should inherit 
 
 ## Shared Platform Example
 
-Based on `gen/testdata/platform_topology/shared_platform_oke.jsonnet`.
+Based on `tests/gen/testdata/direct/pass/config_platform_compartments.jsonnet`.
 
 ```jsonnet
 {
@@ -76,8 +77,9 @@ Based on `gen/testdata/platform_topology/shared_platform_oke.jsonnet`.
       extension: {
         type: 'oke_simple',
         params: {
-          kubernetes_version: 'v1.31.1',
+          kubernetes_version: 'v1.35.2',
           services_cidr: '10.96.0.0/16',
+          api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
         },
       },
     },
@@ -89,7 +91,7 @@ Use this when the platform should live under the shared platform compartment tre
 
 ## Multi-Environment Example
 
-Based on `gen/testdata/platform_topology/prod_preprod_hub_a.jsonnet`.
+Based on `tests/gen/testdata/direct/pass/config_hub_a_staging.jsonnet`.
 
 ```jsonnet
 {
@@ -107,8 +109,9 @@ Based on `gen/testdata/platform_topology/prod_preprod_hub_a.jsonnet`.
           extension: {
             type: 'oke_simple',
             params: {
-              kubernetes_version: 'v1.31.1',
+              kubernetes_version: 'v1.35.2',
               services_cidr: '10.96.0.0/16',
+              api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
             },
           },
         },
@@ -123,8 +126,9 @@ Based on `gen/testdata/platform_topology/prod_preprod_hub_a.jsonnet`.
           extension: {
             type: 'oke_simple',
             params: {
-              kubernetes_version: 'v1.31.1',
+              kubernetes_version: 'v1.35.2',
               services_cidr: '10.97.0.0/16',
+              api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
             },
           },
         },

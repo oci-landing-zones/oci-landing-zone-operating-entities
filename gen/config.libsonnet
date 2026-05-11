@@ -15,6 +15,22 @@ local validation = import 'lib/validation.libsonnet';
 
   local spoke_subnet_names = ['web', 'app', 'db', 'infra'],
 
+  local required_vcn(network, label) =
+    cidrs.validate(
+      '%s.vcn' % label,
+      validation.required(network, 'vcn', '%s.vcn' % label)
+    ),
+
+  local normalize_auto_subnet_network(network, label, subnet_names) =
+    local vcn = required_vcn(network, label);
+    network {
+      vcn: vcn,
+      subnets:
+        if std.objectHas(network, 'subnets') then
+          subnet_utils.validate_named_subnets(network.subnets, '%s.subnets' % label, vcn)
+        else subnet_utils.auto_subnets_24(vcn, subnet_names),
+    },
+
   normalize(config)::
     local hub = validation.required_object(config, 'hub', 'config.hub');
     local hub_kind = validation.required(hub, 'kind', 'config.hub.kind');
@@ -57,10 +73,7 @@ local validation = import 'lib/validation.libsonnet';
 
     local hub_subnet_keys = hub_subnet_order[hub_kind];
     local hub_subnet_label = 'config.hub.network.subnets for %s' % hub_kind;
-    local hub_vcn = cidrs.validate(
-      'config.hub.network.vcn',
-      validation.required(hub_network, 'vcn', 'config.hub.network.vcn')
-    );
+    local hub_vcn = required_vcn(hub_network, 'config.hub.network');
     local hub_subnets =
       if std.objectHas(hub_network, 'subnets') then
         subnet_utils.validate_subnet_map(hub_network.subnets, hub_subnet_keys, hub_subnet_label, hub_vcn)
@@ -88,10 +101,8 @@ local validation = import 'lib/validation.libsonnet';
       local normalized_network =
         if has_network then
           local network = validation.object(plat.network, 'Platform %s.network' % p_name);
-          local platform_vcn = cidrs.validate(
-            'Platform %s.network.vcn' % p_name,
-            validation.required(network, 'vcn', 'Platform %s.network.vcn' % p_name)
-          );
+          local network_label = 'Platform %s.network' % p_name;
+          local platform_vcn = required_vcn(network, network_label);
           {
             network: network {
               vcn: platform_vcn,
@@ -100,7 +111,7 @@ local validation = import 'lib/validation.libsonnet';
                   if extension != null then network.subnets
                   else subnet_utils.validate_named_subnets(
                     network.subnets,
-                    'Platform %s.network.subnets' % p_name,
+                    '%s.subnets' % network_label,
                     platform_vcn
                   )
                 else if extension != null then null
@@ -123,26 +134,9 @@ local validation = import 'lib/validation.libsonnet';
         'network',
         'Environment %s.shared_project_network.network' % env_name
       );
-      local spn_vcn = cidrs.validate(
-        'Environment %s.shared_project_network.network.vcn' % env_name,
-        validation.required(
-          network,
-          'vcn',
-          'Environment %s.shared_project_network.network.vcn' % env_name
-        )
-      );
+      local network_label = 'Environment %s.shared_project_network.network' % env_name;
       spn {
-        network+: {
-          vcn: spn_vcn,
-          subnets:
-            if std.objectHas(network, 'subnets') then
-              subnet_utils.validate_named_subnets(
-                network.subnets,
-                'Environment %s.shared_project_network.network.subnets' % env_name,
-                spn_vcn
-              )
-            else subnet_utils.auto_subnets_24(spn_vcn, spoke_subnet_names),
-        },
+        network+: normalize_auto_subnet_network(network, network_label, spoke_subnet_names),
       };
 
     local norm_envs = {

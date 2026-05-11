@@ -358,7 +358,7 @@ Config mode validates required fields during normalization. `config.environments
 - Integrated IAM owns platform child compartments for config-driven outputs.
 - Standalone multi-stack OKE may overlay the same platform child compartment only to stay self-contained.
 - Extensions receive scope semantics via `params.topology`; naming remains formatting-only.
-- Security-target environment selection is centralized in `topology.libsonnet`. Current behavior intentionally targets only `prod`, so widening later is a single-helper change.
+- Security-target environment selection is centralized in `topology.libsonnet`. Current behavior targets all defined environments when `security_targets` is omitted; set `security_targets` explicitly when a published profile needs narrower targeting.
 
 ## 12. Code Style Rules
 

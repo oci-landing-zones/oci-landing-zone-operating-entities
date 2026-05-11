@@ -119,4 +119,3 @@ local operator_events = [
     vmc: vmc_events,
   },
 }
-

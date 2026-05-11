@@ -1,9 +1,4 @@
 local builder = import './oke_builder.libsonnet';
+local wrapper = import '../../extension_wrapper.libsonnet';
 
-{
-  metadata(params):: builder.metadata(params),
-
-  render(params)::
-    local rendered = builder.render(params);
-    rendered.contributions,
-}
+wrapper.fromBuilder(builder)

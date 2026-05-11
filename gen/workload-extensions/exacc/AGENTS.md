@@ -87,13 +87,13 @@ Prefer fixture-based tests for generator behavior:
 
 - Config pass/fail fixtures under `tests/gen/testdata/configs/`.
 - Direct pass/fail fixtures under `tests/gen/testdata/direct/`.
-- Publication-boundary tests in `tests/gen/test_exacc_publication_boundaries.py`.
-- Published snapshot parity comes from `tests/gen/test_direct_entrypoints.py`.
+- Publication-boundary coverage lives in fixture pass/fail cases under `tests/gen/testdata/`.
+- Published snapshot parity is checked through direct entrypoint fixtures in `tests/gen/testdata/direct/`.
 
 Relevant verification:
 
 ```bash
-python3 -m unittest tests.gen.test_fixture_cases tests.gen.test_exacc_publication_boundaries tests.gen.test_direct_entrypoints
+python3 -m unittest tests.gen.test_fixture_cases tests.gen.test_fixture_inventory tests.gen.test_fixture_runner
 bash gen/generate.sh
 git diff --check
 ```

@@ -5,7 +5,7 @@ By default, create only the `.excalidraw` file. Do not create `.svg`, `.png`, `.
 
 ## Baseline Example
 
-- Treat `/Users/paolajuarez/Desktop/IA/LZ/Profile-config-exacc/exacc_identity_uc1_compartments.excalidraw` as the visual baseline for compartment diagrams with IAM access information.
+- Use this section as the repo-local visual baseline for compartment diagrams with IAM access information.
 - A finished compartment diagram must include both the compartment hierarchy and the right-side `Access groups` panel unless the user explicitly asks for a compartment-only diagram.
 - The `Access groups` panel is part of the standard, not an optional enhancement. Do not stop after drawing only compartment boxes and arrows.
 - Keep IAM/compartment diagrams and Network diagrams as separate diagram types. Do not apply IAM access-panel rules to network-only diagrams, and do not apply network VCN/subnet styling to IAM compartment diagrams.

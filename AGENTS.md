@@ -32,8 +32,8 @@ Examples of `customer-use` requests:
 Examples of `repo-development` requests:
 
 - update documentation
-- modify generator logic in `gen/` 
-- add tests 
+- modify generator logic in `gen/`
+- add tests
 - update blueprint docs or workload extension code in this repo
 
 Examples of `ambiguous-or-mixed` requests:
@@ -184,7 +184,7 @@ Move the customer to the config-driven path for anything non-standard or customi
 - adding environments
 - adding workload extensions across multiple environments
 - using multiple workload extensions at the same time
-- defining custom cidr ranges 
+- defining custom cidr ranges
 
 Start from:
 

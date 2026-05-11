@@ -34,15 +34,11 @@ If you are running a Workload Extension (WE) with a multi-stack approach and you
 
 In this model, the first stack deploys One-OE with output enabled so that the orchestrator generates the key/OCID dependency files required by the second stack, such as `compartments_output.json`, `network_output.json`, or `tags_output.json`.
 
-For quick testing, enable the output feature and store the generated files in a dedicated bucket. For production environments, use GitHub.
-
-<img src="../images/output.png" width="600">
+For quick testing, enable the output feature and store the generated files in a dedicated bucket. For production environments, use a private GitHub repository or another approved private source.
 
 This is the recommended approach when you want to use cross-stack dependencies based on generated outputs instead of manually editing or maintaining dependency files.
 
 In the second stack, include the generated dependency files in the **Dependencies Source for URL-based Configuration** field.
-
-<img src="../images/Dependencies.png" width="600">
 
 > Note: Official orchestrator reference for external dependencies and generated outputs: https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator#external-dependencies
 
@@ -56,7 +52,7 @@ In the second stack, include the generated dependency files in the **Dependencie
    - Terraform version,
    - facade working directory.
 4. Configure input files from a controlled source (URL, OCI bucket or private GitHub).
-   
+
 The Orchestrator provides an ORM Facade module allowing these three options:
 
 | Configurations Source | Configuration Files Formats | Dependencies Sources | Dependency Files Formats | Requirements |
@@ -71,7 +67,7 @@ The Orchestrator provides an ORM Facade module allowing these three options:
   It is strongly recommended to maintain your own copy of these files. Two main options are available:
 
   **A. Store the files in an OCI Object Storage bucket**: suitable for PoCs, demos, and quick testing cycles.<br>
-    
+
   **B. Store the files in a private GitHub repository**: recommended for teams that require version control, peer review, and controlled change management.
 
   The first option is faster for short-lived environments and POCs. For regular customization and ongoing operations, the second option is preferable because it provides better traceability, collaboration, and governance.
@@ -82,8 +78,8 @@ The Orchestrator provides an ORM Facade module allowing these three options:
 |-------------------|
 | - **Create a private GitHub repository.** |
 | - **Populate your repository** with the required JSON files from the Operating Entities repository and make any necessary customizations. |
-| - **Generate a GitHub Personal Access Token:** Go to your GitHub account: Settings > Developer Settings > Personal Access Tokens > Tokens (Classic) > Generate New Token.<br><br><img src="../images/token.png" width="400"><br><br>Select at minimum the **repo** scope to grant full control of private repositories. |
-| - **Update the ORM stack configuration:**<br><br>• Edit your ORM stack and navigate to **Input Files** section<br>• Under Configuration Source, select **GitHub**<br>• Paste your GitHub token in the authentication field<br>• Remove the pre-existing configuration file URLs and replace them with your private repository file paths<br><br> <img src="../images/github.png" width="700"> <br> If you are using a private GitHub repository, leave the GitHub Base URL field empty, if you are using an organization account, set it to **api.github.com** and if you are using an enterprise account, use your company’s GitHub URL (e.g., company.github.com) |
+| - **Generate a GitHub Personal Access Token:** Go to your GitHub account: Settings > Developer Settings > Personal Access Tokens > Tokens (Classic) > Generate New Token. Select at minimum the **repo** scope to grant full control of private repositories. |
+| - **Update the ORM stack configuration:** Edit your ORM stack and navigate to the **Input Files** section. Under Configuration Source, select **GitHub**, paste your GitHub token in the authentication field, and replace the pre-existing configuration file URLs with your private repository file paths. If you are using a private GitHub repository, leave the GitHub Base URL field empty; if you are using an organization account, set it to **api.github.com**; if you are using an enterprise account, use your company’s GitHub URL (for example, company.github.com). |
 
 
 5. Enable the output option if you are planning to run a Workload Extension (WE).
@@ -107,7 +103,7 @@ The Orchestrator provides an ORM Facade module allowing these three options:
 
 This two-operation approach reduces coupling, clarifies ownership, and simplifies troubleshooting. Use a standardized **two-operation model** (`One-OE` first, `WE` second) with explicit dependencies and output artifacts. This is the safest default for scalable and repeatable ORM operations.
 
-&nbsp; 
+&nbsp;
 
 # License
 
