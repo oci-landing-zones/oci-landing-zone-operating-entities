@@ -100,6 +100,15 @@ An extension-backed platform config looks like this:
 For the current native OKE contract, pod IPs come from the generated or explicit pod subnet inside the OKE VCN. `services_cidr` remains the explicit Kubernetes-internal service range, and `pods_cidr` is not required for the standard native path even though the downstream `cis-oke` module can still accept it if you deliberately pass it through. In the emitted cluster payload, those values belong under `options.kubernetes_network_config`.
 It also contributes default platform subnets when the platform omits explicit `network.subnets`.
 
+`gen/workload-extensions/exacs/exacs_builder.libsonnet` enforces ExaCS placement semantics:
+
+- Database placement means AVMC/VMC placement and requires `platform.network`; the extension auto-generates `db` and `backup` subnets when explicit subnets are omitted
+- Infrastructure-only placement is inferred when an ExaCS platform has no `network`
+- `project_db_compartments` is only for Autonomous Database Dedicated project tiers; `shared_project_network` is only needed when that environment also needs project network resources
+- Shared infrastructure plus shared AVMC/VMC uses `shared_platforms.exacs` with `network`
+- Shared infrastructure plus environment AVMC/VMC uses `shared_platforms.exacs` without `network` and networked `environments.<env>.platforms.exacs`
+- Dedicated infrastructure plus dedicated AVMC/VMC uses only networked `environments.<env>.platforms.exacs`
+
 ## Output Model
 
 `gen/landing_zone_multi.jsonnet` always emits:

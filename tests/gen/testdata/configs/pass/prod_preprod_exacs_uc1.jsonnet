@@ -1,4 +1,4 @@
-// config-mode EXACS use case 1 renders shared EXACS network plus identity-only environment EXACS platforms
+// config-mode EXACS use case 1 renders shared EXACS network and project DB tiers without environment EXACS platforms
 // contains: CMP-LZ-SHARED-EXACS-KEY
 // contains: CMP-LZ-PROD-PROJ1-EXACS-DB-KEY
 // contains: VCN-FRA-LZ-SHARED-PLATFORM-EXACS-KEY
@@ -20,20 +20,10 @@ local exacs_params(projects) = {
     prod: {
       shared_project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
-      platforms: {
-        exacs: {
-          extension: { type: 'exacs', params: exacs_params(['proj1']) },
-        },
-      },
     },
     preprod: {
       shared_project_network: { network: { vcn: '10.0.128.0/21' } },
       projects: { proj1: {} },
-      platforms: {
-        exacs: {
-          extension: { type: 'exacs', params: exacs_params(['proj1']) },
-        },
-      },
     },
   },
   shared_platforms: {

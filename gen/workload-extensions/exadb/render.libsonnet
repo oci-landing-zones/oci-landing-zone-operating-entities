@@ -18,11 +18,22 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
     local cfg = params.config_params;
     local descriptions = inputs.descriptions;
     local notification = notification_emails.validate(product.code, cfg, supported_notification_keys);
+    local inferred_components =
+      if std.objectHas(scope_config, 'extension_entry_components') then
+        scope_config.extension_entry_components
+      else null;
+    local components = exadb_project_db.normalize_components(product, cfg, inferred_components);
+    local aggregate_components =
+      if std.objectHas(scope_config, 'extension_components') &&
+         std.objectHas(scope_config.extension_components, product.code) then
+        scope_config.extension_components[product.code]
+      else components;
     local model = exadb_project_db.normalize({
       product: product,
       scope: scope,
       scope_config: scope_config,
       cfg: cfg,
+      components: components,
     });
     local project_db_key(env_name, project_name) =
       exadb_project_db.project_db_key(product, n, env_name, project_name);
@@ -36,6 +47,8 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
       tag_key: tag_key,
       project_db_key: project_db_key,
       project_db_name: project_db_name,
+      components: components,
+      aggregate_components: aggregate_components,
     });
     local observability = exadb_observability.render({
       product: product,
@@ -47,6 +60,7 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
       db_key: exadb_project_db.platform_db_key(product, n, scope),
       infra_key: exadb_project_db.platform_infra_key(product, n, scope),
       project_db_key: project_db_key,
+      components: components,
     });
     {
       iam: {
@@ -58,6 +72,7 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
               descriptions: descriptions,
               scope: scope,
               tag_key: tag_key,
+              components: components,
             })
             + exadb_project_db.project_compartment_overlay({
               product: product,

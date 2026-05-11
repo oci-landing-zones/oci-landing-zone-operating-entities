@@ -1,0 +1,135 @@
+{
+  "dedicated": {
+    "exacs_event_rules": [
+      "RUL-LZ-PROD-EXACS-NOTIFICATION-PROJECTS-KEY"
+    ],
+    "network_categories": [
+      "preprod-platform-exacs",
+      "prod-platform-exacs"
+    ],
+    "preprod_exacs_children": [
+      "CMP-LZ-PREPROD-EXACS-DB-KEY",
+      "CMP-LZ-PREPROD-EXACS-INFRA-KEY"
+    ],
+    "preprod_platform_children": [
+      "CMP-LZ-PREPROD-EXACS-KEY"
+    ],
+    "prod_exacs_children": [
+      "CMP-LZ-PROD-EXACS-DB-KEY",
+      "CMP-LZ-PROD-EXACS-INFRA-KEY"
+    ],
+    "prod_platform_children": [
+      "CMP-LZ-PROD-EXACS-KEY"
+    ],
+    "prod_project_children": [
+      "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY"
+    ],
+    "shared_exacs_children": [],
+    "shared_platform_children": []
+  },
+  "hybrid": {
+    "exacs_event_rules": [
+      "RUL-LZ-NOTIFICATION-EXACS-OPERATOR-ACCESS-CONTROL-KEY",
+      "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY",
+      "RUL-LZ-PROD-EXACS-NOTIFICATION-PROJECTS-KEY"
+    ],
+    "network_categories": [
+      "preprod-platform-exacs",
+      "prod-platform-exacs"
+    ],
+    "preprod_exacs_children": [
+      "CMP-LZ-PREPROD-EXACS-DB-KEY"
+    ],
+    "preprod_platform_children": [
+      "CMP-LZ-PREPROD-EXACS-KEY"
+    ],
+    "prod_exacs_children": [
+      "CMP-LZ-PROD-EXACS-DB-KEY"
+    ],
+    "prod_platform_children": [
+      "CMP-LZ-PROD-EXACS-KEY"
+    ],
+    "prod_project_children": [
+      "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY"
+    ],
+    "shared_exacs_children": [
+      "CMP-LZ-SHARED-EXACS-INFRA-KEY"
+    ],
+    "shared_platform_children": [
+      "CMP-LZ-SHARED-EXACS-KEY"
+    ]
+  },
+  "infra_only": {
+    "autonomous_vmcluster_statement_count": 0,
+    "cloud_vmcluster_statement_count": 0,
+    "exacs_event_rules": [
+      "RUL-LZ-NOTIFICATION-EXACS-OPERATOR-ACCESS-CONTROL-KEY",
+      "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY"
+    ],
+    "exacs_group_keys": [
+      "GRP-LZ-GLOBAL-EXACS-INFRA-ADMIN-KEY"
+    ],
+    "network_categories": [],
+    "preprod_exacs_children": [],
+    "preprod_platform_children": [],
+    "prod_exacs_children": [],
+    "prod_platform_children": [],
+    "prod_project_children": [],
+    "shared_exacs_children": [
+      "CMP-LZ-SHARED-EXACS-INFRA-KEY"
+    ],
+    "shared_platform_children": [
+      "CMP-LZ-SHARED-EXACS-KEY"
+    ]
+  },
+  "shared_autonomous": {
+    "exacs_event_rules": [
+      "RUL-LZ-NOTIFICATION-EXACS-OPERATOR-ACCESS-CONTROL-KEY",
+      "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-DB-KEY",
+      "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY",
+      "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-VMC-KEY",
+      "RUL-LZ-PREPROD-EXACS-NOTIFICATION-PROJECTS-KEY",
+      "RUL-LZ-PROD-EXACS-NOTIFICATION-PROJECTS-KEY"
+    ],
+    "network_categories": [
+      "shared-platform-exacs"
+    ],
+    "preprod_exacs_children": [],
+    "preprod_platform_children": [],
+    "prod_exacs_children": [],
+    "prod_platform_children": [],
+    "prod_project_children": [
+      "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY"
+    ],
+    "shared_exacs_children": [
+      "CMP-LZ-SHARED-EXACS-DB-KEY",
+      "CMP-LZ-SHARED-EXACS-INFRA-KEY"
+    ],
+    "shared_platform_children": [
+      "CMP-LZ-SHARED-EXACS-KEY"
+    ]
+  },
+  "shared_vmc_only": {
+    "exacs_event_rules": [
+      "RUL-LZ-NOTIFICATION-EXACS-OPERATOR-ACCESS-CONTROL-KEY",
+      "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-DB-KEY",
+      "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY",
+      "RUL-LZ-NOTIFICATION-PLATFORM-EXACS-VMC-KEY"
+    ],
+    "network_categories": [
+      "shared-platform-exacs"
+    ],
+    "preprod_exacs_children": [],
+    "preprod_platform_children": [],
+    "prod_exacs_children": [],
+    "prod_platform_children": [],
+    "prod_project_children": [],
+    "shared_exacs_children": [
+      "CMP-LZ-SHARED-EXACS-DB-KEY",
+      "CMP-LZ-SHARED-EXACS-INFRA-KEY"
+    ],
+    "shared_platform_children": [
+      "CMP-LZ-SHARED-EXACS-KEY"
+    ]
+  }
+}

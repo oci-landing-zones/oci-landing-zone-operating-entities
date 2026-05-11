@@ -164,6 +164,39 @@ Only after these six decisions are known may the agent continue with:
 - explaining OKE deployment options such as single-stack, multi-stack, or config-driven `oke_simple`
 - generating or modifying landing zone guidance, configs, or deployment steps
 
+## Mandatory ExaDB-D / ExaCS Discovery Addendum
+
+For `customer-use` and `ambiguous-or-mixed` requests that include ExaDB-D, Exadata Database Service on Dedicated Infrastructure, Autonomous Database Dedicated, ExaCS, VMCs, or AVMCs, complete these extra discovery decisions before creating or modifying config-mode artifacts. Ask them one at a time in customer language after the base landing-zone decisions above are known.
+
+1. **Exadata infrastructure placement**
+   - Determine whether the Exadata infrastructure is shared across environments or dedicated per environment.
+   - Explain that shared infrastructure maps to a shared platform scope, while per-environment infrastructure maps to environment platform scopes.
+   - If the customer chooses shared infrastructure only, do not create environment ExaCS platforms just to mirror the shared platform.
+
+2. **Database service model**
+   - Determine whether the customer will use Autonomous Database Dedicated on AVMCs, regular Exadata Database Service on VMCs, or both.
+   - Explain that Autonomous Database Dedicated needs AVMC placement and may need project-level Autonomous Database tiers, while regular Exadata Database Service uses VMC placement and does not need project DB tiers.
+   - Do not add `project_db_compartments` for regular Exadata Database Service-only designs.
+
+3. **AVMC/VMC placement**
+   - Determine whether AVMCs or VMCs are shared with the Exadata infrastructure or dedicated per environment.
+   - Explain that AVMC/VMC placement requires an ExaCS platform network with database and backup subnets. The Exadata infrastructure-only scope does not require that network.
+   - If shared infrastructure has no network, treat that shared platform as infrastructure-only. Do not grant AVMC/VMC permissions or create AVMC/VMC observability for that scope.
+
+4. **Autonomous project tiers**
+   - If Autonomous Database Dedicated will be used, determine which environments and projects need Autonomous Database project tiers.
+   - Explain that each selected project needs a project DB compartment. A separate project/spoke network is only needed when applications or other project resources such as VMs must be deployed in that project and connect to the Autonomous Database.
+   - In config terms, this means `project_db_compartments` only for selected projects. Define `shared_project_network` only for environments that need project network resources.
+
+Use the existing config contract for these outcomes:
+
+- Shared infrastructure plus shared AVMC/VMC: only `shared_platforms.exacs`, with `network`.
+- Shared infrastructure plus environment-specific AVMC/VMC: `shared_platforms.exacs` without `network`, and `environments.<env>.platforms.exacs` with `network`.
+- Environment-specific infrastructure plus environment-specific AVMC/VMC: only `environments.<env>.platforms.exacs`, with `network`.
+- Autonomous Dedicated project tiers: set `project_db_compartments` only for selected projects.
+- Regular Exadata Database Service only: omit `project_db_compartments`.
+- Infrastructure-only ExaCS scope: omit `network`.
+
 ## Standard Customer Path: Published Blueprint Deployment
 
 For most customers, start with the published runtime documentation and the published JSON artifacts.
@@ -236,6 +269,7 @@ When helping customers, make no assumptions and do not hallucinate data, file pa
 - `gen/` is the source of truth for generator behavior and customization logic.
 - `terraform-oci-modules-orchestrator` is the source of truth for how generated configuration files are interpreted at deployment time. When a generated field seems unused, transformed, or contradictory, inspect the orchestrator and the downstream modules it invokes before changing this repo's contract. For published OKE behavior, inspect the exact orchestrator tag referenced by the published OKE docs.
 - `gen/workload-extensions/oke/AGENTS.md` plus `gen/workload-extensions/oke/simple/*` are the source of truth for config-driven `oke_simple` behavior and OKE-native networking semantics in this repo.
+- `gen/workload-extensions/exacs/AGENTS.md` plus `gen/workload-extensions/exacs/*` are the source of truth for config-driven ExaDB-D / ExaCS placement, component, network, and project DB tier semantics in this repo.
 - Published JSON files under `blueprints/` and `workload-extensions/` are deployable artifacts for the standard published path, but they are not the source of truth for generator logic.
 - For config-driven changes, start from `gen/config.libsonnet`, `gen/landing_zone.libsonnet`, `gen/topology.libsonnet`, or `gen/workload-extensions/*` before touching generated outputs.
 

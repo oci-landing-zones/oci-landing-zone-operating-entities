@@ -325,7 +325,7 @@ Current OKE ownership:
 
 Keep `gen/defaults.libsonnet` limited to generic reusable hub defaults. If an extension needs published committed snapshots, keep those canonical published configs in local `profiles.libsonnet` files owned by the published family.
 
-EXACS uses `network_mode: 'optional'` because UC1 has one shared networked EXACS platform and environment EXACS platforms that only add project DB compartments, IAM, and observability. This avoids fake VCNs and keeps one extension type for the product family.
+EXACS derives `network_mode` from placement and network presence. A shared ExaCS platform with `network` owns shared infrastructure plus shared AVMC/VMC placement. A shared ExaCS platform without `network` is infrastructure-only and must not emit AVMC/VMC permissions or database-scope observability. Environment ExaCS platforms with `network` own environment AVMC/VMC placement; if no shared ExaCS platform exists, they also own environment-specific infrastructure. Autonomous Dedicated project DB tiers use `project_db_compartments`; `shared_project_network` is only needed when that environment also needs project network resources.
 
 ## 9. Generation Modes
 

@@ -5,6 +5,14 @@
     local descriptions = inputs.descriptions;
     local model = inputs.model;
     local tag_key = inputs.tag_key;
+    local components =
+      if std.objectHas(inputs, 'components') then inputs.components
+      else { infrastructure: true, database: true };
+    local aggregate_components =
+      if std.objectHas(inputs, 'aggregate_components') then inputs.aggregate_components
+      else components;
+    local has_infra_group = aggregate_components.infrastructure || aggregate_components.database;
+    local has_db_group = aggregate_components.database;
     local product_upper = std.asciiUpper(product.code);
     local domain_display = 'id_lz_common';
     local domain_grp(grp_name) = "'%s'/'%s'" % [domain_display, grp_name];
@@ -36,16 +44,19 @@
     local infra_resource = product.resources.infrastructure;
     local vmcluster_resource = product.resources.vmclusters;
 
-    local global_groups = {
+    local global_groups =
+    (if has_db_group then {
       [n.key_global('GRP', global_group_key_segments('DB'))]: {
         name: group_name('DB'),
         description: descriptions.global_db_group,
       },
+    } else {}) +
+    (if has_infra_group then {
       [n.key_global('GRP', global_group_key_segments('INFRA'))]: {
         name: group_name('INFRA'),
         description: descriptions.global_infra_group,
       },
-    };
+    } else {});
     local project_groups = {
       [n.key_global('GRP', [spec.env_name, product_upper, spec.project_name, 'ADMIN'])]: {
         name: project_group_name(spec),
@@ -54,34 +65,39 @@
       for spec in model.specs
     };
 
-    local global_infra_policy = {
+    local infra_base_statements(grp) = [
+      tag_allow(grp, 'manage', infra_resource, product.tags.infra),
+      tag_allow(grp, 'manage', 'scheduling-policies', product.tags.infra),
+      tag_allow(grp, 'manage', 'scheduling-windows', product.tags.infra),
+      tag_allow(grp, 'manage', 'execution-windows', product.tags.infra),
+      tag_allow(grp, 'manage', 'orm-stacks', product.tags.infra),
+      tag_allow(grp, 'manage', 'orm-jobs', product.tags.infra),
+      tag_allow(grp, 'manage', 'orm-config-source-providers', product.tags.infra),
+    ];
+    local infra_database_statements(grp) = [
+      "allow group %s to manage %s in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.%s, ('%s')), request.permission !='VM_CLUSTER_UPDATE_GI_SOFTWARE', request.permission !='VM_CLUSTER_UPDATE_EXADATA_STORAGE'}" % [domain_grp(grp), vmcluster_resource, tag_key, product.tags.db],
+      tag_allow(grp, 'use', 'dbServers', product.tags.db),
+      tag_allow(grp, 'manage', 'dbnode-console-connection', product.tags.db),
+      tag_allow(grp, 'manage', 'dbnode-console-history', product.tags.db),
+      tag_allow(grp, 'manage', 'autonomous-vmclusters', product.tags.db),
+      tag_allow(grp, 'use', 'subnets', 'lz-network-admin'),
+      tag_allow(grp, 'use', 'vnics', 'lz-network-admin'),
+      tag_allow(grp, 'use', 'dns', 'lz-network-admin'),
+      tag_allow(grp, 'manage', 'db-nodes', product.tags.db),
+    ];
+    local global_infra_policy = if has_infra_group then {
       [n.key_global('PCY', ['GLOBAL', product_upper, 'INFRA', 'ADMIN'])]: {
         name: 'pcy-lz-global-%s-infra-admin' % product.code,
         description: descriptions.global_infra_policy,
         compartment_id: 'CMP-LANDINGZONE-KEY',
         local grp = group_name('INFRA'),
-        statements: [
-          tag_allow(grp, 'manage', infra_resource, product.tags.infra),
-          tag_allow(grp, 'manage', 'scheduling-policies', product.tags.infra),
-          tag_allow(grp, 'manage', 'scheduling-windows', product.tags.infra),
-          tag_allow(grp, 'manage', 'execution-windows', product.tags.infra),
-          tag_allow(grp, 'manage', 'orm-stacks', product.tags.infra),
-          tag_allow(grp, 'manage', 'orm-jobs', product.tags.infra),
-          tag_allow(grp, 'manage', 'orm-config-source-providers', product.tags.infra),
-          "allow group %s to manage %s in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.%s, ('%s')), request.permission !='VM_CLUSTER_UPDATE_GI_SOFTWARE', request.permission !='VM_CLUSTER_UPDATE_EXADATA_STORAGE'}" % [domain_grp(grp), vmcluster_resource, tag_key, product.tags.db],
-          tag_allow(grp, 'use', 'dbServers', product.tags.db),
-          tag_allow(grp, 'manage', 'dbnode-console-connection', product.tags.db),
-          tag_allow(grp, 'manage', 'dbnode-console-history', product.tags.db),
-          tag_allow(grp, 'manage', 'autonomous-vmclusters', product.tags.db),
-          tag_allow(grp, 'use', 'subnets', 'lz-network-admin'),
-          tag_allow(grp, 'use', 'vnics', 'lz-network-admin'),
-          tag_allow(grp, 'use', 'dns', 'lz-network-admin'),
-          tag_allow(grp, 'manage', 'db-nodes', product.tags.db),
-        ],
+        statements:
+          (if aggregate_components.infrastructure then infra_base_statements(grp) else [])
+          + (if aggregate_components.database then infra_database_statements(grp) else []),
       },
-    };
+    } else {};
 
-    local global_db_policy = {
+    local global_db_policy = if has_db_group then {
       [n.key_global('PCY', ['GLOBAL', product_upper, 'DB', 'ADMIN'])]: {
         name: 'pcy-lz-global-%s-db-admin' % product.code,
         description: descriptions.global_db_policy,
@@ -104,17 +120,18 @@
           tag_allow(grp, 'read', 'virtual-network-family', 'lz-network-admin'),
         ],
       },
-    };
+    } else {};
 
-    local global_generic_policy = {
+    local global_generic_policy = if has_infra_group || has_db_group then {
       [n.key_global('PCY', ['GLOBAL', product_upper, 'GENERIC', 'ADMIN'])]: {
         name: 'pcy-lz-global-%s-generic' % product.code,
         description: descriptions.global_generic_policy,
         compartment_id: 'TENANCY-ROOT',
-        local groups = '%s,%s' % [
-          domain_grp(group_name('INFRA')),
-          domain_grp(group_name('DB')),
-        ],
+        local groups = std.join(',', (
+          if has_infra_group then [domain_grp(group_name('INFRA'))] else []
+        ) + (
+          if has_db_group then [domain_grp(group_name('DB'))] else []
+        )),
         statements: [
           'allow group %s to use cloud-shell in tenancy' % groups,
           'allow group %s to read compartments in tenancy' % groups,
@@ -127,7 +144,7 @@
           "allow group %s to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.%s, ('%s'))" % [groups, tag_key, product.tags.admin],
         ],
       },
-    };
+    } else {};
 
     local project_policies = {
       [n.key_global('PCY', [spec.env_name, product_upper, spec.project_name, 'ADMIN'])]: {

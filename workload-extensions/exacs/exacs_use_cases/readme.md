@@ -23,7 +23,7 @@
   - [**3.3 Software Images**](#33-software-images)
   - [**3.4 Backup Destinations**](#34-backup-destinations)
 
-Published generated artifacts currently cover UC1. UC2 and UC3 are retained as design guidance and require config-driven generation before use.
+Published generated artifacts currently cover UC1 and intentionally include both shared and environment EXACS platform scopes to cover multiple placement use cases. UC2 and UC3 are retained as design guidance and require config-driven generation before use.
 
 ## **1. Summary**
 
@@ -40,6 +40,8 @@ We have identified three main use cases:
 3. Dedicated ExaDB-D Platform: Fully dedicated infrastructure and VMCs/AVMCs per environment.
 
 While not all possible configurations are covered, these represent the most common scenarios. If your use case involves a combination of these, you can leverage elements from each to design a custom solution.
+
+For config-driven generation, ask the placement decisions explicitly before producing artifacts: where Exadata infrastructure lives, whether Autonomous Database Dedicated on AVMCs or regular Exadata Database Service on VMCs is used, where AVMCs/VMCs live, and which projects need Autonomous Database Dedicated project DB tiers. AVMC/VMC placement requires an EXACS VCN with database and backup subnets. Infrastructure-only placement does not use an EXACS network and does not require AVMC/VMC permissions. Autonomous Database Dedicated project tiers require `project_db_compartments`; a project/spoke network is only needed when project resources, such as application VMs, need network connectivity to those databases.
 
 The ExaDB-D infrastructure consists of database and storage servers connected through a RoCE switch fabric. It supports both "regular" *Virtual Machine Clusters (VMCs)* and *Autonomous Virtual Machine Clusters (AVMCs)*. Each VMC/AVMC is composed of one or more virtual machines distributed across database servers, ensuring high availability through Oracle Grid Infrastructure clusterware.
 

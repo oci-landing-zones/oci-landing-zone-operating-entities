@@ -29,7 +29,7 @@
 
 The multi-stack EXACS network files are extension-only. The base One-OE stack owns the hub DRG, so the generated `oneoe_network_hub_*_post.json` file updates that stack with the EXACS DRG attachment and hub routes.
 
-Published generated artifacts in this folder currently cover UC1. UC2 and UC3 are retained as design guidance and require config-driven generation before use.
+Published generated artifacts in this folder currently cover UC1 with one shared EXACS platform VCN, environment EXACS platform compartments, and Autonomous Database Dedicated project DB tiers for `prod` and `preprod`. UC2 and UC3 are retained as design guidance and require config-driven generation before use.
 
 &nbsp;
 

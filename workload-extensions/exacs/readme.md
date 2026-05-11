@@ -12,7 +12,7 @@
 
 The ExaDB-D Landing Zone Workload Extension is a reference configuration for onboarding Exadata Database Service on Dedicated Infrastructure workloads into an OCI landing zone. It adds the EXACS network, IAM, and observability resources needed to operate ExaDB-D database platforms.
 
-The generated examples model a One-OE landing zone with `prod` and `preprod` environments, a shared EXACS platform VCN, and project-level EXACS database compartments.
+The generated UC1 examples model a One-OE landing zone with `prod` and `preprod` environments, one shared EXACS platform VCN, environment EXACS platform compartments, and project-level EXACS database compartments for Autonomous Database Dedicated. The published examples intentionally include both shared and environment platform scopes to cover multiple ExaDB-D placement use cases.
 
 Published generated artifacts currently cover UC1. UC2 and UC3 are retained as design guidance and require config-driven generation before use.
 
@@ -24,8 +24,10 @@ This workload extension uses the One-OE blueprint as the reference landing zone 
 
 - EXACS platform compartments for database and infrastructure administration.
 - EXACS IAM groups and policies for global DBA, global infrastructure, and project DBA teams.
-- An optional EXACS platform VCN with database and backup subnets.
+- EXACS platform VCNs with database and backup subnets where AVMCs or VMCs are placed.
 - EXACS event rules, alarms, notification topics, and flow-log support in published outputs.
+
+In config-driven generation, Exadata infrastructure placement and AVMC/VMC placement are separate decisions. Infrastructure-only EXACS scopes omit the platform network and do not receive AVMC/VMC permissions. AVMC/VMC scopes require a platform network. Autonomous Database Dedicated project tiers are represented with `project_db_compartments`. A separate project/spoke network is only required when project resources, such as application VMs, need network connectivity to those databases.
 
 See the [ExaDB-D use cases](./exacs_use_cases/readme.md) for the design scenarios behind the published example.
 

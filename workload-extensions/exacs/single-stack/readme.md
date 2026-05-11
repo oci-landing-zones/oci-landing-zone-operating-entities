@@ -30,7 +30,7 @@
 | [exacs_observability_cis2_uc1_pre.json](exacs_observability_cis2_uc1_pre.json) | CIS level 2 observability before flow logs |
 | [exacs_observability_cis2_uc1.json](exacs_observability_cis2_uc1.json) | CIS level 2 observability with flow logs |
 
-The published single-stack example uses a shared EXACS platform VCN with database and backup subnets. It also creates project-level EXACS database compartments for `prod` and `preprod`.
+The published single-stack UC1 example uses one shared EXACS platform VCN with database and backup subnets. It also creates environment EXACS platform compartments and project-level EXACS database compartments for `prod` and `preprod` so the published artifacts continue to cover multiple ExaDB-D placement use cases.
 
 Published generated artifacts in this folder currently cover UC1. UC2 and UC3 are retained as design guidance and require config-driven generation before use.
 

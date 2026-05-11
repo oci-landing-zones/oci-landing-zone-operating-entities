@@ -29,6 +29,7 @@ local result = lz({
           },
         },
         exacs: {
+          network: { vcn: '10.0.24.0/21' },
           extension: {
             type: 'exacs',
             params: {
@@ -57,6 +58,7 @@ local result = lz({
       },
     },
     exacs: {
+      network: { vcn: '10.0.32.0/21' },
       extension: {
         type: 'exacs',
         params: {

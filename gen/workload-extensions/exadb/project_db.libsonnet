@@ -3,6 +3,27 @@ local collections = import '../../lib/collections.libsonnet';
 local validation = import '../../lib/validation.libsonnet';
 
 {
+  component_defaults:: { infrastructure: true, database: true },
+
+  normalize_components(product, cfg, inferred=null)::
+    local has_components = std.objectHas(cfg, 'components') && cfg.components != null;
+    assert !has_components :
+           '%s components is not supported' % product.code;
+    local base_components =
+      if inferred != null then inferred
+      else self.component_defaults;
+    local components = base_components;
+    local invalid = [
+      key
+      for key in std.objectFields(components)
+      if std.type(components[key]) != 'boolean'
+    ];
+    assert std.length(invalid) == 0 :
+           '%s placement.%s must be a boolean' % [product.code, invalid[0]];
+    assert components.infrastructure || components.database :
+           '%s placement must include infrastructure or database' % product.code;
+    components,
+
   platform_db_key(product, n, scope)::
     n.key_global('CMP', [scope.scope_name, scope.platform_name, 'DB']),
 
@@ -15,18 +36,23 @@ local validation = import '../../lib/validation.libsonnet';
     local descriptions = inputs.descriptions;
     local scope = inputs.scope;
     local tag_key = inputs.tag_key;
-    {
+    local components =
+      if std.objectHas(inputs, 'components') then inputs.components
+      else self.component_defaults;
+    (if components.database then {
       [self.platform_db_key(product, n, scope)]: {
         name: '%s-db' % scope.compartment_name,
         description: descriptions.platform_child_compartment(scope, 'Database'),
         defined_tags: { [tag_key]: product.tags.db },
       },
+    } else {}) +
+    (if components.infrastructure then {
       [self.platform_infra_key(product, n, scope)]: {
         name: '%s-infra' % scope.compartment_name,
         description: descriptions.platform_child_compartment(scope, 'Infrastructure'),
         defined_tags: { [tag_key]: product.tags.infra },
       },
-    },
+    } else {}),
 
   project_db_key(product, n, env_name, project_name)::
     if product.code == 'exacs' then n.key_global('CMP', [env_name, project_name, 'EXACS', 'DB'])
@@ -123,11 +149,12 @@ local validation = import '../../lib/validation.libsonnet';
     {
       [entry.scope.compartment_key]: {
         local scope = entry.scope,
+        local components = $.normalize_components(product, entry.platform_config.extension.params),
         name: scope.compartment_name,
         description: descriptions.platform_compartment(scope),
         parent_id: scope.parent_compartment_key,
         defined_tags: { [tag_key]: product.tags.admin },
-        children: $.platform_children(inputs { scope: scope }),
+        children: $.platform_children(inputs { scope: scope, components: components }),
       }
       for entry in entries
     },
@@ -220,6 +247,20 @@ local validation = import '../../lib/validation.libsonnet';
       product,
       self.raw_project_db_map(product, scope, inputs.cfg)
     );
+    local components =
+      if std.objectHas(inputs, 'components') then inputs.components
+      else self.normalize_components(product, inputs.cfg);
+    assert components.database || std.length(std.objectFields(raw_project_db_compartments)) == 0 :
+           '%s project_db_compartments require database placement' % product.code;
+    local extension_has_networks =
+      if std.objectHas(scope_config, 'extension_has_networks') then scope_config.extension_has_networks
+      else {};
+    local exacs_has_platform_network =
+      std.objectHas(extension_has_networks, product.code) && extension_has_networks[product.code];
+    assert product.code != 'exacs' ||
+           std.length(std.objectFields(raw_project_db_compartments)) == 0 ||
+           exacs_has_platform_network :
+           'exacs project_db_compartments require an ExaCS platform network for AVMC placement';
 
     local by_environment = {
       [env_name]: collections.unique(raw_project_db_compartments[env_name])
@@ -233,7 +274,6 @@ local validation = import '../../lib/validation.libsonnet';
     local environment_labels =
       if std.objectHas(scope_config, 'environment_labels') then scope_config.environment_labels
       else {};
-
     local exacs_unknown_envs = [
       env_name
       for env_name in std.objectFields(by_environment)

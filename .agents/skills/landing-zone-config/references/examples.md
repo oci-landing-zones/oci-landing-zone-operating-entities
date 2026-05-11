@@ -89,6 +89,48 @@ Based on `tests/gen/testdata/direct/pass/config_platform_compartments.jsonnet`.
 
 Use this when the platform should live under the shared platform compartment tree rather than an environment.
 
+## Shared ExaCS With Autonomous Project Tiers
+
+Based on `tests/gen/testdata/configs/pass/prod_preprod_exacs_uc1.jsonnet`.
+
+```jsonnet
+{
+  hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
+  environments: {
+    prod: {
+      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      projects: { proj1: {} },
+    },
+    preprod: {
+      shared_project_network: { network: { vcn: '10.0.128.0/21' } },
+      projects: { proj1: {} },
+    },
+  },
+  shared_platforms: {
+    exacs: {
+      network: { vcn: '10.0.24.0/21' },
+      extension: {
+        type: 'exacs',
+        params: {
+          project_db_compartments: {
+            prod: ['proj1'],
+            preprod: ['proj1'],
+          },
+          notification_emails: {
+            default: ['exacs-platform@example.com'],
+            db_workloads: ['exacs-db@example.com'],
+            infra_workloads: ['exacs-infra@example.com'],
+            projects: ['exacs-projects@example.com'],
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+Use this when Exadata infrastructure and AVMC/VMC placement are shared, and Autonomous Database Dedicated should be delegated to selected project DB tiers. The `shared_project_network` entries are only needed when those environments also need project network resources. Do not add environment ExaCS platforms for this shared-only case.
+
 ## Multi-Environment Example
 
 Based on `tests/gen/testdata/direct/pass/config_hub_a_staging.jsonnet`.

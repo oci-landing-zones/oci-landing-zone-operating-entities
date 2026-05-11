@@ -53,6 +53,8 @@ Do not use this skill as the first response to an open-ended customer request su
 | Config-mode network outputs | `network.json` is canonical final output; `network_pre.json` appears only for staged hubs. |
 | Artifact placement | Ask for both the config file location and the output directory before creating customer artifacts; do not default them into `tests/`. |
 | Unsupported resources | Do not add unsupported config keys or fake extension types. Generate only supported prerequisites, then document the unsupported resource as manual post-deployment configuration. |
+| ExaCS network | Network is required for ExaCS AVMC/VMC placement and forbidden for ExaCS infrastructure-only placement. |
+| ExaCS project DB tiers | Use `project_db_compartments` only for Autonomous Database Dedicated project tiers; `shared_project_network` is only needed when the environment also needs project network resources. |
 
 ## Authoring Guidance
 
@@ -64,6 +66,7 @@ Do not use this skill as the first response to an open-ended customer request su
 - Keep CIDRs explicit even when subnets are auto-generated. Auto-subnetting helps with subnet layout, not top-level network planning.
 - When selecting CIDRs, check whether the landing zone will connect to on-premises or other clouds; any routed OCI or Kubernetes ranges must avoid overlap with those external networks.
 - When adding a new extension-backed platform, verify both the config schema and the extension contract.
+- For ExaCS, decide infrastructure placement, database service model, AVMC/VMC placement, and Autonomous project tiers before writing config. Shared-only ExaCS uses `shared_platforms.exacs` with `network`; hybrid uses infrastructure-only `shared_platforms.exacs` plus environment `platforms.exacs` with `network`; dedicated uses only environment `platforms.exacs` with `network`.
 - For customer deployment guidance, Prefer Terraform CLI locally or from customer-controlled CI/CD. If ORM is used, stage the generated files in a customer-controlled private OCI Object Storage bucket or approved private GitHub source and use the orchestrator `rms-facade` workflow instead of repo-hosted public raw URLs.
 - If the requested resource is not supported by config mode, say so clearly. Keep it out of generated files, use config mode only for adjacent supported items such as CIDRs, VCNs, subnets, DRG attachments, route tables, security rules, DNS, logging, or IAM, and provide separate manual post-deployment steps for the unsupported resource.
 
@@ -79,6 +82,7 @@ Do not use this skill as the first response to an open-ended customer request su
 - For the schema and behavior map, read `references/schema-and-behavior.md`.
 - For starter patterns and repo-native examples, read `references/examples.md`.
 - For config-driven OKE semantics and CIDR guardrails, read `gen/workload-extensions/oke/AGENTS.md`.
+- For config-driven ExaCS placement and component semantics, read `gen/workload-extensions/exacs/AGENTS.md`.
 
 ## Common Mistakes
 
@@ -86,6 +90,8 @@ Do not use this skill as the first response to an open-ended customer request su
 - Dropping customer configs or generated landing zone outputs into `tests/gen/testdata/...` just because those directories already exist.
 - Assuming every platform can auto-generate subnets. Plain platforms without an extension cannot.
 - Forgetting that only environments with `shared_project_network` become spokes.
+- Treating ExaCS network as optional. Network means AVMC/VMC placement; infrastructure-only ExaCS must omit network.
+- Adding ExaCS `project_db_compartments` for regular Exadata Database Service-only designs.
 - Forgetting that omitted `security_targets` now means all environments. Narrow it explicitly when you need a subset.
 - Adding an extension `type` in config without registering it in `gen/landing_zone.libsonnet`.
 - Representing unsupported resources such as VPN or FastConnect by inventing config fields instead of marking them as manual post-deployment configuration.

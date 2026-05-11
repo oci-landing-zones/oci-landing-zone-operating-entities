@@ -86,6 +86,17 @@ If the customer's answers point to `Multi-OE`, warn immediately before continuin
 - When the customer asks for public access, do not assume the chosen hub needs a brand-new public load balancer design. Check the selected hub guide or runtime artifacts first; in the One-OE one-stack runtime, each hub family already includes a public load balancer example with placeholder backends.
 - If the workload or application can expose a private endpoint such as an internal load balancer, explain that the hub public load balancer can target that private endpoint when the chosen design supports it instead of assuming the workload must expose its own separate public load balancer.
 
+## ExaDB-D / ExaCS-Specific Guardrails
+
+- If the customer says ExaDB-D, Exadata Database Service on Dedicated Infrastructure, Autonomous Database Dedicated, ExaCS, VMC, or AVMC, complete the base landing-zone discovery first, then ask ExaCS placement questions before config guidance.
+- Ask whether Exadata infrastructure is shared across environments or dedicated per environment.
+- Ask whether the customer will use Autonomous Database Dedicated on AVMCs, regular Exadata Database Service on VMCs, or both.
+- Ask whether AVMCs/VMCs are shared or environment-specific. Explain that AVMC/VMC placement requires an ExaCS network with database and backup subnets.
+- If a shared ExaCS platform has no network, treat it as infrastructure-only. Do not imply that VMCs/AVMCs can be deployed there or that AVMC/VMC permissions are needed there.
+- For Autonomous Database Dedicated, ask which environments and projects need Autonomous Database tiers. Explain that a project/spoke network is separate from the AVMC network and is only needed when the project will deploy applications or other resources such as VMs that need network connectivity to the Autonomous Database.
+- Do not add project DB tiers for regular Exadata Database Service-only designs.
+- Map answers to config only after the customer understands the placement decision: shared-only uses `shared_platforms.exacs`; hybrid uses infrastructure-only `shared_platforms.exacs` plus environment `platforms.exacs`; dedicated uses only environment `platforms.exacs`.
+
 ## Deployment Delivery Defaults
 
 - Prefer Terraform CLI locally or from customer-controlled CI/CD.

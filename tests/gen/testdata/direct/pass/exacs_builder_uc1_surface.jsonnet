@@ -1,6 +1,5 @@
-// EXACS contributes shared/env platform IAM, project DB layers, observability, and product-specific cloud resource policies
+// EXACS shared platform contributes network, IAM, project DB layers, observability, and product-specific cloud resource policies
 // contains: CMP-LZ-SHARED-EXACS-KEY
-// contains: CMP-LZ-PROD-EXACS-KEY
 // contains: CMP-LZ-PROD-PROJ1-EXACS-DB-KEY
 // contains: GRP-LZ-GLOBAL-EXACS-DB-ADMIN-KEY
 // contains: GRP-LZ-GLOBAL-EXACS-INFRA-ADMIN-KEY
@@ -33,11 +32,6 @@ local result = lz({
     prod: {
       shared_project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
-      platforms: {
-        exacs: {
-          extension: { type: 'exacs', params: exacs_params(['proj1']) },
-        },
-      },
     },
   },
   shared_platforms: {

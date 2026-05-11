@@ -9,6 +9,7 @@
   },
   shared_platforms: {
     exacs: {
+      network: { vcn: '10.0.24.0/21' },
       extension: {
         type: 'exacs',
         params: {

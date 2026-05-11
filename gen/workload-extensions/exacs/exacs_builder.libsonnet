@@ -1,17 +1,37 @@
 local common = import '../../hub/hub_common.libsonnet';
 local descriptions = import './descriptions.libsonnet';
 local exadb_render = import '../exadb/render.libsonnet';
+local exadb_project_db = import '../exadb/project_db.libsonnet';
 local products = import '../exadb/products.libsonnet';
 
 {
-  metadata(params):: {
-    network_mode: 'optional',
-    default_subnets: {
-      db: '/24',
-      backup: '/24',
-    },
-    subnet_order: ['db', 'backup'],
-  },
+  metadata(params)::
+    local scope_config =
+      if std.objectHas(params, 'scope_config') then params.scope_config
+      else {};
+    local inferred_components =
+      if std.objectHas(scope_config, 'extension_entry_components') then
+        scope_config.extension_entry_components
+      else null;
+    local components = exadb_project_db.normalize_components(
+      products.exacs,
+      params.config_params,
+      inferred_components
+    );
+    local has_platform_network =
+      std.objectHas(params, 'platform_config') &&
+      std.objectHas(params.platform_config, 'network') &&
+      params.platform_config.network != null;
+    {
+      network_mode: if has_platform_network then 'required' else 'forbidden',
+    }
+    + (if has_platform_network then {
+      default_subnets: {
+        db: '/24',
+        backup: '/24',
+      },
+      subnet_order: ['db', 'backup'],
+    } else {}),
 
   render(params)::
     local n = params.naming;
