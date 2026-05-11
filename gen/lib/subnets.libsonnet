@@ -14,8 +14,7 @@ local cidrs = import 'cidrs.libsonnet';
       }
       for k in keys
     ];
-    local checked_entries = cidrs.assert_non_overlapping(entries, label);
-    assert std.length(checked_entries) == std.length(entries);
+    assert cidrs.assert_non_overlapping(entries, label);
     if parent_cidr != null then
       assert std.all([
         cidrs.contains(parent_cidr, subnets[k])

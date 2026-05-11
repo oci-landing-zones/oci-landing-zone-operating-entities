@@ -116,5 +116,5 @@ local digit_map = {
     ];
     assert std.length(overlaps) == 0 :
       '%s contains overlapping CIDRs: %s' % [label, std.join('; ', overlaps)];
-    entries,
+    true,
 }

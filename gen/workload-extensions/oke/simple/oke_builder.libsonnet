@@ -31,7 +31,6 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
   assert std.objectHas(params.config_params, 'services_cidr') : 'oke_simple requires config_params.services_cidr';
   assert std.objectHas(params.config_params, 'api_endpoint_allowed_cidrs') :
     'oke_simple requires config_params.api_endpoint_allowed_cidrs';
-  assert std.objectHas(params, 'topology') : 'oke_simple requires topology scope semantics';
 
   local metadata = self.metadata(params);
   local n = params.naming;

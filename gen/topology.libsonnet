@@ -17,17 +17,6 @@ function(config, n)
   ];
   local security_target_env_names =
     if std.objectHas(config, 'security_targets') && config.security_targets != null then
-      assert std.type(config.security_targets) == 'array' :
-        'config.security_targets must be an array';
-      assert std.all([
-        std.member(raw_env_names, env_name)
-        for env_name in config.security_targets
-      ]) :
-        'config.security_targets must only reference defined environments: %s' % std.join(', ', [
-          env_name
-          for env_name in config.security_targets
-          if !std.member(raw_env_names, env_name)
-        ]);
       [
         env_name
         for env_name in ordered_env_names

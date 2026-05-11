@@ -1,15 +1,19 @@
-local platforms = import 'platforms.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
+local validation = import 'lib/validation.libsonnet';
+local platforms = import 'platforms.libsonnet';
 
 {
-  entries_by_type(extension_entries, extension_type, publication_label)::
-    local entries = [
+  select_entries_by_type(extension_entries, extension_type)::
+    [
       entry
       for entry in extension_entries
       if entry.platform_config.extension.type == extension_type
-    ];
+    ],
+
+  entries_by_type(extension_entries, extension_type, publication_label)::
+    local entries = self.select_entries_by_type(extension_entries, extension_type);
     assert std.length(entries) > 0 :
-      '%s publication requires at least one %s platform' % [publication_label, extension_type];
+           '%s publication requires at least one %s platform' % [publication_label, extension_type];
     entries,
 
   resolve_by_type(inputs)::
@@ -32,14 +36,29 @@ local subnet_utils = import 'lib/subnets.libsonnet';
     },
 
   resolve_entry(inputs)::
-    local extension_registry = inputs.extension_registry;
     local pe = inputs.platform_entry;
     local n = inputs.naming;
-    local hub_vcn_cidr = inputs.hub_vcn_cidr;
-    local routed_vcn_entries = inputs.routed_vcn_entries;
-    local hub_has_spoke_natgw =
-      if std.objectHas(inputs, 'hub_has_spoke_natgw') then inputs.hub_has_spoke_natgw
-      else true;
+    local ext_type = pe.platform_config.extension.type;
+    local ext_def = self._validate_definition(
+      ext_type,
+      self._lookup_definition(inputs.extension_registry, pe)
+    );
+    local raw_ext_meta = self._raw_metadata(ext_type, ext_def, pe, n);
+    local ext_meta = self._normalize_metadata(ext_type, raw_ext_meta, pe);
+    local resolved_subnets = self._resolve_subnets(ext_type, pe, ext_meta);
+    local routing = self._resolve_routing(inputs, pe, ext_meta);
+    local render_params =
+      self._render_params(inputs, pe, resolved_subnets, routing, ext_meta);
+    {
+      type: ext_type,
+      definition: ext_def,
+      metadata: ext_meta { resolved_subnets: resolved_subnets },
+      resolved_subnets: resolved_subnets,
+      routing: routing,
+      render_params: render_params,
+    },
+
+  _lookup_definition(extension_registry, pe)::
     local ext_type = pe.platform_config.extension.type;
     assert std.objectHas(extension_registry, ext_type) :
            'Unknown extension type "%s" for platform %s/%s. Available: %s' % [
@@ -48,16 +67,28 @@ local subnet_utils = import 'lib/subnets.libsonnet';
       pe.scope.platform_name,
       std.join(', ', std.objectFields(extension_registry)),
     ];
-    local ext_def = extension_registry[ext_type];
+    extension_registry[ext_type],
+
+  _validate_definition(ext_type, ext_def)::
     assert std.objectHasAll(ext_def, 'metadata') :
            'Extension "%s" must define metadata(params)' % ext_type;
     assert std.objectHasAll(ext_def, 'render') :
            'Extension "%s" must define render(params)' % ext_type;
-    local raw_ext_meta = ext_def.metadata({
+    ext_def,
+
+  _raw_metadata(ext_type, ext_def, pe, n)::
+    local meta = ext_def.metadata({
       config_params: pe.platform_config.extension.params,
       naming: n,
       topology: pe.scope,
     });
+    validation.object(
+      meta,
+      'Extension "%s" metadata(params)' % ext_type,
+      return_contract=true
+    ),
+
+  _normalize_metadata(ext_type, raw_ext_meta, pe)::
     local has_legacy_requires_network = std.objectHas(raw_ext_meta, 'requires_network');
     assert !has_legacy_requires_network || std.type(raw_ext_meta.requires_network) == 'boolean' :
            'Extension "%s" metadata.requires_network must be a boolean' % ext_type;
@@ -69,7 +100,10 @@ local subnet_utils = import 'lib/subnets.libsonnet';
         if raw_ext_meta.requires_network then 'required' else 'forbidden'
       else 'required';
     assert std.member(['required', 'forbidden', 'optional'], declared_network_mode) :
-           'Extension "%s" metadata.network_mode must be one of: required, forbidden, optional' % ext_type;
+           'Extension "%s" metadata.network_mode must be one of: required, forbidden, optional; got %s' % [
+      ext_type,
+      std.manifestJson(declared_network_mode),
+    ];
     assert declared_network_mode != 'required' || has_platform_network :
            'Extension "%s" for platform %s/%s requires network.vcn' % [
       ext_type,
@@ -79,41 +113,46 @@ local subnet_utils = import 'lib/subnets.libsonnet';
     assert declared_network_mode != 'forbidden' || !has_platform_network :
            if has_legacy_requires_network && !raw_ext_meta.requires_network &&
               !std.objectHas(raw_ext_meta, 'network_mode') then
-             'Extension "%s" for platform %s/%s does not accept platform.network because metadata.requires_network is false' % [
-               ext_type,
-               pe.scope.scope_name,
-               pe.scope.platform_name,
-             ]
-           else
-             'Extension "%s" for platform %s/%s does not accept platform.network because metadata.network_mode is forbidden' % [
-               ext_type,
-               pe.scope.scope_name,
-               pe.scope.platform_name,
-             ];
+      'Extension "%s" for platform %s/%s does not accept platform.network because metadata.requires_network is false' % [
+        ext_type,
+        pe.scope.scope_name,
+        pe.scope.platform_name,
+      ]
+    else
+      'Extension "%s" for platform %s/%s does not accept platform.network because metadata.network_mode is forbidden' % [
+        ext_type,
+        pe.scope.scope_name,
+        pe.scope.platform_name,
+      ];
     local resolves_network = has_platform_network;
     assert !resolves_network || std.objectHas(raw_ext_meta, 'default_subnets') :
            'Extension "%s" must define metadata.default_subnets when network is used' % ext_type;
-    local ext_meta = raw_ext_meta {
+    raw_ext_meta {
       network_mode: declared_network_mode,
       requires_network: declared_network_mode == 'required',
       has_network: resolves_network,
-    };
+    },
+
+  _subnet_names(ext_meta)::
+    if ext_meta.has_network then
+      if std.objectHas(ext_meta, 'subnet_order') then ext_meta.subnet_order
+      else std.objectFields(ext_meta.default_subnets)
+    else [],
+
+  _resolve_subnets(ext_type, pe, ext_meta)::
     local subnet_names =
-      if resolves_network then
-        if std.objectHas(ext_meta, 'subnet_order') then ext_meta.subnet_order
-        else std.objectFields(ext_meta.default_subnets)
-      else [];
-    assert !resolves_network || std.all([
+      self._subnet_names(ext_meta);
+    assert !ext_meta.has_network || std.all([
       std.objectHas(ext_meta.default_subnets, sn)
       for sn in subnet_names
     ]) : 'Extension "%s" subnet_order contains names not in default_subnets: %s' % [
       ext_type,
       std.join(', ', [sn for sn in subnet_names if !std.objectHas(ext_meta.default_subnets, sn)]),
-      ];
+    ];
     local subnet_label =
       'Platform %s.network.subnets for extension %s' % [pe.scope.platform_name, ext_type];
     local resolved_subnets =
-      if resolves_network then
+      if ext_meta.has_network then
         if pe.platform_config.network.subnets != null then
           subnet_utils.validate_subnet_map(
             pe.platform_config.network.subnets,
@@ -129,80 +168,77 @@ local subnet_utils = import 'lib/subnets.libsonnet';
           ]
         )
       else null;
-    local routing =
-      if resolves_network then
-        platforms.build_extension_route_targets({
-          platform_entry: pe,
-          routed_vcn_entries: routed_vcn_entries,
-          naming: n,
-          hub_vcn_cidr: hub_vcn_cidr,
-          hub_has_spoke_natgw: hub_has_spoke_natgw,
-        })
-      else null;
+    resolved_subnets,
+
+  _resolve_routing(inputs, pe, ext_meta)::
+    local hub_has_spoke_natgw =
+      if std.objectHas(inputs, 'hub_has_spoke_natgw') then inputs.hub_has_spoke_natgw
+      else true;
+    if ext_meta.has_network then
+      platforms.build_extension_route_targets({
+        platform_entry: pe,
+        routed_vcn_entries: inputs.routed_vcn_entries,
+        naming: inputs.naming,
+        hub_vcn_cidr: inputs.hub_vcn_cidr,
+        hub_has_spoke_natgw: hub_has_spoke_natgw,
+      })
+    else null,
+
+  _render_params(inputs, pe, resolved_subnets, routing, ext_meta)::
     {
-      type: ext_type,
-      definition: ext_def,
-      metadata: ext_meta { resolved_subnets: resolved_subnets },
-      resolved_subnets: resolved_subnets,
+      config_params: pe.platform_config.extension.params,
+      network:
+        if ext_meta.has_network then
+          { vcn: pe.platform_config.network.vcn, subnets: resolved_subnets }
+        else null,
+      naming: inputs.naming,
+      topology: pe.scope,
+      scope_config:
+        if std.objectHas(pe, 'scope_config') then pe.scope_config
+        else {},
       routing: routing,
-      render_params: {
-        config_params: pe.platform_config.extension.params,
-        network:
-          if resolves_network then
-            { vcn: pe.platform_config.network.vcn, subnets: resolved_subnets }
-          else null,
-        naming: n,
-        topology: pe.scope,
-        scope_config:
-          if std.objectHas(pe, 'scope_config') then pe.scope_config
-          else {},
-        routing: routing,
-      },
     },
 
   resolve(inputs)::
     local extension_registry = inputs.extension_registry;
     local extension_entries = inputs.extension_entries;
-    local results =
-      if std.length(extension_entries) > 0 then
-        [
-          local resolved = self.resolve_entry(inputs { platform_entry: extension_entries[i] });
-          local ext_contributions = resolved.definition.render(resolved.render_params);
-          assert !resolved.metadata.has_network || std.objectHas(ext_contributions, 'network_pre') :
-                 'Extension "%s" is missing required contribution "network_pre"' % resolved.type;
-          {
-            type: resolved.type,
-            metadata: resolved.metadata,
-            contributions: ext_contributions,
-          }
-          for i in std.range(0, std.length(extension_entries) - 1)
-        ]
-      else [];
-    local standard_key_specs = [
-      { key: 'network_pre', required: false },
-      { key: 'iam', required: false },
-      { key: 'security_cis1', required: false },
-      { key: 'security_cis2', required: false },
-      { key: 'observability_cis1', required: false },
-      { key: 'observability_cis2', required: false },
+    local results = std.map(
+      function(entry)
+        local resolved = self.resolve_entry(inputs { platform_entry: entry });
+        local ext_contributions = validation.object(
+          resolved.definition.render(resolved.render_params),
+          'Extension "%s" render(params)' % resolved.type,
+          return_contract=true
+        );
+        assert !resolved.metadata.has_network || std.objectHas(ext_contributions, 'network_pre') :
+               'Extension "%s" is missing required contribution "network_pre"' % resolved.type;
+        {
+          type: resolved.type,
+          metadata: resolved.metadata,
+          contributions: ext_contributions,
+        },
+      extension_entries
+    );
+    local standard_keys = [
+      'network_pre',
+      'iam',
+      'security_cis1',
+      'security_cis2',
+      'observability_cis1',
+      'observability_cis2',
     ];
-    local standard_keys = [spec.key for spec in standard_key_specs];
-    local merge_standard_contribution(spec) =
+    local merge_standard_contribution(key) =
       std.foldl(
         function(acc, ext)
-          if std.objectHas(ext.contributions, spec.key) then
-            acc + ext.contributions[spec.key]
-          else
-            assert !spec.required :
-                   'Extension "%s" is missing required contribution "%s"' % [ext.type, spec.key];
-            acc,
+          if std.objectHas(ext.contributions, key) then acc + ext.contributions[key]
+          else acc,
         results,
         {}
       );
     local standard_contributions =
       {
-        [spec.key]: merge_standard_contribution(spec)
-        for spec in standard_key_specs
+        [key]: merge_standard_contribution(key)
+        for key in standard_keys
       };
     {
       results: results,

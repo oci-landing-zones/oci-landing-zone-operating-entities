@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -11,6 +13,22 @@ from typing import Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 GEN_DIR = REPO_ROOT / "gen"
+
+
+def jsonnet_command() -> str:
+    configured = os.environ.get("JSONNET_BIN")
+    ci = os.environ.get("CI") not in (None, "", "0", "false")
+    if ci:
+        if not configured:
+            return "jsonnet"
+        if Path(configured).name != "jsonnet":
+            raise ValueError("CI/CD fixture runs must use canonical jsonnet")
+        return configured
+    if configured:
+        return configured
+    if shutil.which("jrsonnet"):
+        return "jrsonnet"
+    return "jsonnet"
 
 
 def ensure_gen_on_path() -> None:
@@ -44,7 +62,7 @@ def render_config_outputs(config_file: Path) -> dict[str, dict]:
     with tempfile.TemporaryDirectory() as tmpdir:
         run_cmd(
             [
-                "jsonnet",
+                jsonnet_command(),
                 "--multi",
                 f"{tmpdir}/",
                 "--tla-code-file",
@@ -64,7 +82,7 @@ def render_config_failure(config_file: Path) -> str:
     with tempfile.TemporaryDirectory() as tmpdir:
         proc = run_cmd(
             [
-                "jsonnet",
+                jsonnet_command(),
                 "--multi",
                 f"{tmpdir}/",
                 "--tla-code-file",
@@ -86,6 +104,10 @@ def normalize_jsonnet_error(text: str) -> str:
         if "ERROR:" in line:
             message = line.split("ERROR:", 1)[1].strip()
             return re.sub(r"\s+", " ", message)
+        for prefix in ("runtime error:", "assert failed:"):
+            if line.startswith(prefix):
+                message = line.split(prefix, 1)[1].strip()
+                return re.sub(r"\s+", " ", message)
     if not lines:
         return ""
     return re.sub(r"\s+", " ", lines[0])
@@ -94,7 +116,7 @@ def normalize_jsonnet_error(text: str) -> str:
 def render_direct_failure_message(jsonnet_file: Path) -> str:
     jsonnet_path = (REPO_ROOT / jsonnet_file).resolve()
     proc = run_cmd(
-        ["jsonnet", "-J", str(REPO_ROOT), str(jsonnet_path)],
+        [jsonnet_command(), "-J", str(REPO_ROOT), str(jsonnet_path)],
         expect_success=False,
     )
     if proc.returncode == 0:
@@ -110,7 +132,7 @@ def render_config_failure_message(config_file: Path) -> str:
 
 def render_jsonnet_object(jsonnet_file: Path) -> dict:
     jsonnet_path = (REPO_ROOT / jsonnet_file).resolve()
-    proc = run_cmd(["jsonnet", "-J", str(REPO_ROOT), str(jsonnet_path)])
+    proc = run_cmd([jsonnet_command(), "-J", str(REPO_ROOT), str(jsonnet_path)])
     try:
         return json.loads(proc.stdout)
     except json.JSONDecodeError as exc:

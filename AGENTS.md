@@ -240,3 +240,14 @@ IMPORTANT, following sections applies only to developers of landing, standard re
 - Use `jsonnet --multi` only for config-mode fan-out and debugging. Do not use it to regenerate committed snapshot families under `blueprints/` or `workload-extensions/`.
 - When changing generator contracts, publication boundaries, or topology semantics, update the relevant docs and tests in the same change.
 - If you are unsure where a change belongs, start at `gen/landing_zone.libsonnet` and read outward.
+
+## Generator Error-Handling Policy
+
+For repo-development work in `gen/`, prefer boundary-only error handling that keeps the generator readable and relies on Jsonnet's native failures for trusted internal misuse.
+
+- Keep explicit custom validation at public boundaries: config input normalization, extension metadata/render contracts, CIDR/subnet/network invariants, and workload-extension parameters that customers author directly.
+- Centralize reusable shape checks in `gen/lib/validation.libsonnet` instead of repeating `std.objectHas`, `std.type`, missing-field, array, allowed-key, and string-array checks at each call site.
+- Keep domain validators such as `gen/lib/cidrs.libsonnet` and `gen/lib/subnets.libsonnet` explicit, because overlap, containment, canonical CIDR, and required subnet-key failures need clear customer-facing messages.
+- Do not add defensive custom asserts inside helpers that only receive normalized data from the generator itself unless the native Jsonnet error would be misleading or would hide a security/network invariant.
+- Add or keep custom errors only when they improve customer-facing diagnosis, prevent a late confusing failure, or protect a deployable contract. Otherwise let Jsonnet fail naturally.
+- Tests should pin stable boundary messages with focused fail fixtures. Prefer `// error_contains:` for brittle Jsonnet stack output, and avoid tests that only preserve internal defensive boilerplate.

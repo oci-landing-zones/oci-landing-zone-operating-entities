@@ -2,6 +2,7 @@
 // Config normalization and subnet policy selection for OCI Landing Zone.
 local cidrs = import 'lib/cidrs.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
+local validation = import 'lib/validation.libsonnet';
 
 {
   local hub_subnet_order = {
@@ -15,14 +16,29 @@ local subnet_utils = import 'lib/subnets.libsonnet';
   local spoke_subnet_names = ['web', 'app', 'db', 'infra'],
 
   normalize(config)::
-    assert std.objectHas(config, 'hub') : 'config.hub is required';
-    assert std.objectHas(config.hub, 'kind') : 'config.hub.kind is required';
-    assert std.member(supported_hub_kinds, config.hub.kind) :
+    local hub = validation.required_object(config, 'hub', 'config.hub');
+    local hub_kind = validation.required(hub, 'kind', 'config.hub.kind');
+    assert std.member(supported_hub_kinds, hub_kind) :
       'config.hub.kind must be one of: %s' % std.join(', ', supported_hub_kinds);
-    assert std.objectHas(config.hub, 'network') : 'config.hub.network is required';
-    assert std.objectHas(config.hub.network, 'vcn') : 'config.hub.network.vcn is required';
-    assert std.objectHas(config, 'environments') : 'config.environments is required';
-    assert std.length(std.objectFields(config.environments)) > 0 : 'config.environments must have at least one environment';
+    local hub_network = validation.required_object(hub, 'network', 'config.hub.network');
+    local environments = validation.required_object(config, 'environments', 'config.environments');
+    local env_names = std.objectFields(environments);
+    assert std.length(std.objectFields(environments)) > 0 : 'config.environments must have at least one environment';
+
+    local security_target_names =
+      if std.objectHas(config, 'security_targets') && config.security_targets != null then
+        local targets = validation.array(config.security_targets, 'config.security_targets');
+        assert std.all([
+          std.member(env_names, env_name)
+          for env_name in targets
+        ]) :
+          'config.security_targets must only reference defined environments: %s' % std.join(', ', [
+            env_name
+            for env_name in targets
+            if !std.member(env_names, env_name)
+          ]);
+        targets
+      else null;
 
     local has_region = std.objectHas(config, 'region') && config.region != null;
     local has_region_short_name =
@@ -39,41 +55,51 @@ local subnet_utils = import 'lib/subnets.libsonnet';
       if std.objectHas(config, 'realm') && config.realm != null then config.realm
       else 'oc1';
 
-    local hub_subnet_keys = hub_subnet_order[config.hub.kind];
-    local hub_subnet_label = 'config.hub.network.subnets for %s' % config.hub.kind;
-    local hub_vcn = cidrs.validate('config.hub.network.vcn', config.hub.network.vcn);
+    local hub_subnet_keys = hub_subnet_order[hub_kind];
+    local hub_subnet_label = 'config.hub.network.subnets for %s' % hub_kind;
+    local hub_vcn = cidrs.validate(
+      'config.hub.network.vcn',
+      validation.required(hub_network, 'vcn', 'config.hub.network.vcn')
+    );
     local hub_subnets =
-      if std.objectHas(config.hub.network, 'subnets') then
-        subnet_utils.validate_subnet_map(config.hub.network.subnets, hub_subnet_keys, hub_subnet_label, hub_vcn)
+      if std.objectHas(hub_network, 'subnets') then
+        subnet_utils.validate_subnet_map(hub_network.subnets, hub_subnet_keys, hub_subnet_label, hub_vcn)
       else subnet_utils.auto_subnets_24(hub_vcn, hub_subnet_keys);
 
     local norm_platform(plat, p_name) =
       local extension =
         if std.objectHas(plat, 'extension') then
-          assert plat.extension != null && std.type(plat.extension) == 'object' :
-            'Platform %s.extension must be an object' % p_name;
-          assert std.objectHas(plat.extension, 'type') :
-            'Platform %s.extension.type is required' % p_name;
-          assert std.objectHas(plat.extension, 'params') :
-            'Platform %s.extension.params is required' % p_name;
-          assert plat.extension.params != null && std.type(plat.extension.params) == 'object' :
-            'Platform %s.extension.params must be an object' % p_name;
-          plat.extension
+          local ext = validation.required_object(
+            plat,
+            'extension',
+            'Platform %s.extension' % p_name
+          );
+          ext {
+            type: validation.required(ext, 'type', 'Platform %s.extension.type' % p_name),
+            params: validation.required_object(
+              ext,
+              'params',
+              'Platform %s.extension.params' % p_name
+            ),
+          }
         else null;
       local has_network = std.objectHas(plat, 'network') && plat.network != null;
       assert has_network || extension != null : 'Platform %s.network is required' % p_name;
       local normalized_network =
         if has_network then
-          assert std.objectHas(plat.network, 'vcn') : 'Platform %s.network.vcn is required' % p_name;
-          local platform_vcn = cidrs.validate('Platform %s.network.vcn' % p_name, plat.network.vcn);
+          local network = validation.object(plat.network, 'Platform %s.network' % p_name);
+          local platform_vcn = cidrs.validate(
+            'Platform %s.network.vcn' % p_name,
+            validation.required(network, 'vcn', 'Platform %s.network.vcn' % p_name)
+          );
           {
-            network: plat.network {
+            network: network {
               vcn: platform_vcn,
               subnets:
-                if std.objectHas(plat.network, 'subnets') then
-                  if extension != null then plat.network.subnets
+                if std.objectHas(network, 'subnets') then
+                  if extension != null then network.subnets
                   else subnet_utils.validate_named_subnets(
-                    plat.network.subnets,
+                    network.subnets,
                     'Platform %s.network.subnets' % p_name,
                     platform_vcn
                   )
@@ -87,24 +113,31 @@ local subnet_utils = import 'lib/subnets.libsonnet';
       + normalized_network;
 
     local norm_spn(env_name, env) =
-      local spn = env.shared_project_network;
-      assert spn != null && std.type(spn) == 'object' :
-        'Environment %s.shared_project_network.network is required' % env_name;
-      assert std.objectHas(spn, 'network') :
-        'Environment %s.shared_project_network.network is required' % env_name;
-      assert std.objectHas(spn.network, 'vcn') :
-        'Environment %s.shared_project_network.network.vcn is required' % env_name;
+      local spn = validation.required_object(
+        env,
+        'shared_project_network',
+        'Environment %s.shared_project_network' % env_name
+      );
+      local network = validation.required_object(
+        spn,
+        'network',
+        'Environment %s.shared_project_network.network' % env_name
+      );
       local spn_vcn = cidrs.validate(
         'Environment %s.shared_project_network.network.vcn' % env_name,
-        spn.network.vcn
+        validation.required(
+          network,
+          'vcn',
+          'Environment %s.shared_project_network.network.vcn' % env_name
+        )
       );
       spn {
         network+: {
           vcn: spn_vcn,
           subnets:
-            if std.objectHas(spn.network, 'subnets') then
+            if std.objectHas(network, 'subnets') then
               subnet_utils.validate_named_subnets(
-                spn.network.subnets,
+                network.subnets,
                 'Environment %s.shared_project_network.network.subnets' % env_name,
                 spn_vcn
               )
@@ -113,7 +146,7 @@ local subnet_utils = import 'lib/subnets.libsonnet';
       };
 
     local norm_envs = {
-      [env_name]: local env = config.environments[env_name]; env {
+      [env_name]: local env = environments[env_name]; env {
         [if std.objectHas(env, 'shared_project_network') then 'shared_project_network']:
           norm_spn(env_name, env),
 
@@ -122,7 +155,7 @@ local subnet_utils = import 'lib/subnets.libsonnet';
           for p_name in std.objectFields(env.platforms)
         },
       }
-      for env_name in std.objectFields(config.environments)
+      for env_name in std.objectFields(environments)
     };
 
     local norm_shared = if std.objectHas(config, 'shared_platforms') then {
@@ -156,18 +189,18 @@ local subnet_utils = import 'lib/subnets.libsonnet';
       for p_name in std.objectFields(norm_shared)
       if std.objectHas(norm_shared[p_name], 'network') && norm_shared[p_name].network != null
     ];
-    local validated_vcns = cidrs.assert_non_overlapping(
+    assert cidrs.assert_non_overlapping(
       [{ label: 'Hub VCN', cidr: hub_vcn }] + env_vcn_entries + shared_vcn_entries,
       'VCN CIDRs'
     );
 
-    assert std.length(validated_vcns) > 0 : 'VCN CIDR validation failed';
     config {
       region: region,
       region_short_name: region_short_name,
       realm: realm,
       hub+: { network+: { subnets: hub_subnets } },
       environments: norm_envs,
+      [if security_target_names != null then 'security_targets']: security_target_names,
       [if std.length(std.objectFields(norm_shared)) > 0 then 'shared_platforms']: norm_shared,
     },
 }

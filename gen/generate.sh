@@ -37,13 +37,32 @@ for hook in "$HOOKS_SOURCE_DIR"/*; do
   fi
 done
 
-# Ensure jsonnet is installed and available on the PATH
-if ! command -v jsonnet &>/dev/null; then
-  echo "Error: 'jsonnet' command not found. 🤷" >&2
-  echo "Please install Jsonnet and make sure it's in your system's PATH." >&2
-  echo "📦 Using Package managers:" >&2
+# Select Jsonnet renderer. Local developer runs prefer jrsonnet when installed
+# because it is much faster. CI/CD must use canonical jsonnet so we keep
+# compatibility with the renderer used by supported automation.
+JSONNET_BIN="${JSONNET_BIN:-}"
+if [[ -n "${CI:-}" && "${CI:-}" != "0" && "${CI:-}" != "false" ]]; then
+  JSONNET_BIN="${JSONNET_BIN:-jsonnet}"
+  if [[ "${JSONNET_BIN##*/}" != "jsonnet" ]]; then
+    echo "Error: CI/CD generation must use canonical 'jsonnet', not '$JSONNET_BIN'." >&2
+    echo "Unset JSONNET_BIN or set it to a jsonnet binary path." >&2
+    exit 1
+  fi
+elif [[ -z "$JSONNET_BIN" ]]; then
+  if command -v jrsonnet &>/dev/null; then
+    JSONNET_BIN=jrsonnet
+  else
+    JSONNET_BIN=jsonnet
+  fi
+fi
+
+if ! command -v "$JSONNET_BIN" &>/dev/null; then
+  echo "Error: '$JSONNET_BIN' command not found." >&2
+  echo "Install canonical jsonnet for config-based LZ generation and all CI/CD runs:" >&2
   echo "  brew install jsonnet" >&2
   echo "  pip install jsonnet" >&2
+  echo "Optional local fast renderer for developer test/generation loops:" >&2
+  echo "  brew install jrsonnet" >&2
   exit 1
 fi
 
@@ -67,10 +86,10 @@ if [[ "${1:-}" == "--config" ]]; then
   CONFIG_OUTPUT_DIR="${3:-output}"
   mkdir -p "$CONFIG_OUTPUT_DIR"
 
-  # jsonnet --multi writes files directly AND prints paths to stdout.
+  # --multi writes files directly AND prints paths to stdout.
   # Collect output file list first, then format in a separate loop
   # to keep set -e effective for each formatting command.
-  output_files=$(jsonnet --multi "$CONFIG_OUTPUT_DIR/" \
+  output_files=$("$JSONNET_BIN" --multi "$CONFIG_OUTPUT_DIR/" \
     --tla-code-file "config=$CONFIG_FILE" \
     "$INPUT_DIR/landing_zone_multi.jsonnet")
 
@@ -91,11 +110,11 @@ while IFS= read -r -d '' file; do
   output_dir="$(dirname "$OUTPUT_DIR/$rel_path")"
   mkdir -p "$output_dir"
 
-  # Run jsonnet to generate the JSON file, then format it with Python
+  # Run Jsonnet to generate the JSON file, then format it with Python
   jsonnet_file="$file"
   json_file="$OUTPUT_DIR/$rel_path"
   json_file="${json_file%.jsonnet}.json"
-  jsonnet "$jsonnet_file" | python3 "$INPUT_DIR/format_json.py" >"$json_file"
+  "$JSONNET_BIN" "$jsonnet_file" | python3 "$INPUT_DIR/format_json.py" >"$json_file"
 done < <(
   find "$INPUT_DIR" \
     -path "$INPUT_DIR/testdata" -prune -o \

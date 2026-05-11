@@ -1,5 +1,6 @@
-local collections = import '../../lib/collections.libsonnet';
 local labels = import '../../labels.libsonnet';
+local collections = import '../../lib/collections.libsonnet';
+local validation = import '../../lib/validation.libsonnet';
 
 {
   platform_db_key(product, n, scope)::
@@ -7,6 +8,25 @@ local labels = import '../../labels.libsonnet';
 
   platform_infra_key(product, n, scope)::
     n.key_global('CMP', [scope.scope_name, scope.platform_name, 'INFRA']),
+
+  platform_children(inputs)::
+    local product = inputs.product;
+    local n = inputs.naming;
+    local descriptions = inputs.descriptions;
+    local scope = inputs.scope;
+    local tag_key = inputs.tag_key;
+    {
+      [self.platform_db_key(product, n, scope)]: {
+        name: '%s-db' % scope.compartment_name,
+        description: descriptions.platform_child_compartment(scope, 'Database'),
+        defined_tags: { [tag_key]: product.tags.db },
+      },
+      [self.platform_infra_key(product, n, scope)]: {
+        name: '%s-infra' % scope.compartment_name,
+        description: descriptions.platform_child_compartment(scope, 'Infrastructure'),
+        defined_tags: { [tag_key]: product.tags.infra },
+      },
+    },
 
   project_db_key(product, n, env_name, project_name)::
     if product.code == 'exacs' then n.key_global('CMP', [env_name, project_name, 'EXACS', 'DB'])
@@ -25,21 +45,7 @@ local labels = import '../../labels.libsonnet';
     local scope = inputs.scope;
     local tag_key = inputs.tag_key;
     local platform_key = scope.compartment_key;
-    local platform_name = scope.compartment_name;
-    local db_key = n.key_global('CMP', [scope.scope_name, scope.platform_name, 'DB']);
-    local infra_key = n.key_global('CMP', [scope.scope_name, scope.platform_name, 'INFRA']);
-    local platform_children = {
-      [db_key]: {
-        name: '%s-db' % platform_name,
-        description: descriptions.platform_child_compartment(scope, 'Database'),
-        defined_tags: { [tag_key]: product.tags.db },
-      },
-      [infra_key]: {
-        name: '%s-infra' % platform_name,
-        description: descriptions.platform_child_compartment(scope, 'Infrastructure'),
-        defined_tags: { [tag_key]: product.tags.infra },
-      },
-    };
+    local platform_children = self.platform_children(inputs);
     if scope.scope_type == 'shared' then {
       'CMP-LANDINGZONE-KEY'+: {
         children+: {
@@ -111,7 +117,6 @@ local labels = import '../../labels.libsonnet';
 
   flat_platform_compartments(inputs)::
     local product = inputs.product;
-    local n = inputs.naming;
     local descriptions = inputs.descriptions;
     local entries = inputs.entries;
     local tag_key = inputs.tag_key;
@@ -122,18 +127,7 @@ local labels = import '../../labels.libsonnet';
         description: descriptions.platform_compartment(scope),
         parent_id: scope.parent_compartment_key,
         defined_tags: { [tag_key]: product.tags.admin },
-        children: {
-          [$.platform_db_key(product, n, scope)]: {
-            name: '%s-db' % scope.compartment_name,
-            description: descriptions.platform_child_compartment(scope, 'Database'),
-            defined_tags: { [tag_key]: product.tags.db },
-          },
-          [$.platform_infra_key(product, n, scope)]: {
-            name: '%s-infra' % scope.compartment_name,
-            description: descriptions.platform_child_compartment(scope, 'Infrastructure'),
-            defined_tags: { [tag_key]: product.tags.infra },
-          },
-        },
+        children: $.platform_children(inputs { scope: scope }),
       }
       for entry in entries
     },
@@ -189,53 +183,43 @@ local labels = import '../../labels.libsonnet';
       for project_name in project_db_compartments[env_name]
     },
 
+  raw_project_db_map(product, scope, cfg)::
+    local has_project_db =
+      std.objectHas(cfg, 'project_db_compartments') && cfg.project_db_compartments != null;
+    if !has_project_db then {}
+    else if product.code == 'exacc' then
+      assert scope.scope_type == 'environment' :
+             'exacc project_db_compartments can only be set on environment platforms';
+      assert std.type(cfg.project_db_compartments) == 'array' :
+             'exacc project_db_compartments must be an array';
+      { [scope.scope_name]: cfg.project_db_compartments }
+    else if product.code == 'exacs' then
+      if scope.scope_type == 'shared' then
+        assert std.type(cfg.project_db_compartments) == 'object' :
+               'exacs project_db_compartments must be an object when set on shared platforms';
+        cfg.project_db_compartments
+      else
+        assert std.type(cfg.project_db_compartments) == 'array' :
+               'exacs project_db_compartments must be an array when set on environment platforms';
+        { [scope.scope_name]: cfg.project_db_compartments }
+    else error 'Unsupported ExaDB product: %s' % product.code,
+
+  validate_project_db_map(product, raw_project_db_compartments)::
+    validation.string_array_map(
+      raw_project_db_compartments,
+      '%s project_db_compartments' % product.code
+    ),
+
   normalize(inputs)::
     local product = inputs.product;
     local scope = inputs.scope;
     local scope_config =
       if std.objectHas(inputs, 'scope_config') then inputs.scope_config
       else {};
-    local cfg = inputs.cfg;
-    local has_project_db =
-      std.objectHas(cfg, 'project_db_compartments') && cfg.project_db_compartments != null;
-    local raw_project_db_compartments =
-      if !has_project_db then {}
-      else if product.code == 'exacc' then
-        assert scope.scope_type == 'environment' :
-          'exacc project_db_compartments can only be set on environment platforms';
-        assert std.type(cfg.project_db_compartments) == 'array' :
-          'exacc project_db_compartments must be an array';
-        { [scope.scope_name]: cfg.project_db_compartments }
-      else if product.code == 'exacs' then
-        if scope.scope_type == 'shared' then
-          assert std.type(cfg.project_db_compartments) == 'object' :
-            'exacs project_db_compartments must be an object when set on shared platforms';
-          cfg.project_db_compartments
-        else
-          assert std.type(cfg.project_db_compartments) == 'array' :
-            'exacs project_db_compartments must be an array when set on environment platforms';
-          { [scope.scope_name]: cfg.project_db_compartments }
-      else error 'Unsupported ExaDB product: %s' % product.code;
-
-    local exacs_non_array_project_envs = [
-      env_name
-      for env_name in std.objectFields(raw_project_db_compartments)
-      if product.code == 'exacs' && std.type(raw_project_db_compartments[env_name]) != 'array'
-    ];
-    assert std.length(exacs_non_array_project_envs) == 0 :
-      'exacs project_db_compartments.%s must be an array' % exacs_non_array_project_envs[0];
-    local exacs_invalid_project_value_envs = [
-      env_name
-      for env_name in std.objectFields(raw_project_db_compartments)
-      if product.code == 'exacs' && std.length([
-        project_name
-        for project_name in raw_project_db_compartments[env_name]
-        if std.type(project_name) != 'string' || project_name == ''
-      ]) > 0
-    ];
-    assert std.length(exacs_invalid_project_value_envs) == 0 :
-      'exacs project_db_compartments.%s values must be non-empty strings' %
-      exacs_invalid_project_value_envs[0];
+    local raw_project_db_compartments = self.validate_project_db_map(
+      product,
+      self.raw_project_db_map(product, scope, inputs.cfg)
+    );
 
     local by_environment = {
       [env_name]: collections.unique(raw_project_db_compartments[env_name])
@@ -256,8 +240,8 @@ local labels = import '../../labels.libsonnet';
       if product.code == 'exacs' && !std.objectHas(environment_projects, env_name)
     ];
     assert std.length(exacs_unknown_envs) == 0 :
-      'exacs project_db_compartments must reference defined environments: %s' %
-      std.join(', ', exacs_unknown_envs);
+           'exacs project_db_compartments must reference defined environments: %s' %
+           std.join(', ', exacs_unknown_envs);
 
     local unknown_projects = std.flattenArrays([
       [
@@ -268,10 +252,10 @@ local labels = import '../../labels.libsonnet';
       for env_name in std.objectFields(by_environment)
     ]);
     assert std.length(unknown_projects) == 0 :
-      '%s project_db_compartments must reference projects defined in the same environment: %s' % [
-        product.code,
-        std.join(', ', unknown_projects),
-      ];
+           '%s project_db_compartments must reference projects defined in the same environment: %s' % [
+      product.code,
+      std.join(', ', unknown_projects),
+    ];
     local environment_scope(env_name) =
       local env_label =
         if std.objectHas(environment_labels, env_name) then environment_labels[env_name]

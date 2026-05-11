@@ -1,59 +1,30 @@
+local validation = import 'validation.libsonnet';
+
 {
   validate(product, cfg, supported_keys)::
-    assert std.objectHas(cfg, 'notification_emails') && cfg.notification_emails != null :
-      '%s notification_emails is required' % product;
-    assert std.type(cfg.notification_emails) == 'object' :
-      '%s notification_emails must be an object' % product;
-    assert std.objectHas(cfg.notification_emails, 'default') :
-      '%s notification_emails.default is required' % product;
-    assert std.type(cfg.notification_emails.default) == 'array' :
-      '%s notification_emails.default must be an array' % product;
-    assert std.length(cfg.notification_emails.default) > 0 :
-      '%s notification_emails.default must contain at least one value' % product;
-    assert std.all([
-      std.member(supported_keys, key)
-      for key in std.objectFields(cfg.notification_emails)
-    ]) : '%s notification_emails contains unsupported keys: %s' % [
-      product,
-      std.join(', ', [
-        key
-        for key in std.objectFields(cfg.notification_emails)
-        if !std.member(supported_keys, key)
-      ]),
-    ];
-    local notification_email_keys = std.objectFields(cfg.notification_emails);
-    local non_array_notification_keys = [
-      key
-      for key in notification_email_keys
-      if std.type(cfg.notification_emails[key]) != 'array'
-    ];
-    assert std.length(non_array_notification_keys) == 0 :
-      '%s notification_emails.%s must be an array' % [product, non_array_notification_keys[0]];
-    local empty_notification_keys = [
-      key
-      for key in notification_email_keys
-      if std.length(cfg.notification_emails[key]) == 0
-    ];
-    assert std.length(empty_notification_keys) == 0 :
-      '%s notification_emails.%s must contain at least one value' % [product, empty_notification_keys[0]];
-    local invalid_notification_value_keys = [
-      key
-      for key in notification_email_keys
-      if std.length([
-        value
-        for value in cfg.notification_emails[key]
-        if std.type(value) != 'string' || value == ''
-      ]) > 0
-    ];
-    assert std.length(invalid_notification_value_keys) == 0 :
-      '%s notification_emails.%s values must be non-empty strings' % [product, invalid_notification_value_keys[0]];
+    local notification_label = '%s notification_emails' % product;
+    local raw_emails =
+      validation.required_object(cfg, 'notification_emails', notification_label);
+    local default_emails =
+      validation.required(raw_emails, 'default', '%s.default' % notification_label);
+    local supported_emails =
+      validation.allowed_keys(
+        raw_emails { default: default_emails },
+        notification_label,
+        supported_keys
+      );
+    local emails = validation.string_array_map(
+      supported_emails,
+      notification_label,
+      require_non_empty_arrays=true
+    );
     {
       emails: {
-        [key]: cfg.notification_emails[key]
-        for key in notification_email_keys
+        [key]: emails[key]
+        for key in std.objectFields(emails)
       },
       topic_emails(key)::
         if std.objectHas(self.emails, key) then self.emails[key]
-        else self.emails['default'],
+        else self.emails.default,
     },
 }

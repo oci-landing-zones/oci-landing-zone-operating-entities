@@ -48,6 +48,7 @@
 //   output documents or own profile-specific publication logic.
 local cfg_lib = import 'config.libsonnet';
 local constants = import 'constants.libsonnet';
+local extensions = import 'extensions.libsonnet';
 local naming = import 'naming.libsonnet';
 local platforms = import 'platforms.libsonnet';
 local topology = import 'topology.libsonnet';
@@ -95,17 +96,10 @@ local common = import 'hub/hub_common.libsonnet';
       shared_only_config: config { environments: {} },
 
       extension_entries_by_type(ext_type)::
-        [
-          entry
-          for entry in self.extension_entries
-          if entry.platform_config.extension.type == ext_type
-        ],
+        extensions.select_entries_by_type(self.extension_entries, ext_type),
 
       require_extension_entries(ext_type, label)::
-        local entries = self.extension_entries_by_type(ext_type);
-        assert std.length(entries) > 0 :
-          '%s publication requires at least one %s platform' % [label, ext_type];
-        entries,
+        extensions.entries_by_type(self.extension_entries, ext_type, label),
 
       env_platform_entry(env_name, platform_name)::
         local matches = [

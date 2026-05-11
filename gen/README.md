@@ -1,6 +1,6 @@
 # Local Set-up
 
-Run `bash gen/generate.sh` the first time you work on the generator. It sets up the repo hooks, checks that `jsonnet` is installed, and regenerates the checked-in outputs.
+Run `bash gen/generate.sh` the first time you work on the generator. It sets up the repo hooks, checks that a Jsonnet renderer is installed, and regenerates the checked-in outputs.
 
 ## Documentation Map
 
