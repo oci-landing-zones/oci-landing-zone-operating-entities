@@ -179,30 +179,27 @@ function(hub_ctx)
                 route_tables+: {
                   [n.key('RT', ['HUB', 'INGRESS'])]+: {
                     route_rules: {
-                      [n.route_rule([n.region, 'internet'])]: {
-                        description: 'Route to the Internet through the OCI Network Firewall',
-                        destination: '0.0.0.0/0',
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: nfw_ocid,
-                      },
+                      [n.route_rule([n.region, 'internet'])]: common._route_via_id(
+                        'Route to the Internet through the OCI Network Firewall',
+                        '0.0.0.0/0',
+                        nfw_ocid
+                      ),
 
-                      [n.route_rule(['vcn', n.region, 'hub', 'lb', 'sn'])]: {
-                        description: 'Route to Public LB through the OCI Network Firewall',
-                        destination: subnets.lb,
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: nfw_ocid,
-                      },
+                      [n.route_rule(['vcn', n.region, 'hub', 'lb', 'sn'])]: common._route_via_id(
+                        'Route to Public LB through the OCI Network Firewall',
+                        subnets.lb,
+                        nfw_ocid
+                      ),
                     },
                   },
 
                   [n.key('RT', ['HUB', 'MGMT'])]+: {
                     route_rules+: {
-                      [n.route_rule([n.region, 'internet'])]: {
-                        description: 'Route to the Internet through the OCI Network Firewall',
-                        destination: '0.0.0.0/0',
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: nfw_ocid,
-                      },
+                      [n.route_rule([n.region, 'internet'])]: common._route_via_id(
+                        'Route to the Internet through the OCI Network Firewall',
+                        '0.0.0.0/0',
+                        nfw_ocid
+                      ),
                     },
                   },
 

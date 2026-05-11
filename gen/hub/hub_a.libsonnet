@@ -133,25 +133,17 @@ function(hub_ctx)
                         stateless: true,
                       },
 
-                      https_443: {
-                        description: 'Allow inbound traffic from 0.0.0.0/0 over HTTPS',
-                        src: '0.0.0.0/0',
-                        src_type: 'CIDR_BLOCK',
-                        dst_port_max: 443,
-                        dst_port_min: 443,
-                        protocol: 'TCP',
-                        stateless: false,
-                      },
+                      https_443: common._tcp_ingress_rule(
+                        'Allow inbound traffic from 0.0.0.0/0 over HTTPS',
+                        '0.0.0.0/0',
+                        443
+                      ),
 
-                      http_80: {
-                        description: 'Allow inbound traffic from 0.0.0.0/0 over HTTP',
-                        src: '0.0.0.0/0',
-                        src_type: 'CIDR_BLOCK',
-                        dst_port_max: 80,
-                        dst_port_min: 80,
-                        protocol: 'TCP',
-                        stateless: false,
-                      },
+                      http_80: common._tcp_ingress_rule(
+                        'Allow inbound traffic from 0.0.0.0/0 over HTTP',
+                        '0.0.0.0/0',
+                        80
+                      ),
                     },
                   },
 
@@ -242,45 +234,41 @@ function(hub_ctx)
                 route_tables+: {
                   [n.key('RT', ['HUB', 'IGW'])]+: {
                     route_rules: {
-                      [n.route_rule(['vcn', n.region, 'hub', 'lb', 'sn'])]: {
-                        description: 'Route to lb subnet in Hub VCN through DMZ OCI Network Firewall',
-                        destination: subnets.lb,
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: nfw_dmz_ocid,
-                      },
+                      [n.route_rule(['vcn', n.region, 'hub', 'lb', 'sn'])]: common._route_via_id(
+                        'Route to lb subnet in Hub VCN through DMZ OCI Network Firewall',
+                        subnets.lb,
+                        nfw_dmz_ocid
+                      ),
                     },
                   },
 
                   [n.key('RT', ['HUB', 'INGRESS'])]+: {
                     route_rules: {
-                      [n.route_rule([n.region, 'internet'])]: {
-                        description: 'Route to the Internet through the Internal OCI Network Firewall',
-                        destination: '0.0.0.0/0',
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: nfw_int_ocid,
-                      },
+                      [n.route_rule([n.region, 'internet'])]: common._route_via_id(
+                        'Route to the Internet through the Internal OCI Network Firewall',
+                        '0.0.0.0/0',
+                        nfw_int_ocid
+                      ),
                     },
                   },
 
                   [n.key('RT', ['HUB', 'LB'])]+: {
                     route_rules+: {
-                      [n.route_rule([n.region, 'internet'])]: {
-                        description: 'Route to the Internet through the DMZ Firewall',
-                        destination: '0.0.0.0/0',
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: nfw_dmz_ocid,
-                      },
+                      [n.route_rule([n.region, 'internet'])]: common._route_via_id(
+                        'Route to the Internet through the DMZ Firewall',
+                        '0.0.0.0/0',
+                        nfw_dmz_ocid
+                      ),
                     },
                   },
 
                   [n.key('RT', ['HUB', 'MGMT'])]+: {
                     route_rules+: {
-                      [n.route_rule([n.region, 'internet'])]: {
-                        description: 'Route to the Internet through the Internal OCI Network Firewall',
-                        destination: '0.0.0.0/0',
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: nfw_int_ocid,
-                      },
+                      [n.route_rule([n.region, 'internet'])]: common._route_via_id(
+                        'Route to the Internet through the Internal OCI Network Firewall',
+                        '0.0.0.0/0',
+                        nfw_int_ocid
+                      ),
                     },
                   },
 

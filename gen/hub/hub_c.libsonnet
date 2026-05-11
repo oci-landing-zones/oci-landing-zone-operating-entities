@@ -153,25 +153,17 @@ function(hub_ctx)
                     egress_rules: common._nsg_egress_tcp_only,
 
                     ingress_rules: {
-                      http_80: {
-                        description: 'Allow inbound traffic from Hub Untrust subnet over HTTP',
-                        src: subnets.untrust,
-                        src_type: 'CIDR_BLOCK',
-                        dst_port_max: 80,
-                        dst_port_min: 80,
-                        protocol: 'TCP',
-                        stateless: false,
-                      },
+                      http_80: common._tcp_ingress_rule(
+                        'Allow inbound traffic from Hub Untrust subnet over HTTP',
+                        subnets.untrust,
+                        80
+                      ),
 
-                      https_443: {
-                        description: 'Allow inbound traffic from Hub Untrust subnet over HTTPS',
-                        src: subnets.untrust,
-                        src_type: 'CIDR_BLOCK',
-                        dst_port_max: 443,
-                        dst_port_min: 443,
-                        protocol: 'TCP',
-                        stateless: false,
-                      },
+                      https_443: common._tcp_ingress_rule(
+                        'Allow inbound traffic from Hub Untrust subnet over HTTPS',
+                        subnets.untrust,
+                        443
+                      ),
                     },
                   },
 
@@ -180,25 +172,19 @@ function(hub_ctx)
                     egress_rules: common._nsg_egress_all_protocols,
 
                     ingress_rules: {
-                      from_trust_nlb_http: {
-                        description: 'Allow inbound from NSG %s over HTTP' % n.display('nsg', ['hub', 'trust', 'nlb']),
-                        src: n.key('NSG', ['HUB', 'TRUST', 'NLB']),
-                        src_type: 'NETWORK_SECURITY_GROUP',
-                        dst_port_max: 80,
-                        dst_port_min: 80,
-                        protocol: 'TCP',
-                        stateless: false,
-                      },
+                      from_trust_nlb_http: common._tcp_ingress_rule(
+                        'Allow inbound from NSG %s over HTTP' % n.display('nsg', ['hub', 'trust', 'nlb']),
+                        n.key('NSG', ['HUB', 'TRUST', 'NLB']),
+                        80,
+                        src_type='NETWORK_SECURITY_GROUP'
+                      ),
 
-                      from_trust_nlb_https: {
-                        description: 'Allow inbound from NSG %s over HTTPS' % n.display('nsg', ['hub', 'trust', 'nlb']),
-                        src: n.key('NSG', ['HUB', 'TRUST', 'NLB']),
-                        src_type: 'NETWORK_SECURITY_GROUP',
-                        dst_port_max: 443,
-                        dst_port_min: 443,
-                        protocol: 'TCP',
-                        stateless: false,
-                      },
+                      from_trust_nlb_https: common._tcp_ingress_rule(
+                        'Allow inbound from NSG %s over HTTPS' % n.display('nsg', ['hub', 'trust', 'nlb']),
+                        n.key('NSG', ['HUB', 'TRUST', 'NLB']),
+                        443,
+                        src_type='NETWORK_SECURITY_GROUP'
+                      ),
 
                       from_trust_nlb_icmp: {
                         description: 'Allow ICMP type 8 (Echo) from NSG %s' % n.display('nsg', ['hub', 'trust', 'nlb']),
@@ -210,15 +196,12 @@ function(hub_ctx)
                         stateless: false,
                       },
 
-                      from_trust_nlb_ssh: {
-                        description: 'Allow inbound from NSG %s over SSH' % n.display('nsg', ['hub', 'trust', 'nlb']),
-                        src: n.key('NSG', ['HUB', 'TRUST', 'NLB']),
-                        src_type: 'NETWORK_SECURITY_GROUP',
-                        dst_port_max: 22,
-                        dst_port_min: 22,
-                        protocol: 'TCP',
-                        stateless: false,
-                      },
+                      from_trust_nlb_ssh: common._tcp_ingress_rule(
+                        'Allow inbound from NSG %s over SSH' % n.display('nsg', ['hub', 'trust', 'nlb']),
+                        n.key('NSG', ['HUB', 'TRUST', 'NLB']),
+                        22,
+                        src_type='NETWORK_SECURITY_GROUP'
+                      ),
                     },
                   },
 
@@ -233,13 +216,11 @@ function(hub_ctx)
                     egress_rules: common._nsg_egress_all_protocols,
 
                     ingress_rules: {
-                      from_untrust_nlb: {
-                        description: 'Allow inbound from NSG %s over TCP ALL' % n.display('nsg', ['hub', 'untrust', 'nlb']),
-                        src: n.key('NSG', ['HUB', 'UNTRUST', 'NLB']),
-                        src_type: 'NETWORK_SECURITY_GROUP',
-                        protocol: 'TCP',
-                        stateless: false,
-                      },
+                      from_untrust_nlb: common._tcp_ingress_rule(
+                        'Allow inbound from NSG %s over TCP ALL' % n.display('nsg', ['hub', 'untrust', 'nlb']),
+                        n.key('NSG', ['HUB', 'UNTRUST', 'NLB']),
+                        src_type='NETWORK_SECURITY_GROUP'
+                      ),
                     },
                   },
 
@@ -248,25 +229,17 @@ function(hub_ctx)
                     egress_rules: common._nsg_egress_all_protocols,
 
                     ingress_rules: {
-                      https_443: {
-                        description: 'Allow inbound traffic from 0.0.0.0/0 over HTTPS',
-                        src: '0.0.0.0/0',
-                        src_type: 'CIDR_BLOCK',
-                        dst_port_max: 443,
-                        dst_port_min: 443,
-                        protocol: 'TCP',
-                        stateless: false,
-                      },
+                      https_443: common._tcp_ingress_rule(
+                        'Allow inbound traffic from 0.0.0.0/0 over HTTPS',
+                        '0.0.0.0/0',
+                        443
+                      ),
 
-                      http_80: {
-                        description: 'Allow inbound traffic from 0.0.0.0/0 over HTTP',
-                        src: '0.0.0.0/0',
-                        src_type: 'CIDR_BLOCK',
-                        dst_port_max: 80,
-                        dst_port_min: 80,
-                        protocol: 'TCP',
-                        stateless: false,
-                      },
+                      http_80: common._tcp_ingress_rule(
+                        'Allow inbound traffic from 0.0.0.0/0 over HTTP',
+                        '0.0.0.0/0',
+                        80
+                      ),
                     },
                   },
                 },
@@ -302,45 +275,41 @@ function(hub_ctx)
                 route_tables+: {
                   [n.key('RT', ['HUB', 'IGW'])]+: {
                     route_rules: {
-                      [n.route_rule([n.region, 'igw', 'ingress'])]: {
-                        description: "Route to Public LoadBalancer's subnet through Untrust NLB and Firewalls",
-                        destination: subnets.lb,
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: untrust_nlb_ocid,
-                      },
+                      [n.route_rule([n.region, 'igw', 'ingress'])]: common._route_via_id(
+                        "Route to Public LoadBalancer's subnet through Untrust NLB and Firewalls",
+                        subnets.lb,
+                        untrust_nlb_ocid
+                      ),
                     },
                   },
 
                   [n.key('RT', ['HUB', 'INGRESS'])]+: {
                     route_rules: {
-                      [n.route_rule([n.region, 'internet'])]: {
-                        description: 'Route to the Internet through Trust NLB and Firewalls',
-                        destination: '0.0.0.0/0',
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: trust_nlb_ocid,
-                      },
+                      [n.route_rule([n.region, 'internet'])]: common._route_via_id(
+                        'Route to the Internet through Trust NLB and Firewalls',
+                        '0.0.0.0/0',
+                        trust_nlb_ocid
+                      ),
                     },
                   },
 
                   [n.key('RT', ['HUB', 'LB'])]+: {
                     route_rules+: {
-                      [n.route_rule([n.region, 'internet'])]: {
-                        description: 'Route to the Internet through Untrust NLB and Firewalls',
-                        destination: '0.0.0.0/0',
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: untrust_nlb_ocid,
-                      },
+                      [n.route_rule([n.region, 'internet'])]: common._route_via_id(
+                        'Route to the Internet through Untrust NLB and Firewalls',
+                        '0.0.0.0/0',
+                        untrust_nlb_ocid
+                      ),
                     },
                   },
 
                   [n.key('RT', ['HUB', 'MGMT'])]+: {
                     route_rules+: {
-                      [n.route_rule([n.region, 'internet'])]: {
-                        description: 'Route to the Internet through Trust NLB and Firewalls',
-                        destination: '0.0.0.0/0',
-                        destination_type: 'CIDR_BLOCK',
-                        network_entity_id: trust_nlb_ocid,
-                      },
+                      [n.route_rule([n.region, 'internet'])]: common._route_via_id(
+                        'Route to the Internet through Trust NLB and Firewalls',
+                        '0.0.0.0/0',
+                        trust_nlb_ocid
+                      ),
                     },
                   },
                 },

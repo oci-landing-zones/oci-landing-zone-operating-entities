@@ -85,6 +85,7 @@ if [[ "${1:-}" == "--config" ]]; then
   CONFIG_FILE="${2:?Usage: generate.sh --config <config_file> [output_dir]}"
   CONFIG_OUTPUT_DIR="${3:-output}"
   mkdir -p "$CONFIG_OUTPUT_DIR"
+  find "$CONFIG_OUTPUT_DIR" -maxdepth 1 -type f -name '*.json' -delete
 
   # --multi writes files directly AND prints paths to stdout.
   # Collect output file list first, then format in a separate loop
