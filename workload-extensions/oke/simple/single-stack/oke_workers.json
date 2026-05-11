@@ -4,7 +4,7 @@
 
         "node_pools": {
             "NDP-FRA-LZ-PROD-PLATFORM-OKE-1-KEY": {
-                "name"                          : "ndp-fra-lz-prod-platform-oke-1",
+                "name"                          : "ndp-fra-lz-prod-oke-1",
                 "cluster_id"                    : "CLR-FRA-LZ-PROD-OKE-KEY",
                 "enable_cycling"                : false,
                 "size"                          : 1,

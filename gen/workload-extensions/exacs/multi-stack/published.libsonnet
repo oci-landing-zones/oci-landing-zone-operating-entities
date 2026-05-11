@@ -135,7 +135,7 @@ local products = import '../../exadb/products.libsonnet';
         local scope = spec.entry.scope;
         acc + {
           [n.key_global('LGRP', [scope.scope_name, 'PLATFORM', scope.platform_name, 'VCN', 'FLOW'])]: {
-            name: n.display_global('lgrp', [scope.scope_name, 'platform', scope.platform_name, 'vcn', 'flow']),
+            name: n.display_global('lgrp', [scope.scope_name, scope.platform_name, 'vcn', 'flow']),
             compartment_id: security_compartment_for(scope),
           },
         },

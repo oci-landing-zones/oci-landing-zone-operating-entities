@@ -146,7 +146,7 @@ local common = import 'hub/hub_common.libsonnet';
           kind: 'platform',
           drg_att_key: n.key('DRGATT', [pe.scope.scope_name, 'PLATFORM', pe.scope.platform_name]),
           vcn_key: n.key('VCN', [pe.scope.scope_name, 'PLATFORM', pe.scope.platform_name]),
-          drg_att_display: n.display('drgatt', [pe.scope.scope_name, 'platform', pe.scope.platform_name]),
+          drg_att_display: n.display('drgatt', [pe.scope.scope_name, pe.scope.platform_name]),
           route_key: n.route_rule([n.region, 'vcn', label.raw_name]),
           route_desc: route_desc,
         },
@@ -197,6 +197,7 @@ local common = import 'hub/hub_common.libsonnet';
     local scope = pe.scope;
     local env_name = scope.scope_name;
     local plat = scope.platform_name;
+    local display_segments = [env_name, plat];
     local dns = scope.dns;
     local vcn_cidr = pe.platform_config.network.vcn;
     local plat_subnets = pe.platform_config.network.subnets;
@@ -247,7 +248,7 @@ local common = import 'hub/hub_common.libsonnet';
       category_compartment_id: scope.network_compartment_key,
       vcns: {
         [vcn_key]: {
-          display_name: n.display('vcn', [env_name, 'platform', plat]),
+          display_name: n.display('vcn', display_segments),
           cidr_blocks: [vcn_cidr],
           dns_label: n.dns_label(['vcn', n.region, 'lz', dns, plat]),
           block_nat_traffic: false,
@@ -258,13 +259,13 @@ local common = import 'hub/hub_common.libsonnet';
           default_security_list: { egress_rules: [], ingress_rules: [] },
           route_tables: {
             [rt_key]: {
-              display_name: n.display('rt', [env_name, 'platform', plat, 'generic']),
+              display_name: n.display('rt', display_segments + ['generic']),
               route_rules: route_rules,
             },
           },
           security_lists: {
             [sl_key]: {
-              display_name: n.display('sl', [env_name, 'platform', plat, 'generic']),
+              display_name: n.display('sl', display_segments + ['generic']),
               egress_rules: [
                 {
                   description: 'Allow all outbound traffic',
@@ -279,7 +280,7 @@ local common = import 'hub/hub_common.libsonnet';
           },
           subnets: {
             [n.key('SN', [env_name, 'PLATFORM', plat, sn_name])]: {
-              display_name: n.display('sn', [env_name, 'platform', plat, sn_name]),
+              display_name: n.display('sn', display_segments + [sn_name]),
               cidr_block: plat_subnets[sn_name],
               dhcp_options_key: 'default_dhcp_options',
               prohibit_internet_ingress: true,
@@ -292,13 +293,13 @@ local common = import 'hub/hub_common.libsonnet';
           vcn_specific_gateways: {
             [if hub_has_spoke_natgw then 'nat_gateways']: {
               [n.key('NGW', [env_name, 'PLATFORM', plat])]: {
-                display_name: n.display('ngw', [env_name, 'platform', plat]),
+                display_name: n.display('ngw', display_segments),
                 block_traffic: false,
               },
             },
             service_gateways: {
               [n.key('SGW', [env_name, 'PLATFORM', plat])]: {
-                display_name: n.display('sgw', [env_name, 'platform', plat]),
+                display_name: n.display('sgw', display_segments),
                 services: 'all-services',
               },
             },

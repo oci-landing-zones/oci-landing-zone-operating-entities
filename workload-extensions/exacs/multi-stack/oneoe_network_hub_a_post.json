@@ -725,7 +725,7 @@
                                 },
 
                                 "DRGATT-FRA-LZ-SHARED-PLATFORM-EXACS-KEY": {
-                                    "display_name"                                 : "drgatt-fra-lz-shared-platform-exacs",
+                                    "display_name"                                 : "drgatt-fra-lz-shared-exacs",
                                     "drg_route_table_key"                          : "DRGRT-FRA-LZ-SPOKES-KEY",
 
                                     "network_details": {

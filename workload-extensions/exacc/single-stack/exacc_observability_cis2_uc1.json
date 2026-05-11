@@ -271,7 +271,7 @@
             "RUL-LZ-PREPROD-NOTIFICATION-PROJECTS-KEY": {
                 "compartment_id"                             : "CMP-LZ-PREPROD-PROJ1-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PREPROD-EXACC-PROJECTS-KEY"],
-                "event_display_name"                         : "rul-lz-preprod-notify-on-notifications-projects",
+                "event_display_name"                         : "rul-lz-preprod-notify-on-notifications",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
@@ -352,7 +352,7 @@
             "RUL-LZ-PROD-NOTIFICATION-PROJECTS-KEY": {
                 "compartment_id"                             : "CMP-LZ-PROD-PROJ1-DB-KEY",
                 "destination_topic_ids"                      : ["NOTT-LZ-PROD-EXACC-PROJECTS-KEY"],
-                "event_display_name"                         : "rul-lz-prod-notify-on-notifications-projects",
+                "event_display_name"                         : "rul-lz-prod-notify-on-notifications",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
@@ -538,7 +538,7 @@
             },
 
             "NOTT-LZ-PREPROD-EXACC-PROJECTS-KEY": {
-                "name"                                       : "nott-lz-preprod-exacc-projects",
+                "name"                                       : "nott-lz-preprod-exacc",
                 "description"                                : "Topic for Pre-Production ExaDB-C@C project notifications.",
                 "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
 
@@ -551,7 +551,7 @@
             },
 
             "NOTT-LZ-PROD-EXACC-PROJECTS-KEY": {
-                "name"                                       : "nott-lz-prod-exacc-projects",
+                "name"                                       : "nott-lz-prod-exacc",
                 "description"                                : "Topic for Production ExaDB-C@C project notifications.",
                 "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
 

@@ -256,7 +256,7 @@
             "RUL-LZ-PREPROD-EXACS-NOTIFICATION-PROJECTS-KEY": {
                 "compartment_id"                                   : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "event_display_name"                               : "rul-lz-preprod-notify-on-notifications-projects",
+                "event_display_name"                               : "rul-lz-preprod-notify-on-notifications",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
@@ -322,7 +322,7 @@
             "RUL-LZ-PROD-EXACS-NOTIFICATION-PROJECTS-KEY": {
                 "compartment_id"                                   : "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "event_display_name"                               : "rul-lz-prod-notify-on-notifications-projects",
+                "event_display_name"                               : "rul-lz-prod-notify-on-notifications",
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
@@ -406,7 +406,7 @@
 
         "log_groups": {
             "LGRP-LZ-SHARED-PLATFORM-EXACS-VCN-FLOW-KEY": {
-                "name"                                             : "lgrp-lz-shared-platform-exacs-vcn-flow",
+                "name"                                             : "lgrp-lz-shared-exacs-vcn-flow",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY"
             }
         }
@@ -443,7 +443,7 @@
             },
 
             "NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY": {
-                "name"                                             : "nott-lz-preprod-exacs-projects",
+                "name"                                             : "nott-lz-preprod-exacs",
                 "description"                                      : "Topic for Pre-Production ExaDB-D project notifications.",
                 "compartment_id"                                   : "CMP-LZ-PREPROD-SECURITY-KEY",
 
@@ -456,7 +456,7 @@
             },
 
             "NOTT-LZ-PROD-EXACS-PROJECTS-KEY": {
-                "name"                                             : "nott-lz-prod-exacs-projects",
+                "name"                                             : "nott-lz-prod-exacs",
                 "description"                                      : "Topic for Production ExaDB-D project notifications.",
                 "compartment_id"                                   : "CMP-LZ-PROD-SECURITY-KEY",
 

@@ -6,7 +6,7 @@
 
                 "vcns": {
                     "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY": {
-                        "display_name"                                : "vcn-fra-lz-prod-platform-oke",
+                        "display_name"                                : "vcn-fra-lz-prod-oke",
                         "cidr_blocks"                                 : ["10.0.80.0/21"],
                         "dns_label"                                   : "vcnfralzppoke",
                         "block_nat_traffic"                           : false,
@@ -17,7 +17,7 @@
 
                         "subnets": {
                             "SN-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
-                                "display_name"                        : "sn-fra-lz-prod-platform-oke-lb",
+                                "display_name"                        : "sn-fra-lz-prod-oke-lb",
                                 "cidr_block"                          : "10.0.80.0/25",
                                 "dns_label"                           : "snpplatokelb",
                                 "dhcp_options_key"                    : "default_dhcp_options",
@@ -28,7 +28,7 @@
                             },
 
                             "SN-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY": {
-                                "display_name"                        : "sn-fra-lz-prod-platform-oke-cp",
+                                "display_name"                        : "sn-fra-lz-prod-oke-cp",
                                 "cidr_block"                          : "10.0.80.128/25",
                                 "dns_label"                           : "snpplatokecp",
                                 "dhcp_options_key"                    : "default_dhcp_options",
@@ -39,7 +39,7 @@
                             },
 
                             "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
-                                "display_name"                        : "sn-fra-lz-prod-platform-oke-workers",
+                                "display_name"                        : "sn-fra-lz-prod-oke-workers",
                                 "cidr_block"                          : "10.0.82.0/23",
                                 "dns_label"                           : "snpplatokework",
                                 "dhcp_options_key"                    : "default_dhcp_options",
@@ -50,7 +50,7 @@
                             },
 
                             "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
-                                "display_name"                        : "sn-fra-lz-prod-platform-oke-pods",
+                                "display_name"                        : "sn-fra-lz-prod-oke-pods",
                                 "cidr_block"                          : "10.0.84.0/23",
                                 "dns_label"                           : "snpplatokepods",
                                 "dhcp_options_key"                    : "default_dhcp_options",
@@ -63,7 +63,7 @@
 
                         "route_tables": {
                             "RT-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY": {
-                                "display_name"                        : "rt-fra-lz-prod-platform-oke-cp",
+                                "display_name"                        : "rt-fra-lz-prod-oke-cp",
 
                                 "route_rules": {
                                     "rr-fra-prod-projects": {
@@ -97,7 +97,7 @@
                             },
 
                             "RT-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
-                                "display_name"                        : "rt-fra-lz-prod-platform-oke-int-lb",
+                                "display_name"                        : "rt-fra-lz-prod-oke-int-lb",
 
                                 "route_rules": {
                                     "rr-fra-prod-projects": {
@@ -131,7 +131,7 @@
                             },
 
                             "RT-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
-                                "display_name"                        : "rt-fra-lz-prod-platform-oke-pods",
+                                "display_name"                        : "rt-fra-lz-prod-oke-pods",
 
                                 "route_rules": {
                                     "rr-fra-prod-projects": {
@@ -165,7 +165,7 @@
                             },
 
                             "RT-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
-                                "display_name"                        : "rt-fra-lz-prod-platform-oke-workers",
+                                "display_name"                        : "rt-fra-lz-prod-oke-workers",
 
                                 "route_rules": {
                                     "rr-fra-prod-projects": {
@@ -201,7 +201,7 @@
 
                         "security_lists": {
                             "SL-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY": {
-                                "display_name"                        : "sl-fra-lz-prod-platform-oke-cp",
+                                "display_name"                        : "sl-fra-lz-prod-oke-cp",
                                 "defined_tags"                        : null,
                                 "freeform_tags"                       : null,
 
@@ -231,13 +231,13 @@
                             },
 
                             "SL-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
-                                "display_name"                        : "sl-fra-lz-prod-platform-oke-int-lb",
+                                "display_name"                        : "sl-fra-lz-prod-oke-int-lb",
                                 "ingress_rules"                       : [],
                                 "egress_rules"                        : []
                             },
 
                             "SL-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
-                                "display_name"                        : "sl-fra-lz-prod-platform-oke-pods",
+                                "display_name"                        : "sl-fra-lz-prod-oke-pods",
 
                                 "ingress_rules": [
                                     {
@@ -265,7 +265,7 @@
                             },
 
                             "SL-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
-                                "display_name"                        : "sl-fra-lz-prod-platform-oke-workers",
+                                "display_name"                        : "sl-fra-lz-prod-oke-workers",
 
                                 "ingress_rules": [
                                     {
@@ -295,7 +295,7 @@
 
                         "network_security_groups": {
                             "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY": {
-                                "display_name"                        : "nsg-fra-lz-prod-platform-oke-cp",
+                                "display_name"                        : "nsg-fra-lz-prod-oke-cp",
 
                                 "ingress_rules": {
                                     "nsg_api_6443": {
@@ -429,7 +429,7 @@
                             },
 
                             "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
-                                "display_name"                        : "nsg-fra-lz-prod-platform-oke-int-lb",
+                                "display_name"                        : "nsg-fra-lz-prod-oke-int-lb",
                                 "ingress_rules"                       : {},
 
                                 "egress_rules": {
@@ -466,7 +466,7 @@
                             },
 
                             "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
-                                "display_name"                        : "nsg-fra-lz-prod-platform-oke-pods",
+                                "display_name"                        : "nsg-fra-lz-prod-oke-pods",
 
                                 "ingress_rules": {
                                     "nsg_cp": {
@@ -560,7 +560,7 @@
                             },
 
                             "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
-                                "display_name"                        : "nsg-fra-lz-prod-platform-oke-workers",
+                                "display_name"                        : "nsg-fra-lz-prod-oke-workers",
 
                                 "ingress_rules": {
                                     "nsg_cp": {
@@ -697,7 +697,7 @@
                         "vcn_specific_gateways": {
                             "service_gateways": {
                                 "SGW-FRA-LZ-PROD-PLATFORM-OKE-KEY": {
-                                    "display_name"                    : "sgw-fra-lz-prod-platform-oke",
+                                    "display_name"                    : "sgw-fra-lz-prod-oke",
                                     "services"                        : "all-services"
                                 }
                             }
@@ -712,7 +712,7 @@
 
                             "drg_attachments": {
                                 "DRGATT-FRA-LZ-PROD-PLATFORM-OKE-KEY": {
-                                    "display_name"                    : "drgatt-fra-lz-prod-platform-oke",
+                                    "display_name"                    : "drgatt-fra-lz-prod-oke",
                                     "drg_route_table_key"             : "DRGRT-FRA-LZ-SPOKES-KEY",
 
                                     "network_details": {

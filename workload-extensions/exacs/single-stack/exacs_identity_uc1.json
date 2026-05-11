@@ -240,62 +240,62 @@
         "groups": {
             "GRP-AUDITORS-ADMIN-KEY": {
                 "name"                                                         : "grp-auditors-admin",
-                "description"                                                  : "Tenancy global read access group(for security auditing or health checks)."
+                "description"                                                  : "Tenancy-scoped audit and read-only access group."
             },
 
             "GRP-COST-ADMIN-KEY": {
                 "name"                                                         : "grp-cost-admin",
-                "description"                                                  : "Tenancy global cost control group."
+                "description"                                                  : "Tenancy-scoped cost management access group."
             },
 
             "GRP-IAM-ADMIN-KEY": {
                 "name"                                                         : "grp-iam-admin",
-                "description"                                                  : "Tenancy global Identity and access management administrator group."
+                "description"                                                  : "Tenancy-scoped IAM administration access group."
             },
 
             "GRP-LZ-GLOBAL-EXACS-DB-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-global-exacs-db-admin",
-                "description"                                                  : "Global ExaDB-D database administration group."
+                "description"                                                  : "Landing Zone global ExaDB-D database administration access group."
             },
 
             "GRP-LZ-GLOBAL-EXACS-INFRA-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-global-exacs-infra-admin",
-                "description"                                                  : "Global ExaDB-D infrastructure administration group."
+                "description"                                                  : "Landing Zone global ExaDB-D infrastructure administration access group."
             },
 
             "GRP-LZ-NETWORK-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-network-admin",
-                "description"                                                  : "One-OE Landing Zone, Shared network administration group, including common OE network elements."
+                "description"                                                  : "Landing Zone shared network administration access group."
             },
 
             "GRP-LZ-PREPROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-preprod-proj1-exacs-admin",
-                "description"                                                  : "Dedicated team to manage the ExaDB-D database layer in Project 1, Pre-Production environment."
+                "description"                                                  : "Landing Zone Pre-Production environment, Project 1 ExaDB-D database administration access group."
             },
 
             "GRP-LZ-PREPROD-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-preprod-proj1-admin",
-                "description"                                                  : "One-OE Landing Zone, Pre-Production environment, Project 1, Administrators."
+                "description"                                                  : "Landing Zone Pre-Production environment, Project 1 administration access group."
             },
 
             "GRP-LZ-PROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-prod-proj1-exacs-admin",
-                "description"                                                  : "Dedicated team to manage the ExaDB-D database layer in Project 1, Production environment."
+                "description"                                                  : "Landing Zone Production environment, Project 1 ExaDB-D database administration access group."
             },
 
             "GRP-LZ-PROD-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-prod-proj1-admin",
-                "description"                                                  : "One-OE Landing Zone, Production environment, Project 1, Administrators."
+                "description"                                                  : "Landing Zone Production environment, Project 1 administration access group."
             },
 
             "GRP-LZ-SECURITY-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-security-admin",
-                "description"                                                  : "One-OE Landing Zone, Shared security administration group, including common OE network elements."
+                "description"                                                  : "Landing Zone shared security administration access group."
             },
 
             "GRP-SECURITY-ADMIN-KEY": {
                 "name"                                                         : "grp-security-admin",
-                "description"                                                  : "Tenancy Security Administrators for global resources as Cloud Guard."
+                "description"                                                  : "Tenancy-scoped security service administration access group."
             }
         }
     },
@@ -331,7 +331,7 @@
         "supplied_policies": {
             "PCY-AUDITING-ADMIN-KEY": {
                 "name"                                                         : "pcy-auditing-admin",
-                "description"                                                  : "Allow grp-auditors-admin group users to read all the resources in the tenancy.",
+                "description"                                                  : "Grants grp-auditors-admin read-only audit access in the tenancy.",
                 "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -362,7 +362,7 @@
 
             "PCY-COST-ADMIN-KEY": {
                 "name"                                                         : "pcy-cost-admin",
-                "description"                                                  : "Allow grp-cost-admin group users to manage all budget resources in the tenancy.",
+                "description"                                                  : "Grants grp-cost-admin budget and usage report management access in the tenancy.",
                 "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -375,7 +375,7 @@
 
             "PCY-GENERIC-ADMIN-KEY": {
                 "name"                                                         : "pcy-generic-admin",
-                "description"                                                  : "Allow defined groups to use generic services.",
+                "description"                                                  : "Grants defined administration groups shared service usage in the tenancy.",
                 "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -390,7 +390,7 @@
 
             "PCY-IAM-ADMIN-KEY": {
                 "name"                                                         : "pcy-iam-admin",
-                "description"                                                  : "Allow grp-iam-admin group users to manage IAM resources in the tenancy.",
+                "description"                                                  : "Grants grp-iam-admin IAM administration access in the tenancy.",
                 "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -412,7 +412,7 @@
 
             "PCY-LZ-GLOBAL-EXACS-DB-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-global-exacs-db-admin",
-                "description"                                                  : "Allow grp-lz-global-exacs-db-admin group users to manage databases in all ExaDB-D database compartments.",
+                "description"                                                  : "Grants grp-lz-global-exacs-db-admin ExaDB-D database administration access in Landing Zone ExaDB-D database compartments.",
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -435,7 +435,7 @@
 
             "PCY-LZ-GLOBAL-EXACS-GENERIC-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-global-exacs-generic",
-                "description"                                                  : "Allow grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin group users to use shared ExaDB-D administration services.",
+                "description"                                                  : "Grants grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin shared ExaDB-D administration service access in the tenancy and Landing Zone.",
                 "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -453,7 +453,7 @@
 
             "PCY-LZ-GLOBAL-EXACS-INFRA-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-global-exacs-infra-admin",
-                "description"                                                  : "Allow grp-lz-global-exacs-infra-admin group users to manage ExaDB-D infrastructure in all ExaDB-D infrastructure compartments.",
+                "description"                                                  : "Grants grp-lz-global-exacs-infra-admin ExaDB-D infrastructure administration access in Landing Zone ExaDB-D infrastructure compartments.",
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -478,7 +478,7 @@
 
             "PCY-LZ-NETWORK-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-network-admin",
-                "description"                                                  : "Allow grp-lz-network-admin group users to manage all network resources in the child compartments of cmp-landingzone with the matching tags.",
+                "description"                                                  : "Grants grp-lz-network-admin network administration access in Landing Zone child compartments tagged for network administration.",
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -515,7 +515,7 @@
 
             "PCY-LZ-PREPROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-preprod-exacs-proj1-admin",
-                "description"                                                  : "Allow grp-lz-preprod-proj1-exacs-admin group users to manage the ExaDB-D Autonomous Database layer in Project 1.",
+                "description"                                                  : "Grants grp-lz-preprod-proj1-exacs-admin ExaDB-D Autonomous Database administration access in the Project 1 database compartment in the Pre-Production environment.",
                 "compartment_id"                                               : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
 
                 "statements": [
@@ -534,7 +534,7 @@
 
             "PCY-LZ-PREPROD-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-preprod-proj1-admin",
-                "description"                                                  : "Allow grp-lz-preprod-proj1-admin group to manage their dedicated project 1 compartment",
+                "description"                                                  : "Grants grp-lz-preprod-proj1-admin administration access in the Project 1 compartment in the Pre-Production environment.",
                 "compartment_id"                                               : "CMP-LZ-PREPROD-PROJ1-KEY",
 
                 "statements": [
@@ -574,7 +574,7 @@
 
             "PCY-LZ-PREPROD-PROJ1-ADMIN-NET-KEY": {
                 "name"                                                         : "pcy-lz-preprod-proj1-admin-net",
-                "description"                                                  : "Allow grp-lz-preprod-proj1-admin group to use shared network resources",
+                "description"                                                  : "Grants grp-lz-preprod-proj1-admin shared network resource usage in the Pre-Production environment network compartment.",
                 "compartment_id"                                               : "CMP-LZ-PREPROD-NETWORK-KEY",
 
                 "statements": [
@@ -587,7 +587,7 @@
 
             "PCY-LZ-PREPROD-PROJ1-ADMIN-SEC-KEY": {
                 "name"                                                         : "pcy-lz-preprod-proj1-admin-sec",
-                "description"                                                  : "Allow grp-lz-preprod-proj1-admin group to use shared security resources",
+                "description"                                                  : "Grants grp-lz-preprod-proj1-admin shared security resource usage in the Pre-Production environment security compartment.",
                 "compartment_id"                                               : "CMP-LZ-PREPROD-SECURITY-KEY",
 
                 "statements": [
@@ -602,7 +602,7 @@
 
             "PCY-LZ-PROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-prod-exacs-proj1-admin",
-                "description"                                                  : "Allow grp-lz-prod-proj1-exacs-admin group users to manage the ExaDB-D Autonomous Database layer in Project 1.",
+                "description"                                                  : "Grants grp-lz-prod-proj1-exacs-admin ExaDB-D Autonomous Database administration access in the Project 1 database compartment in the Production environment.",
                 "compartment_id"                                               : "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY",
 
                 "statements": [
@@ -621,7 +621,7 @@
 
             "PCY-LZ-PROD-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-prod-proj1-admin",
-                "description"                                                  : "Allow grp-lz-prod-proj1-admin group to manage their dedicated project 1 compartment",
+                "description"                                                  : "Grants grp-lz-prod-proj1-admin administration access in the Project 1 compartment in the Production environment.",
                 "compartment_id"                                               : "CMP-LZ-PROD-PROJ1-KEY",
 
                 "statements": [
@@ -661,7 +661,7 @@
 
             "PCY-LZ-PROD-PROJ1-ADMIN-NET-KEY": {
                 "name"                                                         : "pcy-lz-prod-proj1-admin-net",
-                "description"                                                  : "Allow grp-lz-prod-proj1-admin group to use shared network resources",
+                "description"                                                  : "Grants grp-lz-prod-proj1-admin shared network resource usage in the Production environment network compartment.",
                 "compartment_id"                                               : "CMP-LZ-PROD-NETWORK-KEY",
 
                 "statements": [
@@ -674,7 +674,7 @@
 
             "PCY-LZ-PROD-PROJ1-ADMIN-SEC-KEY": {
                 "name"                                                         : "pcy-lz-prod-proj1-admin-sec",
-                "description"                                                  : "Allow grp-lz-prod-proj1-admin group to use shared security resources",
+                "description"                                                  : "Grants grp-lz-prod-proj1-admin shared security resource usage in the Production environment security compartment.",
                 "compartment_id"                                               : "CMP-LZ-PROD-SECURITY-KEY",
 
                 "statements": [
@@ -689,7 +689,7 @@
 
             "PCY-LZ-SECURITY-ADMIN-KEY": {
                 "name"                                                         : "pcy-lz-security-admin",
-                "description"                                                  : "Allow grp-lz-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
+                "description"                                                  : "Grants grp-lz-security-admin security administration access in Landing Zone child compartments tagged for security administration.",
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -738,7 +738,7 @@
 
             "PCY-SECURITY-ADMIN-KEY": {
                 "name"                                                         : "pcy-security-admin",
-                "description"                                                  : "Allow grp-security-admin group users to manage all security resources in the security compartment.",
+                "description"                                                  : "Grants grp-security-admin security service administration access in the tenancy.",
                 "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -750,7 +750,7 @@
 
             "PCY-SERVICES-ADMIN-KEY": {
                 "name"                                                         : "pcy-services-admin",
-                "description"                                                  : "Policy for all supported services in the tenancy.",
+                "description"                                                  : "Grants supported OCI services required Landing Zone service access in the tenancy.",
                 "compartment_id"                                               : "TENANCY-ROOT",
 
                 "statements": [

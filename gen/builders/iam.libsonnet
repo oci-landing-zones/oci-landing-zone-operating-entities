@@ -8,15 +8,13 @@
 
 function(config, n, realm_constants, topo)
   local labels = import '../labels.libsonnet';
+  local desc = import '../descriptions.libsonnet';
 
   // --- Display-name helpers ---
   local env_desc(env_name) = topo.env_display_long(env_name);
 
   // Project display name for compartment/group descriptions: 'proj1' → 'Project 1'.
   local proj_display(proj_name) = labels.project_display(proj_name);
-
-  // Lowercase project display for policy description sentences.
-  local proj_desc_lower(proj_name) = labels.project_desc_lower(proj_name);
 
   local env_names = topo.ordered_env_names();
 
@@ -204,7 +202,7 @@ function(config, n, realm_constants, topo)
           gacc + {
             [n.key_global('GRP', [env_name, proj_name, 'ADMIN'])]: {
               name: proj_grp_name(env_name, proj_name),
-              description: 'One-OE Landing Zone, %s environment, %s, Administrators.' % [env_desc(env_name), proj_display(proj_name)],
+              description: desc.group.project(env_desc(env_name), proj_name, 'administration'),
             },
           },
         project_names,
@@ -219,28 +217,28 @@ function(config, n, realm_constants, topo)
     groups: {
       [n.key_tenancy('GRP', ['AUDITORS', 'ADMIN'])]: {
         name: n.display_tenancy('GRP', ['AUDITORS', 'ADMIN']),
-        description: 'Tenancy global read access group(for security auditing or health checks).',
+        description: desc.group.tenancy('audit and read-only'),
       },
       [n.key_tenancy('GRP', ['COST', 'ADMIN'])]: {
         name: n.display_tenancy('GRP', ['COST', 'ADMIN']),
-        description: 'Tenancy global cost control group.',
+        description: desc.group.tenancy('cost management'),
       },
       [n.key_tenancy('GRP', ['IAM', 'ADMIN'])]: {
         name: n.display_tenancy('GRP', ['IAM', 'ADMIN']),
-        description: 'Tenancy global Identity and access management administrator group.',
+        description: desc.group.tenancy('IAM administration'),
       },
       [n.key_global('GRP', ['NETWORK', 'ADMIN'])]: {
         name: n.display_global('GRP', ['NETWORK', 'ADMIN']),
-        description: 'One-OE Landing Zone, Shared network administration group, including common OE network elements.',
+        description: desc.group.landing_zone('shared', 'network administration'),
       },
     } + env_project_groups + {
       [n.key_global('GRP', ['SECURITY', 'ADMIN'])]: {
         name: n.display_global('GRP', ['SECURITY', 'ADMIN']),
-        description: 'One-OE Landing Zone, Shared security administration group, including common OE network elements.',
+        description: desc.group.landing_zone('shared', 'security administration'),
       },
       [n.key_tenancy('GRP', ['SECURITY', 'ADMIN'])]: {
         name: n.display_tenancy('GRP', ['SECURITY', 'ADMIN']),
-        description: 'Tenancy Security Administrators for global resources as Cloud Guard.',
+        description: desc.group.tenancy('security service administration'),
       },
     },
   };
@@ -287,12 +285,14 @@ function(config, n, realm_constants, topo)
     local net_cmp_key = n.key_global('CMP', [env_name, 'NETWORK']);
     local sec_cmp_key = n.key_global('CMP', [env_name, 'SECURITY']);
     local grp_name = proj_grp_name(env_name, proj_name);
-    local proj_desc_l = proj_desc_lower(proj_name);
-
     {
       [proj_key]: {
         name: 'pcy-lz-%s-%s-admin' % [std.asciiLower(env_name), std.asciiLower(proj_name)],
-        description: 'Allow %s group to manage their dedicated %s compartment' % [grp_name, proj_desc_l],
+        description: desc.policy.grants(
+          grp_name,
+          'administration access',
+          desc.scope.project_compartment(env_desc(env_name), proj_name)
+        ),
         compartment_id: proj_cmp_key,
         statements: [
           '%s to read all-resources in compartment %s' % [grp, proj_cmp],
@@ -331,7 +331,11 @@ function(config, n, realm_constants, topo)
 
       [proj_net_key]: {
         name: 'pcy-lz-%s-%s-admin-net' % [std.asciiLower(env_name), std.asciiLower(proj_name)],
-        description: 'Allow %s group to use shared network resources' % grp_name,
+        description: desc.policy.grants(
+          grp_name,
+          'shared network resource usage',
+          desc.scope.environment_compartment(env_desc(env_name), 'network')
+        ),
         compartment_id: net_cmp_key,
         statements: [
           '%s to use virtual-network-family in compartment %s' % [grp, net_cmp],
@@ -343,7 +347,11 @@ function(config, n, realm_constants, topo)
 
       [proj_sec_key]: {
         name: 'pcy-lz-%s-%s-admin-sec' % [std.asciiLower(env_name), std.asciiLower(proj_name)],
-        description: 'Allow %s group to use shared security resources' % grp_name,
+        description: desc.policy.grants(
+          grp_name,
+          'shared security resource usage',
+          desc.scope.environment_compartment(env_desc(env_name), 'security')
+        ),
         compartment_id: sec_cmp_key,
         statements: [
           '%s to read ons-topics in compartment %s' % [grp, sec_cmp],
@@ -387,7 +395,7 @@ function(config, n, realm_constants, topo)
     supplied_policies: {
       [n.key_tenancy('PCY', ['AUDITING', 'ADMIN'])]: {
         name: n.display_tenancy('PCY', ['AUDITING', 'ADMIN']),
-        description: 'Allow %s group users to read all the resources in the tenancy.' % grp_auditors,
+        description: desc.policy.grants(grp_auditors, 'read-only audit access', 'the tenancy'),
         compartment_id: 'TENANCY-ROOT',
         statements: [
           tenancy_allow(grp_auditors, 'inspect', 'all-resources'),
@@ -417,7 +425,7 @@ function(config, n, realm_constants, topo)
 
       [n.key_tenancy('PCY', ['COST', 'ADMIN'])]: {
         name: n.display_tenancy('PCY', ['COST', 'ADMIN']),
-        description: 'Allow %s group users to manage all budget resources in the tenancy.' % grp_cost,
+        description: desc.policy.grants(grp_cost, 'budget and usage report management access', 'the tenancy'),
         compartment_id: 'TENANCY-ROOT',
         statements: [
           'define tenancy usage-report as %s' % realm_constants.usage_report_tenancy_ocid,
@@ -429,7 +437,7 @@ function(config, n, realm_constants, topo)
 
       [n.key_tenancy('PCY', ['GENERIC', 'ADMIN'])]: {
         name: n.display_tenancy('PCY', ['GENERIC', 'ADMIN']),
-        description: 'Allow defined groups to use generic services.',
+        description: desc.policy.grants('defined administration groups', 'shared service usage', 'the tenancy'),
         compartment_id: 'TENANCY-ROOT',
         statements: [
           '%s to use cloud-shell in tenancy' % generic_admin_stmt,
@@ -443,7 +451,7 @@ function(config, n, realm_constants, topo)
 
       [n.key_tenancy('PCY', ['IAM', 'ADMIN'])]: {
         name: n.display_tenancy('PCY', ['IAM', 'ADMIN']),
-        description: 'Allow %s group users to manage IAM resources in the tenancy.' % grp_iam,
+        description: desc.policy.grants(grp_iam, 'IAM administration access', 'the tenancy'),
         compartment_id: 'TENANCY-ROOT',
         statements: [
           tenancy_allow(grp_iam, 'manage', 'policies'),
@@ -464,7 +472,11 @@ function(config, n, realm_constants, topo)
 
       [n.key_global('PCY', ['NETWORK', 'ADMIN'])]: {
         name: n.display_global('PCY', ['NETWORK', 'ADMIN']),
-        description: 'Allow %s group users to manage all network resources in the child compartments of %s with the matching tags.' % [grp_network, cmp_lz],
+        description: desc.policy.grants(
+          grp_network,
+          'network administration access',
+          'Landing Zone child compartments tagged for network administration'
+        ),
         compartment_id: 'CMP-LANDINGZONE-KEY',
         statements: [
           // Own compartment access: network-tagged compartments
@@ -502,7 +514,11 @@ function(config, n, realm_constants, topo)
     } + env_project_policies + {
       [n.key_global('PCY', ['SECURITY', 'ADMIN'])]: {
         name: n.display_global('PCY', ['SECURITY', 'ADMIN']),
-        description: 'Allow %s group users to manage all security resources in the child compartments of %s with the matching tags.' % [grp_security_lz, cmp_lz],
+        description: desc.policy.grants(
+          grp_security_lz,
+          'security administration access',
+          'Landing Zone child compartments tagged for security administration'
+        ),
         compartment_id: 'CMP-LANDINGZONE-KEY',
         statements: [
           // Own compartment access: security-tagged compartments
@@ -552,7 +568,7 @@ function(config, n, realm_constants, topo)
 
       [n.key_tenancy('PCY', ['SECURITY', 'ADMIN'])]: {
         name: n.display_tenancy('PCY', ['SECURITY', 'ADMIN']),
-        description: 'Allow %s group users to manage all security resources in the security compartment.' % grp_security_tenancy,
+        description: desc.policy.grants(grp_security_tenancy, 'security service administration access', 'the tenancy'),
         compartment_id: 'TENANCY-ROOT',
         statements: [
           tenancy_allow(grp_security_tenancy, 'manage', 'cloudevents-rules'),
@@ -563,7 +579,7 @@ function(config, n, realm_constants, topo)
 
       [n.key_tenancy('PCY', ['SERVICES', 'ADMIN'])]: {
         name: n.display_tenancy('PCY', ['SERVICES', 'ADMIN']),
-        description: 'Policy for all supported services in the tenancy.',
+        description: desc.policy.grants('supported OCI services', 'required Landing Zone service access', 'the tenancy'),
         compartment_id: 'TENANCY-ROOT',
         statements: [
           "allow service cloudguard to manage cloudevents-rules in tenancy where target.rule.type='managed'",

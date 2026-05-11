@@ -25,7 +25,7 @@ local exadb_events = import './events.libsonnet';
     ];
     local project_topics = {
       [env_topic_key(env_name)]: {
-        name: n.display_global('nott', [env_name, product.code, 'projects']),
+        name: n.display_global('nott', [env_name, product.code]),
         description: descriptions.project_topic(model.environment_scope(env_name)),
         compartment_id: n.key_global('CMP', [env_name, 'SECURITY']),
         subscriptions: subscriptions('projects'),
@@ -64,9 +64,9 @@ local exadb_events = import './events.libsonnet';
       if project_count == 1 then base else base + [project_name];
     local project_display_segments(env_name, project_name, project_count) =
       if project_count == 1 then
-        [env_name, 'notify-on-notifications-projects']
+        [env_name, 'notify-on-notifications']
       else
-        [env_name, 'notify-on-notifications-projects', project_name];
+        [env_name, 'notify-on-notifications', project_name];
     local project_event_rules_for_env(env_name) =
       local project_names = model.by_environment[env_name];
       {

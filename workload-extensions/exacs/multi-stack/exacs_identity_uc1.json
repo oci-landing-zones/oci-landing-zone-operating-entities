@@ -121,22 +121,22 @@
         "groups": {
             "GRP-LZ-GLOBAL-EXACS-DB-ADMIN-KEY": {
                 "name"                                 : "grp-lz-global-exacs-db-admin",
-                "description"                          : "Global ExaDB-D database administration group."
+                "description"                          : "Landing Zone global ExaDB-D database administration access group."
             },
 
             "GRP-LZ-GLOBAL-EXACS-INFRA-ADMIN-KEY": {
                 "name"                                 : "grp-lz-global-exacs-infra-admin",
-                "description"                          : "Global ExaDB-D infrastructure administration group."
+                "description"                          : "Landing Zone global ExaDB-D infrastructure administration access group."
             },
 
             "GRP-LZ-PREPROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                 : "grp-lz-preprod-proj1-exacs-admin",
-                "description"                          : "Dedicated team to manage the ExaDB-D database layer in Project 1, Pre-Production environment."
+                "description"                          : "Landing Zone Pre-Production environment, Project 1 ExaDB-D database administration access group."
             },
 
             "GRP-LZ-PROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                 : "grp-lz-prod-proj1-exacs-admin",
-                "description"                          : "Dedicated team to manage the ExaDB-D database layer in Project 1, Production environment."
+                "description"                          : "Landing Zone Production environment, Project 1 ExaDB-D database administration access group."
             }
         }
     },
@@ -145,7 +145,7 @@
         "supplied_policies": {
             "PCY-LZ-GLOBAL-EXACS-DB-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-global-exacs-db-admin",
-                "description"                          : "Allow grp-lz-global-exacs-db-admin group users to manage databases in all ExaDB-D database compartments.",
+                "description"                          : "Grants grp-lz-global-exacs-db-admin ExaDB-D database administration access in Landing Zone ExaDB-D database compartments.",
                 "compartment_id"                       : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -168,7 +168,7 @@
 
             "PCY-LZ-GLOBAL-EXACS-GENERIC-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-global-exacs-generic",
-                "description"                          : "Allow grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin group users to use shared ExaDB-D administration services.",
+                "description"                          : "Grants grp-lz-global-exacs-infra-admin and grp-lz-global-exacs-db-admin shared ExaDB-D administration service access in the tenancy and Landing Zone.",
                 "compartment_id"                       : "TENANCY-ROOT",
 
                 "statements": [
@@ -186,7 +186,7 @@
 
             "PCY-LZ-GLOBAL-EXACS-INFRA-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-global-exacs-infra-admin",
-                "description"                          : "Allow grp-lz-global-exacs-infra-admin group users to manage ExaDB-D infrastructure in all ExaDB-D infrastructure compartments.",
+                "description"                          : "Grants grp-lz-global-exacs-infra-admin ExaDB-D infrastructure administration access in Landing Zone ExaDB-D infrastructure compartments.",
                 "compartment_id"                       : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -211,7 +211,7 @@
 
             "PCY-LZ-PREPROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-preprod-exacs-proj1-admin",
-                "description"                          : "Allow grp-lz-preprod-proj1-exacs-admin group users to manage the ExaDB-D Autonomous Database layer in Project 1.",
+                "description"                          : "Grants grp-lz-preprod-proj1-exacs-admin ExaDB-D Autonomous Database administration access in the Project 1 database compartment in the Pre-Production environment.",
                 "compartment_id"                       : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
 
                 "statements": [
@@ -230,7 +230,7 @@
 
             "PCY-LZ-PROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-prod-exacs-proj1-admin",
-                "description"                          : "Allow grp-lz-prod-proj1-exacs-admin group users to manage the ExaDB-D Autonomous Database layer in Project 1.",
+                "description"                          : "Grants grp-lz-prod-proj1-exacs-admin ExaDB-D Autonomous Database administration access in the Project 1 database compartment in the Production environment.",
                 "compartment_id"                       : "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY",
 
                 "statements": [

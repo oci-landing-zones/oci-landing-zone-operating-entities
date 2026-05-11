@@ -121,22 +121,22 @@
         "groups": {
             "GRP-LZ-GLOBAL-DB-ADMIN-KEY": {
                 "name"                                 : "grp-lz-global-exacc-db-admin",
-                "description"                          : "Global ExaDB-C@C database administration group."
+                "description"                          : "Landing Zone global ExaDB-C@C database administration access group."
             },
 
             "GRP-LZ-GLOBAL-INFRA-ADMIN-KEY": {
                 "name"                                 : "grp-lz-global-exacc-infra-admin",
-                "description"                          : "Global ExaDB-C@C infrastructure administration group."
+                "description"                          : "Landing Zone global ExaDB-C@C infrastructure administration access group."
             },
 
             "GRP-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
                 "name"                                 : "grp-lz-preprod-proj1-exacc-admin",
-                "description"                          : "Dedicated team to manage the ExaDB-C@C database layer in Project 1, Pre-Production environment."
+                "description"                          : "Landing Zone Pre-Production environment, Project 1 ExaDB-C@C database administration access group."
             },
 
             "GRP-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
                 "name"                                 : "grp-lz-prod-proj1-exacc-admin",
-                "description"                          : "Dedicated team to manage the ExaDB-C@C database layer in Project 1, Production environment."
+                "description"                          : "Landing Zone Production environment, Project 1 ExaDB-C@C database administration access group."
             }
         }
     },
@@ -145,7 +145,7 @@
         "supplied_policies": {
             "PCY-LZ-GLOBAL-EXACC-DB-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-global-exacc-db-admin",
-                "description"                          : "Allow grp-lz-global-exacc-db-admin group users to manage databases in all ExaDB-C@C database compartments.",
+                "description"                          : "Grants grp-lz-global-exacc-db-admin ExaDB-C@C database administration access in Landing Zone ExaDB-C@C database compartments.",
                 "compartment_id"                       : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -168,7 +168,7 @@
 
             "PCY-LZ-GLOBAL-EXACC-GENERIC-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-global-exacc-generic",
-                "description"                          : "Allow grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin group users to use shared ExaDB-C@C administration services.",
+                "description"                          : "Grants grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin shared ExaDB-C@C administration service access in the tenancy and Landing Zone.",
                 "compartment_id"                       : "TENANCY-ROOT",
 
                 "statements": [
@@ -186,7 +186,7 @@
 
             "PCY-LZ-GLOBAL-EXACC-INFRA-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-global-exacc-infra-admin",
-                "description"                          : "Allow grp-lz-global-exacc-infra-admin group users to manage ExaDB-C@C infrastructure in all ExaDB-C@C infrastructure compartments.",
+                "description"                          : "Grants grp-lz-global-exacc-infra-admin ExaDB-C@C infrastructure administration access in Landing Zone ExaDB-C@C infrastructure compartments.",
                 "compartment_id"                       : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -211,7 +211,7 @@
 
             "PCY-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-preprod-exacc-proj1-admin",
-                "description"                          : "Allow grp-lz-preprod-proj1-exacc-admin group users to manage the ExaDB-C@C Autonomous Database layer in Project 1.",
+                "description"                          : "Grants grp-lz-preprod-proj1-exacc-admin ExaDB-C@C Autonomous Database administration access in the Project 1 database compartment in the Pre-Production environment.",
                 "compartment_id"                       : "CMP-LZ-PREPROD-PROJ1-DB-KEY",
 
                 "statements": [
@@ -230,7 +230,7 @@
 
             "PCY-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-prod-exacc-proj1-admin",
-                "description"                          : "Allow grp-lz-prod-proj1-exacc-admin group users to manage the ExaDB-C@C Autonomous Database layer in Project 1.",
+                "description"                          : "Grants grp-lz-prod-proj1-exacc-admin ExaDB-C@C Autonomous Database administration access in the Project 1 database compartment in the Production environment.",
                 "compartment_id"                       : "CMP-LZ-PROD-PROJ1-DB-KEY",
 
                 "statements": [

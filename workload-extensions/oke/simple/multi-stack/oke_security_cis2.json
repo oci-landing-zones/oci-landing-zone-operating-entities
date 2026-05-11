@@ -156,7 +156,7 @@
             },
 
             "SZ-TGT-LZ-PROD-PLATFORM-OKE-KEY": {
-                "name"                              : "sz-tgt-lz-prod-platform-oke",
+                "name"                              : "sz-tgt-lz-prod-oke",
                 "compartment_id"                    : "CMP-LZ-PROD-OKE-KEY",
                 "recipe_key"                        : "SZ-RCP-LZ-05-WORKLOAD-KEY"
             },

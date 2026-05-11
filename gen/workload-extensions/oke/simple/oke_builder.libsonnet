@@ -13,6 +13,7 @@
 //   params.routing       — explicit DRG route targets (null when not hub-backed)
 
 local cidrs = import '../../../lib/cidrs.libsonnet';
+local desc = import '../../../descriptions.libsonnet';
 
 {
   metadata(params):: {
@@ -36,8 +37,9 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
   local n = params.naming;
   local scope = params.topology;
   local env = scope.scope_name;
-  local env_title = scope.scope_title;
+  local env_long_title = scope.scope_long_title;
   local plat = scope.platform_name;
+  local display_segments = [env, plat];
   local cmp_key = scope.compartment_key;
   local routing = if std.objectHas(params, 'routing') then params.routing else null;
   local has_hub = routing != null && routing.hub != null;
@@ -106,7 +108,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
   local node_pool_key =
     n.key('NDP', [env, 'PLATFORM', plat, '1']);
   local node_pool_name =
-    checked_oke_name('OKE node pool name', n.display('ndp', [env, 'platform', plat, '1']), 32);
+    checked_oke_name('OKE node pool name', n.display('ndp', display_segments + ['1']), 32);
 
   // Subnet CIDRs from params
   local subnets = params.network.subnets;
@@ -216,7 +218,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
       [desc.key]:
         (
           {
-            display_name: n.display('sl', [env, 'platform', plat, desc.suffix]),
+            display_name: n.display('sl', display_segments + [desc.suffix]),
             egress_rules: desc.egress,
             ingress_rules: desc.ingress,
           }
@@ -280,7 +282,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
   local build_route_tables(route_rules) =
     {
       [desc.key]: {
-        display_name: n.display('rt', [env, 'platform', plat, desc.suffix]),
+        display_name: n.display('rt', display_segments + [desc.suffix]),
         route_rules: route_rules,
       }
       for desc in route_table_descriptors
@@ -295,7 +297,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
         security_zones_configuration+: {
           security_zones+: {
             [n.key_global('SZ-TGT', [env, 'PLATFORM', plat])]: {
-              name: n.display_global('sz-tgt', [env, 'platform', plat]),
+              name: n.display_global('sz-tgt', display_segments),
               compartment_id: cmp_key,
               recipe_key: 'SZ-RCP-LZ-05-WORKLOAD-KEY',
             },
@@ -310,7 +312,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
 
         vcns: {
           [vcn_key]: {
-            display_name: n.display('vcn', [env, 'platform', plat]),
+            display_name: n.display('vcn', display_segments),
             cidr_blocks: [params.network.vcn],
             dns_label: n.dns_label(['vcn', n.region, 'lz', dns, dns + plat]),
             block_nat_traffic: false,
@@ -321,7 +323,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
 
             subnets: {
               [sn_cp_key]: {
-                display_name: n.display('sn', [env, 'platform', plat, 'cp']),
+                display_name: n.display('sn', display_segments + ['cp']),
                 dns_label: n.dns_label(['sn', dns, 'plat', plat, 'cp']),
                 cidr_block: subnets['control-plane'],
                 dhcp_options_key: 'default_dhcp_options',
@@ -332,7 +334,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
               },
 
               [sn_lb_key]: {
-                display_name: n.display('sn', [env, 'platform', plat, 'lb']),
+                display_name: n.display('sn', display_segments + ['lb']),
                 dns_label: n.dns_label(['sn', dns, 'plat', plat, 'lb']),
                 cidr_block: subnets['int-lb'],
                 dhcp_options_key: 'default_dhcp_options',
@@ -343,7 +345,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
               },
 
               [sn_pods_key]: {
-                display_name: n.display('sn', [env, 'platform', plat, 'pods']),
+                display_name: n.display('sn', display_segments + ['pods']),
                 dns_label: n.dns_label(['sn', dns, 'plat', plat, 'pods']),
                 cidr_block: subnets.pods,
                 dhcp_options_key: 'default_dhcp_options',
@@ -354,7 +356,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
               },
 
               [sn_workers_key]: {
-                display_name: n.display('sn', [env, 'platform', plat, 'workers']),
+                display_name: n.display('sn', display_segments + ['workers']),
                 dns_label: n.dns_label(['sn', dns, 'plat', plat, 'work']),
                 cidr_block: subnets.workers,
                 dhcp_options_key: 'default_dhcp_options',
@@ -372,7 +374,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
             network_security_groups: {
               // --- Control Plane NSG ---
               [nsg_cp_key]: {
-                display_name: n.display('nsg', [env, 'platform', plat, 'cp']),
+                display_name: n.display('nsg', display_segments + ['cp']),
 
                 egress_rules: {
                   nsg_cp_6443: nsg_tcp_egress('Allow TCP egress for Kubernetes control plane inter-communication', nsg_cp_key, '6443'),
@@ -424,7 +426,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
 
               // --- LB NSG ---
               [nsg_lb_key]: {
-                display_name: n.display('nsg', [env, 'platform', plat, 'int-lb']),
+                display_name: n.display('nsg', display_segments + ['int-lb']),
                 ingress_rules: {},
 
                 egress_rules: {
@@ -452,7 +454,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
 
               // --- Pods NSG ---
               [nsg_pods_key]: {
-                display_name: n.display('nsg', [env, 'platform', plat, 'pods']),
+                display_name: n.display('nsg', display_segments + ['pods']),
 
                 egress_rules: {
                   anywhere: {
@@ -531,7 +533,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
 
               // --- Workers NSG ---
               [nsg_workers_key]: {
-                display_name: n.display('nsg', [env, 'platform', plat, 'workers']),
+                display_name: n.display('nsg', display_segments + ['workers']),
 
                 egress_rules: {
                   anywhere: {
@@ -625,14 +627,14 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
               {
                 service_gateways: {
                   [sgw_key]: {
-                    display_name: n.display('sgw', [env, 'platform', plat]),
+                    display_name: n.display('sgw', display_segments),
                     services: 'all-services',
                   },
                 },
               } + if has_hub && !overlay_output && use_local_natgw then {
                 nat_gateways: {
                   [ngw_key]: {
-                    display_name: n.display('ngw', [env, 'platform', plat]),
+                    display_name: n.display('ngw', display_segments),
                     block_traffic: false,
                   },
                 },
@@ -646,16 +648,16 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
         groups_configuration+: {
           groups+: {
             [n.key_global('GRP', [env, 'PLATFORM', plat, 'ADMINS'])]: {
-              name: n.display_global('grp', [env, 'platform', plat, 'admins']),
-              description: '%s OKE Cluster Management Admin' % env_title,
+              name: n.display_global('grp', display_segments + ['admins']),
+              description: desc.group.platform(env_long_title, 'OKE', 'cluster management administration'),
             },
             [n.key_global('GRP', [env, 'PLATFORM', plat, 'RBAC-ADMIN'])]: {
-              name: n.display_global('grp', [env, 'platform', plat, 'rbac-admin']),
-              description: '%s OKE RBAC Admin' % env_title,
+              name: n.display_global('grp', display_segments + ['rbac-admin']),
+              description: desc.group.platform(env_long_title, 'OKE', 'Kubernetes RBAC administration'),
             },
             [n.key_global('GRP', [env, 'PLATFORM', plat, 'RBAC-VIEWER'])]: {
-              name: n.display_global('grp', [env, 'platform', plat, 'rbac-viewer']),
-              description: '%s OKE RBAC Viewer' % env_title,
+              name: n.display_global('grp', display_segments + ['rbac-viewer']),
+              description: desc.group.platform(env_long_title, 'OKE', 'Kubernetes RBAC viewer'),
             },
           },
         },
@@ -663,13 +665,17 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
         policies_configuration+: {
           supplied_policies+: {
             [n.key_global('PCY', [env, 'PLATFORM', plat, 'ADMINS'])]: {
-              name: n.display_global('pcy', [env, 'platform', plat, 'admins']),
-              description: 'allow %s to manage OKE resources' % n.display_global('grp', [env, 'platform', plat, 'admins']),
+              name: n.display_global('pcy', display_segments + ['admins']),
+              description: desc.policy.grants(
+                n.display_global('grp', display_segments + ['admins']),
+                'OKE platform administration access',
+                'the %s environment OKE platform and network compartments' % env_long_title
+              ),
               compartment_id: 'TENANCY-ROOT',
 
               local cmp_path = scope.compartment_path,
               local net_path = scope.network_compartment_path,
-              local grp_name = n.display_global('grp', [env, 'platform', plat, 'admins']),
+              local grp_name = n.display_global('grp', display_segments + ['admins']),
 
               statements: [
                 "allow group 'id_lz_common'/'%s' to read all-resources in compartment %s" % [grp_name, cmp_path],
@@ -686,13 +692,17 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
             },
 
             [n.key_global('PCY', [env, 'PLATFORM', plat, 'RBAC-ROLE'])]: {
-              name: n.display_global('pcy', [env, 'platform', plat, 'rbac-roles']),
-              description: 'allow rbac roles to access OKE %s Cluster' % env_title,
+              name: n.display_global('pcy', display_segments + ['rbac-roles']),
+              description: desc.policy.grants(
+                'OKE RBAC administrator and viewer groups',
+                'Kubernetes cluster access',
+                'the %s environment OKE platform compartment' % env_long_title
+              ),
               compartment_id: 'TENANCY-ROOT',
 
               local cmp_path = scope.compartment_path,
-              local rbac_admin = n.display_global('grp', [env, 'platform', plat, 'rbac-admin']),
-              local rbac_viewer = n.display_global('grp', [env, 'platform', plat, 'rbac-viewer']),
+              local rbac_admin = n.display_global('grp', display_segments + ['rbac-admin']),
+              local rbac_viewer = n.display_global('grp', display_segments + ['rbac-viewer']),
 
               statements: [
                 "allow group 'id_lz_common'/'%s' to use cluster in compartment %s" % [rbac_admin, cmp_path],
@@ -701,8 +711,11 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
             },
 
             [n.key_global('PCY', [env, 'PLATFORM', plat, 'VCN-CNI'])]: {
-              name: n.display_global('pcy', [env, 'platform', plat, 'vcn-cni']),
-              description: '(unsafe) Grant OKE clusters tenancy wide permissions to use resource',
+              name: n.display_global('pcy', display_segments + ['vcn-cni']),
+              description: desc.policy.unsafe_grants(
+                'OKE clusters',
+                'tenancy-wide VCN CNI permissions for instance, private IP, and network security group resources'
+              ),
               compartment_id: 'TENANCY-ROOT',
               '//': 'This is potentially unsafe as it can be used for privilege escalation across environments. See https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-OCI_CNI_plugin.htm for restricting permissions.',
 

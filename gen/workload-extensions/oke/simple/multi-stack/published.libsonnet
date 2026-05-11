@@ -30,7 +30,7 @@ local oke_builder = import '../oke_builder.libsonnet';
 
               drg_attachments+: {
                 [n.key('DRGATT', [env, 'PLATFORM', plat])]: {
-                  display_name: n.display('drgatt', [env, 'platform', plat]),
+                  display_name: n.display('drgatt', [env, plat]),
                   drg_route_table_key: n.key('DRGRT', ['SPOKES']),
 
                   network_details: {

@@ -38,6 +38,7 @@ local products = import '../exadb/products.libsonnet';
     local scope = params.topology;
     local env = scope.scope_name;
     local plat = scope.platform_name;
+    local display_segments = [env, plat];
     local dns = scope.dns;
     local routing =
       if std.objectHas(params, 'routing') then params.routing
@@ -70,7 +71,7 @@ local products = import '../exadb/products.libsonnet';
       category_compartment_id: scope.network_compartment_key,
       vcns: {
         [vcn_key]: {
-          display_name: n.display('vcn', [env, 'platform', plat]),
+          display_name: n.display('vcn', display_segments),
           cidr_blocks: [params.network.vcn],
           dns_label: n.dns_label(['vcn', n.region, 'lz', dns, plat]),
           block_nat_traffic: false,
@@ -82,13 +83,13 @@ local products = import '../exadb/products.libsonnet';
           network_security_groups: {},
           route_tables: {
             [rt_key]: {
-              display_name: n.display('rt', [env, 'platform', plat, 'generic']),
+              display_name: n.display('rt', display_segments + ['generic']),
               route_rules: route_rules,
             },
           },
           security_lists: {
             [sl_key]: {
-              display_name: n.display('sl', [env, 'platform', plat, 'generic']),
+              display_name: n.display('sl', display_segments + ['generic']),
               egress_rules: [
                 {
                   description: 'Allow all outbound traffic',
@@ -113,7 +114,7 @@ local products = import '../exadb/products.libsonnet';
           },
           subnets: {
             [n.key('SN', [env, 'PLATFORM', plat, 'DB'])]: {
-              display_name: n.display('sn', [env, 'platform', plat, 'db']),
+              display_name: n.display('sn', display_segments + ['db']),
               cidr_block: params.network.subnets.db,
               dns_label: n.dns_label(['sn', n.region, dns, plat, 'db']),
               dhcp_options_key: 'default_dhcp_options',
@@ -123,7 +124,7 @@ local products = import '../exadb/products.libsonnet';
               security_list_keys: [sl_key],
             },
             [n.key('SN', [env, 'PLATFORM', plat, 'BACKUP'])]: {
-              display_name: n.display('sn', [env, 'platform', plat, 'backup']),
+              display_name: n.display('sn', display_segments + ['backup']),
               cidr_block: params.network.subnets.backup,
               dns_label: n.dns_label(['sn', n.region, dns, plat, 'bck']),
               dhcp_options_key: 'default_dhcp_options',
@@ -136,7 +137,7 @@ local products = import '../exadb/products.libsonnet';
           vcn_specific_gateways: {
             service_gateways: {
               [sgw_key]: {
-                display_name: n.display('sgw', [env, 'platform', plat]),
+                display_name: n.display('sgw', display_segments),
                 services: 'all-services',
               },
             },

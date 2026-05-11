@@ -4,7 +4,7 @@
   "node_pool_cluster_id": "CLR-FRA-LZ-PROD-OKE-KEY",
   "node_pool_cluster_tag": "clr-fra-lz-prod-oke",
   "node_pool_key": "NDP-FRA-LZ-PROD-PLATFORM-OKE-1-KEY",
-  "node_pool_name": "ndp-fra-lz-prod-platform-oke-1",
+  "node_pool_name": "ndp-fra-lz-prod-oke-1",
   "output_files": [
     "governance.json",
     "iam.json",
