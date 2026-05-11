@@ -67,6 +67,7 @@ By default, create only the `.excalidraw` file. Do not create `.svg`, `.png`, `.
 - When two nearby branches both have grandchildren on the same row, reserve separate horizontal lanes for those grandchildren. Do not let a platform leaf box overlap a projects leaf box just because their parents are adjacent.
 - OKE should be nested under the environment platform branch, not directly under the environment root unless the generated `iam.json` says so.
 - Keep the first text line equal to the generated compartment `name` value, except for the synthetic tenancy root box, which should be labeled `TENANCY-ROOT`. For every compartment box, including `TENANCY-ROOT`, include the policy statement count when the source IAM JSON has policies assigned to that compartment key. Add the count as a compact secondary line inside the same compartment box, using the bare number unless the user asks for a descriptive label. `TENANCY-ROOT` is synthetic, so explicitly derive its count from policies whose `compartment_id` is `TENANCY-ROOT`; do not skip it just because it is not in `compartments_configuration`. Do not put policy statement counts in the `Access groups` panel.
+- Keep compartment labels visually centered inside their boxes, including two-line labels with policy statement counts. If the generated compartment name plus bare policy count appears too high and leaves visibly more space below the count line than above the name, lower the text box slightly within the compartment rectangle while keeping the label fully inside the box.
 
 ## Target Result Checklist
 
@@ -148,3 +149,8 @@ Use this standard when the user asks for a network graph, VCN/subnet graph, or a
   - `hub_d`: `https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_d`
   - `hub_e`: `https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_e`
 - Before finishing, validate the `.excalidraw` with `jq empty`, confirm the network topology is vertical top-to-bottom with hub VCN above DRG and DRG above every spoke VCN, confirm every `line` and `arrow` element has no more than three points, confirm all VCN/subnet boxes use dashed borders, confirm VCN/private-subnet borders are red, confirm subnet boxes are transparent unless explicitly highlighted, confirm route-table cards retain their colored headers/fills, confirm route-table and DRG route-table connector lines start on the nearest header edge rather than from the center of the card, confirm route-table connector lines do not cross or stack on top of each other, confirm route-table connector lines do not cross gateway circles or labels, confirm VCN-to-DRG connectors are `line` elements with no arrowheads, and confirm each DRG attachment label center matches the corresponding VCN-to-DRG line's middle point.
+
+## Pending Diagram Follow-Up
+
+- No accepted pending corrections are currently known for the ExaCS VMC, AVMC, or combined VMC+AVMC compartment and network diagrams after the latest generation and validation.
+- Do not leave future visual-review findings only in chat. If a reviewer finds a diagram mismatch, record it here as either a concrete convention or an explicit pending item before regenerating the affected diagrams.
