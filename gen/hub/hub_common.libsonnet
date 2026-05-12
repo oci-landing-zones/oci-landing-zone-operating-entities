@@ -17,6 +17,7 @@
 //   _services_route_via_sgw(n)      — Route rule to Oracle Services via SGW
 //   _internet_route_via_natgw(n)    — Route rule to 0.0.0.0/0 via NAT GW
 //   _internet_route_via_igw(n)      — Route rule to 0.0.0.0/0 via IGW
+//   _hub_output(n, spec)            — Standard hub builder return envelope
 //   _firewall_hub_drg(n)            — DRG for firewall hubs (A, B, C)
 //   _icmp_sl(n, segments, hub_vcn_cidr) — ICMP-only security list (key via naming)
 //   _natgw_firewall_routes(n, subnets, entity_id, fw_desc) — NATGW routes through firewall
@@ -257,6 +258,36 @@
     destination_type: destination_type,
     network_entity_id: network_entity_id,
   },
+
+  _hub_output(n, spec):: {
+    pre: {
+      network_configuration: {
+        default_compartment_id: 'CMP-LZ-NETWORK-KEY',
+        default_enable_cis_checks: false,
+
+        network_configuration_categories: {
+          '0-shared': {
+            category_compartment_id: 'CMP-LZ-NETWORK-KEY',
+
+            vcns: {
+              [n.key('VCN', ['HUB'])]: spec.hub_vcn,
+            },
+
+            non_vcn_specific_gateways: spec.non_vcn_specific_gateways,
+          },
+        },
+      },
+    } + (if std.objectHas(spec, 'extra_pre') then spec.extra_pre else {}),
+
+    post: if std.objectHas(spec, 'post') then spec.post else null,
+
+    spoke_route_tables: spec.spoke_route_tables,
+    post_route_tables: spec.post_route_tables,
+    fw_nsg_key: spec.fw_nsg_key,
+    has_spoke_natgw: spec.has_spoke_natgw,
+    post_route_entity_id: spec.post_route_entity_id,
+    post_route_entity_desc: spec.post_route_entity_desc,
+  } + (if std.objectHas(spec, 'backends') then { backends: spec.backends } else {}),
 
   _route_table_from_descriptor(n, d):: {
     [n.key('RT', d.key_segments)]: {

@@ -61,18 +61,8 @@ function(hub_ctx)
     },
   ]);
 
-  {
-    pre: {
-      network_configuration: {
-        default_compartment_id: 'CMP-LZ-NETWORK-KEY',
-        default_enable_cis_checks: false,
-
-        network_configuration_categories: {
-          '0-shared': {
-            category_compartment_id: 'CMP-LZ-NETWORK-KEY',
-
-            vcns: {
-              [n.key('VCN', ['HUB'])]: common._hub_vcn(n, vcn_cidr, subnets, {
+  common._hub_output(n, {
+    hub_vcn: common._hub_vcn(n, vcn_cidr, subnets, {
                 [n.key('SN', ['HUB', 'FW'])]: {
                   display_name: n.display('sn', ['hub', 'fw']),
                   dns_label: n.dns_label(['sn', n.region, 'hub', 'fw']),
@@ -125,9 +115,8 @@ function(hub_ctx)
                   service_gateways: common._service_gateway(n, ['HUB']),
                 },
               },
-            },
 
-            non_vcn_specific_gateways: {
+    non_vcn_specific_gateways: {
               dynamic_routing_gateways: common._firewall_hub_drg(n),
 
               l7_load_balancers: lb._l7_load_balancer(n, lb_backends, lb_env_name),
@@ -165,10 +154,6 @@ function(hub_ctx)
                 },
               },
             },
-          },
-        },
-      },
-    },
 
     post: {
       network_configuration+: {
@@ -231,4 +216,4 @@ function(hub_ctx)
 
     post_route_entity_id: nfw_ocid,
     post_route_entity_desc: 'OCI Network Firewall',
-  }
+  })

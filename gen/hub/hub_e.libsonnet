@@ -37,117 +37,91 @@ function(hub_ctx)
     },
   ]);
 
-  {
-    pre: {
-      network_configuration: {
-        default_compartment_id: 'CMP-LZ-NETWORK-KEY',
-        default_enable_cis_checks: false,
+  common._hub_output(n, {
+    hub_vcn: common._hub_vcn(n, vcn_cidr, subnets) + {
+      route_tables: hub_route_tables,
+      default_security_list: common._empty_default_security_list,
+      security_lists: common._icmp_sl(n, ['HUB', 'LB'], vcn_cidr)
+        + common._mgmt_security_list(n, vcn_cidr, bastion_ip),
+      network_security_groups: lb._lb_nsg(n),
+      vcn_specific_gateways: {
+        internet_gateways: common._internet_gateway(n, ['HUB']),
+        nat_gateways: common._nat_gateway(n, ['HUB']),
+        service_gateways: common._service_gateway(n, ['HUB']),
+      },
+    },
 
-        network_configuration_categories: {
-          '0-shared': {
-            category_compartment_id: 'CMP-LZ-NETWORK-KEY',
+    non_vcn_specific_gateways: {
+      dynamic_routing_gateways: {
+        [n.key('DRG', ['HUB'])]: {
+          display_name: n.display('drg', ['hub']),
 
-            vcns: {
-              [n.key('VCN', ['HUB'])]: common._hub_vcn(n, vcn_cidr, subnets) + {
+          drg_attachments: {
+            [n.key('DRGATT', ['HUB', 'VCN'])]: {
+              display_name: n.display('drgatt', ['hub']),
+              drg_route_table_key: n.key('DRGRT', ['HUB']),
 
-                route_tables: hub_route_tables,
+              network_details: {
+                attached_resource_key: n.key('VCN', ['HUB']),
+                type: 'VCN',
+              },
+            },
+          },
 
-                default_security_list: common._empty_default_security_list,
+          drg_route_distributions: {
+            [n.key('DRGRD', ['HUB'])]: {
+              display_name: n.display('drgrd', ['hub']),
+              distribution_type: 'IMPORT',
+              statements: {},
+            },
 
-                security_lists: common._icmp_sl(n, ['HUB', 'LB'], vcn_cidr)
-                  + common._mgmt_security_list(n, vcn_cidr, bastion_ip),
+            [n.key('DRGRD', ['SPOKE'])]: {
+              display_name: n.display('drgrd', ['spoke']),
+              distribution_type: 'IMPORT',
 
-                network_security_groups: lb._lb_nsg(n),
+              statements: {
+                [n.key_global('ROUTE-TO-VCN', ['HUB'])]: {
+                  priority: 10,
+                  action: 'ACCEPT',
 
-                vcn_specific_gateways: {
-                  internet_gateways: common._internet_gateway(n, ['HUB']),
-                  nat_gateways: common._nat_gateway(n, ['HUB']),
-                  service_gateways: common._service_gateway(n, ['HUB']),
+                  match_criteria: {
+                    match_type: 'DRG_ATTACHMENT_ID',
+                    attachment_type: 'VCN',
+                    drg_attachment_key: n.key('DRGATT', ['HUB', 'VCN']),
+                  },
                 },
               },
             },
+          },
 
-            non_vcn_specific_gateways: {
-              dynamic_routing_gateways: {
-                [n.key('DRG', ['HUB'])]: {
-                  display_name: n.display('drg', ['hub']),
+          drg_route_tables: {
+            [n.key('DRGRT', ['HUB'])]: {
+              display_name: n.display('drgrt', ['hub']),
+              import_drg_route_distribution_key: n.key('DRGRD', ['HUB']),
+              is_ecmp_enabled: false,
+              route_rules: {},
+            },
 
-                  drg_attachments: {
-                    [n.key('DRGATT', ['HUB', 'VCN'])]: {
-                      display_name: n.display('drgatt', ['hub']),
-                      drg_route_table_key: n.key('DRGRT', ['HUB']),
-
-                      network_details: {
-                        attached_resource_key: n.key('VCN', ['HUB']),
-                        type: 'VCN',
-                      },
-                    },
-                  },
-
-                  drg_route_distributions: {
-                    [n.key('DRGRD', ['HUB'])]: {
-                      display_name: n.display('drgrd', ['hub']),
-                      distribution_type: 'IMPORT',
-                      statements: {},
-                    },
-
-                    [n.key('DRGRD', ['SPOKE'])]: {
-                      display_name: n.display('drgrd', ['spoke']),
-                      distribution_type: 'IMPORT',
-
-                      statements: {
-                        [n.key_global('ROUTE-TO-VCN', ['HUB'])]: {
-                          priority: 10,
-                          action: 'ACCEPT',
-
-                          match_criteria: {
-                            match_type: 'DRG_ATTACHMENT_ID',
-                            attachment_type: 'VCN',
-                            drg_attachment_key: n.key('DRGATT', ['HUB', 'VCN']),
-                          },
-                        },
-                      },
-                    },
-                  },
-
-                  drg_route_tables: {
-                    [n.key('DRGRT', ['HUB'])]: {
-                      display_name: n.display('drgrt', ['hub']),
-                      import_drg_route_distribution_key: n.key('DRGRD', ['HUB']),
-                      is_ecmp_enabled: false,
-                      route_rules: {},
-                    },
-
-                    [n.key('DRGRT', ['SPOKES'])]: {
-                      display_name: n.display('drgrt', ['spokes']),
-                      import_drg_route_distribution_key: n.key('DRGRD', ['SPOKE']),
-                      is_ecmp_enabled: false,
-                      route_rules: {},
-                    },
-                  },
-                },
-              },
-
-              l7_load_balancers: lb._l7_load_balancer(n, lb_backends, lb_env_name),
+            [n.key('DRGRT', ['SPOKES'])]: {
+              display_name: n.display('drgrt', ['spokes']),
+              import_drg_route_distribution_key: n.key('DRGRD', ['SPOKE']),
+              is_ecmp_enabled: false,
+              route_rules: {},
             },
           },
         },
       },
-    },
 
-    post: null,
+      l7_load_balancers: lb._l7_load_balancer(n, lb_backends, lb_env_name),
+    },
 
     spoke_route_tables: [
       n.key('RT', ['HUB', 'LB']),
       n.key('RT', ['HUB', 'MGMT']),
     ],
-
     post_route_tables: [],
-
     fw_nsg_key: null,
-
     has_spoke_natgw: true,
-
     post_route_entity_id: null,
     post_route_entity_desc: null,
-  }
+  })
