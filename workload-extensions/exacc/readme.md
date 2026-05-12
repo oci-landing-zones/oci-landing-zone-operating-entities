@@ -34,8 +34,6 @@ This Landing Zone Extension provides **two deployment approaches**, [single-stac
 | Landing zone | One-OE plus ExaDB-C@C in one deployable set | Existing One-OE landing zone plus ExaDB-C@C extension files |
 | Deployment steps | Single deployment operation | Deploy One-OE first, then ExaDB-C@C extension |
 | Terraform state | Combined state | Separate landing-zone and ExaDB-C@C state |
-| Components | One-OE foundation plus ExaDB-C@C IAM and observability | ExaDB-C@C IAM and observability only |
-| Lifecycle | Landing zone and ExaDB-C@C resources move together | ExaDB-C@C resources can be managed separately |
 | Complexity | Lower | Requires coordination with existing landing-zone outputs |
 
 &nbsp;
