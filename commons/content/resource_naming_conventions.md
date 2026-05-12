@@ -550,12 +550,12 @@ clr-&lt;region&gt;-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;workload&gt;
 ### 8.2 OKE Node Pools
 
 #### Naming Convention
-ndp-&lt;region&gt;-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;resource_type&gt;-&lt;workload&gt;-&lt;number&gt;
+ndp-&lt;region&gt;-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;workload&gt;
 
 #### Examples
 | Name | Object Name | Description |
 |---|---|---|
-| ndp-fra-lz-prod-platform-oke-1 | NDP-FRA-LZ-PROD-PLATFORM-OKE-1-KEY | Production OKE node pool |
+| ndp-fra-lz-prod-oke | NDP-FRA-LZ-PROD-OKE-KEY | Production OKE node pool |
 
 &nbsp;
 

@@ -341,7 +341,7 @@ Edit the JSON file to modify CIDR blocks:
 {
   "oke_workers_configuration": {
     "node_pools": {
-      "NDP-FRA-LZ-PROD-PLATFORM-OKE-1-KEY": {
+      "NDP-FRA-LZ-PROD-OKE-KEY": {
         "size": 3,  // Changed from 1 to 3 nodes
         ...
       }
@@ -358,7 +358,7 @@ Edit the JSON file to modify CIDR blocks:
 {
   "oke_workers_configuration": {
     "node_pools": {
-      "NDP-FRA-LZ-PROD-PLATFORM-OKE-1-KEY": {
+      "NDP-FRA-LZ-PROD-OKE-KEY": {
         "node_config_details": {
           "image": "8.10",
           "node_shape": "VM.Standard.E5.Flex",
