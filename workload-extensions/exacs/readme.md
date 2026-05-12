@@ -2,34 +2,24 @@
 
 ## Table of Contents <!-- omit from toc -->
 
-- [1. Summary](#1-summary)
-- [2. Design Overview](#2-design-overview)
+- [**1. Summary**](#1-summary)
+- [**2. Design Overview**](#2-design-overview)
 - [3. Deployment Options](#3-deployment-options)
 
 &nbsp;
 
-## 1. Summary
+## **1. Summary**
 
-The ExaDB-D Landing Zone Workload Extension is a reference configuration for onboarding Exadata Database Service on Dedicated Infrastructure workloads into an OCI landing zone. It adds the EXACS network, IAM, and observability resources needed to operate ExaDB-D database platforms.
+Welcome to the ExaDB-C@C Landing Zone Workload Extension (WE).
 
-The generated UC1 examples model a One-OE landing zone with `prod` and `preprod` environments, one shared EXACS platform VCN, environment EXACS platform compartments, and project-level EXACS database compartments for Autonomous Database Dedicated. The published examples intentionally include both shared and environment platform scopes to cover multiple ExaDB-D placement use cases.
-
-Published generated artifacts currently cover UC1. UC2 and UC3 are retained as design guidance and require config-driven generation before use.
+The ExaDB-C@C Landing Zone Workload Extension is a secure cloud environment, designed with the best practices to simplify the on-boarding of ExaDB-C@C workloads and enable the continuous operations of their cloud resources. This reference architecture provides an automated landing zone configuration.
 
 &nbsp;
 
-## 2. Design Overview
+## **2. Design Overview**
+This workload extension uses the [One-OE](../../blueprints/one-oe/) Blueprint as the reference Landing Zone and guides the deployment of ExaDB-C@C on top of it. The extension includes a base infrastructure layer that provisions the required OCI resources for deploying ExaDB-C@C.
 
-This workload extension uses the One-OE blueprint as the reference landing zone and layers ExaDB-D resources on top of it. The extension includes:
-
-- EXACS platform compartments for database and infrastructure administration.
-- EXACS IAM groups and policies for global DBA, global infrastructure, and project DBA teams.
-- EXACS platform VCNs with database and backup subnets where AVMCs or VMCs are placed.
-- EXACS event rules, alarms, notification topics, and flow-log support in published outputs.
-
-In config-driven generation, Exadata infrastructure placement and AVMC/VMC placement are separate decisions. Infrastructure-only EXACS scopes omit the platform network and do not receive AVMC/VMC permissions. AVMC/VMC scopes require a platform network. Autonomous Database Dedicated project tiers are represented with `project_db_compartments`. A separate project/spoke network is only required when project resources, such as application VMs, need network connectivity to those databases.
-
-See the [ExaDB-D use cases](./exacs_use_cases/readme.md) for the design scenarios behind the published example.
+If you have not reviewed it yet, we recommend checking the [ExaDB-C@C use cases section](../exacc/exacc_use_cases/readme.md) to better understand the available scenarios and identify the one that best fits your needs.
 
 &nbsp;
 

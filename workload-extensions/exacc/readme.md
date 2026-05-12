@@ -5,7 +5,6 @@
 - [**1. Summary**](#1-summary)
 - [**2. Design Overview**](#2-design-overview)
 - [**3. Deployment Options**](#3-deployment-options)
-  - [**Choosing the Right Approach**](#choosing-the-right-approach)
 
 &nbsp;
 
@@ -29,59 +28,15 @@ If you have not reviewed it yet, we recommend checking the [ExaDB-C@C use cases 
 This Landing Zone Extension provides **two deployment approaches**, [single-stack](./single-stack/readme.md) and  [multi-stack](./multi-stack/readme.md), to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator).
 
 
-### **Choosing the Right Approach**
-
-<table style="width:100%; table-layout:fixed; word-break:break-word;">
-  <colgroup>
-    <col style="width:20%;">
-    <col style="width:40%;">
-    <col style="width:40%;">
-  </colgroup>
-  <thead>
-    <tr>
-      <th>Consideration</th>
-      <th><a href="single-stack/">Single-stack</a></th>
-      <th><a href="multi-stack/">Multi-stack</a></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Use Case</strong></td>
-      <td>PoC, Exploration</td>
-      <td>Production deployment</td>
-    </tr>
-    <tr>
-      <td><strong>Landing Zone</strong></td>
-      <td>One-OE + ExaDB-C@C WE</td>
-      <td>ExaDB-C@C WE to extend an existing One-OE</td>
-    </tr>
-    <tr>
-      <td><strong>Deployment Steps</strong></td>
-      <td>Single deployment operation</td>
-      <td>Deploy LZ first, then ExaDB-C@C WE</td>
-    </tr>
-    <tr>
-      <td><strong>Terraform State</strong></td>
-      <td>Combined (1 state)</td>
-      <td>Separate (2 states)</td>
-    </tr>
-    <tr>
-      <td><strong>Deployment components</strong></td>
-      <td>lz identity domain, One-OE + ExaDB-C@C groups, One-OE + ExaDB-C@C policies &amp; One-OE + ExaDB-C@C Observability resources</td>
-      <td>ExaDB-C@C groups, policies &amp; obs. resources</td>
-    </tr>
-    <tr>
-      <td><strong>Resource Lifecycle</strong></td>
-      <td>Coupled</td>
-      <td>Independent</td>
-    </tr>
-    <tr>
-      <td><strong>Complexity</strong></td>
-      <td>Self-contained</td>
-      <td>Requires key coordination across stacks</td>
-    </tr>
-  </tbody>
-  </table>
+| Consideration | [Single-stack](./single-stack/readme.md) | [Multi-stack](./multi-stack/readme.md) |
+|---|---|---|
+| Use case | PoC, lab, or one-shot reference deployment | Production-style extension of an existing landing zone |
+| Landing zone | One-OE plus ExaDB-C@C in one deployable set | Existing One-OE landing zone plus ExaDB-C@C extension files |
+| Deployment steps | Single deployment operation | Deploy One-OE first, then ExaDB-C@C extension |
+| Terraform state | Combined state | Separate landing-zone and ExaDB-C@C state |
+| Components | One-OE foundation plus ExaDB-C@C IAM and observability | ExaDB-C@C IAM and observability only |
+| Lifecycle | Landing zone and ExaDB-C@C resources move together | ExaDB-C@C resources can be managed separately |
+| Complexity | Lower | Requires coordination with existing landing-zone outputs |
 
 &nbsp;
 # License <!-- omit from toc -->
