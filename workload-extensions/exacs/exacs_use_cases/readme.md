@@ -23,7 +23,7 @@
   - [**3.3 Software Images**](#33-software-images)
   - [**3.4 Backup Destinations**](#34-backup-destinations)
 
-Published generated artifacts currently cover UC1 and intentionally include both shared and environment EXACS platform scopes to cover multiple placement use cases. UC2 and UC3 are retained as design guidance and require config-driven generation before use.
+Published generated artifacts currently support UC1 (Shared ExaDB-D Platform). UC2 (Hybrid ExaDB-D Platform) and UC3 (Dedicated ExaDB-D Platform) are retained as design guidance and require config-driven generation before use.
 
 ## **1. Summary**
 
@@ -41,7 +41,7 @@ We have identified three main use cases:
 
 While not all possible configurations are covered, these represent the most common scenarios. If your use case involves a combination of these, you can leverage elements from each to design a custom solution.
 
-For config-driven generation, ask the placement decisions explicitly before producing artifacts: where Exadata infrastructure lives, whether Autonomous Database Dedicated on AVMCs or regular Exadata Database Service on VMCs is used, where AVMCs/VMCs live, and which projects need Autonomous Database Dedicated project DB tiers. AVMC/VMC placement requires an EXACS VCN with database and backup subnets. Infrastructure-only placement does not use an EXACS network and does not require AVMC/VMC permissions. Autonomous Database Dedicated project tiers require `project_db_compartments`; a project/spoke network is only needed when project resources, such as application VMs, need network connectivity to those databases.
+For config-driven generation, placement decisions for UC2 (Hybrid ExaDB-D Platform) and UC3 (Dedicated ExaDB-D Platform) must be explicitly defined before artifacts are produced, including which database service model is used and, when Autonomous Database Dedicated is selected, which projects will host them. AVMC/VMC deployments require a VCN configured with client and backup subnets, as well as the corresponding AVMC/VMC permissions. Autonomous Database Dedicated project tiers require a project database compartment, and a project/spoke network is only needed when project resources, such as application VMs, require connectivity to those databases.
 
 The ExaDB-D infrastructure consists of database and storage servers connected through a RoCE switch fabric. It supports both "regular" *Virtual Machine Clusters (VMCs)* and *Autonomous Virtual Machine Clusters (AVMCs)*. Each VMC/AVMC is composed of one or more virtual machines distributed across database servers, ensuring high availability through Oracle Grid Infrastructure clusterware.
 
@@ -107,7 +107,7 @@ Event rules <img src="../content/h.png" style="height: 1.5em; vertical-align: te
 
 At the shared level, event rules cover the shared ExaCS infrastructure compartment and the shared ExaCS database compartment, routing those events to the corresponding shared infrastructure and database workload notification topics.
 
-At the project level, event rules cover the production and pre-production project EXACS database compartments, routing those events to the corresponding environment project notification topics.
+At the project level, event rules cover the production and pre-production project database compartments, routing those events to the corresponding environment project notification topics.
 
 These event rules ensure that operational changes, failures, or state transitions are automatically propagated to the appropriate notification channels.
 
@@ -131,9 +131,9 @@ These alarms continuously evaluate defined thresholds and, upon breach, generate
 
 Notification topics <img src="../content/j.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
 
-At the global level, notification topics support shared EXACS infrastructure and shared EXACS database workloads.
+At the global level, notification topics support shared ExaDB-D infrastructure and shared ExaDB-D database workloads.
 
-At the environment level, dedicated notification topics support production and pre-production project EXACS scopes.
+At the environment level, dedicated notification topics support production and pre-production project scopes.
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 
@@ -202,7 +202,7 @@ At the shared level, event rules cover the shared ExaCS infrastructure compartme
 
 At the environment level, event rules cover the production and pre-production ExaCS database compartments.
 
-At the project level, event rules cover the production and pre-production project EXACS database compartments.
+At the project level, event rules cover the production and pre-production project database compartments.
 
 These event rules ensure that operational changes, failures, or state transitions are automatically propagated to the appropriate notification channels.
 
@@ -226,9 +226,9 @@ These alarms continuously evaluate defined thresholds and, upon breach, generate
 
 Notification topics <img src="../content/j.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
 
-At the global level, notification topics support shared EXACS infrastructure and shared EXACS database workloads.
+At the global level, notification topics support shared ExaDB-D infrastructure.
 
-At the environment level, dedicated notification topics support production and pre-production project EXACS scopes.
+At the environment level, dedicated notification topics support production and pre-production projects and ExaCS compartment scopes.
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 
@@ -292,7 +292,7 @@ Event rules <img src="../content/h.png" style="height: 1.5em; vertical-align: te
 
 At the environment level, event rules cover the ExaCS infrastructure compartments and ExaCS database compartments for each generated environment.
 
-At the project level, event rules cover the production and pre-production project EXACS database compartments.
+At the project level, event rules cover the production and pre-production project database compartments.
 
 This ensures that all events are handled within the scope of their corresponding environment.
 
@@ -316,9 +316,7 @@ These alarms continuously evaluate defined thresholds and, upon breach, generate
 
 Notification topics <img src="../content/j.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
 
-At the global level, notification topics support shared EXACS infrastructure and shared EXACS database workloads.
-
-At the environment level, dedicated notification topics support production and pre-production project EXACS scopes.
+At the environment level, dedicated notification topics support production and pre-production projects and ExaCS compartment scopes (infra and database).
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 
