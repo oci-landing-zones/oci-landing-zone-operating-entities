@@ -401,8 +401,9 @@ From an operational perspective, Production and DR resources are typically manag
 
 Cost allocation between primary and DR deployments can be managed through the use of OCI tags, applied consistently to the corresponding infrastructure and database resources.
 
-This approach provides a consistent and scalable DR model, where protection is based on cluster-to-cluster replication across infrastructures, while maintaining flexibility in terms of logical organization, cost tracking, and operational ownership.
+This approach provides a consistent and scalable DR model, where protection is based on databases located in different VM clusters, running on separate ExaDB-D infrastructures, replicating database information between CDBs, while maintaining flexibility in terms of logical organization, cost tracking, and operational ownership.
 
+To know more about how to use Data Guard on ExaDB-D environments you can check the public document [Use Oracle Data Guard with Exadata Cloud Infrastructure](https://docs.oracle.com/en-us/iaas/exadatacloud/doc/ecs-using-data-guard.html).
 
 ### **3.2 Operator Access Control**
 
