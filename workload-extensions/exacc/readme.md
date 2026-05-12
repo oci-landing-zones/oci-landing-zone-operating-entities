@@ -5,9 +5,11 @@
 - [**1. Summary**](#1-summary)
 - [**2. Design Overview**](#2-design-overview)
 - [**3. Deployment Options**](#3-deployment-options)
-
+  - [**Choosing the Right Approach**](#choosing-the-right-approach)
 
 &nbsp;
+
+Published generated artifacts currently support UC1 (Shared ExaDB-C@C Platform). UC2 (Hybrid xaDB-C@C  Platform) and UC3 (Dedicated xaDB-C@C Platform) are retained as design guidance and require config-driven generation before use.
 
 ## **1. Summary**
 
