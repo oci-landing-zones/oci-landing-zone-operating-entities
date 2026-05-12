@@ -23,6 +23,8 @@
   - [**3.3 Software Images**](#33-software-images)
   - [**3.4 Backup Destinations**](#34-backup-destinations)
 
+Published generated artifacts currently support UC1 (Shared ExaDB-C@C Platform). UC2 (Hybrid xaDB-C@C  Platform) and UC3 (Dedicated xaDB-C@C Platform) are retained as design guidance and require config-driven generation before use.
+
 ## **1. Summary**
 
 The ExaDB-C@C infrastructure is a platform designed for large-scale Oracle Database consolidation. A single infrastructure can support multiple Virtual Machine Clusters (VMCs) and Autonomous Virtual Machine Clusters (AVMCs), which may be shared or dedicated across different workload environments, operating entities, organizational units, lines of business, departments, and more.
