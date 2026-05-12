@@ -41,8 +41,6 @@ We have identified three main use cases:
 
 While not all possible configurations are covered, these represent the most common scenarios. If your use case involves a combination of these, you can leverage elements from each to design a custom solution.
 
-For config-driven generation, placement decisions for UC2 (Hybrid ExaDB-D Platform) and UC3 (Dedicated ExaDB-D Platform) must be explicitly defined before artifacts are produced, including which database service model is used and, when Autonomous Database Dedicated is selected, which projects will host them. AVMC/VMC deployments require a VCN configured with client and backup subnets, as well as the corresponding AVMC/VMC permissions. Autonomous Database Dedicated project tiers require a project database compartment, and a project/spoke network is only needed when project resources, such as application VMs, require connectivity to those databases.
-
 The ExaDB-D infrastructure consists of database and storage servers connected through a RoCE switch fabric. It supports both "regular" *Virtual Machine Clusters (VMCs)* and *Autonomous Virtual Machine Clusters (AVMCs)*. Each VMC/AVMC is composed of one or more virtual machines distributed across database servers, ensuring high availability through Oracle Grid Infrastructure clusterware.
 
 On top of regular VMCs, you can deploy multiple *Oracle Homes (OHs)*, which are used to create and run *Oracle Container Databases (CDBs)*. Each CDB can host multiple *Pluggable Databases (PDBs)*.
