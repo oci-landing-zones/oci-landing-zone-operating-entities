@@ -29,8 +29,8 @@ This extension provides two published deployment layouts:
 
 | Consideration | [Single-stack](./single-stack/readme.md) | [Multi-stack](./multi-stack/readme.md) |
 |---|---|---|
-| Use case | PoC, lab, or one-shot reference deployment | Production-style extension of an existing landing zone |
-| Landing zone | One-OE Hub E plus EXACS in one deployable set | Existing One-OE landing zone plus EXACS extension files |
+| Use case | PoC, lab, or one-shot reference deployment | Extension of a existing Landing zone or Modular IaC Model. |
+| Landing zone | One-OE plus ExaDB-C@C in one deployable set | Existing One-OE landing zone plus ExaDB-C@C extension files |
 | Terraform state | Combined state | Separate landing-zone and EXACS state |
 | Lifecycle | Landing zone and EXACS resources move together | EXACS resources can be managed separately |
 | Complexity | Lower | Requires coordination with existing landing-zone outputs |

@@ -30,7 +30,7 @@ This Landing Zone Extension provides **two deployment approaches**, [single-stac
 
 | Consideration | [Single-stack](./single-stack/readme.md) | [Multi-stack](./multi-stack/readme.md) |
 |---|---|---|
-| Use case | PoC, lab, or one-shot reference deployment | Production-style extension of an existing landing zone |
+| Use case | PoC, lab, or one-shot reference deployment | Extension of a existing Landing zone or Modular IaC Model. |
 | Landing zone | One-OE plus ExaDB-C@C in one deployable set | Existing One-OE landing zone plus ExaDB-C@C extension files |
 | Deployment steps | Single deployment operation | Deploy One-OE first, then ExaDB-C@C extension |
 | Terraform state | Combined state | Separate landing-zone and ExaDB-C@C state |
