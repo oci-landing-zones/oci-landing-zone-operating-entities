@@ -45,6 +45,13 @@
                                 "display_name"                           : "rt-fra-lz-shared-exacs-generic",
 
                                 "route_rules": {
+                                    "rr-fra-natgw": {
+                                        "description"                    : "Route to the Internet through NAT GW",
+                                        "destination"                    : "0.0.0.0/0",
+                                        "destination_type"               : "CIDR_BLOCK",
+                                        "network_entity_key"             : "NGW-FRA-LZ-SHARED-PLATFORM-EXACS-KEY"
+                                    },
+
                                     "rr-fra-sgw": {
                                         "description"                    : "Route to Oracle Services Network through Service GW",
                                         "destination"                    : "all-services",
@@ -113,6 +120,13 @@
                         },
 
                         "vcn_specific_gateways": {
+                            "nat_gateways": {
+                                "NGW-FRA-LZ-SHARED-PLATFORM-EXACS-KEY": {
+                                    "display_name"                       : "ngw-fra-lz-shared-exacs",
+                                    "block_traffic"                      : false
+                                }
+                            },
+
                             "service_gateways": {
                                 "SGW-FRA-LZ-SHARED-PLATFORM-EXACS-KEY": {
                                     "display_name"                       : "sgw-fra-lz-shared-exacs",

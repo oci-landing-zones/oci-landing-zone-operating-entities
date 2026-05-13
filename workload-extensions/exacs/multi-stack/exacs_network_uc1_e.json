@@ -45,9 +45,30 @@
                                 "display_name"                           : "rt-fra-lz-shared-exacs-generic",
 
                                 "route_rules": {
-                                    "rr-fra-drg": {
-                                        "description"                    : "Route to 0.0.0.0/0 through DRG",
+                                    "rr-fra-natgw": {
+                                        "description"                    : "Route to the Internet through NAT GW",
                                         "destination"                    : "0.0.0.0/0",
+                                        "destination_type"               : "CIDR_BLOCK",
+                                        "network_entity_key"             : "NGW-FRA-LZ-SHARED-PLATFORM-EXACS-KEY"
+                                    },
+
+                                    "rr-fra-prod-projects": {
+                                        "description"                    : "Route to VCN Prod Projects through DRG",
+                                        "destination"                    : "10.0.64.0/21",
+                                        "destination_type"               : "CIDR_BLOCK",
+                                        "network_entity_key"             : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "rr-fra-hub": {
+                                        "description"                    : "Route to the Hub VCN through DRG",
+                                        "destination"                    : "10.0.0.0/21",
+                                        "destination_type"               : "CIDR_BLOCK",
+                                        "network_entity_key"             : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "rr-fra-preprod-projects": {
+                                        "description"                    : "Route to VCN PreProd Projects through DRG",
+                                        "destination"                    : "10.0.128.0/21",
                                         "destination_type"               : "CIDR_BLOCK",
                                         "network_entity_key"             : "DRG-FRA-LZ-HUB-KEY"
                                     },
@@ -120,6 +141,13 @@
                         },
 
                         "vcn_specific_gateways": {
+                            "nat_gateways": {
+                                "NGW-FRA-LZ-SHARED-PLATFORM-EXACS-KEY": {
+                                    "display_name"                       : "ngw-fra-lz-shared-exacs",
+                                    "block_traffic"                      : false
+                                }
+                            },
+
                             "service_gateways": {
                                 "SGW-FRA-LZ-SHARED-PLATFORM-EXACS-KEY": {
                                     "display_name"                       : "sgw-fra-lz-shared-exacs",

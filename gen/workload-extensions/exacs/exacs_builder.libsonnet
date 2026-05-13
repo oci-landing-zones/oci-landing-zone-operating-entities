@@ -44,8 +44,17 @@ local products = import '../exadb/products.libsonnet';
       if std.objectHas(params, 'routing') then params.routing
       else null;
     local has_hub = routing != null && std.objectHas(routing, 'hub') && routing.hub != null;
+    local internet_default_target =
+      if routing != null && std.objectHas(routing, 'internet_default_target') then
+        routing.internet_default_target
+      else 'local_natgw';
+    local use_local_natgw = internet_default_target == 'local_natgw';
+    local peer_routes =
+      if routing != null && std.objectHas(routing, 'peers') then routing.peers
+      else {};
     local category_key = '%s-platform-%s' % [std.asciiLower(env), std.asciiLower(plat)];
     local vcn_key = n.key('VCN', [env, 'PLATFORM', plat]);
+    local ngw_key = n.key('NGW', [env, 'PLATFORM', plat]);
     local sgw_key = n.key('SGW', [env, 'PLATFORM', plat]);
     local drg_key = n.key('DRG', ['HUB']);
     local rt_key = n.key('RT', [env, 'PLATFORM', plat, 'GENERIC']);
@@ -59,7 +68,28 @@ local products = import '../exadb/products.libsonnet';
           network_entity_key: sgw_key,
         },
       }
-      + (if has_hub then {
+      + (if has_hub && use_local_natgw then {
+        [routing.hub.route_key]: {
+          description: routing.hub.description,
+          destination: routing.hub.destination,
+          destination_type: 'CIDR_BLOCK',
+          network_entity_key: drg_key,
+        },
+        [n.route_rule([n.region, 'natgw'])]: {
+          description: 'Route to the Internet through NAT GW',
+          destination: '0.0.0.0/0',
+          destination_type: 'CIDR_BLOCK',
+          network_entity_key: ngw_key,
+        },
+      } + {
+        [route_key]: {
+          description: peer_routes[route_key].description,
+          destination: peer_routes[route_key].destination,
+          destination_type: 'CIDR_BLOCK',
+          network_entity_key: drg_key,
+        }
+        for route_key in std.objectFields(peer_routes)
+      } else if has_hub then {
         [n.route_rule([n.region, 'drg'])]: {
           description: 'Route to 0.0.0.0/0 through DRG',
           destination: '0.0.0.0/0',
@@ -135,6 +165,12 @@ local products = import '../exadb/products.libsonnet';
             },
           },
           vcn_specific_gateways: {
+            [if has_hub && use_local_natgw then 'nat_gateways']: {
+              [ngw_key]: {
+                display_name: n.display('ngw', display_segments),
+                block_traffic: false,
+              },
+            },
             service_gateways: {
               [sgw_key]: {
                 display_name: n.display('sgw', display_segments),

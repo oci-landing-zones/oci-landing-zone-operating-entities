@@ -17,7 +17,7 @@ local products = import '../../exadb/products.libsonnet';
         extension_type: 'exacs',
         extension_definition: exacs,
         publication_label: 'EXACS multi-stack',
-      } + ctx.extension_routing_context()
+      } + ctx.extension_routing_context(config.hub.kind == 'hub_e')
     );
     local exacs_entries = resolved.entries;
     local extension_state = resolved.state;
@@ -34,19 +34,41 @@ local products = import '../../exadb/products.libsonnet';
       if extension_state.results[i].metadata.has_network
     ];
 
-    local multi_stack_category(spec, route_keys_to_drop=[]) =
+    local drg_route_keys(category) =
+      local drg_key = n.key('DRG', ['HUB']);
+      std.flattenArrays([
+        std.flattenArrays([
+          [
+            route_key
+            for route_key in std.objectFields(category.vcns[vcn_key].route_tables[rt_key].route_rules)
+            if std.objectHas(
+              category.vcns[vcn_key].route_tables[rt_key].route_rules[route_key],
+              'network_entity_key'
+            ) &&
+               category.vcns[vcn_key].route_tables[rt_key].route_rules[route_key].network_entity_key == drg_key
+          ]
+          for rt_key in std.objectFields(category.vcns[vcn_key].route_tables)
+        ])
+        for vcn_key in std.objectFields(category.vcns)
+      ]);
+    local multi_stack_category(spec, drop_drg_routes=false) =
       local scope = spec.entry.scope;
       local exacs_category =
         spec.result.contributions.network_pre.network_configuration.network_configuration_categories[
           platforms.publication_category_key(scope)
         ];
-      platforms.publication_network_category(exacs_category, n, route_keys_to_drop);
+      platforms.publication_network_category(
+        exacs_category,
+        n,
+        if drop_drg_routes then drg_route_keys(exacs_category) else [],
+        false
+      );
     local network_categories = {
       [platforms.publication_category_key(spec.entry.scope)]: multi_stack_category(spec)
       for spec in networked_specs
     };
     local network_pre_categories = {
-      [platforms.publication_category_key(spec.entry.scope)]: multi_stack_category(spec, [n.route_rule([n.region, 'drg'])])
+      [platforms.publication_category_key(spec.entry.scope)]: multi_stack_category(spec, true)
       for spec in networked_specs
     };
     local full_network = lz(config).network;

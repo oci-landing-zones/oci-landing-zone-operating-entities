@@ -75,7 +75,7 @@ local common = import 'hub/hub_common.libsonnet';
     std.asciiLower(scope.platform_name),
   ],
 
-  strip_publication_local_routes(vcn, n, route_keys_to_drop=[])::
+  strip_publication_local_routes(vcn, n, route_keys_to_drop=[], strip_nat_gateways=true)::
     local route_drop_keys = [n.route_rule([n.region, 'default'])] + route_keys_to_drop;
     vcn {
       route_tables: {
@@ -89,7 +89,7 @@ local common = import 'hub/hub_common.libsonnet';
         for rt_key in std.objectFields(vcn.route_tables)
       },
       vcn_specific_gateways:
-        if std.objectHas(vcn.vcn_specific_gateways, 'nat_gateways') then
+        if strip_nat_gateways && std.objectHas(vcn.vcn_specific_gateways, 'nat_gateways') then
           {
             [gateway_type]: vcn.vcn_specific_gateways[gateway_type]
             for gateway_type in std.objectFields(vcn.vcn_specific_gateways)
@@ -98,10 +98,15 @@ local common = import 'hub/hub_common.libsonnet';
         else vcn.vcn_specific_gateways,
     },
 
-  publication_network_category(category, n, route_keys_to_drop=[])::
+  publication_network_category(category, n, route_keys_to_drop=[], strip_nat_gateways=true)::
     category {
       vcns: {
-        [key]: $.strip_publication_local_routes(category.vcns[key], n, route_keys_to_drop)
+        [key]: $.strip_publication_local_routes(
+          category.vcns[key],
+          n,
+          route_keys_to_drop,
+          strip_nat_gateways
+        )
         for key in std.objectFields(category.vcns)
       },
     },
