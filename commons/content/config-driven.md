@@ -133,7 +133,7 @@ The config-mode output commonly includes files such as:
 - `observability_cis1.json`
 - `observability_cis2.json`
 
-Some hub models that require staged network deployment also emit `network_pre.json`.
+Some configurations emit `*_pre.json` files, such as `network_pre.json` or `observability_*_pre.json`. A `*_pre.json` file is a first-step file used when Terraform cannot create every dependent resource in one run. For example, VCN flow logs depend on network resources that must exist first, so the first observability run can use a pre-observability file without those flow logs. A second run then uses the final observability file, without the `_pre` suffix, which contains the complete required resource set.
 
 &nbsp;
 &nbsp;
