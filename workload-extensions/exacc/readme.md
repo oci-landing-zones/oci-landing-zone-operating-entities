@@ -36,9 +36,9 @@ If you have not reviewed it yet, we recommend checking the [ExaDB-C@C use cases 
 
 | When to use it / Use case  | POC or one-shot reference deployment | Extension of an existing Landing Zone or Modular IaC Model. |
 |---|---|---|
-| Shared ExaDB-C@C Platform | Use when deploying a new One-OE foundation and the shared ExaDB-C@C platform together in one deployable set. Published UC1 artifacts are available in the [single-stack](./single-stack/readme.md) folder. | Use when extending an existing One-OE landing zone with the shared ExaDB-C@C platform. Published UC1 extension artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. |
-| Hybrid ExaDB-C@C Platform | Config-driven generation required | Config-driven generation required |
-| Dedicated ExaDB-C@C Platform | Config-driven generation required | Config-driven generation required |
+| Shared ExaDB-C@C Platform<br><br><img src="./content/uc1.png" width="220"> | Use when deploying a new One-OE foundation and the shared ExaDB-C@C platform together in one deployable set. Published UC1 artifacts are available in the [single-stack](./single-stack/readme.md) folder. | Use when extending an existing One-OE landing zone with the shared ExaDB-C@C platform. Published UC1 extension artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. |
+| Hybrid ExaDB-C@C Platform<br><br><img src="./content/uc2.png" width="220"> | [Config-driven generation required](../../commons/content/config-driven.md) | [Config-driven generation required](../../commons/content/config-driven.md) |
+| Dedicated ExaDB-C@C Platform<br><br><img src="./content/uc3.png" width="220"> | [Config-driven generation required](../../commons/content/config-driven.md) | [Config-driven generation required](../../commons/content/config-driven.md) |
 
 &nbsp;
 
