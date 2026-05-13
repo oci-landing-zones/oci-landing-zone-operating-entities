@@ -53,7 +53,7 @@ In this asset, we assume that One-OE has already been deployed, and we focus on 
 |----------|---|---|---|
 | Description | [shared ExaDB-C@C platform](../exacc_use_cases/readme.md/#21-shared-exadb-cc-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments) | [hybrid ExaDB-C@C platform](../exacc_use_cases/readme.md/#22-hybrid-exadb-cc-platform-shared-infrastructure-with-dedicated-vmcsavmcs-per-environment) | [dedicated ExaDB-C@C platform](../exacc_use_cases/readme.md/#23-dedicated-exadb-cc-platform-fully-dedicated-infrastructure-and-vmcsavmcs-per-environment) |
 | Deployment | Use the files listed below with Terraform CLI, or stage them in a private Object Storage bucket or approved private source for OCI Resource Manager. Configure outputs and dependencies because pre-existing resources are used. To learn more about this, go [here](../../../commons/content/orm_bp.md). | Config-driven generation required | Config-driven generation required |
-| Files | [iam](./exacc_identity_uc1.json), [observability](./exacc_observability_uc1.json) | Generated from customer config | Generated from customer config |
+| Files | Deploy the EXACC extension stack with [iam](./exacc_identity_uc1.json) and [observability](./exacc_observability_uc1.json). | Generated from customer config | Generated from customer config |
 
 
 &nbsp;
