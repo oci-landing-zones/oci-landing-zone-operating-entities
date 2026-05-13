@@ -26,7 +26,7 @@ Do not use this skill for repo-development work. Once the request is clearly on 
 
 1. For `customer-use` and `ambiguous-or-mixed` requests, show the exact warning from `AGENTS.md` and wait for explicit acceptance.
 2. After acceptance, give one short orientation sentence and ask only the first missing question.
-3. Follow the discovery order from `AGENTS.md`. The six items are a decision sequence, not a single questionnaire.
+3. Follow the discovery order from `AGENTS.md`. The items are a decision sequence, not a single questionnaire.
 4. Before asking the customer to choose between repo labels, explain those options in customer language and recommend a default when the repo has one.
 5. After each answer, summarize what is now known in one sentence, then ask the next missing question.
 6. After the hub family is known and before discussing public exposure, load balancers, or OKE ingress, inspect the matching hub guide or runtime artifacts first so you know what load balancer pattern already exists.
@@ -46,9 +46,10 @@ If the selected published path, config generator, or workload extension does not
 
 ## Discovery Reminders
 
-- Ask the six base decisions in root `AGENTS.md` order: operations model, environments, workloads, firewall, hub model, then CIDRs.
+- Always default to `One-OE`; do not ask who operates the landing zone or ask the customer to choose a landing zone family.
+- Ask in root `AGENTS.md` order: One-OE baseline, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, then CIDRs.
 - Explain each decision in customer language before using repo terms such as `One-OE`, `Hub A`, `platform`, `project`, or `shared_project_network`.
-- If the answers point to `Multi-OE`, immediately give the policy-statement limit warning and Oracle documentation link from root `AGENTS.md`.
+- Do not propose concrete CIDRs until the root `AGENTS.md` network-scope gate is complete; use extension guides such as OKE or ExaCS only for extension-specific sizing inputs.
 
 ## OKE-Specific Guardrails
 

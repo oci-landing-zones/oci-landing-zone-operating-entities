@@ -54,6 +54,7 @@ Do not use this skill as the first response to an open-ended customer request su
 | Config-mode network outputs | `network.json` is canonical final output; `network_pre.json` appears only for staged hubs. |
 | Artifact placement | Ask for both the config file location and the output directory before creating customer artifacts; do not default them into `tests/`. |
 | Unsupported resources | Do not add unsupported config keys or fake extension types. Generate only supported prerequisites, then document the unsupported resource as manual post-deployment configuration. |
+| Networked extension CIDRs | Include CIDRs only for network scopes the selected config will emit; do not allocate for unchosen optional placement branches or networkless/infrastructure-only scopes. |
 | ExaCS network | Network is required for ExaCS AVMC/VMC placement and forbidden for ExaCS infrastructure-only placement. |
 | ExaCS project DB tiers | Use `project_db_compartments` only for Autonomous Database Dedicated project tiers; `shared_project_network` is only needed when the environment also needs project network resources. |
 
@@ -65,6 +66,7 @@ Do not use this skill as the first response to an open-ended customer request su
 - Put environment-scoped platforms under `environments.<env>.platforms`.
 - Put shared platforms under top-level `shared_platforms`.
 - Keep CIDRs explicit even when subnets are auto-generated. Auto-subnetting helps with subnet layout, not top-level network planning.
+- Resolve network-producing extension scope and sizing before CIDR allocation; make any deliberate reserved space explicit in the customer-facing rationale.
 - When selecting CIDRs, check whether the landing zone will connect to on-premises or other clouds; any routed OCI or Kubernetes ranges must avoid overlap with those external networks.
 - When adding a new extension-backed platform, verify both the config schema and the extension contract.
 - For OKE, read `gen/workload-extensions/oke/AGENTS.md` before giving exact CIDR splits or networking contract guidance.

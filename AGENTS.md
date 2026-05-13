@@ -106,21 +106,17 @@ For `customer-use` and `ambiguous-or-mixed` requests, before creating config-mod
 
 ## Mandatory Customer Discovery Sequence
 
-For `customer-use` and `ambiguous-or-mixed` requests, do not jump directly to workload-extension, deployment, or configuration options after the warning is accepted. First establish the customer's landing zone design inputs in the following order.
+For `customer-use` and `ambiguous-or-mixed` requests, do not jump directly to workload-extension, deployment, or configuration options after the warning is accepted. First establish the customer's landing zone design inputs, extension and network scope, and CIDR inputs in the following order.
 
 If any item below is still unknown, ask for it before continuing. Do not skip ahead and do not recommend OKE deployment paths, published JSON artifacts, or config-mode files until this sequence is complete.
 The list below defines the decision order. It is not a customer-facing bulk questionnaire. If multiple items are unknown, handle them across separate turns.
 
-1. **Landing zone choice**
-   - First determine which landing zone family the customer is using or should use.
-   - Recommend `One-OE` as the starting point for most customers unless their requirements clearly call for another blueprint family.
-   - Do not open by asking the customer whether they want `One-OE` or whether they have an "operating entity".
-   - First explain the concept in customer language: whether the landing zone will be run mainly by one operations team, or whether several operations teams will share responsibility inside the same tenancy.
-   - Explain that labels such as department, business unit, country, or operating entity are only examples. The important distinction is not the label, but whether there are multiple operations teams with responsibilities that overlap or must be separated.
-   - If one main operations team will run the landing zone, map that concept to the repo term `One-OE`.
-   - If several operations teams will share responsibility in the same tenancy, explain that `Multi-OE` may be the better fit.
-   - Whenever recommending `Multi-OE`, immediately warn that a single tenancy can have at most 500 IAM policy statements from the root compartment to any leaf compartment path, that this is a hard OCI limit, and include this Oracle documentation link: [Policy Statements Limit per Compartment Hierarchy](https://docs.oracle.com/en-us/iaas/Content/Identity/policymgmt/policy-limits-compartment-hierarchy.htm).
-   - Do not assume the customer should start from a workload extension before the base landing zone choice is known.
+1. **Landing zone baseline**
+   - Always use `One-OE` as the landing zone family for customer-use guidance in this repository.
+   - Do not ask who will operate the landing zone or whether the customer has one or several operating entities.
+   - Do not ask the customer to choose a landing zone family before continuing discovery.
+   - Explain briefly that this guidance uses the current One-OE baseline, then move to the environment question.
+   - Do not assume the customer should start from a workload extension before the One-OE baseline is established.
 
 2. **Environment count and names**
    - Determine how many environments the landing zone needs and what they are called.
@@ -155,11 +151,21 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Recommend a no-firewall hub only when the customer explicitly accepts the tradeoff, or when the request is clearly PoC, lab, or cost/simplicity driven.
    - Reserve `Hub E` for PoC, lab, or explicitly non-production cases where a no-firewall design is acceptable.
 
-6. **CIDR allocation**
-   - Determine the OCI CIDR plan for the hub, spoke, and platform networks before giving concrete deployment or config guidance.
+6. **Extension and network scope sizing**
+   - Determine which applications, platforms, and workload extensions will need network resources or other CIDR-bearing ranges before proposing concrete CIDRs or asking the customer for final CIDR values.
+   - For network-producing workload extensions, identify every VCN/subnet-producing or CIDR-bearing scope the selected path will actually emit, including hub VCNs, spoke VCNs, platform VCNs, extension VCNs, Kubernetes service CIDRs, Kubernetes pod ranges, or any other routed or internal ranges defined by the selected extension contract.
+   - Use the selected workload extension's local guide under `gen/workload-extensions/*/AGENTS.md` to decide which placement, component, and sizing questions must be answered before CIDR allocation.
+   - Ask for rough scale and growth expectations only where they affect address planning, such as VM count, cluster count, node count, pod density, database network scope, environment count, expected subnet growth, and future environments or workloads that need reserved address space.
+   - Do not reserve CIDRs for unchosen extension placement branches. Allocate only for the network scopes the selected design will emit, plus deliberate future reserves that are explained to the customer.
+   - If a selected extension or placement scope is networkless, infrastructure-only, or otherwise forbidden from emitting network resources, do not assign it a VCN or subnet CIDR.
+
+7. **CIDR allocation**
+   - Determine the concrete OCI CIDR plan for the hub, spoke, platform, and selected workload-extension networks before giving deployment or config guidance.
    - Explain CIDRs as the network ranges reserved for OCI VCNs and subnets before asking the customer for numbers.
+   - CIDR allocations are difficult to change later. Before recommending a split, explain the reasoning behind each block size, which network scope it serves, which sizing input drove it, and where intentional reserve space is left.
    - Ask whether the landing zone must connect to on-premises networks or other clouds before proposing CIDRs.
    - Explain that OCI VCN and subnet CIDRs that need routed connectivity to on-premises or other clouds must not overlap with those external network ranges.
+   - Before proposing concrete CIDRs, confirm that network-producing workload-extension scope and sizing are already known.
    - Distinguish OCI VCN/subnet CIDRs from Kubernetes-internal CIDRs such as services and, depending on the pod networking model, pods.
    - For OKE guidance, explicitly explain whether pod and service CIDRs must come from the customer's OCI-allocated range or only need to avoid overlap with it.
    - When OKE networking must coexist with connected on-premises or multi-cloud ranges, explain the overlap constraints for pod and service CIDRs as well instead of treating them as isolated defaults.
@@ -167,7 +173,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - If the customer has not defined CIDRs yet, help them decide the allocation first.
    - If repository behavior and official OCI documentation appear inconsistent for OKE networking, say so and verify with official OCI docs before advising.
 
-Only after these six decisions are known may the agent continue with:
+Only after these seven decisions are known may the agent continue with:
 
 - recommending the standard published path versus the config-driven path
 - explaining OKE deployment options such as single-stack, multi-stack, or config-driven `oke_simple`
@@ -175,7 +181,7 @@ Only after these six decisions are known may the agent continue with:
 
 ## Mandatory ExaDB-D / ExaCS Discovery Addendum
 
-For `customer-use` and `ambiguous-or-mixed` requests that include ExaDB-D, Exadata Database Service on Dedicated Infrastructure, Autonomous Database Dedicated, ExaCS, VMCs, or AVMCs, complete these extra discovery decisions before creating or modifying config-mode artifacts. Ask them one at a time in customer language after the base landing-zone decisions above are known.
+For `customer-use` and `ambiguous-or-mixed` requests that include ExaDB-D, Exadata Database Service on Dedicated Infrastructure, Autonomous Database Dedicated, ExaCS, VMCs, or AVMCs, complete these extra discovery decisions before CIDR allocation and before creating or modifying config-mode artifacts. Ask them one at a time in customer language after the base landing-zone decisions above are known.
 
 1. **Exadata infrastructure placement**
    - Determine whether the Exadata infrastructure is shared across environments or dedicated per environment.

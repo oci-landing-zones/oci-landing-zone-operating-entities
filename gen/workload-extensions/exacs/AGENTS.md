@@ -31,11 +31,12 @@ Scope: this file covers `gen/workload-extensions/exacs/**` and published ExaCS s
 
 ## Extension Discovery Addendum
 
-After root `AGENTS.md` base landing-zone discovery is complete and ExaCS is in scope, ask these decisions before authoring config:
+After root `AGENTS.md` base landing-zone discovery is complete and ExaCS is in scope, ask these decisions before CIDR allocation or config authoring:
 
 1. Is Exadata infrastructure shared across environments, or dedicated per environment?
 2. Will the customer use Autonomous Database Dedicated on AVMCs, regular Exadata Database Service on VMCs, or both?
 3. Are AVMCs/VMCs shared, or dedicated per environment?
 4. For Autonomous Database Dedicated, which environments and projects need project DB tiers?
-5. For every AVMC/VMC scope, what platform VCN CIDR should be used?
-6. For every environment that will deploy applications or other project resources needing network connectivity to Autonomous Database, what project/spoke VCN CIDR should be used?
+5. For the chosen AVMC/VMC and application/project network scopes, what sizing inputs affect CIDR planning, such as environment count, expected database network growth, VM/application network growth, or future reserved environments?
+
+CIDR questions come after these decisions. Request ExaCS CIDRs only for chosen AVMC/VMC and application/project network scopes. Do not request or reserve CIDRs for unchosen placement branches. Do not assign a CIDR to infrastructure-only ExaCS scopes.
