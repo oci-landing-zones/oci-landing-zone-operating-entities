@@ -1,50 +1,64 @@
-# ExaDB-D Workload Extension - Multi-Stack Deployment <!-- omit from toc -->
+# ExaDB-D Workload Extension - Multi-stack Deployment  <!-- omit from toc -->
 
-## 1. Summary
 
-| | |
-|---|---|
-| **Name** | EXACS workload extension for an existing One-OE landing zone |
-| **Objective** | Deploy EXACS resources as a separate stack that extends an existing landing zone |
-| **Target resources** | EXACS compartments, groups, policies, network, events, alarms, notifications, and flow logs |
+## **1. Summary**
+
+<table>
+  <tbody>
+    <tr>
+      <td><strong>NAME</strong></td>
+      <td>WE ExaDB-D Deployment to extend an existing One-OE LZ (Multi-Stack)</td>
+    </tr>
+    <tr>
+      <td><strong>OBJECTIVE</strong></td>
+      <td>WE ExaDB-D</td>
+    </tr>
+    <tr>
+      <td><strong>TARGET RESOURCES</strong></td>
+      <td>compartments, groups, policies, network, events, alarms, notifications and flow logs</td>
+    </tr>
+  </tbody>
+</table>
+
+
 
 &nbsp;
 
-## 2. Architecture Overview
+## **2. Architecture Overview**
+
+ The main reason for using a multi-stack model in OCI Resource Manager (ORM) is to reuse existing assets as building blocks. Instead of deploying everything as a single monolithic stack, the solution is split into independent layers that can be deployed, reused, and extended in a controlled way. This approach also helps reduce coupling, improve traceability, and simplify dependency management across layers.
+
+In this model, the first operation is to deploy [One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack), which establishes the foundation landing zone structure. Once this base is in place, the environment can be further extended with a Workload Extension (WE) that adds workload-specific resources and configurations. This makes the overall deployment model more modular, reusable, and easier to manage over time.
+
+In this asset, we assume that One-OE has already been deployed, and we focus on the WE ExaDB-D deployment.
+&nbsp;
 
 <img src="../content/Multi.png" width="600" align="center">
 
-&nbsp;
 
-## 3. Architecture Components
 
-| JSON configuration | Configuration-defined components |
-|---|---|
-| [exacs_identity_uc1.json](exacs_identity_uc1.json) | EXACS platform and project database compartments, EXACS groups, and EXACS policies |
-| [exacs_network_uc1_a_pre.json](exacs_network_uc1_a_pre.json), [exacs_network_uc1_e_pre.json](exacs_network_uc1_e_pre.json) | Shared EXACS VCN, database subnet, backup subnet, route table, security list, and service gateway before hub DRG routing is ready |
-| [oneoe_network_hub_a_post.json](oneoe_network_hub_a_post.json), [oneoe_network_hub_e_post.json](oneoe_network_hub_e_post.json) | Existing One-OE hub network update that attaches the EXACS VCN to the hub DRG |
-| [exacs_network_uc1_a.json](exacs_network_uc1_a.json), [exacs_network_uc1_e.json](exacs_network_uc1_e.json) | Shared EXACS VCN network after hub DRG routing is ready |
-| [exacs_observability_uc1_pre.json](exacs_observability_uc1_pre.json) | EXACS events, alarms, and notification topics before flow logs |
-| [exacs_observability_uc1.json](exacs_observability_uc1.json) | EXACS events, alarms, notification topics, and EXACS VCN flow logs |
+## **3. Architecture Components**
 
-The multi-stack EXACS network files are extension-only. The base One-OE stack owns the hub DRG, so the generated `oneoe_network_hub_*_post.json` file updates that stack with the EXACS DRG attachment and hub routes.
-
-Published generated artifacts in this folder currently cover UC1 with one shared EXACS platform VCN, environment EXACS platform compartments, and Autonomous Database Dedicated project DB tiers for `prod` and `preprod`. UC2 and UC3 are retained as design guidance and require config-driven generation before use.
+| JSON configurations | Configuration-defined components | Resources |
+|:-|:-|:-|
+| **IAM configuration**</br> [exacs_identity_uc1.json](exacs_identity_uc1.json) | • ExaDB-D compartments</br> • ExaDB-D IAM groups and policies | cmp-lz-shared-exacs, cmp-lz-shared-exacs-db, cmp-lz-shared-exacs-infra, cmp-lz-preprod-exacs, cmp-lz-preprod-exacs-db, cmp-lz-preprod-exacs-infra, cmp-lz-preprod-proj1-exacs-db, cmp-lz-prod-exacs, cmp-lz-prod-exacs-db, cmp-lz-prod-exacs-infra, cmp-lz-prod-proj1-exacs-db <br><br> grp-lz-global-exacs-db-admin, grp-lz-global-exacs-infra-admin, grp-lz-preprod-proj1-exacs-admin, grp-lz-prod-proj1-exacs-admin <br><br> pcy-lz-global-exacs-db-admin, pcy-lz-global-exacs-generic, pcy-lz-global-exacs-infra-admin, pcy-lz-preprod-exacs-proj1-admin, pcy-lz-prod-exacs-proj1-admin |
+| **Network pre configuration**</br> [exacs_network_uc1_a_pre.json](exacs_network_uc1_a_pre.json)</br> [exacs_network_uc1_e_pre.json](exacs_network_uc1_e_pre.json) | • ExaDB-D VCN, database subnet, backup subnet, route table, security list and service gateway before hub DRG routing is ready | vcn-fra-lz-shared-exacs <br><br> sn-fra-lz-shared-exacs-db, sn-fra-lz-shared-exacs-backup <br><br> rt-fra-lz-shared-exacs-generic <br><br> sl-fra-lz-shared-exacs-generic <br><br> sgw-fra-lz-shared-exacs |
+| **Hub post configuration**</br> [oneoe_network_hub_a_post.json](oneoe_network_hub_a_post.json)</br> [oneoe_network_hub_e_post.json](oneoe_network_hub_e_post.json) | • One-OE hub network update for the ExaDB-D VCN DRG attachment and hub routing | drgatt-fra-lz-shared-exacs <br><br> Hub route-table and DRG route-distribution updates for the shared ExaDB-D platform CIDR |
+| **Network final configuration**</br> [exacs_network_uc1_a.json](exacs_network_uc1_a.json)</br> [exacs_network_uc1_e.json](exacs_network_uc1_e.json) | • ExaDB-D VCN network after hub DRG routing is ready | vcn-fra-lz-shared-exacs <br><br> sn-fra-lz-shared-exacs-db, sn-fra-lz-shared-exacs-backup <br><br> rt-fra-lz-shared-exacs-generic <br><br> sl-fra-lz-shared-exacs-generic <br><br> sgw-fra-lz-shared-exacs |
+| **Observability pre configuration**</br> [exacs_observability_uc1_pre.json](exacs_observability_uc1_pre.json) | • Events</br> • Alarms</br> • Notifications | rul-lz-notify-on-opctl-events, rul-lz-notify-on-exacs-vmc-events, rul-lz-notify-on-exacs-db-events, rul-lz-notify-on-exacs-infra-events, rul-lz-preprod-notify-on-notifications, rul-lz-prod-notify-on-notifications <br><br> al-lz-db-cpuutil, al-lz-vmc-cpuutil, al-lz-vmc-dgutil, al-lz-vmc-fsutil, al-lz-vmc-memutil, al-lz-vmc-swaputil, al-lz-db-storageutil <br><br> nott-lz-exacs-db-workloads, nott-lz-exacs-infra-workloads, nott-lz-preprod-exacs, nott-lz-prod-exacs |
+| **Observability final configuration**</br> [exacs_observability_uc1.json](exacs_observability_uc1.json) | • Events</br> • Alarms</br> • Notifications</br> • VCN and subnet flow logs | rul-lz-notify-on-opctl-events, rul-lz-notify-on-exacs-vmc-events, rul-lz-notify-on-exacs-db-events, rul-lz-notify-on-exacs-infra-events, rul-lz-preprod-notify-on-notifications, rul-lz-prod-notify-on-notifications <br><br> al-lz-db-cpuutil, al-lz-vmc-cpuutil, al-lz-vmc-dgutil, al-lz-vmc-fsutil, al-lz-vmc-memutil, al-lz-vmc-swaputil, al-lz-db-storageutil <br><br> nott-lz-exacs-db-workloads, nott-lz-exacs-infra-workloads, nott-lz-preprod-exacs, nott-lz-prod-exacs <br><br> lgrp-lz-shared-exacs-vcn-flow |
 
 &nbsp;
 
-## 4. Deployment Guidance
 
-For customer deployments, stage these JSON files in a customer-controlled private OCI Object Storage bucket or approved private source repository, then deploy through Terraform CLI or the orchestrator `rms-facade` workflow. Use customer-controlled private sources rather than convenience URL feeds.
+## **4. Deployment Steps**
 
-Deploy in this order:
+| USE CASE | 1 | 2 | 3 |
+|----------|---|---|---|
+| Description | [shared ExaDB-D platform](../exacs_use_cases/readme.md/#21-shared-exadb-d-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments) | [hybrid ExaDB-D platform](../exacs_use_cases/readme.md/#22-hybrid-exadb-d-platform-shared-infrastructure-with-dedicated-vmcsavmcs-per-environment) | [dedicated ExaDB-D platform](../exacs_use_cases/readme.md/#23-dedicated-exadb-d-platform-fully-dedicated-infrastructure-and-vmcsavmcs-per-environment) |
+| Deployment | Use the files listed below with Terraform CLI, or stage them in a private Object Storage bucket or approved private source for OCI Resource Manager. Configure outputs and dependencies because pre-existing resources are used. To learn more about this, go [here](../../../commons/content/orm_bp.md). | Config-driven generation required | Config-driven generation required |
+| Files | Deploy the EXACS extension stack with [iam](./exacs_identity_uc1.json), [observability pre](./exacs_observability_uc1_pre.json), and the matching network pre file for the selected hub: [Hub A network pre](./exacs_network_uc1_a_pre.json) or [Hub E network pre](./exacs_network_uc1_e_pre.json). Then re-apply the base One-OE stack with [Hub A post](./oneoe_network_hub_a_post.json) or [Hub E post](./oneoe_network_hub_e_post.json). Finally re-apply the EXACS extension stack keeping [iam](./exacs_identity_uc1.json) and replacing the pre files with [observability](./exacs_observability_uc1.json) plus [Hub A network](./exacs_network_uc1_a.json) or [Hub E network](./exacs_network_uc1_e.json). | Generated from customer config | Generated from customer config |
 
-1. Deploy the base One-OE landing zone stack.
-2. Deploy the EXACS extension stack with `exacs_identity_uc1.json`, `exacs_observability_uc1_pre.json`, and the matching pre network file: `exacs_network_uc1_a_pre.json` for Hub A or `exacs_network_uc1_e_pre.json` for Hub E.
-3. Re-apply the base One-OE stack with `oneoe_network_hub_a_post.json` for Hub A or `oneoe_network_hub_e_post.json` for Hub E.
-4. Re-apply the EXACS extension stack with the matching final network file and `exacs_observability_uc1.json` after EXACS network resources exist, so DRG routing and VCN flow logs can target the created VCN and subnets.
-
-If using Resource Manager with customer-controlled private sources, configure outputs and dependencies so the EXACS stack can reference resources owned by the existing landing-zone stack.
 
 &nbsp;
 
