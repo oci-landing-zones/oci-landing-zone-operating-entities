@@ -112,32 +112,40 @@ local validation = import '../../lib/validation.libsonnet';
     local descriptions = inputs.descriptions;
     local model = inputs.model;
     local tag_key = inputs.tag_key;
+    local project_children(env_name) = std.foldl(
+      function(acc, project_name) acc {
+        [n.key_global('CMP', [env_name, project_name])]+: {
+          children+: {
+            [$.project_db_key(product, n, env_name, project_name)]: {
+              name: $.project_db_name(product, env_name, project_name),
+              description: descriptions.project_db_compartment(
+                model.environment_scope(env_name),
+                project_name
+              ),
+              defined_tags: { [tag_key]: product.tags.db },
+            },
+          },
+        },
+      },
+      model.by_environment[env_name],
+      {}
+    );
+    local environment_children = std.foldl(
+      function(acc, env_name) acc {
+        [n.key_global('CMP', [env_name])]+: {
+          children+: {
+            [n.key_global('CMP', [env_name, 'PROJECTS'])]+: {
+              children+: project_children(env_name),
+            },
+          },
+        },
+      },
+      std.objectFields(model.by_environment),
+      {}
+    );
     if std.length(model.specs) > 0 then {
       'CMP-LANDINGZONE-KEY'+: {
-        children+: {
-          [n.key_global('CMP', [env_name])]+: {
-            children+: {
-              [n.key_global('CMP', [env_name, 'PROJECTS'])]+: {
-                children+: {
-                  [n.key_global('CMP', [env_name, project_name])]+: {
-                    children+: {
-                      [$.project_db_key(product, n, env_name, project_name)]: {
-                        name: $.project_db_name(product, env_name, project_name),
-                        description: descriptions.project_db_compartment(
-                          model.environment_scope(env_name),
-                          project_name
-                        ),
-                        defined_tags: { [tag_key]: product.tags.db },
-                      },
-                    },
-                  }
-                  for project_name in model.by_environment[env_name]
-                },
-              },
-            },
-          }
-          for env_name in std.objectFields(model.by_environment)
-        },
+        children+: environment_children,
       },
     } else {},
 

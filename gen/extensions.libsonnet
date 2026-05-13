@@ -182,7 +182,7 @@ local collections = import 'lib/collections.libsonnet';
   _resolve_subnets(ext_type, pe, ext_meta)::
     local subnet_names =
       self._subnet_names(ext_meta);
-    assert !ext_meta.has_network || std.all([
+    assert !ext_meta.has_network || collections.all([
       std.objectHas(ext_meta.default_subnets, sn)
       for sn in subnet_names
     ]) : 'Extension "%s" subnet_order contains names not in default_subnets: %s' % [

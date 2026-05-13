@@ -1,3 +1,5 @@
+local collections = import 'collections.libsonnet';
+
 local digit_map = {
   '0': true,
   '1': true,
@@ -15,7 +17,7 @@ local digit_map = {
   is_decimal_string(value)::
     std.type(value) == 'string'
     && std.length(value) > 0
-    && std.all([std.objectHas(digit_map, c) for c in std.stringChars(value)]),
+    && collections.all([std.objectHas(digit_map, c) for c in std.stringChars(value)]),
 
   is_canonical_decimal_string(value)::
     self.is_decimal_string(value)
@@ -63,7 +65,7 @@ local digit_map = {
     local ip_parts = std.split(parts[0], '.');
     assert std.length(ip_parts) == 4 :
       '%s must be a canonical IPv4 CIDR' % label;
-    assert std.all([self.is_canonical_decimal_string(part) for part in ip_parts]) :
+    assert collections.all([self.is_canonical_decimal_string(part) for part in ip_parts]) :
       '%s must be a canonical IPv4 CIDR' % label;
     assert self.is_canonical_decimal_string(parts[1]) :
       '%s must be a canonical IPv4 CIDR' % label;

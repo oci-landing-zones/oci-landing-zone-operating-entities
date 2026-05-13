@@ -1,6 +1,7 @@
 // gen/config.libsonnet
 // Config normalization and subnet policy selection for OCI Landing Zone.
 local cidrs = import 'lib/cidrs.libsonnet';
+local collections = import 'lib/collections.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
 local validation = import 'lib/validation.libsonnet';
 
@@ -44,7 +45,7 @@ local validation = import 'lib/validation.libsonnet';
     local security_target_names =
       if std.objectHas(config, 'security_targets') && config.security_targets != null then
         local targets = validation.array(config.security_targets, 'config.security_targets');
-        assert std.all([
+        assert collections.all([
           std.member(env_names, env_name)
           for env_name in targets
         ]) :

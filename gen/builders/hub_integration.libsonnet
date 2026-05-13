@@ -56,6 +56,15 @@ function(params)
     [e.route_key]: common._route_via_key('%s through DRG' % e.route_desc, e.vcn, drg_key)
     for e in all_vcn_entries
   };
+  local route_tables_with_routes(route_tables, routes) = std.foldl(
+    function(acc, rt) acc {
+      [rt]+: {
+        route_rules+: routes,
+      },
+    },
+    route_tables,
+    {}
+  );
 
   // --- 4. Firewall NSG Ingress Rules ---
   local nsg_fw_spoke_ingress = std.foldl(
@@ -110,10 +119,10 @@ function(params)
           // Inject spoke routes into hub route tables
           vcns+: {
             [n.key('VCN', ['HUB'])]+: {
-              route_tables+: {
-                [rt]+: { route_rules+: hub_spoke_routes_via_drg }
-                for rt in hub.spoke_route_tables
-              },
+              route_tables+: route_tables_with_routes(
+                hub.spoke_route_tables,
+                hub_spoke_routes_via_drg
+              ),
             } + (if hub.fw_nsg_key != null then {
                    network_security_groups+: {
                      [hub.fw_nsg_key]+: { ingress_rules+: nsg_fw_spoke_ingress },
@@ -153,10 +162,10 @@ function(params)
           '0-shared'+: {
             vcns+: {
               [n.key('VCN', ['HUB'])]+: {
-                route_tables+: {
-                  [rt]+: { route_rules+: hub_spoke_routes_via_nfw }
-                  for rt in post_route_tables
-                },
+                route_tables+: route_tables_with_routes(
+                  post_route_tables,
+                  hub_spoke_routes_via_nfw
+                ),
               },
             },
           },

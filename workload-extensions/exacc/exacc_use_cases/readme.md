@@ -127,8 +127,8 @@ Notification topics <img src="../content/i.png" style="height: 1.5em; vertical-a
 At the global level, notification topics support shared ExaDB-C@C infrastructure and shared ExaDB-C@C database workloads.
 
 At the environment level, dedicated notification topics support production and pre-production project scopes.
-- **Production**: nott-lz-prod-exacc-projects
-- **Pre-Production**: nott-lz-preprod-exacc-projects
+- **Production**: `nott-lz-prod-exacc`
+- **Pre-Production**: `nott-lz-preprod-exacc`
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 

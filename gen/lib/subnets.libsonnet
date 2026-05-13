@@ -1,4 +1,5 @@
 local cidrs = import 'cidrs.libsonnet';
+local collections = import 'collections.libsonnet';
 local validation = import 'validation.libsonnet';
 
 {
@@ -19,7 +20,7 @@ local validation = import 'validation.libsonnet';
     subnets,
 
   local validate_subnet_values(subnets, keys, label, parent_cidr=null) =
-    assert std.all([
+    assert collections.all([
       subnets[k] != null && std.type(subnets[k]) == 'string'
       for k in keys
     ]) :
@@ -33,7 +34,7 @@ local validation = import 'validation.libsonnet';
     ];
     assert cidrs.assert_non_overlapping(entries, label);
     if parent_cidr != null then
-      assert std.all([
+      assert collections.all([
         cidrs.contains(parent_cidr, subnets[k])
         for k in keys
       ]) :
