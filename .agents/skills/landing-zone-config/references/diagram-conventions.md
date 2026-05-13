@@ -42,9 +42,10 @@ By default, create only the `.excalidraw` file. Do not create `.svg`, `.png`, `.
 |---|---:|---:|---|
 | Tenancy root / landing-zone root | `#eef2ff` | `#5b6472` | Root or enclosing compartments, including `TENANCY-ROOT`. |
 | Environment compartment | `#e8f7ee` | `#5b6472` | Example: `cmp-lz-prod`, `cmp-lz-test`. |
-| Platform compartment and generated platform child compartments | `#e9ecef` | `#5b6472` | Examples: OKE, ExaCS, ExaCC, or another platform extension compartment. |
+| Platform parent and generic platform compartments | `#d8dee6` | `#5b6472` | Use for `cmp-lz-platform`, environment platform parents such as `cmp-lz-prod-platform`, and generic generated platform compartments such as `cmp-lz-shared-exacc`, `cmp-lz-shared-exacs`, `cmp-lz-prod-exacc`, or `cmp-lz-prod-exacs`. |
+| Platform leaf compartments | `#e9ecef` | `#5b6472` | Use for generated platform child compartments below the generic platform node, such as `cmp-lz-shared-exacc-db`, `cmp-lz-shared-exacc-infra`, `cmp-lz-shared-exacs-db`, or `cmp-lz-shared-exacs-infra`. |
 | Network / security / projects child compartments | `#fff9db` | `#5b6472` | Regular environment child compartments. |
-| Shared child compartments | `#ffec99` | `#5b6472` | Shared network/platform/security. |
+| Shared non-platform child compartments | `#ffec99` | `#5b6472` | Shared network/security or other shared non-platform compartments. Do not use this color for shared platform branches; platform semantics take precedence. |
 | Group boundary | `transparent` | `#c5cad3` | Visual grouping only, not an OCI compartment. |
 | Default neutral box | `#f7f9fc` | `#5b6472` | Use only when no stronger semantic color applies. |
 | Connector arrows | `transparent` | `#7b8494` | Use arrows for parent-child links. |
