@@ -17,11 +17,11 @@
     - [**ExaDB-D Groups**](#exadb-d-groups-2)
     - [**ExaDB-D Observability**](#exadb-d-observability-2)
 - [**3. Design Decisions**](#3-design-decisions)
-- [**3. Management of other resources**](#3-management-of-other-resources)
-  - [**3.1 Disaster Recovery (DR)**](#31-disaster-recovery-dr)
-  - [**3.2 Operator Access Control**](#32-operator-access-control)
-  - [**3.3 Software Images**](#33-software-images)
-  - [**3.4 Backup Destinations**](#34-backup-destinations)
+- [**4. Management of other resources**](#4-management-of-other-resources)
+  - [**4.1 Disaster Recovery (DR)**](#41-disaster-recovery-dr)
+  - [**4.2 Operator Access Control**](#42-operator-access-control)
+  - [**4.3 Software Images**](#43-software-images)
+  - [**4.4 Backup Destinations**](#44-backup-destinations)
 
 Published generated artifacts currently support UC1 (Shared ExaDB-D Platform). UC2 (Hybrid ExaDB-D Platform) and UC3 (Dedicated ExaDB-D Platform) are retained as design guidance and require config-driven generation before use.
 
@@ -385,9 +385,9 @@ Based on this capability, a deliberate design decision has been made to always d
 
 By combining these two approaches, the architecture acknowledges the structural constraints of VMC-based deployments—where the cluster defines the boundary—while leveraging the flexibility of Autonomous Databases to achieve project-level isolation and delegation.
 
-## **3. Management of other resources**
+## **4. Management of other resources**
 
-### **3.1 Disaster Recovery (DR)**
+### **4.1 Disaster Recovery (DR)**
 
 In this architecture, Disaster Recovery (DR) is implemented by defining two ExaDB-D infrastructures, one acting as primary and the other as standby.
 
@@ -403,7 +403,7 @@ This approach provides a consistent and scalable DR model, where protection is b
 
 To know more about how to use Data Guard on ExaDB-D environments you can check the public document [Use Oracle Data Guard with Exadata Cloud Infrastructure](https://docs.oracle.com/en-us/iaas/exadatacloud/doc/ecs-using-data-guard.html).
 
-### **3.2 Operator Access Control**
+### **4.2 Operator Access Control**
 
 Oracle Operator Access Control is an OCI compliance and auditing service that provides visibility into when Oracle operators require access to the underlying ExaDB-D infrastructure for maintenance or issue resolution. It offers near real-time audit trails of all actions performed by Oracle personnel.
 
@@ -415,7 +415,7 @@ An alternative design may place Operator Access Control resources within environ
 
 To know more about the Oracle Operator Access Control you can check the public document [Oracle Operator Access Control](https://docs.oracle.com/en-us/iaas/operator-access-control/index.html).
 
-### **3.3 Software Images**
+### **4.3 Software Images**
 
 Oracle provides the capability to define custom Database Software Images and Grid Infrastructure Software Images in OCI. These images represent curated versions of Oracle software, including specific Release Updates (RUs) and optional one-off patches, allowing organizations to standardize the software stack used across their database platforms.
 
@@ -431,9 +431,9 @@ IAM policies are defined accordingly to grant the appropriate DBA teams permissi
 
 This flexible approach ensures consistency in software deployment while allowing the architecture to adapt to different organizational, operational, and governance requirements.
 
-For more information, refer to the official documentation [Manage Software Images](https://docs.oracle.com/en/engineered-systems/exadata-cloud-at-customer/ecccm/ecc-oracle-database-software-images.html#GUID-93D6419A-DD43-45E0-BF69-92E8907C6652).
+For more information, refer to the official documentation [Manage Software Images](https://docs.oracle.com/en-us/iaas/exadatacloud/doc/ecc-manage-images.html).
 
-### **3.4 Backup Destinations**
+### **4.4 Backup Destinations**
 
 ExaDB-D supports multiple backup options, based on integration with OCI Autonomous Recovery Service and OCI Object Storage. Autonomous Recovery Service is the recommended backup destination for database workloads, providing advanced data protection, automated validation, and point-in-time recovery capabilities.
 
