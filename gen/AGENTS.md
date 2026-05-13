@@ -33,7 +33,7 @@ gen/
 │
 ├── workload-extensions/         # Pluggable extensions (extension-specific docs may have AGENTS.md)
 │   ├── exadb/                   # Shared ExaDB helpers used by ExaDB extensions
-│   ├── exacc/                   # ExaDB-C@C extension; see workload-extensions/exacc/AGENTS.md
+│   ├── exacc/                   # ExaDB-C@C extension; see its local guide
 │   ├── exacs/                   # ExaDB-D / ExaCS extension; see workload-extensions/exacs/AGENTS.md
 │   └── oke/simple/
 │       ├── oke_builder.libsonnet # Shared OKE builder internals
@@ -311,7 +311,7 @@ Current extension ownership:
 - `gen/workload-extensions/oke/simple/oke_builder.libsonnet` owns the reusable OKE rendering logic.
 - `gen/workload-extensions/oke/simple/oke_simple.libsonnet` is the active generic extension wrapper for config mode and integrated landing-zone assembly.
 - `gen/workload-extensions/oke/simple/multi-stack/published.libsonnet` owns the multi-stack publication-only OKE network and identity projections used by repo entrypoints.
-- `gen/workload-extensions/exacc/AGENTS.md` owns ExaDB-C@C extension-specific contracts, notification email semantics, publication layout, and tests.
+- The local ExaDB-C@C guide owns extension-specific contracts, notification email semantics, publication layout, and tests.
 - `gen/workload-extensions/exacs/AGENTS.md` owns ExaDB-D / ExaCS placement mapping, component inference, network rules, and discovery addenda.
 
 ## 7. How to Add a New Hub Type
@@ -335,7 +335,7 @@ Current extension ownership:
 
 Keep `gen/defaults.libsonnet` limited to generic reusable hub defaults. If an extension needs published committed snapshots, keep those canonical published configs in local `profiles.libsonnet` files owned by the published family.
 
-Keep extension-specific placement and parameter semantics in the extension's own `AGENTS.md`; for example, ExaDB-C@C lives in `gen/workload-extensions/exacc/AGENTS.md` and ExaDB-D / ExaCS lives in `gen/workload-extensions/exacs/AGENTS.md`.
+Keep extension-specific placement and parameter semantics in the extension's own local guide; for example, ExaDB-C@C lives under `gen/workload-extensions/exacc/` and ExaDB-D / ExaCS lives under `gen/workload-extensions/exacs/`.
 
 ## 9. Generation Modes
 

@@ -20,6 +20,22 @@ Scope: this file covers `gen/workload-extensions/exacc/**` and the published Exa
 - ExaDB-C@C contributes IAM and observability only. It must not emit `network_pre`, `network`, subnet metadata, or platform VCN categories.
 - Config-mode IAM owns the nested platform root compartments. The ExaDB-C@C builder deep-merges child DB/infra compartments and tags into that nested tree.
 - Standalone multi-stack publication projects the nested config-mode IAM overlay into flat extension-only compartments with `parent_id` references.
+- Do not add native root families such as `exacc_configuration` or `exacs_configuration` unless the active Orchestrator contract proves those families exist.
+
+## Use-Case Support
+
+- UC1 is the native published template-backed ExaDB-C@C use case in this repo.
+- UC2 and UC3 are use-case models only unless dedicated source templates and generator fixtures exist in this repo.
+- If UC2, UC3, or a custom combination is requested, stop before deployable artifact changes unless the matching templates and tests are present. Capture design notes or requirements instead of relabeling UC1 output.
+- Existing deployed landing zones should use the multi-stack extension-only publication shape unless the user explicitly asks to change the foundation.
+- Fresh foundation plus ExaDB-C@C publication uses the single-stack shape emitted by the local published adapters. Do not mix stack families unless the active Orchestrator merge behavior and top-level family collisions have been checked.
+
+## Dependencies And Orchestrator Contract
+
+- Multi-stack ExaDB-C@C output should consume dependency outputs from the deployed foundation whenever the active Orchestrator contract supports those dependency inputs.
+- If dependency outputs are unavailable, ask for OCIDs only for resources owned by prior stacks. Preserve logical keys for resources created in the current ExaDB-C@C stack.
+- Do not assume identity-domain outputs are accepted as dependency inputs. Verify the active Orchestrator root and `rms-facade` contract before advising that groups can target a previously created identity domain through a dependency file.
+- Keep configuration files, dependency files, output files, OCID replacements, and Resource Manager variables separate in handoff notes.
 
 ## Notification Emails
 
@@ -79,7 +95,19 @@ Environment platform example with project DB compartments:
   - `exacc_observability_uc1.json`
 - Do not add a root `gen/workload-extensions/exacc/published.libsonnet`. Publication adapters stay local to the stack family that needs them.
 - Keep `workload-extensions/exacc/content/OLD` out of the published tree.
-- Do not keep source-branch raw URLs such as `we_exacc_update` in ExaDB-C@C docs.
+- Do not keep temporary source-branch raw URLs in ExaDB-C@C docs.
+
+## Validation Levels
+
+Before claiming generated or edited ExaDB-C@C artifacts are ready, report the strongest validation level actually reached:
+
+- design coherence checked
+- JSON syntax checked
+- Orchestrator contract checked
+- Terraform validate run or not run
+- Terraform plan run or not run
+
+Do not collapse those levels into a generic "correct" or "production ready" statement.
 
 ## Tests
 

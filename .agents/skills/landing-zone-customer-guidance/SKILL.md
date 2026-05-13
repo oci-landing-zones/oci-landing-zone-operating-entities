@@ -32,6 +32,7 @@ Do not use this skill for repo-development work. Once the request is clearly on 
 6. After the hub family is known and before discussing public exposure, load balancers, or OKE ingress, inspect the matching hub guide or runtime artifacts first so you know what load balancer pattern already exists.
 7. Only after all required decisions are known may you recommend a published runtime path, a workload extension path, or config-mode generation.
 8. When deployment execution comes up, use the secure delivery defaults from `AGENTS.md`: prefer Terraform CLI or customer-controlled CI/CD; for ORM, use customer-controlled private Object Storage or approved private GitHub source, not public raw URLs.
+9. If the conversation turns into Orchestrator or Resource Manager runtime troubleshooting, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier after this customer flow has established the deployment context.
 
 ## Unsupported Requirements
 
@@ -66,3 +67,9 @@ If the selected published path, config generator, or workload extension does not
 - Ask whether AVMCs/VMCs are shared or environment-specific. Explain that AVMC/VMC placement requires an ExaCS network with database and backup subnets.
 - For Autonomous Database Dedicated, ask which environments and projects need project DB tiers; do not add them for regular Exadata Database Service-only designs.
 - Use `gen/workload-extensions/exacs/AGENTS.md` for extension-specific placement mapping before authoring config.
+
+## ExaDB-C@C / ExaCC-Specific Guardrails
+
+- Complete the base landing-zone discovery first before discussing ExaDB-C@C artifacts.
+- Use the ExaDB-C@C generator guide under `gen/workload-extensions/exacc/` for extension-specific semantics before authoring config or reviewing published snapshots.
+- Treat Orchestrator dependency/output questions as contract checks, not as permission to skip customer discovery.

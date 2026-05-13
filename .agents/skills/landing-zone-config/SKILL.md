@@ -36,6 +36,7 @@ Do not use this skill as the first response to an open-ended customer request su
 4. Keep only the smallest top-level shape first: `hub` and non-empty `environments`, plus `region` / `region_short_name` only when overriding their defaults as a pair.
 5. Add environments and platforms incrementally, then run config mode and inspect the generated outputs.
 6. When behavior is unclear, prefer reading the normalization and extension code over guessing from checked-in JSON.
+7. If the question is about Orchestrator runtime behavior, dependency files, output files, Resource Manager source settings, or duplicate top-level configuration collisions, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier rather than expanding this skill into runtime troubleshooting.
 
 ## Quick Rules
 
@@ -68,6 +69,7 @@ Do not use this skill as the first response to an open-ended customer request su
 - When adding a new extension-backed platform, verify both the config schema and the extension contract.
 - For OKE, read `gen/workload-extensions/oke/AGENTS.md` before giving exact CIDR splits or networking contract guidance.
 - For ExaCS, complete the placement decisions in `AGENTS.md`, then use `gen/workload-extensions/exacs/AGENTS.md` for the config mapping.
+- For ExaDB-C@C, complete the placement decisions in `AGENTS.md`, then use the generator guide under `gen/workload-extensions/exacc/` for config and publication semantics.
 - If a requested resource is unsupported by config mode, keep unsupported resources out of generated files and mark the separate work as "Manual post-deployment configuration required."
 
 ## Verification
