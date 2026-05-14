@@ -1,8 +1,8 @@
 // ExaCC project DB notifications emit one event rule per project DB compartment when multiple projects are configured
 // contains: RUL-LZ-PROD-NOTIFICATION-PROJECTS-PROJ1-KEY
 // contains: RUL-LZ-PROD-NOTIFICATION-PROJECTS-PROJ2-KEY
-// contains: CMP-LZ-PROD-PROJ1-DB-KEY
-// contains: CMP-LZ-PROD-PROJ2-DB-KEY
+// contains: CMP-LZ-PROD-PROJ1-EXACC-DB-KEY
+// contains: CMP-LZ-PROD-PROJ2-EXACC-DB-KEY
 local lz = import 'gen/landing_zone.libsonnet';
 
 local result = lz({

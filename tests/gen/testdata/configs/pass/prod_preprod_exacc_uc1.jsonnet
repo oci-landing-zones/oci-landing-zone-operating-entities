@@ -1,6 +1,7 @@
 // config-mode ExaCC use case 1 renders common landing-zone files with ExaCC IAM and observability merged in
 // contains: CMP-LZ-SHARED-EXACC-KEY
-// contains: CMP-LZ-PROD-PROJ1-DB-KEY
+// contains: CMP-LZ-PROD-PROJ1-EXACC-DB-KEY
+// contains: cmp-lz-prod-proj1-exacc-db
 // contains: RUL-LZ-NOTIFICATION-PLATFORM-EXACC-DB-KEY
 // contains: exacc-db@example.com
 local env_exacc_platform(projects=[]) = {

@@ -5,7 +5,7 @@
 // contains: AL-LZ-EXACS-DB-CLUSTER-CPUUTIL-KEY
 // contains: RUL-LZ-NOTIFICATION-OPERATOR-ACCESS-CONTROL-KEY
 // contains: RUL-LZ-NOTIFICATION-EXACS-OPERATOR-ACCESS-CONTROL-KEY
-// contains: CMP-LZ-PROD-PROJ1-DB-KEY
+// contains: CMP-LZ-PROD-PROJ1-EXACC-DB-KEY
 // contains: CMP-LZ-PROD-PROJ1-EXACS-DB-KEY
 local lz = import 'gen/landing_zone.libsonnet';
 

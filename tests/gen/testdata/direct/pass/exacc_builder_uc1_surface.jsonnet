@@ -3,7 +3,8 @@
 // contains: CMP-LZ-PROD-EXACC-KEY
 // contains: CMP-LZ-PREPROD-EXACC-KEY
 // contains: CMP-LZ-PROD-EXACC-DB-KEY
-// contains: CMP-LZ-PROD-PROJ1-DB-KEY
+// contains: CMP-LZ-PROD-PROJ1-EXACC-DB-KEY
+// contains: cmp-lz-prod-proj1-exacc-db
 // contains: GRP-LZ-GLOBAL-DB-ADMIN-KEY
 // contains: PCY-LZ-GLOBAL-EXACC-INFRA-ADMIN-KEY
 // contains: NOTT-LZ-EXACC-SHARED-INFRA-WORKLOADS-KEY

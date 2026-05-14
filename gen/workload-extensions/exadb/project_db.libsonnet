@@ -55,14 +55,14 @@ local validation = import '../../lib/validation.libsonnet';
     } else {}),
 
   project_db_key(product, n, env_name, project_name)::
-    if product.code == 'exacs' then n.key_global('CMP', [env_name, project_name, 'EXACS', 'DB'])
-    else n.key_global('CMP', [env_name, project_name, 'DB']),
+    n.key_global('CMP', [env_name, project_name, std.asciiUpper(product.code), 'DB']),
 
   project_db_name(product, env_name, project_name)::
-    if product.code == 'exacs' then
-      'cmp-lz-%s-%s-exacs-db' % [std.asciiLower(env_name), std.asciiLower(project_name)]
-    else
-      'cmp-lz-%s-%s-db' % [std.asciiLower(env_name), std.asciiLower(project_name)],
+    'cmp-lz-%s-%s-%s-db' % [
+      std.asciiLower(env_name),
+      std.asciiLower(project_name),
+      product.code,
+    ],
 
   platform_compartment_overlay(inputs)::
     local product = inputs.product;
