@@ -16,21 +16,23 @@ The diagram below illustrates a sample routing setup for a multi-tenancy/multi-r
 &nbsp;
 ### 2. Sample JSON Configuration for RPC  
 
-#### Configuration Details:
+#### Configuration Details:  
 
-- **Tenancy 1 (RPC Acceptor, old Connectivity Hub/CH)**
-  - Runtime files are in `runtime/tenancy1/`.
-  - `tenancy1_iam.auto.tfvars.json` includes the RPC acceptor IAM policy.
-  - `tenancy1_network_hub_e.auto.tfvars.json` includes RPC DRG and route extensions.
-  - CIDR baseline follows `10.0.x.x`.
+- **Tenancy 1 Configuration**  
+  - `tenancy1_iam.auto.tfvars.json` defines the compartment groups and policies required for RPC setup in the Connectivity Hub tenancy.  
+  - `tenancy1_network.auto.tfvars.json` defines the Hub and Spoke network setup, including the Remote Peering Connection and associated route tables. The Connectivity Hub JSON configuration follows **OCI Open LZ - Hub A**.  
+    - To learn more about **HUB Model A**, refer to the [OCI Open LZ - Hub A Documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_a).  
 
-- **Tenancy 2 (RPC Requester, old OE1)**
-  - Runtime files are in `runtime/tenancy2/`.
-  - `tenancy2_iam.auto.tfvars.json` includes the RPC requester IAM policy.
-  - `tenancy2_network_hub_e.auto.tfvars.json` includes RPC DRG and route extensions.
-  - Tenancy 2 network JSON carries the RPC `peer_id` for peering to Tenancy 1.
-  - CIDR baseline follows `10.1.x.x`.
+- **Tenancy 2 Configuration**  
+  - `tenancy2_iam.auto.tfvars.json` defines the compartment groups and policies required for RPC setup in the OE1 tenancy.  
+  - `tenancy1_network.auto.tfvars.json` defines the Hub and Spoke network setup, including the Remote Peering Connection and associated route tables. The OE1 JSON configuration follows **OCI Open LZ - Hub E**.  
+    - To learn more about **HUB Model E**, refer to the [OCI Open LZ - Hub E Documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_e).  
 
+> [!NOTE]  
+> To spin up **Tenancy 1** or **Tenancy 2** with the **One-OE (HUB E) single-stack** plus **RPC** configuration, navigate to the respective directories below to access the complete JSON configuration files:
+>
+> - [tenancy1](./tenancy1/)
+> - [tenancy2](./tenancy2/)
 
 
 #### License
