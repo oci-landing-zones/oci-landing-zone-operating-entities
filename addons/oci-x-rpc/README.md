@@ -122,33 +122,10 @@ Configuration details:
 
 
 
-### Steps to Set Up Cross-Tenancy RPC
-Any of the Landing Zone [Blueprints](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints) can be deployed across both tenanciesTenancy 1 and 2 to establish a structured and automated framework for configuring cross-tenancy networking.
+### Cross-Tenancy RPC Execution Guide
 
-#### Configuration Update & Execution in Tenancy1
-***Step 1: Add the RPC IAM Policy (Acceptor)***<br>
-Update the IAM JSON config with the Acceptor policy in the Tenancy1.
-
-***Step 2: Add the Remote Peering Connection (RPC) Block***<br>
-Modify the network JSON config of the Tenancy1 by adding the RPC block under the DRG section.
-
-***Step 3: Execute the Terraform Deployment***<br>
-`Plan` and `Apply` the newly added IAM policy & RPC configuration.Collect the RPC OCID upon successful deployment.
-
-#### Configuration Update & Execution in Tenancy2
-***Step 1: Add the RPC IAM Policy (Requestor)***<br>
-Update the IAM JSON config with the Requestor policy in the Tenancy2.
-
-***Step 2: Add the Remote Peering Connection (RPC) Block***<br>
-Modify the network JSON config of the Tenancy2 by adding the RPC block under the **DRG** section. Set the `peer_id` parameter to the RPC OCID collected from the Tenancy1.
-
-***Step 3: Execute the Terraform Deployment***<br>
-`Plan` and `Apply` the newly added IAM policy & RPC configuration. Verify the deployment is successful and that the RPC is established.
-
-> [!IMPORTANT]
->Ensure that the user performing Terraform automation belongs to the group specified in the RPC policy. Otherwise, the connection will not establish. From a One-OE standpoint, this group should be `grp-lz-network-admins`.
->
-> Refer to the runtime directory files hub_network.auto.tfvars.json and oe1_iam.network.tfvars.json files for the complete networking configuration sample template based on One-OE.
+> [!TIP]
+> Refer to the [Cross-Tenancy RPC Execution Guide](./execution.md) for complete deployment, configuration, and execution instructions.
 
 &nbsp;
 
