@@ -234,25 +234,12 @@ The RPC status can be verified from:
 ---
 
 > [!IMPORTANT]
-
 > The user executing Terraform/ORM automation must belong to:
-
->
-
 > - `grp-lz-network-admins`
-
->
-
 > Otherwise:
-
->
-
 > - The ORM stack deployment may fail.
-
 > - The OCI Console RPC status may display a `REVOKED` state.
-
 > - Cross-tenancy RPC peering will not be established successfully.
-
 ---
 
 # Summary
