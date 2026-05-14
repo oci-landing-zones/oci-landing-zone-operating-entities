@@ -12,39 +12,41 @@ The setup enables secure connectivity between **Tenancy1** and **Tenancy2** thro
 
 ```mermaid
 
-flowchart LR
+flowchart TD
 
-    A[Update Tenancy2 IAM Config<br/>Add Tenancy1 OCID] --> 
+    A["Step 1<br/>Update Tenancy2 IAM Config<br/>Add Tenancy1 OCID"]
 
-    B[Deploy Tenancy2 IAM + Governance Stack]
+    B["Deploy Tenancy2<br/>IAM + Governance Stack"]
 
-    B --> 
+    C["Obtain<br/>grp-lz-network-admins<br/>Group OCID"]
 
-    C[Obtain grp-lz-network-admins Group OCID]
+    D["Step 2<br/>Update Tenancy1 IAM Config<br/>Add Group OCID + Tenancy2 OCID"]
 
-    C --> 
+    E["Deploy Tenancy1<br/>IAM + Network + Governance Stack"]
 
-    D[Update Tenancy1 IAM Config<br/>Add Group OCID and Tenancy2 OCID]
+    F["Obtain<br/>Tenancy1 RPC OCID"]
 
-    D --> 
+    G["Step 3<br/>Update Tenancy2 Network Config<br/>Add peer_id"]
 
-    E[Deploy Tenancy1 IAM + Network + Governance Stack]
+    H["Deploy Tenancy2<br/>Network Stack"]
 
-    E --> 
+    I["Validate RPC Status<br/>PEERED"]
 
-    F[Obtain Tenancy1 RPC OCID]
+    A --> B
 
-    F --> 
+    B --> C
 
-    G[Update Tenancy2 Network Config<br/>Add peer_id]
+    C --> D
 
-    G --> 
+    D --> E
 
-    H[Deploy Tenancy2 Network Stack]
+    E --> F
 
-    H --> 
+    F --> G
 
-    I[Validate RPC Status = PEERED]
+    G --> H
+
+    H --> I
 
 ```
 
@@ -242,8 +244,6 @@ The RPC status can be verified from:
 
 > [!IMPORTANT]
 
->
-
 > The user executing Terraform/ORM automation must belong to:
 
 >
@@ -252,7 +252,15 @@ The RPC status can be verified from:
 
 >
 
-> Otherwise, the RPC connection will not be established successfully. ORM stack failed and OCI consile RPC status shows revoke message
+> Otherwise:
+
+>
+
+> - The ORM stack deployment may fail.
+
+> - The OCI Console RPC status may display a `REVOKED` state.
+
+> - Cross-tenancy RPC peering will not be established successfully.
 
 ---
 
