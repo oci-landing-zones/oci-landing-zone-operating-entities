@@ -11,43 +11,34 @@ The setup enables secure connectivity between **Tenancy1** and **Tenancy2** thro
 # Execution Flow
 
 ```mermaid
-
 flowchart TD
 
-    A["Step 1<br/>Update Tenancy2 IAM Config<br/>Add Tenancy1 OCID"]
+    A["Update Tenancy2 IAM<br/>Add Tenancy1 OCID"]
 
-    B["Deploy Tenancy2<br/>IAM + Governance Stack"]
+    B["Deploy Tenancy2<br/>IAM + Governance"]
 
-    C["Obtain<br/>grp-lz-network-admins<br/>Group OCID"]
+    C["Collect<br/>Network Group OCID"]
 
-    D["Step 2<br/>Update Tenancy1 IAM Config<br/>Add Group OCID + Tenancy2 OCID"]
+    D["Update Tenancy1 IAM<br/>Add Group + Tenancy2 OCID"]
 
-    E["Deploy Tenancy1<br/>IAM + Network + Governance Stack"]
+    E["Deploy Tenancy1<br/>IAM + Network + Governance"]
 
-    F["Obtain<br/>Tenancy1 RPC OCID"]
+    F["Collect<br/>Tenancy1 RPC OCID"]
 
-    G["Step 3<br/>Update Tenancy2 Network Config<br/>Add peer_id"]
+    G["Update Tenancy2 Network<br/>Add peer_id"]
 
     H["Deploy Tenancy2<br/>Network Stack"]
 
     I["Validate RPC Status<br/>PEERED"]
 
     A --> B
-
     B --> C
-
     C --> D
-
     D --> E
-
     E --> F
-
     F --> G
-
     G --> H
-
     H --> I
-
 ```
 
 ---
