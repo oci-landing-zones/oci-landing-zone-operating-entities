@@ -147,6 +147,7 @@
 
     "identity_domain_groups_configuration": {
         "default_identity_domain_id"                           : "COMMON-DOMAIN",
+        "ignore_external_membership_updates"                   : true,
 
         "groups": {
             "GRP-AUDITORS-ADMIN-KEY": {

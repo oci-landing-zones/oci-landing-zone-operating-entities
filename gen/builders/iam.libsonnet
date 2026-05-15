@@ -214,6 +214,7 @@ function(config, n, realm_constants, topo)
 
   local identity_domain_groups_configuration = {
     default_identity_domain_id: 'COMMON-DOMAIN',
+    ignore_external_membership_updates: true,
     groups: {
       [n.key_tenancy('GRP', ['AUDITORS', 'ADMIN'])]: {
         name: n.display_tenancy('GRP', ['AUDITORS', 'ADMIN']),
