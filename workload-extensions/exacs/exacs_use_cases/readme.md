@@ -23,7 +23,7 @@
   - [**4.3 Software Images**](#43-software-images)
   - [**4.4 Backup Destinations**](#44-backup-destinations)
 
-Published generated artifacts currently support UC1 (Shared ExaDB-D Platform). UC2 (Hybrid ExaDB-D Platform) and UC3 (Dedicated ExaDB-D Platform) are retained as design guidance and require config-driven generation before use.
+Published generated artifacts currently support Use Case 1 (UC1), the shared ExaDB-D platform. Use Case 2 (UC2), the hybrid ExaDB-D platform, and Use Case 3 (UC3), the dedicated ExaDB-D platform, are retained as design guidance and require config-driven generation before use.
 
 ## **1. Summary**
 
