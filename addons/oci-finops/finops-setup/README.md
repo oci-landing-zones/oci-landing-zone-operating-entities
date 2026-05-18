@@ -15,20 +15,29 @@ Follow the deployment sheet below to setup the FinOps platform in your tenancy o
 |---|---| 
 | **OPERATION** | **FinOps Platform Deployment** | 
 | **TARGET RESOURCES**  </br></br><img src="../../../commons/images/icon_oci.jpg" width="32">| </br>This operation provisions the foundational FinOps platform resources including IAM group, policies, compartment, and networking **without** Autonomous Database. | 
-| **INPUT CONFIGURATIONS** </br></br><img src="../../../commons/images/icon_json.jpg" width="30" align="center">&nbsp; +&nbsp; <img src="../../../commons/images/icon_terraform.jpg" width="32" align="center">|</br>[**IAM Configuration**](finops_iam.auto.tfvars.json) as input to the [OCI Landing Zone IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) module. </br>[**Network Configuration**](finops_network.auto.tfvars.json) as input to the [OCI Landing Zone Network](https://github.com/oci-landing-zones/terraform-oci-modules-networking) module.</br></br> | 
-| **DEPLOY WITH ORM** </br>*- STEP #1* </br></br><img src="../../../commons/images/icon_orm.jpg" width="40">| </br>[<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-finops/finops-setup/finops_iam.auto.tfvars.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-finops/finops-setup/finops_network.auto.tfvars.json"})  </br></br> And follow these steps:</br> **a**. Accept terms,  wait for the configuration to load. </br> **b**. Set the working directory to “rms-facade”. </br> **c**. Set the stack name you prefer.</br> **d**. Set the terraform version to 1.5.x. Click Next. </br> **e**. Accept the default files. Click Next. Optionally, replace with your json/yaml config files. </br> **f**. Un-check run apply. Click Create. </br> </br> |
+| **INPUT CONFIGURATIONS** </br></br><img src="../../../commons/images/icon_json.jpg" width="30" align="center">&nbsp; +&nbsp; <img src="../../../commons/images/icon_terraform.jpg" width="32" align="center">|</br>[**IAM Configuration**](finops_iam.json) as input to the [OCI Landing Zone IAM](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam) module. </br>[**Governance Configuration**](finops_governance.json), [**Network Configuration**](finops_network.json), [**Observability Configuration**](finops_observability_cis1_pre.json), and [**Security Configuration**](finops_security_cis1_pre.json) follow the same One-OE full-stack structure and can be combined based on target CIS profile.</br></br> | 
+| **DEPLOY WITH ORM** </br>*- STEP #1* </br></br><img src="../../../commons/images/icon_orm.jpg" width="40">| </br>[<img src="/commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.0.12.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-finops/finops-setup/finops_iam.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-finops/finops-setup/finops_network.json"})  </br></br> And follow these steps:</br> **a**. Accept terms,  wait for the configuration to load. </br> **b**. Set the working directory to “rms-facade”. </br> **c**. Set the stack name you prefer.</br> **d**. Set the terraform version to 1.5.x. Click Next. </br> **e**. Accept the default files. Click Next. Optionally, replace with your json/yaml config files. </br> **f**. Un-check run apply. Click Create. </br> </br> |
 
 
 > [!NOTE]  
 > If you already have an existing **Operating Entities Landing Zone** in place, refer to the following input configuration templates and update your own configurations accordingly to align with your OCI IAM and network topology:  
-> - [`finops_iam.auto.tfvars.json`](./finops_iam.auto.tfvars.json)  
-> - [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json)
+> - [`finops_iam.json`](./finops_iam.json)  
+> - [`finops_governance.json`](./finops_governance.json)  
+> - [`finops_network.json`](./finops_network.json)  
+> - [`finops_observability_cis1_pre.json`](./finops_observability_cis1_pre.json)  
+> - [`finops_observability_cis1.json`](./finops_observability_cis1.json)  
+> - [`finops_observability_cis2_pre.json`](./finops_observability_cis2_pre.json)  
+> - [`finops_observability_cis2.json`](./finops_observability_cis2.json)  
+> - [`finops_security_cis1_pre.json`](./finops_security_cis1_pre.json)  
+> - [`finops_security_cis1.json`](./finops_security_cis1.json)  
+> - [`finops_security_cis2_pre.json`](./finops_security_cis2_pre.json)  
+> - [`finops_security_cis2.json`](./finops_security_cis2.json)
 
 > These files define the required IAM and networking components for the FinOps addon. If you wish to create a seperate stack for FinOps platform deployment, Consider the deployed Landing Zone compartment output and Dependencies Source.<br>
 > Dynamic groups matching rules have associated OCIDs that cannot be referenced using the KEY identifier. After the first apply job, you need to update the **CMP-LZP-PLATFORM-FINOPS-KEY** attributes with the correct **OCID**, and then run a second apply job.
 
 > [!IMPORTANT]  
-> The [`finops_network.auto.tfvars.json`](./finops_network.auto.tfvars.json) file is designed for the **Hub-and-Spoke (HUB-E)** network model.  
+> The [`finops_network.json`](./finops_network.json) file is designed for the **Hub-and-Spoke (HUB-E)** network model.  
 > For alternative network architectures, refer to the [HUB firewall models documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models).
 
 &nbsp;
