@@ -63,7 +63,7 @@
                                 "security_list_keys"                      : ["SL-FRA-LZ-HUB-MGMT-KEY"]
                             },
 
-                            "SN-FRA-LZ-HUB-DNS": {
+                            "SN-FRA-LZ-HUB-DNS-KEY": {
                                 "display_name"                            : "sn-fra-lz-hub-dns",
                                 "cidr_block"                              : "10.0.4.0/24",
                                 "dns_label"                               : "snfrahubdns",
@@ -85,7 +85,7 @@
                                 "display_name"                            : "rt-fra-lz-hub-lb",
 
                                 "route_rules": {
-                                    "rt-internet": {
+                                    "rr-fra-internet": {
                                         "description"                     : "Route to the Internet through Internet GW",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
@@ -98,7 +98,7 @@
                                 "display_name"                            : "rt-fra-lz-hub-fw",
 
                                 "route_rules": {
-                                    "rt-natgw": {
+                                    "rr-fra-natgw": {
                                         "description"                     : "Route to Internet through NAT GW",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
@@ -116,7 +116,7 @@
                                 "display_name"                            : "rt-fra-lz-hub-mgmt",
 
                                 "route_rules": {
-                                    "rt-sgw": {
+                                    "rr-fra-sgw": {
                                         "description"                     : "Route to Oracle Services Network through Service GW",
                                         "destination"                     : "all-services",
                                         "destination_type"                : "SERVICE_CIDR_BLOCK",
@@ -155,7 +155,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -189,7 +189,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -222,7 +222,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -268,7 +268,7 @@
                                         "stateless"                       : false
                                     },
 
-                                    "http_443": {
+                                    "https_443": {
                                         "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTPS",
                                         "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
@@ -281,7 +281,7 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "TCP",

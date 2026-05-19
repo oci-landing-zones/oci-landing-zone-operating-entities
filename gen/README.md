@@ -1,6 +1,37 @@
 # Local Set-up
 
-To configure generation using Jsonnet `./gen/generate.sh` needs to be run for the first time manualy. This will set-up git pre-commit hooks, verify jsonnet is installed and generate files from jsonnet
+Run `bash gen/generate.sh` the first time you work on the generator. It sets up the repo hooks, checks that a Jsonnet renderer is installed, and regenerates the checked-in outputs.
+
+## Documentation Map
+
+- [`../AGENTS.md`](../AGENTS.md): repo-specific workflow rules and generator guardrails.
+- [`AGENTS.md`](AGENTS.md): architecture, schema, naming rules, publication rules, and stable generator contracts.
+- [`JSONNET_COMPOSITION.md`](JSONNET_COMPOSITION.md): how the Jsonnet files compose and where to edit for common change types.
+- [`../tests/gen/`](../tests/gen/): generator test modules and fixtures.
+
+## Generator Workflow
+
+- Default generation: `bash gen/generate.sh`
+- Config mode: `bash gen/generate.sh --config <config_file> [output_dir]`
+- Raw config-mode fan-out and debugging: `jsonnet --multi <output_dir>/ --tla-code-file config=<config_file> gen/landing_zone_multi.jsonnet`
+
+Config-mode network artifacts use one canonical final file: `network.json`. Only hubs that require staged deployment also emit `network_pre.json`.
+If you set `hub.network.subnets` explicitly, provide the full canonical subnet set for that hub kind; partial hub subnet overrides are rejected during normalization.
+For networked extension-backed platforms, explicit `platform.network.subnets` overrides must match the extension metadata-defined subnet set exactly; otherwise omit subnets and let the extension auto-allocate. Extensions declare network behavior with `metadata.network_mode`: `required`, `forbidden`, or `optional`. Legacy `metadata.requires_network: true|false` is still supported and maps to `required` or `forbidden`. Optional-network extensions may omit `platform.network` for IAM/observability-only contributions, or include it to emit `network_pre`.
+
+Change the Jsonnet sources under `gen/` first. Checked-in JSON under `blueprints/` and `workload-extensions/` are generated snapshots, not hand-maintained source files.
+
+Use `jsonnet --multi` only for config-mode output fan-out and debugging. Do not use it to regenerate committed snapshot families.
+
+## Generator Tests
+
+Run the generator suite from the repository root with:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py'
+```
+
+These tests require `jsonnet` on `PATH`.
 
 # Jsonnet Quick Reference
 

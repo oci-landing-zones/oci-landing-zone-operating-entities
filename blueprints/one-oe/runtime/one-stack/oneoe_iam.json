@@ -5,7 +5,7 @@
         "compartments": {
             "CMP-LANDINGZONE-KEY": {
                 "name"                                         : "cmp-landingzone",
-                "description"                                  : "Enclosing Production Landing Zone Compartment",
+                "description"                                  : "Enclosing Landing Zone Compartment",
 
                 "children": {
                     "CMP-LZ-NETWORK-KEY": {
@@ -43,7 +43,7 @@
 
                             "CMP-LZ-PREPROD-PROJECTS-KEY": {
                                 "name"                         : "cmp-lz-preprod-projects",
-                                "description"                  : "One-OE Pre-Production Workload Environment, Common Projects Compartment",
+                                "description"                  : "Pre-Production Workload Environment, Common Projects Compartment",
 
                                 "children": {
                                     "CMP-LZ-PREPROD-PROJ1-KEY": {
@@ -85,12 +85,12 @@
 
                             "CMP-LZ-PROD-PROJECTS-KEY": {
                                 "name"                         : "cmp-lz-prod-projects",
-                                "description"                  : "One-OE Production Workload Environment, Common Projects Compartment",
+                                "description"                  : "Production Workload Environment, Common Projects Compartment",
 
                                 "children": {
                                     "CMP-LZ-PROD-PROJ1-KEY": {
                                         "name"                 : "cmp-lz-prod-proj1",
-                                        "description"          : "Production environment, Project 1 Compartment"
+                                        "description"          : "Production environment, Project 1 compartment"
                                     }
                                 }
                             },
@@ -121,46 +121,47 @@
 
     "identity_domain_groups_configuration": {
         "default_identity_domain_id"                           : "COMMON-DOMAIN",
+        "ignore_external_membership_updates"                   : true,
 
         "groups": {
             "GRP-AUDITORS-ADMIN-KEY": {
                 "name"                                         : "grp-auditors-admin",
-                "description"                                  : "Tenancy global read access group(for security auditing or health checks)."
+                "description"                                  : "Tenancy-scoped audit and read-only access group."
             },
 
             "GRP-COST-ADMIN-KEY": {
                 "name"                                         : "grp-cost-admin",
-                "description"                                  : "Tenancy global cost control group."
+                "description"                                  : "Tenancy-scoped cost management access group."
             },
 
             "GRP-IAM-ADMIN-KEY": {
                 "name"                                         : "grp-iam-admin",
-                "description"                                  : "Tenancy global Identity and access management administrator group."
+                "description"                                  : "Tenancy-scoped IAM administration access group."
             },
 
             "GRP-LZ-NETWORK-ADMIN-KEY": {
                 "name"                                         : "grp-lz-network-admin",
-                "description"                                  : "One-OE Landing Zone, Shared network administration group, including common OE network elements."
+                "description"                                  : "Landing Zone shared network administration access group."
             },
 
             "GRP-LZ-PREPROD-PROJ1-ADMIN-KEY": {
                 "name"                                         : "grp-lz-preprod-proj1-admin",
-                "description"                                  : "One-OE Landing Zone, Pre-Production environment, Project 1, Administrators."
+                "description"                                  : "Landing Zone Pre-Production environment, Project 1 administration access group."
             },
 
             "GRP-LZ-PROD-PROJ1-ADMIN-KEY": {
                 "name"                                         : "grp-lz-prod-proj1-admin",
-                "description"                                  : "One-OE Landing Zone, Production environment, Project 1, Administrators."
+                "description"                                  : "Landing Zone Production environment, Project 1 administration access group."
             },
 
             "GRP-LZ-SECURITY-ADMIN-KEY": {
                 "name"                                         : "grp-lz-security-admin",
-                "description"                                  : "One-OE Landing Zone, Shared security administration group, including common OE network elements."
+                "description"                                  : "Landing Zone shared security administration access group."
             },
 
             "GRP-SECURITY-ADMIN-KEY": {
                 "name"                                         : "grp-security-admin",
-                "description"                                  : "Tenancy Security Administrators for global resources as Cloud Guard."
+                "description"                                  : "Tenancy-scoped security service administration access group."
             }
         }
     },
@@ -196,7 +197,7 @@
         "supplied_policies": {
             "PCY-AUDITING-ADMIN-KEY": {
                 "name"                                         : "pcy-auditing-admin",
-                "description"                                  : "Allow grp-auditors-admin group users to read all the resources in the tenancy.",
+                "description"                                  : "Grants grp-auditors-admin read-only audit access in the tenancy.",
                 "compartment_id"                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -227,7 +228,7 @@
 
             "PCY-COST-ADMIN-KEY": {
                 "name"                                         : "pcy-cost-admin",
-                "description"                                  : "Allow grp-cost-admin group users to manage all budget resources in the tenancy.",
+                "description"                                  : "Grants grp-cost-admin budget and usage report management access in the tenancy.",
                 "compartment_id"                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -240,7 +241,7 @@
 
             "PCY-GENERIC-ADMIN-KEY": {
                 "name"                                         : "pcy-generic-admin",
-                "description"                                  : "Allow defined groups to use generic services.",
+                "description"                                  : "Grants defined administration groups shared service usage in the tenancy.",
                 "compartment_id"                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -255,7 +256,7 @@
 
             "PCY-IAM-ADMIN-KEY": {
                 "name"                                         : "pcy-iam-admin",
-                "description"                                  : "Allow grp-iam-admin group users to manage IAM resources in the tenancy.",
+                "description"                                  : "Grants grp-iam-admin IAM administration access in the tenancy.",
                 "compartment_id"                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -277,7 +278,7 @@
 
             "PCY-LZ-NETWORK-ADMIN-KEY": {
                 "name"                                         : "pcy-lz-network-admin",
-                "description"                                  : "Allow grp-lz-network-admin group users to manage all network resources in the child compartments of cmp-landingzone with the matching tags.",
+                "description"                                  : "Grants grp-lz-network-admin network administration access in Landing Zone child compartments tagged for network administration.",
                 "compartment_id"                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -314,7 +315,7 @@
 
             "PCY-LZ-PREPROD-PROJ1-ADMIN-KEY": {
                 "name"                                         : "pcy-lz-preprod-proj1-admin",
-                "description"                                  : "Allow grp-lz-preprod-proj1-admin group to manage their dedicated project 1 compartment",
+                "description"                                  : "Grants grp-lz-preprod-proj1-admin administration access in the Project 1 compartment in the Pre-Production environment.",
                 "compartment_id"                               : "CMP-LZ-PREPROD-PROJ1-KEY",
 
                 "statements": [
@@ -354,7 +355,7 @@
 
             "PCY-LZ-PREPROD-PROJ1-ADMIN-NET-KEY": {
                 "name"                                         : "pcy-lz-preprod-proj1-admin-net",
-                "description"                                  : "Allow grp-lz-preprod-proj1-admin group to use shared network resources",
+                "description"                                  : "Grants grp-lz-preprod-proj1-admin shared network resource usage in the Pre-Production environment network compartment.",
                 "compartment_id"                               : "CMP-LZ-PREPROD-NETWORK-KEY",
 
                 "statements": [
@@ -367,7 +368,7 @@
 
             "PCY-LZ-PREPROD-PROJ1-ADMIN-SEC-KEY": {
                 "name"                                         : "pcy-lz-preprod-proj1-admin-sec",
-                "description"                                  : "Allow grp-lz-preprod-proj1-admin group to use shared security resources",
+                "description"                                  : "Grants grp-lz-preprod-proj1-admin shared security resource usage in the Pre-Production environment security compartment.",
                 "compartment_id"                               : "CMP-LZ-PREPROD-SECURITY-KEY",
 
                 "statements": [
@@ -382,7 +383,7 @@
 
             "PCY-LZ-PROD-PROJ1-ADMIN-KEY": {
                 "name"                                         : "pcy-lz-prod-proj1-admin",
-                "description"                                  : "Allow grp-lz-prod-proj1-admin group to manage their dedicated project 1 compartment",
+                "description"                                  : "Grants grp-lz-prod-proj1-admin administration access in the Project 1 compartment in the Production environment.",
                 "compartment_id"                               : "CMP-LZ-PROD-PROJ1-KEY",
 
                 "statements": [
@@ -422,7 +423,7 @@
 
             "PCY-LZ-PROD-PROJ1-ADMIN-NET-KEY": {
                 "name"                                         : "pcy-lz-prod-proj1-admin-net",
-                "description"                                  : "Allow grp-lz-prod-proj1-admin group to use shared network resources",
+                "description"                                  : "Grants grp-lz-prod-proj1-admin shared network resource usage in the Production environment network compartment.",
                 "compartment_id"                               : "CMP-LZ-PROD-NETWORK-KEY",
 
                 "statements": [
@@ -435,7 +436,7 @@
 
             "PCY-LZ-PROD-PROJ1-ADMIN-SEC-KEY": {
                 "name"                                         : "pcy-lz-prod-proj1-admin-sec",
-                "description"                                  : "Allow grp-lz-prod-proj1-admin group to use shared security resources",
+                "description"                                  : "Grants grp-lz-prod-proj1-admin shared security resource usage in the Production environment security compartment.",
                 "compartment_id"                               : "CMP-LZ-PROD-SECURITY-KEY",
 
                 "statements": [
@@ -450,7 +451,7 @@
 
             "PCY-LZ-SECURITY-ADMIN-KEY": {
                 "name"                                         : "pcy-lz-security-admin",
-                "description"                                  : "Allow grp-security-admin group users to manage all security resources in the child compartments of cmp-landingzone with the matching tags.",
+                "description"                                  : "Grants grp-lz-security-admin security administration access in Landing Zone child compartments tagged for security administration.",
                 "compartment_id"                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
@@ -499,7 +500,7 @@
 
             "PCY-SECURITY-ADMIN-KEY": {
                 "name"                                         : "pcy-security-admin",
-                "description"                                  : "Allow grp-security-admin group users to manage all security resources in the security compartment.",
+                "description"                                  : "Grants grp-security-admin security service administration access in the tenancy.",
                 "compartment_id"                               : "TENANCY-ROOT",
 
                 "statements": [
@@ -511,7 +512,7 @@
 
             "PCY-SERVICES-ADMIN-KEY": {
                 "name"                                         : "pcy-services-admin",
-                "description"                                  : "Policy for all supported services in the tenancy.",
+                "description"                                  : "Grants supported OCI services required Landing Zone service access in the tenancy.",
                 "compartment_id"                               : "TENANCY-ROOT",
 
                 "statements": [

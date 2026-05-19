@@ -42,7 +42,10 @@
 - [**7. Governance Resources**](#7-governance-resources)
   - [**7.1 Tag Namespaces**](#71-tag-namespaces)
   - [**7.2 Tags**](#72-tags)
-- [**8. List of Resource Types**](#8-list-of-resource-types)
+- [**8. OKE Resources**](#8-oke-resources)
+  - [**8.1 OKE Clusters**](#81-oke-clusters)
+  - [**8.2 OKE Node Pools**](#82-oke-node-pools)
+- [**9. List of Resource Types**](#9-list-of-resource-types)
 
 &nbsp; 
 
@@ -53,7 +56,7 @@ A resource naming convention helps to identify resources, their type, and locati
 1. **Segmented Names**: Segments of the name are separated by "-". Within a name segment do not use &lt;space&gt; and ".".
 2. **Intuitive Names**: Where possible intuitive/standard abbreviations should be considered. Use simple rules such as "p" for production, or "pp" for pre-production, for a clear identification of the resource scope.
 3. **Intuitive Grouping**: Use the technical scope (e.g., production environment) and functional scope (e.g., LoB, Department) to aggregate resources and resource groups.
-4. **Intuitive Hierarchy**: Compartment names should reflect their hierarchy (environment -&gt; projects -&gt; workload layer).
+4. **Intuitive Hierarchy**: Compartment hierarchy may use container compartments, while nested workload compartment names should reflect the environment and workload directly.
 
 &nbsp; 
 
@@ -126,6 +129,8 @@ One-OE Example:\
 #### Naming Convention
 cmp-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;workload&gt;
 
+Nested workload compartment names use the workload name directly, even when the compartment lives under a `project` or `platform` container. Do not add `project` or `platform` as an extra naming segment unless that word is the workload name itself.
+
 #### Examples
 | Name | Short Name | Object Name | Description |
 |---|---|---|---|
@@ -135,6 +140,7 @@ cmp-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;workload&gt;
 | cmp-lz-project || CMP-LZ-PROJECT-KEY | Project | 
 | cmp-lz-prod || CMP-LZ-PROD-KEY | Production Environment | 
 | cmp-lz-preprod || CMP-LZ-PREPROD-KEY | Pre-Production Environment | 
+| cmp-lz-prod-oke || CMP-LZ-PROD-OKE-KEY | Production Environment OKE Workload |
 | cmp-lz-prod-proj1 || CMP-LZ-PROD-PROJ1-KEY | Production Environment "proj1" Workload | 
 | cmp-landingzonenp | cmp-lznp-… | CMP-LANDINGZONENP-KEY | Enclosing (Non-Production) | 
 
@@ -529,7 +535,31 @@ tag-&lt;landing_zone&gt;-&lt;tag_type&gt;
 
 &nbsp;
 
-## 8. List of Resource Types
+## 8. OKE Resources
+
+### 8.1 OKE Clusters
+
+#### Naming Convention
+clr-&lt;region&gt;-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;workload&gt;
+
+#### Examples
+| Name | Object Name | Description |
+|---|---|---|
+| clr-fra-lz-prod-oke | CLR-FRA-LZ-PROD-OKE-KEY | Production OKE cluster |
+
+### 8.2 OKE Node Pools
+
+#### Naming Convention
+ndp-&lt;region&gt;-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;workload&gt;
+
+#### Examples
+| Name | Object Name | Description |
+|---|---|---|
+| ndp-fra-lz-prod-oke | NDP-FRA-LZ-PROD-OKE-KEY | Production OKE node pool |
+
+&nbsp;
+
+## 9. List of Resource Types
 
 | RESOURCE TYPE  |  ABREVIATION | 
 |---|---|
@@ -597,6 +627,8 @@ tag-&lt;landing_zone&gt;-&lt;tag_type&gt;
 | Managed key | key |
 | OCI Function Application | fn |
 | Object Storage Bucket | bkt |
+| OKE Cluster | clr |
+| OKE Node Pool | ndp |
 | Policy | pcy |
 | Routing Table | rt |
 | Secret | sec |

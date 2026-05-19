@@ -1,0 +1,28 @@
+{
+  "hub_a": {
+    "has_route_rules": true,
+    "has_rr_prefixed_keys": true,
+    "non_rr_keys": [
+      "DRGRT-FRA-LZ-SPOKES-STATIC-ROUTE"
+    ],
+    "rt_prefixed_keys": []
+  },
+  "hub_e": {
+    "has_route_rules": true,
+    "has_rr_prefixed_keys": true,
+    "non_rr_keys": [],
+    "rt_prefixed_keys": []
+  },
+  "oke_multi_stack": {
+    "has_route_rules": true,
+    "has_rr_prefixed_keys": true,
+    "non_rr_keys": [],
+    "rt_prefixed_keys": []
+  },
+  "oke_single_stack": {
+    "has_route_rules": true,
+    "has_rr_prefixed_keys": true,
+    "non_rr_keys": [],
+    "rt_prefixed_keys": []
+  }
+}

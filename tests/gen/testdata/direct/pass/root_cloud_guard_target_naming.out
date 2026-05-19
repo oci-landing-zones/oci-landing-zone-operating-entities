@@ -1,0 +1,14 @@
+{
+  "oke_single_stack": {
+    "bad_target_names": [],
+    "has_lz_root_key": false,
+    "has_root_key": true,
+    "root_name": "cg-tgt-root"
+  },
+  "oneoe": {
+    "bad_target_names": [],
+    "has_lz_root_key": false,
+    "has_root_key": true,
+    "root_name": "cg-tgt-root"
+  }
+}

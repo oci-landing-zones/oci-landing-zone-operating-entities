@@ -1,33 +1,51 @@
-# **[ExaDB-C@C Landing Zone Extension](#)**   <!-- omit from toc -->
-## **An OCI Open LZ [Workload Extensions](#) to Reduce Your Time-to-Production** <!-- omit from toc -->
+# ExaDB-C@C WE Set-up <!-- omit from toc -->
 
- <img src="../../commons/images/icon_exacc.jpg" height="100">
-&nbsp; 
+## **Table of Contents** <!-- omit from toc -->
 
-## **1. Introduction**
-Welcome to the **ExaDB-C@C Landing Zone Extension**.
+- [**1. Summary**](#1-summary)
+- [**2. Design Overview**](#2-design-overview)
+- [**3. Deployment Options**](#3-deployment-options)
 
-The ExaDB-C@C Landing Zone Extension is a secure cloud environment, designed with the best practices to simplify the on-boarding of [ExaDB-C@C workloads](https://www.oracle.com/es/engineered-systems/exadata/cloud-at-customer/) and enable the continuous operations of their cloud resources. This reference architecture provides an automated landing zone configuration.
+&nbsp;
+
+## **1. Summary**
+
+Welcome to the ExaDB-C@C Landing Zone Workload Extension (WE).
+
+The ExaDB-C@C Landing Zone Workload Extension is a secure cloud environment, designed with the best practices to simplify the on-boarding of ExaDB-C@C workloads and enable the continuous operations of their cloud resources. This reference architecture provides an automated landing zone configuration.
+
 &nbsp;
 
 ## **2. Design Overview**
-This workload extension uses a simplified version of the [One-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe) Blueprint as the reference Landing Zone and guides the deployment of ExaDB-C@C on top of it. You could use this extension also in the other Operating Entities blueprints, as the [Multi-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/multi-oe) Blueprint or the [Multi-Tenancy](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/multi-tenancy) Blueprint.
+This workload extension uses the [One-OE](../../blueprints/one-oe/) Blueprint as the reference Landing Zone and guides the deployment of ExaDB-C@C on top of it. The extension includes a base infrastructure layer that provisions the required OCI resources for deploying ExaDB-C@C. The ExaDB-C@C extension is networkless and does not deploy VCNs, subnets, route tables, or other network resources.
 
-A Worklod extension satisfies the requirements to deploy a specific, complex workload, providing design guidelines about where to deploy the workload in a pre-existing baseline Landing Zone.
+The extension covers three ExaDB-C@C Use Cases (UCs):
 
-&nbsp;
+1. **Use Case 1 (UC1): Shared ExaDB-C@C Platform**: Shared infrastructure and shared VMCs/AVMCs across multiple environments.
+2. **Use Case 2 (UC2): Hybrid ExaDB-C@C Platform**: Shared infrastructure with dedicated VMCs/AVMCs per environment.
+3. **Use Case 3 (UC3): Dedicated ExaDB-C@C Platform**: Fully dedicated infrastructure and VMCs/AVMCs per environment.
 
-## **3. Deployment**
+Published generated artifacts currently support Use Case 1 (UC1), the shared model. Use Case 2 (UC2), the hybrid model, and Use Case 3 (UC3), the dedicated model, are retained as design guidance and require config-driven generation before use.
 
-These are the required steps to provision the ExaDB-C@C landing zone extension:
-
- 1. It's required to already have deployed an OCI Landing Zone. In this guide we will build on top of the [One-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe) Landing Zone without any network.
- 2. **Deploy** the Landing Zone ExaDB-C@C requirements with the [**Step 1 - ExaDB-C@C Extension**](1_exacc_extension/) guide.
- 3. **Use** the **ExaDB-C@C Use Cases** to guide your deployment following [**Step 2 - ExaDB-C@C Use Cases**](2_exacc_use_cases/).
+If you have not reviewed it yet, we recommend checking the [ExaDB-C@C use cases section](./exacc_use_cases/readme.md) to better understand the available scenarios and identify the one that best fits your needs.
 
 &nbsp;
 
-## License <!-- omit from toc -->
+## **3. Deployment Options**
+&nbsp;
+
+| When to use it / Use Case  | POC or one-shot reference deployment | Extension of an existing Landing Zone or Modular IaC Model. |
+|---|---|---|
+| Use Case 1 (UC1): Shared ExaDB-C@C Platform<br><br><img src="./content/uc1.png" width="220"> | Use when deploying a new One-OE foundation and the shared ExaDB-C@C platform together in one deployable set without VCN/network resources. Published Use Case 1 artifacts are available in the [single-stack](./single-stack/readme.md) folder. | Use when extending an existing One-OE landing zone with the shared ExaDB-C@C platform. Published Use Case 1 artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. The extension adds IAM and observability only; it does not include network configuration files. |
+| Use Case 2 (UC2): Hybrid ExaDB-C@C Platform<br><br><img src="./content/uc2.png" width="220"> | [Config-driven generation required](../../commons/content/config-driven.md) | [Config-driven generation required](../../commons/content/config-driven.md) |
+| Use Case 3 (UC3): Dedicated ExaDB-C@C Platform<br><br><img src="./content/uc3.png" width="220"> | [Config-driven generation required](../../commons/content/config-driven.md) | [Config-driven generation required](../../commons/content/config-driven.md) |
+
+&nbsp;
+
+This Landing Zone Extension provides **two deployment approaches**, single-stack and multi-stack, to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator).
+
+&nbsp;
+# License <!-- omit from toc -->
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 

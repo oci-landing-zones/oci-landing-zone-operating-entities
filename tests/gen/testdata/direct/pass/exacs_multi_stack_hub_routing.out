@@ -1,0 +1,23 @@
+{
+  "hub_a_final_default_target": "DRG-FRA-LZ-HUB-KEY",
+  "hub_a_pre_has_natgw": false,
+  "hub_a_pre_route_keys": [
+    "rr-fra-sgw"
+  ],
+  "hub_e_final_default_target": "NGW-FRA-LZ-SHARED-PLATFORM-EXACS-KEY",
+  "hub_e_final_hub_destination": "10.0.0.0/21",
+  "hub_e_final_prod_destination": "10.0.64.0/21",
+  "hub_e_final_route_keys": [
+    "rr-fra-hub",
+    "rr-fra-natgw",
+    "rr-fra-preprod-projects",
+    "rr-fra-prod-projects",
+    "rr-fra-sgw"
+  ],
+  "hub_e_pre_default_target": "NGW-FRA-LZ-SHARED-PLATFORM-EXACS-KEY",
+  "hub_e_pre_has_natgw": true,
+  "hub_e_pre_route_keys": [
+    "rr-fra-natgw",
+    "rr-fra-sgw"
+  ]
+}

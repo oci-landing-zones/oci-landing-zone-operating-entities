@@ -1,0 +1,14 @@
+{
+  "backend_set_keys": [
+    "LBBKST-FRA-LZ-DEV-01-KEY",
+    "LBBKST-FRA-LZ-DEV-02-KEY"
+  ],
+  "lb_display_name": "lb-fra-lz-dev-01",
+  "lb_key": "LB-FRA-LZ-DEV-01-KEY",
+  "listener_keys": [
+    "LBLSNR-FRA-LZ-DEV-01-KEY"
+  ],
+  "routing_policy_keys": [
+    "LBRT-FRA-LZ-DEV-01-KEY"
+  ]
+}

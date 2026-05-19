@@ -49,7 +49,7 @@ Both approaches deploy these resources:
 - **IAM Configuration**: Compartments, groups, and policies for OKE
 - **Network Infrastructure**: VCN, subnets, NSGs, route tables, service gateway, and DRG attachment
 - **OKE Cluster**: Kubernetes cluster with native pod networking (v1.35.2)
-- **Worker Nodes**: Compute instances for running workloads (VM.Standard.E4.Flex)
+- **Worker Nodes**: Compute instances for running workloads (VM.Standard.E5.Flex, Oracle Linux 8.10)
 
 &nbsp;
 

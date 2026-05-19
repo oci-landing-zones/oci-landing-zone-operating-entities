@@ -1,0 +1,4 @@
+interface:
+  display_name: "OCI LZ Contract Advisor"
+  short_description: "Verify Orchestrator, RMS, dependencies, outputs, stack boundaries, and runtime failures"
+  default_prompt: "Use $oci-lz-orchestrator-contract-advisor to verify OCI Landing Zone Orchestrator or Resource Manager runtime behavior, including dependency files, output files, stack boundaries, source settings, duplicate config collisions, provider failures, and version drift."

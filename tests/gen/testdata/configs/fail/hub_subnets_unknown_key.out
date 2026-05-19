@@ -1,0 +1,1 @@
+config.hub.network.subnets for hub_b has unsupported keys: firewall. Allowed: lb, fw, mgmt, mon, dns

@@ -74,7 +74,7 @@
                                 "security_list_keys"                      : ["SL-FRA-LZ-HUB-MGMT-KEY"]
                             },
 
-                            "SN-FRA-LZ-HUB-DNS": {
+                            "SN-FRA-LZ-HUB-DNS-KEY": {
                                 "display_name"                            : "sn-fra-lz-hub-dns",
                                 "cidr_block"                              : "10.0.5.0/24",
                                 "dns_label"                               : "snfrahubdns",
@@ -91,22 +91,22 @@
                                 "display_name"                            : "rt-fra-lz-hub-ingress",
 
                                 "route_rules": {
-                                    "rt-internet": {
+                                    "rr-fra-internet": {
                                         "description"                     : "Route to the Internet through the Internal OCI Network Firewall",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
                                     },
 
-                                    "rt-fra-prod-projects": {
-                                        "description"                     : "Route to VCN Prod Projects through the Internal OCI Network Firewall",
+                                    "rr-fra-prod-projects": {
+                                        "description"                     : "Route to VCN Prod Projects through Internal OCI Network Firewall",
                                         "destination"                     : "10.0.64.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
                                     },
 
-                                    "rt-fra-preprod-projects": {
-                                        "description"                     : "Route to VCN PreProd Projects through the Internal OCI Network Firewall",
+                                    "rr-fra-preprod-projects": {
+                                        "description"                     : "Route to VCN PreProd Projects through Internal OCI Network Firewall",
                                         "destination"                     : "10.0.128.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
@@ -118,21 +118,21 @@
                                 "display_name"                            : "rt-fra-lz-hub-lb",
 
                                 "route_rules": {
-                                    "rt-internet": {
+                                    "rr-fra-internet": {
                                         "description"                     : "Route to the Internet through the DMZ Firewall",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_id"               : "DMZ OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.vrdnynvr..."
                                     },
 
-                                    "rt-fra-prod-projects": {
+                                    "rr-fra-prod-projects": {
                                         "description"                     : "Route to VCN Prod Projects through DRG",
                                         "destination"                     : "10.0.64.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rt-fra-preprod-projects": {
+                                    "rr-fra-preprod-projects": {
                                         "description"                     : "Route to VCN PreProd Projects through DRG",
                                         "destination"                     : "10.0.128.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
@@ -145,7 +145,7 @@
                                 "display_name"                            : "rt-fra-lz-hub-fw-dmz",
 
                                 "route_rules": {
-                                    "rt-igw": {
+                                    "rr-fra-igw": {
                                         "description"                     : "Route to the Internet through Internet GW",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
@@ -158,21 +158,21 @@
                                 "display_name"                            : "rt-fra-lz-hub-fw-int",
 
                                 "route_rules": {
-                                    "rt-natgw": {
+                                    "rr-fra-natgw": {
                                         "description"                     : "Route to Internet through NAT GW",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_key"              : "NGW-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rt-fra-prod-projects": {
+                                    "rr-fra-prod-projects": {
                                         "description"                     : "Route to VCN Prod Projects through DRG",
                                         "destination"                     : "10.0.64.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rt-fra-preprod-projects": {
+                                    "rr-fra-preprod-projects": {
                                         "description"                     : "Route to VCN PreProd Projects through DRG",
                                         "destination"                     : "10.0.128.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
@@ -185,35 +185,35 @@
                                 "display_name"                            : "rt-fra-lz-hub-natgw",
 
                                 "route_rules": {
-                                    "rt-vcn-fra-hub-mgmt-sn": {
+                                    "rr-vcn-fra-hub-mgmt-sn": {
                                         "description"                     : "Route to mgmt subnet in Hub VCN through Internal OCI Network Firewall",
                                         "destination"                     : "10.0.3.0/24",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
                                     },
 
-                                    "rt-vcn-fra-hub-logs-sn": {
+                                    "rr-vcn-fra-hub-mon-sn": {
                                         "description"                     : "Route to mon subnet in Hub VCN through Internal OCI Network Firewall",
                                         "destination"                     : "10.0.4.0/24",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
                                     },
 
-                                    "rt-vcn-fra-hub-dns-sn": {
+                                    "rr-vcn-fra-hub-dns-sn": {
                                         "description"                     : "Route to dns subnet in Hub VCN through Internal OCI Network Firewall",
                                         "destination"                     : "10.0.5.0/24",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
                                     },
 
-                                    "rt-fra-prod-projects": {
+                                    "rr-fra-prod-projects": {
                                         "description"                     : "Route to VCN Prod Projects through Internal OCI Network Firewall",
                                         "destination"                     : "10.0.64.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
                                     },
 
-                                    "rt-fra-preprod-projects": {
+                                    "rr-fra-preprod-projects": {
                                         "description"                     : "Route to VCN PreProd Projects through Internal OCI Network Firewall",
                                         "destination"                     : "10.0.128.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
@@ -226,7 +226,7 @@
                                 "display_name"                            : "rt-fra-lz-hub-igw",
 
                                 "route_rules": {
-                                    "rt-vcn-fra-hub-lb-sn": {
+                                    "rr-vcn-fra-hub-lb-sn": {
                                         "description"                     : "Route to lb subnet in Hub VCN through DMZ OCI Network Firewall",
                                         "destination"                     : "10.0.1.0/24",
                                         "destination_type"                : "CIDR_BLOCK",
@@ -239,28 +239,28 @@
                                 "display_name"                            : "rt-fra-lz-hub-mgmt",
 
                                 "route_rules": {
-                                    "rt-internet": {
+                                    "rr-fra-internet": {
                                         "description"                     : "Route to the Internet through the Internal OCI Network Firewall",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
                                     },
 
-                                    "rt-fra-prod-projects": {
+                                    "rr-fra-prod-projects": {
                                         "description"                     : "Route to VCN Prod Projects through DRG",
                                         "destination"                     : "10.0.64.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rt-fra-preprod-projects": {
+                                    "rr-fra-preprod-projects": {
                                         "description"                     : "Route to VCN PreProd Projects through DRG",
                                         "destination"                     : "10.0.128.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rt-sgw": {
+                                    "rr-fra-sgw": {
                                         "description"                     : "Route to Oracle Services Network through Service GW",
                                         "destination"                     : "all-services",
                                         "destination_type"                : "SERVICE_CIDR_BLOCK",
@@ -299,7 +299,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -333,7 +333,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -367,7 +367,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -400,7 +400,7 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
                                         "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -454,7 +454,7 @@
                                         "stateless"                       : false
                                     },
 
-                                    "http_443": {
+                                    "https_443": {
                                         "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTPS",
                                         "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
@@ -498,7 +498,7 @@
                                         "stateless"                       : false
                                     },
 
-                                    "http_443": {
+                                    "https_443": {
                                         "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTPS",
                                         "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
@@ -511,7 +511,7 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "TCP",
@@ -545,7 +545,7 @@
                                     },
 
                                     "from_prod_icmp": {
-                                        "description"                     : "Allow ICMP type 8 (Echo) from Prod VCN ",
+                                        "description"                     : "Allow ICMP type 8 (Echo) from Prod VCN",
                                         "src"                             : "10.0.64.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -575,7 +575,7 @@
                                     },
 
                                     "from_preprod_icmp": {
-                                        "description"                     : "Allow ICMP type 8 (Echo) from PreProd VCN ",
+                                        "description"                     : "Allow ICMP type 8 (Echo) from PreProd VCN",
                                         "src"                             : "10.0.128.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
@@ -677,7 +677,7 @@
                                             }
                                         },
 
-                                        "ROUTE-TO-VCN-NONPROD-KEY": {
+                                        "ROUTE-TO-VCN-PREPROD-KEY": {
                                             "action"                      : "ACCEPT",
                                             "priority"                    : 20,
 
@@ -1076,7 +1076,7 @@
                             "SN-FRA-LZ-PROD-INFRA-KEY": {
                                 "display_name"                            : "sn-fra-lz-prod-infra",
                                 "cidr_block"                              : "10.0.67.0/24",
-                                "dns_label"                               : "snfralzpinfr",
+                                "dns_label"                               : "snfralzpinfra",
                                 "dhcp_options_key"                        : "default_dhcp_options",
                                 "prohibit_internet_ingress"               : true,
                                 "prohibit_public_ip_on_vnic"              : true,
@@ -1090,14 +1090,14 @@
                                 "display_name"                            : "rt-fra-lz-prod-proj-generic",
 
                                 "route_rules": {
-                                    "drg_route": {
+                                    "rr-fra-drg": {
                                         "description"                     : "Route to the 0.0.0.0/0 through DRG",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "sgw_route": {
+                                    "rr-fra-sgw": {
                                         "description"                     : "Route to Oracle Services Network through Service GW",
                                         "destination"                     : "all-services",
                                         "destination_type"                : "SERVICE_CIDR_BLOCK",
@@ -1255,7 +1255,7 @@
                                     },
 
                                     "https_443": {
-                                        "description"                     : "Allow inbound traffic from Hub LB subnet over over HTTPS",
+                                        "description"                     : "Allow inbound traffic from Hub LB subnet over HTTPS",
                                         "src"                             : "10.0.1.0/24",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "dst_port_min"                    : 443,
@@ -1350,7 +1350,7 @@
                             "SN-FRA-LZ-PREPROD-INFRA-KEY": {
                                 "display_name"                            : "sn-fra-lz-preprod-infra",
                                 "cidr_block"                              : "10.0.131.0/24",
-                                "dns_label"                               : "snfralzppinfr",
+                                "dns_label"                               : "snfralzppinfra",
                                 "dhcp_options_key"                        : "default_dhcp_options",
                                 "prohibit_internet_ingress"               : true,
                                 "prohibit_public_ip_on_vnic"              : true,
@@ -1364,14 +1364,14 @@
                                 "display_name"                            : "rt-fra-lz-preprod-proj-generic",
 
                                 "route_rules": {
-                                    "drg_route": {
+                                    "rr-fra-drg": {
                                         "description"                     : "Route to the 0.0.0.0/0 through DRG",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
                                         "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "sgw_route": {
+                                    "rr-fra-sgw": {
                                         "description"                     : "Route to Oracle Services Network through Service GW",
                                         "destination"                     : "all-services",
                                         "destination_type"                : "SERVICE_CIDR_BLOCK",
@@ -1455,7 +1455,7 @@
                                     },
 
                                     "https_443": {
-                                        "description"                     : "Allow inbound traffic from Hub LB subnet over over HTTPS",
+                                        "description"                     : "Allow inbound traffic from Hub LB subnet over HTTPS",
                                         "src"                             : "10.0.1.0/24",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "dst_port_min"                    : 443,

@@ -1,0 +1,16 @@
+{
+  "explicit_extension_subnets_passthrough": {
+    "cidr": "10.0.96.0/24",
+    "subnets": {
+      "app": "10.0.96.0/25",
+      "db": "10.0.96.128/25"
+    }
+  },
+  "explicit_metadata_and_render_phases": {
+    "cidr": "10.0.96.0/24",
+    "subnets": {
+      "app": "10.0.96.0/25",
+      "db": "10.0.96.128/25"
+    }
+  }
+}
