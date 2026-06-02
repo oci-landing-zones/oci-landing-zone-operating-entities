@@ -25,7 +25,7 @@ The extension covers three ExaDB-C@C Use Cases (UCs):
 2. **Use Case 2 (UC2): Hybrid ExaDB-C@C Platform**: Shared infrastructure with dedicated VMCs/AVMCs per environment.
 3. **Use Case 3 (UC3): Dedicated ExaDB-C@C Platform**: Fully dedicated infrastructure and VMCs/AVMCs per environment.
 
-Published generated artifacts currently support Use Case 1 (UC1), the shared model. Use Case 2 (UC2), the hybrid model, and Use Case 3 (UC3), the dedicated model, are retained as design guidance and require config-driven generation before use.
+Published generated artifacts currently support Use Case 1 (UC1), Use Case 2 (UC2), and Use Case 3 (UC3) for both single-stack and multi-stack deployment.
 
 If you have not reviewed it yet, we recommend checking the [ExaDB-C@C use cases section](./exacc_use_cases/readme.md) to better understand the available scenarios and identify the one that best fits your needs.
 
@@ -37,8 +37,8 @@ If you have not reviewed it yet, we recommend checking the [ExaDB-C@C use cases 
 | When to use it / Use Case  | POC or one-shot reference deployment | Extension of an existing Landing Zone or Modular IaC Model. |
 |---|---|---|
 | Use Case 1 (UC1): Shared ExaDB-C@C Platform<br><br><img src="./content/uc1.png" width="220"> | Use when deploying a new One-OE foundation and the shared ExaDB-C@C platform together in one deployable set without VCN/network resources. Published Use Case 1 artifacts are available in the [single-stack](./single-stack/readme.md) folder. | Use when extending an existing One-OE landing zone with the shared ExaDB-C@C platform. Published Use Case 1 artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. The extension adds IAM and observability only; it does not include network configuration files. |
-| Use Case 2 (UC2): Hybrid ExaDB-C@C Platform<br><br><img src="./content/uc2.png" width="220"> | [Config-driven generation required](../../commons/content/config-driven.md) | [Config-driven generation required](../../commons/content/config-driven.md) |
-| Use Case 3 (UC3): Dedicated ExaDB-C@C Platform<br><br><img src="./content/uc3.png" width="220"> | [Config-driven generation required](../../commons/content/config-driven.md) | [Config-driven generation required](../../commons/content/config-driven.md) |
+| Use Case 2 (UC2): Hybrid ExaDB-C@C Platform<br><br><img src="./content/uc2.png" width="220"> | Use when deploying a new One-OE foundation with shared ExaDB-C@C infrastructure and environment-specific VMCs/AVMCs. Published Use Case 2 artifacts are available in the [single-stack](./single-stack/readme.md) folder. | Use when extending an existing One-OE landing zone with shared ExaDB-C@C infrastructure and dedicated environment-level database platform scopes. Published Use Case 2 artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. |
+| Use Case 3 (UC3): Dedicated ExaDB-C@C Platform<br><br><img src="./content/uc3.png" width="220"> | Use when deploying a new One-OE foundation where each environment has its own ExaDB-C@C infrastructure and VMCs/AVMCs. Published Use Case 3 artifacts are available in the [single-stack](./single-stack/readme.md) folder. | Use when extending an existing One-OE landing zone with fully environment-dedicated ExaDB-C@C platform scopes. Published Use Case 3 artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. |
 
 &nbsp;
 

@@ -254,12 +254,35 @@ local collections = import 'lib/collections.libsonnet';
         for entry in extension_entries
         if entry.platform_config.extension.type == ext_type && entry.scope.scope_type == 'shared'
       ]) > 0;
+    local publication_components(entry) =
+      if std.objectHas(entry.platform_config, 'publication_components') then
+        local components = entry.platform_config.publication_components;
+        assert std.type(components) == 'object' :
+               'Platform %s/%s publication_components must be an object' % [
+                 entry.scope.scope_name,
+                 entry.scope.platform_name,
+               ];
+        assert std.objectHas(components, 'infrastructure') && std.objectHas(components, 'database') :
+               'Platform %s/%s publication_components must define infrastructure and database' % [
+                 entry.scope.scope_name,
+                 entry.scope.platform_name,
+               ];
+        assert std.type(components.infrastructure) == 'boolean' &&
+               std.type(components.database) == 'boolean' :
+               'Platform %s/%s publication_components values must be boolean' % [
+                 entry.scope.scope_name,
+                 entry.scope.platform_name,
+               ];
+        components
+      else null;
     local entry_components(entry) =
       local ext_type = entry.platform_config.extension.type;
       local project_db_only =
         ext_type == 'exacs' && has_project_db(entry) && !has_network(entry);
+      local explicit_components = publication_components(entry);
       local inferred =
-        if ext_type != 'exacs' then component_defaults
+        if explicit_components != null then explicit_components
+        else if ext_type != 'exacs' then component_defaults
         else {
           infrastructure:
             entry.scope.scope_type == 'shared' ||
@@ -301,6 +324,7 @@ local collections = import 'lib/collections.libsonnet';
           scope_config+: {
             extension_components: extension_components,
             extension_entry_components: entry_components(entry),
+            extension_entry_uses_publication_components: publication_components(entry) != null,
             extension_has_networks: extension_has_networks,
           },
         };

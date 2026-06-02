@@ -23,13 +23,13 @@
   - [**4.3 Software Images**](#43-software-images)
   - [**4.4 Backup Destinations**](#44-backup-destinations)
 
-Published generated artifacts currently support Use Case 1 (UC1), the shared ExaDB-C@C platform. Use Case 2 (UC2), the hybrid ExaDB-C@C platform, and Use Case 3 (UC3), the dedicated ExaDB-C@C platform, are retained as design guidance and require config-driven generation before use.
+Published generated artifacts currently support Use Case 1 (UC1), Use Case 2 (UC2), and Use Case 3 (UC3) for both single-stack and multi-stack deployment.
 
 ## **1. Summary**
 
 The ExaDB-C@C infrastructure is a platform designed for large-scale Oracle Database consolidation. A single infrastructure can support multiple Virtual Machine Clusters (VMCs) and Autonomous Virtual Machine Clusters (AVMCs), which may be shared or dedicated across different workload environments, operating entities, organizational units, lines of business, departments, and more.
 
-In this Landing Zone Workload Extension, we provide examples of common scenarios that customers typically encounter, along with guidance on how the available templates can be used to implement solutions tailored to specific requirements.
+In this Landing Zone Workload Extension, we provide examples of common scenarios that customers typically encounter, along with guidance on how the available published artifacts and config-driven generation can be used to implement solutions tailored to specific requirements.
 
 This section is intended to guide you through several of these scenarios.
 

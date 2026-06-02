@@ -22,6 +22,12 @@ local products = import '../../exadb/products.libsonnet';
 
     local tag_key = 'tagns-lz-role.tag-lz-role';
     local product = products.exacc;
+    local entry_components(entry) =
+      local inferred_components =
+        if std.objectHas(entry.platform_config, 'publication_components') then
+          entry.platform_config.publication_components
+        else null;
+      exadb_project_db.normalize_components(product, entry.platform_config.extension.params, inferred_components);
     local platform_db_key(scope) =
       exadb_project_db.platform_db_key(product, n, scope);
     local platform_compartments = exadb_project_db.flat_platform_compartments({
@@ -39,9 +45,19 @@ local products = import '../../exadb/products.libsonnet';
       tag_key: tag_key,
     });
 
-    local shared_entries = [entry for entry in exacc_entries if entry.scope.scope_type == 'shared'];
+    local db_entries = [
+      entry
+      for entry in exacc_entries
+      if entry_components(entry).database
+    ];
+    local shared_db_entries = [
+      entry
+      for entry in db_entries
+      if entry.scope.scope_type == 'shared'
+    ];
     local default_alarm_compartment =
-      if std.length(shared_entries) > 0 then platform_db_key(shared_entries[0].scope)
+      if std.length(shared_db_entries) > 0 then platform_db_key(shared_db_entries[0].scope)
+      else if std.length(db_entries) > 0 then platform_db_key(db_entries[0].scope)
       else platform_db_key(exacc_entries[0].scope);
     local security_compartment = n.key_global('CMP', ['SECURITY']);
 

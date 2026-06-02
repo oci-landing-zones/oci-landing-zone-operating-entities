@@ -55,6 +55,7 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
       naming: n,
       descriptions: descriptions,
       scope: scope,
+      scope_config: scope_config,
       model: model,
       notification: notification,
       db_key: exadb_project_db.platform_db_key(product, n, scope),

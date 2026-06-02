@@ -157,7 +157,11 @@ local validation = import '../../lib/validation.libsonnet';
     {
       [entry.scope.compartment_key]: {
         local scope = entry.scope,
-        local components = $.normalize_components(product, entry.platform_config.extension.params),
+        local inferred_components =
+          if std.objectHas(entry.platform_config, 'publication_components') then
+            entry.platform_config.publication_components
+          else null,
+        local components = $.normalize_components(product, entry.platform_config.extension.params, inferred_components),
         name: scope.compartment_name,
         description: descriptions.platform_compartment(scope),
         parent_id: scope.parent_compartment_key,
@@ -223,11 +227,14 @@ local validation = import '../../lib/validation.libsonnet';
       std.objectHas(cfg, 'project_db_compartments') && cfg.project_db_compartments != null;
     if !has_project_db then {}
     else if product.code == 'exacc' then
-      assert scope.scope_type == 'environment' :
-             'exacc project_db_compartments can only be set on environment platforms';
-      assert std.type(cfg.project_db_compartments) == 'array' :
-             'exacc project_db_compartments must be an array';
-      { [scope.scope_name]: cfg.project_db_compartments }
+      if scope.scope_type == 'shared' then
+        assert std.type(cfg.project_db_compartments) == 'object' :
+               'exacc project_db_compartments must be an object when set on shared platforms';
+        cfg.project_db_compartments
+      else
+        assert std.type(cfg.project_db_compartments) == 'array' :
+               'exacc project_db_compartments must be an array when set on environment platforms';
+        { [scope.scope_name]: cfg.project_db_compartments }
     else if product.code == 'exacs' then
       if scope.scope_type == 'shared' then
         assert std.type(cfg.project_db_compartments) == 'object' :

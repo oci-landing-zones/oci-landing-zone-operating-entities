@@ -31,6 +31,23 @@ local env_exacc_platform(projects) = {
   },
 };
 
+local exacc_platform(projects=null, components=null, emails={}) = {
+  [if components != null then 'publication_components']: components,
+  extension: {
+    type: 'exacc',
+    params: {
+      [if projects != null then 'project_db_compartments']: projects,
+      notification_emails: {
+        default: notification_emails.default,
+      } + emails,
+    },
+  },
+};
+
+local infra_only = { infrastructure: true, database: false };
+local db_only = { infrastructure: false, database: true };
+local infra_and_db = { infrastructure: true, database: true };
+
 local exacc_no_network_base = {
   region: 'eu-frankfurt-1',
   region_short_name: 'fra',
@@ -66,6 +83,74 @@ local exacc_no_network_base = {
       preprod+: {
         platforms+: {
           exacc: env_exacc_platform(['proj1']),
+        },
+      },
+    },
+  },
+
+  hub_e_prod_preprod_exacc_uc1_config: self.hub_e_prod_preprod_exacc_config,
+
+  hub_e_prod_preprod_exacc_uc2_config: exacc_no_network_base {
+    shared_platforms: {
+      exacc: exacc_platform(
+        components=infra_only,
+        emails={ infra_workloads: notification_emails.infra_workloads }
+      ),
+    },
+    environments+: {
+      prod+: {
+        platforms+: {
+          exacc: exacc_platform(
+            projects=['proj1'],
+            components=db_only,
+            emails={
+              db_workloads: notification_emails.db_workloads,
+              projects: notification_emails.projects,
+            }
+          ),
+        },
+      },
+      preprod+: {
+        platforms+: {
+          exacc: exacc_platform(
+            projects=['proj1'],
+            components=db_only,
+            emails={
+              db_workloads: notification_emails.db_workloads,
+              projects: notification_emails.projects,
+            }
+          ),
+        },
+      },
+    },
+  },
+
+  hub_e_prod_preprod_exacc_uc3_config: exacc_no_network_base {
+    environments+: {
+      prod+: {
+        platforms+: {
+          exacc: exacc_platform(
+            projects=['proj1'],
+            components=infra_and_db,
+            emails={
+              infra_workloads: notification_emails.infra_workloads,
+              db_workloads: notification_emails.db_workloads,
+              projects: notification_emails.projects,
+            }
+          ),
+        },
+      },
+      preprod+: {
+        platforms+: {
+          exacc: exacc_platform(
+            projects=['proj1'],
+            components=infra_and_db,
+            emails={
+              infra_workloads: notification_emails.infra_workloads,
+              db_workloads: notification_emails.db_workloads,
+              projects: notification_emails.projects,
+            }
+          ),
         },
       },
     },
