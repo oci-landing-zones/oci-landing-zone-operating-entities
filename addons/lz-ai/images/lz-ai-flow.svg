@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">Landing Zone AI guidance flow</title>
+  <desc id="desc">A concise flow showing design inputs moving through an AI design assistant and Jsonnet guardrails into a reviewed landing zone draft.</desc>
+  <rect width="960" height="360" rx="18" fill="#f8f4ec"/>
+  <rect x="28" y="28" width="904" height="304" rx="14" fill="#ffffff" stroke="#e5dfd3"/>
+
+  <text x="60" y="74" fill="#4f3326" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">AI guided landing zone design</text>
+  <text x="60" y="104" fill="#64554a" font-family="Arial, Helvetica, sans-serif" font-size="15">From requirements to reviewed Operating Entities draft through repository backed guardrails</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7a6a5f"/>
+    </marker>
+  </defs>
+
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="64" y="142" width="175" height="112" rx="10" fill="#f3eee6" stroke="#d9cfc2"/>
+    <circle cx="100" cy="178" r="18" fill="#c74634"/>
+    <path d="M91 178 h18 M100 169 v18" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <text x="126" y="172" fill="#4f3326" font-size="18" font-weight="700">Design inputs</text>
+    <text x="86" y="208" fill="#5c514a" font-size="14">Scope, environments</text>
+    <text x="86" y="229" fill="#5c514a" font-size="14">Network, IAM</text>
+
+    <line x1="252" y1="198" x2="328" y2="198" stroke="#7a6a5f" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <rect x="344" y="142" width="175" height="112" rx="10" fill="#eef5f6" stroke="#bfd4d8"/>
+    <circle cx="380" cy="178" r="18" fill="#2d5f6f"/>
+    <path d="M371 181 c5 -14 23 -14 18 0 M376 186 h8" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <text x="406" y="172" fill="#214a56" font-size="18" font-weight="700">AI assistant</text>
+    <text x="366" y="208" fill="#4f6368" font-size="14">Discovery, drafting</text>
+    <text x="366" y="229" fill="#4f6368" font-size="14">Review summaries</text>
+
+    <line x1="532" y1="198" x2="608" y2="198" stroke="#7a6a5f" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <rect x="624" y="142" width="175" height="112" rx="10" fill="#edf4ee" stroke="#bed4c4"/>
+    <circle cx="660" cy="178" r="18" fill="#2e6b4f"/>
+    <path d="M650 178 l8 8 l14 -17" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="686" y="172" fill="#23523d" font-size="18" font-weight="700">Jsonnet guardrails</text>
+    <text x="646" y="208" fill="#4d6656" font-size="14">Structured input</text>
+    <text x="646" y="229" fill="#4d6656" font-size="14">Traceable changes</text>
+
+    <line x1="799" y1="198" x2="858" y2="198" stroke="#7a6a5f" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <rect x="742" y="44" width="150" height="70" rx="8" fill="#fff6df" stroke="#e5b95f"/>
+    <text x="763" y="73" fill="#6b4b16" font-size="15" font-weight="700">Reviewed draft</text>
+    <text x="763" y="94" fill="#6b4b16" font-size="13">Ready for design review</text>
+
+    <rect x="164" y="284" width="632" height="30" rx="15" fill="#4f3326"/>
+    <text x="203" y="304" fill="#ffffff" font-size="14" font-weight="700">Faster discovery</text>
+    <circle cx="345" cy="299" r="3" fill="#e5b95f"/>
+    <text x="370" y="304" fill="#ffffff" font-size="14" font-weight="700">Traceable iterations</text>
+    <circle cx="545" cy="299" r="3" fill="#e5b95f"/>
+    <text x="570" y="304" fill="#ffffff" font-size="14" font-weight="700">Security centered review</text>
+  </g>
+</svg>

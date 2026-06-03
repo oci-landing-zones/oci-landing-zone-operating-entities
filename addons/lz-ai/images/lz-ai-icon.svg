@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Landing Zone AI icon</title>
+  <desc id="desc">A simple landing zone AI guidance icon.</desc>
+  <rect x="8" y="8" width="80" height="80" rx="16" fill="#1f4e79"/>
+  <path d="M24 64h48v8H24z" fill="#ffffff" opacity=".95"/>
+  <path d="M28 56h40L48 28z" fill="#ffffff" opacity=".95"/>
+  <circle cx="48" cy="52" r="7" fill="#1f4e79"/>
+  <path d="M68 20v8m0 8v8m-12-12h8m8 0h8" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+</svg>
