@@ -1409,7 +1409,7 @@
                                         "protocol"                            : "ICMP",
                                         "icmp_type"                           : 3,
                                         "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 ],
 
@@ -1421,7 +1421,7 @@
                                         "protocol"                            : "ICMP",
                                         "icmp_type"                           : 3,
                                         "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 ]
                             },
@@ -1443,7 +1443,7 @@
                                         "protocol"                            : "ICMP",
                                         "icmp_type"                           : 3,
                                         "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 ],
 
@@ -1455,7 +1455,7 @@
                                         "protocol"                            : "ICMP",
                                         "icmp_type"                           : 3,
                                         "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 ]
                             },
@@ -1471,7 +1471,7 @@
                                         "protocol"                            : "ICMP",
                                         "icmp_type"                           : 3,
                                         "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 ],
 
@@ -1483,7 +1483,7 @@
                                         "protocol"                            : "ICMP",
                                         "icmp_type"                           : 3,
                                         "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 ]
                             }
@@ -1495,23 +1495,31 @@
 
                                 "ingress_rules": {
                                     "nsg_api_6443": {
-                                        "description"                         : "Allow TCP ingress to kube-apiserver from 10.0.1.0/24 on port 6443",
+                                        "description"                         : "Allow TCP ingress to kube-apiserver from configured API endpoint source CIDR 10.0.1.0/24 on port 6443. In published Hub E profiles this is the hub management subnet used for private administrative access.",
                                         "src"                                 : "10.0.1.0/24",
                                         "src_type"                            : "CIDR_BLOCK",
                                         "dst_port_min"                        : "6443",
                                         "dst_port_max"                        : "6443",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_cp_6443": {
-                                        "description"                         : "Allow TCP ingress to kube-apiserver from control plane on port 6443",
+                                        "description"                         : "Allow TCP ingress for Kubernetes control plane inter-communication on source port 6443",
                                         "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
                                         "src_type"                            : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                        : "6443",
-                                        "dst_port_max"                        : "6443",
+                                        "src_port_min"                        : "6443",
+                                        "src_port_max"                        : "6443",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_pods": {
+                                        "description"                         : "Allow TCP ingress from pods to OKE control plane for responses to Kubernetes API server callbacks to pod-hosted admission webhooks. Keep the explicit 12250 and 6443 rules below as the fixed OKE control plane paths if this broader webhook rule is removed.",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_pods_12250": {
@@ -1521,7 +1529,7 @@
                                         "dst_port_min"                        : "12250",
                                         "dst_port_max"                        : "12250",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_pods_6443": {
@@ -1531,7 +1539,25 @@
                                         "dst_port_min"                        : "6443",
                                         "dst_port_max"                        : "6443",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_service": {
+                                        "description"                         : "Allow TCP ingress from OCI services to control plane for responses",
+                                        "src"                                 : "all-services",
+                                        "src_type"                            : "SERVICE_CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_workers_10250": {
+                                        "description"                         : "Allow TCP ingress to control plane from worker nodes for Kubelet responses on source port 10250",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "src_port_min"                        : "10250",
+                                        "src_port_max"                        : "10250",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_workers_12250": {
@@ -1541,7 +1567,7 @@
                                         "dst_port_min"                        : "12250",
                                         "dst_port_max"                        : "12250",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_workers_6443": {
@@ -1551,21 +1577,21 @@
                                         "dst_port_min"                        : "6443",
                                         "dst_port_max"                        : "6443",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
-                                    },
-
-                                    "nsg_workers_icmp": {
-                                        "description"                         : "Allow ICMP ingress for path discovery from worker nodes",
-                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
-                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
-                                        "protocol"                            : "ICMP",
-                                        "icmp_type"                           : 3,
-                                        "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 },
 
                                 "egress_rules": {
+                                    "nsg_api_6443": {
+                                        "description"                         : "Allow TCP egress from kube-apiserver to configured API endpoint source CIDR 10.0.1.0/24 on source port 6443. In published Hub E profiles this is the hub management subnet used for private administrative access.",
+                                        "src_port_min"                        : "6443",
+                                        "src_port_max"                        : "6443",
+                                        "dst"                                 : "10.0.1.0/24",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
                                     "nsg_cp_6443": {
                                         "description"                         : "Allow TCP egress for Kubernetes control plane inter-communication",
                                         "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
@@ -1573,15 +1599,35 @@
                                         "dst_port_min"                        : "6443",
                                         "dst_port_max"                        : "6443",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_pods": {
-                                        "description"                         : "Allow TCP egress from OKE control plane to pods",
+                                        "description"                         : "Allow TCP egress from OKE control plane to pods on any port for Kubernetes API server callbacks to pod-hosted admission webhooks. Keep the explicit 12250 and 6443 rules below as the fixed OKE control plane paths if this broader webhook rule is removed.",
                                         "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
                                         "dst_type"                            : "NETWORK_SECURITY_GROUP",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_pods_12250": {
+                                        "description"                         : "Allow TCP egress from OKE control plane to pods with source port 12250",
+                                        "src_port_min"                        : "12250",
+                                        "src_port_max"                        : "12250",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_pods_6443": {
+                                        "description"                         : "Allow TCP egress from OKE control plane to pods with source port 6443",
+                                        "src_port_min"                        : "6443",
+                                        "src_port_max"                        : "6443",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_service": {
@@ -1589,7 +1635,7 @@
                                         "dst"                                 : "all-services",
                                         "dst_type"                            : "SERVICE_CIDR_BLOCK",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_workers_10250": {
@@ -1599,44 +1645,97 @@
                                         "dst_port_min"                        : "10250",
                                         "dst_port_max"                        : "10250",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_workers_12250": {
-                                        "description"                         : "Allow TCP egress for path discovery to worker nodes",
+                                        "description"                         : "Allow TCP egress from control plane to worker nodes with source port 12250",
+                                        "src_port_min"                        : "12250",
+                                        "src_port_max"                        : "12250",
                                         "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
                                         "dst_type"                            : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                        : "12250",
-                                        "dst_port_max"                        : "12250",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
-                                    "nsg_workers_icmp": {
-                                        "description"                         : "Allow ICMP egress from OKE control plane to worker nodes",
+                                    "nsg_workers_6443": {
+                                        "description"                         : "Allow TCP egress from control plane to worker nodes with source port 6443",
+                                        "src_port_min"                        : "6443",
+                                        "src_port_max"                        : "6443",
                                         "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
                                         "dst_type"                            : "NETWORK_SECURITY_GROUP",
-                                        "protocol"                            : "ICMP",
-                                        "icmp_type"                           : 3,
-                                        "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
                                     }
                                 }
                             },
 
                             "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
-                                "display_name"                                : "nsg-fra-lz-prod-oke-int-lb",
-                                "ingress_rules"                               : {},
+                                "display_name"                                : "nsg-fra-lz-prod-oke-int-lb-default-backend",
+
+                                "ingress_rules": {
+                                    "nsg_pods_tcp": {
+                                        "description"                         : "Allow TCP ingress from pods to load balancers for responses",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_pods_udp": {
+                                        "description"                         : "Allow UDP ingress from pods to load balancers for responses",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_workers_10256": {
+                                        "description"                         : "Allow TCP ingress from worker nodes to load balancers for health check responses on source port 10256",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "src_port_min"                        : "10256",
+                                        "src_port_max"                        : "10256",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_workers_tcp": {
+                                        "description"                         : "Allow TCP ingress from worker nodes to load balancers for service responses on source ports 30000-32767",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "src_port_min"                        : "30000",
+                                        "src_port_max"                        : "32767",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_workers_udp": {
+                                        "description"                         : "Allow UDP ingress from worker nodes to load balancers for service responses on source ports 30000-32767",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "src_port_min"                        : "30000",
+                                        "src_port_max"                        : "32767",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
+                                    }
+                                },
 
                                 "egress_rules": {
-                                    "nsg_workers": {
-                                        "description"                         : "Allow TCP egress from load balancers to worker nodes for NodePort traffic",
-                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
+                                    "nsg_pods_tcp": {
+                                        "description"                         : "Allow TCP egress from load balancers to pods for OCI Native Ingress and Pods as Backends",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
                                         "dst_type"                            : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                        : "30000",
-                                        "dst_port_max"                        : "32767",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_pods_udp": {
+                                        "description"                         : "Allow UDP egress from load balancers to pods for OCI Native Ingress and Pods as Backends",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_workers_10256": {
@@ -1646,17 +1745,27 @@
                                         "dst_port_min"                        : "10256",
                                         "dst_port_max"                        : "10256",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
-                                    "nsg_workers_icmp": {
-                                        "description"                         : "Allow ICMP egress from load balancers to worker nodes for path discovery",
+                                    "nsg_workers_tcp": {
+                                        "description"                         : "Allow TCP egress from load balancers to worker nodes for NodePort traffic",
                                         "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
                                         "dst_type"                            : "NETWORK_SECURITY_GROUP",
-                                        "protocol"                            : "ICMP",
-                                        "icmp_type"                           : 3,
-                                        "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                        "dst_port_min"                        : "30000",
+                                        "dst_port_max"                        : "32767",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_workers_udp": {
+                                        "description"                         : "Allow UDP egress from load balancers to worker nodes for NodePort traffic",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_min"                        : "30000",
+                                        "dst_port_max"                        : "32767",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
                                     }
                                 }
                             },
@@ -1665,22 +1774,54 @@
                                 "display_name"                                : "nsg-fra-lz-prod-oke-pods",
 
                                 "ingress_rules": {
+                                    "hub_public_lb_tcp": {
+                                        "description"                         : "Allow TCP ingress to pods from Hub public load balancer subnet 10.0.0.0/24. OKE services can request public load balancers in that Hub subnet through annotations; because the subnet is in another VCN, this rule uses a CIDR source instead of an NSG source.",
+                                        "src"                                 : "10.0.0.0/24",
+                                        "src_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "hub_public_lb_udp": {
+                                        "description"                         : "Allow UDP ingress to pods from Hub public load balancer subnet 10.0.0.0/24. OKE services can request public load balancers in that Hub subnet through annotations; because the subnet is in another VCN, this rule uses a CIDR source instead of an NSG source.",
+                                        "src"                                 : "10.0.0.0/24",
+                                        "src_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
+                                    },
+
                                     "nsg_cp": {
-                                        "description"                         : "Allow ALL ingress to pods from Kubernetes control plane for webhooks served by pods",
+                                        "description"                         : "Allow ALL ingress to pods from Kubernetes control plane for pod-hosted admission webhooks. This broad rule is required when webhook services use arbitrary target ports, but it can be removed if the deployment forbids pod-hosted webhooks or accepts managing narrower webhook ports explicitly.",
                                         "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
                                         "src_type"                            : "NETWORK_SECURITY_GROUP",
                                         "protocol"                            : "ALL",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
-                                    "nsg_icmp": {
-                                        "description"                         : "Allow ICMP ingress to pods for path discovery",
-                                        "src"                                 : "0.0.0.0/0",
-                                        "src_type"                            : "CIDR_BLOCK",
-                                        "protocol"                            : "ICMP",
-                                        "icmp_type"                           : 3,
-                                        "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                    "nsg_cp_6443": {
+                                        "description"                         : "Allow TCP ingress from control plane to pods on source port 6443",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "src_port_min"                        : "6443",
+                                        "src_port_max"                        : "6443",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_lb_tcp": {
+                                        "description"                         : "Allow TCP ingress to pods from load balancers",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_lb_udp": {
+                                        "description"                         : "Allow UDP ingress to pods from load balancers",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_pods": {
@@ -1688,15 +1829,23 @@
                                         "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
                                         "src_type"                            : "NETWORK_SECURITY_GROUP",
                                         "protocol"                            : "ALL",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_service": {
+                                        "description"                         : "Allow TCP ingress from OCI services to pods",
+                                        "src"                                 : "all-services",
+                                        "src_type"                            : "SERVICE_CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_workers": {
-                                        "description"                         : "Allow ALL ingress to pods for cross-node pod communication when using NodePorts or hostNetwork: true",
+                                        "description"                         : "Allow ALL ingress to pods from workers",
                                         "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
                                         "src_type"                            : "NETWORK_SECURITY_GROUP",
                                         "protocol"                            : "ALL",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 },
 
@@ -1705,8 +1854,32 @@
                                         "description"                         : "Allow ALL egress from pods to internet",
                                         "dst"                                 : "0.0.0.0/0",
                                         "dst_type"                            : "CIDR_BLOCK",
-                                        "protocol"                            : "TCP",
+                                        "protocol"                            : "ALL",
                                         "stateless"                           : false
+                                    },
+
+                                    "hub_public_lb_tcp": {
+                                        "description"                         : "Allow TCP egress from pods to Hub public load balancer subnet 10.0.0.0/24 for responses to public load balancer traffic. This is the stateless return pair for the Hub public LB TCP ingress rule.",
+                                        "dst"                                 : "10.0.0.0/24",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "hub_public_lb_udp": {
+                                        "description"                         : "Allow UDP egress from pods to Hub public load balancer subnet 10.0.0.0/24 for responses to public load balancer traffic. This is the stateless return pair for the Hub public LB UDP ingress rule.",
+                                        "dst"                                 : "10.0.0.0/24",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_cp": {
+                                        "description"                         : "Allow ALL egress from pods to Kubernetes control plane for responses to pod-hosted admission webhook callbacks. This broad rule pairs with the broad webhook ingress rule and can be removed when that rule is removed.",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "ALL",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_cp_6443": {
@@ -1716,17 +1889,23 @@
                                         "dst_port_min"                        : "6443",
                                         "dst_port_max"                        : "6443",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
-                                    "nsg_icmp": {
-                                        "description"                         : "Allow ICMP egress from pods for path discovery",
-                                        "dst"                                 : "0.0.0.0/0",
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "protocol"                            : "ICMP",
-                                        "icmp_type"                           : 3,
-                                        "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                    "nsg_lb_tcp": {
+                                        "description"                         : "Allow TCP egress from pods to load balancers",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_lb_udp": {
+                                        "description"                         : "Allow UDP egress from pods to load balancers",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_pods": {
@@ -1734,7 +1913,7 @@
                                         "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
                                         "dst_type"                            : "NETWORK_SECURITY_GROUP",
                                         "protocol"                            : "ALL",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_service": {
@@ -1742,15 +1921,15 @@
                                         "dst"                                 : "all-services",
                                         "dst_type"                            : "SERVICE_CIDR_BLOCK",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_workers": {
-                                        "description"                         : "Allow ALL egress from pods for cross-node pod communication when using NodePorts or hostNetwork: true",
+                                        "description"                         : "Allow ALL egress from pods to workers",
                                         "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
                                         "dst_type"                            : "NETWORK_SECURITY_GROUP",
                                         "protocol"                            : "ALL",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 }
                             },
@@ -1759,22 +1938,72 @@
                                 "display_name"                                : "nsg-fra-lz-prod-oke-workers",
 
                                 "ingress_rules": {
-                                    "nsg_cp": {
-                                        "description"                         : "Allow ALL ingress to workers from Kubernetes control plane for webhooks served by workers",
-                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
-                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
-                                        "protocol"                            : "ALL",
-                                        "stateless"                           : false
+                                    "hub_public_lb_10256": {
+                                        "description"                         : "Allow TCP ingress to workers from Hub public load balancer subnet 10.0.0.0/24 for health checks on port 10256. OKE services can request public load balancers in that Hub subnet through annotations; because the subnet is in another VCN, this rule uses a CIDR source instead of an NSG source.",
+                                        "src"                                 : "10.0.0.0/24",
+                                        "src_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : "10256",
+                                        "dst_port_max"                        : "10256",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
                                     },
 
-                                    "nsg_icmp": {
-                                        "description"                         : "Allow ICMP ingress to pods for path discovery",
-                                        "src"                                 : "0.0.0.0/0",
+                                    "hub_public_lb_tcp": {
+                                        "description"                         : "Allow TCP ingress to workers from Hub public load balancer subnet 10.0.0.0/24 on NodePort service ports 30000-32767. This mirrors the internal load balancer NSG rule using the Hub LB subnet CIDR because the load balancer subnet is in another VCN.",
+                                        "src"                                 : "10.0.0.0/24",
                                         "src_type"                            : "CIDR_BLOCK",
-                                        "protocol"                            : "ICMP",
-                                        "icmp_type"                           : 3,
-                                        "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                        "dst_port_min"                        : "30000",
+                                        "dst_port_max"                        : "32767",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "hub_public_lb_udp": {
+                                        "description"                         : "Allow UDP ingress to workers from Hub public load balancer subnet 10.0.0.0/24 on NodePort service ports 30000-32767. This mirrors the internal load balancer NSG rule using the Hub LB subnet CIDR because the load balancer subnet is in another VCN.",
+                                        "src"                                 : "10.0.0.0/24",
+                                        "src_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : "30000",
+                                        "dst_port_max"                        : "32767",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_cp": {
+                                        "description"                         : "Allow TCP ingress to workers from Kubernetes control plane for API server callbacks to webhooks served on worker hostNetwork ports. This rule is broad on TCP ports because hostNetwork webhooks can listen on non-standard ports.",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_cp_10250": {
+                                        "description"                         : "Allow TCP ingress from control plane to workers on source port 10250",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "src_port_min"                        : "10250",
+                                        "src_port_max"                        : "10250",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_cp_12250": {
+                                        "description"                         : "Allow TCP ingress from control plane to workers on source port 12250",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "src_port_min"                        : "12250",
+                                        "src_port_max"                        : "12250",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_cp_6443": {
+                                        "description"                         : "Allow TCP ingress from control plane to workers on source port 6443",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "src_port_min"                        : "6443",
+                                        "src_port_max"                        : "6443",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_lb_10256": {
@@ -1784,25 +2013,43 @@
                                         "dst_port_min"                        : "10256",
                                         "dst_port_max"                        : "10256",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
-                                    "nsg_pods": {
-                                        "description"                         : "Allow ALL ingress to workers from other pods",
-                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
-                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
-                                        "protocol"                            : "ALL",
-                                        "stateless"                           : false
-                                    },
-
-                                    "nsg_pub_lb_30000_30000": {
-                                        "description"                         : "Allow TCP ingress to workers from load balancers",
+                                    "nsg_lb_tcp": {
+                                        "description"                         : "Allow TCP ingress to workers from load balancers on service ports 30000-32767",
                                         "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
                                         "src_type"                            : "NETWORK_SECURITY_GROUP",
                                         "dst_port_min"                        : "30000",
                                         "dst_port_max"                        : "32767",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_lb_udp": {
+                                        "description"                         : "Allow UDP ingress to workers from load balancers on service ports 30000-32767",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_min"                        : "30000",
+                                        "dst_port_max"                        : "32767",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_pods": {
+                                        "description"                         : "Allow ALL ingress to workers from pods",
+                                        "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+                                        "src_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "ALL",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_service": {
+                                        "description"                         : "Allow TCP ingress from OCI services to workers",
+                                        "src"                                 : "all-services",
+                                        "src_type"                            : "SERVICE_CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_workers": {
@@ -1810,7 +2057,7 @@
                                         "src"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
                                         "src_type"                            : "NETWORK_SECURITY_GROUP",
                                         "protocol"                            : "ALL",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 },
 
@@ -1823,6 +2070,44 @@
                                         "stateless"                           : false
                                     },
 
+                                    "hub_public_lb_10256": {
+                                        "description"                         : "Allow TCP egress from workers to Hub public load balancer subnet 10.0.0.0/24 with source port 10256 for health check responses. This is the stateless return pair for the Hub public LB health check ingress rule.",
+                                        "src_port_min"                        : "10256",
+                                        "src_port_max"                        : "10256",
+                                        "dst"                                 : "10.0.0.0/24",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "hub_public_lb_tcp": {
+                                        "description"                         : "Allow TCP egress from workers to Hub public load balancer subnet 10.0.0.0/24 with source ports 30000-32767 for NodePort service responses. This is the stateless return pair for the Hub public LB TCP NodePort ingress rule.",
+                                        "src_port_min"                        : "30000",
+                                        "src_port_max"                        : "32767",
+                                        "dst"                                 : "10.0.0.0/24",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "hub_public_lb_udp": {
+                                        "description"                         : "Allow UDP egress from workers to Hub public load balancer subnet 10.0.0.0/24 with source ports 30000-32767 for NodePort service responses. This is the stateless return pair for the Hub public LB UDP NodePort ingress rule.",
+                                        "src_port_min"                        : "30000",
+                                        "src_port_max"                        : "32767",
+                                        "dst"                                 : "10.0.0.0/24",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_cp": {
+                                        "description"                         : "Allow TCP egress from workers to Kubernetes control plane for responses to API server callbacks to webhooks served on worker hostNetwork ports. This rule is broad on TCP ports because hostNetwork webhooks can listen on non-standard ports.",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
                                     "nsg_cp_10250": {
                                         "description"                         : "Allow TCP egress from workers to OKE control plane",
                                         "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
@@ -1830,7 +2115,7 @@
                                         "dst_port_min"                        : "10250",
                                         "dst_port_max"                        : "10250",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_cp_12250": {
@@ -1840,7 +2125,7 @@
                                         "dst_port_min"                        : "12250",
                                         "dst_port_max"                        : "12250",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_cp_6443": {
@@ -1850,25 +2135,45 @@
                                         "dst_port_min"                        : "6443",
                                         "dst_port_max"                        : "6443",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
-                                    "nsg_icmp": {
-                                        "description"                         : "Allow ICMP egress from workers for path discovery",
-                                        "dst"                                 : "0.0.0.0/0",
-                                        "dst_type"                            : "CIDR_BLOCK",
-                                        "protocol"                            : "ICMP",
-                                        "icmp_type"                           : 3,
-                                        "icmp_code"                           : 4,
-                                        "stateless"                           : false
+                                    "nsg_lb_10256": {
+                                        "description"                         : "Allow TCP egress to load balancers from workers with source port 10256",
+                                        "src_port_min"                        : "10256",
+                                        "src_port_max"                        : "10256",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_lb_tcp": {
+                                        "description"                         : "Allow TCP egress to load balancers from workers with source ports 30000-32767",
+                                        "src_port_min"                        : "30000",
+                                        "src_port_max"                        : "32767",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : true
+                                    },
+
+                                    "nsg_lb_udp": {
+                                        "description"                         : "Allow UDP egress to load balancers from workers with source ports 30000-32767",
+                                        "src_port_min"                        : "30000",
+                                        "src_port_max"                        : "32767",
+                                        "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
+                                        "dst_type"                            : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                            : "UDP",
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_pods": {
-                                        "description"                         : "Allow ALL egress from workers to other pods",
+                                        "description"                         : "Allow ALL egress from workers to pods",
                                         "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
                                         "dst_type"                            : "NETWORK_SECURITY_GROUP",
                                         "protocol"                            : "ALL",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_service": {
@@ -1876,15 +2181,15 @@
                                         "dst"                                 : "all-services",
                                         "dst_type"                            : "SERVICE_CIDR_BLOCK",
                                         "protocol"                            : "TCP",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     },
 
                                     "nsg_workers": {
-                                        "description"                         : "Allow ALL egress from workers for cross-node pod communication when using NodePorts or hostNetwork: true",
+                                        "description"                         : "Allow ALL egress from workers to other workers",
                                         "dst"                                 : "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
                                         "dst_type"                            : "NETWORK_SECURITY_GROUP",
                                         "protocol"                            : "ALL",
-                                        "stateless"                           : false
+                                        "stateless"                           : true
                                     }
                                 }
                             }

@@ -18,6 +18,9 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
   local cmp_key = scope.compartment_key;
   local routing = if std.objectHas(params, 'routing') then params.routing else null;
   local has_hub = routing != null && routing.hub != null;
+  local hub_lb_cidr =
+    if routing != null && std.objectHas(routing, 'hub_lb_cidr') then routing.hub_lb_cidr
+    else null;
   local internet_default_target =
     if routing != null && std.objectHas(routing, 'internet_default_target')
     then routing.internet_default_target
@@ -43,13 +46,25 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     else 'nsg_api_6443_%d' % (i + 1);
   local api_endpoint_ingress_rules = {
     [api_endpoint_rule_key(i)]: {
-      description: 'Allow TCP ingress to kube-apiserver from %s on port 6443' % api_endpoint_allowed_cidrs[i],
+      description: 'Allow TCP ingress to kube-apiserver from configured API endpoint source CIDR %s on port 6443. In published Hub E profiles this is the hub management subnet used for private administrative access.' % api_endpoint_allowed_cidrs[i],
       protocol: 'TCP',
       dst_port_max: '6443',
       dst_port_min: '6443',
       src: api_endpoint_allowed_cidrs[i],
       src_type: 'CIDR_BLOCK',
-      stateless: false,
+      stateless: true,
+    }
+    for i in std.range(0, std.length(api_endpoint_allowed_cidrs) - 1)
+  };
+  local api_endpoint_egress_rules = {
+    [api_endpoint_rule_key(i)]: {
+      description: 'Allow TCP egress from kube-apiserver to configured API endpoint source CIDR %s on source port 6443. In published Hub E profiles this is the hub management subnet used for private administrative access.' % api_endpoint_allowed_cidrs[i],
+      protocol: 'TCP',
+      dst: api_endpoint_allowed_cidrs[i],
+      dst_type: 'CIDR_BLOCK',
+      src_port_max: '6443',
+      src_port_min: '6443',
+      stateless: true,
     }
     for i in std.range(0, std.length(api_endpoint_allowed_cidrs) - 1)
   };
@@ -96,11 +111,13 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     cmp_key: cmp_key,
     routing: routing,
     has_hub: has_hub,
+    hub_lb_cidr: hub_lb_cidr,
     internet_default_target: internet_default_target,
     use_local_natgw: use_local_natgw,
     category_key: category_key,
     services_cidr: services_cidr,
     api_endpoint_ingress_rules: api_endpoint_ingress_rules,
+    api_endpoint_egress_rules: api_endpoint_egress_rules,
     optional_cluster_kubernetes_network_config: optional_cluster_kubernetes_network_config,
     worker_image: worker_image,
     cluster_key: cluster_key,

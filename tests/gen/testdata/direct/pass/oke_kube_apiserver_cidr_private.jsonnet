@@ -14,6 +14,8 @@ local collect_rules(payload) = [
       for rule_key in std.objectFields(nsgs[nsg_key].ingress_rules)
       if nsgs[nsg_key].ingress_rules[rule_key].src_type == 'CIDR_BLOCK' &&
          nsgs[nsg_key].ingress_rules[rule_key].protocol == 'TCP' &&
+         std.objectHas(nsgs[nsg_key].ingress_rules[rule_key], 'dst_port_min') &&
+         std.objectHas(nsgs[nsg_key].ingress_rules[rule_key], 'dst_port_max') &&
          nsgs[nsg_key].ingress_rules[rule_key].dst_port_min == '6443' &&
          nsgs[nsg_key].ingress_rules[rule_key].dst_port_max == '6443' &&
          std.length(std.findSubstr(

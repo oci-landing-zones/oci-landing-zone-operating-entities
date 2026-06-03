@@ -166,6 +166,9 @@ local common = import 'hub/hub_common.libsonnet';
     local routed_vcn_entries = inputs.routed_vcn_entries;
     local n = inputs.naming;
     local hub_vcn_cidr = inputs.hub_vcn_cidr;
+    local hub_lb_cidr =
+      if std.objectHas(inputs, 'hub_lb_cidr') then inputs.hub_lb_cidr
+      else null;
     local hub_has_spoke_natgw =
       if std.objectHas(inputs, 'hub_has_spoke_natgw') then inputs.hub_has_spoke_natgw
       else true;
@@ -178,6 +181,7 @@ local common = import 'hub/hub_common.libsonnet';
           description: 'Route to the Hub VCN through DRG',
           destination: hub_vcn_cidr,
         },
+        hub_lb_cidr: hub_lb_cidr,
         peers: {
           [e.route_key]: {
             description: '%s through DRG' % e.route_desc,
