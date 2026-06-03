@@ -16,6 +16,15 @@
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
                         }
+                    },
+
+                    "CMP-LZ-PREPROD-EXACC-INFRA-KEY": {
+                        "name"                         : "cmp-lz-preprod-exacc-infra",
+                        "description"                  : "Pre-Production Platform ExaDB-C@C Infrastructure Compartment",
+
+                        "defined_tags": {
+                            "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
+                        }
                     }
                 },
 
@@ -47,6 +56,15 @@
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
                         }
+                    },
+
+                    "CMP-LZ-PROD-EXACC-INFRA-KEY": {
+                        "name"                         : "cmp-lz-prod-exacc-infra",
+                        "description"                  : "Production Platform ExaDB-C@C Infrastructure Compartment",
+
+                        "defined_tags": {
+                            "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
+                        }
                     }
                 },
 
@@ -71,6 +89,15 @@
                 "parent_id"                            : "CMP-LZ-PLATFORM-KEY",
 
                 "children": {
+                    "CMP-LZ-SHARED-EXACC-DB-KEY": {
+                        "name"                         : "cmp-lz-shared-exacc-db",
+                        "description"                  : "Shared Platform ExaDB-C@C Database Compartment",
+
+                        "defined_tags": {
+                            "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
+                        }
+                    },
+
                     "CMP-LZ-SHARED-EXACC-INFRA-KEY": {
                         "name"                         : "cmp-lz-shared-exacc-infra",
                         "description"                  : "Shared Platform ExaDB-C@C Infrastructure Compartment",

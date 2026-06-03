@@ -182,7 +182,7 @@ local validation = import '../../lib/validation.libsonnet';
       local params = entry.platform_config.extension.params;
       if std.objectHas(params, 'project_db_compartments')
          && params.project_db_compartments != null then
-        if product.code == 'exacs' && entry.scope.scope_type == 'shared' then
+        if entry.scope.scope_type == 'shared' then
           params.project_db_compartments
         else
           { [entry.scope.scope_name]: params.project_db_compartments }

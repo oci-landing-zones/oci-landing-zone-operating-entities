@@ -38,7 +38,7 @@ local exadb_events = import './events.libsonnet';
       else project_environment_names;
     local project_topics = {
       [env_topic_key(env_name)]: {
-        name: n.display_global('nott', [env_name, product.code]),
+        name: n.display_global('nott', [env_name, product.code, 'projects']),
         description: descriptions.project_topic(model.environment_scope(env_name)),
         compartment_id: n.key_global('CMP', [env_name, 'SECURITY']),
         subscriptions: subscriptions('projects'),

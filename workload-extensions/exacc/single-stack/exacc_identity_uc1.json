@@ -69,38 +69,7 @@
 
                             "CMP-LZ-PREPROD-PLATFORM-KEY": {
                                 "name"                                         : "cmp-lz-preprod-platform",
-                                "description"                                  : "Pre-Production Workload Environment, Common Platform Compartment",
-
-                                "children": {
-                                    "CMP-LZ-PREPROD-EXACC-KEY": {
-                                        "name"                                 : "cmp-lz-preprod-exacc",
-                                        "description"                          : "Pre-Production Platform ExaDB-C@C Compartment",
-
-                                        "children": {
-                                            "CMP-LZ-PREPROD-EXACC-DB-KEY": {
-                                                "name"                         : "cmp-lz-preprod-exacc-db",
-                                                "description"                  : "Pre-Production Platform ExaDB-C@C Database Compartment",
-
-                                                "defined_tags": {
-                                                    "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
-                                                }
-                                            },
-
-                                            "CMP-LZ-PREPROD-EXACC-INFRA-KEY": {
-                                                "name"                         : "cmp-lz-preprod-exacc-infra",
-                                                "description"                  : "Pre-Production Platform ExaDB-C@C Infrastructure Compartment",
-
-                                                "defined_tags": {
-                                                    "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
-                                                }
-                                            }
-                                        },
-
-                                        "defined_tags": {
-                                            "tagns-lz-role.tag-lz-role"        : "lz-exacc-admin"
-                                        }
-                                    }
-                                }
+                                "description"                                  : "Pre-Production Workload Environment, Common Platform Compartment"
                             },
 
                             "CMP-LZ-PREPROD-PROJECTS-KEY": {
@@ -153,38 +122,7 @@
 
                             "CMP-LZ-PROD-PLATFORM-KEY": {
                                 "name"                                         : "cmp-lz-prod-platform",
-                                "description"                                  : "Production Workload Environment, Common Platform Compartment",
-
-                                "children": {
-                                    "CMP-LZ-PROD-EXACC-KEY": {
-                                        "name"                                 : "cmp-lz-prod-exacc",
-                                        "description"                          : "Production Platform ExaDB-C@C Compartment",
-
-                                        "children": {
-                                            "CMP-LZ-PROD-EXACC-DB-KEY": {
-                                                "name"                         : "cmp-lz-prod-exacc-db",
-                                                "description"                  : "Production Platform ExaDB-C@C Database Compartment",
-
-                                                "defined_tags": {
-                                                    "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
-                                                }
-                                            },
-
-                                            "CMP-LZ-PROD-EXACC-INFRA-KEY": {
-                                                "name"                         : "cmp-lz-prod-exacc-infra",
-                                                "description"                  : "Production Platform ExaDB-C@C Infrastructure Compartment",
-
-                                                "defined_tags": {
-                                                    "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
-                                                }
-                                            }
-                                        },
-
-                                        "defined_tags": {
-                                            "tagns-lz-role.tag-lz-role"        : "lz-exacc-admin"
-                                        }
-                                    }
-                                }
+                                "description"                                  : "Production Workload Environment, Common Platform Compartment"
                             },
 
                             "CMP-LZ-PROD-PROJECTS-KEY": {

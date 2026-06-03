@@ -71,7 +71,7 @@ In this scenario, the ExaDB-C@C stack is treated as a **shared platform** from t
 
 Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs) are all deployed within the same ExaDB-C@C DB compartment <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, as these resources cannot be distributed across multiple compartments. This model simplifies management but implies that access control must be handled carefully, as all resources reside in a shared scope.
 
-For Autonomous deployments AVMCs and Autonomous Container Databases (ACDs) are also created within the ExaDB-C@C DB compartment <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. However, Autonomous Databases Dedicated (ADB-D) can be deployed in separate project compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This provides greater flexibility, allowing better isolation between environments, more granular IAM policy control, and easier delegation of administrative responsibilities.
+For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are also created within the ExaDB-C@C DB compartment <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. Autonomous Databases Dedicated (ADB-D) can be deployed in separate project compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> when project-level ownership is required. The published UC1 artifacts keep the ExaDB-C@C infrastructure shared under `CMP-LZ-SHARED-EXACC-KEY` and its DB and infrastructure children, and also include production and pre-production project DB compartments for the AVMC/ADB-D placement model.
 
 The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in the ExaDB-C@C DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
 
@@ -84,11 +84,11 @@ The groups associated with the shared ExaDB-C@C environment are:
 - **Global Infra Admin Team**, responsible for the management and maintenance of the ExaDB-C@C infrastructure, including VMCs and AVMCs, as well as related infrastructure-level operations.
 - **Global DBA Team**, responsible for database administration tasks within the shared compartment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs.
 
-In addition, environment-specific database administration is handled by dedicated groups:
+For the AVMC/ADB-D part of UC1, environment-specific database administration is handled by dedicated groups:
 
 - **Project DBA Team (per environment and project)**, responsible exclusively for managing the ADB-D databases deployed within their respective project compartments.
 
-This approach ensures that infrastructure and shared database layers are centrally managed, while granting each environment its own level of autonomy over its dedicated Autonomous Databases, reinforcing both governance and operational efficiency.
+This approach keeps infrastructure and shared database layers centrally managed while each environment receives delegated ownership for its dedicated Autonomous Databases.
 
 #### **ExaDB-C@C Observability**
 
@@ -124,11 +124,11 @@ These alarms continuously evaluate defined thresholds and, upon breach, generate
 
 Notification topics <img src="../content/i.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
 
-At the global level, notification topics support shared ExaDB-C@C infrastructure and shared ExaDB-C@C database workloads.
-
-At the environment level, dedicated notification topics support production and pre-production project scopes.
-- **Production**: `nott-lz-prod-exacc`
-- **Pre-Production**: `nott-lz-preprod-exacc`
+The published UC1 artifacts create global notification topics for shared ExaDB-C@C infrastructure and shared ExaDB-C@C database workloads, plus environment project topics for the AVMC/ADB-D project DB compartments:
+- **Database workloads**: `nott-lz-exacc-db-workloads`
+- **Infrastructure workloads**: `nott-lz-exacc-infra-workloads`
+- **Production project workloads**: `nott-lz-prod-exacc-projects`
+- **Pre-Production project workloads**: `nott-lz-preprod-exacc-projects`
 
 These topics act as targets for both alarm actions and event rules, ensuring consistent and centralized message delivery.
 
@@ -154,26 +154,24 @@ In this scenario, the ExaDB-C@C stack follows a **hybrid model**, where the infr
 
 There are two infrastructures, <img src="../content/a.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">: one primary and one disaster recovery (DR), both deployed in the shared ExaDB-C@C infra compartment.
 
-Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs), are deployed in environment-specific compartments <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">. This allows each environment to have dedicated database stacks, improving isolation, governance, and operational control compared to the fully shared model.
+The published UC2 artifacts keep both the shared ExaDB-C@C infrastructure compartment and a shared ExaDB-C@C DB compartment under the shared platform scope, while production and pre-production also get their own ExaDB-C@C platform scopes with dedicated infrastructure and database child compartments for the environment-specific VMCs/AVMCs.
 
-For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are also created within their respective environment-specific compartments <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
+Regular Virtual Machine Clusters (VMCs), along with their associated Oracle Homes (OHs), Container Databases (CDBs), and Pluggable Databases (PDBs), are deployed in environment-specific ExaDB-C@C DB compartments <img src="../content/b.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
+
+For Autonomous deployments, AVMCs and Autonomous Container Databases (ACDs) are also deployed in their respective environment-specific ExaDB-C@C DB compartments <img src="../content/c.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
 
 Autonomous Databases Dedicated (ADB-D) are deployed in project-level compartments <img src="../content/d.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, maintaining a clear separation between projects within the same environment and enabling fine-grained IAM control.
 
-The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaDB-C@C DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
+The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaDB-C@C DB compartment <img src="../content/e.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
 
 #### **ExaDB-C@C Groups**
 
-The administrative groups <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined following a hybrid model, combining global, environment-level, and project-level responsibilities to balance central governance with environment isolation.
+The administrative groups <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined following a hybrid model, combining global and project-level responsibilities to balance central governance with environment and project isolation.
 
 At the global level, shared administration groups are defined:
 
 - **Global Infra Admin Team**, responsible for managing infrastructure resources across the entire Landing Zone, including the ExaDB-C@C infrastructure and shared components.
-
-At the environment level, dedicated groups are defined per environment:
-
-- **Env Infra Admin Team (per environment)**, responsible for the management and maintenance of infrastructure resources within the environment, including VMCs and AVMCs.
-- **Environment DBA Team (per environment)**, responsible for database administration within the environment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs.
+- **Global DBA Team**, responsible for database administration across the shared and environment-specific ExaDB-C@C DB compartments, including Oracle Homes (OHs), CDBs, PDBs, and ACDs.
 
 In addition, project-scoped groups are defined:
 
@@ -181,7 +179,7 @@ In addition, project-scoped groups are defined:
 
 These project-level DBA groups are scoped at the project level within each environment, enabling fine-grained ownership and access control.
 
-This model enforces a layered separation of duties, where infrastructure governance is partially centralized at the global level, environment-specific resources are managed at the environment level, and Autonomous Databases Dedicated (ADB-D) are managed at the project level providing a balanced approach between central control, environment isolation, and project-level autonomy.
+This model enforces a layered separation of duties, where infrastructure and DB governance are centralized at the global level, while Autonomous Databases Dedicated (ADB-D) are managed at the project level.
 
 #### **ExaDB-C@C Observability**
 
@@ -189,11 +187,11 @@ The observability framework for this scenario is based on the combined use of **
 
 **Events**
 
-Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured to capture relevant lifecycle and operational events generated by ExaDB-C@C resources. These rules are defined across both shared and environment-specific compartments and are responsible for routing events to the corresponding notification topics.
+Event rules <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured to capture relevant lifecycle and operational events generated by ExaDB-C@C resources. These rules are defined across shared, environment-specific, and project-level compartments and are responsible for routing events to the corresponding notification topics.
 
-At the shared level, event rules cover the shared ExaDB-C@C infrastructure compartment.
+At the shared level, event rules cover the shared ExaDB-C@C infrastructure compartment and the shared ExaDB-C@C database compartment.
 
-At the environment level, event rules cover the production and pre-production ExaDB-C@C database compartments.
+At the environment level, event rules cover the production and pre-production ExaDB-C@C infrastructure and database compartments.
 
 At the project level, event rules cover the production and pre-production project database compartments.
 
@@ -201,7 +199,7 @@ These event rules ensure that operational changes, failures, or state transition
 
 **Alarms**
 
-Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within each environment-specific ExaDB-C@C Database compartment to monitor key performance and utilization metrics of the database clusters.
+Alarms <img src="../content/h.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined within the shared and environment-specific ExaDB-C@C DB compartments to monitor key performance and utilization metrics of the database clusters.
 
 The following alarms are configured:
 
@@ -219,9 +217,12 @@ These alarms continuously evaluate defined thresholds and, upon breach, generate
 
 Notification topics <img src="../content/i.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are configured within the security compartments, both at a global scope and at the environment level, to serve as the primary mechanism for delivering alerts and event messages.
 
-At the global level, notification topics support shared ExaDB-C@C infrastructure.
+At the global level, notification topics support shared ExaDB-C@C database and infrastructure workloads.
 
-At the environment level, dedicated notification topics support production and pre-production projects and ExaDB-C@C compartment scopes.
+- **Shared database workloads**: nott-lz-exacc-db-workloads
+- **Shared infrastructure workloads**: nott-lz-exacc-infra-workloads
+
+At the environment level, dedicated notification topics support production and pre-production project and ExaDB-C@C compartment scopes.
 - **Production**: nott-lz-prod-exacc-projects
 - **Pre-Production**: nott-lz-preprod-exacc-projects
 

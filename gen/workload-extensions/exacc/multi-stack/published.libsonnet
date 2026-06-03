@@ -43,6 +43,7 @@ local products = import '../../exadb/products.libsonnet';
       descriptions: descriptions,
       entries: exacc_entries,
       tag_key: tag_key,
+      topology: ctx.topo,
     });
 
     local db_entries = [

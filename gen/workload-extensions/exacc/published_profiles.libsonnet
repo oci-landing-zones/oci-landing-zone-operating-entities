@@ -5,32 +5,6 @@ local notification_emails = {
   projects: ['exacc-project-team@example.com'],
 };
 
-local shared_exacc_platform = {
-  extension: {
-    type: 'exacc',
-    params: {
-      notification_emails: {
-        default: notification_emails.default,
-        db_workloads: notification_emails.db_workloads,
-        infra_workloads: notification_emails.infra_workloads,
-      },
-    },
-  },
-};
-
-local env_exacc_platform(projects) = {
-  extension: {
-    type: 'exacc',
-    params: {
-      project_db_compartments: projects,
-      notification_emails: {
-        default: notification_emails.default,
-        projects: notification_emails.projects,
-      },
-    },
-  },
-};
-
 local exacc_platform(projects=null, components=null, emails={}) = {
   [if components != null then 'publication_components']: components,
   extension: {
@@ -72,19 +46,17 @@ local exacc_no_network_base = {
 
   hub_e_prod_preprod_exacc_config: exacc_no_network_base {
     shared_platforms: {
-      exacc: shared_exacc_platform,
-    },
-    environments+: {
-      prod+: {
-        platforms+: {
-          exacc: env_exacc_platform(['proj1']),
+      exacc: exacc_platform(
+        projects={
+          prod: ['proj1'],
+          preprod: ['proj1'],
         },
-      },
-      preprod+: {
-        platforms+: {
-          exacc: env_exacc_platform(['proj1']),
-        },
-      },
+        emails={
+          db_workloads: notification_emails.db_workloads,
+          infra_workloads: notification_emails.infra_workloads,
+          projects: notification_emails.projects,
+        }
+      ),
     },
   },
 
@@ -93,8 +65,11 @@ local exacc_no_network_base = {
   hub_e_prod_preprod_exacc_uc2_config: exacc_no_network_base {
     shared_platforms: {
       exacc: exacc_platform(
-        components=infra_only,
-        emails={ infra_workloads: notification_emails.infra_workloads }
+        components=infra_and_db,
+        emails={
+          db_workloads: notification_emails.db_workloads,
+          infra_workloads: notification_emails.infra_workloads,
+        }
       ),
     },
     environments+: {
@@ -102,8 +77,9 @@ local exacc_no_network_base = {
         platforms+: {
           exacc: exacc_platform(
             projects=['proj1'],
-            components=db_only,
+            components=infra_and_db,
             emails={
+              infra_workloads: notification_emails.infra_workloads,
               db_workloads: notification_emails.db_workloads,
               projects: notification_emails.projects,
             }
@@ -114,8 +90,9 @@ local exacc_no_network_base = {
         platforms+: {
           exacc: exacc_platform(
             projects=['proj1'],
-            components=db_only,
+            components=infra_and_db,
             emails={
+              infra_workloads: notification_emails.infra_workloads,
               db_workloads: notification_emails.db_workloads,
               projects: notification_emails.projects,
             }

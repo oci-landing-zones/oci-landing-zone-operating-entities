@@ -12,12 +12,12 @@
 
 Welcome to the ExaDB-C@C Landing Zone Workload Extension (WE).
 
-The ExaDB-C@C Landing Zone Workload Extension is a secure cloud environment, designed with the best practices to simplify the on-boarding of ExaDB-C@C workloads and enable the continuous operations of their cloud resources. This reference architecture provides an automated landing zone configuration.
+The ExaDB-C@C Landing Zone Workload Extension provides landing-zone supporting configuration designed with best practices to simplify the onboarding and continuous operations of ExaDB-C@C workloads. This reference architecture configures the landing-zone resources required to govern and monitor ExaDB-C@C workloads; it does not provision the ExaDB-C@C service infrastructure itself.
 
 &nbsp;
 
 ## **2. Design Overview**
-This workload extension uses the [One-OE](../../blueprints/one-oe/) Blueprint as the reference Landing Zone and guides the deployment of ExaDB-C@C on top of it. The extension includes a base infrastructure layer that provisions the required OCI resources for deploying ExaDB-C@C. The ExaDB-C@C extension is networkless and does not deploy VCNs, subnets, route tables, or other network resources.
+This workload extension uses the [One-OE](../../blueprints/one-oe/) Blueprint as the reference Landing Zone and guides the placement and operational model for ExaDB-C@C workloads on top of it. The ExaDB-C@C extension is networkless and contributes landing-zone supporting resources such as compartments, IAM groups and policies, events, alarms, and notifications. It does not provision ExaDB-C@C infrastructure, VMCs, AVMCs, databases, VCNs, subnets, route tables, or other network resources.
 
 The extension covers three ExaDB-C@C Use Cases (UCs):
 
@@ -43,6 +43,9 @@ If you have not reviewed it yet, we recommend checking the [ExaDB-C@C use cases 
 &nbsp;
 
 This Landing Zone Extension provides **two deployment approaches**, single-stack and multi-stack, to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator).
+
+- **Single-stack** deploys a new One-OE foundation and the ExaDB-C@C workload extension resources together in one deployable set.
+- **Multi-stack** extends an existing One-OE foundation with only the ExaDB-C@C extension layer. The existing foundation must already provide the baseline Landing Zone resources that the extension references.
 
 &nbsp;
 # License <!-- omit from toc -->
