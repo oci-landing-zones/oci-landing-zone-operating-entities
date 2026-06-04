@@ -236,7 +236,7 @@ local desc = import '../../../descriptions.libsonnet';
          destination_type: 'CIDR_BLOCK',
          network_entity_key: drg_key,
        },
-     } else {})
+    } else {})
     + {
       [route_key]: {
         description: peer_routes[route_key].description,
@@ -255,9 +255,9 @@ local desc = import '../../../descriptions.libsonnet';
          destination_type: 'CIDR_BLOCK',
          network_entity_key: ngw_key,
        },
-     } else if has_hub && !overlay_output then {
-       [n.route_rule([n.region, 'default'])]: {
-         description: 'Default route to internet through DRG',
+    } else if has_hub && !overlay_output then {
+       [n.route_rule([n.region, 'drg'])]: {
+         description: 'Route to the 0.0.0.0/0 through DRG',
          destination: '0.0.0.0/0',
          destination_type: 'CIDR_BLOCK',
          network_entity_key: drg_key,

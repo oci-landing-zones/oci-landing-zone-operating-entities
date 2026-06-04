@@ -9,7 +9,7 @@ local oke_builder = import '../oke_builder.libsonnet';
     local n = ctx.n;
     local platform_entry = ctx.env_platform_entry(env_name, platform_name);
     local resolved = extensions.resolve_entry(
-      ctx.extension_resolve_entry_inputs({ oke_simple: oke_builder }, platform_entry)
+      ctx.extension_resolve_entry_inputs({ oke_simple: oke_builder }, platform_entry, config.hub.kind == 'hub_e')
     );
 
     local rendered = oke_builder.render(resolved.render_params);
