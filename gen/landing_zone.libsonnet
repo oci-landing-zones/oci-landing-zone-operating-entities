@@ -102,6 +102,7 @@ function(raw_config)
     extension_entries: extension_entries,
     naming: n,
     hub_vcn_cidr: hub_vcn_cidr,
+    hub_lb_cidr: config.hub.network.subnets.lb,
     routed_vcn_entries: all_vcn_entries,
     hub_has_spoke_natgw: hub.has_spoke_natgw,
   });

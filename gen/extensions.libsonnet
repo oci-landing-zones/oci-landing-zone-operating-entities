@@ -220,6 +220,9 @@ local collections = import 'lib/collections.libsonnet';
         routed_vcn_entries: inputs.routed_vcn_entries,
         naming: inputs.naming,
         hub_vcn_cidr: inputs.hub_vcn_cidr,
+        hub_lb_cidr:
+          if std.objectHas(inputs, 'hub_lb_cidr') then inputs.hub_lb_cidr
+          else null,
         hub_has_spoke_natgw: hub_has_spoke_natgw,
       })
     else null,

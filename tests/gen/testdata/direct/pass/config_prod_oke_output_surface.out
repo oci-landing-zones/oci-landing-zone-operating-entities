@@ -1,10 +1,36 @@
 {
+  "api_endpoint_nsg_ids": [
+    "NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY"
+  ],
+  "api_endpoint_public": false,
+  "api_endpoint_subnet_id": "SN-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
+  "cluster_cni_type": "native",
   "cluster_key": "CLR-FRA-LZ-PROD-OKE-KEY",
   "cluster_name": "clr-fra-lz-prod-oke",
+  "kubernetes_network_config": {
+    "pods_cidr": "10.244.0.0/16",
+    "services_cidr": "10.96.0.0/16"
+  },
   "node_pool_cluster_id": "CLR-FRA-LZ-PROD-OKE-KEY",
   "node_pool_cluster_tag": "clr-fra-lz-prod-oke",
   "node_pool_key": "NDP-FRA-LZ-PROD-OKE-KEY",
   "node_pool_name": "ndp-fra-lz-prod-oke",
+  "node_pool_networking": {
+    "pods_nsg_ids": [
+      "NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"
+    ],
+    "pods_subnet_id": "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+    "workers_nsg_ids": [
+      "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
+    ],
+    "workers_subnet_id": "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
+  },
+  "oke_subnet_keys": [
+    "SN-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
+    "SN-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY",
+    "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+    "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
+  ],
   "output_files": [
     "governance.json",
     "iam.json",
@@ -19,6 +45,9 @@
     "security_cis1_pre.json",
     "security_cis2.json",
     "security_cis2_pre.json"
+  ],
+  "services_subnet_id": [
+    "SN-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY"
   ],
   "unexpected_split_output_files_present": [],
   "worker_image": "8.10"
