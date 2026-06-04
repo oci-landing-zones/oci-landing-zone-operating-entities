@@ -1,15 +1,17 @@
-# **[OCI LZ AI](#)**
-## **An OCI Landing Zone Operating Entities [Addon](#) for AI assisted landing zone design**
+# **[OCI LZ AI Agent](#)**
+## **An OCI Open LZ [Addon](#) for AI assisted Landing Zones**
 
 &nbsp;
 
 **Table of Contents**
 
-[Overview](#overview)<br>
-[1. Prepare Your AI](#1-prepare-your-ai)<br>
-[2. AI Guides the Setup](#2-ai-guides-the-setup)<br>
-[3. Run & Deploy](#3-run--deploy)<br>
-[AI Security](#ai-security)<br>
+[1. Overview](#overview)<br>
+[2. Workflow](#)<br>
+[2.1. Prepare Your AI](#1-prepare-your-ai)<br>
+[2.2. AI Guides the Setup](#2-ai-guides-the-setup)<br>
+[2.3. Run & Deploy](#3-run--deploy)<br>
+[3. AI Built-in Security](#ai-security)<br>
+[4. Complementary resources](#)<br>
 
 &nbsp;
 
@@ -18,7 +20,7 @@
 The **OCI LZ AI** addon helps to use AI coding agents with the OCI Landing Zone Operating Entities repository. It aligns landing zone design with repository knowledge, json structure and review before manual deployment.
 
 <p align="center">
-  <img src="images/oci-lz-ai-flow.svg" alt="Three step flow for AI guided Operating Entities setup" width="900">
+  <img src="images/oci-lz-ai-flow.svg" alt="Three step flow for AI guided Operating Entities setup" width="600">
 </p>
 
 > [!IMPORTANT]
@@ -56,10 +58,10 @@ Recommended inputs:
 - Required environments, such as dev, test, prod.
 - Hub (DMZ) model and connectivity requirements.
 - CIDR allocation and known constraints.
-- Workloads to be deployed on top of OCI LZ.
+- Workloads to be deployed on top of OCI Landing Zone.
 - Security, observability, governance and compliance requirements.
 
-### Example of complete OKE one-shot promp to Generate LZ
+### Example of complete OKE one-shot promp to Generate Landing Zone
 
 ```text
 Create a reviewed OCI Landing Zone Operating Entities draft with these inputs:
@@ -82,10 +84,12 @@ Prepare the draft and return blockers, warnings, assumptions and review items.
 I want a landing zone with OKE.
 ```
 
-### Currently supported AI Security:
-- [Addon] All Hub Models
-- [Extension] OKE
-- [Extension] ExaCS/ExaCC
+### Currently supported addonns and workloads:
+
+||Released|Available Soon|
+|---|---|---|
+|Addons|Hub A, B, C, E|FinOps, DNS|
+|Extensions|OKE, ExaCS, ExaCC|EBS, OpenShift, OCVS|
 
 &nbsp;
 
