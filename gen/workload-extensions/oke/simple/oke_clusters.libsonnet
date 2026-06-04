@@ -7,7 +7,7 @@ function(ctx) {
     clusters+: {
       [ctx.cluster_key]: {
         name: ctx.cluster_name,
-        cni_type: 'native',
+        cni_type: ctx.cluster_cni_type,
         is_enhanced: true,
         kubernetes_version: ctx.params.config_params.kubernetes_version,
         networking: {

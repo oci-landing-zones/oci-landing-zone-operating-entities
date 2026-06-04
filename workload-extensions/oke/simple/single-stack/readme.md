@@ -32,6 +32,8 @@
 | **TARGET RESOURCES** | Complete LZ Foundation, IAM, Hub Network, DRG, OKE VCN, OKE Cluster with all components integrated |
 | **DEPLOYMENT**          | Use the JSON files in this folder with Terraform CLI, or stage them in a customer-controlled private source for OCI Resource Manager as described in [Deployment Steps](#5-deployment-steps). [Terraform CLI](/commons/content/terraform.md) can also be used. |
 
+For customized OKE landing zones generated from a configuration file, see [OKE Config-Driven Generation](../config-driven.md).
+
 
 &nbsp;
 
@@ -53,7 +55,7 @@ This deployment combines **OneOE Blueprint**, **Hub Model E networking**, and **
 - **Automated Routing**: Hub route tables pre-configured  with OKE CIDR (10.0.80.0/21)
 - **DRG Integration**: Dynamic Routing Gateway with route distributions configured for Hub-Spoke communication
 - **CIS-Compliant OKE**: Uses the CIS-compliant OKE module from [terraform-oci-modules-workloads](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
-- **Native Pod Networking**: Configured with VCN-native pod networking for improved security and performance
+- **OKE Network Modes**: Published JSON is VCN-native by default; config-driven generation can also emit an overlay network shape for Flannel-compatible clusters
 
 &nbsp;
 
@@ -78,7 +80,7 @@ The deployment includes the complete OneOE blueprint with:
 
 ### **3.3 OKE Spoke Network** <!-- omit from toc -->
 
-**OKE VCN (`10.0.80.0/21`)** with four dedicated subnets:
+**OKE VCN (`10.0.80.0/21`)** with dedicated subnets. The published single-stack JSON uses native networking and includes four subnets:
 
 | Subnet | CIDR | Purpose | Size |
 |--------|------|---------|------|
@@ -92,6 +94,8 @@ The deployment includes the complete OneOE blueprint with:
 - NSG for Worker Nodes (full egress, selective ingress)
 - NSG for Pods (pod-to-pod, pod-to-services)
 - NSG for Internal Load Balancers (NodePort range)
+
+For config-driven overlay generation, the OKE VCN uses only the Control Plane, Internal LB, and Worker Nodes subnets. The pod subnet, pod route table, pod security list, pod NSG, and worker pod networking fields are omitted because pod addressing comes from the Kubernetes overlay pod CIDR instead of an OCI pod subnet.
 
 **Gateways:**
 - NAT Gateway for outbound internet access (all subnets)
@@ -110,12 +114,25 @@ The deployment includes the complete OneOE blueprint with:
 ### **3.5 OKE Cluster** <!-- omit from toc -->
 
 - **Kubernetes Version**: v1.35.2
-- **Cluster Type**: Enhanced cluster with native pod networking
+- **Cluster Type**: Enhanced cluster
 - **Control Plane**: Private endpoint in dedicated subnet
 - **Worker Pool**: 1x VM.Standard.E5.Flex (1 OCPU, 8GB RAM, Oracle Linux 8.10) - easily scalable
-- **CNI**: VCN-native pod networking (OCI VCN-Native Pod Networking CNI)
+- **CNI**: VCN-native pod networking in the published JSON; config-driven overlay generation requests Flannel
 
 &nbsp;
+
+### **3.6 Native and Overlay Network Modes** <!-- omit from toc -->
+
+`oke_simple` separates the network shape emitted by the workload extension from the cluster CNI requested from the downstream OKE module.
+
+| Config parameter | Purpose | Supported values | Default |
+| --- | --- | --- | --- |
+| `cni_type` | Network shape emitted by this workload extension | `native`, `overlay` | `native` |
+| `cni` | OKE cluster CNI requested from the downstream OKE module | `vcn_native`, `flannel` | `vcn_native` for native, `flannel` for overlay |
+
+Native mode uses workload-extension `cni_type: native` and `cni: vcn_native`. It creates a pod subnet in the OKE VCN, creates the pod security list and pod NSG, and wires the worker node pool with `pods_subnet_id` and `pods_nsg_ids`.
+
+Overlay mode uses workload-extension `cni_type: overlay` and `cni: flannel`. It creates no OCI pod subnet and wires the worker node pool only with the worker subnet and worker NSG. Overlay mode defaults `pods_cidr` to `10.244.0.0/16`. Keep `services_cidr` and overlay `pods_cidr` non-overlapping with each other, the OKE VCN, and any routed on-premises, cloud, or peered ranges. Do not set workload-extension `cni_type` to `flannel`; `flannel` is the OKE CNI value, while `overlay` is the workload-extension network shape.
 
 ## **4. Configuration Files**
 
@@ -397,6 +414,8 @@ Edit the JSON file to modify CIDR blocks:
 
 **Note**: Keep `options.kubernetes_network_config.services_cidr` aligned with your Kubernetes service network plan. It remains required for the published native OKE payload even though `pods_cidr` is no longer part of the standard single-stack example.
 
+For config-driven overlay clusters, `options.kubernetes_network_config` includes both `services_cidr` and `pods_cidr`. If `pods_cidr` is not provided, the generator defaults it to `10.244.0.0/16`.
+
 **Important**: [Check Supported Images, Shapes for Worker Nodes](https://docs.oracle.com/en-us/iaas/Content/ContEng/Reference/contengimagesshapes.htm) and [OKE supported versions](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengaboutk8sversions.htm) before upgrading.
 
 ### 7.5 Add Custom NSG Rules
@@ -438,7 +457,7 @@ Understanding the routing is critical for troubleshooting connectivity. This dep
 
 ### 8.1 OKE Subnet Route Tables <!-- omit from toc -->
 
-All four OKE subnets (Control Plane, Internal LB, Workers, Pods) use the same routing pattern:
+The published native OKE subnets (Control Plane, Internal LB, Workers, Pods) use the same routing pattern. Config-driven overlay clusters use the same pattern for the remaining Control Plane, Internal LB, and Workers subnets, with no pod subnet route table.
 
 ```
 Default Route:
@@ -540,8 +559,9 @@ OKE VCN Route:
    ```
    PCY-LZ-PROD-PLATFORM-OKE-VCN-CNI-KEY
    ```
-3. Verify subnet CIDRs don't overlap
-4. Check NSG rules allow required traffic
+3. If using overlay, verify the source config uses workload-extension `cni_type: overlay` and `cni: flannel`, and that the generated worker node pool does not include `pods_subnet_id` or `pods_nsg_ids`
+4. Verify subnet CIDRs don't overlap
+5. Check NSG rules allow required traffic
 
 ### Issue: Worker Nodes Not Joining Cluster <!-- omit from toc -->
 
@@ -572,14 +592,15 @@ OKE VCN Route:
 **Cause**: Pods don't have internet connectivity.
 
 **Solution**:
-1. Verify service gateway route exists in pod subnet route table
-2. Check NSG rules allow egress from pods:
+1. For native clusters, verify service gateway route exists in the pod subnet route table
+2. For overlay clusters, verify the worker subnet route table has service gateway and NAT/default routes because pod traffic exits through worker nodes
+3. Check NSG rules allow egress from pods or workers, depending on the selected network mode:
    ```
    Protocol: TCP
    Destination: 0.0.0.0/0
    Ports: 443
    ```
-3. For non-OCI registries, verify Hub NAT Gateway is working
+4. For non-OCI registries, verify NAT Gateway egress is working
 
 ### Issue: Configuration Key Not Found <!-- omit from toc -->
 
@@ -638,6 +659,7 @@ terraform destroy
 - [OneOE Blueprint](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe)
 - [OKE Documentation](https://docs.oracle.com/en-us/iaas/Content/ContEng/home.htm)
 - [VCN-Native Pod Networking](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-OCI_CNI_plugin.htm)
+- [Flannel Pod Networking](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-flannel_CNI_plugin.htm)
 - [Hub-and-Spoke Network Topology](https://docs.oracle.com/en/solutions/hub-spoke-network/index.html)
 
 &nbsp;

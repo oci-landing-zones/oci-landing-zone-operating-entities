@@ -201,7 +201,12 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
           network: { vcn: '10.0.96.0/22' },
           extension: {
             type: 'oke_simple',
-            params: { kubernetes_version: 'v1.35.2', services_cidr: '...', api_endpoint_allowed_cidrs: ['...'] },
+            params: {
+              kubernetes_version: 'v1.35.2',
+              services_cidr: '...',
+              api_endpoint_allowed_cidrs: ['...'],
+              cni_type: 'overlay',             // optional; omit for native, or set overlay for Flannel-compatible networking
+            },
           },
         },
       },

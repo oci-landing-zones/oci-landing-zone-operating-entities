@@ -1586,7 +1586,7 @@
 
                                 "ingress_rules": {
                                     "nsg_api_6443": {
-                                        "description"                         : "Allow TCP ingress to kube-apiserver from API endpoint source CIDR 10.0.1.0/24 on port 6443. Hub E uses the hub management subnet for private admin access.",
+                                        "description"                         : "Allow TCP ingress to kube-apiserver from API endpoint source CIDR 10.0.1.0/24 on port 6443 for private admin access.",
                                         "src"                                 : "10.0.1.0/24",
                                         "src_type"                            : "CIDR_BLOCK",
                                         "dst_port_min"                        : "6443",
@@ -1674,7 +1674,7 @@
 
                                 "egress_rules": {
                                     "nsg_api_6443": {
-                                        "description"                         : "Allow TCP egress from kube-apiserver to API endpoint source CIDR 10.0.1.0/24 on source port 6443. Hub E uses the hub management subnet for private admin access.",
+                                        "description"                         : "Allow TCP egress from kube-apiserver to API endpoint source CIDR 10.0.1.0/24 on source port 6443 for private admin access responses.",
                                         "src_port_min"                        : "6443",
                                         "src_port_max"                        : "6443",
                                         "dst"                                 : "10.0.1.0/24",

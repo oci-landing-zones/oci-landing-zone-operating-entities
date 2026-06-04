@@ -46,7 +46,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     else 'nsg_api_6443_%d' % (i + 1);
   local api_endpoint_ingress_rules = {
     [api_endpoint_rule_key(i)]: {
-      description: 'Allow TCP ingress to kube-apiserver from API endpoint source CIDR %s on port 6443. Hub E uses the hub management subnet for private admin access.' % api_endpoint_allowed_cidrs[i],
+      description: 'Allow TCP ingress to kube-apiserver from API endpoint source CIDR %s on port 6443 for private admin access.' % api_endpoint_allowed_cidrs[i],
       protocol: 'TCP',
       dst_port_max: '6443',
       dst_port_min: '6443',
@@ -58,7 +58,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
   };
   local api_endpoint_egress_rules = {
     [api_endpoint_rule_key(i)]: {
-      description: 'Allow TCP egress from kube-apiserver to API endpoint source CIDR %s on source port 6443. Hub E uses the hub management subnet for private admin access.' % api_endpoint_allowed_cidrs[i],
+      description: 'Allow TCP egress from kube-apiserver to API endpoint source CIDR %s on source port 6443 for private admin access responses.' % api_endpoint_allowed_cidrs[i],
       protocol: 'TCP',
       dst: api_endpoint_allowed_cidrs[i],
       dst_type: 'CIDR_BLOCK',
@@ -68,11 +68,47 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     }
     for i in std.range(0, std.length(api_endpoint_allowed_cidrs) - 1)
   };
+  local cni_type =
+    if std.objectHas(params.config_params, 'cni_type') && params.config_params.cni_type != null then
+      assert std.type(params.config_params.cni_type) == 'string' :
+        'config_params.cni_type must be a string';
+      assert std.member(['native', 'overlay'], params.config_params.cni_type) :
+        'config_params.cni_type must be one of: native, overlay';
+      params.config_params.cni_type
+    else
+      'native';
+  local cni =
+    if std.objectHas(params.config_params, 'cni') && params.config_params.cni != null then
+      assert std.type(params.config_params.cni) == 'string' :
+        'config_params.cni must be a string';
+      assert std.member(['vcn_native', 'flannel'], params.config_params.cni) :
+        'config_params.cni must be one of: vcn_native, flannel';
+      params.config_params.cni
+    else if cni_type == 'overlay' then
+      'flannel'
+    else
+      'vcn_native';
+  assert cni_type != 'native' || cni == 'vcn_native' :
+    'config_params.cni_type native requires config_params.cni vcn_native';
+  assert cni_type != 'overlay' || cni == 'flannel' :
+    'config_params.cni_type overlay requires config_params.cni flannel';
+  local is_overlay_network = cni_type == 'overlay';
+  local cluster_cni_type =
+    if cni == 'vcn_native' then 'native'
+    else 'flannel';
   local optional_cluster_kubernetes_network_config =
-    if std.objectHas(params.config_params, 'pods_cidr') && params.config_params.pods_cidr != null then
-      local pods_cidr = cidrs.validate('config_params.pods_cidr', params.config_params.pods_cidr);
+    if is_overlay_network || (std.objectHas(params.config_params, 'pods_cidr') && params.config_params.pods_cidr != null) then
+      local raw_pods_cidr =
+        if std.objectHas(params.config_params, 'pods_cidr') && params.config_params.pods_cidr != null then
+          params.config_params.pods_cidr
+        else
+          '10.244.0.0/16';
+      local pods_cidr = cidrs.validate('config_params.pods_cidr', raw_pods_cidr);
       assert !cidrs.overlaps(pods_cidr, services_cidr) :
-        'config_params.pods_cidr must not overlap config_params.services_cidr';
+        if is_overlay_network then
+          'config_params.pods_cidr for overlay must not overlap config_params.services_cidr'
+        else
+          'config_params.pods_cidr must not overlap config_params.services_cidr';
       { pods_cidr: pods_cidr }
     else
       {};
@@ -118,6 +154,10 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     services_cidr: services_cidr,
     api_endpoint_ingress_rules: api_endpoint_ingress_rules,
     api_endpoint_egress_rules: api_endpoint_egress_rules,
+    cni_type: cni_type,
+    cni: cni,
+    cluster_cni_type: cluster_cni_type,
+    is_overlay_network: is_overlay_network,
     optional_cluster_kubernetes_network_config: optional_cluster_kubernetes_network_config,
     worker_image: worker_image,
     cluster_key: cluster_key,

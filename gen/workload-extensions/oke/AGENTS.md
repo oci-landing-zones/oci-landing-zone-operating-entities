@@ -24,17 +24,25 @@ For published OKE deployment investigations, inspect the exact orchestrator tag 
 
 ## Current Repo Contract
 
-- `oke_simple` currently emits `cni_type: 'native'`.
-- The generator creates and wires a dedicated pod subnet in the OKE VCN through `pods_subnet_id`.
+- `oke_simple` supports two network shapes through `config_params.cni_type`: `native` and `overlay`.
+- `cni_type` defaults to `native`.
+- `config_params.cni` is the downstream OKE cluster CNI request. It defaults from `cni_type`: `vcn_native` for native and `flannel` for overlay.
+- Native network shape requires `cni: 'vcn_native'`.
+- Overlay network shape currently requires `cni: 'flannel'`.
+- Do not use `flannel` as a workload-extension `config_params.cni_type`; `cni_type` is the workload-extension network shape and only accepts `native` or `overlay`.
+- For native, the generator creates and wires a dedicated pod subnet in the OKE VCN through `pods_subnet_id`.
+- For overlay, the generator does not emit pod subnet, pod route table, pod security list, pod NSG, worker `pods_subnet_id`, or worker `pods_nsg_ids`.
 - `oke_simple` defaults `worker_image` to `'8.10'`, which the generator emits as `node_config_details.image`.
 - `services_cidr` remains the explicit Kubernetes service CIDR in the repo's standard native examples and is emitted under `options.kubernetes_network_config` in the cluster payload consumed by `cis-oke`.
 - `pods_cidr` is not required for the standard native `oke_simple` path, but if a config explicitly sets it the generator preserves it under `options.kubernetes_network_config` as a passthrough to the downstream `cis-oke` module.
+- For overlay, `pods_cidr` defaults to `10.244.0.0/16` and is emitted under `options.kubernetes_network_config`.
 - Do not make `pods_cidr` mandatory again for the native `oke_simple` path unless the downstream module contract truly requires it.
 
 ## CIDR Planning Rules
 
 - Distinguish OCI VCN/subnet CIDRs from Kubernetes-internal CIDRs.
-- For the current native OKE contract in this repo, pod IPs come from the pod subnet inside the OKE VCN.
+- For the native OKE contract in this repo, pod IPs come from the pod subnet inside the OKE VCN.
+- For the overlay OKE contract in this repo, pod IPs come from the Kubernetes overlay pod CIDR, not from an OCI pod subnet. The overlay `pods_cidr` must not overlap the OKE VCN, subnets, `services_cidr`, routed external networks, or other Kubernetes-internal ranges that must communicate.
 - `services_cidr` must be planned separately and must not overlap the OKE VCN or its subnets.
 - If the landing zone connects to on-premises or other clouds, OCI-routed ranges must not overlap those external networks.
 - Do not present an exact OKE CIDR split as "guaranteed" unless the sizing assumptions are explicit.
@@ -52,4 +60,6 @@ If those assumptions are missing, present the CIDRs as an example or starting po
 
 - If official Oracle docs and the repo contract appear inconsistent, stop and verify the downstream module contract before recommending deployment values.
 - For native OKE questions, do not infer overlay semantics from `pods_cidr` passthrough examples.
+- For overlay OKE questions, do not add or require pod OCI subnets unless the contract changes.
+- When multiple OKE platforms are generated, each OKE VCN route table must reference only gateways in that same VCN for NAT and service gateway routes.
 - When changing the OKE contract, update the generator, fixtures, tests, published JSON, and OKE docs in the same change.

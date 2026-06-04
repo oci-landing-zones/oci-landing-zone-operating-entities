@@ -19,9 +19,10 @@ function(ctx) {
         freeform_tags: {
           cluster: ctx.cluster_name,
         },
-        networking: {
+        networking: (if ctx.is_overlay_network then {} else {
           pods_nsg_ids: [ctx.nsg_pods_key],
           pods_subnet_id: ctx.sn_pods_key,
+        }) + {
           workers_nsg_ids: [ctx.nsg_workers_key],
           workers_subnet_id: ctx.sn_workers_key,
         },
