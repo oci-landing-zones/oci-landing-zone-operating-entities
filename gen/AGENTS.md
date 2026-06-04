@@ -40,10 +40,11 @@ gen/
 │       ├── oke_simple.libsonnet # Generic extension wrapper
 │       ├── single-stack/
 │       │   ├── profiles.libsonnet
+│       │   ├── output_builder.libsonnet
 │       │   └── *.jsonnet
 │       └── multi-stack/
 │           ├── profiles.libsonnet
-│           ├── published.libsonnet # Published-entrypoint adapter
+│           ├── output_builder.libsonnet # Profile-to-JSON publication output builder
 │           └── *.jsonnet
 │
 ├── addons/oci-hub-models/         # Published addon hub-model entrypoints
@@ -136,9 +137,24 @@ Update this diagram when any of these change:
   - `gen/addons/oci-hub-models/profiles.libsonnet`
 - Published entrypoints must stay thin:
   - import the local `profiles.libsonnet`
-  - call either `landing_zone.libsonnet` or a local `published.libsonnet` adapter with one profile config
+  - call either `landing_zone.libsonnet`, a local `output_builder.libsonnet`, or a local `published.libsonnet` adapter with one profile config
   - select exactly one result field
 - Published entrypoints must not rewrite outputs, compose checked-in JSONs together, import another published entrypoint as a wrapper, or push publication flags down into generic extension params.
+
+### Profile Output Builder Pattern (`output_builder.libsonnet`)
+
+A profile is the predefined Jsonnet config used to generate committed repository JSON artifacts. A profile lives in a local `profiles.libsonnet` file. An `output_builder.libsonnet` lives next to the profile and transforms that profile's rendered landing-zone result into the exact JSON surfaces committed for that published family.
+
+Rules:
+
+- Use a local `output_builder.libsonnet` when committed JSON output names or shapes need a stable publication projection over a profile config.
+- Keep profile data and output shaping separate. Profiles own predefined parameters; output builders own projection and transformation.
+- Output builders may pass through generic `landing_zone.libsonnet` outputs when the generated shape already matches the committed JSON contract.
+- Output builders may reshape only the published output surface. Do not push publication flags into generic extension params.
+
+Current output builders:
+
+- `gen/workload-extensions/oke/simple/{single-stack,multi-stack}/output_builder.libsonnet` — own the profile-to-committed-JSON output surfaces for published OKE simple artifacts. The multi-stack builder owns the publication-only OKE network and identity projections.
 
 ### Published Adapter Pattern (`published.libsonnet`)
 
@@ -154,7 +170,6 @@ Rules:
 Current adapters:
 
 - `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. It reuses `gen/render_context.libsonnet` for normalization/topology-derived inputs while preserving the hub-only network contract and shared-only IAM/governance projections.
-- `gen/workload-extensions/oke/simple/multi-stack/published.libsonnet` — owns the multi-stack publication-only OKE network and identity projections used by the multi-stack OKE entrypoints.
 - `gen/workload-extensions/exacc/{single-stack,multi-stack}/published.libsonnet` — own ExaDB-C@C stack-local publication projections.
 - `gen/workload-extensions/exacs/multi-stack/published.libsonnet` — owns ExaDB-D / ExaCS multi-stack publication projections.
 
@@ -312,7 +327,7 @@ Current extension ownership:
 
 - `gen/workload-extensions/oke/simple/oke_builder.libsonnet` owns the reusable OKE rendering logic.
 - `gen/workload-extensions/oke/simple/oke_simple.libsonnet` is the active generic extension wrapper for config mode and integrated landing-zone assembly.
-- `gen/workload-extensions/oke/simple/multi-stack/published.libsonnet` owns the multi-stack publication-only OKE network and identity projections used by repo entrypoints.
+- `gen/workload-extensions/oke/simple/{single-stack,multi-stack}/output_builder.libsonnet` owns the profile-to-committed-JSON OKE output surfaces used by repo entrypoints.
 - The local ExaDB-C@C guide owns extension-specific contracts, notification email semantics, publication layout, and tests.
 - `gen/workload-extensions/exacs/AGENTS.md` owns ExaDB-D / ExaCS placement mapping, component inference, network rules, and discovery addenda.
 
@@ -342,7 +357,7 @@ Keep extension-specific placement and parameter semantics in the extension's own
 ## 9. Generation Modes
 
 **Default mode** (`bash gen/generate.sh`):
-Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes formatted JSON output to the repo root (mirroring the directory structure). Generic entry points may import `defaults.libsonnet` for reusable baselines, while published entry points import their local `profiles.libsonnet`. Both patterns call `landing_zone.libsonnet` and select a single result field.
+Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes formatted JSON output to the repo root (mirroring the directory structure). Generic entry points may import `defaults.libsonnet` for reusable baselines, while published entry points import their local `profiles.libsonnet`. Published entry points either call `landing_zone.libsonnet` directly or select a single result field from a local profile output builder.
 
 **Config mode** (`bash gen/generate.sh --config my_config.libsonnet [output_dir]`):
 Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json`, `iam.json`, `security_*.json`, `observability_*.json`, and `governance.json` for every config. Staged hubs also emit `network_pre.json`, Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs.

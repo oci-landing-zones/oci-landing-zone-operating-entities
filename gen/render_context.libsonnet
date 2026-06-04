@@ -120,6 +120,7 @@ local common = import 'hub/hub_common.libsonnet';
       extension_routing_context(hub_has_spoke_natgw=true):: {
         naming: n,
         hub_vcn_cidr: config.hub.network.vcn,
+        hub_lb_cidr: config.hub.network.subnets.lb,
         routed_vcn_entries: all_vcn_entries,
         hub_has_spoke_natgw: hub_has_spoke_natgw,
       },
