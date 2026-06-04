@@ -46,7 +46,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     else 'nsg_api_6443_%d' % (i + 1);
   local api_endpoint_ingress_rules = {
     [api_endpoint_rule_key(i)]: {
-      description: 'Allow TCP ingress to kube-apiserver from configured API endpoint source CIDR %s on port 6443. In published Hub E profiles this is the hub management subnet used for private administrative access.' % api_endpoint_allowed_cidrs[i],
+      description: 'Allow TCP ingress to kube-apiserver from API endpoint source CIDR %s on port 6443. Hub E uses the hub management subnet for private admin access.' % api_endpoint_allowed_cidrs[i],
       protocol: 'TCP',
       dst_port_max: '6443',
       dst_port_min: '6443',
@@ -58,7 +58,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
   };
   local api_endpoint_egress_rules = {
     [api_endpoint_rule_key(i)]: {
-      description: 'Allow TCP egress from kube-apiserver to configured API endpoint source CIDR %s on source port 6443. In published Hub E profiles this is the hub management subnet used for private administrative access.' % api_endpoint_allowed_cidrs[i],
+      description: 'Allow TCP egress from kube-apiserver to API endpoint source CIDR %s on source port 6443. Hub E uses the hub management subnet for private admin access.' % api_endpoint_allowed_cidrs[i],
       protocol: 'TCP',
       dst: api_endpoint_allowed_cidrs[i],
       dst_type: 'CIDR_BLOCK',

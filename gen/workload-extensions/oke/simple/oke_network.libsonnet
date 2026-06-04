@@ -3,6 +3,9 @@
 function(ctx, overlay_output=false) {
   local n = ctx.n,
   local root = self,
+  local osn_service_cidr = 'all-%s-services-in-oracle-services-network' % n.region,
+  local icmp_security_list_egress_rules = root._icmp_security_list_egress_rules(ctx),
+  local icmp_security_list_ingress_rules = root._icmp_security_list_ingress_rules(ctx),
 
   network_configuration+: {
     network_configuration_categories+: {
@@ -15,6 +18,10 @@ function(ctx, overlay_output=false) {
             cidr_blocks: [ctx.params.network.vcn],
             dns_label: n.dns_label(['vcn', n.region, 'lz', ctx.dns, ctx.dns + ctx.plat]),
             block_nat_traffic: false,
+            default_security_list: {
+              egress_rules: [],
+              ingress_rules: [],
+            },
             is_attach_drg: false,
             is_create_igw: false,
             is_ipv6enabled: false,
@@ -93,27 +100,27 @@ function(ctx, overlay_output=false) {
                 {
                   key: ctx.sl_lb_key,
                   suffix: 'int-lb',
-                  egress: [],
-                  ingress: [],
+                  egress: icmp_security_list_egress_rules,
+                  ingress: icmp_security_list_ingress_rules,
                 },
                 {
                   key: ctx.sl_cp_key,
                   suffix: 'cp',
-                  egress: [root._icmp_egress_rule],
-                  ingress: [root._icmp_ingress_rule],
+                  egress: icmp_security_list_egress_rules,
+                  ingress: icmp_security_list_ingress_rules,
                   extras: { defined_tags: null, freeform_tags: null },
                 },
                 {
                   key: ctx.sl_pods_key,
                   suffix: 'pods',
-                  egress: [root._icmp_egress_rule],
-                  ingress: [root._icmp_ingress_rule],
+                  egress: icmp_security_list_egress_rules,
+                  ingress: icmp_security_list_ingress_rules,
                 },
                 {
                   key: ctx.sl_workers_key,
                   suffix: 'workers',
-                  egress: [root._icmp_egress_rule],
-                  ingress: [root._icmp_ingress_rule],
+                  egress: icmp_security_list_egress_rules,
+                  ingress: icmp_security_list_ingress_rules,
                 },
               ]
             },
@@ -124,7 +131,7 @@ function(ctx, overlay_output=false) {
 
                 egress_rules: {
                   nsg_cp_6443: root._nsg_tcp_egress('Allow TCP egress for Kubernetes control plane inter-communication', ctx.nsg_cp_key, '6443'),
-                  nsg_pods: root._nsg_tcp_egress_any('Allow TCP egress from OKE control plane to pods on any port for Kubernetes API server callbacks to pod-hosted admission webhooks. Keep the explicit 12250 and 6443 rules below as the fixed OKE control plane paths if this broader webhook rule is removed.', ctx.nsg_pods_key),
+                  nsg_pods: root._nsg_tcp_egress_any('Broad webhook rule: allow TCP egress from OKE control plane to pods on any port for API server callbacks. If removed, keep explicit 12250 and 6443 rules.', ctx.nsg_pods_key),
                   nsg_pods_12250: root._nsg_tcp_egress_src('Allow TCP egress from OKE control plane to pods with source port 12250', ctx.nsg_pods_key, '12250'),
                   nsg_pods_6443: root._nsg_tcp_egress_src('Allow TCP egress from OKE control plane to pods with source port 6443', ctx.nsg_pods_key, '6443'),
                   nsg_service: root._nsg_service_egress('Allow TCP egress from OKE control plane to OCI services'),
@@ -136,7 +143,7 @@ function(ctx, overlay_output=false) {
                 ingress_rules: {
                   nsg_cp_6443: root._nsg_tcp_ingress_src('Allow TCP ingress for Kubernetes control plane inter-communication on source port 6443', ctx.nsg_cp_key, '6443'),
                 } + ctx.api_endpoint_ingress_rules + {
-                  nsg_pods: root._nsg_tcp_ingress_any('Allow TCP ingress from pods to OKE control plane for responses to Kubernetes API server callbacks to pod-hosted admission webhooks. Keep the explicit 12250 and 6443 rules below as the fixed OKE control plane paths if this broader webhook rule is removed.', ctx.nsg_pods_key),
+                  nsg_pods: root._nsg_tcp_ingress_any('Return pair for broad pod webhook rule: allow TCP ingress from pods to OKE control plane. If broad rule is removed, keep 12250 and 6443 rules.', ctx.nsg_pods_key),
                   nsg_pods_12250: root._nsg_tcp_ingress('Allow TCP ingress from pods to kube-apiserver on port 12250', ctx.nsg_pods_key, '12250'),
                   nsg_pods_6443: root._nsg_tcp_ingress('Allow TCP ingress to kube-apiserver from pods on port 6443', ctx.nsg_pods_key, '6443'),
                   nsg_service: root._nsg_service_ingress('Allow TCP ingress from OCI services to control plane for responses'),
@@ -176,7 +183,7 @@ function(ctx, overlay_output=false) {
                     dst_type: 'CIDR_BLOCK',
                     stateless: false,
                   },
-                  nsg_cp: root._nsg_all_egress('Allow ALL egress from pods to Kubernetes control plane for responses to pod-hosted admission webhook callbacks. This broad rule pairs with the broad webhook ingress rule and can be removed when that rule is removed.', ctx.nsg_cp_key),
+                  nsg_cp: root._nsg_all_egress('Return pair for broad pod webhook rule: allow all egress from pods to Kubernetes control plane. Remove with matching broad ingress rule.', ctx.nsg_cp_key),
                   nsg_cp_6443: root._nsg_tcp_egress('Allow TCP egress from pods to Kubernetes API server', ctx.nsg_cp_key, '6443'),
                   nsg_lb_tcp: root._nsg_tcp_egress_any('Allow TCP egress from pods to load balancers', ctx.nsg_lb_key),
                   nsg_lb_udp: root._nsg_udp_egress_any('Allow UDP egress from pods to load balancers', ctx.nsg_lb_key),
@@ -186,7 +193,7 @@ function(ctx, overlay_output=false) {
                 } + root._hub_public_lb_pod_egress_rules(ctx),
 
                 ingress_rules: {
-                  nsg_cp: root._nsg_all_ingress('Allow ALL ingress to pods from Kubernetes control plane for pod-hosted admission webhooks. This broad rule is required when webhook services use arbitrary target ports, but it can be removed if the deployment forbids pod-hosted webhooks or accepts managing narrower webhook ports explicitly.', ctx.nsg_cp_key),
+                  nsg_cp: root._nsg_all_ingress('Broad webhook rule: allow all ingress to pods from Kubernetes control plane. Needed for pod-hosted webhooks on arbitrary target ports.', ctx.nsg_cp_key),
                   nsg_cp_6443: root._nsg_tcp_ingress_src('Allow TCP ingress from control plane to pods on source port 6443', ctx.nsg_cp_key, '6443'),
                   nsg_lb_tcp: root._nsg_tcp_ingress_any('Allow TCP ingress to pods from load balancers', ctx.nsg_lb_key),
                   nsg_lb_udp: root._nsg_udp_ingress_any('Allow UDP ingress to pods from load balancers', ctx.nsg_lb_key),
@@ -207,7 +214,7 @@ function(ctx, overlay_output=false) {
                     dst_type: 'CIDR_BLOCK',
                     stateless: false,
                   },
-                  nsg_cp: root._nsg_tcp_egress_any('Allow TCP egress from workers to Kubernetes control plane for responses to API server callbacks to webhooks served on worker hostNetwork ports. This rule is broad on TCP ports because hostNetwork webhooks can listen on non-standard ports.', ctx.nsg_cp_key),
+                  nsg_cp: root._nsg_tcp_egress_any('Return pair for hostNetwork webhook rule: allow TCP egress from workers to Kubernetes control plane on any port.', ctx.nsg_cp_key),
                   nsg_cp_10250: root._nsg_tcp_egress('Allow TCP egress from workers to OKE control plane', ctx.nsg_cp_key, '10250'),
                   nsg_cp_12250: root._nsg_tcp_egress('Allow TCP egress from workers to OKE control plane on port 12250', ctx.nsg_cp_key, '12250'),
                   nsg_cp_6443: root._nsg_tcp_egress('Allow TCP egress from workers to Kubernetes API server', ctx.nsg_cp_key, '6443'),
@@ -220,7 +227,7 @@ function(ctx, overlay_output=false) {
                 } + root._hub_public_lb_worker_egress_rules(ctx),
 
                 ingress_rules: {
-                  nsg_cp: root._nsg_tcp_ingress_any('Allow TCP ingress to workers from Kubernetes control plane for API server callbacks to webhooks served on worker hostNetwork ports. This rule is broad on TCP ports because hostNetwork webhooks can listen on non-standard ports.', ctx.nsg_cp_key),
+                  nsg_cp: root._nsg_tcp_ingress_any('Broad hostNetwork webhook rule: allow TCP ingress to workers from Kubernetes control plane on any port.', ctx.nsg_cp_key),
                   nsg_cp_10250: root._nsg_tcp_ingress_src('Allow TCP ingress from control plane to workers on source port 10250', ctx.nsg_cp_key, '10250'),
                   nsg_cp_12250: root._nsg_tcp_ingress_src('Allow TCP ingress from control plane to workers on source port 12250', ctx.nsg_cp_key, '12250'),
                   nsg_cp_6443: root._nsg_tcp_ingress_src('Allow TCP ingress from control plane to workers on source port 6443', ctx.nsg_cp_key, '6443'),
@@ -527,47 +534,47 @@ function(ctx, overlay_output=false) {
   _nsg_service_ingress(description):: {
     description: description,
     protocol: 'TCP',
-    src: 'all-services',
+    src: osn_service_cidr,
     src_type: 'SERVICE_CIDR_BLOCK',
     stateless: true,
   },
 
   _hub_public_lb_pod_ingress_rules(ctx):: if ctx.hub_lb_cidr == null then {} else {
     hub_public_lb_tcp: $._nsg_tcp_ingress_cidr(
-      'Allow TCP ingress to pods from Hub public load balancer subnet %s. OKE services can request public load balancers in that Hub subnet through annotations; because the subnet is in another VCN, this rule uses a CIDR source instead of an NSG source.' % ctx.hub_lb_cidr,
+      'Allow TCP ingress to pods from Hub public LB subnet %s. OKE can create public LBs there; cross-VCN rule uses CIDR instead of NSG.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr
     ),
     hub_public_lb_udp: $._nsg_udp_ingress_cidr(
-      'Allow UDP ingress to pods from Hub public load balancer subnet %s. OKE services can request public load balancers in that Hub subnet through annotations; because the subnet is in another VCN, this rule uses a CIDR source instead of an NSG source.' % ctx.hub_lb_cidr,
+      'Allow UDP ingress to pods from Hub public LB subnet %s. OKE can create public LBs there; cross-VCN rule uses CIDR instead of NSG.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr
     ),
   },
 
   _hub_public_lb_pod_egress_rules(ctx):: if ctx.hub_lb_cidr == null then {} else {
     hub_public_lb_tcp: $._nsg_tcp_egress_cidr(
-      'Allow TCP egress from pods to Hub public load balancer subnet %s for responses to public load balancer traffic. This is the stateless return pair for the Hub public LB TCP ingress rule.' % ctx.hub_lb_cidr,
+      'Return pair: allow TCP egress from pods to Hub public LB subnet %s for public LB traffic responses.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr
     ),
     hub_public_lb_udp: $._nsg_udp_egress_cidr(
-      'Allow UDP egress from pods to Hub public load balancer subnet %s for responses to public load balancer traffic. This is the stateless return pair for the Hub public LB UDP ingress rule.' % ctx.hub_lb_cidr,
+      'Return pair: allow UDP egress from pods to Hub public LB subnet %s for public LB traffic responses.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr
     ),
   },
 
   _hub_public_lb_worker_ingress_rules(ctx):: if ctx.hub_lb_cidr == null then {} else {
     hub_public_lb_10256: $._nsg_tcp_ingress_cidr_dst(
-      'Allow TCP ingress to workers from Hub public load balancer subnet %s for health checks on port 10256. OKE services can request public load balancers in that Hub subnet through annotations; because the subnet is in another VCN, this rule uses a CIDR source instead of an NSG source.' % ctx.hub_lb_cidr,
+      'Allow TCP ingress to workers from Hub public LB subnet %s for health checks on port 10256. Cross-VCN rule uses CIDR instead of NSG.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr,
       '10256'
     ),
     hub_public_lb_tcp: $._nsg_tcp_ingress_cidr_dst_range(
-      'Allow TCP ingress to workers from Hub public load balancer subnet %s on NodePort service ports 30000-32767. This mirrors the internal load balancer NSG rule using the Hub LB subnet CIDR because the load balancer subnet is in another VCN.' % ctx.hub_lb_cidr,
+      'Allow TCP ingress to workers from Hub public LB subnet %s on NodePort ports 30000-32767. Mirrors internal LB rule using CIDR.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr,
       '30000',
       '32767'
     ),
     hub_public_lb_udp: $._nsg_udp_ingress_cidr_dst_range(
-      'Allow UDP ingress to workers from Hub public load balancer subnet %s on NodePort service ports 30000-32767. This mirrors the internal load balancer NSG rule using the Hub LB subnet CIDR because the load balancer subnet is in another VCN.' % ctx.hub_lb_cidr,
+      'Allow UDP ingress to workers from Hub public LB subnet %s on NodePort ports 30000-32767. Mirrors internal LB rule using CIDR.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr,
       '30000',
       '32767'
@@ -576,26 +583,36 @@ function(ctx, overlay_output=false) {
 
   _hub_public_lb_worker_egress_rules(ctx):: if ctx.hub_lb_cidr == null then {} else {
     hub_public_lb_10256: $._nsg_tcp_egress_cidr_src(
-      'Allow TCP egress from workers to Hub public load balancer subnet %s with source port 10256 for health check responses. This is the stateless return pair for the Hub public LB health check ingress rule.' % ctx.hub_lb_cidr,
+      'Return pair: allow TCP egress from workers to Hub public LB subnet %s with source port 10256 for health checks.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr,
       '10256'
     ),
     hub_public_lb_tcp: $._nsg_tcp_egress_cidr_src_range(
-      'Allow TCP egress from workers to Hub public load balancer subnet %s with source ports 30000-32767 for NodePort service responses. This is the stateless return pair for the Hub public LB TCP NodePort ingress rule.' % ctx.hub_lb_cidr,
+      'Return pair: allow TCP egress from workers to Hub public LB subnet %s with source ports 30000-32767 for NodePort responses.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr,
       '30000',
       '32767'
     ),
     hub_public_lb_udp: $._nsg_udp_egress_cidr_src_range(
-      'Allow UDP egress from workers to Hub public load balancer subnet %s with source ports 30000-32767 for NodePort service responses. This is the stateless return pair for the Hub public LB UDP NodePort ingress rule.' % ctx.hub_lb_cidr,
+      'Return pair: allow UDP egress from workers to Hub public LB subnet %s with source ports 30000-32767 for NodePort responses.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr,
       '30000',
       '32767'
     ),
   },
 
-  _icmp_egress_rule:: {
-    description: 'ICMP type 3 code 4 for: All',
+  _icmp_security_list_egress_rules(ctx):: [
+    self._icmp_pmtu_egress_rule,
+    self._icmp_vcn_fail_fast_egress_rule(ctx),
+  ],
+
+  _icmp_security_list_ingress_rules(ctx):: [
+    self._icmp_pmtu_ingress_rule,
+    self._icmp_vcn_fail_fast_ingress_rule(ctx),
+  ],
+
+  _icmp_pmtu_egress_rule:: {
+    description: 'Required to enable Path MTU Discovery responses to work, and non-OCI communication',
     protocol: 'ICMP',
     dst: '0.0.0.0/0',
     dst_type: 'CIDR_BLOCK',
@@ -604,12 +621,30 @@ function(ctx, overlay_output=false) {
     stateless: true,
   },
 
-  _icmp_ingress_rule:: {
-    description: 'ICMP type 3 code 4 for: All',
+  _icmp_pmtu_ingress_rule:: {
+    description: 'Required to enable Path MTU Discovery to work, and non-OCI communication',
     protocol: 'ICMP',
     icmp_code: 4,
     icmp_type: 3,
     src: '0.0.0.0/0',
+    src_type: 'CIDR_BLOCK',
+    stateless: true,
+  },
+
+  _icmp_vcn_fail_fast_egress_rule(ctx):: {
+    description: 'Required to allow application within VCN responses to fail fast',
+    protocol: 'ICMP',
+    dst: ctx.params.network.vcn,
+    dst_type: 'CIDR_BLOCK',
+    icmp_type: 3,
+    stateless: true,
+  },
+
+  _icmp_vcn_fail_fast_ingress_rule(ctx):: {
+    description: 'Required to allow application within VCN to fail fast',
+    protocol: 'ICMP',
+    icmp_type: 3,
+    src: ctx.params.network.vcn,
     src_type: 'CIDR_BLOCK',
     stateless: true,
   },
