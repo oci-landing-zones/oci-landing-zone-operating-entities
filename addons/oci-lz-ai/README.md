@@ -1,24 +1,24 @@
-# **[Landing Zone AI Guidance](#)**
+# **[OCI LZ AI](#)**
 ## **An OCI Landing Zone Operating Entities [Addon](#) for AI assisted landing zone design**
 
 &nbsp;
 
 **Table of Contents**
 
-[1. Introduction](#1-introduction)<br>
-[2. Prepare Your AI](#2-prepare-your-ai)<br>
-[3. AI Guides the Setup](#3-ai-guides-the-setup)<br>
-[4. Run & Deploy](#4-run--deploy)<br>
-[5. Security Guardrails](#5-security-guardrails)<br>
+[Overview](#overview)<br>
+[1. Prepare Your AI](#1-prepare-your-ai)<br>
+[2. AI Guides the Setup](#2-ai-guides-the-setup)<br>
+[3. Run & Deploy](#3-run--deploy)<br>
+[AI Security](#ai-security)<br>
 
 &nbsp;
 
-## 1. Introduction
+## Overview
 
-The **Landing Zone AI Guidance** addon helps to use AI coding agents with the OCI Landing Zone Operating Entities repository. It aligns landing zone design with repository knowledge, json structure and review before manual deployment.
+The **OCI LZ AI** addon helps to use AI coding agents with the OCI Landing Zone Operating Entities repository. It aligns landing zone design with repository knowledge, json structure and review before manual deployment.
 
 <p align="center">
-  <img src="images/lz-ai-flow.svg" alt="Three step flow for AI guided Operating Entities setup" width="900">
+  <img src="images/oci-lz-ai-flow.svg" alt="Three step flow for AI guided Operating Entities setup" width="900">
 </p>
 
 > [!IMPORTANT]
@@ -28,12 +28,12 @@ This addon supports faster landing zone discovery while keeping architecture own
 
 - **Faster discovery**: AI helps structure requirements for environments, networking, IAM, security, observability and governance.
 - **Reviewable documentation**: Initial drafts are prepared for architecture and security review before deployment decisions.
-- **Security centered review**: Security guardrails are applied to all AI generated configurations. Assumptions and open questions are surfaced before deployment.
+- **Security centered review**: AI Security checks are applied to all AI generated configurations. Assumptions and open questions are surfaced before deployment.
 - **Guided deployment**: Deplyoment steps and review of landing zone is guided by AI.
 
 &nbsp;
 
-## 2. Prepare Your AI
+## 1. Prepare Your AI
 
 Before using this addon:
 
@@ -47,7 +47,7 @@ Keep source files and deployment artifacts in private, secure location controlle
 
 &nbsp;
 
-## 3. AI Guides the Setup
+## 2. AI Guides the Setup
 
 Start by describing the landing zone outcome, business context, technical constraints, security and compliance requirements. The AI coding agent works from the relevant repository knowledge and walks you through identifying and validating your reuirements. Generating landing zone and the next steps for reviewing and deploying to OCI.
 
@@ -82,13 +82,14 @@ Prepare the draft and return blockers, warnings, assumptions and review items.
 I want a landing zone with OKE.
 ```
 
-### Currently supported workload extensions with AI guardrails:
-- OKE
-- ExaCS/ExaCC
+### Currently supported AI Security:
+- [Addon] All Hub Models
+- [Extension] OKE
+- [Extension] ExaCS/ExaCC
 
 &nbsp;
 
-## 4. Run & Deploy
+## 3. Run & Deploy
 
 AI will deliver deployable assets as JSON files with documentation. Review all assets before deployment.
 
@@ -109,7 +110,7 @@ Follow additional documentation for both deployment paths of Landing Zones:
 
 &nbsp;
 
-## 5. Security Guardrails
+## AI Security
 
 AI assistance remains anchored in the OCI Landing Zone Operating Entities repository model. The AI agent creates or updates structured inputs and review artifacts. It does not invent landing zone files from memory or produce deployment artifacts outside the repository model.
 
