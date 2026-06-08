@@ -37,8 +37,8 @@ If you have not reviewed it yet, we recommend checking the [ExaDB-C@C use cases 
 | When to use it / Use Case  | POC or one-shot reference deployment | Extension of an existing Landing Zone or Modular IaC Model. |
 |---|---|---|
 | Use Case 1 (UC1): Shared ExaDB-C@C Platform<br><br><img src="./content/uc1.png" width="220"> | Use when deploying a new One-OE foundation and the shared ExaDB-C@C platform together in one deployable set without VCN/network resources. Published Use Case 1 artifacts are available in the [single-stack](./single-stack/readme.md) folder. | Use when extending an existing One-OE landing zone with the shared ExaDB-C@C platform. Published Use Case 1 artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. The extension adds IAM and observability only; it does not include network configuration files. |
-| Use Case 2 (UC2): Hybrid ExaDB-C@C Platform<br><br><img src="./content/uc2.png" width="220"> | [Config-driven generation required](../../commons/content/config-driven.md) | [Config-driven generation required](../../commons/content/config-driven.md) |
-| Use Case 3 (UC3): Dedicated ExaDB-C@C Platform<br><br><img src="./content/uc3.png" width="220"> | [Config-driven generation required](../../commons/content/config-driven.md) | [Config-driven generation required](../../commons/content/config-driven.md) |
+| Use Case 2 (UC2): Hybrid ExaDB-C@C Platform<br><br><img src="./content/uc2.png" width="220"> | [Config-driven generation required](../../addons/oci-lz-blueprint-factory/README.md) | [Config-driven generation required](../../addons/oci-lz-blueprint-factory/README.md) |
+| Use Case 3 (UC3): Dedicated ExaDB-C@C Platform<br><br><img src="./content/uc3.png" width="220"> | [Config-driven generation required](../../addons/oci-lz-blueprint-factory/README.md) | [Config-driven generation required](../../addons/oci-lz-blueprint-factory/README.md) |
 
 &nbsp;
 

@@ -1,0 +1,67 @@
+{
+  "region": "eu-frankfurt-1",
+  "region_short_name": "fra",
+  "realm": "oc1",
+  "hub": {
+    "kind": "hub_e",
+    "network": {
+      "vcn": "10.0.0.0/21"
+    }
+  },
+  "environments": {
+    "prod": {
+      "shared_project_network": {
+        "network": {
+          "vcn": "10.0.64.0/21"
+        }
+      },
+      "projects": {
+        "proj1": {}
+      }
+    },
+    "preprod": {
+      "shared_project_network": {
+        "network": {
+          "vcn": "10.0.128.0/21"
+        }
+      },
+      "projects": {
+        "proj1": {}
+      }
+    }
+  },
+  "shared_platforms": {
+    "exacs": {
+      "network": {
+        "vcn": "10.0.24.0/21"
+      },
+      "extension": {
+        "type": "exacs",
+        "params": {
+          "project_db_compartments": {
+            "prod": [
+              "proj1"
+            ],
+            "preprod": [
+              "proj1"
+            ]
+          },
+          "notification_emails": {
+            "default": [
+              "exacs-platform@example.com"
+            ],
+            "db_workloads": [
+              "exacs-db@example.com"
+            ],
+            "infra_workloads": [
+              "exacs-infra@example.com"
+            ],
+            "projects": [
+              "exacs-projects@example.com"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
