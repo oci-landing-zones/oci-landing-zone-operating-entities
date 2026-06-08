@@ -25,7 +25,7 @@
   - [**5.1 Cloud Guard Targets**](#51-cloud-guard-targets)
   - [**5.2 Vulnerability Scanning Services Recipes - Host**](#52-vulnerability-scanning-services-recipes---host)
   - [**5.3 Vulnerability Scanning Services Recipes - Container**](#53-vulnerability-scanning-services-recipes---container)
-  - [**5.4 Vulnerability Scanning Targets - Host**](#54-vulnerability-scanning-target---host)
+  - [**5.4 Vulnerability Scanning Targets - Host**](#54-vulnerability-scanning-targets---host)
   - [**5.5 Vulnerability Scanning Targets - Container**](#55-vulnerability-scanning-targets---container)
   - [**5.6 Security Zone Recipes**](#56-security-zone-recipes)
   - [**5.7 Security Zone Targets**](#57-security-zone-targets)

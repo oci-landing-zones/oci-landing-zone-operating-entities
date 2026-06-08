@@ -66,7 +66,7 @@ And follow these steps:
   
 
   1. **Network - Routing**:</br>
-     - Use the [oneoe_network_hub_a.json](oneoe_network_hub_a.json) configuration file and update the fields labeled "DMZ OCI NFW PRIVATE IP OCID" and "Internal OCI NFW PRIVATE IP OCID" with the corresponding Private IP OCIDs of the DMZ and Internal OCI Network Firewalls deployed in Step 1 ([how to obtain the Network Firewall Private IP OCID](../../../commons/content/howto_identify_private_ip_ocid_network_firewall.md)).
+     - Use the [oneoe_network_hub_a.json](oneoe_network_hub_a.json) configuration file and update the fields labeled "DMZ OCI NFW PRIVATE IP OCID" and "Internal OCI NFW PRIVATE IP OCID" with the corresponding Private IP OCIDs of the DMZ and Internal OCI Network Firewalls deployed in Step 1 ([how to obtain the Network Firewall Private IP OCID](../../../../commons/content/howto_identify_private_ip_ocid_network_firewall.md)).
      - After updating the file, edit the ORM stack and replace the previous [oneoe_network_hub_a_pre.json](oneoe_network_hub_a_pre.json) network configuration with [oneoe_network_hub_a.json](oneoe_network_hub_a.json). This updated JSON file now includes the Private IPs (OCIDs) for both OCI Network Firewalls and ensures they are referenced correctly in the associated route tables.
   
   2. **Security - Security Zones, Vulnerability Scanning Service**:</br></br>
