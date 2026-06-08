@@ -17,13 +17,18 @@ local exacs_extension(projects=null) = {
   },
 };
 
-local env_exacs_platform(projects) = exacs_extension(projects);
+local env_exacs_platform(projects, vcn) = exacs_extension(projects) {
+  network: { vcn: vcn },
+};
 
 local shared_exacs_platform = exacs_extension() {
   network: { vcn: '10.0.24.0/21' },
 };
 
-local prod_preprod_exacs_uc1_config(hub_kind) = {
+local prod_exacs_vcn = '10.0.104.0/21';
+local preprod_exacs_vcn = '10.0.168.0/21';
+
+local base_prod_preprod_config(hub_kind) = {
   region: 'eu-frankfurt-1',
   region_short_name: 'fra',
   realm: 'oc1',
@@ -36,15 +41,24 @@ local prod_preprod_exacs_uc1_config(hub_kind) = {
     prod: {
       shared_project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
-      platforms: {
-        exacs: env_exacs_platform(['proj1']),
-      },
     },
     preprod: {
       shared_project_network: { network: { vcn: '10.0.128.0/21' } },
       projects: { proj1: {} },
+    },
+  },
+};
+
+local prod_preprod_exacs_uc1_config(hub_kind) = base_prod_preprod_config(hub_kind) {
+  environments+: {
+    prod+: {
       platforms: {
-        exacs: env_exacs_platform(['proj1']),
+        exacs: exacs_extension(['proj1']),
+      },
+    },
+    preprod+: {
+      platforms: {
+        exacs: exacs_extension(['proj1']),
       },
     },
   },
@@ -53,9 +67,46 @@ local prod_preprod_exacs_uc1_config(hub_kind) = {
   },
 };
 
+local prod_preprod_exacs_uc2_config(hub_kind) = base_prod_preprod_config(hub_kind) {
+  shared_platforms: {
+    exacs: exacs_extension(),
+  },
+  environments+: {
+    prod+: {
+      platforms: {
+        exacs: env_exacs_platform(['proj1'], prod_exacs_vcn),
+      },
+    },
+    preprod+: {
+      platforms: {
+        exacs: env_exacs_platform(['proj1'], preprod_exacs_vcn),
+      },
+    },
+  },
+};
+
+local prod_preprod_exacs_uc3_config(hub_kind) = base_prod_preprod_config(hub_kind) {
+  environments+: {
+    prod+: {
+      platforms: {
+        exacs: env_exacs_platform(['proj1'], prod_exacs_vcn),
+      },
+    },
+    preprod+: {
+      platforms: {
+        exacs: env_exacs_platform(['proj1'], preprod_exacs_vcn),
+      },
+    },
+  },
+};
+
 {
   notification_emails: notification_emails,
 
   hub_a_prod_preprod_exacs_uc1_config: prod_preprod_exacs_uc1_config('hub_a'),
   hub_e_prod_preprod_exacs_uc1_config: prod_preprod_exacs_uc1_config('hub_e'),
+  hub_a_prod_preprod_exacs_uc2_config: prod_preprod_exacs_uc2_config('hub_a'),
+  hub_e_prod_preprod_exacs_uc2_config: prod_preprod_exacs_uc2_config('hub_e'),
+  hub_a_prod_preprod_exacs_uc3_config: prod_preprod_exacs_uc3_config('hub_a'),
+  hub_e_prod_preprod_exacs_uc3_config: prod_preprod_exacs_uc3_config('hub_e'),
 }

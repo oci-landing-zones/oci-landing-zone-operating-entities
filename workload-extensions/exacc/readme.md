@@ -34,11 +34,32 @@ If you have not reviewed it yet, we recommend checking the [ExaDB-C@C use cases 
 ## **3. Deployment Options**
 &nbsp;
 
-| When to use it / Use Case  | POC or one-shot reference deployment | Extension of an existing Landing Zone or Modular IaC Model. |
-|---|---|---|
-| Use Case 1 (UC1): Shared ExaDB-C@C Platform<br><br><img src="./content/uc1.png" width="220"> | Use when deploying a new One-OE foundation and the shared ExaDB-C@C platform together in one deployable set without VCN/network resources. Published Use Case 1 artifacts are available in the [single-stack](./single-stack/readme.md) folder. | Use when extending an existing One-OE landing zone with the shared ExaDB-C@C platform. Published Use Case 1 artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. The extension adds IAM and observability only; it does not include network configuration files. |
-| Use Case 2 (UC2): Hybrid ExaDB-C@C Platform<br><br><img src="./content/uc2.png" width="220"> | Use when deploying a new One-OE foundation with shared ExaDB-C@C infrastructure and environment-specific VMCs/AVMCs. Published Use Case 2 artifacts are available in the [single-stack](./single-stack/readme.md) folder. | Use when extending an existing One-OE landing zone with shared ExaDB-C@C infrastructure and dedicated environment-level database platform scopes. Published Use Case 2 artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. |
-| Use Case 3 (UC3): Dedicated ExaDB-C@C Platform<br><br><img src="./content/uc3.png" width="220"> | Use when deploying a new One-OE foundation where each environment has its own ExaDB-C@C infrastructure and VMCs/AVMCs. Published Use Case 3 artifacts are available in the [single-stack](./single-stack/readme.md) folder. | Use when extending an existing One-OE landing zone with fully environment-dedicated ExaDB-C@C platform scopes. Published Use Case 3 artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="34%">When to use it / Use Case</th>
+      <th width="33%">Single-stack<br>POC or one-shot reference deployment</th>
+      <th width="33%">Multi-stack<br>Extension of an existing Landing Zone or Modular IaC Model</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="34%">Use Case 1 (UC1): Shared ExaDB-C@C Platform<br><br><img src="./content/exacc_use_case_1.png" width="220"></td>
+      <td width="33%">Use when deploying a new One-OE foundation and the shared ExaDB-C@C platform together in one deployable set without VCN/network resources. Published Use Case 1 artifacts are available in the <a href="./single-stack/readme.md">single-stack</a> folder.</td>
+      <td width="33%">Use when extending an existing One-OE landing zone with the shared ExaDB-C@C platform. Published Use Case 1 artifacts are available in the <a href="./multi-stack/readme.md">multi-stack</a> folder. The extension adds IAM and observability only; it does not include network configuration files.</td>
+    </tr>
+    <tr>
+      <td width="34%">Use Case 2 (UC2): Hybrid ExaDB-C@C Platform<br><br><img src="./content/exacc_use_case_2.png" width="220"></td>
+      <td width="33%">Use when deploying a new One-OE foundation with shared ExaDB-C@C infrastructure and environment-specific VMCs/AVMCs. Published Use Case 2 artifacts are available in the <a href="./single-stack/readme.md">single-stack</a> folder.</td>
+      <td width="33%">Use when extending an existing One-OE landing zone with shared ExaDB-C@C infrastructure and dedicated environment-level database platform scopes. Published Use Case 2 artifacts are available in the <a href="./multi-stack/readme.md">multi-stack</a> folder.</td>
+    </tr>
+    <tr>
+      <td width="34%">Use Case 3 (UC3): Dedicated ExaDB-C@C Platform<br><br><img src="./content/exacc_use_case_3.png" width="220"></td>
+      <td width="33%">Use when deploying a new One-OE foundation where each environment has its own ExaDB-C@C infrastructure and VMCs/AVMCs. Published Use Case 3 artifacts are available in the <a href="./single-stack/readme.md">single-stack</a> folder.</td>
+      <td width="33%">Use when extending an existing One-OE landing zone with fully environment-dedicated ExaDB-C@C platform scopes. Published Use Case 3 artifacts are available in the <a href="./multi-stack/readme.md">multi-stack</a> folder.</td>
+    </tr>
+  </tbody>
+</table>
 
 &nbsp;
 

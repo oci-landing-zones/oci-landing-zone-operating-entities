@@ -37,26 +37,116 @@ In this asset, we assume that One-OE has already been deployed, and we focus on 
 
 
 
-## **3. Architecture Components**
+## **3. Deployment Steps**
 
-| JSON configurations | Configuration-defined components | Resources |
-|:-|:-|:-|
-| **IAM configuration**</br> [exacs_identity_uc1.json](exacs_identity_uc1.json) | • ExaDB-D compartments</br> • ExaDB-D IAM groups and policies | cmp-lz-shared-exacs, cmp-lz-shared-exacs-db, cmp-lz-shared-exacs-infra, cmp-lz-preprod-exacs, cmp-lz-preprod-exacs-db, cmp-lz-preprod-exacs-infra, cmp-lz-preprod-proj1-exacs-db, cmp-lz-prod-exacs, cmp-lz-prod-exacs-db, cmp-lz-prod-exacs-infra, cmp-lz-prod-proj1-exacs-db <br><br> grp-lz-global-exacs-db-admin, grp-lz-global-exacs-infra-admin, grp-lz-preprod-proj1-exacs-admin, grp-lz-prod-proj1-exacs-admin <br><br> pcy-lz-global-exacs-db-admin, pcy-lz-global-exacs-generic, pcy-lz-global-exacs-infra-admin, pcy-lz-preprod-exacs-proj1-admin, pcy-lz-prod-exacs-proj1-admin |
-| **Spoke network configurations**</br> **Network pre configuration:** [exacs_network_uc1_a_pre.json](exacs_network_uc1_a_pre.json), [exacs_network_uc1_e_pre.json](exacs_network_uc1_e_pre.json)</br> **Network configuration:** [exacs_network_uc1_a.json](exacs_network_uc1_a.json), [exacs_network_uc1_e.json](exacs_network_uc1_e.json) | • ExaDB-D spoke VCN pre and final configuration for Hub A and Hub E</br> • Pre files create the spoke VCN before hub DRG routing is ready</br> • Network files update the spoke VCN after hub DRG routing is ready: Hub A sends default egress through the DRG and firewalled hub; Hub E sends default egress through the local NAT gateway and keeps DRG routes to the hub and peer spokes | vcn-fra-lz-shared-exacs <br><br> sn-fra-lz-shared-exacs-db, sn-fra-lz-shared-exacs-backup <br><br> rt-fra-lz-shared-exacs-generic <br><br> sl-fra-lz-shared-exacs-generic <br><br> sgw-fra-lz-shared-exacs <br><br> Hub E only: ngw-fra-lz-shared-exacs |
-| **Hub post configuration**</br> [oneoe_network_hub_a_post.json](oneoe_network_hub_a_post.json)</br> [oneoe_network_hub_e_post.json](oneoe_network_hub_e_post.json) | • One-OE hub network update that attaches and routes to the ExaDB-D spoke VCN | drgatt-fra-lz-shared-exacs <br><br> Hub route-table and DRG route-distribution updates for the shared ExaDB-D platform CIDR |
-| **Observability configurations**</br> **Observability pre configuration:** [exacs_observability_uc1_pre.json](exacs_observability_uc1_pre.json)</br> **Observability final configuration:** [exacs_observability_uc1.json](exacs_observability_uc1.json) | • Events, alarms, and notifications for ExaDB-D operations, VMC, database, infrastructure, and environment notifications</br> • Final configuration also adds VCN and subnet flow logs after the network resources exist | rul-lz-notify-on-opctl-events, rul-lz-notify-on-exacs-vmc-events, rul-lz-notify-on-exacs-db-events, rul-lz-notify-on-exacs-infra-events, rul-lz-preprod-notify-on-notifications, rul-lz-prod-notify-on-notifications <br><br> al-lz-db-cpuutil, al-lz-vmc-cpuutil, al-lz-vmc-dgutil, al-lz-vmc-fsutil, al-lz-vmc-memutil, al-lz-vmc-swaputil, al-lz-db-storageutil <br><br> nott-lz-exacs-db-workloads, nott-lz-exacs-infra-workloads, nott-lz-preprod-exacs-projects, nott-lz-prod-exacs-projects <br><br> Final only: lgrp-lz-shared-exacs-vcn-flow |
+<table>
+  <thead>
+    <tr>
+      <th>USE CASE</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Description</td>
+      <td><a href="../exacs_use_cases/readme.md/#21-shared-exadb-d-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments">shared ExaDB-D platform</a></td>
+      <td><a href="../exacs_use_cases/readme.md/#22-hybrid-exadb-d-platform-shared-infrastructure-with-dedicated-vmcsavmcs-per-environment">hybrid ExaDB-D platform</a></td>
+      <td><a href="../exacs_use_cases/readme.md/#23-dedicated-exadb-d-platform-fully-dedicated-infrastructure-and-vmcsavmcs-per-environment">dedicated ExaDB-D platform</a></td>
+    </tr>
+    <tr>
+      <td>Files</td>
+      <td>Deploy the EXACS extension stack with IAM <a href="./exacs_identity_uc1.json">exacs_identity_uc1.json</a>, observability pre <a href="./exacs_observability_uc1_pre.json">exacs_observability_uc1_pre.json</a>, and the selected hub network pre file: <a href="./exacs_network_uc1_a_pre.json">exacs_network_uc1_a_pre.json</a> or <a href="./exacs_network_uc1_e_pre.json">exacs_network_uc1_e_pre.json</a>. Then re-apply the base One-OE stack with <a href="./oneoe_network_hub_a_post.json">oneoe_network_hub_a_post.json</a> or <a href="./oneoe_network_hub_e_post.json">oneoe_network_hub_e_post.json</a>. Finally re-apply the EXACS extension stack with observability final <a href="./exacs_observability_uc1.json">exacs_observability_uc1.json</a> and the selected hub network final file: <a href="./exacs_network_uc1_a.json">exacs_network_uc1_a.json</a> or <a href="./exacs_network_uc1_e.json">exacs_network_uc1_e.json</a>.</td>
+      <td>Deploy the EXACS extension stack with IAM <a href="./exacs_identity_uc2.json">exacs_identity_uc2.json</a>, observability pre <a href="./exacs_observability_uc2_pre.json">exacs_observability_uc2_pre.json</a>, and the selected hub network pre file: <a href="./exacs_network_uc2_a_pre.json">exacs_network_uc2_a_pre.json</a> or <a href="./exacs_network_uc2_e_pre.json">exacs_network_uc2_e_pre.json</a>. Then re-apply the base One-OE stack with <a href="./oneoe_network_hub_a_uc2_post.json">oneoe_network_hub_a_uc2_post.json</a> or <a href="./oneoe_network_hub_e_uc2_post.json">oneoe_network_hub_e_uc2_post.json</a>. Finally re-apply the EXACS extension stack with observability final <a href="./exacs_observability_uc2.json">exacs_observability_uc2.json</a> and the selected hub network final file: <a href="./exacs_network_uc2_a.json">exacs_network_uc2_a.json</a> or <a href="./exacs_network_uc2_e.json">exacs_network_uc2_e.json</a>.</td>
+      <td>Deploy the EXACS extension stack with IAM <a href="./exacs_identity_uc3.json">exacs_identity_uc3.json</a>, observability pre <a href="./exacs_observability_uc3_pre.json">exacs_observability_uc3_pre.json</a>, and the selected hub network pre file: <a href="./exacs_network_uc3_a_pre.json">exacs_network_uc3_a_pre.json</a> or <a href="./exacs_network_uc3_e_pre.json">exacs_network_uc3_e_pre.json</a>. Then re-apply the base One-OE stack with <a href="./oneoe_network_hub_a_uc3_post.json">oneoe_network_hub_a_uc3_post.json</a> or <a href="./oneoe_network_hub_e_uc3_post.json">oneoe_network_hub_e_uc3_post.json</a>. Finally re-apply the EXACS extension stack with observability final <a href="./exacs_observability_uc3.json">exacs_observability_uc3.json</a> and the selected hub network final file: <a href="./exacs_network_uc3_a.json">exacs_network_uc3_a.json</a> or <a href="./exacs_network_uc3_e.json">exacs_network_uc3_e.json</a>.</td>
+    </tr>
+    <tr>
+      <td>Deployment</td>
+      <td colspan="3">Use the files listed above with Terraform CLI, or stage them in a private Object Storage bucket or approved private source for OCI Resource Manager. Configure outputs and dependencies because pre-existing resources are used. To learn more about this, go <a href="../../../commons/content/orm_bp.md">here</a>.</td>
+    </tr>
+  </tbody>
+</table>
 
 &nbsp;
 
+## **4. Architecture Components**
 
-## **4. Deployment Steps**
-
-| USE CASE | 1 | 2 | 3 |
-|----------|---|---|---|
-| Description | [shared ExaDB-D platform](../exacs_use_cases/readme.md/#21-shared-exadb-d-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments) | [hybrid ExaDB-D platform](../exacs_use_cases/readme.md/#22-hybrid-exadb-d-platform-shared-infrastructure-with-dedicated-vmcsavmcs-per-environment) | [dedicated ExaDB-D platform](../exacs_use_cases/readme.md/#23-dedicated-exadb-d-platform-fully-dedicated-infrastructure-and-vmcsavmcs-per-environment) |
-| Deployment | Use the files listed below with Terraform CLI, or stage them in a private Object Storage bucket or approved private source for OCI Resource Manager. Configure outputs and dependencies because pre-existing resources are used. To learn more about this, go [here](../../../commons/content/orm_bp.md). | Config-driven generation required | Config-driven generation required |
-| Files | Deploy the EXACS extension stack with [iam](./exacs_identity_uc1.json), [observability pre](./exacs_observability_uc1_pre.json), and the matching network pre file for the selected hub: [Hub A network pre](./exacs_network_uc1_a_pre.json) or [Hub E network pre](./exacs_network_uc1_e_pre.json). Then re-apply the base One-OE stack with [Hub A post](./oneoe_network_hub_a_post.json) or [Hub E post](./oneoe_network_hub_e_post.json). Finally re-apply the EXACS extension stack keeping [iam](./exacs_identity_uc1.json) and replacing the pre files with [observability](./exacs_observability_uc1.json) plus [Hub A network](./exacs_network_uc1_a.json) or [Hub E network](./exacs_network_uc1_e.json). | Generated from customer config | Generated from customer config |
-
+<table>
+  <thead>
+    <tr>
+      <th>Use Case</th>
+      <th>JSON configurations</th>
+      <th>Configuration-defined components</th>
+      <th>Resources</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="4"><strong>Use Case 1 (UC1)</strong></td>
+      <td><strong>IAM configuration</strong><br><a href="exacs_identity_uc1.json">exacs_identity_uc1.json</a></td>
+      <td>• ExaDB-D compartments<br>• ExaDB-D IAM groups and policies</td>
+      <td>Shared ExaDB-D platform compartments and project database compartments.<br><br>ExaDB-D database, infrastructure, and project admin groups and policies.</td>
+    </tr>
+    <tr>
+      <td><strong>Network configuration</strong><br><strong>Hub A pre</strong>: <a href="exacs_network_uc1_a_pre.json">exacs_network_uc1_a_pre.json</a><br><strong>Hub A final</strong>: <a href="exacs_network_uc1_a.json">exacs_network_uc1_a.json</a><br><strong>Hub E pre</strong>: <a href="exacs_network_uc1_e_pre.json">exacs_network_uc1_e_pre.json</a><br><strong>Hub E final</strong>: <a href="exacs_network_uc1_e.json">exacs_network_uc1_e.json</a></td>
+      <td>• Shared ExaDB-D platform network<br>• Database and backup subnets<br>• Route tables, gateways, and security lists</td>
+      <td>Shared ExaDB-D platform VCN, database subnet, backup subnet, route table, security list, NAT gateway, and service gateway.</td>
+    </tr>
+    <tr>
+      <td><strong>Hub post configuration</strong><br><strong>Hub A</strong>: <a href="oneoe_network_hub_a_post.json">oneoe_network_hub_a_post.json</a><br><strong>Hub E</strong>: <a href="oneoe_network_hub_e_post.json">oneoe_network_hub_e_post.json</a></td>
+      <td>• Existing One-OE hub and spoke route updates<br>• DRG attachments and route distribution updates</td>
+      <td>Hub and spoke routes required to connect the existing One-OE network to the shared ExaDB-D platform network.</td>
+    </tr>
+    <tr>
+      <td><strong>Observability configuration</strong><br><strong>Pre</strong>: <a href="exacs_observability_uc1_pre.json">exacs_observability_uc1_pre.json</a><br><strong>Final</strong>: <a href="exacs_observability_uc1.json">exacs_observability_uc1.json</a></td>
+      <td>• Events<br>• Alarms<br>• Notifications<br>• Logging and VCN flow logs</td>
+      <td>ExaDB-D infrastructure and project notification rules; load balancer alarms where applicable; notification topics; VCN flow log groups.<br><br>The pre file supports the initial apply before network-dependent flow logs exist; the final file enables the full observability configuration after network resources exist.</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><strong>Use Case 2 (UC2)</strong></td>
+      <td><strong>IAM configuration</strong><br><a href="exacs_identity_uc2.json">exacs_identity_uc2.json</a></td>
+      <td>• ExaDB-D compartments<br>• ExaDB-D IAM groups and policies</td>
+      <td>Shared ExaDB-D infrastructure compartments, environment ExaDB-D platform compartments, and project database compartments.<br><br>ExaDB-D database, infrastructure, and project admin groups and policies.</td>
+    </tr>
+    <tr>
+      <td><strong>Network configuration</strong><br><strong>Hub A pre</strong>: <a href="exacs_network_uc2_a_pre.json">exacs_network_uc2_a_pre.json</a><br><strong>Hub A final</strong>: <a href="exacs_network_uc2_a.json">exacs_network_uc2_a.json</a><br><strong>Hub E pre</strong>: <a href="exacs_network_uc2_e_pre.json">exacs_network_uc2_e_pre.json</a><br><strong>Hub E final</strong>: <a href="exacs_network_uc2_e.json">exacs_network_uc2_e.json</a></td>
+      <td>• Environment-specific ExaDB-D platform networks<br>• Database and backup subnets<br>• Route tables, gateways, and security lists</td>
+      <td>Prod and preprod ExaDB-D platform VCNs, database subnets, backup subnets, route tables, security lists, NAT gateways, and service gateways.</td>
+    </tr>
+    <tr>
+      <td><strong>Hub post configuration</strong><br><strong>Hub A</strong>: <a href="oneoe_network_hub_a_uc2_post.json">oneoe_network_hub_a_uc2_post.json</a><br><strong>Hub E</strong>: <a href="oneoe_network_hub_e_uc2_post.json">oneoe_network_hub_e_uc2_post.json</a></td>
+      <td>• Existing One-OE hub and spoke route updates<br>• DRG attachments and route distribution updates</td>
+      <td>Hub and spoke routes required to connect the existing One-OE network to the prod and preprod ExaDB-D platform networks.</td>
+    </tr>
+    <tr>
+      <td><strong>Observability configuration</strong><br><strong>Pre</strong>: <a href="exacs_observability_uc2_pre.json">exacs_observability_uc2_pre.json</a><br><strong>Final</strong>: <a href="exacs_observability_uc2.json">exacs_observability_uc2.json</a></td>
+      <td>• Events<br>• Alarms<br>• Notifications<br>• Logging and VCN flow logs</td>
+      <td>Shared ExaDB-D infrastructure, environment ExaDB-D platform, and project notification rules; load balancer alarms where applicable; notification topics; VCN flow log groups.<br><br>The pre file supports the initial apply before network-dependent flow logs exist; the final file enables the full observability configuration after network resources exist.</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><strong>Use Case 3 (UC3)</strong></td>
+      <td><strong>IAM configuration</strong><br><a href="exacs_identity_uc3.json">exacs_identity_uc3.json</a></td>
+      <td>• ExaDB-D compartments<br>• ExaDB-D IAM groups and policies</td>
+      <td>Environment ExaDB-D platform compartments and project database compartments.<br><br>ExaDB-D database, infrastructure, and project admin groups and policies.</td>
+    </tr>
+    <tr>
+      <td><strong>Network configuration</strong><br><strong>Hub A pre</strong>: <a href="exacs_network_uc3_a_pre.json">exacs_network_uc3_a_pre.json</a><br><strong>Hub A final</strong>: <a href="exacs_network_uc3_a.json">exacs_network_uc3_a.json</a><br><strong>Hub E pre</strong>: <a href="exacs_network_uc3_e_pre.json">exacs_network_uc3_e_pre.json</a><br><strong>Hub E final</strong>: <a href="exacs_network_uc3_e.json">exacs_network_uc3_e.json</a></td>
+      <td>• Environment-specific ExaDB-D platform networks<br>• Database and backup subnets<br>• Route tables, gateways, and security lists</td>
+      <td>Prod and preprod ExaDB-D platform VCNs, database subnets, backup subnets, route tables, security lists, NAT gateways, and service gateways.</td>
+    </tr>
+    <tr>
+      <td><strong>Hub post configuration</strong><br><strong>Hub A</strong>: <a href="oneoe_network_hub_a_uc3_post.json">oneoe_network_hub_a_uc3_post.json</a><br><strong>Hub E</strong>: <a href="oneoe_network_hub_e_uc3_post.json">oneoe_network_hub_e_uc3_post.json</a></td>
+      <td>• Existing One-OE hub and spoke route updates<br>• DRG attachments and route distribution updates</td>
+      <td>Hub and spoke routes required to connect the existing One-OE network to the prod and preprod ExaDB-D platform networks.</td>
+    </tr>
+    <tr>
+      <td><strong>Observability configuration</strong><br><strong>Pre</strong>: <a href="exacs_observability_uc3_pre.json">exacs_observability_uc3_pre.json</a><br><strong>Final</strong>: <a href="exacs_observability_uc3.json">exacs_observability_uc3.json</a></td>
+      <td>• Events<br>• Alarms<br>• Notifications<br>• Logging and VCN flow logs</td>
+      <td>Environment ExaDB-D platform and project notification rules; load balancer alarms where applicable; notification topics; VCN flow log groups.<br><br>The pre file supports the initial apply before network-dependent flow logs exist; the final file enables the full observability configuration after network resources exist.</td>
+    </tr>
+  </tbody>
+</table>
 
 &nbsp;
 

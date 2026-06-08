@@ -1,0 +1,251 @@
+{
+    "network_configuration": {
+        "network_configuration_categories": {
+            "preprod-platform-exacs": {
+                "category_compartment_id"                                 : "CMP-LZ-PREPROD-NETWORK-KEY",
+
+                "vcns": {
+                    "VCN-FRA-LZ-PREPROD-PLATFORM-EXACS-KEY": {
+                        "display_name"                                    : "vcn-fra-lz-preprod-exacs",
+                        "cidr_blocks"                                     : ["10.0.168.0/21"],
+                        "dns_label"                                       : "vcnfralzppexacs",
+                        "block_nat_traffic"                               : false,
+                        "is_attach_drg"                                   : false,
+                        "is_create_igw"                                   : false,
+                        "is_ipv6enabled"                                  : false,
+                        "is_oracle_gua_allocation_enabled"                : false,
+                        "network_security_groups"                         : {},
+
+                        "subnets": {
+                            "SN-FRA-LZ-PREPROD-PLATFORM-EXACS-DB-KEY": {
+                                "display_name"                            : "sn-fra-lz-preprod-exacs-db",
+                                "cidr_block"                              : "10.0.168.0/24",
+                                "dns_label"                               : "snfrappexacsdb",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-FRA-LZ-PREPROD-PLATFORM-EXACS-GENERIC-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-PREPROD-PLATFORM-EXACS-GENERIC-KEY"]
+                            },
+
+                            "SN-FRA-LZ-PREPROD-PLATFORM-EXACS-BACKUP-KEY": {
+                                "display_name"                            : "sn-fra-lz-preprod-exacs-backup",
+                                "cidr_block"                              : "10.0.169.0/24",
+                                "dns_label"                               : "snfrappexacsbck",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-FRA-LZ-PREPROD-PLATFORM-EXACS-GENERIC-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-PREPROD-PLATFORM-EXACS-GENERIC-KEY"]
+                            }
+                        },
+
+                        "route_tables": {
+                            "RT-FRA-LZ-PREPROD-PLATFORM-EXACS-GENERIC-KEY": {
+                                "display_name"                            : "rt-fra-lz-preprod-exacs-generic",
+
+                                "route_rules": {
+                                    "rr-fra-sgw": {
+                                        "description"                     : "Route to Oracle Services Network through Service GW",
+                                        "destination"                     : "all-services",
+                                        "destination_type"                : "SERVICE_CIDR_BLOCK",
+                                        "network_entity_key"              : "SGW-FRA-LZ-PREPROD-PLATFORM-EXACS-KEY"
+                                    }
+                                }
+                            }
+                        },
+
+                        "default_security_list": {
+                            "ingress_rules"                               : [],
+                            "egress_rules"                                : []
+                        },
+
+                        "security_lists": {
+                            "SL-FRA-LZ-PREPROD-PLATFORM-EXACS-GENERIC-KEY": {
+                                "display_name"                            : "sl-fra-lz-preprod-exacs-generic",
+
+                                "ingress_rules": [
+                                    {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "icmp_code"                       : 4,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 3",
+                                        "src"                             : "10.0.168.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo) from Hub VCN",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "Allow all outbound traffic",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "Allow outbound traffic to Oracle Services Network over ALL protocols",
+                                        "dst"                             : "all-services",
+                                        "dst_type"                        : "SERVICE_CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                ]
+                            }
+                        },
+
+                        "vcn_specific_gateways": {
+                            "service_gateways": {
+                                "SGW-FRA-LZ-PREPROD-PLATFORM-EXACS-KEY": {
+                                    "display_name"                        : "sgw-fra-lz-preprod-exacs",
+                                    "services"                            : "all-services"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "prod-platform-exacs": {
+                "category_compartment_id"                                 : "CMP-LZ-PROD-NETWORK-KEY",
+
+                "vcns": {
+                    "VCN-FRA-LZ-PROD-PLATFORM-EXACS-KEY": {
+                        "display_name"                                    : "vcn-fra-lz-prod-exacs",
+                        "cidr_blocks"                                     : ["10.0.104.0/21"],
+                        "dns_label"                                       : "vcnfralzpexacs",
+                        "block_nat_traffic"                               : false,
+                        "is_attach_drg"                                   : false,
+                        "is_create_igw"                                   : false,
+                        "is_ipv6enabled"                                  : false,
+                        "is_oracle_gua_allocation_enabled"                : false,
+                        "network_security_groups"                         : {},
+
+                        "subnets": {
+                            "SN-FRA-LZ-PROD-PLATFORM-EXACS-DB-KEY": {
+                                "display_name"                            : "sn-fra-lz-prod-exacs-db",
+                                "cidr_block"                              : "10.0.104.0/24",
+                                "dns_label"                               : "snfrapexacsdb",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-FRA-LZ-PROD-PLATFORM-EXACS-GENERIC-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-PROD-PLATFORM-EXACS-GENERIC-KEY"]
+                            },
+
+                            "SN-FRA-LZ-PROD-PLATFORM-EXACS-BACKUP-KEY": {
+                                "display_name"                            : "sn-fra-lz-prod-exacs-backup",
+                                "cidr_block"                              : "10.0.105.0/24",
+                                "dns_label"                               : "snfrapexacsbck",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-FRA-LZ-PROD-PLATFORM-EXACS-GENERIC-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-PROD-PLATFORM-EXACS-GENERIC-KEY"]
+                            }
+                        },
+
+                        "route_tables": {
+                            "RT-FRA-LZ-PROD-PLATFORM-EXACS-GENERIC-KEY": {
+                                "display_name"                            : "rt-fra-lz-prod-exacs-generic",
+
+                                "route_rules": {
+                                    "rr-fra-sgw": {
+                                        "description"                     : "Route to Oracle Services Network through Service GW",
+                                        "destination"                     : "all-services",
+                                        "destination_type"                : "SERVICE_CIDR_BLOCK",
+                                        "network_entity_key"              : "SGW-FRA-LZ-PROD-PLATFORM-EXACS-KEY"
+                                    }
+                                }
+                            }
+                        },
+
+                        "default_security_list": {
+                            "ingress_rules"                               : [],
+                            "egress_rules"                                : []
+                        },
+
+                        "security_lists": {
+                            "SL-FRA-LZ-PROD-PLATFORM-EXACS-GENERIC-KEY": {
+                                "display_name"                            : "sl-fra-lz-prod-exacs-generic",
+
+                                "ingress_rules": [
+                                    {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "icmp_code"                       : 4,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 3",
+                                        "src"                             : "10.0.104.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo) from Hub VCN",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "Allow all outbound traffic",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "Allow outbound traffic to Oracle Services Network over ALL protocols",
+                                        "dst"                             : "all-services",
+                                        "dst_type"                        : "SERVICE_CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                ]
+                            }
+                        },
+
+                        "vcn_specific_gateways": {
+                            "service_gateways": {
+                                "SGW-FRA-LZ-PROD-PLATFORM-EXACS-KEY": {
+                                    "display_name"                        : "sgw-fra-lz-prod-exacs",
+                                    "services"                            : "all-services"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

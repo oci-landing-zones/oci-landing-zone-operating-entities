@@ -1,0 +1,218 @@
+{
+    "alarms_configuration": {
+        "alarms"                                            : {},
+        "default_compartment_id"                            : "CMP-LZ-PROD-EXACS-DB-KEY"
+    },
+
+    "events_configuration": {
+        "default_compartment_id"                            : "CMP-LZ-SECURITY-KEY",
+
+        "event_rules": {
+            "RUL-LZ-PREPROD-EXACS-NOTIFICATION-PROJECTS-KEY": {
+                "compartment_id"                            : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
+                "destination_topic_ids"                     : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                        : "rul-lz-preprod-notify-on-notifications",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
+                    "com.oraclecloud.databaseservice.dbnodeaction.end",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            },
+
+            "RUL-LZ-PROD-EXACS-NOTIFICATION-PROJECTS-KEY": {
+                "compartment_id"                            : "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY",
+                "destination_topic_ids"                     : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                        : "rul-lz-prod-notify-on-notifications",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
+                    "com.oraclecloud.databaseservice.dbnodeaction.end",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            }
+        }
+    },
+
+    "logging_configuration": {
+        "default_compartment_id"                            : "CMP-LZ-SECURITY-KEY",
+
+        "flow_logs": {
+            "LOG-LZ-PREPROD-PLATFORM-EXACS-SUBNET-FLOW-KEY": {
+                "log_group_id"                              : "LGRP-LZ-PREPROD-PLATFORM-EXACS-VCN-FLOW-KEY",
+                "target_compartment_ids"                    : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"                      : "subnet"
+            },
+
+            "LOG-LZ-PREPROD-PLATFORM-EXACS-VCN-FLOW-KEY": {
+                "log_group_id"                              : "LGRP-LZ-PREPROD-PLATFORM-EXACS-VCN-FLOW-KEY",
+                "target_compartment_ids"                    : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"                      : "vcn"
+            },
+
+            "LOG-LZ-PROD-PLATFORM-EXACS-SUBNET-FLOW-KEY": {
+                "log_group_id"                              : "LGRP-LZ-PROD-PLATFORM-EXACS-VCN-FLOW-KEY",
+                "target_compartment_ids"                    : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"                      : "subnet"
+            },
+
+            "LOG-LZ-PROD-PLATFORM-EXACS-VCN-FLOW-KEY": {
+                "log_group_id"                              : "LGRP-LZ-PROD-PLATFORM-EXACS-VCN-FLOW-KEY",
+                "target_compartment_ids"                    : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"                      : "vcn"
+            }
+        },
+
+        "log_groups": {
+            "LGRP-LZ-PREPROD-PLATFORM-EXACS-VCN-FLOW-KEY": {
+                "name"                                      : "lgrp-lz-preprod-exacs-vcn-flow",
+                "compartment_id"                            : "CMP-LZ-PREPROD-SECURITY-KEY"
+            },
+
+            "LGRP-LZ-PROD-PLATFORM-EXACS-VCN-FLOW-KEY": {
+                "name"                                      : "lgrp-lz-prod-exacs-vcn-flow",
+                "compartment_id"                            : "CMP-LZ-PROD-SECURITY-KEY"
+            }
+        }
+    },
+
+    "notifications_configuration": {
+        "default_compartment_id"                            : "CMP-LZ-SECURITY-KEY",
+
+        "topics": {
+            "NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY": {
+                "name"                                      : "nott-lz-preprod-exacs-projects",
+                "description"                               : "Topic for Pre-Production ExaDB-D project notifications.",
+                "compartment_id"                            : "CMP-LZ-PREPROD-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                          : "EMAIL",
+                        "values"                            : ["exacs-project-team@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-PROD-EXACS-PROJECTS-KEY": {
+                "name"                                      : "nott-lz-prod-exacs-projects",
+                "description"                               : "Topic for Production ExaDB-D project notifications.",
+                "compartment_id"                            : "CMP-LZ-PROD-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                          : "EMAIL",
+                        "values"                            : ["exacs-project-team@example.com"]
+                    }
+                ]
+            }
+        }
+    }
+}
