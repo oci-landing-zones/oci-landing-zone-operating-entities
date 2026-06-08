@@ -6,13 +6,11 @@
 **Table of Contents**
 
 [1. Overview](#1-overview)<br>
-[1.1. Blueprint Factory Pattern](#blueprint-factory-pattern)<br>
 [2. Workflow](#2-workflow)<br>
 [2.1. Prepare Your AI](#21-prepare-your-ai)<br>
 [2.2. AI Guides the Setup](#22-ai-guides-the-setup)<br>
 [2.3. Run & Deploy](#23-run--deploy)<br>
 [3. AI Built-in Security](#3-ai-built-in-security)<br>
-[3.1. Blueprint Factory Enforces Repository-Based Safety](#blueprint-factory-enforces-repository-based-safety)<br>
 [4. Complementary Resources](#4-complementary-resources)<br>
 
 &nbsp;
@@ -34,16 +32,6 @@ This addon supports faster landing zone discovery while keeping architecture own
 - **Reviewable documentation**: Initial drafts are prepared for architecture and security review before deployment decisions.
 - **Security centered review**: AI Security checks are applied to all AI generated configurations. Assumptions and open questions are surfaced before deployment.
 - **Guided deployment**: Deployment steps and review of landing zone is guided by AI.
-
-&nbsp;
-### Blueprint Factory Pattern
-
-The **Blueprint Factory** is the core engine that generates and manages landing zone blueprints. It enables:
-
-- **Blueprint Selection**: Choose from published One-OE blueprints (Hub A, B, C, E) or create customized variations.
-- **Blueprint Composition**: Combine hub models, environments, workloads, and extensions into complete landing zone designs.
-- **Iterative Refinement**: Generate blueprint variations from Jsonnet configurations, keeping all iterations traceable and reviewable.
-- **AI-Driven Customization**: AI assists in authoring or modifying blueprint configurations without creating arbitrary landing zones outside the repository model.
 
 &nbsp;
 ## 2. Workflow
@@ -111,20 +99,6 @@ Prepare the draft and return blockers, warnings, assumptions and review items.
 I want a landing zone with OKE.
 ```
 
-### Example: Using Blueprint Factory with AI for Custom Design
-
-```text
-I need a One-OE Hub B landing zone with:
-- 3 environments (dev, staging, prod)
-- OKE cluster in each environment
-- ExaCS database platform (shared)
-- Custom CIDR allocation
-
-Using the Blueprint Factory, generate:
-1. The configuration file for this design
-2. The deployable JSON artifacts
-3. Documentation of architecture decisions and assumptions
-```
 
 ### Currently supported add-ons and workloads:
 
@@ -162,26 +136,19 @@ Jsonnet generation provides the foundational input layer that keeps the design t
 
 - **Structured design surface**: Landing zone intent is captured in a structured format before deployment artifacts are considered.
 - **Repository based behavior**: Outputs are derived from OCI Landing Zone Operating Entities repository logic.
-- **Repeatable input**: The same Jsonnet input can be reviewed, versioned, regenerated and compared across design iterations.
+- **Repeatable Composition**: The same Jsonnet config always produces identical JSON outputs, supporting GitOps workflows.
 - **Reviewable change**: Design updates are inspected as focused diffs before deployment.
-- **Reduced hallucination risk**: AI output stays aligned with the repository model instead of invented Terraform, IAM policy text or network definitions.
+- **Reduced hallucination risk**: AI cannot invent resources outside the generator's contract. Unsupported requirements are clearly marked as manual post-deployment steps.
 - **Ownership boundary**: AI assists with drafting and review while architecture, security, compliance and deployment approval remain with your organization.
 
-### Blueprint Factory Enforces Repository-Based Safety
-
-- **Template-Driven**: All outputs conform to published blueprint patterns from `gen/blueprints/` and `gen/workload-extensions/`.
-- **Jsonnet as Source of Truth**: Configuration stays in human-readable Jsonnet format before JSON generation, enabling version control and diff review.
-- **No Hallucination**: AI cannot invent resources outside the generator's contract. Unsupported requirements are clearly marked as manual post-deployment steps.
-- **Repeatable Composition**: The same Jsonnet config always produces identical JSON outputs, supporting GitOps workflows.
+Review [Blueprint Factory Add-on](../oci-lz-blueprint-factory/README.md) for more details.
 
 &nbsp;
 
 ## 4. Complementary Resources
 
 - **[Blueprint Factory Documentation](../oci-lz-blueprint-factory/README.md)** - Deep dive into how the Blueprint Factory works, including architecture, composition patterns, and advanced customization techniques.
-- **[Generator README](../../gen/README.md)** - Technical details on the Jsonnet generator and composition
-- **[Config-Driven Generation Guide](../../commons/content/config-driven.md)** - Step-by-step guide for creating customized landing zones
-- **[One-OE Blueprint Design](../../blueprints/one-oe/design/readme.md)** - Landing zone design principles and architecture
+- **[One-OE Blueprint](../../blueprints/one-oe/design)** - Landing zone design principles and architecture
 
 &nbsp;
 
