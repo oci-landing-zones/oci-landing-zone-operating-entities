@@ -27,7 +27,7 @@ function(ctx, overlay_output=false) {
             is_ipv6enabled: false,
             is_oracle_gua_allocation_enabled: false,
 
-            subnets: {
+            subnets: ({
               [ctx.sn_cp_key]: {
                 display_name: n.display('sn', ctx.display_segments + ['cp']),
                 dns_label: n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, 'cp']),
@@ -50,17 +50,6 @@ function(ctx, overlay_output=false) {
                 security_list_keys: [ctx.sl_lb_key],
               },
 
-              [ctx.sn_pods_key]: {
-                display_name: n.display('sn', ctx.display_segments + ['pods']),
-                dns_label: n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, 'pods']),
-                cidr_block: ctx.subnets.pods,
-                dhcp_options_key: 'default_dhcp_options',
-                prohibit_internet_ingress: true,
-                prohibit_public_ip_on_vnic: true,
-                route_table_key: ctx.rt_pods_key,
-                security_list_keys: [ctx.sl_pods_key],
-              },
-
               [ctx.sn_workers_key]: {
                 display_name: n.display('sn', ctx.display_segments + ['workers']),
                 dns_label: n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, 'work']),
@@ -71,19 +60,31 @@ function(ctx, overlay_output=false) {
                 route_table_key: ctx.rt_workers_key,
                 security_list_keys: [ctx.sl_workers_key],
               },
-            },
+            } + (if ctx.is_overlay_network then {} else {
+              [ctx.sn_pods_key]: {
+                display_name: n.display('sn', ctx.display_segments + ['pods']),
+                dns_label: n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, 'pods']),
+                cidr_block: ctx.subnets.pods,
+                dhcp_options_key: 'default_dhcp_options',
+                prohibit_internet_ingress: true,
+                prohibit_public_ip_on_vnic: true,
+                route_table_key: ctx.rt_pods_key,
+                security_list_keys: [ctx.sl_pods_key],
+              },
+            })),
 
             route_tables: {
               [desc.key]: {
                 display_name: n.display('rt', ctx.display_segments + [desc.suffix]),
-                route_rules: root._route_rules,
+                route_rules: root._route_rules(ctx),
               }
               for desc in [
                 { key: ctx.rt_cp_key, suffix: 'cp' },
                 { key: ctx.rt_lb_key, suffix: 'int-lb' },
-                { key: ctx.rt_pods_key, suffix: 'pods' },
                 { key: ctx.rt_workers_key, suffix: 'workers' },
-              ]
+              ] + (if ctx.is_overlay_network then [] else [
+                { key: ctx.rt_pods_key, suffix: 'pods' },
+              ])
             },
 
             security_lists: {
@@ -111,67 +112,72 @@ function(ctx, overlay_output=false) {
                   extras: { defined_tags: null, freeform_tags: null },
                 },
                 {
-                  key: ctx.sl_pods_key,
-                  suffix: 'pods',
-                  egress: icmp_security_list_egress_rules,
-                  ingress: icmp_security_list_ingress_rules,
-                },
-                {
                   key: ctx.sl_workers_key,
                   suffix: 'workers',
                   egress: icmp_security_list_egress_rules,
                   ingress: icmp_security_list_ingress_rules,
                 },
-              ]
+              ] + (if ctx.is_overlay_network then [] else [
+                {
+                  key: ctx.sl_pods_key,
+                  suffix: 'pods',
+                  egress: icmp_security_list_egress_rules,
+                  ingress: icmp_security_list_ingress_rules,
+                },
+              ])
             },
 
-            network_security_groups: {
+            network_security_groups: ({
               [ctx.nsg_cp_key]: {
                 display_name: n.display('nsg', ctx.display_segments + ['cp']),
 
                 egress_rules: {
                   nsg_cp_6443: root._nsg_tcp_egress('Allow TCP egress for Kubernetes control plane inter-communication', ctx.nsg_cp_key, '6443'),
-                  nsg_pods: root._nsg_tcp_egress_any('Broad webhook rule: allow TCP egress from OKE control plane to pods on any port for API server callbacks. If removed, keep explicit 12250 and 6443 rules.', ctx.nsg_pods_key),
-                  nsg_pods_12250: root._nsg_tcp_egress_src('Allow TCP egress from OKE control plane to pods with source port 12250', ctx.nsg_pods_key, '12250'),
-                  nsg_pods_6443: root._nsg_tcp_egress_src('Allow TCP egress from OKE control plane to pods with source port 6443', ctx.nsg_pods_key, '6443'),
                   nsg_service: root._nsg_service_egress('Allow TCP egress from OKE control plane to OCI services'),
                   nsg_workers_10250: root._nsg_tcp_egress('Allow TCP egress for path discovery to worker nodes', ctx.nsg_workers_key, '10250'),
                   nsg_workers_12250: root._nsg_tcp_egress_src('Allow TCP egress from control plane to worker nodes with source port 12250', ctx.nsg_workers_key, '12250'),
                   nsg_workers_6443: root._nsg_tcp_egress_src('Allow TCP egress from control plane to worker nodes with source port 6443', ctx.nsg_workers_key, '6443'),
-                } + ctx.api_endpoint_egress_rules,
+                } + (if ctx.is_overlay_network then {} else {
+                  nsg_pods: root._nsg_tcp_egress_any('Broad webhook rule: allow TCP egress from OKE control plane to pods on any port for API server callbacks. If removed, keep explicit 12250 and 6443 rules.', ctx.nsg_pods_key),
+                  nsg_pods_12250: root._nsg_tcp_egress_src('Allow TCP egress from OKE control plane to pods with source port 12250', ctx.nsg_pods_key, '12250'),
+                  nsg_pods_6443: root._nsg_tcp_egress_src('Allow TCP egress from OKE control plane to pods with source port 6443', ctx.nsg_pods_key, '6443'),
+                }) + ctx.api_endpoint_egress_rules,
 
                 ingress_rules: {
                   nsg_cp_6443: root._nsg_tcp_ingress_src('Allow TCP ingress for Kubernetes control plane inter-communication on source port 6443', ctx.nsg_cp_key, '6443'),
                 } + ctx.api_endpoint_ingress_rules + {
-                  nsg_pods: root._nsg_tcp_ingress_any('Return pair for broad pod webhook rule: allow TCP ingress from pods to OKE control plane. If broad rule is removed, keep 12250 and 6443 rules.', ctx.nsg_pods_key),
-                  nsg_pods_12250: root._nsg_tcp_ingress('Allow TCP ingress from pods to kube-apiserver on port 12250', ctx.nsg_pods_key, '12250'),
-                  nsg_pods_6443: root._nsg_tcp_ingress('Allow TCP ingress to kube-apiserver from pods on port 6443', ctx.nsg_pods_key, '6443'),
                   nsg_service: root._nsg_service_ingress('Allow TCP ingress from OCI services to control plane for responses'),
                   nsg_workers_10250: root._nsg_tcp_ingress_src('Allow TCP ingress to control plane from worker nodes for Kubelet responses on source port 10250', ctx.nsg_workers_key, '10250'),
                   nsg_workers_12250: root._nsg_tcp_ingress('Allow TCP ingress to kube-apiserver from workers on port 12250', ctx.nsg_workers_key, '12250'),
                   nsg_workers_6443: root._nsg_tcp_ingress('Allow TCP ingress to kube-apiserver from workers on port 6443', ctx.nsg_workers_key, '6443'),
-                },
+                } + (if ctx.is_overlay_network then {} else {
+                  nsg_pods: root._nsg_tcp_ingress_any('Return pair for broad pod webhook rule: allow TCP ingress from pods to OKE control plane. If broad rule is removed, keep 12250 and 6443 rules.', ctx.nsg_pods_key),
+                  nsg_pods_12250: root._nsg_tcp_ingress('Allow TCP ingress from pods to kube-apiserver on port 12250', ctx.nsg_pods_key, '12250'),
+                  nsg_pods_6443: root._nsg_tcp_ingress('Allow TCP ingress to kube-apiserver from pods on port 6443', ctx.nsg_pods_key, '6443'),
+                }),
               },
 
               [ctx.nsg_lb_key]: {
                 display_name: n.display('nsg', ctx.display_segments + ['int-lb', 'default-backend']),
                 ingress_rules: {
-                  nsg_pods_tcp: root._nsg_tcp_ingress_any('Allow TCP ingress from pods to load balancers for responses', ctx.nsg_pods_key),
-                  nsg_pods_udp: root._nsg_udp_ingress_any('Allow UDP ingress from pods to load balancers for responses', ctx.nsg_pods_key),
                   nsg_workers_10256: root._nsg_tcp_ingress_src('Allow TCP ingress from worker nodes to load balancers for health check responses on source port 10256', ctx.nsg_workers_key, '10256'),
                   nsg_workers_tcp: root._nsg_tcp_ingress_src_range('Allow TCP ingress from worker nodes to load balancers for service responses on source ports 30000-32767', ctx.nsg_workers_key, '30000', '32767'),
                   nsg_workers_udp: root._nsg_udp_ingress_src_range('Allow UDP ingress from worker nodes to load balancers for service responses on source ports 30000-32767', ctx.nsg_workers_key, '30000', '32767'),
-                },
+                } + (if ctx.is_overlay_network then {} else {
+                  nsg_pods_tcp: root._nsg_tcp_ingress_any('Allow TCP ingress from pods to load balancers for responses', ctx.nsg_pods_key),
+                  nsg_pods_udp: root._nsg_udp_ingress_any('Allow UDP ingress from pods to load balancers for responses', ctx.nsg_pods_key),
+                }),
 
                 egress_rules: {
-                  nsg_pods_tcp: root._nsg_tcp_egress_any('Allow TCP egress from load balancers to pods for OCI Native Ingress and Pods as Backends', ctx.nsg_pods_key),
-                  nsg_pods_udp: root._nsg_udp_egress_any('Allow UDP egress from load balancers to pods for OCI Native Ingress and Pods as Backends', ctx.nsg_pods_key),
                   nsg_workers_tcp: root._nsg_tcp_egress_range('Allow TCP egress from load balancers to worker nodes for NodePort traffic', ctx.nsg_workers_key, '30000', '32767'),
                   nsg_workers_udp: root._nsg_udp_egress_range('Allow UDP egress from load balancers to worker nodes for NodePort traffic', ctx.nsg_workers_key, '30000', '32767'),
                   nsg_workers_10256: root._nsg_tcp_egress('Allow TCP egress from load balancers to worker nodes for health checks', ctx.nsg_workers_key, '10256'),
-                },
+                } + (if ctx.is_overlay_network then {} else {
+                  nsg_pods_tcp: root._nsg_tcp_egress_any('Allow TCP egress from load balancers to pods for OCI Native Ingress and Pods as Backends', ctx.nsg_pods_key),
+                  nsg_pods_udp: root._nsg_udp_egress_any('Allow UDP egress from load balancers to pods for OCI Native Ingress and Pods as Backends', ctx.nsg_pods_key),
+                }),
               },
-
+            } + (if ctx.is_overlay_network then {} else {
               [ctx.nsg_pods_key]: {
                 display_name: n.display('nsg', ctx.display_segments + ['pods']),
 
@@ -202,7 +208,7 @@ function(ctx, overlay_output=false) {
                   nsg_workers: root._nsg_all_ingress('Allow ALL ingress to pods from workers', ctx.nsg_workers_key),
                 } + root._hub_public_lb_pod_ingress_rules(ctx),
               },
-
+            }) + {
               [ctx.nsg_workers_key]: {
                 display_name: n.display('nsg', ctx.display_segments + ['workers']),
 
@@ -221,10 +227,11 @@ function(ctx, overlay_output=false) {
                   nsg_lb_10256: root._nsg_tcp_egress_src('Allow TCP egress to load balancers from workers with source port 10256', ctx.nsg_lb_key, '10256'),
                   nsg_lb_tcp: root._nsg_tcp_egress_src_range('Allow TCP egress to load balancers from workers with source ports 30000-32767', ctx.nsg_lb_key, '30000', '32767'),
                   nsg_lb_udp: root._nsg_udp_egress_src_range('Allow UDP egress to load balancers from workers with source ports 30000-32767', ctx.nsg_lb_key, '30000', '32767'),
-                  nsg_pods: root._nsg_all_egress('Allow ALL egress from workers to pods', ctx.nsg_pods_key),
                   nsg_service: root._nsg_service_egress('Allow TCP egress from workers to OCI Services'),
                   nsg_workers: root._nsg_all_egress('Allow ALL egress from workers to other workers', ctx.nsg_workers_key),
-                } + root._hub_public_lb_worker_egress_rules(ctx),
+                } + (if ctx.is_overlay_network then {} else {
+                  nsg_pods: root._nsg_all_egress('Allow ALL egress from workers to pods', ctx.nsg_pods_key),
+                }) + root._hub_public_lb_worker_egress_rules(ctx),
 
                 ingress_rules: {
                   nsg_cp: root._nsg_tcp_ingress_any('Broad hostNetwork webhook rule: allow TCP ingress to workers from Kubernetes control plane on any port.', ctx.nsg_cp_key),
@@ -234,12 +241,13 @@ function(ctx, overlay_output=false) {
                   nsg_lb_10256: root._nsg_tcp_ingress('Allow TCP ingress to workers for health check from load balancer on port 10256', ctx.nsg_lb_key, '10256'),
                   nsg_lb_tcp: root._nsg_tcp_ingress_range('Allow TCP ingress to workers from load balancers on service ports 30000-32767', ctx.nsg_lb_key, '30000', '32767'),
                   nsg_lb_udp: root._nsg_udp_ingress_range('Allow UDP ingress to workers from load balancers on service ports 30000-32767', ctx.nsg_lb_key, '30000', '32767'),
-                  nsg_pods: root._nsg_all_ingress('Allow ALL ingress to workers from pods', ctx.nsg_pods_key),
                   nsg_service: root._nsg_service_ingress('Allow TCP ingress from OCI services to workers'),
                   nsg_workers: root._nsg_all_ingress('Allow ALL ingress to workers from other workers', ctx.nsg_workers_key),
-                } + root._hub_public_lb_worker_ingress_rules(ctx),
+                } + (if ctx.is_overlay_network then {} else {
+                  nsg_pods: root._nsg_all_ingress('Allow ALL ingress to workers from pods', ctx.nsg_pods_key),
+                }) + root._hub_public_lb_worker_ingress_rules(ctx),
               },
-            },
+            }),
 
             vcn_specific_gateways:
               {
@@ -249,14 +257,14 @@ function(ctx, overlay_output=false) {
                     services: 'all-services',
                   },
                 },
-              } + if ctx.has_hub && !overlay_output && ctx.use_local_natgw then {
+              } + (if ctx.has_hub && !overlay_output && ctx.use_local_natgw then {
                 nat_gateways: {
                   [ctx.ngw_key]: {
                     display_name: n.display('ngw', ctx.display_segments),
                     block_traffic: false,
                   },
                 },
-              } else {},
+              } else {}),
           },
         },
       },
@@ -649,7 +657,7 @@ function(ctx, overlay_output=false) {
     stateless: true,
   },
 
-  _route_rules::
+  _route_rules(ctx)::
     local peer_routes = if ctx.routing != null && std.objectHas(ctx.routing, 'peers') then ctx.routing.peers else {};
     local drg_route_rules =
       (if ctx.has_hub then {

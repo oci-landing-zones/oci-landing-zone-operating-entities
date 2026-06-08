@@ -6,7 +6,7 @@
 //     metadata(params):: { default_subnets, subnet_order },
 //     render(params):: { metadata, contributions },
 //   }
-//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, pods_cidr?}
+//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, pods_cidr?, cni_type?, cni?}
 //   params.network       — {vcn: 'cidr', subnets: {name: cidr}}
 //   params.naming        — naming object
 //   params.topology      — platform scope semantics from topology.libsonnet
@@ -20,14 +20,28 @@ local oke_context = import './oke_context.libsonnet';
 
 {
   metadata(params):: {
-    default_subnets: {
-      'control-plane': '/25',
-      'int-lb': '/25',
-      pods: '/23',
-      workers: '/23',
-    },
+    local raw_cni_type =
+      if std.objectHas(params.config_params, 'cni_type') && params.config_params.cni_type != null then
+        params.config_params.cni_type
+      else
+        'native',
+    local cni_type =
+      assert std.type(raw_cni_type) == 'string' :
+        'config_params.cni_type must be a string';
+      assert std.member(['native', 'overlay'], raw_cni_type) :
+        'config_params.cni_type must be one of: native, overlay';
+      raw_cni_type,
+    local is_overlay_network = cni_type == 'overlay',
+    default_subnets:
+      {
+        'control-plane': '/25',
+        'int-lb': '/25',
+        workers: '/23',
+      } + (if is_overlay_network then {} else {
+        pods: '/23',
+      }),
     // Order for auto-subnet allocation (determines CIDR assignment order)
-    subnet_order: ['int-lb', 'control-plane', 'workers', 'pods'],
+    subnet_order: ['int-lb', 'control-plane', 'workers'] + (if is_overlay_network then [] else ['pods']),
   },
 
   render(params)::

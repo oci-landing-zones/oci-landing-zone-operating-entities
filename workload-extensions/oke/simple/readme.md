@@ -18,6 +18,8 @@ This workload extension uses the [One-OE](https://github.com/oracle-quickstart/t
 
 This OKE Landing Zone Extension provides **two deployment approaches**, [single-stack](single-stack/) and  [multi-stack](multi-stack/), to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator) for automated dependency resolution with configuration keys.
 
+For customized OKE landing zones generated from a configuration file, see [OKE Config-Driven Generation](config-driven.md).
+
 
 ### **Choosing the Right Approach**
 
@@ -38,17 +40,28 @@ This OKE Landing Zone Extension provides **two deployment approaches**, [single-
 Both deployment options provide:
 - **Automated Dependency Resolution**: Configuration keys instead of manual OCID lookups
 - **CIS-Compliant OKE**: Using [CIS OKE module](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
-- **VCN-Native Pod Networking**: Improved performance and security
-- **Comprehensive NSG Configuration**: Control plane, workers, pods, and load balancer isolation
+- **OKE CNI Network Modes**: VCN-native pod networking by default, with config-driven overlay networking for Flannel-compatible clusters
+- **Comprehensive NSG Configuration**: Control plane, workers, load balancers, and, for native networking, pods
 - **Hub-and-Spoke Topology**: OKE VCN as spoke connected to Hub via DRG
 - **Service Gateway**: Direct connectivity to OCI services
+
+### OKE Network Modes
+
+The published simple OKE JSON files use the native network mode by default. In config-driven generation, `oke_simple` can also emit an overlay network shape for Flannel-compatible clusters.
+
+| Config parameter | Purpose | Supported values | Default |
+| --- | --- | --- | --- |
+| `cni_type` | Network shape emitted by the workload extension | `native`, `overlay` | `native` |
+| `cni` | OKE cluster CNI requested from the downstream OKE module | `vcn_native`, `flannel` | `vcn_native` for native, `flannel` for overlay |
+
+Native mode emits control plane, internal load balancer, worker, and pod subnets, and wires the worker node pool with pod subnet and pod NSG IDs. Overlay mode emits only control plane, internal load balancer, and worker subnets; it omits the OCI pod subnet, pod route table, pod security list, pod NSG, and worker pod networking fields. Overlay mode defaults `pods_cidr` to `10.244.0.0/16` for the Kubernetes overlay network.
 
 ### Deployment Components
 
 Both approaches deploy these resources:
 - **IAM Configuration**: Compartments, groups, and policies for OKE
 - **Network Infrastructure**: VCN, subnets, NSGs, route tables, service gateway, and DRG attachment
-- **OKE Cluster**: Kubernetes cluster with native pod networking (v1.35.2)
+- **OKE Cluster**: Kubernetes cluster with native or overlay networking (v1.35.2)
 - **Worker Nodes**: Compute instances for running workloads (VM.Standard.E5.Flex, Oracle Linux 8.10)
 
 &nbsp;
