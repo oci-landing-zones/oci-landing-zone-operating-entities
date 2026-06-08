@@ -7,7 +7,7 @@ The sample customer VCNs are pre-configured with the following CIDR ranges:
 - **three-tier-vcn**: 10.0.0.0/26
 - **oke-vcn**: 10.0.1.0/24
 
-The *three-tier-vcn* can be changed in configuration file [network_three_tier_config.json](../pod/customer1/network_three_tier_config.json), while *oke-vcn* can be changed in [network_oke_config.json](../pod/customer1/network_oke_config.json).
+The *three-tier-vcn* can be changed in configuration file [network_three_tier_config.json](../pod/customer1/network_three_tier_config.json), while *oke-vcn* can be changed in [network_oke_flannel_config.json](../pod/customer1/network_oke_flannel_config.json).
 
 ### Overall Deployment Sequence
 
@@ -27,7 +27,7 @@ Input Configuration Files | Input Dependency Files | Generated Output
 
 ### Stack Creation
 
-**Deploying this stack as-is requires [Deployment Bootstrap](../readme.md#deployment-bootstrap)**.
+**Deploying this stack as-is requires [Deployment Bootstrap](../readme.md#bootstrap)**.
 
 [![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"configuration_source":"ocibucket","oci_configuration_bucket":"landing-zone-runtime-bucket","oci_configuration_objects":"pod/customer1/compartments_config.json,pod/customer1/budgets_config.json,pod/customer1/network_three_tier_config.json","oci_dependency_objects":"mgmt-plane/iam/output/compartments_output.json,mgmt-plane/network/output/network_output.json","save_output":true,"oci_object_prefix":"pod/customer1/output"})
 

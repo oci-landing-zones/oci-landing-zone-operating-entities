@@ -224,7 +224,7 @@ Use the magic button provided in the summary section to deploy the Openshift lan
 
 This operation creates a default routing configuration. To complete the network layer setup, deploy the firewalls and update the routing in the hub to prepare for deploying the Openshift cluster.
 
-You can now proceed with Openshift Cluster installation [Openshift Installation](../2_openshift/).
+You can now proceed with Openshift Cluster installation [Openshift Installation](../2_openshift_installation/).
 
 &nbsp;
 

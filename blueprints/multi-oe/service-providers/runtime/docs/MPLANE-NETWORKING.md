@@ -32,7 +32,7 @@ Input Configuration Files | Input Dependency Files | Generated Output
 
 #### Stack Creation
 
-**Deploying this stack as-is requires [Deployment Bootstrap](../readme.md#deployment-bootstrap)**.
+**Deploying this stack as-is requires [Deployment Bootstrap](../readme.md#bootstrap)**.
 
 [![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"configuration_source":"ocibucket","oci_configuration_bucket":"landing-zone-runtime-bucket","oci_configuration_objects":"mgmt-plane/network/network_initial_config.json,mgmt-plane/network/flow_logs_config.json,mgmt-plane/network/jump_host_config.json","oci_dependency_objects":"mgmt-plane/iam/output/compartments_output.json","save_output":true,"oci_object_prefix":"mgmt-plane/network/output"})
 
