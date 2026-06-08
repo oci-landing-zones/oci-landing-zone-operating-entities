@@ -7,3 +7,4 @@
 **/*oci-credentials.tfvars.json
 **/*.old
 **/*.backup
+__pycache__
