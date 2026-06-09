@@ -134,6 +134,8 @@ Native mode uses workload-extension `cni_type: native` and `cni: vcn_native`. It
 
 Overlay mode uses workload-extension `cni_type: overlay` and `cni: flannel`. It creates no OCI pod subnet and wires the worker node pool only with the worker subnet and worker NSG. Overlay mode defaults `pods_cidr` to `10.244.0.0/16`. Keep `services_cidr` and overlay `pods_cidr` non-overlapping with each other, the OKE VCN, and any routed on-premises, cloud, or peered ranges. Do not set workload-extension `cni_type` to `flannel`; `flannel` is the OKE CNI value, while `overlay` is the workload-extension network shape.
 
+For config-driven subnetting, prefer `cluster_size` profiles: `small` requires an OKE VCN `/20`, `medium` requires `/18`, and `large` requires `/16`. Manual OKE subnet CIDRs are still supported by omitting `cluster_size` and defining `network.subnets` with the required native or overlay subnet keys.
+
 ## **4. Configuration Files**
 
 The deployment uses five JSON configuration files:

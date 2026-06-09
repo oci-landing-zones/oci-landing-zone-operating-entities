@@ -37,6 +37,32 @@ For published OKE deployment investigations, inspect the exact orchestrator tag 
 - `pods_cidr` is not required for the standard native `oke_simple` path, but if a config explicitly sets it the generator preserves it under `options.kubernetes_network_config` as a passthrough to the downstream `cis-oke` module.
 - For overlay, `pods_cidr` defaults to `10.244.0.0/16` and is emitted under `options.kubernetes_network_config`.
 - Do not make `pods_cidr` mandatory again for the native `oke_simple` path unless the downstream module contract truly requires it.
+- `config_params.cluster_size` is optional and currently supports `small`, `medium`, and `large`.
+- If `cluster_size` is set, the OKE platform VCN prefix must exactly match the selected size: `small` requires `/20`, `medium` requires `/18`, and `large` requires `/16`.
+- `cluster_size` cannot be used together with `platform.network.subnets`. With `cluster_size`, the extension owns the fixed subnet layout for the OKE platform VCN.
+- If `cluster_size` is omitted, the extension keeps the previous default subnet behavior.
+- For new customer-facing config examples, prefer the `cluster_size` profiles as the normal subnetting path. Use manual `platform.network.subnets` only when the profile layouts do not fit the required address plan.
+- Manual native subnet maps must include exactly `control-plane`, `int-lb`, `workers`, and `pods`. Manual overlay subnet maps must include exactly `control-plane`, `int-lb`, and `workers`.
+
+## Auto-Subnet Profiles
+
+When `cluster_size` is set, OKE subnet CIDRs are allocated from the platform VCN in a fixed order.
+
+Native profiles:
+
+| Size | VCN prefix | Allocation order and subnet prefixes |
+| --- | --- | --- |
+| `small` | `/20` | pods `/21`, workers `/23`, int-lb `/26`, control-plane `/29` |
+| `medium` | `/18` | pods `/19`, workers `/22`, int-lb `/25`, control-plane `/29` |
+| `large` | `/16` | pods `/17`, workers `/19`, int-lb `/24`, control-plane `/29` |
+
+Overlay profiles:
+
+| Size | VCN prefix | Allocation order and subnet prefixes |
+| --- | --- | --- |
+| `small` | `/20` | workers `/23`, int-lb `/26`, control-plane `/29` |
+| `medium` | `/18` | workers `/22`, int-lb `/25`, control-plane `/29` |
+| `large` | `/16` | workers `/19`, int-lb `/24`, control-plane `/29` |
 
 ## CIDR Planning Rules
 

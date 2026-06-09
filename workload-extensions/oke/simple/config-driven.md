@@ -5,8 +5,10 @@
 - [**3. What `oke_simple` Means**](#3-what-oke_simple-means)
 - [**4. Native OKE Example**](#4-native-oke-example)
 - [**5. Overlay OKE Example**](#5-overlay-oke-example)
-- [**6. Generate the JSON Files**](#6-generate-the-json-files)
-- [**7. Review the Output**](#7-review-the-output)
+- [**6. OKE VCN Sizing**](#6-oke-vcn-sizing)
+- [**7. Manual OKE Subnet CIDRs**](#7-manual-oke-subnet-cidrs)
+- [**8. Generate the JSON Files**](#8-generate-the-json-files)
+- [**9. Review the Output**](#9-review-the-output)
 
 ## **1. Overview**
 
@@ -75,7 +77,7 @@ Create a configuration file, for example `oke-native.jsonnet`:
       platforms: {
         oke: {
           network: {
-            vcn: '10.0.80.0/21',
+            vcn: '10.0.80.0/20',
           },
           extension: {
             type: 'oke_simple',
@@ -84,6 +86,7 @@ Create a configuration file, for example `oke-native.jsonnet`:
               services_cidr: '10.96.0.0/16',
               cni_type: 'native',
               cni: 'vcn_native',
+              cluster_size: 'small',
               api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
             },
           },
@@ -126,7 +129,7 @@ Create a configuration file, for example `oke-overlay-hub-a.jsonnet`:
       platforms: {
         oke: {
           network: {
-            vcn: '10.0.80.0/21',
+            vcn: '10.0.80.0/20',
           },
           extension: {
             type: 'oke_simple',
@@ -135,6 +138,7 @@ Create a configuration file, for example `oke-overlay-hub-a.jsonnet`:
               services_cidr: '10.96.0.0/16',
               cni_type: 'overlay',
               cni: 'flannel',
+              cluster_size: 'small',
               api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
             },
           },
@@ -153,7 +157,7 @@ Create a configuration file, for example `oke-overlay-hub-a.jsonnet`:
       platforms: {
         oke: {
           network: {
-            vcn: '10.0.144.0/21',
+            vcn: '10.0.144.0/20',
           },
           extension: {
             type: 'oke_simple',
@@ -162,6 +166,7 @@ Create a configuration file, for example `oke-overlay-hub-a.jsonnet`:
               services_cidr: '10.97.0.0/16',
               cni_type: 'overlay',
               cni: 'flannel',
+              cluster_size: 'small',
               api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
             },
           },
@@ -174,7 +179,78 @@ Create a configuration file, for example `oke-overlay-hub-a.jsonnet`:
 
 Overlay mode omits the OCI pod subnet, pod route table, pod security list, pod NSG, and worker pod networking references. If `pods_cidr` is not provided, it defaults to `10.244.0.0/16`.
 
-## **6. Generate the JSON Files**
+## **6. OKE VCN Sizing**
+
+Use `cluster_size` as the default way to define OKE subnetting. With this option, the user provides only the OKE VCN CIDR and the cluster size profile; the generator creates the required OKE subnets.
+
+The OKE VCN CIDR prefix must match the selected size exactly:
+
+| `cluster_size` | Required OKE VCN prefix |
+| --- | --- |
+| `small` | `/20` |
+| `medium` | `/18` |
+| `large` | `/16` |
+
+With native networking, the generator creates these subnet sizes:
+
+| `cluster_size` | Pod subnet | Worker subnet | Internal LB subnet | Control plane subnet |
+| --- | --- | --- | --- | --- |
+| `small` | `/21` | `/23` | `/26` | `/29` |
+| `medium` | `/19` | `/22` | `/25` | `/29` |
+| `large` | `/17` | `/19` | `/24` | `/29` |
+
+With overlay networking, the generator creates these subnet sizes:
+
+| `cluster_size` | Worker subnet | Internal LB subnet | Control plane subnet |
+| --- | --- | --- | --- |
+| `small` | `/23` | `/26` | `/29` |
+| `medium` | `/22` | `/25` | `/29` |
+| `large` | `/19` | `/24` | `/29` |
+
+If `cluster_size` is set, do not also define OKE platform subnets in the configuration.
+
+## **7. Manual OKE Subnet CIDRs**
+
+Use manual subnet CIDRs only when the standard cluster size profiles do not fit the required address plan.
+
+To provide manual OKE subnet CIDRs:
+
+- Omit `cluster_size`.
+- Add `network.subnets` under the OKE platform.
+- Use the exact subnet keys expected by the selected network mode.
+- Keep every subnet CIDR inside the OKE VCN CIDR.
+- Keep subnet CIDRs non-overlapping.
+
+Native networking requires these subnet keys:
+
+```jsonnet
+network: {
+  vcn: '10.0.80.0/21',
+  subnets: {
+    'control-plane': '10.0.80.128/25',
+    'int-lb': '10.0.80.0/25',
+    workers: '10.0.82.0/23',
+    pods: '10.0.84.0/23',
+  },
+},
+```
+
+Overlay networking requires only these subnet keys:
+
+```jsonnet
+network: {
+  vcn: '10.0.88.0/21',
+  subnets: {
+    'control-plane': '10.0.88.128/25',
+    'int-lb': '10.0.88.0/25',
+    workers: '10.0.90.0/23',
+  },
+},
+```
+
+Do not include `pods` in an overlay manual subnet map. Overlay pod addresses come from the Kubernetes overlay pod CIDR, not from an OCI pod subnet.
+
+## **8. Generate the JSON Files**
 
 Run the generator from the repository root:
 
@@ -190,7 +266,7 @@ bash gen/generate.sh --config ./oke-overlay-hub-a.jsonnet ./generated/oke-overla
 
 The generated directory contains the JSON files to use with the OCI Landing Zone Orchestrator.
 
-## **7. Review the Output**
+## **9. Review the Output**
 
 The generated file set commonly includes:
 
