@@ -181,9 +181,9 @@ Overlay mode omits the OCI pod subnet, pod route table, pod security list, pod N
 
 ## **6. OKE VCN Sizing**
 
-Use `cluster_size` as the default way to define OKE subnetting. With this option, the user provides only the OKE VCN CIDR and the cluster size profile; the generator creates the required OKE subnets.
+Auto-subnet profiles are the default way to define OKE subnetting. The user provides the OKE VCN CIDR, and may optionally provide `cluster_size`; when `cluster_size` is omitted, the generator uses the `small` profile. The generator then creates the required OKE subnets.
 
-The OKE VCN CIDR prefix must match the selected size exactly:
+The OKE VCN CIDR prefix must match the selected or defaulted size exactly:
 
 | `cluster_size` | Required OKE VCN prefix |
 | --- | --- |
@@ -207,7 +207,7 @@ With overlay networking, the generator creates these subnet sizes:
 | `medium` | `/22` | `/25` | `/29` |
 | `large` | `/19` | `/24` | `/29` |
 
-If `cluster_size` is set, do not also define OKE platform subnets in the configuration.
+If `cluster_size` is set, do not also define OKE platform subnets in the configuration. To use the default `small` profile, omit both `cluster_size` and manual OKE platform subnets.
 
 ## **7. Manual OKE Subnet CIDRs**
 
@@ -225,7 +225,7 @@ Native networking requires these subnet keys:
 
 ```jsonnet
 network: {
-  vcn: '10.0.80.0/21',
+  vcn: '10.0.80.0/20',
   subnets: {
     'control-plane': '10.0.80.128/25',
     'int-lb': '10.0.80.0/25',

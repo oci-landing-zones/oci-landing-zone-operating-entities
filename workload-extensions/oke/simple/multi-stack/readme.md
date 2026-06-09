@@ -105,7 +105,7 @@ Use ORM only when the customer specifically wants ORM. Prefer Terraform CLI loca
    - `CMP-LZ-PROD-NETWORK-KEY` - Network compartment
    - `DRG-FRA-LZ-HUB-KEY` - Your DRG key
    - `DRGRT-FRA-LZ-SPOKES-KEY` - Your DRG route table key
-   - CIDR blocks (`10.0.80.0/21`) - Adjust if conflicts with existing networks
+   - CIDR blocks (`10.0.80.0/20`) - Adjust if conflicts with existing networks
 
 5. **Run Terraform Plan**
    - Click **Next** to review the configuration
@@ -185,7 +185,7 @@ Edit `oke_clusters.json`:
 
 - **Kubernetes Version**: Change `kubernetes_version` to upgrade/downgrade
 - **Cluster Type**: Set `is_enhanced: false` for basic clusters
-- **Network CIDRs**: Adjust the OKE VCN CIDR and `options.kubernetes_network_config.services_cidr` for your networking requirements. In config-driven generation, use `cluster_size` as the default subnetting path and provide manual OKE subnet CIDRs only when the size profiles do not fit. In native mode, `pods_cidr` is optional passthrough. In overlay mode, `pods_cidr` represents the Kubernetes overlay pod range and defaults to `10.244.0.0/16` when omitted.
+- **Network CIDRs**: Adjust the OKE VCN CIDR and `options.kubernetes_network_config.services_cidr` for your networking requirements. In config-driven generation, auto-subnetting defaults to the `small` profile when `cluster_size` and manual OKE subnet CIDRs are omitted. In native mode, `pods_cidr` is optional passthrough. In overlay mode, `pods_cidr` represents the Kubernetes overlay pod range and defaults to `10.244.0.0/16` when omitted.
 - **CNI Mode**: The published multi-stack JSON uses native networking. In config-driven generation, set workload-extension `cni_type: overlay` to select the overlay network shape; the OKE CNI is selected with `cni: flannel`.
 - **Security**: Modify `is_api_endpoint_public` and NSG settings
 
@@ -202,7 +202,7 @@ Native mode creates control plane, internal load balancer, worker, and pod subne
 
 Overlay mode creates only control plane, internal load balancer, and worker subnets. It omits the pod subnet and related pod network resources because pod addressing comes from the Kubernetes overlay pod CIDR. Do not set workload-extension `cni_type` to `flannel`; `flannel` is the OKE CNI value, while `overlay` is the workload-extension network shape.
 
-For config-driven subnetting, prefer `cluster_size` profiles: `small` requires an OKE VCN `/20`, `medium` requires `/18`, and `large` requires `/16`. Manual OKE subnet CIDRs are still supported by omitting `cluster_size` and defining `network.subnets` with the required native or overlay subnet keys.
+For config-driven subnetting, prefer auto-subnet profiles. If `cluster_size` is omitted and no manual OKE subnet map is provided, the generator uses `small`. `small` requires an OKE VCN `/20`, `medium` requires `/18`, and `large` requires `/16`. Manual OKE subnet CIDRs are still supported by omitting `cluster_size` and defining `network.subnets` with the required native or overlay subnet keys.
 
 ### Worker Pool Configuration <!-- omit from toc -->
 
@@ -253,7 +253,7 @@ terraform destroy
 - Check compartment, network, and DRG keys exist in your parent Landing Zone
 
 **Issue**: CIDR block conflicts
-- **Solution**: Ensure VCN CIDR (`10.0.80.0/21`) doesn't overlap with existing VCNs
+- **Solution**: Ensure VCN CIDR (`10.0.80.0/20`) doesn't overlap with existing VCNs
 - Adjust subnet CIDRs in `oke_network.json`
 
 **Issue**: Cluster creation fails

@@ -1,5 +1,5 @@
 // OKE overlay subnet overrides must not include the native pod subnet
-// error_contains: Platform oke.network.subnets for extension oke_simple has unsupported keys: pods. Allowed: int-lb, control-plane, workers
+// error_contains: Platform oke.network.subnets for extension oke_simple has unsupported keys: pods. Allowed: workers, int-lb, control-plane
 {
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {

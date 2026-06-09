@@ -38,15 +38,15 @@ For published OKE deployment investigations, inspect the exact orchestrator tag 
 - For overlay, `pods_cidr` defaults to `10.244.0.0/16` and is emitted under `options.kubernetes_network_config`.
 - Do not make `pods_cidr` mandatory again for the native `oke_simple` path unless the downstream module contract truly requires it.
 - `config_params.cluster_size` is optional and currently supports `small`, `medium`, and `large`.
-- If `cluster_size` is set, the OKE platform VCN prefix must exactly match the selected size: `small` requires `/20`, `medium` requires `/18`, and `large` requires `/16`.
+- If `cluster_size` is omitted and no manual `platform.network.subnets` map is provided, the extension uses the `small` auto-subnet profile.
+- The OKE platform VCN prefix must exactly match the selected or defaulted size: `small` requires `/20`, `medium` requires `/18`, and `large` requires `/16`.
 - `cluster_size` cannot be used together with `platform.network.subnets`. With `cluster_size`, the extension owns the fixed subnet layout for the OKE platform VCN.
-- If `cluster_size` is omitted, the extension keeps the previous default subnet behavior.
-- For new customer-facing config examples, prefer the `cluster_size` profiles as the normal subnetting path. Use manual `platform.network.subnets` only when the profile layouts do not fit the required address plan.
+- For new customer-facing config examples, prefer the auto-subnet profiles as the normal subnetting path. Use manual `platform.network.subnets` only when the profile layouts do not fit the required address plan.
 - Manual native subnet maps must include exactly `control-plane`, `int-lb`, `workers`, and `pods`. Manual overlay subnet maps must include exactly `control-plane`, `int-lb`, and `workers`.
 
 ## Auto-Subnet Profiles
 
-When `cluster_size` is set, OKE subnet CIDRs are allocated from the platform VCN in a fixed order.
+When `cluster_size` is set, or when it defaults to `small`, OKE subnet CIDRs are allocated from the platform VCN in a fixed order.
 
 Native profiles:
 

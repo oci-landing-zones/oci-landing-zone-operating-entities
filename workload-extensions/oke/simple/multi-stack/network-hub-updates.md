@@ -16,8 +16,8 @@ To connect OKE clusters as a spoke to the hub, we need to perform the following 
 
 - **1.** Identify the Private IP OCID of your firewalls. [Light version steps](/commons/content/howto_identify_private_ip_ocid_vm_vnic.md) or [Complete version steps](/commons/content/howto_identify_private_ip_ocid_network_firewall.md).
 - **2.** You'll need to update Hub routing to the cluster network (spoke VCN). Start from your deployed Hub A network JSON and add the post-deployment routing entries for the OKE spoke VCN:
-  - **2.1** Add route entry for the destination of cluster network range (10.0.80.0/21 in our example) to route tables: rt-\<region>-hub-natgw,  rt-\<region>-hub-ingress. And next hop as OCID of the respective Firewall IP from the step 1. 
-  - **2.2** Add route entry for the destination of cluster network range (10.0.80.0/21 in our example) to route tables:  rt-\<region>-hub-lb,  rt-\<region>-hub-internal,  rt-\<region>-hub-mgmt. And next hop as Hub DRG.
+  - **2.1** Add route entry for the destination of cluster network range (10.0.80.0/20 in our example) to route tables: rt-\<region>-hub-natgw,  rt-\<region>-hub-ingress. And next hop as OCID of the respective Firewall IP from the step 1.
+  - **2.2** Add route entry for the destination of cluster network range (10.0.80.0/20 in our example) to route tables:  rt-\<region>-hub-lb,  rt-\<region>-hub-internal,  rt-\<region>-hub-mgmt. And next hop as Hub DRG.
 - **2.3.** Create DRG Attachment to the cluster network using the drg_route_table_key "DRGRT-FRA-LZ-SPOKES-KEY". After the attachment is created DRG will automatically import routes from the spokes to the DRG Route Table.
 - **3.** You'll need to update cluster network routing (spoke VCN) to Hub.
   - **3.1** Modify all route tables in VCN (rt-\<region>-sn-p-oke-lb, rt-\<region>-sn-p-oke-cp, rt-\<region>-sn-p-oke-workers, rt-\<region>-sn-p-oke-pods) with new entry adding destination of 0.0.0.0/0 and next hop DRG. Resulting in sending all traffic outside of the VCN to DRG.

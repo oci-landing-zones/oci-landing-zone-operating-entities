@@ -53,25 +53,26 @@ local oke_context = import './oke_context.libsonnet';
       medium: 18,
       large: 16,
     },
-    assert cluster_size == null || vcn_prefix == cluster_vcn_prefix[cluster_size] :
-      'config_params.cluster_size %s requires platform network.vcn prefix /%d' % [
-        cluster_size,
-        cluster_vcn_prefix[cluster_size],
-      ],
+    local has_manual_subnets =
+      std.objectHas(params.platform_config.network, 'subnets') &&
+      params.platform_config.network.subnets != null,
     assert cluster_size == null ||
-           !(std.objectHas(params.platform_config.network, 'subnets') &&
-             params.platform_config.network.subnets != null) :
+           !has_manual_subnets :
       'config_params.cluster_size cannot be used together with platform network.subnets',
-    local default_profile = {
-      subnets: {
-        'control-plane': '/25',
-        'int-lb': '/25',
-        workers: '/23',
-      } + (if is_overlay_network then {} else {
-        pods: '/23',
-      }),
-      order: ['int-lb', 'control-plane', 'workers'] + (if is_overlay_network then [] else ['pods']),
-    },
+    local auto_cluster_size =
+      if cluster_size == null then 'small'
+      else cluster_size,
+    assert has_manual_subnets || vcn_prefix == cluster_vcn_prefix[auto_cluster_size] :
+      if cluster_size == null then
+        'OKE auto-subnet profile %s requires platform network.vcn prefix /%d' % [
+          auto_cluster_size,
+          cluster_vcn_prefix[auto_cluster_size],
+        ]
+      else
+        'config_params.cluster_size %s requires platform network.vcn prefix /%d' % [
+          cluster_size,
+          cluster_vcn_prefix[cluster_size],
+        ],
     local sized_profiles = {
       small: {
         subnets: {
@@ -105,11 +106,10 @@ local oke_context = import './oke_context.libsonnet';
       },
     },
     local subnet_profile =
-      if cluster_size == null then default_profile
-      else sized_profiles[cluster_size],
+      sized_profiles[auto_cluster_size],
     default_subnets:
       subnet_profile.subnets,
-    // Order for auto-subnet allocation (determines CIDR assignment order)
+    // Explicit array order for sequential CIDR allocation in subnets.auto_subnets.
     subnet_order: subnet_profile.order,
   },
 
