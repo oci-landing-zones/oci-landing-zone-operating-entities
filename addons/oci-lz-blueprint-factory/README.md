@@ -1,5 +1,5 @@
 # **[OCI LZ Blueprint Factory](#)**
-## **An OCI Open LZ [Addon](#) for config-driven Landing Zone blueprint generation**
+## **An OCI Open LZ [Addon](#) to Generate Runnable Blueprints**
 
 &nbsp;
 
@@ -17,11 +17,9 @@
 
 ## 1. Overview
 
-The **OCI LZ Blueprint Factory** documents the config-driven generation path for OCI Landing Zone Operating Entities. It explains when to use a custom configuration, how the factory turns that configuration into reviewable Landing Zone artifacts, and where to find deeper reference material.
+The **OCI LZ Blueprint Factory** creates runnable JSON configurations as variations of the OCI Open LZ, while also allowing customization of environments, CIDR ranges, additional projects, platforms, add-ons, or workload extensions.
 
-Use this add-on when the published blueprints do not fully represent the required landing zone shape, such as custom environments, custom CIDR ranges, additional projects, platforms, or workload extensions.
-
-For standard deployments that match an existing published blueprint, the published runtime documentation remains the shortest path.
+For standard deployments that do not require updates, using the published blueprints remains the shortest path.
 
 &nbsp;
 
