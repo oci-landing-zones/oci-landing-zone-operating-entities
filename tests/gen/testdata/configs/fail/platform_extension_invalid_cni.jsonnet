@@ -6,7 +6,7 @@
     prod: {
       platforms: {
         oke: {
-          network: { vcn: '10.0.80.0/21' },
+          network: { vcn: '10.0.80.0/20' },
           extension: {
             type: 'oke_simple',
             params: {

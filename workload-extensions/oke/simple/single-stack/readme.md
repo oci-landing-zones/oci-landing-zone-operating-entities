@@ -52,7 +52,7 @@ This deployment combines **OneOE Blueprint**, **Hub Model E networking**, and **
 **Key Features:**
 - **Complete Landing Zone Foundation**: OneOE compartment structure, IAM groups, policies
 - **Hub-and-Spoke Networking**: Hub VCN (Model E) with firewall capabilities + OKE Spoke VCN
-- **Automated Routing**: Hub route tables pre-configured  with OKE CIDR (10.0.80.0/21)
+- **Automated Routing**: Hub route tables pre-configured  with OKE CIDR (10.0.80.0/20)
 - **DRG Integration**: Dynamic Routing Gateway with route distributions configured for Hub-Spoke communication
 - **CIS-Compliant OKE**: Uses the CIS-compliant OKE module from [terraform-oci-modules-workloads](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
 - **OKE Network Modes**: Published JSON is VCN-native by default; config-driven generation can also emit an overlay network shape for Flannel-compatible clusters
@@ -75,19 +75,19 @@ The deployment includes the complete OneOE blueprint with:
 - Load Balancer subnet with Internet Gateway (for inbound public traffic)
 - Management subnet with NAT Gateway (for Hub management)
 - DRG for inter-VCN routing
-- **Routing **: Routes to OKE CIDR (`10.0.80.0/21 → DRG`) added to both Hub subnets and DRG throguh route distribution
+- **Routing **: Routes to OKE CIDR (`10.0.80.0/20 → DRG`) added to both Hub subnets and DRG throguh route distribution
 - **Hub Model E Characteristic**: Internet Gateway resides in Hub; spoke VCNs use their own NAT Gateways for outbound internet
 
 ### **3.3 OKE Spoke Network** <!-- omit from toc -->
 
-**OKE VCN (`10.0.80.0/21`)** with dedicated subnets. The published single-stack JSON uses native networking and includes four subnets:
+**OKE VCN (`10.0.80.0/20`)** with dedicated subnets. The published single-stack JSON uses native networking and includes four subnets:
 
 | Subnet | CIDR | Purpose | Size |
 |--------|------|---------|------|
-| Control Plane | 10.0.80.128/25 | Kubernetes control plane | /25 (126 IPs) |
-| Internal LB | 10.0.80.0/25 | Internal load balancers | /25 (126 IPs) |
-| Worker Nodes | 10.0.82.0/23 | OKE worker instances | /23 (510 IPs) |
-| Pods | 10.0.84.0/23 | VCN-native pod networking | /23 (510 IPs) |
+| Control Plane | 10.0.90.64/29 | Kubernetes control plane | /29 (6 IPs) |
+| Internal LB | 10.0.90.0/26 | Internal load balancers | /26 (62 IPs) |
+| Worker Nodes | 10.0.88.0/23 | OKE worker instances | /23 (510 IPs) |
+| Pods | 10.0.80.0/21 | VCN-native pod networking | /21 (2046 IPs) |
 
 **Network Security Groups (NSGs):**
 - NSG for Control Plane (API server access, health checks)
@@ -133,6 +133,8 @@ For config-driven overlay generation, the OKE VCN uses only the Control Plane, I
 Native mode uses workload-extension `cni_type: native` and `cni: vcn_native`. It creates a pod subnet in the OKE VCN, creates the pod security list and pod NSG, and wires the worker node pool with `pods_subnet_id` and `pods_nsg_ids`.
 
 Overlay mode uses workload-extension `cni_type: overlay` and `cni: flannel`. It creates no OCI pod subnet and wires the worker node pool only with the worker subnet and worker NSG. Overlay mode defaults `pods_cidr` to `10.244.0.0/16`. Keep `services_cidr` and overlay `pods_cidr` non-overlapping with each other, the OKE VCN, and any routed on-premises, cloud, or peered ranges. Do not set workload-extension `cni_type` to `flannel`; `flannel` is the OKE CNI value, while `overlay` is the workload-extension network shape.
+
+For config-driven subnetting, prefer auto-subnet profiles. If `cluster_size` is omitted and no manual OKE subnet map is provided, the generator uses `small`. `small` requires an OKE VCN `/20`, `medium` requires `/18`, and `large` requires `/16`. Manual OKE subnet CIDRs are still supported by omitting `cluster_size` and defining `network.subnets` with the required native or overlay subnet keys.
 
 ## **4. Configuration Files**
 
@@ -195,7 +197,7 @@ The published package also includes companion JSONs that capture CIS-aligned sec
    - **Regions**: Default region code is `FRA` (Frankfurt) - update all keys and display names if deploying to a different region
    - **CIDR Blocks**:
      - Hub VCN: `10.0.0.0/21`
-     - OKE VCN: `10.0.80.0/21`
+     - OKE VCN: `10.0.80.0/20`
      - Adjust these in the JSON files if they conflict with existing networks
    - **Configuration Keys**: Ensure keys like `DRG-FRA-LZ-HUB-KEY` match your naming convention
 
@@ -499,7 +501,7 @@ Default Route:
   Target: Internet Gateway
 
 OKE VCN Route:
-  Destination: 10.0.80.0/21
+  Destination: 10.0.80.0/20
   Target: DRG
   Purpose: Return traffic to OKE VCN
 ```
@@ -511,7 +513,7 @@ Default Route:
   Target: NAT Gateway
 
 OKE VCN Route:
-  Destination: 10.0.80.0/21
+  Destination: 10.0.80.0/20
   Target: DRG
   Purpose: Management access to OKE VCN
 ```
@@ -524,7 +526,7 @@ OKE VCN Route:
 
 **Hub Route Table** (for Hub VCN attachment):
 - Configured via route distributions
-- Receives routes to OKE VCN (10.0.80.0/21)
+- Receives routes to OKE VCN (10.0.80.0/20)
 
 ### 8.4 DRG Route Distributions <!-- omit from toc -->
 

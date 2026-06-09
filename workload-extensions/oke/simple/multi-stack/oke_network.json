@@ -7,7 +7,7 @@
                 "vcns": {
                     "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY": {
                         "display_name"                                : "vcn-fra-lz-prod-oke",
-                        "cidr_blocks"                                 : ["10.0.80.0/21"],
+                        "cidr_blocks"                                 : ["10.0.80.0/20"],
                         "dns_label"                                   : "vcnfralzppoke",
                         "block_nat_traffic"                           : false,
                         "is_attach_drg"                               : false,
@@ -16,9 +16,31 @@
                         "is_oracle_gua_allocation_enabled"            : false,
 
                         "subnets": {
+                            "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
+                                "display_name"                        : "sn-fra-lz-prod-oke-pods",
+                                "cidr_block"                          : "10.0.80.0/21",
+                                "dns_label"                           : "snpplatokepods",
+                                "dhcp_options_key"                    : "default_dhcp_options",
+                                "prohibit_internet_ingress"           : true,
+                                "prohibit_public_ip_on_vnic"          : true,
+                                "route_table_key"                     : "RT-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+                                "security_list_keys"                  : ["SL-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"]
+                            },
+
+                            "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
+                                "display_name"                        : "sn-fra-lz-prod-oke-workers",
+                                "cidr_block"                          : "10.0.88.0/23",
+                                "dns_label"                           : "snpplatokework",
+                                "dhcp_options_key"                    : "default_dhcp_options",
+                                "prohibit_internet_ingress"           : true,
+                                "prohibit_public_ip_on_vnic"          : true,
+                                "route_table_key"                     : "RT-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
+                                "security_list_keys"                  : ["SL-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"]
+                            },
+
                             "SN-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
                                 "display_name"                        : "sn-fra-lz-prod-oke-lb",
-                                "cidr_block"                          : "10.0.80.0/25",
+                                "cidr_block"                          : "10.0.90.0/26",
                                 "dns_label"                           : "snpplatokelb",
                                 "dhcp_options_key"                    : "default_dhcp_options",
                                 "prohibit_internet_ingress"           : true,
@@ -29,35 +51,13 @@
 
                             "SN-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY": {
                                 "display_name"                        : "sn-fra-lz-prod-oke-cp",
-                                "cidr_block"                          : "10.0.80.128/25",
+                                "cidr_block"                          : "10.0.90.64/29",
                                 "dns_label"                           : "snpplatokecp",
                                 "dhcp_options_key"                    : "default_dhcp_options",
                                 "prohibit_internet_ingress"           : true,
                                 "prohibit_public_ip_on_vnic"          : true,
                                 "route_table_key"                     : "RT-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
                                 "security_list_keys"                  : ["SL-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY"]
-                            },
-
-                            "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
-                                "display_name"                        : "sn-fra-lz-prod-oke-workers",
-                                "cidr_block"                          : "10.0.82.0/23",
-                                "dns_label"                           : "snpplatokework",
-                                "dhcp_options_key"                    : "default_dhcp_options",
-                                "prohibit_internet_ingress"           : true,
-                                "prohibit_public_ip_on_vnic"          : true,
-                                "route_table_key"                     : "RT-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY",
-                                "security_list_keys"                  : ["SL-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"]
-                            },
-
-                            "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
-                                "display_name"                        : "sn-fra-lz-prod-oke-pods",
-                                "cidr_block"                          : "10.0.84.0/23",
-                                "dns_label"                           : "snpplatokepods",
-                                "dhcp_options_key"                    : "default_dhcp_options",
-                                "prohibit_internet_ingress"           : true,
-                                "prohibit_public_ip_on_vnic"          : true,
-                                "route_table_key"                     : "RT-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
-                                "security_list_keys"                  : ["SL-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"]
                             }
                         },
 
@@ -222,7 +222,7 @@
                                     },
                                     {
                                         "description"                 : "Required to allow application within VCN to fail fast",
-                                        "src"                         : "10.0.80.0/21",
+                                        "src"                         : "10.0.80.0/20",
                                         "src_type"                    : "CIDR_BLOCK",
                                         "protocol"                    : "ICMP",
                                         "icmp_type"                   : 3,
@@ -242,7 +242,7 @@
                                     },
                                     {
                                         "description"                 : "Required to allow application within VCN responses to fail fast",
-                                        "dst"                         : "10.0.80.0/21",
+                                        "dst"                         : "10.0.80.0/20",
                                         "dst_type"                    : "CIDR_BLOCK",
                                         "protocol"                    : "ICMP",
                                         "icmp_type"                   : 3,
@@ -266,7 +266,7 @@
                                     },
                                     {
                                         "description"                 : "Required to allow application within VCN to fail fast",
-                                        "src"                         : "10.0.80.0/21",
+                                        "src"                         : "10.0.80.0/20",
                                         "src_type"                    : "CIDR_BLOCK",
                                         "protocol"                    : "ICMP",
                                         "icmp_type"                   : 3,
@@ -286,7 +286,7 @@
                                     },
                                     {
                                         "description"                 : "Required to allow application within VCN responses to fail fast",
-                                        "dst"                         : "10.0.80.0/21",
+                                        "dst"                         : "10.0.80.0/20",
                                         "dst_type"                    : "CIDR_BLOCK",
                                         "protocol"                    : "ICMP",
                                         "icmp_type"                   : 3,
@@ -310,7 +310,7 @@
                                     },
                                     {
                                         "description"                 : "Required to allow application within VCN to fail fast",
-                                        "src"                         : "10.0.80.0/21",
+                                        "src"                         : "10.0.80.0/20",
                                         "src_type"                    : "CIDR_BLOCK",
                                         "protocol"                    : "ICMP",
                                         "icmp_type"                   : 3,
@@ -330,7 +330,7 @@
                                     },
                                     {
                                         "description"                 : "Required to allow application within VCN responses to fail fast",
-                                        "dst"                         : "10.0.80.0/21",
+                                        "dst"                         : "10.0.80.0/20",
                                         "dst_type"                    : "CIDR_BLOCK",
                                         "protocol"                    : "ICMP",
                                         "icmp_type"                   : 3,
@@ -354,7 +354,7 @@
                                     },
                                     {
                                         "description"                 : "Required to allow application within VCN to fail fast",
-                                        "src"                         : "10.0.80.0/21",
+                                        "src"                         : "10.0.80.0/20",
                                         "src_type"                    : "CIDR_BLOCK",
                                         "protocol"                    : "ICMP",
                                         "icmp_type"                   : 3,
@@ -374,7 +374,7 @@
                                     },
                                     {
                                         "description"                 : "Required to allow application within VCN responses to fail fast",
-                                        "dst"                         : "10.0.80.0/21",
+                                        "dst"                         : "10.0.80.0/20",
                                         "dst_type"                    : "CIDR_BLOCK",
                                         "protocol"                    : "ICMP",
                                         "icmp_type"                   : 3,

@@ -1,5 +1,5 @@
-// OKE overlay subnet overrides must not include the native pod subnet
-// error_contains: Platform oke.network.subnets for extension oke_simple has unsupported keys: pods. Allowed: workers, int-lb, control-plane
+// OKE extension does not allow manual subnet maps with cluster size profiles
+// error_contains: config_params.cluster_size cannot be used together with platform network.subnets
 {
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
@@ -7,12 +7,12 @@
       platforms: {
         oke: {
           network: {
-            vcn: '10.0.80.0/21',
+            vcn: '10.0.16.0/20',
             subnets: {
-              'control-plane': '10.0.80.128/25',
-              'int-lb': '10.0.80.0/25',
-              workers: '10.0.81.0/23',
-              pods: '10.0.83.0/23',
+              'control-plane': '10.0.16.0/25',
+              'int-lb': '10.0.16.128/25',
+              workers: '10.0.18.0/23',
+              pods: '10.0.20.0/23',
             },
           },
           extension: {
@@ -20,7 +20,7 @@
             params: {
               kubernetes_version: 'v1.35.2',
               services_cidr: '10.96.0.0/16',
-              cni_type: 'overlay',
+              cluster_size: 'small',
               api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
             },
           },

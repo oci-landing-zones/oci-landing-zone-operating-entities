@@ -92,6 +92,11 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     'config_params.cni_type native requires config_params.cni vcn_native';
   assert cni_type != 'overlay' || cni == 'flannel' :
     'config_params.cni_type overlay requires config_params.cni flannel';
+  local cluster_size =
+    if std.objectHas(params.config_params, 'cluster_size') && params.config_params.cluster_size != null then
+      params.config_params.cluster_size
+    else
+      null;
   local is_overlay_network = cni_type == 'overlay';
   local cluster_cni_type =
     if cni == 'vcn_native' then 'native'
@@ -156,6 +161,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     api_endpoint_egress_rules: api_endpoint_egress_rules,
     cni_type: cni_type,
     cni: cni,
+    cluster_size: cluster_size,
     cluster_cni_type: cluster_cni_type,
     is_overlay_network: is_overlay_network,
     optional_cluster_kubernetes_network_config: optional_cluster_kubernetes_network_config,
