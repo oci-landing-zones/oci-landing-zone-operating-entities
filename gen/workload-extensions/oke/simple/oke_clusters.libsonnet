@@ -2,8 +2,6 @@
 
 function(ctx) {
   oke_clusters_configuration+: {
-    default_compartment_id: ctx.cmp_key,
-
     clusters+: {
       [ctx.cluster_key]: {
         name: ctx.cluster_name,
