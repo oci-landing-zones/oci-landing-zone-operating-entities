@@ -28,7 +28,7 @@ For standard deployments that do not require updates, using the published bluepr
 The Blueprint Factory can be reached through three paths:
 
 <p align="center">
-  <img src="images/workflow.png" alt="Blueprint Factory access paths for AI-assisted, direct config, and published blueprint usage" width="600">
+  <img src="images/workflow.png" alt="Blueprint Factory access paths for AI-assisted, direct config, and published blueprint usage" width="800">
 </p>
 
 - **AI-assisted path**: use the [OCI LZ AI Agent](/addons/oci-lz-ai-agent/README.md) to help discover requirements and draft a config-driven input.
