@@ -43,6 +43,12 @@ function(raw_config)
   local all_vcn_entries = ctx.all_vcn_entries;
   local lb_env_name = ctx.lb_env_name;
   local lb_backends = ctx.lb_backends;
+  local create_hub_l7_load_balancer =
+    std.length([
+      entry
+      for entry in extension_entries
+      if entry.platform_config.extension.type == 'oke_simple'
+    ]) == 0;
 
   // Hub CIDRs needed for spoke NSG/security list rules
   local hub_vcn_cidr = config.hub.network.vcn;
@@ -60,6 +66,7 @@ function(raw_config)
       { name: entry.name, cidr: entry.vcn }
       for entry in all_vcn_entries
     ],
+    create_l7_load_balancer: create_hub_l7_load_balancer,
     lb_backends: lb_backends,
     lb_env_name: lb_env_name,
   });
