@@ -48,7 +48,7 @@ local shared_oke = multi({
   },
   shared_platforms: {
     oke: {
-      network: { vcn: '10.0.80.0/21' },
+      network: { vcn: '10.0.80.0/20' },
       extension: {
         type: 'oke_simple',
         params: {
@@ -68,7 +68,7 @@ local mixed = multi({
       projects: { proj1: {} },
       platforms: {
         oke: {
-          network: { vcn: '10.0.96.0/21' },
+          network: { vcn: '10.0.96.0/20' },
           extension: {
             type: 'oke_simple',
             params: {
@@ -80,8 +80,8 @@ local mixed = multi({
         },
         data: {
           network: {
-            vcn: '10.0.104.0/24',
-            subnets: { main: '10.0.104.0/28' },
+            vcn: '10.0.112.0/24',
+            subnets: { main: '10.0.112.0/28' },
           },
         },
       },

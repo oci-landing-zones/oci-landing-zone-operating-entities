@@ -3,7 +3,7 @@ local kubernetes_version = 'v1.35.2';
 local services_cidr = '10.96.0.0/16';
 local api_endpoint_allowed_cidrs = ['10.0.1.0/24'];
 local oke_platform = {
-  network: { vcn: '10.0.80.0/21' },
+  network: { vcn: '10.0.80.0/20' },
   extension: {
     type: 'oke_simple',
     params: {

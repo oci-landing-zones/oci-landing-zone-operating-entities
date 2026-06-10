@@ -23,6 +23,8 @@
 | **TARGET RESOURCES** | IAM (Compartments, Groups, Policies), Network (VCN, Subnets, NSGs, Gateways), OKE Cluster |
 | **DEPLOYMENT**          | Use the JSON files in this folder with Terraform CLI, or stage them in a customer-controlled private source for OCI Resource Manager as described in [Deployment Steps](#4-deployment-steps). [Terraform CLI](/commons/content/terraform.md) can also be used. |
 
+For customized OKE landing zones generated from a configuration file, see [OKE Config-Driven Generation](../config-driven.md).
+
 
 &nbsp;
 
@@ -33,7 +35,7 @@ This deployment uses the [OCI Landing Zone Orchestrator](https://github.com/oci-
 **Key Features:**
 - **Automated Dependency Resolution**: Network resources (VCN, subnets, NSGs) are automatically linked to the OKE cluster using configuration keys using dependency exchange across stacks
 - **CIS-Compliant**: Uses the CIS-compliant OKE module from [terraform-oci-modules-workloads](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
-- **Native Pod Networking**: Configured with VCN-native pod networking for improved security and performance
+- **OKE Network Modes**: Published JSON is VCN-native by default; config-driven generation can also emit an overlay network shape for Flannel-compatible clusters
 - **Multi-Step Deployment**: Deploy OKE together in one ORM stack and Landing Zone separately
 
 &nbsp;
@@ -103,7 +105,7 @@ Use ORM only when the customer specifically wants ORM. Prefer Terraform CLI loca
    - `CMP-LZ-PROD-NETWORK-KEY` - Network compartment
    - `DRG-FRA-LZ-HUB-KEY` - Your DRG key
    - `DRGRT-FRA-LZ-SPOKES-KEY` - Your DRG route table key
-   - CIDR blocks (`10.0.80.0/21`) - Adjust if conflicts with existing networks
+   - CIDR blocks (`10.0.80.0/20`) - Adjust if conflicts with existing networks
 
 5. **Run Terraform Plan**
    - Click **Next** to review the configuration
@@ -183,8 +185,24 @@ Edit `oke_clusters.json`:
 
 - **Kubernetes Version**: Change `kubernetes_version` to upgrade/downgrade
 - **Cluster Type**: Set `is_enhanced: false` for basic clusters
-- **Network CIDRs**: Adjust the OKE VCN/subnet CIDRs and `options.kubernetes_network_config.services_cidr` for your networking requirements. If you intentionally need to pass `pods_cidr`, set it under `options.kubernetes_network_config.pods_cidr`.
+- **Network CIDRs**: Adjust the OKE VCN CIDR and `options.kubernetes_network_config.services_cidr` for your networking requirements. In config-driven generation, auto-subnetting defaults to the `small` profile when `cluster_size` and manual OKE subnet CIDRs are omitted. In native mode, `pods_cidr` is optional passthrough. In overlay mode, `pods_cidr` represents the Kubernetes overlay pod range and defaults to `10.244.0.0/16` when omitted.
+- **CNI Mode**: The published multi-stack JSON uses native networking. In config-driven generation, set workload-extension `cni_type: overlay` to select the overlay network shape; the OKE CNI is selected with `cni: flannel`.
 - **Security**: Modify `is_api_endpoint_public` and NSG settings
+
+### Native and Overlay Network Modes <!-- omit from toc -->
+
+Config-driven `oke_simple` generation supports two OKE network shapes:
+
+| Config parameter | Purpose | Supported values | Default |
+| --- | --- | --- | --- |
+| `cni_type` | Network shape emitted by this workload extension | `native`, `overlay` | `native` |
+| `cni` | OKE cluster CNI requested from the downstream OKE module | `vcn_native`, `flannel` | `vcn_native` for native, `flannel` for overlay |
+
+Native mode creates control plane, internal load balancer, worker, and pod subnets, plus pod route table, pod security list, pod NSG, and worker pod networking references.
+
+Overlay mode creates only control plane, internal load balancer, and worker subnets. It omits the pod subnet and related pod network resources because pod addressing comes from the Kubernetes overlay pod CIDR. Do not set workload-extension `cni_type` to `flannel`; `flannel` is the OKE CNI value, while `overlay` is the workload-extension network shape.
+
+For config-driven subnetting, prefer auto-subnet profiles. If `cluster_size` is omitted and no manual OKE subnet map is provided, the generator uses `small`. `small` requires an OKE VCN `/20`, `medium` requires `/18`, and `large` requires `/16`. Manual OKE subnet CIDRs are still supported by omitting `cluster_size` and defining `network.subnets` with the required native or overlay subnet keys.
 
 ### Worker Pool Configuration <!-- omit from toc -->
 
@@ -235,12 +253,13 @@ terraform destroy
 - Check compartment, network, and DRG keys exist in your parent Landing Zone
 
 **Issue**: CIDR block conflicts
-- **Solution**: Ensure VCN CIDR (`10.0.80.0/21`) doesn't overlap with existing VCNs
+- **Solution**: Ensure VCN CIDR (`10.0.80.0/20`) doesn't overlap with existing VCNs
 - Adjust subnet CIDRs in `oke_network.json`
 
 **Issue**: Cluster creation fails
 - **Solution**: Check IAM policies are correctly configured
-- Verify VCN-native CNI policy grants required permissions (see `oke_identity.json`)
+- For native clusters, verify VCN-native CNI policy grants required permissions (see `oke_identity.json`)
+- For overlay clusters, verify the source config uses workload-extension `cni_type: overlay` and `cni: flannel`, and that the generated worker node pool does not include `pods_subnet_id` or `pods_nsg_ids`
 
 **Issue**: Nodes not joining cluster
 - **Solution**: Verify NSG rules allow required traffic
@@ -258,6 +277,7 @@ terraform destroy
 - [CIS OKE Module Documentation](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
 - [OKE Documentation](https://docs.oracle.com/en-us/iaas/Content/ContEng/home.htm)
 - [VCN-Native Pod Networking](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-OCI_CNI_plugin.htm)
+- [Flannel Pod Networking](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-flannel_CNI_plugin.htm)
 
 &nbsp;
 

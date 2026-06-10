@@ -11,7 +11,7 @@ local outputs = multi({
       projects: { proj1: {} },
       platforms: {
         oke: {
-          network: { vcn: '10.0.80.0/21' },
+          network: { vcn: '10.0.80.0/20' },
           extension: {
             type: 'oke_simple',
             params: {
@@ -28,7 +28,7 @@ local outputs = multi({
       projects: { proj1: {} },
       platforms: {
         oke: {
-          network: { vcn: '10.0.144.0/21' },
+          network: { vcn: '10.0.144.0/20' },
           extension: {
             type: 'oke_simple',
             params: {
