@@ -10,7 +10,7 @@
 [2.1. Prepare Your AI](#21-prepare-your-ai)<br>
 [2.2. AI Guides the Setup](#22-ai-guides-the-setup)<br>
 [2.3. Run & Deploy](#23-run--deploy)<br>
-[3. AI Built-in Security](#3-ai-built-in-security)<br>
+[3. AI Built-in Security](#3-engineered-security-from-the-ground-up)<br>
 [4. Complementary Resources](#4-complementary-resources)<br>
 
 &nbsp;
@@ -125,7 +125,7 @@ Follow additional documentation for both deployment paths of Landing Zones:
 
 &nbsp;
 
-## 3. AI Built-in Security
+## 3. Engineered Security from the Ground-up
 
 AI assistance remains anchored in the OCI Landing Zone Operating Entities repository model. The AI agent creates or updates structured inputs and review artifacts. It does not invent landing zone files from memory or produce deployment artifacts outside the repository model.
 
