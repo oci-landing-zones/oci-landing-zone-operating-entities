@@ -64,17 +64,14 @@ Recommended inputs:
 - Workloads to be deployed on top of OCI Landing Zone.
 - Security, observability, governance and compliance requirements.
 
-### How Blueprint Factory Works with AI
+The AI Agent works within the [Blueprint Factory](../oci-lz-blueprint-factory/README.md) to:
 
-The AI agent works within the Blueprint Factory model:
+1. **Discover**: AI asks questions to understand your landing zone requirements.
+2. **Select Templates**: AI identifies the best-fit published blueprint or determines if customization is needed.
+3. **Generate Configuration**: AI generates the JSON configs for the available scenarios.
+4. **Review**: AI reviews generated JSON before deployment and provides guidance towards deployment.
 
-1. **Discovery**: AI asks questions to understand your landing zone requirements.
-2. **Template Selection**: AI identifies the best-fit published blueprint or determines if customization is needed.
-3. **Configuration Generation**: For standard designs, the AI prepares the blueprint JSON. For custom designs, the AI creates a Jsonnet configuration file.
-4. **Output Generation**: The Blueprint Factory (Jsonnet generator) produces consistent, deployable JSON artifacts from your configuration.
-5. **Review & Refinement**: All generated configurations remain reviewable as Jsonnet or JSON before deployment.
-
-This approach keeps AI assistance anchored in the repository's battle-tested landing zone patterns while enabling customization.
+This approach keeps AI assistance anchored in the repository landing zone patterns and best practices while enabling customization.
 
 ### Example of complete OKE one-shot prompt to Generate Landing Zone
 
@@ -132,11 +129,11 @@ Follow additional documentation for both deployment paths of Landing Zones:
 
 AI assistance remains anchored in the OCI Landing Zone Operating Entities repository model. The AI agent creates or updates structured inputs and review artifacts. It does not invent landing zone files from memory or produce deployment artifacts outside the repository model.
 
-Jsonnet generation provides the foundational input layer that keeps the design traceable and repeatable. It helps prevent arbitrary landing zone output from AI memory and halucinations by keeping design intent aligned with repository owned landing zone patterns.
+The [Blueprint Factory](../oci-lz-blueprint-factory/README.md) provides the foundational input layer that keeps the design traceable and repeatable. It helps prevent arbitrary landing zone output from AI memory and halucinations by keeping design intent aligned with repository owned landing zone patterns.
 
 - **Structured design surface**: Landing zone intent is captured in a structured format before deployment artifacts are considered.
 - **Repository based behavior**: Outputs are derived from OCI Landing Zone Operating Entities repository logic.
-- **Repeatable Composition**: The same Jsonnet config always produces identical JSON outputs, supporting GitOps workflows.
+- **Repeatable Composition**: The same inputs always produce identical JSON outputs, supporting GitOps workflows.
 - **Reviewable change**: Design updates are inspected as focused diffs before deployment.
 - **Reduced hallucination risk**: AI cannot invent resources outside the generator's contract. Unsupported requirements are clearly marked as manual post-deployment steps.
 - **Ownership boundary**: AI assists with drafting and review while architecture, security, compliance and deployment approval remain with your organization.
