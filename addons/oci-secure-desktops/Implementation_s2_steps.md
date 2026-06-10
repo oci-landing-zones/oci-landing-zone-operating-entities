@@ -11,7 +11,7 @@ At the beginning of the README page, select 'Deploy to Oracle Cloud'. When you c
 4. Set the terraform version to 1.5.x. Click Next.
 5. Create your own bucket/GitHub repo and upload the JSON files provided in this asset:
 
-[oci_sd_lz_addon_iam.auto.tfvars.json](oci_sd_lz_addon_iam.auto.tfvars.json)
+[oci_sd_lz_ext_iam.auto.tfvars.json](oci_sd_lz_ext_iam.auto.tfvars.json)
 
 The IAM JSON files define the creation of the following resources:
 * **cmp-lzp-platform-sd**: Compartment for Secure Desktops.
@@ -21,7 +21,7 @@ The IAM JSON files define the creation of the following resources:
 * **pcy-secure-desktop-dg**: IAM policy for the dynamic group.
 * **pcy-secure-desktop-admin-and-users**: IAM policy for both admin and user groups.
   
-[oci_sd_lz_addon_priv_network.auto.tfvars.json](oci_sd_lz_addon_priv_network.auto.tfvars.json)
+[oci_sd_lz_ext_priv_network.auto.tfvars.json](oci_sd_lz_ext_priv_network.auto.tfvars.json)
 
 The Network JSON files define the creation of the following resources:
 * **dns_resolver** with forwarding rules and **dns_forwarder**
@@ -45,4 +45,4 @@ Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](/LICENSE) for more details.
+See [LICENSE](/LICENSE.txt) for more details.

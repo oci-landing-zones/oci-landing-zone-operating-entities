@@ -18,7 +18,7 @@ The sample OKE VCN is pre-configured with 10.0.128.0/22 CIDR range, that can be 
 
 Input Configuration Files | Input Dependency Files | Generated Output
 --------------------------|------------------------|------------------
-[network_oke_npn_config.json](../mt/shared/network_oke_npn_config.json) <br> [network_oke_npn_with_exadata_config.json](../mt/shared/network_oke_npn_with_exadata_config.json) <br> [oke_npn_cluster_config.json](../mt/shared/oke_npn_cluster_config.json) <br> [oke_operator_host_config.json](../mgmt-plane/network/oke_operator_host_config.json) <br> [network_oke_flannel_config.json](../mt/shared/network_oke_flannel_config.json) <br> [network_oke_flannel_with_exadata_config.json](../mt/shared/network_oke_flannel_with_exadata_config.json) <br> [oke_flannel_cluster_config.json](../mt/shared/oke_flannel_cluster_config.json) | mgmt-plane/iam/output/compartments_output.json, mgmt-plane/network/output/network_output.json | mt/shared/output/network_output.json
+[network_oke_npn_config.json](../mt/shared/network_oke_npn_config.json) <br> [network_oke_npn_with_exadata_config.json](../mt/shared/network_oke_npn_with_exadata_config.json) <br> [oke_npn_cluster_config.json](../mt/shared/oke_npn_cluster_config.json) <br> [oke_operator_host_config.json](../mgmt-plane/tooling/oke_operator_host_config.json) <br> [network_oke_flannel_config.json](../mt/shared/network_oke_flannel_config.json) <br> [network_oke_flannel_with_exadata_config.json](../mt/shared/network_oke_flannel_with_exadata_config.json) <br> [oke_flannel_cluster_config.json](../mt/shared/oke_flannel_cluster_config.json) | mgmt-plane/iam/output/compartments_output.json, mgmt-plane/network/output/network_output.json | mt/shared/output/network_output.json
 
 The provided networking templates support the following distinct configurations:
 Input Configuration File | OKE networking | Data Layer
@@ -32,7 +32,7 @@ The sample stack below favors OKE Native networking and non-Exadata data managem
 
 ### Stack Creation
 
-**Deploying this stack as-is requires [Deployment Bootstrap](../readme.md#deployment-bootstrap)**.
+**Deploying this stack as-is requires [Deployment Bootstrap](../readme.md#bootstrap)**.
 
 [![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"configuration_source":"ocibucket","oci_configuration_bucket":"landing-zone-runtime-bucket","oci_configuration_objects":"mt/shared/network_oke_npn_config.json,mt/shared/oke_npn_cluster_config.json","oci_dependency_objects":"mgmt-plane/iam/output/compartments_output.json,mgmt-plane/network/output/network_output.json","save_output":true,"oci_object_prefix":"mt/shared/output"})
 

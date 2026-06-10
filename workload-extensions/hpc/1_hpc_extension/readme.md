@@ -120,7 +120,7 @@ The network layer covers the following resources:
 7. DRG Attachments - Connect spokes with the central Hub
 8. DNS Private Zone 
 
-In this asset, we use reserved CIDR blocks for the different VCNs, but this can be customized. To learn more about managing your OCI subnetting, we recommend checking this [asset](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/LZ_Subnetting/addons/oci-lz-subnetting).
+In this asset, we use reserved CIDR blocks for the different VCNs, but this can be customized. To learn more about managing your OCI subnetting, we recommend checking this [asset](/addons/oci-lz-subnetting/).
 
 
 For customization of the pre-defined setup please refer to the [Networking documentation](https://github.com/oci-landing-zones/terraform-oci-cis-landing-zone-networking) for documentation and examples.
@@ -236,7 +236,7 @@ The paths can change based on the modification in the previous [Compartments](#2
 
 ## **5. Deploy**
 
-Use the magic button provided in the summary section to deploy the HPC LZ extension using [Oracle Resource Manager (ORM)](/../../../commons/content/orm.md) or use [Terraform CLI](../../../commons/content/terraform.md).
+Use the magic button provided in the summary section to deploy the HPC LZ extension using [Oracle Resource Manager (ORM)](../../../commons/content/orm.md) or use [Terraform CLI](../../../commons/content/terraform.md).
 
 This operation creates a default routing configuration. To complete the network layer setup, deploy the firewalls and update the routing in the hub to prepare for deploying the HPC Stack. All these steps are defined in this [POST operation](1.1_Network_post_updates/readme.md). Once completed, everything will be ready for creating the HPC Cluster.
 
@@ -250,4 +250,4 @@ Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](/LICENSE) for more details.
+See [LICENSE](/LICENSE.txt) for more details.

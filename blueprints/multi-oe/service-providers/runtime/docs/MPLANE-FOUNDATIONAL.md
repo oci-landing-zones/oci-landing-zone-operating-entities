@@ -18,7 +18,7 @@ Input Configuration Files | Input Dependency Files | Generated Output
 
 ### Stack Creation
 
-**Deploying this stack as-is requires [Deployment Bootstrap](../readme.md#deployment-bootstrap)**.
+**Deploying this stack as-is requires [Deployment Bootstrap](../readme.md#bootstrap)**.
 
 [![Deploy_To_OCI](../../design/images/DeployToOCI.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"configuration_source":"ocibucket","oci_configuration_bucket":"landing-zone-runtime-bucket","oci_configuration_objects":"mgmt-plane/iam/iam_config.json,mgmt-plane/security/cloud_guard_config.json,mgmt-plane/governance/budgets_config.json,mgmt-plane/governance/tags_config.json,mgmt-plane/observability/observability_config.json,mgmt-plane/security/scanning_config.json,mgmt-plane/security/security_zones_config.json","save_output":true,"oci_object_prefix":"mgmt-plane/iam/output"})
 
