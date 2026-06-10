@@ -41,6 +41,8 @@ For customized OKE landing zones generated from a configuration file, see [OKE C
 
 This deployment combines **OneOE Blueprint**, **Hub Model E networking**, and **OKE cluster** into a **single comprehensive Terraform deployment**. Unlike the multi-stack approach where OKE is added to an existing Landing Zone, this single-stack deployment creates everything together from scratch.
 
+The published quickstart creates one pre-production OKE platform. Use config-driven generation when you need to add a production OKE platform or more OKE platforms.
+
 <img src="../single-stack/content/oke_oneclick.png" width="800">
 
 **What Makes This Different:**
@@ -51,7 +53,7 @@ This deployment combines **OneOE Blueprint**, **Hub Model E networking**, and **
 
 **Key Features:**
 - **Complete Landing Zone Foundation**: OneOE compartment structure, IAM groups, policies
-- **Hub-and-Spoke Networking**: Hub VCN (Model E) with firewall capabilities + OKE Spoke VCN
+- **Hub-and-Spoke Networking**: Hub VCN (Model E, no firewall) + OKE Spoke VCN
 - **Automated Routing**: Hub route tables pre-configured  with OKE CIDR (10.0.80.0/20)
 - **DRG Integration**: Dynamic Routing Gateway with route distributions configured for Hub-Spoke communication
 - **CIS-Compliant OKE**: Uses the CIS-compliant OKE module from [terraform-oci-modules-workloads](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
@@ -94,6 +96,8 @@ The deployment includes the complete OneOE blueprint with:
 - NSG for Worker Nodes (full egress, selective ingress)
 - NSG for Pods (pod-to-pod, pod-to-services)
 - NSG for Internal Load Balancers (NodePort range)
+
+The published OKE quickstart does not create a hub-level OCI L7 Load Balancer. The Hub LB subnet remains available for OKE-created public load balancers, which are provisioned by OKE when Kubernetes workloads define `Service` resources of type `LoadBalancer`.
 
 For config-driven overlay generation, the OKE VCN uses only the Control Plane, Internal LB, and Worker Nodes subnets. The pod subnet, pod route table, pod security list, pod NSG, and worker pod networking fields are omitted because pod addressing comes from the Kubernetes overlay pod CIDR instead of an OCI pod subnet.
 
@@ -338,9 +342,9 @@ Edit the JSON file to modify CIDR blocks:
           }
         }
       },
-      "prod": {
+      "preprod": {
         "vcns": {
-          "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY": {
+          "VCN-FRA-LZ-PREPROD-PLATFORM-OKE-KEY": {
             "cidr_blocks": ["10.1.80.0/21"]
           }
         }
@@ -360,7 +364,7 @@ Edit the JSON file to modify CIDR blocks:
 {
   "oke_workers_configuration": {
     "node_pools": {
-      "NDP-FRA-LZ-PROD-OKE-KEY": {
+      "NDP-FRA-LZ-PREPROD-OKE-KEY": {
         "size": 3,  // Changed from 1 to 3 nodes
         ...
       }
@@ -377,7 +381,7 @@ Edit the JSON file to modify CIDR blocks:
 {
   "oke_workers_configuration": {
     "node_pools": {
-      "NDP-FRA-LZ-PROD-OKE-KEY": {
+      "NDP-FRA-LZ-PREPROD-OKE-KEY": {
         "node_config_details": {
           "image": "8.10",
           "node_shape": "VM.Standard.E5.Flex",
@@ -401,7 +405,7 @@ Edit the JSON file to modify CIDR blocks:
 {
   "oke_clusters_configuration": {
     "clusters": {
-      "CLR-FRA-LZ-PROD-OKE-KEY": {
+      "CLR-FRA-LZ-PREPROD-OKE-KEY": {
         "kubernetes_version": "v1.35.2",  // Updated version
         "options": {
           "kubernetes_network_config": {
@@ -430,9 +434,9 @@ To add custom NSG rules, locate the NSG configuration in the JSON file and add n
 {
   "network_configuration": {
     "network_configuration_categories": {
-      "prod": {
+      "preprod-platform-oke": {
         "network_security_groups": {
-          "NSG-PROD-WORKERS": {
+          "NSG-FRA-LZ-PREPROD-PLATFORM-OKE-WORKERS-KEY": {
             "ingress_rules": {
               "ssh_from_bastion": {
                 "description": "Allow SSH from bastion",
@@ -464,7 +468,7 @@ The published native OKE subnets (Control Plane, Internal LB, Workers, Pods) use
 ```
 Default Route:
   Destination: 0.0.0.0/0
-  Target: NAT Gateway (NGW-PROD-OKE-KEY)
+  Target: NAT Gateway (NGW-FRA-LZ-PREPROD-PLATFORM-OKE-KEY)
   Purpose: Outbound internet access from spoke
 
 Hub and Other Networks Route:
@@ -474,7 +478,7 @@ Hub and Other Networks Route:
 
 Service Gateway Route:
   Destination: all-services
-  Target: Service Gateway (SGW-PROD-OKE-KEY)
+  Target: Service Gateway (SGW-FRA-LZ-PREPROD-PLATFORM-OKE-KEY)
   Purpose: Direct access to OCI services (bypasses NAT)
 ```
 
@@ -559,7 +563,7 @@ OKE VCN Route:
 1. Verify IAM policies in `oke_identity.json`
 2. Check that VCN-native CNI policy exists:
    ```
-   PCY-LZ-PROD-PLATFORM-OKE-VCN-CNI-KEY
+   PCY-LZ-PREPROD-PLATFORM-OKE-VCN-CNI-KEY
    ```
 3. If using overlay, verify the source config uses workload-extension `cni_type: overlay` and `cni: flannel`, and that the generated worker node pool does not include `pods_subnet_id` or `pods_nsg_ids`
 4. Verify subnet CIDRs don't overlap

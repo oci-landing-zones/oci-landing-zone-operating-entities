@@ -17,6 +17,9 @@ function(hub_ctx)
   local n = hub_ctx.naming;
   local hub_config = hub_ctx.hub_config;
   local vcn_list = if std.objectHas(hub_ctx, 'vcn_list') then hub_ctx.vcn_list else [];
+  local create_l7_load_balancer =
+    if std.objectHas(hub_ctx, 'create_l7_load_balancer') then hub_ctx.create_l7_load_balancer
+    else true;
   local lb_backends = if std.objectHas(hub_ctx, 'lb_backends') then hub_ctx.lb_backends else null;
   local lb_env_name = if std.objectHas(hub_ctx, 'lb_env_name') then hub_ctx.lb_env_name else 'prod';
   local vcn_cidr = hub_config.network.vcn;
@@ -153,7 +156,11 @@ function(hub_ctx)
 
     non_vcn_specific_gateways: {
               dynamic_routing_gateways: common._firewall_hub_drg(n),
+            }
+            + (if create_l7_load_balancer then {
               l7_load_balancers: lb._l7_load_balancer(n, lb_backends, lb_env_name),
+            } else {})
+            + {
               network_firewalls_configuration: {
                 network_firewall_policies: {
                   [n.key('NFW', ['POLICY', 'DMZ', '01'])]: {

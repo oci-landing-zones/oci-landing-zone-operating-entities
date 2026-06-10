@@ -1,13 +1,13 @@
 {
   "multi_stack": {
-    "prod-platform-oke": {
-      "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY": {
+    "preprod-platform-oke": {
+      "VCN-FRA-LZ-PREPROD-PLATFORM-OKE-KEY": {
         "default_security_list": {
           "egress_rules": [],
           "ingress_rules": []
         },
         "security_lists": {
-          "SL-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY": {
+          "SL-FRA-LZ-PREPROD-PLATFORM-OKE-CP-KEY": {
             "egress_icmp_rule_count": 2,
             "has_fail_fast_egress": true,
             "has_fail_fast_ingress": true,
@@ -15,7 +15,7 @@
             "has_pmtu_ingress": true,
             "ingress_icmp_rule_count": 2
           },
-          "SL-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
+          "SL-FRA-LZ-PREPROD-PLATFORM-OKE-INT-LB-KEY": {
             "egress_icmp_rule_count": 2,
             "has_fail_fast_egress": true,
             "has_fail_fast_ingress": true,
@@ -23,7 +23,7 @@
             "has_pmtu_ingress": true,
             "ingress_icmp_rule_count": 2
           },
-          "SL-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
+          "SL-FRA-LZ-PREPROD-PLATFORM-OKE-PODS-KEY": {
             "egress_icmp_rule_count": 2,
             "has_fail_fast_egress": true,
             "has_fail_fast_ingress": true,
@@ -31,7 +31,7 @@
             "has_pmtu_ingress": true,
             "ingress_icmp_rule_count": 2
           },
-          "SL-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
+          "SL-FRA-LZ-PREPROD-PLATFORM-OKE-WORKERS-KEY": {
             "egress_icmp_rule_count": 2,
             "has_fail_fast_egress": true,
             "has_fail_fast_ingress": true,
@@ -44,14 +44,14 @@
     }
   },
   "single_stack": {
-    "prod-platform-oke": {
-      "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY": {
+    "preprod-platform-oke": {
+      "VCN-FRA-LZ-PREPROD-PLATFORM-OKE-KEY": {
         "default_security_list": {
           "egress_rules": [],
           "ingress_rules": []
         },
         "security_lists": {
-          "SL-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY": {
+          "SL-FRA-LZ-PREPROD-PLATFORM-OKE-CP-KEY": {
             "egress_icmp_rule_count": 2,
             "has_fail_fast_egress": true,
             "has_fail_fast_ingress": true,
@@ -59,7 +59,7 @@
             "has_pmtu_ingress": true,
             "ingress_icmp_rule_count": 2
           },
-          "SL-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
+          "SL-FRA-LZ-PREPROD-PLATFORM-OKE-INT-LB-KEY": {
             "egress_icmp_rule_count": 2,
             "has_fail_fast_egress": true,
             "has_fail_fast_ingress": true,
@@ -67,7 +67,7 @@
             "has_pmtu_ingress": true,
             "ingress_icmp_rule_count": 2
           },
-          "SL-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
+          "SL-FRA-LZ-PREPROD-PLATFORM-OKE-PODS-KEY": {
             "egress_icmp_rule_count": 2,
             "has_fail_fast_egress": true,
             "has_fail_fast_ingress": true,
@@ -75,7 +75,7 @@
             "has_pmtu_ingress": true,
             "ingress_icmp_rule_count": 2
           },
-          "SL-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
+          "SL-FRA-LZ-PREPROD-PLATFORM-OKE-WORKERS-KEY": {
             "egress_icmp_rule_count": 2,
             "has_fail_fast_egress": true,
             "has_fail_fast_ingress": true,

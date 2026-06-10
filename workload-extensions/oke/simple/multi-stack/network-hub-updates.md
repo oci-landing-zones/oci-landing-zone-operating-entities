@@ -1,27 +1,39 @@
-# OP.1.1 - Firewall and RT updates <!-- omit from toc -->
+# Hub E Routing Notes <!-- omit from toc -->
 
-In all OCI Landing Zones, we use a Hub-and-Spoke network architecture. This approach allows deployment of network firewall in the hub for traffic inspection, providing enhanced security posture. There's no one size fits all solution and every customer has different requirements. We provide four different versions of [Hub Models](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models).
+The published simple multi-stack OKE package is based on **Hub E**. It is a quickstart-style example for adding one OKE platform VCN as a spoke to an existing Hub E landing zone.
 
-In the OKE extension we will use [Model A](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/addons/oci-hub-models/hub_a/readme.md) with two firewalls. The first firewall is used for North-South traffic, while the second is responsible for East-West traffic flow.
+For Hub A, Hub B, Hub C, or more customized routing models, use config-driven generation with `oke_simple` instead of treating this published simple multi-stack package as a generic hub-model adapter.
 
-Model A offers two options:
-- **Light Version** (No Cost) - testing purposes, without a firewall
-- **Complete Version** (Paid) - includes deployment of two OCI Network Firewalls.
+## Hub E Assumptions
 
-Follow the steps to configure version of [Hub Model A](/addons/oci-hub-models/hub_a). After Hub has been configured we need to perform modification to OKE environments to establish routing between Hub and Spoke VCN. In the diagram below we can see expected routing for OKE extension both for prod and uat clusters.
+- The Hub E landing zone already exists.
+- The Hub DRG key is `DRG-FRA-LZ-HUB-KEY` in the published Frankfurt example.
+- The Hub DRG spokes route table key is `DRGRT-FRA-LZ-SPOKES-KEY`.
+- The OKE platform VCN is `10.0.80.0/20` in the published example.
+- The OKE platform VCN uses its own NAT gateway and service gateway.
+- The Hub LB subnet remains available for OKE-created public load balancers, but this quickstart does not create a hub-level OCI L7 Load Balancer.
 
-<img src="content/net-routing.png" width="1000" height="auto">
+## Published Multi-Stack Network Output
 
-To connect OKE clusters as a spoke to the hub, we need to perform the following steps for each of the clusters:
+The generated `oke_network.json` contains only the OKE platform network category and injects an OKE VCN attachment into the existing Hub DRG. It does not publish Hub A firewall route-table updates or a hub-level OCI L7 Load Balancer.
 
-- **1.** Identify the Private IP OCID of your firewalls. [Light version steps](/commons/content/howto_identify_private_ip_ocid_vm_vnic.md) or [Complete version steps](/commons/content/howto_identify_private_ip_ocid_network_firewall.md).
-- **2.** You'll need to update Hub routing to the cluster network (spoke VCN). Start from your deployed Hub A network JSON and add the post-deployment routing entries for the OKE spoke VCN:
-  - **2.1** Add route entry for the destination of cluster network range (10.0.80.0/20 in our example) to route tables: rt-\<region>-hub-natgw,  rt-\<region>-hub-ingress. And next hop as OCID of the respective Firewall IP from the step 1.
-  - **2.2** Add route entry for the destination of cluster network range (10.0.80.0/20 in our example) to route tables:  rt-\<region>-hub-lb,  rt-\<region>-hub-internal,  rt-\<region>-hub-mgmt. And next hop as Hub DRG.
-- **2.3.** Create DRG Attachment to the cluster network using the drg_route_table_key "DRGRT-FRA-LZ-SPOKES-KEY". After the attachment is created DRG will automatically import routes from the spokes to the DRG Route Table.
-- **3.** You'll need to update cluster network routing (spoke VCN) to Hub.
-  - **3.1** Modify all route tables in VCN (rt-\<region>-sn-p-oke-lb, rt-\<region>-sn-p-oke-cp, rt-\<region>-sn-p-oke-workers, rt-\<region>-sn-p-oke-pods) with new entry adding destination of 0.0.0.0/0 and next hop DRG. Resulting in sending all traffic outside of the VCN to DRG.
-- **4.** Save and deploy all changes.
+The OKE VCN attachment uses:
+
+```text
+DRG: DRG-FRA-LZ-HUB-KEY
+DRG route table: DRGRT-FRA-LZ-SPOKES-KEY
+Attached VCN: VCN-FRA-LZ-PREPROD-PLATFORM-OKE-KEY
+OKE VCN CIDR: 10.0.80.0/20
+```
+
+## When To Use Config-Driven Generation
+
+Use config-driven generation when the target landing zone is not this simple Hub E quickstart, including:
+
+- Hub A, Hub B, or Hub C.
+- Multiple OKE clusters or environments.
+- Overlay OKE networking.
+- Custom OKE CIDR sizes or manual subnet maps.
 
 &nbsp;
 
