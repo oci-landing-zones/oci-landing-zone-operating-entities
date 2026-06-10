@@ -1,7 +1,5 @@
 {
     "oke_clusters_configuration": {
-        "default_compartment_id"                       : "CMP-LZ-PREPROD-OKE-KEY",
-
         "clusters": {
             "CLR-FRA-LZ-PREPROD-OKE-KEY": {
                 "name"                                 : "clr-fra-lz-preprod-oke",

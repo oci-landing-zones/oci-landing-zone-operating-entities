@@ -1,7 +1,5 @@
 {
     "oke_workers_configuration": {
-        "default_compartment_id"         : "CMP-LZ-PREPROD-OKE-KEY",
-
         "node_pools": {
             "NDP-FRA-LZ-PREPROD-OKE-KEY": {
                 "name"                   : "ndp-fra-lz-preprod-oke",
