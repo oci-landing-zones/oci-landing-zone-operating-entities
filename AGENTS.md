@@ -115,15 +115,23 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Always use `One-OE` as the landing zone family for customer-use guidance in this repository.
    - Do not ask who will operate the landing zone or whether the customer has one or several operating entities.
    - Do not ask the customer to choose a landing zone family before continuing discovery.
-   - Explain briefly that this guidance uses the current One-OE baseline, then move to the environment question.
+   - Explain briefly that this guidance uses the current One-OE baseline, then move to the region question.
    - Do not assume the customer should start from a workload extension before the One-OE baseline is established.
 
-2. **Environment count and names**
+2. **Region and realm**
+   - Determine the OCI region where the landing zone will be deployed.
+   - Explain that the region is the deployment location, such as `eu-frankfurt-1`, while the realm is the isolated OCI cloud boundary, such as `oc1` for public cloud or `oc19` for EU Sovereign Cloud.
+   - Default the realm to `oc1` if the customer does not provide one.
+   - Ask for the realm explicitly only when the customer mentions sovereign, government, dedicated, isolated, Alloy, or another non-public OCI deployment, or when the selected region maps to a non-`oc1` realm.
+   - If the customer does not know the realm, help infer it from the selected region only after checking repository or official OCI region/realm data.
+   - For config mode, keep `region` and `region_short_name` paired; omit `realm` or set it to `oc1` for public-cloud deployments, and set it explicitly for non-`oc1` deployments.
+
+3. **Environment count and names**
    - Determine how many environments the landing zone needs and what they are called.
    - Ask which environments are needed, using examples such as development, test, preproduction, and production when helpful.
    - Keep the environment names explicit. Do not assume only `prod` and `preprod` unless the customer confirms the standard One-OE shape fits.
 
-3. **Application and workload structure**
+4. **Application and workload structure**
    - Determine which applications or workloads are going to run in the landing zone.
    - OKE can itself be the workload or platform the customer is asking for.
    - Ask what will run on top of OKE and whether any other non-OKE workloads must also be part of the landing zone.
@@ -133,7 +141,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Do not treat an application as a single OCI service such as one VM or one Oracle Function.
    - Treat an application as a business workload that is commonly composed of multiple services that together solve a business need.
 
-4. **Firewall requirement**
+5. **Firewall requirement**
    - Determine whether the landing zone must include a firewall.
    - Ask this in customer language: whether the deployment is production and whether inspected or tightly controlled traffic flow is required.
    - Explain that a firewall-based design is recommended for both production and non-production, but it is mandatory for production.
@@ -141,7 +149,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Any production deployment must be treated as firewall-required.
    - Do not recommend a no-firewall hub for production use.
 
-5. **Hub model selection**
+6. **Hub model selection**
    - Choose the hub model only after the firewall requirement is known.
    - Do not ask the customer to pick `Hub A`, `Hub B`, `Hub C`, or `Hub E` by label alone.
    - After the firewall need is known, explain the relevant hub options in plain language, recommend the best fit, and only then confirm the hub family.
@@ -151,7 +159,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Recommend a no-firewall hub only when the customer explicitly accepts the tradeoff, or when the request is clearly PoC, lab, or cost/simplicity driven.
    - Reserve `Hub E` for PoC, lab, or explicitly non-production cases where a no-firewall design is acceptable.
 
-6. **Extension and network scope sizing**
+7. **Extension and network scope sizing**
    - Determine which applications, platforms, and workload extensions will need network resources or other CIDR-bearing ranges before proposing concrete CIDRs or asking the customer for final CIDR values.
    - For network-producing workload extensions, identify every VCN/subnet-producing or CIDR-bearing scope the selected path will actually emit, including hub VCNs, spoke VCNs, platform VCNs, extension VCNs, Kubernetes service CIDRs, Kubernetes pod ranges, or any other routed or internal ranges defined by the selected extension contract.
    - Use the selected workload extension's local guide under `gen/workload-extensions/*/AGENTS.md` to decide which placement, component, and sizing questions must be answered before CIDR allocation.
@@ -159,7 +167,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Do not reserve CIDRs for unchosen extension placement branches. Allocate only for the network scopes the selected design will emit, plus deliberate future reserves that are explained to the customer.
    - If a selected extension or placement scope is networkless, infrastructure-only, or otherwise forbidden from emitting network resources, do not assign it a VCN or subnet CIDR.
 
-7. **CIDR allocation**
+8. **CIDR allocation**
    - Determine the concrete OCI CIDR plan for the hub, spoke, platform, and selected workload-extension networks before giving deployment or config guidance.
    - Explain CIDRs as the network ranges reserved for OCI VCNs and subnets before asking the customer for numbers.
    - CIDR allocations are difficult to change later. Before recommending a split, explain the reasoning behind each block size, which network scope it serves, which sizing input drove it, and where intentional reserve space is left.
@@ -173,7 +181,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - If the customer has not defined CIDRs yet, help them decide the allocation first.
    - If repository behavior and official OCI documentation appear inconsistent for OKE networking, say so and verify with official OCI docs before advising.
 
-Only after these seven decisions are known may the agent continue with:
+Only after these eight decisions are known may the agent continue with:
 
 - recommending the standard published path versus the config-driven path
 - explaining OKE deployment options such as single-stack, multi-stack, or config-driven `oke_simple`

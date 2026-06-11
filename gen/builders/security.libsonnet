@@ -190,7 +190,7 @@ function(config, n, realm_constants, topo)
           name: n.display_global('key', ['shared', 'oss', 'audit', 'bkt']),
           protection_mode: 'SOFTWARE',
           vault_key: n.key_global('VLT', ['SHARED', 'SECURITY']),
-          service_grantees: ['objectstorage-%s' % config.region],
+          service_grantees: [realm_constants.service_identifiers.objectstorage(config.region)],
           group_grantees: [n.display_global('grp', ['security', 'admin'])],
           versions: ['1', '2'],
         },

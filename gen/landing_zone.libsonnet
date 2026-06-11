@@ -128,6 +128,9 @@ function(raw_config)
 
   // --- Compose output ---
   {
+    // Normalized config-mode selector used by landing_zone_multi.jsonnet.
+    cis_level: config.cis_level,
+
     // Canonical network output: final deployable artifact for all hub types.
     network: assembled_network,
 

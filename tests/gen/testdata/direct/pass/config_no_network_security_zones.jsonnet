@@ -1,6 +1,7 @@
 // environments without shared_project_network do not get env-network or project security-zone targets
 local multi = import 'gen/landing_zone_multi.jsonnet';
 local outputs = multi({
+  cis_level: 1,
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {

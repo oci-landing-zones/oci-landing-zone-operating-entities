@@ -182,6 +182,7 @@ Read `landing_zone.libsonnet` as the merge owner.
 ### Standard Outputs And Extension `extra` Outputs Are Different Channels
 
 Standard result fields have fixed names such as `network`, `network_pre`, `iam`, `security_cis1`, `security_cis2`, `observability_cis1`, `observability_cis2`, and `governance`.
+Config-mode filename fan-out still maps from those standard fields, but `landing_zone_multi.jsonnet` emits only the `security_cis*` and `observability_cis*` files selected by normalized `config.cis_level`.
 
 Extensions can contribute standard fragments into those same domains. Extensions declare network behavior with `metadata.network_mode`:
 

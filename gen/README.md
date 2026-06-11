@@ -16,6 +16,7 @@ Run `bash gen/generate.sh` the first time you work on the generator. It sets up 
 - Raw config-mode fan-out and debugging: `jsonnet --multi <output_dir>/ --tla-code-file config=<config_file> gen/landing_zone_multi.jsonnet`
 
 Config-mode network artifacts use one canonical final file: `network.json`. Only hubs that require staged deployment also emit `network_pre.json`.
+Config-mode security and observability artifacts follow `cis_level`: omit it for the default CIS level 2 files, or set `cis_level: 1` to emit the CIS level 1 file pair instead.
 If you set `hub.network.subnets` explicitly, provide the full canonical subnet set for that hub kind; partial hub subnet overrides are rejected during normalization.
 For networked extension-backed platforms, explicit `platform.network.subnets` overrides must match the extension metadata-defined subnet set exactly; otherwise omit subnets and let the extension auto-allocate. Extensions declare network behavior with `metadata.network_mode`: `required`, `forbidden`, or `optional`. Legacy `metadata.requires_network: true|false` is still supported and maps to `required` or `forbidden`. Optional-network extensions may omit `platform.network` for IAM/observability-only contributions, or include it to emit `network_pre`.
 
