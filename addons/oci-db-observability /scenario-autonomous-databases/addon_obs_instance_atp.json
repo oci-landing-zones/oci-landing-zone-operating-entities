@@ -41,7 +41,7 @@
                     "encrypt_in_transit_on_instance_update": null
                 },
                 "flex_shape_settings": {
-                    "memory_in_gbs": 16,
+                    "memory_in_gbs": 8,
                     "ocpus": 2
                 },
                 "networking": {
@@ -53,8 +53,8 @@
                     "availability_domain": 1,
                     "fault_domain": 1
                 },
-                "platform_image": {
-                    "name": "Oracle-Linux-Cloud-Developer-8.10-2025.01.31-0"
+                "marketplace_image": {
+                    "name": "Oracle Linux 7 STIG"
                 }
             }
         }

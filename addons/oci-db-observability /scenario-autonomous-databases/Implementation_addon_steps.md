@@ -7,27 +7,19 @@ Follow these steps:
 3. Set the working directory to `rms-facade`.
 4. Set the stack name you prefer.
 5. Set the Terraform version to `1.5.x`. Click Next.
-6. Confirm that the selected deployment loaded the expected JSON files:
+6. ORM will load the required json files.
+7. Enable Dependencies Source for URL-Based Configuration to ocibucket option.
+8. Create a bucket, upload the output files created with the one-oe deployment and select this bucket.
+9. Add the Dependency Files .
 
-GLOBAL deployment:
+<img src="../images/ORM.png" height="300" align="center">
 
-* [addon_obs_iam_atp_global.json](addon_obs_iam_atp_global.json)
-* [addon_obs_network_atp_global.json](addon_obs_network_atp_global.json)
-* [addon_obs_security_atp.json](addon_obs_security_atp.json)
-* [addon_obs_instance_atp.json](addon_obs_instance_atp.json)
+10.  Click Next.
+11.  Uncheck run apply. Click Create.
+12.  First, execute a plan job to review all the resources that Terraform will create. Once verified, proceed to run the apply job to initiate the deployment.
 
-LOCAL deployment:
 
-* [addon_obs_iam_atp_local.json](addon_obs_iam_atp_local.json)
-* [addon_obs_network_atp_local.json](addon_obs_network_atp_local.json)
-* [addon_obs_security_atp.json](addon_obs_security_atp.json)
-* [addon_obs_instance_atp.json](addon_obs_instance_atp.json)
-
-7. Add the files generated as output in the One-OE deployment as dependencies.
-8. Uncheck run apply. Click Create.
-9. First, execute a plan job to review all the resources that Terraform will create. Once verified, proceed to run the apply job to initiate the deployment.
-
-10. During the first execution, the add-on will create a dedicated Observability Vault and Key. To grant access to these resources for the grp-lz-mon-admins group in the common One-OE identity domain, we have added the following two statements to the pcy-global-mon-admin policy. Check the IAM file selected for your deployment option.
+1.  During the first execution, the add-on will create a dedicated Observability Vault and Key. To grant access to these resources for the grp-lz-mon-admins group in the common One-OE identity domain, we have added the following two statements to the pcy-global-mon-admin policy. Check the IAM file selected for your deployment option.
 
 ```
 allow group 'id_lz_common'/'grp-lz-mon-admins' to use vaults in compartment cmp-landingzone:cmp-lz-security where target.vault.id='ocid1.vault.oc1.region.xxxx'
@@ -41,7 +33,7 @@ allow group 'id_lz_common'/'grp-lz-mon-admins' to use keys in compartment cmp-la
 
 # License <!-- omit from toc -->
 
-Copyright (c) 2025 Oracle and/or its affiliates.
+Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
