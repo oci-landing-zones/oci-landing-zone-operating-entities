@@ -10,12 +10,12 @@
             },
             "CMP-LZ-PROD-MONITORING-KEY": {
                 "parent_id":"CMP-LZ-PROD-PLATFORM-KEY",
-                "name": "cmp-lz-prod-platform-monitoring",
+                "name": "cmp-lz-prod-monitoring",
                 "description": "Observability Production Compartment"
             },
             "CMP-LZ-PREPROD-MONITORING-KEY": {
                 "parent_id":"CMP-LZ-PREPROD-PLATFORM-KEY",
-                "name": "cmp-lz-preprod-platform-monitoring",
+                "name": "cmp-lz-preprod-monitoring",
                 "description": "Observability PreProduction Compartment"
             }
         }
@@ -74,8 +74,8 @@
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to read users in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to read compartments in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-platform:cmp-lz-monitoring",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-platform-monitoring",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-platform-monitoring",
+                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-monitoring",
+                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-monitoring",
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage metrics in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage ons-topics in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage dbmgmt-private-endpoints in tenancy",
@@ -117,7 +117,7 @@
                     "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to inspect all-resources in compartment cmp-landingzone:cmp-lz-prod",
                     "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to read users in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to read compartments in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-platform-monitoring",
+                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-monitoring",
                     "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage alarms in compartment cmp-landingzone:cmp-lz-prod",
                     "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage metrics in compartment cmp-landingzone:cmp-lz-prod",
                     "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage ons-topics in compartment cmp-landingzone:cmp-lz-prod",
@@ -157,7 +157,7 @@
                     "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to inspect all-resources in compartment cmp-landingzone:cmp-lz-preprod",
                     "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to read users in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to read compartments in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-platform-monitoring",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-monitoring",
                     "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage alarms in compartment cmp-landingzone:cmp-lz-preprod",
                     "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage metrics in compartment cmp-landingzone:cmp-lz-preprod",
                     "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage ons-topics in compartment cmp-landingzone:cmp-lz-preprod",
