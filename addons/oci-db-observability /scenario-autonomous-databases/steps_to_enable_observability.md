@@ -83,6 +83,7 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 
 
 
+<tr>
 <td align="left">3</td>
 <td align="left">
 Unlock and change the password for adbsnmp.
@@ -103,6 +104,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 </td>
 </tr>
 
+<tr>
 <td align="left">4</td>
 <td align="left">
 
@@ -149,6 +151,7 @@ Remember to select the private DBM endpoint created in step2.
 </tr>
 
 
+<tr>
 <td align="left">6</td>
 <td align="left">
 
@@ -212,7 +215,6 @@ If the database was created previously, ensure it is placed in the correct CMP, 
 All resources needed like compartments, subnets and Network Security Groups (NSGs) were previously provisioned by the LZ
 </td>
 </tr>
-<tr>
 
 <tr>
 <td align="left" rowspan="2" >2</td>
@@ -244,6 +246,7 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 </td>      
 </tr>
 
+<tr>
 <td align="left">3</td>
 <td align="left">
 Unlock and change the password for adbsnmp.
@@ -267,6 +270,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 </td>
 </tr>
 
+<tr>
 <td align="left">4</td>
 <td align="left">
 Create a secret in the vlt-lz-shared-mon-security vault located in the cmp-landingzone:cmp-lz-security compartment.
@@ -305,7 +309,7 @@ Remember to select the private OPSI endpoint created in Step 2. Choose the appro
 &nbsp; 
 &nbsp; 
 
-<img src="../images/OPSI_1.png" height="100" width="200"  align="left"></img>
+<img src="../images/OPSI_2.png" height="100" width="200"  align="left"></img>
 &nbsp; 
 &nbsp; 
 &nbsp; 
@@ -320,6 +324,7 @@ Remember to select the private OPSI endpoint created in Step 2. Choose the appro
 </tr>
 
 
+<tr>
 <td align="left">6</td>
 <td align="left">
 
@@ -349,4 +354,3 @@ Copyright (c) 2026 Oracle and/or its affiliates.
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
 See [LICENSE](/LICENSE.txt) for more details.
-

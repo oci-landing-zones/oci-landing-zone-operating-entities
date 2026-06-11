@@ -1,4 +1,4 @@
-# STEP2. ORM OBS ADD-ON Deployment Steps <!-- omit from toc -->
+# STEP1. ORM OBS ADD-ON Deployment Steps <!-- omit from toc -->
 
 Follow these steps:
 
