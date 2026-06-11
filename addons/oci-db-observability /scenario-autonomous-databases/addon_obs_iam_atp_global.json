@@ -62,7 +62,7 @@
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage opsi-family in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage management-dashboard-family in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage management-agents in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to inspect ons-topic in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to inspect ons-topics in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage management-agent-install-keys in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to read instance-family in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to read instance-agent-plugins in tenancy",
@@ -99,11 +99,11 @@
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use security-lists in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use subnets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use network-security-groups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage network-security-groups in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage network-security-groups in compartment cmp-lz-preprod-proj1"
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage network-security-groups in compartment cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage network-security-groups in compartment cmp-lz-preprod:cmp-lz-preprod-projects:cmp-lz-preprod-proj1"
                 ]
             },
 
