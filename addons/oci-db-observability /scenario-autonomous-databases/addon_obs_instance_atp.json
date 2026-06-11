@@ -53,8 +53,8 @@
                     "availability_domain": 1,
                     "fault_domain": 1
                 },
-                "marketplace_image": {
-                    "name": "Oracle Linux 7 STIG"
+                "platform_image": {
+                    "ocid": "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaadv452wgzvy52n3pbqf2yc3h6mrdqb4qsryta75qsbntn6q7lo7ea"
                 }
             }
         }

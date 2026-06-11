@@ -75,7 +75,7 @@ The private endpoint must currently be created manually. Follow these steps:
 
 **Step 3**.
 
-Now, the landing zone is ready to proceed with the necessary [steps](steps_to_enable_DBM_OPSI.md) to enable the observability services.
+Now, the landing zone is ready to proceed with the necessary [steps](steps_to_enable_observability.md) to enable the observability services.
 
 &nbsp;
 

@@ -5,7 +5,7 @@
         "compartments": {
             "CMP-LZ-MONITORING-KEY": {
                 "parent_id":"CMP-LZ-PLATFORM-KEY",
-                "name": "cmp-lz-platform-monitoring",
+                "name": "cmp-lz-monitoring",
                 "description": "Observability Global Compartment"
             },
             "CMP-LZ-PROD-MONITORING-KEY": {
@@ -73,7 +73,7 @@
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to inspect all-resources in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to read users in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to read compartments in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-platform:cmp-lz-platform-monitoring",
+                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-platform:cmp-lz-monitoring",
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-platform-monitoring",
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-platform-monitoring",
                     "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage metrics in tenancy",

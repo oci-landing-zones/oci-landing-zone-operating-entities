@@ -1,4 +1,10 @@
 
+## Index
+
+- [Database Management Enabling Steps](#database-management-enabling-steps)
+- [Ops Insights Enabling Steps](#ops-insights-enabling-steps)
+- [Logging Analytics Enabling Steps](#logging-analytics-enabling-steps)
+
 ## **Database Management Enabling Steps**
 
 
@@ -332,6 +338,9 @@ Click the 'Add database' button. Then, go to the work request and check the prog
 </table>
 
 
+## **Logging Analytics Enabling Steps**
+
+TBC
 
 # License <!-- omit from toc -->
 
@@ -340,5 +349,4 @@ Copyright (c) 2026 Oracle and/or its affiliates.
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
 See [LICENSE](/LICENSE.txt) for more details.
-
 
