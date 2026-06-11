@@ -387,9 +387,18 @@ function(config, n, realm_constants, topo)
   ];
   local generic_admin_stmt = 'allow group %s' % std.join(', ', generic_admin_groups);
 
-  // Service policy: FSS service identifier + objectstorage region-specific
+  // Service policy: realm-aware FSS and Object Storage service identifiers.
   local fss_service = realm_constants.service_identifiers.fss;
-  local obj_service = 'objectstorage-%s' % config.region;
+  local obj_service = realm_constants.service_identifiers.objectstorage(config.region);
+  local usage_report_tenancy_ocid =
+    if std.objectHas(realm_constants, 'usage_report_tenancy_ocid') then
+      realm_constants.usage_report_tenancy_ocid
+    else null;
+  local usage_report_cross_tenancy_statements =
+    if usage_report_tenancy_ocid != null then [
+      'define tenancy usage-report as %s' % usage_report_tenancy_ocid,
+      "endorse group %s to read objects in tenancy usage-report" % domain_grp(grp_cost),
+    ] else [];
 
   local policies_configuration = {
     enable_cis_benchmark_checks: 'false',
@@ -428,9 +437,7 @@ function(config, n, realm_constants, topo)
         name: n.display_tenancy('PCY', ['COST', 'ADMIN']),
         description: desc.policy.grants(grp_cost, 'budget and usage report management access', 'the tenancy'),
         compartment_id: 'TENANCY-ROOT',
-        statements: [
-          'define tenancy usage-report as %s' % realm_constants.usage_report_tenancy_ocid,
-          "endorse group %s to read objects in tenancy usage-report" % domain_grp(grp_cost),
+        statements: usage_report_cross_tenancy_statements + [
           tenancy_allow(grp_cost, 'manage', 'usage-report'),
           tenancy_allow(grp_cost, 'manage', 'usage-budgets'),
         ],

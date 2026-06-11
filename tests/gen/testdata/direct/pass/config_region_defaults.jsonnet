@@ -32,7 +32,7 @@ local summarize(outputs, region) =
     route_keys: std.sort(std.objectFields(prod_route_rules)),
     hub_destination: prod_route_rules['rr-%s-hub' % std.asciiLower(region)].destination,
     internet_destination: prod_route_rules['rr-%s-natgw' % std.asciiLower(region)].destination,
-    reporting_region: outputs['security_cis1.json'].cloud_guard_configuration.reporting_region,
+    reporting_region: outputs['security_cis2.json'].cloud_guard_configuration.reporting_region,
   };
 {
   default_region: summarize(default_outputs, 'FRA'),

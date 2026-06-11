@@ -1,0 +1,32 @@
+{
+  "cis2_output_files": [
+    "governance.json",
+    "iam.json",
+    "network.json",
+    "observability_cis2.json",
+    "observability_cis2_pre.json",
+    "security_cis2.json",
+    "security_cis2_pre.json"
+  ],
+  "cis2_vault_service_grantees": [
+    "objectstorage-eu-frankfurt-2"
+  ],
+  "cost_policy_statements": [
+    "define tenancy usage-report as ocid1.tenancy.oc19..aaaaaaaaqukxloflocfzrs2yrqwemn356zrtyo2hdnjtu3gn3mg5e3ve6g4a",
+    "endorse group 'id_lz_common'/'grp-cost-admin' to read objects in tenancy usage-report",
+    "allow group 'id_lz_common'/'grp-cost-admin' to manage usage-report in tenancy",
+    "allow group 'id_lz_common'/'grp-cost-admin' to manage usage-budgets in tenancy"
+  ],
+  "observability_bucket_cis_level": "1",
+  "output_files": [
+    "governance.json",
+    "iam.json",
+    "network.json",
+    "observability_cis1.json",
+    "observability_cis1_pre.json",
+    "security_cis1.json",
+    "security_cis1_pre.json"
+  ],
+  "services_key_policy_statement": "allow service blockstorage, oke, streaming, fssocprod, objectstorage-eu-frankfurt-2 to use keys in tenancy",
+  "shared_network_policy_ocid": "ocid1.securityzonessecuritypolicy.oc19..aaaaaaaavolswrbfqy6qn2qe7zek2dumml6pbmyzv47q6jfwdatrywmqumba"
+}

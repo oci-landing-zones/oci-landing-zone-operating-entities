@@ -95,6 +95,9 @@ Based on `tests/gen/testdata/configs/pass/prod_preprod_exacs_uc1.jsonnet`.
 
 ```jsonnet
 {
+  region: 'eu-frankfurt-1',
+  region_short_name: 'fra',
+  realm: 'oc1',
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
@@ -201,3 +204,5 @@ jsonnet --multi output/ --tla-code-file config=path/to/config.jsonnet gen/landin
 - Prefer omitted hub and spoke subnet maps when canonical auto-subnet allocation is acceptable.
 - Prefer explicit platform subnet maps only when you need non-default layout or the platform is not extension-backed.
 - Prefer environment platforms over `shared_platforms` when the platform belongs operationally to one environment.
+- Ask for and record the target `region` and `region_short_name`; omit `realm` when the customer does not provide one because config mode defaults it to `oc1`.
+- Set `cis_level: 1` only when the requested output set should use CIS level 1; omitted `cis_level` emits CIS level 2 files.

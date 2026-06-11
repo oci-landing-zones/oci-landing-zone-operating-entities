@@ -30,7 +30,7 @@ Do not use this skill for repo-development work. Once the request is clearly on 
 4. Before asking the customer to choose between repo labels, explain those options in customer language and recommend a default when the repo has one.
 5. After each answer, summarize what is now known in one sentence, then ask the next missing question.
 6. After the hub family is known and before discussing public exposure, load balancers, or OKE ingress, inspect the matching hub guide or runtime artifacts first so you know what load balancer pattern already exists.
-7. Only after all required decisions are known may you recommend a published runtime path, a workload extension path, or config-mode generation.
+7. Only after all required decisions are known, including target region and any non-`oc1` realm requirement, may you recommend a published runtime path, a workload extension path, or config-mode generation.
 8. When deployment execution comes up, use the secure delivery defaults from `AGENTS.md`: prefer Terraform CLI or customer-controlled CI/CD; for ORM, use customer-controlled private Object Storage or approved private GitHub source, not public raw URLs.
 9. If the conversation turns into Orchestrator or Resource Manager runtime troubleshooting, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier after this customer flow has established the deployment context.
 
@@ -47,7 +47,8 @@ If the selected published path, config generator, or workload extension does not
 ## Discovery Reminders
 
 - Always default to `One-OE`; do not ask who operates the landing zone or ask the customer to choose a landing zone family.
-- Ask in root `AGENTS.md` order: One-OE baseline, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, then CIDRs.
+- Ask in root `AGENTS.md` order: One-OE baseline, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, then CIDRs.
+- Ask for the target OCI region early. Explain that realm defaults to `oc1` public cloud when omitted, and ask for realm only when a non-public or sovereign deployment may apply, such as `oc19` EU Sovereign Cloud.
 - Explain each decision in customer language before using repo terms such as `One-OE`, `Hub A`, `platform`, `project`, or `shared_project_network`.
 - Do not propose concrete CIDRs until the root `AGENTS.md` network-scope gate is complete; use extension guides such as OKE or ExaCS only for extension-specific sizing inputs.
 
