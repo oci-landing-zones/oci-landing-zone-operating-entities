@@ -51,7 +51,7 @@
                     "Allow service operations-insights to read autonomous-database-family in tenancy where ALL{request.operation='GenerateAutonomousDatabaseWallet'}",
                     "Allow service operations-insights to read secret-family in tenancy",
                     "Allow service loganalytics to use metrics in tenancy",
-                    "Allow service loganalytics to READ loganalytics-features-family in tenancy"
+                    "Allow service loganalytics to read loganalytics-features-family in tenancy"
 
                 ]
             },

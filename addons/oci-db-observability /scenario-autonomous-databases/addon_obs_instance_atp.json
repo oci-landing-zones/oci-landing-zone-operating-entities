@@ -5,7 +5,7 @@
         "instances": {
             "VM-FRA-LZ-SHARED-MON-AGENT-KEY": {
                 "name": "vm-fra-lz-shared-mon-agent",
-                "shape": "VM.Standard.E4.Flex",
+                "shape": "VM.Standard.E5.Flex",
                 "boot_volume": {
                     "preserve_on_instance_deletion": false,
                     "size": 60
@@ -41,7 +41,7 @@
                     "encrypt_in_transit_on_instance_update": null
                 },
                 "flex_shape_settings": {
-                    "memory_in_gbs": 8,
+                    "memory": 8,
                     "ocpus": 2
                 },
                 "networking": {
