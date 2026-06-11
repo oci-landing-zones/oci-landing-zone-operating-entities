@@ -17,9 +17,9 @@ The database should be created in the appropriate project compartment at the dat
 
 Example for Prod database: 
 
-* **Compartment**-> cmp-landingzone-p:cmp-lzp-prod:cmp-lzp-p-projects:cmp-lzp-p-proj1:cmp-lzp-p-proj1-db
-* **Network**-> vnc:vcn-fra-lzp-p-projects; subnet:ssn-fra-lzp-p-db
-* **nsg**-> nsg-lzp-p-projects-mon-pe-db1
+* **Compartment**-> cmp-landingzone:cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1
+* **Network**-> vcn:vcn-fra-lz-prod-projects; subnet:sn-fra-lz-prod-db
+* **NSG**-> nsg-fra-lz-prod-proj1-mon-pe-db1
   
 
 <img src="../images/DB_CMP.png" height="100" width="200" align="left">  
@@ -50,7 +50,7 @@ All resources needed like compartments, subnets and Network Security Groups (NSG
 <td align="left">
 Create the DBM private endpoint. 
 
-* In a **global approach**, DBM PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub vcn and should be assigned to the GLOBAL PE NSGs (nsg-fra-lzp-hub-global-mon-pe). Example: pe_lz_global_dbm.
+* In a **global approach**, DBM PEs will be placed in the monitoring subnet (sn-fra-lz-hub-mon) in the hub VCN and should be assigned to the global PE NSGs (nsg-fra-lz-hub-global-mon-pe). Example: pe_lz_global_dbm.
 
 &nbsp; 
 <img src="../images/GLOBAL_PE.png" height="100" width="200"  align="left">
@@ -68,7 +68,7 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 
 <td align="left">
 
-* In a **local approach**, DBM PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them. Example: pe_lz_p_dbm.
+* In a **local approach**, DBM PEs and the ATP PE will reside in the same database subnet (sn-fra-lz-prod-db), and the nsg-fra-lz-prod-proj1-mon-pe-db1 NSGs will allow communication between them. Example: pe_lz_p_dbm.
 
 &nbsp; 
 <img src="../images/LOCAL_PE.png" height="100" width="200"  align="left">
@@ -100,7 +100,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 <td align="left">4</td>
 <td align="left">
 
-Create a secret in the vlt-lzp-shared-mon-security vault located within the cmp-landingzone-p:cmp-lzp-security compartment.
+Create a secret in the vlt-lz-shared-mon-security vault located within the cmp-landingzone:cmp-lz-security compartment.
 
 <img src="../images/SECRET.png" height="100"  width="200" align="left">
 
@@ -184,7 +184,7 @@ Click the 'Enable Database Management' button. Then, go to the work request and 
 <tbody>
 <tr>
 <th align="left">Steps</th>
-<th align="left">Descriptón</th>
+<th align="left">Description</th>
 <th align="left">Notes</th>
 </tr>
 <tr>
@@ -195,9 +195,9 @@ The database should be created in the appropriate project compartment at the DB 
 
 Example for Prod database: 
 
-* **Compartment**-> cmp-landingzone-p:cmp-lzp-prod:cmp-lzp-p-projects:cmp-lzp-p-proj1:cmp-lzp-p-proj1-db
-* **Network**-> vnc:vcn-fra-lzp-p-projects; subnet:ssn-fra-lzp-p-db
-* **nsg**-> nsg-lzp-p-projects-mon-pe-db1
+* **Compartment**-> cmp-landingzone:cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1
+* **Network**-> vcn:vcn-fra-lz-prod-projects; subnet:sn-fra-lz-prod-db
+* **NSG**-> nsg-fra-lz-prod-proj1-mon-pe-db1
 </td>
 <td align="left"> 
 
@@ -214,7 +214,7 @@ All resources needed like compartments, subnets and Network Security Groups (NSG
 <td align="left">
 Create the OPSI private endpoint. 
 
-* In a **global approach**, OPSI PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe). Example: pe_lz_global_opsi.
+* In a **global approach**, OPSI PEs will be placed in the monitoring subnet (sn-fra-lz-hub-mon) in the hub and should be assigned to the PE NSGs (nsg-fra-lz-hub-global-mon-pe). Example: pe_lz_global_opsi.
 
 <img src="../images/PE_OPSI_GLOBAL.png" height="100" align="left" > </img>
 
@@ -231,7 +231,7 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 <tr>
 <td align="left">
 
-* In a **local approach**, OPSI PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them. Example: pe_lz_p_opsi.
+* In a **local approach**, OPSI PEs and the ATP PE will reside in the same database subnet (sn-fra-lz-prod-db), and the nsg-fra-lz-prod-proj1-mon-pe-db1 NSGs will allow communication between them. Example: pe_lz_p_opsi.
 
 <img src="../images/PE_OPSI_LOCAL.png" height="100" align="left" > </img>
 
@@ -263,7 +263,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 
 <td align="left">4</td>
 <td align="left">
-Create a secret in vlt-lzp-shared-mon-security vault that is place in cmp-landingzone-p:cmp-lzp-security compartment.
+Create a secret in the vlt-lz-shared-mon-security vault located in the cmp-landingzone:cmp-lz-security compartment.
 
 **Note**: If you have already completed this step to enable Database Management, you can skip this step.
 
@@ -333,22 +333,12 @@ Click the 'Add database' button. Then, go to the work request and check the prog
 
 
 
-These diagrams illustrate the final result:
-
-
-|  Approach  | Description | 
-|:--:|---|
-| Using Global PEs | <img src="../images/OBS_ADDON_GLOBAL.png" height="400" align="center">| 
-| Using Local PEs | <img src="../images/OBS_ADDON_LOCAL.png" height="400" align="center">| 
-
-
 # License <!-- omit from toc -->
 
-Copyright (c) 2025 Oracle and/or its affiliates.
+Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](/LICENSE) for more details.
-
+See [LICENSE](/LICENSE.txt) for more details.
 
 

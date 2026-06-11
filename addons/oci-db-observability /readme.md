@@ -92,6 +92,45 @@ Note: The design includes several options, and the customer can decide whether t
 | 6 |  | External Databases | In progress |
 
 
+## 5. Autonomous Databases Implementation Steps
+
+These steps apply to the Autonomous Databases scenario.
+
+Go to the orchestrator [GitHub page](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator).
+
+At the beginning of the README page, select **Deploy to Oracle Cloud**. When you click the provided magic button, a new ORM stack will be created. Follow these steps:
+
+1. Accept terms, wait for the configuration to load.
+2. Set the working directory to `rms-facade`.
+3. Set the stack name you prefer.
+4. Set the Terraform version to 1.5.x. Click Next.
+5. Create your own bucket and upload the JSON files for the selected implementation option.
+
+Common files:
+
+* [addon_obs_security_atp.json](./scenario-autonomous-databases/addon_obs_security_atp.json)
+* [addon_obs_instance_atp.json](./scenario-autonomous-databases/addon_obs_instance_atp.json)
+
+Option-specific files:
+
+* Global PE: [addon_obs_iam_atp_global.json](./scenario-autonomous-databases/addon_obs_iam_atp_global.json) and [addon_obs_network_atp_global.json](./scenario-autonomous-databases/addon_obs_network_atp_global.json)
+* Local PE: [addon_obs_iam_atp_local.json](./scenario-autonomous-databases/addon_obs_iam_atp_local.json) and [addon_obs_network_atp_local.json](./scenario-autonomous-databases/addon_obs_network_atp_local.json)
+
+6. Add the files generated as output in the One-OE deployment as dependencies.
+7. Uncheck run apply. Click Create.
+8. First, execute a plan job to review all the resources that Terraform will create. Once verified, proceed to run the apply job to initiate the deployment.
+9. During the first execution, the add-on will create a dedicated Observability Vault and Key. To grant access to these resources for the `grp-lz-mon-admins` group in the common One-OE identity domain, we have added the following two statements to the `pcy-global-mon-admin` policy. Check the IAM file selected for your deployment option.
+
+```text
+allow group 'id_lz_common'/'grp-lz-mon-admins' to use vaults in compartment cmp-landingzone:cmp-lz-security where target.vault.id='ocid1.vault.oc1.region.xxxx'
+
+allow group 'id_lz_common'/'grp-lz-mon-admins' to use keys in compartment cmp-landingzone:cmp-lz-security where target.key.id='ocid1.key.oc1.region.xxx'
+```
+
+>[!NOTE] Be sure to update the OCIDs with your own resource IDs.
+
+10. After making the changes, execute a second plan to review these updates before running the job again.
+
 
 # License
 

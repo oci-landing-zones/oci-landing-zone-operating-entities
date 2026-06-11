@@ -1,0 +1,21 @@
+{
+
+    "vaults_configuration": {
+        "default_compartment_id": "CMP-LZ-SECURITY-KEY",
+        "vaults": {
+            "VLT-LZ-SHARED-MON-KEY": {
+                "name": "vlt-lz-shared-mon-security"
+            }
+        },
+        "keys": {
+            "KEY-LZ-MON-KEY": {
+                "name": "key-lz-mon-bkt",
+                "protection_mode": "SOFTWARE",
+                "vault_key": "VLT-LZ-SHARED-MON-KEY",
+                "service_grantees": ["objectstorage-eu-frankfurt-1"],
+                "group_grantees": ["grp-lz-mon-admins"],
+                "versions": ["1","2"]
+            }
+        }
+    }
+}

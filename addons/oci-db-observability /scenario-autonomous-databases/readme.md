@@ -1,77 +1,87 @@
 # **[Autonomous Databases ](#)**
-## **An OCI Open LZ Addon to help you enable Database Management & Ops Insights for Autonomous Databases**
+## **An OCI Open LZ add-on to help you enable native Observability services on Autonomous Databases**
 
-## Design
+## OCI Native Services Configuration Prerequisites
 
-To enable **Database Management** or **Ops Insights** for Autonomous Databases, you must deploy Private Endpoints that have access to the database you wish to configure. A Private Endpoint acts as a representation of OCI O&M Services within the VCN.
+This scenario documents the Autonomous Database implementation details for the OCI Database Observability add-on. Before continuing, review and finalize the design decisions listed in the general [OCI Database Observability README](../readme.md#3-design-decisions), including the Global PE vs Local PE decision.
 
-Both DBM Private Endpoints and OPSI Private Endpoints need visibility into the ATP Private Endpoint. To enable this, the add-on includes Network Security Groups (NSGs).
+### Services covered
 
-To check the documentation you can use these links: [DBM PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Database Management Private Endpoint). or [OPSI PE](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints) (Ops Insights Private Endpoint).
+This add-on prepares the Landing Zone to enable:
 
+* Database Management
+* Ops Insights
+* Logging Analytics
 
-**GLOBAL APPROACH**
+### Private endpoint connectivity
 
-For customers with multiple OEs and environments, it's crucial to consider the service limits for Private Endpoints. In such cases, we recommend a shared approach using global Private Endpoints, which should be deployed in the HUB VCN and considered shared resources.
+Database Management and Ops Insights require service Private Endpoints with network access to the Autonomous Database Private Endpoint. The add-on includes the Network Security Groups (NSGs) required to allow that connectivity.
 
-In this **global approach**, PEs will be placed in the monitoring subnet (sn-fra-lzp-hub-mon) in the hub vcn and should be assigned to the PE NSGs (nsg-fra-lzp-hub-global-mon-pe). In the other hand the database will be placed in cmp-lzp-p-proj1-db compartment using the database subnet (ssn-fra-lzp-p-db) and assigned to the DB NSGs (nsg-lzp-p-projects-mon-pe-db1).
-  
-In this add-on, we will deploy a Shared Observability Platform compartment, a dedicated Observability Vault, and include the necessary groups and policies to manage native observability, along with the previously mentioned NSGs
+Use these links to review the relevant OCI documentation:
 
-<img src="../images/ATP_GLOBAL.png" height="300" align="center">
+* [DBM Private Endpoint](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints)
+* [OPSI Private Endpoint](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints)
 
-&nbsp; 
-
-**LOCAL APPROACH**
-
-Customers with simpler infrastructures, using a single OE and fewer environments, may choose to deploy dedicated Private Endpoints (PEs) for each environment. This approach is often preferred when there is a dedicated monitoring team for each environment.
-
-In a **local approach**, DBM/OPS PEs and the ATP PE will reside in the same database subnet (ssn-fra-lzp-p-db), and the nsg-lzp-p-projects-mon-pe-db1 NSGs will allow communication between them.
-  
-In this case, a dedicated Environment Observability platform compartment, a dedicated Observability Vault, along with the necessary groups and policies to manage native observability, will be included, in addition to the previously mentioned NSGs.
-
-<img src="../images/ATP_LOCAL.png" height="300" align="center">
-  
-Private endpoints will be placed in the observability compartments, accessing the required subnets.
-
-During the process of enabling Database Management or Ops Insights in an Autonomous Database, the user and password will be required. These credentials must be stored as secrets in a dedicated Vault within the shared security compartment. All necessary policies to access the secret are already included in the add-on.
-
-> [!WARNING]  
-> You can create the Private Endpoint in the same VCN or a different VCN. Please disregard the information stated in the [Database Management documentation](https://docs.oracle.com/en-us/iaas/database-management/doc/create-database-management-private-endpoint-adb.html#GUID-EBA1A30F-96E9-412D-836F-5ED57FC74D99) or [Ops Insightsdocumentation](https://docs.oracle.com/en-us/iaas/operations-insights/doc/create-private-endpoint.html).
+> [!WARNING]
+> This scenario supports placing the Database Management or Ops Insights Private Endpoint in the same VCN as the Autonomous Database Private Endpoint, or in a different VCN.
 >
-> There is a limitation: only one Private Endpoint can be created per VCN.
-&nbsp; 
+> Keep the service limit in mind: only one Private Endpoint can be created per VCN.
 
+### Credentials and Vault
+
+Enabling Database Management or Ops Insights for an Autonomous Database requires a database user and password. These credentials must be stored as secrets in the dedicated Observability Vault provisioned by the selected implementation option. The required policies to access the secret are included in the add-on.
+
+### Management Agent for Logging Analytics
+
+Logging Analytics requires a Management Agent with access to the monitored database endpoint and the required ingestion policies. This add-on provides the IAM and network prerequisites for that flow.
+
+&nbsp;
 
 ## Implementation
 
-Our add-on template includes all the necessary components, such as CMP, groups, a dedicated monitoring Vault, policies, and NSGs, to enable Database Management and Ops Insights.
+Our add-on template includes the required components to enable Database Management, Ops Insights, and Logging Analytics, such as compartments, groups, a dedicated monitoring Vault, policies, NSGs, and a monitoring instance.
+&nbsp;
 
-Follow these steps to extend your Landing zone:
 
-**Step 1**. 
+Follow these steps to extend your One-OE Landing Zone:
 
-(Prerequisite) Deploy ONE-OE landing Zone. You can follow next [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack).
+**Step 0**. ( prerequisit )
 
-<img src="../images/ONE-OE.png" height="850" align="center">
+Deploy the One-OE Landing Zone. You can follow these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack). To work with multiple stacks, you need to use the orchestrator's outputs and dependencies features within [ORM](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/orm_bp.md).
 
-&nbsp; 
 
-**Step 2**. 
 
-Enable Observability adding this Add-on, use the ATP JSONs files provided in this asset. To check step by step how to do it check [here](./Implementation_addon_steps.md).
+**Step 1**.
 
-<img src="../images/OBS_ADDON_ATP.png" height="600" align="center">
+Deploy the add-on with OCI Resource Manager (ORM):
 
-&nbsp; 
+| GLOBAL | LOCAL |
+|---|---|
+| Use this deployment when DBM/OPSI private endpoints are shared global endpoints deployed in the hub monitoring subnet. | Use this deployment when DBM/OPSI private endpoints are environment-dedicated and deployed in the same database subnet as the Autonomous Database private endpoint. |
+| <img src="../images/ATP_GLOBAL.png" height="250" align="center"> | <img src="../images/ATP_LOCAL.png" height="250" align="center"> |
+| <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-autonomous-databases/addon_obs_iam_atp_global.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-autonomous-databases/addon_obs_network_atp_global.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-autonomous-databases/addon_obs_security_atp.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-autonomous-databases/addon_obs_instance_atp.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> | <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-autonomous-databases/addon_obs_iam_atp_local.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-autonomous-databases/addon_obs_network_atp_local.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-autonomous-databases/addon_obs_security_atp.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-autonomous-databases/addon_obs_instance_atp.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
+| Files loaded:<br>[addon_obs_iam_atp_global.json](addon_obs_iam_atp_global.json)<br>[addon_obs_network_atp_global.json](addon_obs_network_atp_global.json)<br>[addon_obs_security_atp.json](addon_obs_security_atp.json)<br>[addon_obs_instance_atp.json](addon_obs_instance_atp.json) | Files loaded:<br>[addon_obs_iam_atp_local.json](addon_obs_iam_atp_local.json)<br>[addon_obs_network_atp_local.json](addon_obs_network_atp_local.json)<br>[addon_obs_security_atp.json](addon_obs_security_atp.json)<br>[addon_obs_instance_atp.json](addon_obs_instance_atp.json) |
 
-Now, the landing zone is ready to proceed with the necessary steps to enable the observability services. Follow these steps for [Database Management](https://github.com/oracle-devrel/technology-engineering/blob/O%26M-for-LZ/manageability-and-operations/observability-and-manageability/database-management/LZ-addons/steps_to_enable_DBM.md) or [Ops Insights](https://github.com/oracle-devrel/technology-engineering/blob/O%26M-for-LZ/manageability-and-operations/observability-and-manageability/operations-insights/LZ-addons/steps_to_enable_OPSI.md).
+For step-by-step instructions, see [Implementation add-on steps](./Implementation_addon_steps.md).
 
-&nbsp; 
+
+**Step 2**.
+
+The private endpoint must currently be created manually. Follow these steps:
+
+| GLOBAL | LOCAL |
+|---|---|
+| Place the DBM and OPSI private endpoints in the hub monitoring subnet: `sn-fra-lz-hub-mon`.<br><br>Assign the DBM and OPSI private endpoints to the global PE NSG: `nsg-fra-lz-hub-global-mon-pe`.<br><br>Place the Autonomous Database in the project compartment: `cmp-landingzone:cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1`.<br><br>Use the database subnet for the Autonomous Database private endpoint: `sn-fra-lz-prod-db`.<br><br>Assign the Autonomous Database private endpoint to the database NSG: `nsg-fra-lz-prod-proj1-mon-pe-db1`.<br><br>| Place the DBM private endpoint, OPSI private endpoint, and Autonomous Database private endpoint in the same database subnet: `sn-fra-lz-prod-db`.<br><br>Assign the endpoints to the database NSG: `nsg-fra-lz-prod-proj1-mon-pe-db1`.<br><br>Place the Autonomous Database in the project compartment: `cmp-landingzone:cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1`.<br><br> |
+
+**Step 3**.
+
+Now, the landing zone is ready to proceed with the necessary [steps](steps_to_enable_DBM_OPSI.md) to enable the observability services.
+
+&nbsp;
 
 # License
 
-Copyright (c) 2025 Oracle and/or its affiliates.
+Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
