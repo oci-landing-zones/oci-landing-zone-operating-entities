@@ -1,7 +1,7 @@
 {
     "instances_configuration": {
         "default_compartment_id": "CMP-LZ-MONITORING-KEY",
-        "default_ssh_public_key_path": "ssh-rsa AAAAB3NzaC1......RgQ== user@example.com",
+        "default_ssh_public_key_path": null,
         "instances": {
             "VM-FRA-LZ-SHARED-MON-AGENT-KEY": {
                 "name": "vm-fra-lz-shared-mon-agent",
