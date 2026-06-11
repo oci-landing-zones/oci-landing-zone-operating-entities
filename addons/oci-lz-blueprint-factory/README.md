@@ -25,7 +25,7 @@ For standard deployments that do not require updates, using the published bluepr
 
 ## 2. Access Paths
 
-The Blueprint Factory can be reached through three paths:
+The Blueprint Factory can be used in three ways:
 
 <p align="center">
   <img src="images/workflow.png" alt="Blueprint Factory access paths for AI-assisted, direct config, and published blueprint usage" width="800">
@@ -41,7 +41,7 @@ Paths 1 and 2 produce customer-specific generated files. Path 3 does not require
 
 ## 3. Configuration Syntax and Examples
 
-The source configuration is a JSON document. JSON keeps the customer-facing input easy to review, store, and compare in normal code review workflows. The generator also accepts Jsonnet for advanced composition, but the examples in this add-on use JSON.
+The source configuration for the Blueprint Factory is a JSON document. JSON keeps the input easy to review, store, and compare in normal code review workflows. The generator also accepts Jsonnet for advanced composition, but the examples in this add-on use JSON.
 
 A typical configuration describes the target Landing Zone in a few top-level blocks:
 
@@ -94,7 +94,7 @@ Example shape:
 }
 ```
 
-Not every configuration needs every block. A small Landing Zone may only define a hub and one or two environments, while a larger design may add platforms, projects, and workload extensions. The detailed generator reference is available in [Generator Architecture](/gen/AGENTS.md) when exact field behavior is needed.
+Not every configuration needs every block. A small Landing Zone may only define a hub and one or two environments, while a larger design may add platforms, projects, and workload extensions.
 
 The [examples](./examples) folder contains small and medium-size config files that can be used as starting points for common Blueprint Factory scenarios.
 
