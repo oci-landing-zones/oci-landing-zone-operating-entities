@@ -3,11 +3,6 @@
         "enable_delete": "true",
         "default_parent_id":"CMP-LANDINGZONE-KEY",
         "compartments": {
-            "CMP-LZ-MONITORING-KEY": {
-                "parent_id":"CMP-LZ-PLATFORM-KEY",
-                "name": "cmp-lz-monitoring",
-                "description": "Observability Global Compartment"
-            },
             "CMP-LZ-PROD-MONITORING-KEY": {
                 "parent_id":"CMP-LZ-PROD-PLATFORM-KEY",
                 "name": "cmp-lz-prod-monitoring",
@@ -24,8 +19,8 @@
         "default_identity_domain_id": "COMMON-DOMAIN",
         "ignore_external_membership_updates": true,
         "groups": {
-            "GRP-MON-ADMINS": {
-                "name": "grp-lz-mon-admins",
+               "GRP-MON-ADMINS": {
+                "name": "grp-lz-global-mon-admins",
                 "description": "Tenancy global Observability administrator group."
             },
             "GRP-PROD-MON-ADMINS": {
@@ -48,148 +43,5 @@
             "matching_rule": "ALL {resource.type='managementagent'}"
           }
         }
-      },
-    "policies_configuration": {
-        "enable_cis_benchmark_checks": "false",
-        "supplied_policies": {
-            "PCY-MON-SERVICES": {
-                "name": "pcy-mon-services",
-                "description": "Policy to allow usage of Observability services in tenancy.",
-                "compartment_id": "TENANCY-ROOT",
-                "statements": [
-                    "Allow service operations-insights to use ons-topics in tenancy",
-                    "Allow service operations-insights to read autonomous-database-family in tenancy where ALL{request.operation='GenerateAutonomousDatabaseWallet'}",
-                    "Allow service operations-insights to read secret-family in tenancy",
-                    "Allow service loganalytics to use metrics in tenancy",
-                    "Allow service loganalytics to read loganalytics-features-family in tenancy"
-
-                ]
-            },
-            "PCY-MON-ADMINISTRATION": {
-                "name": "pcy-global-mon-admin",
-                "description": "Policy to allow grp-lz-mon-admins group users to manage Observability services/resources in tenancy.",
-                "compartment_id": "TENANCY-ROOT",
-                "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to inspect all-resources in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to read users in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to read compartments in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-platform:cmp-lz-monitoring",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-monitoring",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-monitoring",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage metrics in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage ons-topics in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage dbmgmt-private-endpoints in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to read dbmgmt-work-requests in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage dbmgmt-family in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to use database-family in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to use autonomous-database-family in tenancy",
-                    "Allow service dpd to read secret-family in compartment cmp-landingzone:cmp-lz-security",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to use vaults in compartment cmp-landingzone:cmp-lz-security",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to use keys in compartment cmp-landingzone:cmp-lz-security",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage secret-family in compartment cmp-landingzone:cmp-lz-security",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to use security-lists in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage network-security-groups in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to use network-security-groups in compartment cmp-landingzone:cmp-lz-network",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to read virtual-network-family in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to use subnets in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to use vnics in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage opsi-family in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage management-dashboard-family in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage management-agents in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to inspect ons-topic in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage management-agent-install-keys in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to read instance-family in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to read instance-agent-plugins in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage loganalytics-features-family in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage loganalytics-ingesttime-rule in tenancy",
-                    "Allow dynamic-group dg-lz-mon-dynamic-group to use metrics in tenancy",
-                    "Allow dynamic-group dg-lz-mon-dynamic-group to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage management-dashboard in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-mon-admins' to manage management-saved-search in tenancy"
-
-                ]
-            },
-            "PCY-PROD-MON-ADMINISTRATION": {
-                "name": "pcy-prod-mon-admin",
-                "description": "Policy to allow grp-lz-prod-mon-admins group users to manage Observability services/resources in Prod environment.",
-                "compartment_id": "TENANCY-ROOT",
-                "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to inspect all-resources in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to read users in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to read compartments in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-monitoring",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage alarms in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage metrics in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage ons-topics in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage dbmgmt-private-endpoints in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to read dbmgmt-work-requests in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage dbmgmt-family in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to use database-family in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to use autonomous-database-family in compartment cmp-landingzone:cmp-lz-prod",
-                    "Allow service dpd to read secret-family in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to use network-security-groups in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to use security-lists in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to read virtual-network-family in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to use subnets in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to use vnics in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to inspect vaults in compartment cmp-landingzone:cmp-lz-security",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to inspect keys in compartment cmp-landingzone:cmp-lz-security",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage opsi-family in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage management-dashboard-family in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage management-agents in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to inspect ons-topic in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage management-agent-install-keys in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to read instance-family in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to read instance-agent-plugins in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage loganalytics-features-family in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage loganalytics-ingesttime-rule in compartment cmp-landingzone:cmp-lz-prod",
-                    "Allow dynamic-group dg-lz-mon-dynamic-group to use metrics in compartment cmp-landingzone:cmp-lz-prod",
-                    "Allow dynamic-group dg-lz-mon-dynamic-group to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage management-dashboard in compartment cmp-landingzone:cmp-lz-prod",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admins' to manage management-saved-search in compartment cmp-landingzone:cmp-lz-prod"
-                ]
-            },
-            "PCY-PREPROD-MON-ADMINISTRATION": {
-                "name": "pcy-preprod-mon-admin",
-                "description": "Policy to allow grp-lz-preprod-mon-admins group users to manage Observability services/resources in Preprod environment.",
-                "compartment_id": "TENANCY-ROOT",
-                "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to inspect all-resources in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to read users in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to read compartments in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage compartments in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-monitoring",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage alarms in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage metrics in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage ons-topics in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage dbmgmt-private-endpoints in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to read dbmgmt-work-requests in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage dbmgmt-family in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to use database-family in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to use autonomous-database-family in compartment cmp-landingzone:cmp-lz-preprod",
-                    "Allow service dpd to read secret-family in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to use network-security-groups in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to use security-lists in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to read virtual-network-family in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to use subnets in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to use vnics in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to inspect vaults in compartment cmp-landingzone:cmp-lz-security",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to inspect keys in compartment cmp-landingzone:cmp-lz-security",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage opsi-family in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage management-dashboard-family in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage management-agents in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to inspect ons-topic in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage management-agent-install-keys in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to read instance-family in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to read instance-agent-plugins in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage loganalytics-features-family in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage loganalytics-ingesttime-rule in compartment cmp-landingzone:cmp-lz-preprod",
-                    "Allow dynamic-group dg-lz-mon-dynamic-group to use metrics in compartment cmp-landingzone:cmp-lz-preprod",
-                    "Allow dynamic-group dg-lz-mon-dynamic-group to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage management-dashboard in compartment cmp-landingzone:cmp-lz-preprod",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admins' to manage management-saved-search in compartment cmp-landingzone:cmp-lz-preprod"
-                ]
-            }
-
-        }
-    }
+      }
 }
