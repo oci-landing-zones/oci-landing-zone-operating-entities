@@ -1,0 +1,45 @@
+{
+    "realm"                                             : "oc1",
+    "region"                                            : "eu-frankfurt-1",
+    "region_short_name"                                 : "fra",
+
+    "environments": {
+        "prod": {
+            "platforms": {
+                "oke": {
+                    "extension": {
+                        "type"                          : "oke_simple",
+
+                        "params": {
+                            "api_endpoint_allowed_cidrs": ["10.0.1.0/24"],
+                            "kubernetes_version"        : "v1.35.2",
+                            "services_cidr"             : "10.96.0.0/16"
+                        }
+                    },
+
+                    "network": {
+                        "vcn"                           : "10.0.96.0/21"
+                    }
+                }
+            },
+
+            "projects": {
+                "proj1"                                 : {}
+            },
+
+            "shared_project_network": {
+                "network": {
+                    "vcn"                               : "10.0.64.0/21"
+                }
+            }
+        }
+    },
+
+    "hub": {
+        "kind"                                          : "hub_b",
+
+        "network": {
+            "vcn"                                       : "10.0.0.0/21"
+        }
+    }
+}
