@@ -1,16 +1,20 @@
-# OCI Observability Services for Exadata Cloud@Customer
+# OCI Observability for Exadata Cloud@Customer (ExaDB-C@C)
 
-Source: [exacc-observability-assets](https://github.com/oracle-devrel/technology-engineering/tree/DB_OBS/observability-and-management/database-observability/exacc-observability-assets)
-
-This guide summarizes the source asset steps for enabling OCI Database Management, Operations Insights, and Logging Analytics for Exadata Cloud@Customer.
+This guide describes how to enable OCI observability capabilities for Exadata Cloud@Customer (ExaDB-C@C). It covers Database Management, Operations Insights, and Logging Analytics.
 
 This document does not apply to Autonomous Clusters.
 
-## Architecture
+## Prerequisites Already Created by the Landing Zone Add-on
 
-![Exadata Cloud@Customer observability architecture](https://raw.githubusercontent.com/oracle-devrel/technology-engineering/DB_OBS/observability-and-management/database-observability/exacc-observability-assets/files/image-1.png)
+The Observability Landing Zone add-on deployment already creates the OCI-side prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
-## Prerequisites
+- Monitoring compartments.
+- Monitoring group `grp-lz-global-mon-admins`.
+- The Management Agent dynamic groups `id_lz_common/dg-lz-mon-dynamic-group` and `id_lz_common/dg-lz-mon-credential-dynamic-group` in the COMMON Identity Domain.
+- IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, certificates, vaults, and keys.
+- The Observability Vault and Key, `vlt-lz-shared-mon-security` and `key-lz-mon-bkt`.
+
+## Manual Prerequisites
 
 1. Decide whether to use an OCI Management Gateway.
 

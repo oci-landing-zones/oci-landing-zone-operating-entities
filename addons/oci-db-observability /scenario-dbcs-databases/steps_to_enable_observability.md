@@ -1,11 +1,10 @@
-# OCI Observability for OCI Native Database Deployments
+# OCI Observability for Oracle Base Database Service (DBCS)
 
 This guide describes how to enable OCI observability capabilities for Oracle Base Database Service (DBCS). It covers Database Management, Operations Insights, and Logging Analytics.
 
-
 ## Prerequisites Already Created by the Landing Zone Add-on
 
-The Observability Landing Zone add-on deployment already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics:
+The Observability Landing Zone add-on deployment already creates the OCI-side prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
 - Monitoring compartments.
 - Monitoring groups such as `grp-lz-global-mon-admins`, and in the local deployment option, the environment-specific monitoring groups.
@@ -14,7 +13,6 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 - Network Security Groups for the DBM/OPSI private endpoint connectivity.
 - The Observability Vault and Key, `vlt-lz-shared-mon-security` and `key-lz-mon-bkt`.
 - For Logging Analytics, a Service Gateway is required for database hosts to send logs to Logging Analytics. This is included in the One-OE project VCNs by default. If you are using a custom VCN, make sure a Service Gateway is configured.
-
 
 ## Manual Prerequisites
 

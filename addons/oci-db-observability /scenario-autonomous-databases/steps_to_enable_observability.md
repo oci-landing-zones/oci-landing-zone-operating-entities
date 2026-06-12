@@ -1,8 +1,10 @@
 # OCI Observability for Autonomous Databases
 
-This guide describes how to enable OCI observability capabilities for Autonomous Databases after deploying the Landing Zone add-on from the scenario README.
+This guide describes how to enable OCI observability capabilities for Autonomous Databases. It covers Database Management, Operations Insights, and Logging Analytics.
 
-The Landing Zone add-on already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics:
+## Prerequisites Already Created by the Landing Zone Add-on
+
+The Observability Landing Zone add-on deployment already creates the OCI-side prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
 - Monitoring compartments and monitoring groups.
 - IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, and network access.
@@ -12,13 +14,7 @@ The Landing Zone add-on already creates the prerequisites for Database Managemen
 
 Do not recreate these IAM policies, groups, NSGs, vaults, keys, or the monitoring agent VM manually as part of Step 2: Enable OCI Observability.
 
-## Index
-
-- [Database Management Enabling Steps](#database-management-enabling-steps)
-- [Ops Insights Enabling Steps](#ops-insights-enabling-steps)
-- [Logging Analytics Enabling Steps](#logging-analytics-enabling-steps)
-
-## Quick Flow
+## Manual Prerequisites
 
 The detailed sections below include screenshot-based steps. At a high level, Step 2: Enable OCI Observability covers these manual service-onboarding actions:
 
