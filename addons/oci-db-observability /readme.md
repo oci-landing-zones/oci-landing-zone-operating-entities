@@ -88,7 +88,7 @@ Note: The design includes several options, and the customer can decide whether t
 |:--:|:--:|---|---|
 | 1 | <img src="./images/icon_auto.png" height="40" align="center">| Autonomous database| [Available](./scenario-autonomous-databases/readme.md) |
 | 2 | <img src="./images/dbcs.png" height="40" align="center">| DBCS | [Available](./scenario-dbcs-databases/readme.md) |
-| 3 |  | EXACS | [Available](./scenario-exacs-databases/readme.md) |
+| 3 | <img src="../../commons/images/exacs.png" height="40" align="center"> | EXACS | [Available](./scenario-exacs-databases/readme.md) |
 | 4 |  | ODA@ | In progress |
 | 5 | | EXACC| In progress |
 | 6 |  | External Databases | In progress |
