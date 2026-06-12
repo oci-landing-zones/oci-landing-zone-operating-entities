@@ -20,21 +20,12 @@
                                     }
                                 },
                                 "ingress_rules": {
-                                    "ingress_prod_database_subnet": {
-                                        "description": "Allow communication from the Prod database subnet to the global DBM/OPSI PEs",
+                                    "ingress_shared_exacs_database_subnet": {
+                                        "description": "Allow communication from sn-fra-lz-shared-exacs-db in vcn-fra-lz-shared-exacs to the global DBM/OPSI PEs",
                                         "dst_port_max": 1521,
                                         "dst_port_min": 1521,
                                         "protocol": "TCP",
-                                        "src": "10.0.66.0/24",
-                                        "src_type": "CIDR_BLOCK",
-                                        "stateless": false
-                                    },
-                                    "ingress_preprod_database_subnet": {
-                                        "description": "Allow communication from the Preprod database subnet to the global DBM/OPSI PEs",
-                                        "dst_port_max": 1521,
-                                        "dst_port_min": 1521,
-                                        "protocol": "TCP",
-                                        "src": "10.0.130.0/24",
+                                        "src": "10.0.24.0/24",
                                         "src_type": "CIDR_BLOCK",
                                         "stateless": false
                                     }
@@ -42,12 +33,12 @@
                             }
                         }
                     },
-                    "VCN-FRA-LZ-PROD-PROJECTS-KEY": {
-                        "vcn_id": "VCN-FRA-LZ-PROD-PROJECTS-KEY",
+                    "VCN-FRA-LZ-SHARED-PLATFORM-EXACS-KEY": {
+                        "vcn_id": "VCN-FRA-LZ-SHARED-PLATFORM-EXACS-KEY",
                         "network_security_groups": {
-                            "NSG-FRA-LZ-PROD-PROJ1-MON-PE-DB1-KEY": {
-                                "compartment_id": "CMP-LZ-PROD-PROJ1-KEY",
-                                "display_name": "nsg-fra-lz-prod-proj1-mon-pe-db1",
+                            "NSG-FRA-LZ-SHARED-EXACS-MON-PE-KEY": {
+                                "compartment_id": "CMP-LZ-NETWORK-KEY",
+                                "display_name": "nsg-fra-lz-shared-exacs-mon-pe",
                                 "egress_rules": {
                                     "anywhere": {
                                         "description": "Egress to 0.0.0.0/0 over TCP",
@@ -59,36 +50,7 @@
                                 },
                                 "ingress_rules": {
                                     "ingress_global_pe_monitoring_subnet": {
-                                        "description": "Allow ingress from the global DBM/OPSI PEs in the monitoring subnet",
-                                        "dst_port_max": 1521,
-                                        "dst_port_min": 1521,
-                                        "protocol": "TCP",
-                                        "src": "10.0.4.0/24",
-                                        "src_type": "CIDR_BLOCK",
-                                        "stateless": false
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "VCN-FRA-LZ-PREPROD-PROJECTS-KEY": {
-                        "vcn_id": "VCN-FRA-LZ-PREPROD-PROJECTS-KEY",
-                        "network_security_groups": {
-                            "NSG-FRA-LZ-PREPROD-PROJ1-MON-PE-DB1-KEY": {
-                                "compartment_id": "CMP-LZ-PREPROD-PROJ1-KEY",
-                                "display_name": "nsg-fra-lz-preprod-proj1-mon-pe-db1",
-                                "egress_rules": {
-                                    "anywhere": {
-                                        "description": "Egress to 0.0.0.0/0 over TCP",
-                                        "dst": "0.0.0.0/0",
-                                        "dst_type": "CIDR_BLOCK",
-                                        "protocol": "TCP",
-                                        "stateless": false
-                                    }
-                                },
-                                "ingress_rules": {
-                                    "ingress_global_pe_monitoring_subnet": {
-                                        "description": "Allow ingress from the global DBM/OPSI PEs in the monitoring subnet",
+                                        "description": "Allow ingress from the global DBM/OPSI PEs in the hub monitoring subnet to sn-fra-lz-shared-exacs-db",
                                         "dst_port_max": 1521,
                                         "dst_port_min": 1521,
                                         "protocol": "TCP",

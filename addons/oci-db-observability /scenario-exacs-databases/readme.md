@@ -53,12 +53,12 @@ Deploy the One-OE + ExaCS use case 1 in single stack. You can follow these [step
 
 **Step 1**.
 
-Deploy the add-on Global Approach with OCI Resource Manager (ORM):
+Deploy the Landing zone Observability add-on:
 
 | GLOBAL |
 |---|
 | Use this deployment when DBM/OPSI private endpoints are shared global endpoints deployed in the hub monitoring subnet. |
-| Resources created:<br><br>Compartments: `cmp-lz-monitoring`.<br><br>Groups: `grp-lz-global-mon-admins`.<br><br>Policies: `pcy-mon-services`, `pcy-global-mon-admin`, `pcy-mon-dynamic-group`, `pcy-global-mon-security-admin`, `pcy-global-mon-network-admin`, `pcy-prod-proj1-mon-admin`, `pcy-preprod-proj1-mon-admin`.<br><br>COMMON Identity Domain dynamic group: `id_lz_common/dg-lz-mon-dynamic-group`.<br><br>NSGs: `nsg-fra-lz-hub-global-mon-pe`, `nsg-fra-lz-prod-proj1-mon-pe-db1`, `nsg-fra-lz-preprod-proj1-mon-pe-db1`.<br><br>Vault and key: `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`. |
+| Resources created:<br><br>Compartments: `cmp-lz-monitoring`.<br><br>Groups: `grp-lz-global-mon-admins`.<br><br>Policies: `pcy-mon-services`, `pcy-global-mon-admin`, `pcy-mon-dynamic-group`, `pcy-global-mon-security-admin`, `pcy-global-mon-network-admin`, `pcy-shared-exacs-mon-admin`.<br><br>COMMON Identity Domain dynamic group: `id_lz_common/dg-lz-mon-dynamic-group`.<br><br>NSGs: `nsg-fra-lz-hub-global-mon-pe`, `nsg-fra-lz-shared-exacs-mon-pe` in `vcn-fra-lz-shared-exacs` for `sn-fra-lz-shared-exacs-db`.<br><br>Vault and key: `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`. |
 | <img src="../images/EXACS_GLOBAL.png" height="250" align="center"> |
 | <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-exacs-databases/addon_obs_iam_exacs_global.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-exacs-databases/addon_obs_network_exacs_global.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-exacs-databases/addon_obs_security_exacs.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
 | Files loaded:<br>[addon_obs_iam_exacs_global.json](addon_obs_iam_exacs_global.json)<br>[addon_obs_network_exacs_global.json](addon_obs_network_exacs_global.json)<br>[addon_obs_security_exacs.json](addon_obs_security_exacs.json) |

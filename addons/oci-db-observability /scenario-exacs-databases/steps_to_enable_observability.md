@@ -46,21 +46,31 @@ The Step 1 add-on deployment already creates the Landing Zone prerequisites for 
 
    Create a secret for the `C##OCI_MON_USER` password.
 
-4. Create the private endpoint for Database Management. Use the subnet and NSG model selected in Step 1.
+   <img src="../images/SECRET.png" height="160" align="center">
+
+4. Create the private endpoint for Database Management. Use the Global subnet and NSG model from Step 1. The ExaCS database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
    Go to **Observability & Management** -> **Database Management** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
    If you are creating the private endpoint for a RAC database, select **Use private endpoint**.
 
-5. Create the private endpoint for Operations Insights. Use the subnet and NSG model selected in Step 1.
+   For the Global approach, the private endpoint is created in the hub monitoring subnet and uses the global monitoring NSG.
+
+   <img src="../images/GLOBAL_PE.png" height="220" align="center">
+
+5. Create the private endpoint for Operations Insights. Use the Global subnet and NSG model from Step 1. The ExaCS database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
    Go to **Observability & Management** -> **Operations Insights** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
    Select **Use private endpoint**.
 
+   The form is equivalent to the Database Management private endpoint flow: place the endpoint in the hub monitoring subnet and attach `nsg-fra-lz-hub-global-mon-pe`.
+
+   <img src="../images/PE_OPSI_GLOBAL.png" height="180" align="center">
+
 6. Verify connectivity between the target database and the private endpoint.
 
-   The add-on creates the required NSGs for the Global model. Confirm the target database and service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target ExaCS SCAN listener on port `1521`.
+   The add-on creates the required NSGs for the Global model. Confirm the target database uses `sn-fra-lz-shared-exacs-db`, confirm the service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target ExaCS SCAN listener on port `1521`.
 
 ## Enable Database Management for ExaCS
 
@@ -68,7 +78,13 @@ For each database you want to enable:
 
 Go to **Oracle Database** -> **Exadata Database Service on Dedicated Infrastructure** -> **VM Clusters** -> **VM Cluster Details** -> **Database Details**.
 
+The database details page shows the associated service links for Database Management and Operations Insights.
+
+<img src="../images/EXACS_DB_DETAILS.png" height="220" align="center">
+
 Select **Database Management** -> **Enable**.
+
+<img src="../images/ENABLE.png" height="90" align="center">
 
 If the Console displays an **Add Policy** prompt, these policies have already been deployed by the landing zone. Do not create duplicate policies unless the add-on deployment did not apply the required IAM configuration.
 
@@ -90,6 +106,8 @@ For ExaCS, select **Exadata Database Service on Dedicated Infrastructure**.
 
 Enter the credentials created in the Manual Prerequisites section.
 
+<img src="../images/EXACS_OPSI_ADD_DATABASE.png" height="260" align="center">
+
 ## Enable Logging Analytics for ExaCS
 
 ExaCS logs contain information that should be included in a complete observability design. To analyze these logs in OCI Logging Analytics, push them into Logging Analytics. This guide uses Management Agents installed on the ExaCS VM Cluster database hosts.
@@ -99,6 +117,8 @@ Create a registration key.
 Go to **Observability and Management** -> **Management Agents** -> **Download and Keys**.
 
 Copy the registration key.
+
+<img src="../images/LA_AGENT_KEY.png" height="220" align="center">
 
 Download the agent from the OCI Console to each database host.
 
@@ -131,6 +151,8 @@ Go to **Observability and Management** -> **Logging Analytics** -> **Administrat
 Create a database entity.
 
 Go to **Observability and Management** -> **Logging Analytics** -> **Administration** -> **Create Entity**.
+
+<img src="../images/LA_CREATE_ENTITY.png" height="260" align="center">
 
 To collect alert and trace logs, populate the `adr_home` property.
 
