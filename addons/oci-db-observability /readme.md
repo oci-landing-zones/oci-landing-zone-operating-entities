@@ -34,7 +34,7 @@ To configure this add-on, you will need to make some key design decisions:
 | Decision | Question to answer | Recommended option | Alternative option | Design impact |
 |---|---|---|---|---|
 | [Private endpoints configuration](#31-private-endpoints) | Should Database Management and Operations Insights use shared global private endpoints, or dedicated private endpoints per environment? | Use shared global private endpoints in the hub monitoring subnet. | Use local private endpoints when there is a single environment, no hub, or an explicit requirement for environment-dedicated endpoints. | Determines where DBM/OPSI private endpoints are deployed, which subnets and NSGs are required, and how database connectivity is routed. Dedicated private endpoints can also consume PE service limits quickly in customers with many business lines, environments, or projects. |
-| [Monitoring instance](#32-monitoring-instance) | Will Logging Analytics be enabled for this design? | If Logging Analytics is required, deploy a centralized monitoring instance in the hub monitoring subnet to host the monitoring agent. | If no hub is deployed, select a customer-approved VCN and subnet for the monitoring instance as part of the design. | Determines whether a VM is required, where the agent runs, and which network and policy access must be configured. |
+| [Logging Analytics agent placement](#32-logging-analytics-agent-placement) | Where should the Logging Analytics Management Agent run for the selected database scenario? | Follow the selected scenario guidance. For DBCS, install the Management Agent on the DBCS database hosts. | For scenarios that require a shared agent host, deploy a centralized monitoring instance in the hub monitoring subnet. | Determines whether a VM is required, where the agent runs, and which network and IAM prerequisites apply. |
 | [Monitoring groups structure](#33-groups) | Should one observability team manage all environments, or should there be dedicated monitoring teams per environment? | Use a global observability team for centralized operations across environments. | Use environment-specific observability teams when operating responsibilities are separated by environment. | Determines IAM group structure, policies, vault access, and operational ownership. |
 
 
@@ -56,16 +56,18 @@ Based on this, we can adopt two different approaches:
 | Option |  Description  | 
 |:--:|:--:|
 | **Global Approach** (Highly Recommended) | As a general approach, the Landing Zone uses a hub VCN, which is designed to centralize services such as load balancers, firewalls, DNS, and more. The global approach involves deploying a "Global" Private Endpoint (PE) that can be used across all databases in different projects, environments, or entities. We recommend deploying the PEs in the Monitoring Subnet, as this configuration will include the necessary routing and communication requirements through Network Security Groups (NSGs).| 
-| **Local Approach** | In specific cases where the customer has a single environment or no Hub, a local approach can be adopted using environment-dedicated Private Endpoints. In this case, dedicated DBM/OPSI PEs can be deployed in the database subnet used by the monitored database. The NSGs included in this add-on allow communication between the DBM/OPSI PEs and the monitored database endpoint, such as an Autonomous Database private endpoint or Exacs SCAN listener.|
+| **Local Approach** | In specific cases where the customer has a single environment or no Hub, a local approach can be adopted using environment-dedicated Private Endpoints. In this case, dedicated DBM/OPSI PEs can be deployed in the database subnet used by the monitored database. The NSGs included in each scenario allow communication between the DBM/OPSI PEs and the monitored database endpoint for that scenario, such as a DBCS database listener, an Autonomous Database private endpoint, or an Exacs SCAN listener.|
 
 &nbsp; 
 
 
-## 3.2 Monitoring Instance
+## 3.2 Logging Analytics Agent Placement
 
-If Logging Analytics is required, an agent must be deployed. To support scalability, the agent is hosted on a centralized virtual machine deployed in the hub's monitoring subnet, where it operates as a shared service.
+If Logging Analytics is required, a Management Agent must run where it can collect or receive the target database logs. The placement is scenario-specific.
 
-If no hub is deployed, select a customer-approved VCN and subnet for the monitoring instance during the design phase.
+For DBCS, the add-on does not deploy an additional monitoring VM. Install the Management Agent on the DBCS database hosts and make sure the database VCN has the Service Gateway required for Logging Analytics ingestion.
+
+For scenarios that require a shared agent host, use the scenario README to decide whether a centralized monitoring instance in the hub monitoring subnet is deployed.
 
 ## 3.3 Groups
 

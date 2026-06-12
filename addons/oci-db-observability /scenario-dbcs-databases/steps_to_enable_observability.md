@@ -2,18 +2,8 @@
 
 License: Universal Permissive License (UPL), Version 1.0. Copyright (c) 2026 Oracle and/or its affiliates.
 
-This guide describes how to enable OCI observability capabilities for Oracle Base Database Service (DBCS). It covers Database Management, Operations Insights, and Logging Analytics, and includes actions that help create alerts from database metrics or alert log messages.
+This guide describes how to enable OCI observability capabilities for Oracle Base Database Service (DBCS). It covers Database Management, Operations Insights, and Logging Analytics.
 
-## Index
-
-- [OCI Observability for OCI Native Database Deployments](#oci-observability-for-oci-native-database-deployments)
-  - [Index](#index)
-  - [Prerequisites Already Created by the Add-on](#prerequisites-already-created-by-the-add-on)
-  - [Manual Prerequisites](#manual-prerequisites)
-  - [Enable Database Management for DBCS](#enable-database-management-for-dbcs)
-  - [Enable Operations Insights for DBCS](#enable-operations-insights-for-dbcs)
-  - [Enable Logging Analytics for DBCS](#enable-logging-analytics-for-dbcs)
-- [License](#license)
 
 ## Prerequisites Already Created by the Add-on
 
@@ -29,7 +19,7 @@ The add-on already creates the Landing Zone prerequisites for Database Managemen
 - The Observability Vault and Key, `vlt-lz-shared-mon-security` and `key-lz-mon-bkt`.
 - For Logging Analytics, a Service Gateway is required for database hosts to send logs to Logging Analytics. This is included in the One-OE project VCNs by default. If you are using a custom VCN, make sure a Service Gateway is configured.
 
-Do not recreate these IAM policies, groups, dynamic groups, NSGs, vaults, or keys manually as part of Step 2.
+
 
 ## Manual Prerequisites
 
@@ -156,9 +146,6 @@ Select the database entity created earlier.
 Select **Database** and **Trace logs**.
 
 Wait a few minutes, then open Log Explorer. The logs should appear there and can be analyzed.
-
-For additional logs and dashboards, use the Knowledge Content GitHub resources.
-
 
 &nbsp;
 

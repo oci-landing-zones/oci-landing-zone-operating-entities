@@ -21,7 +21,7 @@
                                 },
                                 "ingress_rules": {
                                     "ingress_local_database_subnet": {
-                                        "description": "Allow communication between local DBM/OPSI PEs and the Autonomous Database PE in the Prod DB subnet",
+                                        "description": "Allow communication between local DBM/OPSI PEs and the DBCS database listener in the Prod DB subnet",
                                         "dst_port_max": 1521,
                                         "dst_port_min": 1521,
                                         "protocol": "TCP",
@@ -50,7 +50,7 @@
                                 },
                                 "ingress_rules": {
                                     "ingress_local_database_subnet": {
-                                        "description": "Allow communication between local DBM/OPSI PEs and the Autonomous Database PE in the Preprod DB subnet",
+                                        "description": "Allow communication between local DBM/OPSI PEs and the DBCS database listener in the Preprod DB subnet",
                                         "dst_port_max": 1521,
                                         "dst_port_min": 1521,
                                         "protocol": "TCP",
