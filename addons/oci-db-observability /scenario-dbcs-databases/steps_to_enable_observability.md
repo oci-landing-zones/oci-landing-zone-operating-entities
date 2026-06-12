@@ -1,13 +1,11 @@
 # OCI Observability for OCI Native Database Deployments
 
-License: Universal Permissive License (UPL), Version 1.0. Copyright (c) 2026 Oracle and/or its affiliates.
-
 This guide describes how to enable OCI observability capabilities for Oracle Base Database Service (DBCS). It covers Database Management, Operations Insights, and Logging Analytics.
 
 
 ## Prerequisites Already Created by the Landing Zone Add-on
 
-The Step 1 add-on deployment already creates the Landing Zone prerequisites for Database Management, Operations Insights, and Logging Analytics:
+The Observability Landing Zone add-on deployment already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
 - Monitoring compartments.
 - Monitoring groups such as `grp-lz-global-mon-admins`, and in the local deployment option, the environment-specific monitoring groups.
@@ -40,19 +38,19 @@ The Step 1 add-on deployment already creates the Landing Zone prerequisites for 
    GRANT EXECUTE ON DBMS_WORKLOAD_REPOSITORY to C##OCI_MON_USER;
    ```
 
-3. Create a secret for the `C##OCI_MON_USER` password in the Observability Vault created by the Step 1 add-on deployment.
+3. Create a secret for the `C##OCI_MON_USER` password in the Observability Vault created by the Observability Landing Zone add-on deployment.
 
    In the OCI Console, go to **Identity & Security** -> **Key Management** -> **Secret Management** and use `vlt-lz-shared-mon-security`.
 
    Create a secret for the `C##OCI_MON_USER` password.
 
-4. Create the private endpoint for Database Management. Use the subnet and NSG model selected in Step 1.
+4. Create the private endpoint for Database Management. Use the subnet and NSG model selected for the Observability Landing Zone add-on deployment.
 
    Go to **Observability & Management** -> **Database Management** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
    If you are creating the private endpoint for a RAC database, select **Use private endpoint**.
 
-5. Create the private endpoint for Operations Insights. Use the subnet and NSG model selected in Step 1.
+5. Create the private endpoint for Operations Insights. Use the subnet and NSG model selected for the Observability Landing Zone add-on deployment.
 
    Go to **Observability & Management** -> **Operations Insights** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 

@@ -1,7 +1,5 @@
 # OCI Observability for Autonomous Databases
 
-License: Universal Permissive License (UPL), Version 1.0. Copyright (c) 2026 Oracle and/or its affiliates.
-
 This guide describes how to enable OCI observability capabilities for Autonomous Databases after deploying the Landing Zone add-on from the scenario README.
 
 The Landing Zone add-on already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics:

@@ -1,13 +1,11 @@
 # OCI Observability for OCI Native Database Deployments
 
-License: Universal Permissive License (UPL), Version 1.0. Copyright (c) 2026 Oracle and/or its affiliates.
-
-This guide describes how to enable OCI observability capabilities for Oracle Exadata Database Service on Dedicated Infrastructure (ExaCS). It covers Database Management, Operations Insights, and Logging Analytics.
+This guide describes how to enable OCI observability capabilities for Oracle Exadata Database Service on Dedicated Infrastructure (ExaDB-D). It covers Database Management, Operations Insights, and Logging Analytics.
 
 
 ## Prerequisites Already Created by the Landing Zone Add-on
 
-The Step 1 add-on deployment already creates the Landing Zone prerequisites for Database Management, Operations Insights, and Logging Analytics:
+The Observability Landing Zone add-on deployment already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
 - Monitoring compartments.
 - Monitoring group `grp-lz-global-mon-admins`.
@@ -40,7 +38,7 @@ The Step 1 add-on deployment already creates the Landing Zone prerequisites for 
    GRANT EXECUTE ON DBMS_WORKLOAD_REPOSITORY to C##OCI_MON_USER;
    ```
 
-3. Create a secret for the `C##OCI_MON_USER` password in the Observability Vault created by the Step 1 add-on deployment.
+3. Create a secret for the `C##OCI_MON_USER` password in the Observability Vault created by the Observability Landing Zone add-on deployment.
 
    In the OCI Console, go to **Identity & Security** -> **Key Management** -> **Secret Management** and use `vlt-lz-shared-mon-security`.
 
@@ -48,7 +46,7 @@ The Step 1 add-on deployment already creates the Landing Zone prerequisites for 
 
    <img src="../images/SECRET.png" height="160" align="center">
 
-4. Create the private endpoint for Database Management. Use the Global subnet and NSG model from Step 1. The ExaCS database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
+4. Create the private endpoint for Database Management. Use the Global subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
    Go to **Observability & Management** -> **Database Management** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
@@ -58,7 +56,7 @@ The Step 1 add-on deployment already creates the Landing Zone prerequisites for 
 
    <img src="../images/GLOBAL_PE.png" height="220" align="center">
 
-5. Create the private endpoint for Operations Insights. Use the Global subnet and NSG model from Step 1. The ExaCS database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
+5. Create the private endpoint for Operations Insights. Use the Global subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
    Go to **Observability & Management** -> **Operations Insights** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
@@ -70,9 +68,9 @@ The Step 1 add-on deployment already creates the Landing Zone prerequisites for 
 
 6. Verify connectivity between the target database and the private endpoint.
 
-   The add-on creates the required NSGs for the Global model. Confirm the target database uses `sn-fra-lz-shared-exacs-db`, confirm the service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target ExaCS SCAN listener on port `1521`.
+   The add-on creates the required NSGs for the Global model. Confirm the target database uses `sn-fra-lz-shared-exacs-db`, confirm the service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target ExaDB-D SCAN listener on port `1521`.
 
-## Enable Database Management for ExaCS
+## Enable Database Management for ExaDB-D
 
 For each database you want to enable:
 
@@ -80,7 +78,7 @@ Go to **Oracle Database** -> **Exadata Database Service on Dedicated Infrastruct
 
 The database details page shows the associated service links for Database Management and Operations Insights.
 
-<img src="../images/EXACS_DB_DETAILS.png" height="220" align="center">
+<img src="../images/EXADB_D_DB_DETAILS.png" height="220" align="center">
 
 Select **Database Management** -> **Enable**.
 
@@ -96,21 +94,21 @@ For each Pluggable Database, go to **Oracle Database** -> **Exadata Database Ser
 
 To identify the PDB service name, use `lsnrctl status`.
 
-## Enable Operations Insights for ExaCS
+## Enable Operations Insights for ExaDB-D
 
-Operations Insights can be enabled for ExaCS, CDB, and PDB resources in a single flow.
+Operations Insights can be enabled for ExaDB-D, CDB, and PDB resources in a single flow.
 
 Go to **Observability & Management** -> **Operations Insights** -> **Administration** -> **Add database**.
 
-For ExaCS, select **Exadata Database Service on Dedicated Infrastructure**.
+For ExaDB-D, select **Exadata Database Service on Dedicated Infrastructure**.
 
 Enter the credentials created in the Manual Prerequisites section.
 
-<img src="../images/EXACS_OPSI_ADD_DATABASE.png" height="260" align="center">
+<img src="../images/EXADB_D_OPSI_ADD_DATABASE.png" height="260" align="center">
 
-## Enable Logging Analytics for ExaCS
+## Enable Logging Analytics for ExaDB-D
 
-ExaCS logs contain information that should be included in a complete observability design. To analyze these logs in OCI Logging Analytics, push them into Logging Analytics. This guide uses Management Agents installed on the ExaCS VM Cluster database hosts.
+ExaDB-D logs contain information that should be included in a complete observability design. To analyze these logs in OCI Logging Analytics, push them into Logging Analytics. This guide uses Management Agents installed on the ExaDB-D VM Cluster database hosts.
 
 Create a registration key.
 
