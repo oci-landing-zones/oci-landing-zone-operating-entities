@@ -1,11 +1,10 @@
 {
     "oke_workers_configuration": {
-        "default_compartment_id"         : "CMP-LZ-PROD-OKE-KEY",
-
         "node_pools": {
-            "NDP-FRA-LZ-PROD-OKE-KEY": {
-                "name"                   : "ndp-fra-lz-prod-oke",
-                "cluster_id"             : "CLR-FRA-LZ-PROD-OKE-KEY",
+            "NDP-FRA-LZ-PREPROD-OKE-KEY": {
+                "name"                   : "ndp-fra-lz-preprod-oke",
+                "compartment_id"         : "CMP-LZ-PREPROD-OKE-KEY",
+                "cluster_id"             : "CLR-FRA-LZ-PREPROD-OKE-KEY",
                 "enable_cycling"         : false,
                 "size"                   : 1,
 
@@ -17,14 +16,14 @@
                 ],
 
                 "freeform_tags": {
-                    "cluster"            : "clr-fra-lz-prod-oke"
+                    "cluster"            : "clr-fra-lz-preprod-oke"
                 },
 
                 "networking": {
-                    "pods_nsg_ids"       : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"],
-                    "pods_subnet_id"     : "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
-                    "workers_nsg_ids"    : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"],
-                    "workers_subnet_id"  : "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
+                    "pods_nsg_ids"       : ["NSG-FRA-LZ-PREPROD-PLATFORM-OKE-PODS-KEY"],
+                    "pods_subnet_id"     : "SN-FRA-LZ-PREPROD-PLATFORM-OKE-PODS-KEY",
+                    "workers_nsg_ids"    : ["NSG-FRA-LZ-PREPROD-PLATFORM-OKE-WORKERS-KEY"],
+                    "workers_subnet_id"  : "SN-FRA-LZ-PREPROD-PLATFORM-OKE-WORKERS-KEY"
                 },
 
                 "node_config_details": {
