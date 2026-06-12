@@ -90,7 +90,7 @@ Note: The design includes several options, and the customer can decide whether t
 | 2 | <img src="./images/dbcs.png" height="40" align="center">| DBCS | [Available](./scenario-dbcs-databases/readme.md) |
 | 3 | <img src="../../commons/images/exacs.png" height="40" align="center"> | ExaDB-D | [Available](./scenario-exacs-databases/readme.md) |
 | 4 |  | ODA@ | [Available](./scenario-oda@-databases/readme.md) |
-| 5 | | EXACC| [Available](./scenario-exacc-databases/readme.md) |
+| 5 |<img src="../../commons/images/exacc.png" | EXACC| [Available](./scenario-exacc-databases/readme.md) |
 | 6 |  | External Databases | In progress |
 
 
