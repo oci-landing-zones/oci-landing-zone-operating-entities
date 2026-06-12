@@ -5,20 +5,17 @@ License: Universal Permissive License (UPL), Version 1.0. Copyright (c) 2026 Ora
 This guide describes how to enable OCI observability capabilities for Oracle Base Database Service (DBCS). It covers Database Management, Operations Insights, and Logging Analytics.
 
 
-## Prerequisites Already Created by the Add-on
+## Prerequisites Already Created by the Landing Zone Add-on
 
-Deploy the add-on from Step 1 in the scenario README before following these service-specific steps.
-
-The add-on already creates the Landing Zone prerequisites for Database Management, Operations Insights, and Logging Analytics:
+The landing zone add-on already creates the Landing Zone prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
 - Monitoring compartments.
 - Monitoring groups such as `grp-lz-global-mon-admins`, and in the local deployment option, the environment-specific monitoring groups.
 - The Management Agent dynamic group `id_lz_common/dg-lz-mon-dynamic-group` in the COMMON Identity Domain.
 - IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, and the required network access.
-- Network Security Groups for the DBM/OPSI private endpoint connectivity model selected in Step 1.
+- Network Security Groups for the DBM/OPSI private endpoint connectivity.
 - The Observability Vault and Key, `vlt-lz-shared-mon-security` and `key-lz-mon-bkt`.
 - For Logging Analytics, a Service Gateway is required for database hosts to send logs to Logging Analytics. This is included in the One-OE project VCNs by default. If you are using a custom VCN, make sure a Service Gateway is configured.
-
 
 
 ## Manual Prerequisites
@@ -43,19 +40,19 @@ The add-on already creates the Landing Zone prerequisites for Database Managemen
    GRANT EXECUTE ON DBMS_WORKLOAD_REPOSITORY to C##OCI_MON_USER;
    ```
 
-3. Create a secret for the `C##OCI_MON_USER` password in the Observability Vault created by Step 1.
+3. Create a secret for the `C##OCI_MON_USER` password in the Observability Vault created by the Landing zone add-on.
 
    In the OCI Console, go to **Identity & Security** -> **Key Management** -> **Secret Management** and use `vlt-lz-shared-mon-security`.
 
    Create a secret for the `C##OCI_MON_USER` password.
 
-4. Create the private endpoint for Database Management. Use the subnet and NSG model selected in Step 1.
+4. Create the private endpoint for Database Management. Use the subnet and NSG model selected in Landing zone add-on.
 
    Go to **Observability & Management** -> **Database Management** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
    If you are creating the private endpoint for a RAC database, select **Use private endpoint**.
 
-5. Create the private endpoint for Operations Insights. Use the subnet and NSG model selected in Step 1.
+5. Create the private endpoint for Operations Insights. Use the subnet and NSG model created in Landing zone add-on.
 
    Go to **Observability & Management** -> **Operations Insights** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
@@ -73,7 +70,7 @@ Go to **Oracle Database** -> **Oracle Base Database** -> **DB Systems** -> **DB 
 
 Select **Database Management** -> **Enable**.
 
-If the Console displays an **Add Policy** prompt, verify that the policies from Step 1 have been deployed. Do not create duplicate policies unless the add-on deployment did not apply the required IAM configuration.
+If the Console displays an **Add Policy** prompt, these policies have already been deployed by the landing zone. Do not create duplicate policies unless the add-on deployment did not apply the required IAM configuration.
 
 Enter the username and select the secret for the monitoring user created in the Manual Prerequisites section.
 
