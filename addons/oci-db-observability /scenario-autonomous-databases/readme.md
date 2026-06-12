@@ -53,7 +53,7 @@ Deploy the One-OE Landing Zone. You can follow these [steps](https://github.com/
 
 **Step 1**.
 
-Deploy the add-on with OCI Resource Manager (ORM):
+Deploy the Observability Landing zone add-on:
 
 | GLOBAL | LOCAL |
 |---|---|

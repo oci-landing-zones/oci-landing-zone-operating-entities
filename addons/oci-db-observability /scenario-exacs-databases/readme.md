@@ -53,7 +53,7 @@ Deploy the One-OE + ExaDB-D use case 1 in single stack. You can follow these [st
 
 **Step 1**.
 
-Deploy the Landing zone Observability add-on:
+Deploy the Observability Landing zone add-on:
 
 | GLOBAL |
 |---|
