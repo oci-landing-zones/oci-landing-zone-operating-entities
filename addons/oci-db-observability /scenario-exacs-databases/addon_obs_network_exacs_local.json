@@ -1,0 +1,69 @@
+{
+    "network_configuration": {
+        "default_enable_cis_checks": false,
+        "network_configuration_categories": {
+            "Add_Local_DBM_OPSI_NSGs": {
+                "inject_into_existing_vcns": {
+                    "VCN-FRA-LZ-PROD-PROJECTS-KEY": {
+                        "vcn_id": "VCN-FRA-LZ-PROD-PROJECTS-KEY",
+                        "network_security_groups": {
+                            "NSG-FRA-LZ-PROD-PROJ1-MON-PE-DB1-KEY": {
+                                "compartment_id": "CMP-LZ-PROD-PROJ1-KEY",
+                                "display_name": "nsg-fra-lz-prod-proj1-mon-pe-db1",
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description": "Egress to 0.0.0.0/0 over TCP",
+                                        "dst": "0.0.0.0/0",
+                                        "dst_type": "CIDR_BLOCK",
+                                        "protocol": "TCP",
+                                        "stateless": false
+                                    }
+                                },
+                                "ingress_rules": {
+                                    "ingress_local_database_subnet": {
+                                        "description": "Allow communication between local DBM/OPSI PEs and the ExaCS SCAN listener in the Prod client subnet",
+                                        "dst_port_max": 1521,
+                                        "dst_port_min": 1521,
+                                        "protocol": "TCP",
+                                        "src": "10.0.66.0/24",
+                                        "src_type": "CIDR_BLOCK",
+                                        "stateless": false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "VCN-FRA-LZ-PREPROD-PROJECTS-KEY": {
+                        "vcn_id": "VCN-FRA-LZ-PREPROD-PROJECTS-KEY",
+                        "network_security_groups": {
+                            "NSG-FRA-LZ-PREPROD-PROJ1-MON-PE-DB1-KEY": {
+                                "compartment_id": "CMP-LZ-PREPROD-PROJ1-KEY",
+                                "display_name": "nsg-fra-lz-preprod-proj1-mon-pe-db1",
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description": "Egress to 0.0.0.0/0 over TCP",
+                                        "dst": "0.0.0.0/0",
+                                        "dst_type": "CIDR_BLOCK",
+                                        "protocol": "TCP",
+                                        "stateless": false
+                                    }
+                                },
+                                "ingress_rules": {
+                                    "ingress_local_database_subnet": {
+                                        "description": "Allow communication between local DBM/OPSI PEs and the ExaCS SCAN listener in the Preprod client subnet",
+                                        "dst_port_max": 1521,
+                                        "dst_port_min": 1521,
+                                        "protocol": "TCP",
+                                        "src": "10.0.130.0/24",
+                                        "src_type": "CIDR_BLOCK",
+                                        "stateless": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
