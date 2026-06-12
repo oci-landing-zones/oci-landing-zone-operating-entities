@@ -29,6 +29,11 @@
             "name": "dg-lz-mon-dynamic-group",
             "description": "dynamic group for security functions execution, required for Logging Analytics",
             "matching_rule": "ALL {resource.type='managementagent'}"
+          },
+          "DG-LZ-MON-CREDENTIAL": {
+            "name": "dg-lz-mon-credential-dynamic-group",
+            "description": "Dynamic group for certificate authority resource principals used by Observability agent credential operations.",
+            "matching_rule": "ALL {resource.type='certificateauthority'}"
           }
         }
       },
@@ -84,6 +89,25 @@
                 "statements": [
                     "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to use metrics in tenancy",
                     "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy"
+                ]
+            },
+            "PCY-MON-AGENT-CERTIFICATE-DYNAMIC-GROUP": {
+                "name": "pcy-mon-agent-cert-dynamic-group",
+                "description": "Policy to allow Observability management agents and certificate authority resource principals to manage certificate, vault, and key operations.",
+                "compartment_id": "TENANCY-ROOT",
+                "statements": [
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-credential-dynamic-group' to use certificate-authority-delegates in tenancy",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-credential-dynamic-group' to use vaults in tenancy",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-credential-dynamic-group' to use keys in tenancy",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to read certificate-authority-bundle in tenancy",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to read leaf-certificate-bundle in tenancy",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to manage certificate-authorities in tenancy where any{request.permission='CERTIFICATE_AUTHORITY_CREATE', request.permission='CERTIFICATE_AUTHORITY_INSPECT', request.permission='CERTIFICATE_AUTHORITY_READ'}",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to manage leaf-certificates in tenancy where any{request.permission='CERTIFICATE_CREATE', request.permission='CERTIFICATE_INSPECT', request.permission='CERTIFICATE_UPDATE', request.permission='CERTIFICATE_READ'}",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to manage vaults in tenancy where any{request.permission='VAULT_CREATE', request.permission='VAULT_INSPECT', request.permission='VAULT_READ', request.permission='VAULT_CREATE_KEY', request.permission='VAULT_IMPORT_KEY', request.permission='VAULT_CREATE_SECRET'}",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to manage keys in tenancy where any{request.permission='KEY_CREATE', request.permission='KEY_INSPECT', request.permission='KEY_READ'}",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to use certificate-authority-delegates in tenancy",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to use key-delegate in tenancy",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to manage leaf-certificates in tenancy where all{request.permission='CERTIFICATE_DELETE', target.leaf-certificate.name=request.principal.id}"
                 ]
             },
             "PCY-GLOBAL-MON-SECURITY-ADMINISTRATION": {

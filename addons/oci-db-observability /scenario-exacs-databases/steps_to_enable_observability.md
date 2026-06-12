@@ -5,12 +5,9 @@ This guide describes how to enable OCI observability capabilities for Oracle Exa
 
 ## Prerequisites Already Created by the Landing Zone Add-on
 
-The Observability Landing Zone add-on deployment already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics:
+The Observability Landing Zone add-on deployment already creates the OCI-side prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
 - Monitoring compartments.
-- Monitoring group `grp-lz-global-mon-admins`.
-- The Management Agent dynamic group `id_lz_common/dg-lz-mon-dynamic-group` in the COMMON Identity Domain.
-- IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, and the required network access.
 - Network Security Groups for the DBM/OPSI private endpoint connectivity.
 - The Observability Vault and Key, `vlt-lz-shared-mon-security` and `key-lz-mon-bkt`.
 - For Logging Analytics, a Service Gateway is required for database hosts to send logs to Logging Analytics. This is included in the One-OE project VCNs by default. If you are using a custom VCN, make sure a Service Gateway is configured.
@@ -18,35 +15,19 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 
 ## Manual Prerequisites
 
-1. Create a monitoring user on each CDB.
+1. Confirm the database monitoring credentials and grants required for each CDB/PDB before enabling Database Management or Operations Insights.
 
-   Download `grantPrivileges.sql` from My Oracle Support Doc ID `2857604.1` and run it on the Container Database.
+   The account and grants are managed outside this scenario guide. Use the credential standard approved for the environment.
 
-   ```text
-   sqlplus sys/<password>@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=<host>.<domain>)(PORT=1521)))(CONNECT_DATA=(SERVICE=<CDB Servicename>))) as sysdba @grantPrivileges.sql C##OCI_MON_USER <password> N Y N> grantPrivileges.log
-   sqlplus sys/<password>@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=<host>.<domain>)(PORT=1521)))(CONNECT_DATA=(SERVICE=<CDB Servicename>))) as sysdba @grantPrivileges.sql C##OCI_MON_USER <password> Y Y N> grantPrivileges.log
-   ```
-
-2. For each PDB/CDB, grant the required privileges.
-
-   ```sql
-   ALTER SESSION SET CONTAINER=pdb1;
-   GRANT CREATE PROCEDURE to C##OCI_MON_USER;
-   GRANT SELECT ANY DICTIONARY, SELECT_CATALOG_ROLE to C##OCI_MON_USER;
-   GRANT ALTER SYSTEM to C##OCI_MON_USER;
-   GRANT ADVISOR to C##OCI_MON_USER;
-   GRANT EXECUTE ON DBMS_WORKLOAD_REPOSITORY to C##OCI_MON_USER;
-   ```
-
-3. Create a secret for the `C##OCI_MON_USER` password in the Observability Vault created by the Observability Landing Zone add-on deployment.
+2. Create a secret for the database monitoring password in the Observability Vault created by the Observability Landing Zone add-on deployment.
 
    In the OCI Console, go to **Identity & Security** -> **Key Management** -> **Secret Management** and use `vlt-lz-shared-mon-security`.
 
-   Create a secret for the `C##OCI_MON_USER` password.
+   Store the database monitoring password as a secret.
 
    <img src="../images/SECRET.png" height="160" align="center">
 
-4. Create the private endpoint for Database Management. Use the Global subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
+3. Create the private endpoint for Database Management. Use the Global subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
    Go to **Observability & Management** -> **Database Management** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
@@ -56,7 +37,7 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 
    <img src="../images/GLOBAL_PE.png" height="220" align="center">
 
-5. Create the private endpoint for Operations Insights. Use the Global subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
+4. Create the private endpoint for Operations Insights. Use the Global subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
    Go to **Observability & Management** -> **Operations Insights** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
@@ -66,7 +47,7 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 
    <img src="../images/PE_OPSI_GLOBAL.png" height="180" align="center">
 
-6. Verify connectivity between the target database and the private endpoint.
+5. Verify connectivity between the target database and the private endpoint.
 
    The add-on creates the required NSGs for the Global model. Confirm the target database uses `sn-fra-lz-shared-exacs-db`, confirm the service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target ExaDB-D SCAN listener on port `1521`.
 
@@ -84,9 +65,7 @@ Select **Database Management** -> **Enable**.
 
 <img src="../images/ENABLE.png" height="90" align="center">
 
-If the Console displays an **Add Policy** prompt, these policies have already been deployed by the landing zone. Do not create duplicate policies unless the add-on deployment did not apply the required IAM configuration.
-
-Enter the username and select the secret for the monitoring user created in the Manual Prerequisites section.
+Enter the database monitoring username and select the secret prepared in the Manual Prerequisites section.
 
 Select **Full Management** when full Database Management capabilities are required.
 
@@ -102,7 +81,7 @@ Go to **Observability & Management** -> **Operations Insights** -> **Administrat
 
 For ExaDB-D, select **Exadata Database Service on Dedicated Infrastructure**.
 
-Enter the credentials created in the Manual Prerequisites section.
+Enter the credentials prepared in the Manual Prerequisites section.
 
 <img src="../images/EXADB_D_OPSI_ADD_DATABASE.png" height="260" align="center">
 
