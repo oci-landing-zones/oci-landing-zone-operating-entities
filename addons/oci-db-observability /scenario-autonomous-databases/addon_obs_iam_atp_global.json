@@ -20,7 +20,8 @@
             }
         }
     },
-    "dynamic_groups_configuration": {
+    "identity_domain_dynamic_groups_configuration": {
+        "default_identity_domain_id": "COMMON-DOMAIN",
         "default_defined_tags": null,
         "default_freeform_tags": null,
         "dynamic_groups": {
@@ -77,8 +78,8 @@
                 "description": "Policy to allow the Observability management agent dynamic group to upload metrics and logs.",
                 "compartment_id": "TENANCY-ROOT",
                 "statements": [
-                    "Allow dynamic-group dg-lz-mon-dynamic-group to use metrics in tenancy",
-                    "Allow dynamic-group dg-lz-mon-dynamic-group to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy"
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to use metrics in tenancy",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy"
                 ]
             },
             "PCY-GLOBAL-MON-SECURITY-ADMINISTRATION": {

@@ -85,7 +85,7 @@ Note: The design includes several options, and the customer can decide whether t
 | # |  Scenario  | Description | Status |
 |:--:|:--:|---|---|
 | 1 | <img src="./images/icon_auto.png" height="40" align="center">| Autonomous database| [Available](./scenario-autonomous-databases/readme.md) |
-| 2 |  | DBCS | In progress |
+| 2 | <img src="./images/dbcs.png" height="40" align="center">| DBCS | [Available](./scenario-dbcs-databases/readme.md) |
 | 3 |  | EXACS | In progress |
 | 4 |  | ODA@ | In progress |
 | 5 | | EXACC| In progress |
