@@ -39,13 +39,13 @@ Logging Analytics requires a Management Agent with access to the monitored datab
 
 ## Implementation
 
-Our add-on template includes the required components to enable Database Management, Ops Insights, and Logging Analytics, such as compartments, groups, a dedicated monitoring Vault, policies, NSGs, and a monitoring instance.
+This scenario deploys the required components to enable Database Management, Ops Insights, and Logging Analytics, such as compartments, groups, a dedicated monitoring Vault, policies, NSGs, and a monitoring instance.
 &nbsp;
 
 
 Follow these steps to extend your One-OE Landing Zone:
 
-**Step 0**. ( prerequisit )
+**Step 0**. ( prerequisite )
 
 Deploy the One-OE Landing Zone. You can follow these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack). To work with multiple stacks, you need to use the orchestrator's outputs and dependencies features within [ORM](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/orm_bp.md).
 
@@ -68,7 +68,9 @@ For step-by-step instructions, see [Implementation add-on steps](./Implementatio
 
 **Step 2**.
 
-Follow the service-specific [steps to enable Database Management, Ops Insights, and Logging Analytics](steps_to_enable_observability.md). The DBM and OPSI private endpoint configuration is covered there for both Global and Local options.
+Follow the remaining service-specific [steps to enable Database Management, Ops Insights, and Logging Analytics](steps_to_enable_observability.md).
+
+The resources created in Step 1 are listed in the table above. Step 2 covers only the remaining manual service-onboarding actions, including preparing the database monitoring user, storing its password as a secret, creating the service private endpoints, enabling DBM/OPSI for the target databases, and completing Logging Analytics onboarding with the monitoring agent VM.
 
 &nbsp;
 

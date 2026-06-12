@@ -1,9 +1,36 @@
+# OCI Observability for Autonomous Databases
+
+License: Universal Permissive License (UPL), Version 1.0. Copyright (c) 2026 Oracle and/or its affiliates.
+
+This guide describes how to enable OCI observability capabilities for Autonomous Databases after deploying the Landing Zone add-on from the scenario README.
+
+The Landing Zone add-on already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics:
+
+- Monitoring compartments and monitoring groups.
+- IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, and network access.
+- Network Security Groups for the selected DBM/OPSI private endpoint connectivity model.
+- The Observability Vault and Key, `vlt-lz-shared-mon-security` and `key-lz-mon-bkt`.
+- The monitoring agent VM `vm-fra-lz-shared-mon-agent`.
+
+Do not recreate these IAM policies, groups, NSGs, vaults, keys, or the monitoring agent VM manually as part of Step 2: Enable OCI Observability.
 
 ## Index
 
 - [Database Management Enabling Steps](#database-management-enabling-steps)
 - [Ops Insights Enabling Steps](#ops-insights-enabling-steps)
 - [Logging Analytics Enabling Steps](#logging-analytics-enabling-steps)
+
+## Quick Flow
+
+The detailed sections below include screenshot-based steps. At a high level, Step 2: Enable OCI Observability covers these manual service-onboarding actions:
+
+1. Confirm that the Autonomous Database uses private endpoint access and the NSG model deployed by the Landing Zone add-on.
+2. Create the Database Management private endpoint using either the Global or Local model selected for the Landing Zone add-on.
+3. Prepare the database monitoring user and store the password in the Observability Vault.
+4. Enable Database Management and select the Database Management private endpoint.
+5. Create the Operations Insights private endpoint using either the Global or Local model selected for the Landing Zone add-on.
+6. Enable Operations Insights and select the Operations Insights private endpoint.
+7. Use the monitoring agent VM created by the Landing Zone add-on to complete Logging Analytics onboarding.
 
 ## **Database Management Enabling Steps**
 
@@ -45,7 +72,7 @@ Example for Prod database:
 
 If the database was created previously, ensure it is placed in the correct cmp, assigned to the proper subnet, and configured with the appropriate NSG.
 
-All resources needed like compartments, subnets and Network Security Groups (NSGs) were previously provisioned by the LZ.
+The Landing Zone add-on already provisions the required compartments, subnets, and Network Security Groups (NSGs).
 </td>
 </tr>
 
@@ -64,7 +91,7 @@ Create the DBM private endpoint.
 
 
 <td align="left" rowspan="2">      
-All resources needed like Subnets, route tables (RT), Gateways (RT),security lists (SL), and Network Security Groups (NSGs) were previously provisioned by the LZ.
+The Landing Zone add-on already provisions the required subnets, route tables, gateways, security lists, and Network Security Groups (NSGs).
 
 This operation can be easily automated with [Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/database_management_db_management_private_endpoint).
 </td>
@@ -122,7 +149,7 @@ DBM_Wallet_Type: "DATABASE"
 
 </td>
 <td align="left">
-All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
+The Landing Zone add-on already provisions the dedicated Vault and required policies.
 </td>
 </tr> 
 
@@ -139,7 +166,7 @@ Enable [Database Management](https://docs.oracle.com/en-us/iaas/database-managem
 </td>
 
 <td align="left" rowspan="2">      
-Remember to select the private DBM endpoint created in step2.
+Remember to select the private DBM endpoint created earlier in the Enable OCI Observability flow.
 
 </td>
 </tr>
@@ -220,7 +247,7 @@ Example for Prod database:
 
 If the database was created previously, ensure it is placed in the correct CMP, assigned to the proper subnet, and configured with the appropriate NSG.
 
-All resources needed like compartments, subnets and Network Security Groups (NSGs) were previously provisioned by the LZ
+The Landing Zone add-on already provisions the required compartments, subnets, and Network Security Groups (NSGs).
 </td>
 </tr>
 
@@ -237,7 +264,7 @@ Create the OPSI private endpoint.
 
 </td>
 <td align="left" rowspan="2">      
-All resources needed like Subnets, route tables (RT), Gateways (RT),security lists (SL), and Network Security Groups (NSGs) were previously provisioned by the LZ.
+The Landing Zone add-on already provisions the required subnets, route tables, gateways, security lists, and Network Security Groups (NSGs).
 
 This operation can be easily automated with [Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/opsi_operations_insights_private_endpoints).
 </td>
@@ -287,7 +314,7 @@ Create a secret in the vlt-lz-shared-mon-security vault located in the cmp-landi
 
 </td>
 <td align="left">
-All resources needed like the dedicated Vault and required policies was previously provisioned by the LZ.
+The Landing Zone add-on already provisions the dedicated Vault and required policies.
 </td>
 </tr> 
 
@@ -303,7 +330,7 @@ Choose the feature set based on the capabilities required:
 * **Basic**: use it for capacity planning when the full feature prerequisites are not ready.
 * **Full feature set**: use it when SQL Explorer, ADDM Spotlight, and richer database analytics are required.
 
-For the full feature set, configure the required credential, database user, Vault password secret, service name or connection string, and the private OPSI endpoint created in Step 2 when the database uses private endpoint access or access control lists.
+For the full feature set, configure the required credential, database user, Vault password secret, service name or connection string, and the private OPSI endpoint created earlier in the Enable OCI Observability flow when the database uses private endpoint access or access control lists.
 
 <img src="../images/ENABLE_OPSI.png" height="100" align="left"></img>
 &nbsp; 
@@ -311,7 +338,7 @@ For the full feature set, configure the required credential, database user, Vaul
 
 <td align="left" rowspan="2">     
 
-Remember to select the private OPSI endpoint created in Step 2. Choose the appropriate PE based on whether you're using a Global or Local approach.
+Remember to select the private OPSI endpoint created earlier in the Enable OCI Observability flow. Choose the appropriate PE based on whether you're using a Global or Local approach.
 
 </td>
 </tr>
@@ -362,7 +389,7 @@ Click the 'Add database' button. Then, go to the work request and check the prog
 
 For Autonomous Database, Logging Analytics collects database records by connecting to the database over JDBC and running SQL against approved tables or views. It does not collect database server host files, because the database hosts are managed by Oracle.
 
-The add-on creates the IAM prerequisites, dynamic group, network access, and the monitoring agent VM `vm-fra-lz-shared-mon-agent`. Use that VM as the Management Agent host unless your implementation requires another approved host with JDBC connectivity to the Autonomous Database.
+The Landing Zone add-on creates the IAM prerequisites, dynamic group, network access, and the monitoring agent VM `vm-fra-lz-shared-mon-agent`. Use that VM as the Management Agent host unless your implementation requires another approved host with JDBC connectivity to the Autonomous Database.
 
 ### 1. Decide What To Collect
 
@@ -419,7 +446,7 @@ Recommended fields:
 
 ### 3. Prepare The Management Agent And Wallet
 
-1. Connect to the monitoring agent VM created by the add-on: `vm-fra-lz-shared-mon-agent`.
+1. Connect to the monitoring agent VM created by the Landing Zone add-on: `vm-fra-lz-shared-mon-agent`.
 2. Confirm the Management Agent is `Active`.
 3. Confirm the Log Analytics service plugin is `Running`.
 4. If the Log Analytics plugin is not enabled, enable or deploy it using the approved Management Agent process. The plugin configuration uses:
