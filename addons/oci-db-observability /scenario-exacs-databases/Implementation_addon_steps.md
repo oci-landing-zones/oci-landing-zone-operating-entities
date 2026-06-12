@@ -31,7 +31,7 @@ allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use keys in compartment
 
 13. After making the changes, execute a second plan to review these updates before running the job again.
 
-# License <!-- omit from toc -->
+# License
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 

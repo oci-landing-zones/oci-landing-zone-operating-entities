@@ -606,7 +606,7 @@ If Logging Analytics reports query errors:
 - Avoid `WHERE` filters on the incremental sequence or timestamp column.
 - Verify the selected sequence column is unique and increasing.
 
-# License <!-- omit from toc -->
+# License
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 

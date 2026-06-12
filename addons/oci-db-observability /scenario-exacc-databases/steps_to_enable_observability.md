@@ -32,47 +32,6 @@ This document does not apply to Autonomous Clusters.
    https://management-agent.<OCI_REGION>.oci.oraclecloud.com
    ```
 
-## IAM Policy Customization Considerations
-
-The source asset provides reference policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, certificates, vaults, and network access.
-
-Review and customize the sample policies before production use based on:
-
-- Compartment structure and resource ownership.
-- Environment separation.
-- Application or business-unit boundaries.
-- Security, compliance, and segregation-of-duties requirements.
-- Database administration and observability team responsibilities.
-
-The `obs_admin` group may need compartment-scoped permissions instead of tenancy-wide permissions. Dynamic groups such as `obs_agent` and `Credential_Dynamic_Group` should also be reviewed so they grant only the minimum access needed.
-
-## OCI Policies and Groups
-
-Create or map these identities:
-
-1. Observability administrator group: `obs_admin`.
-2. Management Agent dynamic group: `obs_agent`.
-
-   ```text
-   ALL {resource.type='managementagent'}
-   ```
-
-3. Credential dynamic group: `Credential_Dynamic_Group`.
-
-   ```text
-   ALL {resource.type='certificateauthority'}
-   ```
-
-Configure policies for the following areas:
-
-- Agent certificate, vault, and key access.
-- OCI Database Management access.
-- Operations Insights access.
-- Logging Analytics access.
-- Dashboard and alert access.
-
-Use the full policy list from the source asset as the baseline and adjust tenancy-wide permissions to the target compartment model before deploying in production.
-
 ## Management Gateway Installation
 
 Create a registration key in **Observability and Management** -> **Management Agents** -> **Download and Keys**.
@@ -183,3 +142,11 @@ echo "loganalytics.enable_large_dir=true" >> /opt/oracle/mgmt_agent/agent_inst/c
 systemctl stop mgmt_agent
 systemctl start mgmt_agent
 ```
+
+# License
+
+Copyright (c) 2026 Oracle and/or its affiliates.
+
+Licensed under the Universal Permissive License (UPL), Version 1.0.
+
+See [LICENSE](/LICENSE.txt) for more details.
