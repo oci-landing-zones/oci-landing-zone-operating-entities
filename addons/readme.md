@@ -11,7 +11,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 |  |  Deployable add-ons  | Description |
 |:--:|:-|:-|
 | <img src="oci-hub-models/images/oci_hub_models_icon.png" height="32" align="center"> | **[OCI Network Hubs](/addons/oci-hub-models/readme.md)** | A set of **OCI Network Hub topologies** applicable to any landing zone or OCI deployment. |
-| <img src="../commons/images/obs.png" height="30" align="center"> | **[OCI Database Observability](/addons/oci-db-observability%20/readme.md)** | Enable native database observability services including **Database Management**, **Ops Insights**, and **Logging Analytics**. |
+| <img src="../commons/images/obs.png" height="30" align="center"> | **[OCI Database Observability](/addons/oci-db-observability/readme.md)** | Enable native database observability services including **Database Management**, **Ops Insights**, and **Logging Analytics**. |
 | <img src="oci-private-dns/images/oci-private-dns_icon.png" height="30" align="center"> | **[OCI Private DNS](/addons/oci-private-dns/README.md)** | A set of **OCI Private DNS configurations** applicable to any landing zone or OCI deployment. |
 | <img src="oci-x-rpc/images/rpc-icon.svg" height="30" align="center"> | **[OCI Remote Peering Connections](./oci-x-rpc/README.md)** | Setup Remote Peering Connections between regions and tenancies. |
 | <img src="oci-sovereign-landing-zone/content/sovcloud_icon.png" height="30" align="center"> | **[OCI Sovereign Landing Zones](./oci-sovereign-landing-zone/readme.md)**| A set of **OCI Sovereign Controls** applicable to any OCI LZ deployment. |

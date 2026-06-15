@@ -22,7 +22,7 @@ The add-on does not create VCNs, subnets, NSGs, or DBM/OPSI service Private Endp
 Use these links to review the relevant OCI documentation:
 
 * [Management Gateway](https://docs.oracle.com/en-us/iaas/management-agents/doc/management-gateway.html)
-* [Management Agent](https://docs.oracle.com/en-us/iaas/management-agents/doc/overview-management-agent.html)
+* [Management Agent](https://docs.oracle.com/en-us/iaas/management-agents/doc/you-begin.html)
 
 ### Credentials and Vault
 
@@ -57,7 +57,7 @@ Deploy the Observability Landing zone add-on:
 | Use this deployment when ExaDB-C@C observability is enabled through Management Agent, with optional Management Gateway connectivity to OCI endpoints. |
 | Resources created:<br><br>Compartments: `cmp-lz-monitoring`.<br><br>Groups: `grp-lz-global-mon-admins`.<br><br>Policies: `pcy-mon-services`, `pcy-global-mon-admin`, `pcy-mon-dynamic-group`, `pcy-mon-agent-cert-dynamic-group`, `pcy-global-mon-security-admin`, `pcy-shared-exacc-mon-admin`.<br><br>COMMON Identity Domain dynamic groups: `id_lz_common/dg-lz-mon-dynamic-group`, `id_lz_common/dg-lz-mon-credential-dynamic-group`.<br><br>Vault and key: `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`. |
 | <img src="../images/EXACC_GLOBAL.png" height="250" align="center"> |
-| <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-exacc-databases/addon_obs_iam_exacc_global.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability%2520/scenario-exacc-databases/addon_obs_security_exacc.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
+| <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacc-databases/addon_obs_iam_exacc_global.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacc-databases/addon_obs_security_exacc.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
 | Files loaded:<br>[addon_obs_iam_exacc_global.json](addon_obs_iam_exacc_global.json)<br>[addon_obs_security_exacc.json](addon_obs_security_exacc.json) |
 
 For step-by-step instructions, see [Implementation add-on steps](./Implementation_addon_steps.md).
