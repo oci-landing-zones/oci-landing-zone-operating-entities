@@ -1,20 +1,4 @@
 {
-    "compartments_configuration": {
-        "enable_delete": "true",
-        "default_parent_id":"CMP-LANDINGZONE-KEY",
-        "compartments": {
-            "CMP-LZ-PROD-MONITORING-KEY": {
-                "parent_id":"CMP-LZ-PROD-PLATFORM-KEY",
-                "name": "cmp-lz-prod-monitoring",
-                "description": "Observability Production Compartment"
-            },
-            "CMP-LZ-PREPROD-MONITORING-KEY": {
-                "parent_id":"CMP-LZ-PREPROD-PLATFORM-KEY",
-                "name": "cmp-lz-preprod-monitoring",
-                "description": "Observability PreProduction Compartment"
-            }
-        }
-    },
     "identity_domain_groups_configuration": {
         "default_identity_domain_id": "COMMON-DOMAIN",
         "ignore_external_membership_updates": true,
