@@ -1,4 +1,4 @@
-local desc = import '../../../descriptions.libsonnet';
+local desc = import '../../descriptions.libsonnet';
 
 function(ctx) {
   local n = ctx.n,

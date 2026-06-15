@@ -29,7 +29,7 @@ local extension_registry = {
   oke_simple: import 'workload-extensions/oke/simple/oke_simple.libsonnet',
   exacc: import 'workload-extensions/exacc/exacc.libsonnet',
   exacs: import 'workload-extensions/exacs/exacs.libsonnet',
-  ocvs_simple: import 'workload-extensions/ocvs/simple/ocvs_simple.libsonnet',
+  ocvs_simple: import 'workload-extensions/ocvs/ocvs_simple.libsonnet',
 };
 
 function(raw_config)

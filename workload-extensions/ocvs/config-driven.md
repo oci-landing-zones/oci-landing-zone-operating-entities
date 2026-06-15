@@ -1,5 +1,7 @@
 # Config-Driven OCVS
 
+Config-driven OCVS should be authored through the [Blueprint Factory addon](../../addons/oci-lz-blueprint-factory/README.md). Use the [Prod with OCVS example](../../addons/oci-lz-blueprint-factory/examples/05-prod-ocvs.json) as the starting point for a reviewed source configuration.
+
 The OCVS workload extension is configured as a platform extension named `ocvs_simple`.
 
 The first supported shape is one OCVS SDDC management cluster per platform. Define another OCVS platform when you need another SDDC.
@@ -10,33 +12,16 @@ HCX is currently not emitted by config mode. `is_hcx_enabled: true` is rejected 
 
 Validation level: generated JSON and Terraform validation can prove the shape and Terraform contracts, but they do not prove OCI capacity, shape availability, VMware bundle availability, or an actual OCVS apply.
 
-Example platform shape:
+Generate the Blueprint Factory example from the repository root:
 
-```jsonnet
-{
-  platforms: {
-    ocvs: {
-      network: { vcn: '10.0.80.0/21' },
-      extension: {
-        type: 'ocvs_simple',
-        params: {
-          ssh_authorized_keys: 'ssh-rsa REPLACE_WITH_CUSTOMER_PUBLIC_KEY',
-          cluster: {
-            service_label: 'prod-ocvs',
-            sddc_display_name: 'prod-ocvs',
-            cluster_display_name: 'prod-ocvs-cluster',
-            vmware_software_version: '7.0 update 3',
-            is_hcx_enabled: false,
-            compute_availability_domain: '1',
-            esxi_hosts_count: 3,
-            vsphere_type: 'MANAGEMENT',
-            initial_host_ocpu_count: 52,
-            initial_host_shape_name: 'BM.DenseIO2.52',
-            workload_network_cidr: '172.16.0.0/24',
-          },
-        },
-      },
-    },
-  },
-}
+```bash
+bash gen/generate.sh --config addons/oci-lz-blueprint-factory/examples/05-prod-ocvs.json generated/ocvs
 ```
+
+| Configuration field | Purpose |
+| --- | --- |
+| `environments.<env>.platforms.ocvs.network.vcn` | OCVS platform VCN and SDDC cluster network CIDR. |
+| `extension.type` | Must be `ocvs_simple`. |
+| `extension.params.ssh_authorized_keys` | Public SSH key passed to the OCVS SDDC configuration. |
+| `extension.params.cluster` | OCVS SDDC and ESXi host settings passed to `ocvs_configuration`. |
+| `extension.params.cluster.workload_network_cidr` | Optional workload network CIDR passed through to the OCVS module. |

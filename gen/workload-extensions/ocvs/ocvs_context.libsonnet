@@ -1,4 +1,4 @@
-local cidrs = import '../../../lib/cidrs.libsonnet';
+local cidrs = import '../../lib/cidrs.libsonnet';
 
 {
   build(params, metadata)::

@@ -48,7 +48,7 @@ A typical configuration describes the target Landing Zone in a few top-level blo
 - **Region metadata**: the OCI region and short region label used by the naming convention.
 - **Hub**: the selected hub model and hub network range.
 - **Environments**: environment-specific networks, projects, platforms, and workload extensions.
-- **Extension parameters**: workload-specific settings, such as OKE or Exadata options, when an extension is part of the design.
+- **Extension parameters**: workload-specific settings, such as OKE, OCVS, or Exadata options, when an extension is part of the design.
 
 Example shape:
 
@@ -104,6 +104,7 @@ The [examples](./examples) folder contains small and medium-size config files th
 | [Prod and preprod projects](./examples/02-prod-preprod-projects.json) | Two environments, project networks, and multiple projects. |
 | [Prod with OKE](./examples/03-prod-oke.json) | Environment-scoped OKE platform using the `oke_simple` extension. |
 | [Shared ExaCS with Autonomous DB tiers](./examples/04-shared-exacs-autonomous.json) | Shared ExaCS platform and project DB tiers across environments. |
+| [Prod with OCVS](./examples/05-prod-ocvs.json) | Environment-scoped OCVS platform using the `ocvs_simple` extension. |
 
 Generate any example from the repository root:
 
@@ -139,6 +140,7 @@ The output package commonly includes files such as:
 - `security_cis2.json`
 - `observability_cis1.json`
 - `observability_cis2.json`
+- workload extension outputs such as `oke_clusters.json`, `oke_workers.json`, or `ocvs.json`
 
 Some configurations emit `*_pre.json` files, such as `network_pre.json` or `observability_*_pre.json`. These files support staged deployments where some resources need to exist before dependent resources are configured.
 
@@ -194,6 +196,7 @@ Deployment follows the standard [Terraform deployment guide](/commons/content/te
 | [One-OE Runtime Documentation](/blueprints/one-oe/runtime/one-stack/readme.md) | Published blueprint runtime reference. |
 | [OCI Network Hubs](/addons/oci-hub-models/readme.md) | Published hub model add-ons. |
 | [Workload Extensions](/workload-extensions/readme.md) | Published workload extension entry point. |
+| [OCVS Config-Driven Reference](/workload-extensions/ocvs/config-driven.md) | OCVS-specific Blueprint Factory parameters and validation notes. |
 
 #### License
 

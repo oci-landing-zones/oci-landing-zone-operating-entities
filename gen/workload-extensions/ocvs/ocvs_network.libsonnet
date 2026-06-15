@@ -1,4 +1,4 @@
-local common = import '../../../hub/hub_common.libsonnet';
+local common = import '../../hub/hub_common.libsonnet';
 
 function(ctx) {
   local n = ctx.n,

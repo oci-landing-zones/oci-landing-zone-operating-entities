@@ -1,6 +1,6 @@
-local extensions = import '../../../../extensions.libsonnet';
-local platforms = import '../../../../platforms.libsonnet';
-local render_context = import '../../../../render_context.libsonnet';
+local extensions = import '../../../extensions.libsonnet';
+local platforms = import '../../../platforms.libsonnet';
+local render_context = import '../../../render_context.libsonnet';
 local ocvs_builder = import '../ocvs_builder.libsonnet';
 
 function(profile, env_name='prod', platform_name='ocvs') {
