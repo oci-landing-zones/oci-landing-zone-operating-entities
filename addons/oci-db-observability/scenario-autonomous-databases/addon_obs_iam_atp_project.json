@@ -19,17 +19,21 @@
         "default_identity_domain_id": "COMMON-DOMAIN",
         "ignore_external_membership_updates": true,
         "groups": {
-               "GRP-MON-ADMINS": {
-                "name": "grp-lz-global-mon-admins",
-                "description": "Tenancy global Observability administrator group."
-            },
-            "GRP-PROD-MON-ADMINS": {
-                "name": "grp-lz-prod-mon-admins",
+            "GRP-PROD-MON-ADMIN": {
+                "name": "grp-lz-prod-mon-admin",
                 "description": "Production Observability admin group."
             },
-            "GRP-PREPROD-MON-ADMINS": {
-                "name": "grp-lz-preprod-mon-admins",
+            "GRP-PREPROD-MON-ADMIN": {
+                "name": "grp-lz-preprod-mon-admin",
                 "description": "Preprod Observability admin group."
+            },
+            "GRP-PROD-MON-READER": {
+                "name": "grp-lz-prod-mon-reader",
+                "description": "Production Observability reader group."
+            },
+            "GRP-PREPROD-MON-READER": {
+                "name": "grp-lz-preprod-mon-reader",
+                "description": "Preprod Observability reader group."
             }
         }
     },
@@ -46,7 +50,7 @@
         }
       },
 
-          "policies_configuration": {
+        "policies_configuration": {
         "enable_cis_benchmark_checks": "false",
         "supplied_policies": {
             "PCY-MON-SERVICES": {

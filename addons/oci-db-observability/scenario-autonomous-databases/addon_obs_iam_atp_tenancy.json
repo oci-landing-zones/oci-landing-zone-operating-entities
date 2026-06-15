@@ -15,8 +15,12 @@
         "ignore_external_membership_updates": true,
         "groups": {
             "GRP-OBS-ADMINS": {
-                "name": "grp-lz-global-mon-admins",
-                "description": "Tenancy global Observability administrator group."
+                "name": "grp-lz-mon-admin",
+                "description": "Tenancy Observability administrator group."
+            },
+             "GRP-OBS-READERS": {
+                "name": "grp-lz-mon-reader",
+                "description": "Tenancy Observability readers group."
             }
         }
     },
