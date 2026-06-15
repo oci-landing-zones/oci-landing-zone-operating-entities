@@ -33,13 +33,30 @@ To configure this add-on, you will need to make some key design decisions:
 
 | Decision | Question to answer | Recommended option | Alternative option | Design impact |
 |---|---|---|---|---|
-| [Private endpoints configuration](#31-private-endpoints) | Should Database Management and Operations Insights use shared global private endpoints, or dedicated private endpoints per environment? | Use shared global private endpoints in the hub monitoring subnet. | Use local private endpoints when there is a single environment, no hub, or an explicit requirement for environment-dedicated endpoints. | Determines where DBM/OPSI private endpoints are deployed, which subnets and NSGs are required, and how database connectivity is routed. Dedicated private endpoints can also consume PE service limits quickly in customers with many business lines, environments, or projects. |
-| [Logging Analytics agent placement](#32-logging-analytics-agent-placement) | Where should the Logging Analytics Management Agent run for the selected database scenario? | Follow the selected scenario guidance. For DBCS and ExaDB-D, install the Management Agent on the database hosts. | For scenarios that require a shared agent host, deploy a centralized monitoring instance in the hub monitoring subnet. | Determines whether a VM is required, where the agent runs, and which network and IAM prerequisites apply. |
-| [Monitoring groups structure](#33-groups) | Should one observability team manage all environments, or should there be dedicated monitoring teams per environment? | Use a global observability team for centralized operations across environments. | Use environment-specific observability teams when operating responsibilities are separated by environment. | Determines IAM group structure, policies, vault access, and operational ownership. |
+| [Monitor groups granularity](#33-groups) | Should one observability team manage all environments, or should there be dedicated monitoring teams per environment? | Use a global observability team for centralized operations across environments. | Use environment-specific observability teams when operating responsibilities are separated by environment. | Determines IAM group structure, policies, vault access, and operational ownership. |
+| [Private endpoints configuration](#31-private-endpoints) | Should **Database Management** and **Operations Insights** use shared global private endpoints, or dedicated private endpoints per environment? | Use shared global private endpoints in the hub monitoring subnet. | Use local private endpoints when there is a single environment, no hub, or an explicit requirement for environment-dedicated endpoints. | Determines where DBM/OPSI private endpoints are deployed, which subnets and NSGs are required, and how database connectivity is routed. Dedicated private endpoints can also consume PE service limits quickly in customers with many business lines, environments, or projects. |
+| [Logging Analytics agent placement](#32-logging-analytics-agent-placement) | Where should the **Logging Analytics** Management Agent run for the selected database scenario? | Follow the selected scenario guidance. For DBCS and ExaDB-D, install the Management Agent on the database hosts. | For scenarios that require a shared agent host, deploy a centralized monitoring instance in the hub monitoring subnet. | Determines whether a VM is required, where the agent runs, and which network and IAM prerequisites apply. |
 
+Across the different database service scenarios presented in this asset, we recommend a default configuration based on Oracle best practices and common operational requirements. However, these configurations are intended as a starting point only. Customers can customize roles, permissions, group structures, and access policies to align with their specific organizational, security, and operational requirements.
 
+## 3.1 Groups
 
-## 3.1 Private Endpoints  
+In this asset, we provide three example Observability groups (roles):
+
+* **Tenancy Observability Team**: A central team responsible for managing all Operations and Maintenance (O&M) services, as well as DBM/OPSI private endpoints across the entire tenancy.
+* **Platform Observability Team**: A specialized team responsible for managing O&M services and DBM/OPSI private endpoints for the production platform environment.
+* **Environment Observability Team**: A specialized team responsible for managing O&M services and DBM/OPSI private endpoints within a specific environment (for example, Production, Non-Production, or Development).
+
+For each team, two access levels are defined in alignment with RBAC best practices:
+
+Administrators: Full management permissions.
+Readers: Read-only access for monitoring and reporting purposes.
+
+Note: This design presents several implementation options. Customers can adopt the approach that best aligns with their organizational structure, operational requirements, and business model.
+
+<img src="./images/ROLES.png" height="300" align="center">
+
+## 3.2 Private Endpoints  
 
 For enhanced security, Observability Services should be configured with private access. Some of the key benefits of OCI Private Endpoints include:
 * **Security**: By avoiding the public internet, Private Endpoints significantly reduce the risk of data breaches and unauthorized access.
@@ -61,7 +78,7 @@ Based on this, we can adopt two different approaches:
 &nbsp; 
 
 
-## 3.2 Logging Analytics Agent Placement
+## 3.3 Logging Analytics Agent Placement
 
 If Logging Analytics is required, a Management Agent must run where it can collect or receive the target database logs. The placement is scenario-specific.
 
@@ -69,17 +86,7 @@ For DBCS and ExaDB-D, the add-on does not deploy an additional monitoring VM. In
 
 For scenarios that require a shared agent host, use the scenario README to decide whether a centralized monitoring instance in the hub monitoring subnet is deployed.
 
-## 3.3 Groups
 
-In this asset, we provide two example Observability groups (roles):
-
-* **Global Observability Team**: A general team responsible for managing all Operations and Maintenance (O&M) services, as well as DBM/OPSI private endpoints across the organization.
-
-* **Production Observability Team**: A specialized team focused on managing all O&M services and DBM/OPSI private endpoints within the production environment.
-  
-Note: The design includes several options, and the customer can decide whether to use them based on what best fits their operating and business model.
-
-<img src="./images/ROLES.png" height="300" align="center">
 
 
 ## 4. Scenarios.
