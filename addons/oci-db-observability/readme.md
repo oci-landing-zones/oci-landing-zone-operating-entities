@@ -49,8 +49,8 @@ In this asset, we provide three example Observability groups (roles):
 
 For each team, two access levels are defined in alignment with RBAC best practices:
 
-Administrators: Full management permissions.
-Readers: Read-only access for monitoring and reporting purposes.
+* **Administrators**: Full management permissions.
+* **Readers**: Read-only access for monitoring and reporting purposes.
 
 Note: This design presents several implementation options. Customers can adopt the approach that best aligns with their organizational structure, operational requirements, and business model.
 
