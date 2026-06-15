@@ -4,11 +4,11 @@
         "ignore_external_membership_updates": true,
         "groups": {
             "GRP-PROD-MON-ADMIN": {
-                "name": "grp-lz-prod-mon-admin",
+                "name": "grp-lz-prod-proj1-mon-admin",
                 "description": "Production Observability admin group."
             },
             "GRP-PREPROD-MON-ADMIN": {
-                "name": "grp-lz-preprod-mon-admin",
+                "name": "grp-lz-preprod-proj1-mon-admin",
                 "description": "Preprod Observability admin group."
             },
             "GRP-PROD-MON-READER": {
@@ -60,54 +60,54 @@
                     "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy"
                 ]
             },
-            "PCY-PROD-MON-SECURITY-ADMINISTRATION": {
-                "name": "pcy-prod-mon-security-admin",
-                "description": "Policy to allow grp-lz-prod-mon-admins group users to manage production Observability security resources.",
+            "PCY-PROD-PROJ1-MON-SECURITY-ADMINISTRATION": {
+                "name": "pcy-prod-proj1-mon-security-admin",
+                "description": "Policy to allow grp-lz-prod-proj1-mon-admin group users to manage production Observability security resources.",
                 "compartment_id": "CMP-LZ-PROD-SECURITY-KEY",
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to use vaults in compartment cmp-lz-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to use keys in compartment cmp-lz-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage secret-family in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use vaults in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use keys in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage secret-family in compartment cmp-lz-prod-security",
                     "Allow service dpd to read secret-family in compartment cmp-lz-prod-security"
                 ]
             },
-            "PCY-PREPROD-MON-SECURITY-ADMINISTRATION": {
-                "name": "pcy-preprod-mon-security-admin",
-                "description": "Policy to allow grp-lz-preprod-mon-admins group users to manage pre-production Observability security resources.",
+            "PCY-PREPROD-PROJ1-MON-SECURITY-ADMINISTRATION": {
+                "name": "pcy-preprod-proj1-mon-admin",
+                "description": "Policy to allow grp-lz-preprod-proj1-mon-admin group users to manage pre-production Observability security resources.",
                 "compartment_id": "CMP-LZ-PREPROD-SECURITY-KEY",
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to use vaults in compartment cmp-lz-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to use keys in compartment cmp-lz-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage secret-family in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use vaults in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use keys in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage secret-family in compartment cmp-lz-preprod-security",
                     "Allow service dpd to read secret-family in compartment cmp-lz-preprod-security"
                 ]
             },
-               "PCY-PROD-MON-NETWORK-ADMINISTRATION": {
-                "name": "pcy-prod-mon-network-admin",
-                "description": "Policy to allow grp-lz-prod-mon-admins group users to manage pre-production Observability private endpoint network resources.",
+               "PCY-PROD-PROJ1-MON-NETWORK-ADMINISTRATION": {
+                "name": "pcy-prod-proj1-mon-network-admin",
+                "description": "Policy to allow grp-lz-prod-proj1-mon-admin group users to manage production Observability private endpoint network resources.",
                 "compartment_id": "CMP-LZ-PROD-NETWORK-KEY",
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to use security-lists in compartment cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to read virtual-network-family in compartment cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to use subnets in compartment cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to use vnics in compartment cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to use network-security-groups in compartment cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to use virtual-network-family in compartment cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to use network-security-groups in compartment cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1"
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use security-lists in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to read virtual-network-family in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use subnets in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use vnics in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use network-security-groups in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use virtual-network-family in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use network-security-groups in compartment cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1"
                 ]
             },
-            "PCY-PREPROD-MON-NETWORK-ADMINISTRATION": {
-                "name": "pcy-preprod-mon-network-admin",
-                "description": "Policy to allow grp-lz-preprod-mon-admins group users to manage pre-production Observability private endpoint network resources.",
+            "PCY-PREPROD-PROJ1MON-NETWORK-ADMINISTRATION": {
+                "name": "pcy-preprod-proj1-mon-admin",
+                "description": "Policy to allow grp-lz-preprod-proj1-mon-admin group users to manage pre-production Observability private endpoint network resources.",
                 "compartment_id": "CMP-LZ-PREPROD-NETWORK-KEY",
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to use security-lists in compartment cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to read virtual-network-family in compartment cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to use subnets in compartment cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to use vnics in compartment cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to use network-security-groups in compartment cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to use virtual-network-family in compartment cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to use network-security-groups in compartment cmp-lz-preprod:cmp-lz-preprod-projects:cmp-lz-preprod-proj1"
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use security-lists in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to read virtual-network-family in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use subnets in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use vnics in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use network-security-groups in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use virtual-network-family in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use network-security-groups in compartment cmp-lz-preprod:cmp-lz-preprod-projects:cmp-lz-preprod-proj1"
                 ]
             },
             "PCY-PROD-PROJ1-MON-ADMINISTRATION": {
@@ -115,25 +115,25 @@
                 "description": "Policy to allow monitoring groups to manage Autonomous Database observability resources in the Prod proj1 compartment.",
                 "compartment_id": "CMP-LZ-PROD-PROJ1-KEY",
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage compartments in compartment in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to read dbmgmt-work-requests in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to use database-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to use autonomous-database-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage metrics in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage ons-topics in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage opsi-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage management-dashboard-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage management-agents in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to inspect ons-topics in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage management-agent-install-keys in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to read instance-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to read instance-agent-plugins in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage loganalytics-features-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage loganalytics-ingesttime-rule in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage loganalytics-resources-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage management-dashboard in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-mon-admin' to manage management-saved-search in compartment cmp-lz-prod-proj1"
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage compartments in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to read dbmgmt-work-requests in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use database-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use autonomous-database-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage metrics in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage ons-topics in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage opsi-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage management-dashboard-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage management-agents in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to inspect ons-topics in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage management-agent-install-keys in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to read instance-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to read instance-agent-plugins in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage loganalytics-features-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage loganalytics-ingesttime-rule in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage loganalytics-resources-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage management-dashboard in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to manage management-saved-search in compartment cmp-lz-prod-proj1"
 
                 ]
             },
@@ -142,25 +142,25 @@
                 "description": "Policy to allow monitoring groups to manage Autonomous Database observability resources in the Preprod proj1 compartment.",
                 "compartment_id": "CMP-LZ-PREPROD-PROJ1-KEY",
                 "statements": [
-                     "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage secret-family in compartment cmp-lz-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to read dbmgmt-work-requests in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to use database-family in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to use autonomous-database-family in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage metrics in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage ons-topics in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage opsi-family in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage management-dashboard-family in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage management-agents in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to inspect ons-topics in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage management-agent-install-keys in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to read instance-family in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to read instance-agent-plugins in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage loganalytics-features-family in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage loganalytics-ingesttime-rule in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage loganalytics-resources-family in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage management-dashboard in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-mon-admin' to manage management-saved-search in compartment cmp-lz-preprod-proj1"        
+                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage secret-family in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to read dbmgmt-work-requests in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use database-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use autonomous-database-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage metrics in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage ons-topics in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage opsi-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage management-dashboard-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage management-agents in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to inspect ons-topics in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage management-agent-install-keys in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to read instance-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to read instance-agent-plugins in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage loganalytics-features-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage loganalytics-ingesttime-rule in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage loganalytics-resources-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage management-dashboard in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage management-saved-search in compartment cmp-lz-preprod-proj1"        
                  ]
             }
 

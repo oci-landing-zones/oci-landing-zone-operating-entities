@@ -3,39 +3,18 @@
 
 ## OCI Native Services Configuration Prerequisites
 
-This scenario documents the Autonomous Database implementation details for the OCI Database Observability add-on. Before continuing, review and finalize the design decisions listed in the general [OCI Database Observability README](../readme.md#3-design-decisions), including the Global PE vs Local PE decision.
+This scenario documents the Autonomous Database implementation details for the OCI Database Observability add-on. Before continuing, review and finalize the design decisions listed in the general [OCI Database Observability README](../readme.md#3-design-decisions), including the Centralized vs Project private endpoint decision.
 
 ### Services covered
 
-This add-on prepares the Landing Zone to enable:
+This add-on prepares the One-OE Landing Zone to enable:
 
 * Database Management
 * Ops Insights
 * Logging Analytics
 
-### Private endpoint connectivity
+For Autonomous Database service.
 
-Database Management and Ops Insights require service Private Endpoints with network access to the Autonomous Database Private Endpoint. The add-on includes the Network Security Groups (NSGs) required to allow that connectivity.
-
-Use these links to review the relevant OCI documentation:
-
-* [DBM Private Endpoint](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints)
-* [OPSI Private Endpoint](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints)
-
-> [!WARNING]
-> This scenario supports placing the Database Management or Ops Insights Private Endpoint in the same VCN as the Autonomous Database Private Endpoint, or in a different VCN.
->
-> Keep the service limit in mind: only one Private Endpoint can be created per VCN.
-
-### Credentials and Vault
-
-Enabling Database Management or Ops Insights for an Autonomous Database requires a database user and password. These credentials must be stored as secrets in the dedicated Observability Vault provisioned by the selected implementation option. The required policies to access the secret are included in the add-on.
-
-### Management Agent for Logging Analytics
-
-Logging Analytics requires a Management Agent with access to the monitored database endpoint and the required ingestion policies. This add-on provides the IAM and network prerequisites for that flow.
-
-&nbsp;
 
 ## Implementation
 
@@ -55,13 +34,13 @@ Deploy the One-OE Landing Zone. You can follow these [steps](https://github.com/
 
 Deploy the Observability Landing zone add-on:
 
-| CENTRALICED | PROJECT |
+| OPTION 1. CENTRALIZED APPROACH (RECOMMENDED) | OPTION 2. PROJECT APPROACH |
 |---|---|
-| Use this deployment when DBM/OPSI private endpoints are shared centralized endpoints deployed in the hub monitoring subnet. | Use this deployment when DBM/OPSI private endpoints are project-dedicated and deployed in the same database subnet as the Autonomous Database private endpoint. |
-| Resources created:<br><br>Compartments: `cmp-lz-monitoring`.<br><br>Groups: `grp-lz-global-mon-admins`.<br><br>Policies: `pcy-mon-services`, `pcy-global-mon-admin`, `pcy-mon-dynamic-group`, `pcy-global-mon-security-admin`, `pcy-global-mon-network-admin`, `pcy-prod-proj1-mon-admin`, `pcy-preprod-proj1-mon-admin`.<br><br>COMMON Identity Domain dynamic group: `id_lz_common/dg-lz-mon-dynamic-group`.<br><br>NSGs: `nsg-fra-lz-hub-global-mon-pe`, `nsg-fra-lz-prod-proj1-mon-pe-db1`, `nsg-fra-lz-preprod-proj1-mon-pe-db1`.<br><br>Vault and key: `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`.<br><br>Monitoring instance: `vm-fra-lz-shared-mon-agent`. | Resources created:<br><br>Compartments: `cmp-lz-prod-monitoring`, `cmp-lz-preprod-monitoring`.<br><br>Groups: `grp-lz-global-mon-admins`, `grp-lz-prod-mon-admins`, `grp-lz-preprod-mon-admins`.<br><br>Policies: `pcy-mon-services`, `pcy-global-mon-admin`, `pcy-mon-dynamic-group`, `pcy-global-mon-security-admin`, `pcy-global-mon-network-admin`, `pcy-prod-proj1-mon-admin`, `pcy-preprod-proj1-mon-admin`.<br><br>COMMON Identity Domain dynamic group: `id_lz_common/dg-lz-mon-dynamic-group`.<br><br>NSGs: `nsg-fra-lz-prod-proj1-mon-pe-db1`, `nsg-fra-lz-preprod-proj1-mon-pe-db1`.<br><br>Vault and key: `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`.<br><br>Monitoring instance: `vm-fra-lz-shared-mon-agent`. |
+| * Use this deployment when DBM/OPSI private endpoints are shared centralized endpoints to be created in the hub monitoring subnet. <br> * One centralized observability team manages DBM, OPSI, Logging Analytics, and shared monitoring resources for all Autonomous Databases. <br> * Logging Analytics requires a Management Agent with access to the monitored database endpoint and the required ingestion policies. This add-on provides the IAM and network prerequisites for that flow and creates the monitoring agent VM `vm-fra-lz-shared-mon-agent` in `cmp-lz-monitoring`, attached to the hub monitoring subnet `sn-fra-lz-hub-mon`. <br> * Enabling Database Management or Ops Insights for an Autonomous Database requires a database user and password. These credentials must be stored as secrets in the dedicated Observability Vault `vlt-lz-shared-mon-security`, created in `cmp-landingzone:cmp-lz-security` by the selected implementation option. The required policies to access the secret are included in the add-on.| * Use this deployment when DBM/OPSI private endpoints are project-dedicated endpoints to be created in the same database subnet as the Autonomous Database private endpoint. <br> * Project-specific observability teams manage DBM, OPSI, Logging Analytics, and project monitoring resources for their own Autonomous Databases. <br> * Logging Analytics requires a Management Agent with access to the monitored database endpoint and the required ingestion policies. This add-on provides the IAM and network prerequisites for that flow and creates the monitoring agent VM `vm-fra-lz-shared-mon-agent` in `cmp-lz-monitoring`, attached to the hub monitoring subnet `sn-fra-lz-hub-mon`. <br> * Enabling Database Management or Ops Insights for an Autonomous Database requires a database user and password. These credentials must be stored as secrets in the dedicated Observability Vault `vlt-lz-shared-mon-security`, created in `cmp-landingzone:cmp-lz-security` by the selected implementation option. The required policies to access the secret are included in the add-on. |
+| Resources created:<br><br>Compartments: `cmp-lz-monitoring`.<br><br>Groups: `grp-lz-global-mon-admins`.<br><br>Policies: `pcy-mon-services`, `pcy-global-mon-admin`, `pcy-mon-dynamic-group`, `pcy-global-mon-security-admin`, `pcy-global-mon-network-admin`, `pcy-prod-proj1-mon-admin`, `pcy-preprod-proj1-mon-admin`.<br><br>COMMON Identity Domain dynamic group: `id_lz_common/dg-lz-mon-dynamic-group`.<br><br>NSGs: `nsg-fra-lz-hub-global-mon-pe`, `nsg-fra-lz-prod-proj1-mon-pe-db1`, `nsg-fra-lz-preprod-proj1-mon-pe-db1`.<br><br>Vault and key: `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`.<br><br>Monitoring instance: `vm-fra-lz-shared-mon-agent`. | Resources created:<br><br>Compartments: none; uses the existing project compartments `cmp-lz-prod-proj1` and `cmp-lz-preprod-proj1` for project-dedicated DBM/OPSI private endpoints.<br><br>Groups: `grp-lz-prod-proj1-mon-admin`, `grp-lz-preprod-proj1-mon-admin`, `grp-lz-prod-mon-reader`, `grp-lz-preprod-mon-reader`.<br><br>Policies: `pcy-mon-services`, `pcy-mon-dynamic-group`, `pcy-prod-mon-security-admin`, `pcy-preprod-mon-security-admin`, `pcy-prod-mon-network-admin`, `pcy-preprod-mon-network-admin`, `pcy-prod-proj1-mon-admin`, `pcy-preprod-proj1-mon-admin`.<br><br>COMMON Identity Domain dynamic group: `id_lz_common/dg-lz-mon-dynamic-group`.<br><br>NSGs: `nsg-fra-lz-prod-proj1-mon-pe-db1`, `nsg-fra-lz-preprod-proj1-mon-pe-db1`.<br><br>Vault and key: `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`.<br><br>Monitoring instance: `vm-fra-lz-shared-mon-agent`. |
 | <img src="../images/ATP_CEN.png" height="250" align="center"> | <img src="../images/ATP_PROJECT.png" height="250" align="center"> |
-| <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_iam_atp_global.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_network_atp_global.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_security_atp.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_instance_atp.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> | <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_iam_atp_local.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_network_atp_local.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_security_atp.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_instance_atp.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
-| Files loaded:<br>[addon_obs_iam_atp_global.json](addon_obs_iam_atp_global.json)<br>[addon_obs_network_atp_global.json](addon_obs_network_atp_global.json)<br>[addon_obs_security_atp.json](addon_obs_security_atp.json)<br>[addon_obs_instance_atp.json](addon_obs_instance_atp.json) | Files loaded:<br>[addon_obs_iam_atp_local.json](addon_obs_iam_atp_local.json)<br>[addon_obs_network_atp_local.json](addon_obs_network_atp_local.json)<br>[addon_obs_security_atp.json](addon_obs_security_atp.json)<br>[addon_obs_instance_atp.json](addon_obs_instance_atp.json) |
+| <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_iam_atp_centralized.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_network_atp_centralized.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_security_atp.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_instance_atp.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> | <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_iam_atp_project.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_network_atp_project.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_security_atp.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-autonomous-databases/addon_obs_instance_atp.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
+| Files loaded:<br>[addon_obs_iam_atp_centralized.json](addon_obs_iam_atp_centralized.json)<br>[addon_obs_network_atp_centralized.json](addon_obs_network_atp_centralized.json)<br>[addon_obs_security_atp.json](addon_obs_security_atp.json)<br>[addon_obs_instance_atp.json](addon_obs_instance_atp.json) | Files loaded:<br>[addon_obs_iam_atp_project.json](addon_obs_iam_atp_project.json)<br>[addon_obs_network_atp_project.json](addon_obs_network_atp_project.json)<br>[addon_obs_security_atp.json](addon_obs_security_atp.json)<br>[addon_obs_instance_atp.json](addon_obs_instance_atp.json) |
 
 For step-by-step instructions, see [Implementation add-on steps](./Implementation_addon_steps.md).
 
@@ -73,6 +52,20 @@ Follow the remaining service-specific [steps to enable Database Management, Ops 
 The resources created in Step 1 are listed in the table above. Step 2 covers only the remaining manual service-onboarding actions, including preparing the database monitoring user, storing its password as a secret, creating the service private endpoints, enabling DBM/OPSI for the target databases, and completing Logging Analytics onboarding with the monitoring agent VM.
 
 &nbsp;
+
+
+
+# Reference Links
+
+Use these links to review the relevant OCI documentation:
+
+* [DBM Private Endpoint](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints)
+* [OPSI Private Endpoint](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/privateaccess.htm#private-endpoints)
+
+> [!WARNING]
+> This scenario supports placing the Database Management or Ops Insights Private Endpoint in the same VCN as the Autonomous Database Private Endpoint, or in a different VCN.
+>
+> Keep the service limit in mind: only one Private Endpoint can be created per VCN.
 
 # License
 
