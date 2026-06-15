@@ -32,13 +32,13 @@ To store the Json files in a OCI bucket follow the next steps:
 Click on each file to download it, and make any necessary changes if required.
 
 * IAM: 
-[oci_open_lz_one-oe_iam.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json)
+[oneoe_iam.json](../../../blueprints/one-oe/runtime/one-stack/oneoe_iam.json)
 * Security:
-[oci_open_lz_one-oe_security_cisl1.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json)
+[oneoe_security_cis1.json](../../../blueprints/one-oe/runtime/one-stack/oneoe_security_cis1.json)
 * Network: 
-[oci_open_lz_hub_a_network_light.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_hub_a_network_light.auto.tfvars.json)
+[oneoe_network_hub_a.json](../../../blueprints/one-oe/runtime/one-stack/oneoe_network_hub_a.json)
 * Observability:
-[oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/v2.2.0-oneoe_v2/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json)
+[oneoe_observability_cis1.json](../../../blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1.json)
 
 <img src="../content/UploadBucket.png" width="1000" height="auto">
 
@@ -92,4 +92,4 @@ Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](/LICENSE) for more details.
+See [LICENSE](/LICENSE.txt) for more details.

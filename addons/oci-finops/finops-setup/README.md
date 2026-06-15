@@ -36,7 +36,7 @@ Follow the deployment sheet below to setup the FinOps platform in your tenancy o
 ## Step 2: Create Autonomous Database
 Please choose a strong ADMIN password for the Autonomous Data Warehouse (ADW) and store it securely in an OCI Secret.
 
-Refer to the [official documentation](https://docs.oracle.com/en-us/iaas/finops-setup/KeyManagement/Tasks/managingsecrets_topic-To_create_a_new_secret.htm) for steps to create a secret in OCI.
+Refer to the [official documentation](https://docs.oracle.com/en-us/iaas/Content/secret-management/Tasks/create-secret.htm) for steps to create a secret in OCI.
 
 Storing the password as a secret is **recommended** when using the provided Terraform script, as it helps avoid exposing credentials in the Terraform state file.
 
@@ -78,7 +78,7 @@ Run the SQL scripts provided in [finopsuser.sql](/addons/oci-finops/finops-setup
 
 This is used to ingest all the previous and upcoming FOCUS reports of your tenancy into ADW for that year. If you have more old files to load scale the ADW so the pipeline will run faster for the initial load and you can scale it down later.
 
-Example: "https://objectstorage.eu-frankfurt-1.oraclecloud.com/n/bling/b/ocid1.tenancy.../o/FOCUS Reports/2025". 
+Example: `https://objectstorage.<region>.oraclecloud.com/n/<namespace>/b/<bucket>/o/FOCUS%20Reports/<year>`. 
 
 This will download all the previous reports for the year 2025 and also the new reports getting generated for that year later.
 

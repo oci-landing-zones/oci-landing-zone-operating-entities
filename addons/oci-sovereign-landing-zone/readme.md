@@ -106,7 +106,7 @@ These resources are key building blocks in the Sovereign Landing Zone. The Sover
 
 OCI IAM, by default, enforces MFA for local accounts. If Identity Federation is used, we instead rely on an external Identity Provider to ensure the user has been properly authenticated using MFA.
 
-In the Sovereign Landing Zone, we include concepts such as Segregation of Duties and Isolation of Resources. These [security controls](/blueprints/one-oe/design#12-vision) allow customers to start a cloud journey with a set of best practices that can be deployed within a few minutes.
+In the Sovereign Landing Zone, we include concepts such as Segregation of Duties and Isolation of Resources. These [security controls](../../blueprints/one-oe/design/readme.md#12-vision) allow customers to start a cloud journey with a set of best practices that can be deployed within a few minutes.
 
 ### Audit Service logs
 For different legal regulations, it might be required to keep access logs for a certain period of time. The Sovereign Landing Zone, out of the box, sets up an empty bucket for storing logs. This bucket can be additionally configured with [Data Retention Rules](https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/usingretentionrules.htm), which can be modified to a specific period as required. Data Retention Rules provide attestation that files haven't been modified since creation and prevent their removal until the retention period expires. This means that even an attacker who gains Administrator rights wouldn't be able to tamper with the logs for the duration of the retention period.
