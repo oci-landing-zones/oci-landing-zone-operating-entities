@@ -1,36 +1,19 @@
-# OCVS Service Set-up <!-- omit from toc -->
-## **Table of Contents** <!-- omit from toc -->
-- [**1. Summary**](#1-summary)
-- [**2. OCVS Deployment**](#2-ocvs-deployment)
+# OCVS Workload Configuration
 
-&nbsp; 
+[ocvs.auto.tfvars.json](./ocvs.auto.tfvars.json) is generated from Jsonnet source under `gen/workload-extensions/ocvs/simple/`.
 
-## **1. Summary**
+It emits the orchestrator root variable `ocvs_configuration`, including:
 
-|                      |                                                       |
-| -------------------- | ----------------------------------------------------- |
-| **NAME**             | OCVS services Set-up                                  |
-| **OBJECTIVE**        | Provision OCI OCVS on top of Landing Zone Extensions. |
-| **TARGET RESOURCES** | OCVS Software Defined Data Center (SDDC)              |
+- `default_compartment_id`
+- `default_ssh_authorized_keys`
+- one SDDC cluster definition
+- logical keys for the generated VCN, provisioning subnet, OCVS VLAN route tables, and OCVS VLAN network security groups
 
-&nbsp; 
+Direct deployment requires an orchestrator version that exposes compatible `network_dependency.route_tables` and generic network security group dependency objects to the imported OCVS workload module. Validate the selected orchestrator ref with Terraform before claiming direct OCVS deployment support.
 
-## **2. OCVS Deployment**
-1. Navigate to [Software-Defined Data Centers](https://cloud.oracle.com/vmware/sddcs/create) as part of VMWare service in OCI. 
-2. Choose a suitable name and as a compartment select *cmp-p-platform-ocvs-sddc*, upload public SSH key.
-3. On the next page, we define clusters. We start by defining a new cluster.
-4. Hosts specification according to your requirements.
-5. On next tab as a VCN choose *vcn-fra-p-ocvs* in the *cmp-p-netowrk* compartment.
-6. Select create new subnet and VLANs.
-7. Provide desired CIDR range for the Cluster Network
-8. Review and finish the set-up
+This file does not prove OCI capacity, host shape availability, VMware software availability, quota, or a successful OCVS apply.
 
-You can now continue with optional LB network deployment in [Step 3](./../3_lb_optional)
-
-&nbsp; 
-&nbsp; 
-
-# License <!-- omit from toc -->
+# License
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 

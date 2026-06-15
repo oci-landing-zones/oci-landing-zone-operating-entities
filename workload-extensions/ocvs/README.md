@@ -1,38 +1,22 @@
-# **[OCVS Landing Zone Extension](#)**   <!-- omit from toc -->
-## **An OCI Open LZ [Workload Extensions](#) to Reduce Your Time-to-Production**  <!-- omit from toc -->
+# OCVS Landing Zone Extension
 
- <img src="../../commons/images/icon_ocvs.jpg" height="50">
+The OCVS extension artifacts in this directory are generated from Jsonnet source under `gen/workload-extensions/ocvs/simple/`.
 
-&nbsp; 
+Use the config-driven path for customized OCVS deployments. The config extension type is `ocvs_simple`; see [config-driven.md](./config-driven.md). Published snapshots in this directory are reference artifacts. Customer deployments should use generated outputs staged in a customer-controlled private source.
 
-## **1. Introduction**
-Welcome to the **OCVS Landing Zone Extension**.
+Direct OCVS deployment requires an orchestrator version whose `ocvs_configuration` and network dependency contract has been validated with the generated OCVS files. This repository does not claim that validation level unless the release notes or test evidence for the selected orchestrator ref say so.
 
-The OCVS Landing Zone (LZ) Extension is a secure cloud environment, designed with best practices to simplify the onboarding of OCVS workloads and enable the continuous operations of their cloud resources. This reference architecture provides an automated landing zone **configuration**.
+## Published Artifacts
 
-&nbsp; 
+1. [Foundations](./1_foundations/README.md): generated IAM and network prerequisites for the OCVS platform.
+2. [OCVS workload](./2_ocvs/README.md): generated `ocvs_configuration` payload for the orchestrator OCVS workload module.
+3. [Optional load balancer subnet](./3_lb_optional/README.md): manual optional post-deployment guidance retained from the existing extension.
 
-## **2. Design Overview**
+## Validation Boundary
 
-This workload extension uses the [One-OE](/blueprints/one-oe/readme.md) Blueprint as the reference Landing Zone and guides the deployment of OCVS on top of it.
+The generated files validate Jsonnet structure, generator contracts, and Terraform input shape when tested against a compatible orchestrator. They do not prove OCI service capacity, host shape availability, VMware software availability, quota, or a successful OCVS apply.
 
-
-<img src="https://github.com/oracle-quickstart/terraform-oci-open-lz/blob/content/workload-extensions/ocvs/ocvs.gif" width="1000" height="auto">
-
-
-&nbsp;
-
-## **3. Deployment**                              
-
-There are  **four deployment steps** to provision OCVS landing zone extension: 
-1. The [**One-OE LZ**](../../blueprints/one-oe/) is a **requirement** and needs to be deployed before continuing.
-2. Deploy **foundations infrastructure**. Follow the guide in [Step 1](1_foundations/README.md)
-3. Create **Software Defined Data Center** (SDDC) in [Step 2](2_ocvs/README.md)
-4.  Optionally create Load Balancer (LB) Subnet in [Step 3](3_lb_optional/README.md)
-
-
-&nbsp; 
-# License <!-- omit from toc -->
+# License
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 

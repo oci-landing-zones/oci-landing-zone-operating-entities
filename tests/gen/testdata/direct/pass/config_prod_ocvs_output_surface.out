@@ -1,0 +1,69 @@
+{
+  "nsg_keys_present": [
+    "NSG-FRA-LZ-PROD-PLATFORM-OCVS-HCX-KEY",
+    "NSG-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-UPLINK-1-KEY",
+    "NSG-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-UPLINK-2-KEY",
+    "NSG-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-VTEP-KEY",
+    "NSG-FRA-LZ-PROD-PLATFORM-OCVS-NSX-VTEP-KEY",
+    "NSG-FRA-LZ-PROD-PLATFORM-OCVS-PROVISIONING-KEY",
+    "NSG-FRA-LZ-PROD-PLATFORM-OCVS-REPLICATION-KEY",
+    "NSG-FRA-LZ-PROD-PLATFORM-OCVS-VMOTION-KEY",
+    "NSG-FRA-LZ-PROD-PLATFORM-OCVS-VSAN-KEY",
+    "NSG-FRA-LZ-PROD-PLATFORM-OCVS-VSPHERE-KEY"
+  ],
+  "ocvs_admin_group_present": true,
+  "ocvs_default_compartment_id": "CMP-LZ-PROD-OCVS-KEY",
+  "ocvs_nsg_keys": {
+    "hcx_nsg_id": "NSG-FRA-LZ-PROD-PLATFORM-OCVS-HCX-KEY",
+    "nsx_edge_uplink_1_nsg_id": "NSG-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-UPLINK-1-KEY",
+    "nsx_edge_uplink_2_nsg_id": "NSG-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-UPLINK-2-KEY",
+    "nsx_edge_vtep_nsg_id": "NSG-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-VTEP-KEY",
+    "nsx_vtep_nsg_id": "NSG-FRA-LZ-PROD-PLATFORM-OCVS-NSX-VTEP-KEY",
+    "provisioning_nsg_id": "NSG-FRA-LZ-PROD-PLATFORM-OCVS-PROVISIONING-KEY",
+    "replication_nsg_id": "NSG-FRA-LZ-PROD-PLATFORM-OCVS-REPLICATION-KEY",
+    "vmotion_nsg_id": "NSG-FRA-LZ-PROD-PLATFORM-OCVS-VMOTION-KEY",
+    "vsan_nsg_id": "NSG-FRA-LZ-PROD-PLATFORM-OCVS-VSAN-KEY",
+    "vsphere_nsg_id": "NSG-FRA-LZ-PROD-PLATFORM-OCVS-VSPHERE-KEY"
+  },
+  "ocvs_route_table_keys": {
+    "hcx_rt_id": "RT-FRA-LZ-PROD-PLATFORM-OCVS-HCX-KEY",
+    "nsx_edge_uplink_1_rt_id": "RT-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-UPLINK-1-KEY",
+    "nsx_edge_uplink_2_rt_id": "RT-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-UPLINK-2-KEY",
+    "nsx_edge_vtep_rt_id": "RT-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-VTEP-KEY",
+    "nsx_vtep_rt_id": "RT-FRA-LZ-PROD-PLATFORM-OCVS-NSX-VTEP-KEY",
+    "provisioning_rt_id": "RT-FRA-LZ-PROD-PLATFORM-OCVS-PROVISIONING-KEY",
+    "replication_rt_id": "RT-FRA-LZ-PROD-PLATFORM-OCVS-REPLICATION-KEY",
+    "vmotion_rt_id": "RT-FRA-LZ-PROD-PLATFORM-OCVS-VMOTION-KEY",
+    "vsan_rt_id": "RT-FRA-LZ-PROD-PLATFORM-OCVS-VSAN-KEY",
+    "vsphere_rt_id": "RT-FRA-LZ-PROD-PLATFORM-OCVS-VSPHERE-KEY"
+  },
+  "ocvs_vcn_cidr_block": "10.0.80.0/21",
+  "ocvs_vcn_id": "VCN-FRA-LZ-PROD-PLATFORM-OCVS-KEY",
+  "output_files": [
+    "governance.json",
+    "iam.json",
+    "network.json",
+    "observability_cis2.json",
+    "observability_cis2_pre.json",
+    "ocvs.json",
+    "security_cis2.json",
+    "security_cis2_pre.json"
+  ],
+  "platform_compartment_present": true,
+  "provisioning_subnet_cidr": "10.0.80.0/25",
+  "provisioning_subnet_key": "SN-FRA-LZ-PROD-PLATFORM-OCVS-PROVISIONING-KEY",
+  "route_table_keys_present": [
+    "RT-FRA-LZ-PROD-PLATFORM-OCVS-HCX-KEY",
+    "RT-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-UPLINK-1-KEY",
+    "RT-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-UPLINK-2-KEY",
+    "RT-FRA-LZ-PROD-PLATFORM-OCVS-NSX-EDGE-VTEP-KEY",
+    "RT-FRA-LZ-PROD-PLATFORM-OCVS-NSX-VTEP-KEY",
+    "RT-FRA-LZ-PROD-PLATFORM-OCVS-PROVISIONING-KEY",
+    "RT-FRA-LZ-PROD-PLATFORM-OCVS-REPLICATION-KEY",
+    "RT-FRA-LZ-PROD-PLATFORM-OCVS-VMOTION-KEY",
+    "RT-FRA-LZ-PROD-PLATFORM-OCVS-VSAN-KEY",
+    "RT-FRA-LZ-PROD-PLATFORM-OCVS-VSPHERE-KEY"
+  ],
+  "sddc_display_name": "prod-ocvs",
+  "workload_network_cidr": "172.16.0.0/24"
+}
