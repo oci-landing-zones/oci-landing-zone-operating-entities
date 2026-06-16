@@ -18,7 +18,7 @@ This document provides the list of Security Zone recipes assigned to One-OE Land
 
 &nbsp;
 
-**<img src="../../design/images/logo1.png"  height="50" align="center">  - CIS Level 1**
+### **<img src="../../design/images/logo1.png"  height="50" align="center">  - CIS Level 1**
 
 | Category           | DENY policy and description                                                                                                       |
 |--------------------|-----------------------------------------------------------------------------------------------------------------------------------|
@@ -27,7 +27,7 @@ This document provides the list of Security Zone recipes assigned to One-OE Land
 
 &nbsp;
 
-**<img src="../../design/images/logo2.png"  height="50" align="center">**
+### **<img src="../../design/images/logo2.png"  height="50" align="center">**
 | Category              | DENY policy and description                                                                                                                    |
 |-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | Includes              | **RECIPE 01**                                                                                                                                  |
@@ -41,7 +41,7 @@ This document provides the list of Security Zone recipes assigned to One-OE Land
 
 &nbsp;
 
-**<img src="../../design/images/logo3.png"  height="50" align="center">**
+### **<img src="../../design/images/logo3.png"  height="50" align="center">**
 | Category              | DENY policy and description                                                                                                                                                             |
 |-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Includes              | **RECIPE 01**                                                                                                                                                                           |
