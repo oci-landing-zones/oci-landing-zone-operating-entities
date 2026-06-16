@@ -45,9 +45,7 @@ Click the Deploy to OCI button and follow step-by-step instructions in [Implemen
 
 **Step 2**.
 
-Follow the remaining service-specific [steps to enable Database Management, Ops Insights, and Logging Analytics](steps_to_enable_observability_atp.md).
-
-The resources created in Step 1 are listed in the table above. Step 2 covers only the remaining manual service-onboarding actions, including preparing the database monitoring user, storing its password as a secret, creating the service private endpoints, enabling DBM/OPSI for the target databases, and completing Logging Analytics onboarding with the monitoring agent VM.
+Now that we have all required resources, we can continue with the remaining manual service-onboarding actions, including preparing the database monitoring user, storing its password as a secret, creating the service private endpoints, enabling DBM/OPSI for the target databases, and completing Logging Analytics onboarding with the monitoring agent VM. Follow these [steps to enable Database Management, Ops Insights, and Logging Analytics](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/obs/addons/oci-db-observability/scenario-autonomous-databases/steps_to_enable_observability_atp.md).
 
 &nbsp;
 
