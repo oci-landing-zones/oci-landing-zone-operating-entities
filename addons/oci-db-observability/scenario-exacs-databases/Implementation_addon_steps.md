@@ -2,7 +2,7 @@
 
 Follow these steps:
 
-1. From the ExaDB-D scenario README, click the ORM deployment button for the GLOBAL approach. The button opens a new ORM stack with the JSON files for that option preloaded.
+1. From the ExaDB-D scenario README, click the ORM deployment button for the CENTRALIZED approach. The button opens a new ORM stack with the JSON files for that option preloaded.
 2. Accept terms and wait for the configuration to load.
 3. Set the working directory to `rms-facade`.
 4. Set the stack name you prefer.
@@ -20,7 +20,7 @@ Follow these steps:
 
 
 
-Note: The add-on creates a dedicated Observability Vault and Key. To grant the `grp-lz-global-mon-admins` group in the common One-OE identity domain access to specific resources, you can optionally modify the following two statements in the `pcy-global-mon-admin` policy by adding a `where` condition. Check the GLOBAL IAM file selected for this deployment.
+Note: The add-on creates a dedicated Observability Vault and Key. To grant the `grp-lz-global-mon-admins` group in the common One-OE identity domain access to specific resources, you can optionally modify the following two statements in the `pcy-centralized-mon-admin` policy by adding a `where` condition. Check the CENTRALIZED IAM file selected for this deployment.
 
 ```
 allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use vaults in compartment cmp-landingzone:cmp-lz-security where target.vault.id='ocid1.vault.oc1.region.xxxx'

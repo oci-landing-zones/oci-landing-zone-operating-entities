@@ -6,7 +6,7 @@
             "CMP-LZ-MONITORING-KEY": {
                 "parent_id":"CMP-LZ-PLATFORM-KEY",
                 "name": "cmp-lz-monitoring",
-                "description": "Observability Global Compartment"
+                "description": "Observability Centralized Compartment"
             }
         }
     },
@@ -16,7 +16,7 @@
         "groups": {
             "GRP-OBS-ADMINS": {
                 "name": "grp-lz-global-mon-admins",
-                "description": "Tenancy global Observability administrator group."
+                "description": "Centralized Observability administrator group."
             }
         }
     },
@@ -48,8 +48,8 @@
 
                 ]
             },
-            "PCY-MON-ADMINISTRATION": {
-                "name": "pcy-global-mon-admin",
+            "PCY-CENTRALIZED-MON-ADMINISTRATION": {
+                "name": "pcy-centralized-mon-admin",
                 "description": "Policy to allow grp-lz-global-mon-admins group users to manage Observability services/resources in tenancy.",
                 "compartment_id": "TENANCY-ROOT",
                 "statements": [
@@ -92,9 +92,9 @@
                     "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy"
                 ]
             },
-            "PCY-GLOBAL-MON-SECURITY-ADMINISTRATION": {
-                "name": "pcy-global-mon-security-admin",
-                "description": "Policy to allow grp-lz-global-mon-admins group users to manage global Observability security resources.",
+            "PCY-CENTRALIZED-MON-SECURITY-ADMINISTRATION": {
+                "name": "pcy-centralized-mon-security-admin",
+                "description": "Policy to allow grp-lz-global-mon-admins group users to manage centralized Observability security resources.",
                 "compartment_id": "CMP-LANDINGZONE-KEY",
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
@@ -102,9 +102,9 @@
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ]
             },
-            "PCY-GLOBAL-MON-NETWORK-ADMINISTRATION": {
-                "name": "pcy-global-mon-network-admin",
-                "description": "Policy to allow grp-lz-global-mon-admins group users to manage global Observability private endpoint network resources.",
+            "PCY-CENTRALIZED-MON-NETWORK-ADMINISTRATION": {
+                "name": "pcy-centralized-mon-network-admin",
+                "description": "Policy to allow grp-lz-global-mon-admins group users to manage centralized Observability private endpoint network resources.",
                 "compartment_id": "CMP-LANDINGZONE-KEY",
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use security-lists in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
@@ -112,7 +112,8 @@
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use subnets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use network-security-groups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))"                ]
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))"
+                ]
             },
 
             "PCY-SHARED-EXACS-MON-ADMINISTRATION": {

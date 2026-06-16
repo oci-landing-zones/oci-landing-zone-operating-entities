@@ -46,29 +46,29 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 
    <img src="../images/SECRET.png" height="160" align="center">
 
-4. Create the private endpoint for Database Management. Use the Global subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
+4. Create the private endpoint for Database Management. Use the centralized subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
    Go to **Observability & Management** -> **Database Management** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
    If you are creating the private endpoint for a RAC database, select **Use private endpoint**.
 
-   For the Global approach, the private endpoint is created in the hub monitoring subnet and uses the global monitoring NSG.
+   For the centralized approach, the private endpoint is created in the hub monitoring subnet and uses the centralized monitoring NSG.
 
    <img src="../images/GLOBAL_PE.png" height="220" align="center">
 
-5. Create the private endpoint for Operations Insights. Use the Global subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
+5. Create the private endpoint for Operations Insights. Use the centralized subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
    Go to **Observability & Management** -> **Operations Insights** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
    Select **Use private endpoint**.
 
-   The form is equivalent to the Database Management private endpoint flow: place the endpoint in the hub monitoring subnet and attach `nsg-fra-lz-hub-global-mon-pe`.
+   The form is equivalent to the Database Management private endpoint flow: place the endpoint in the hub monitoring subnet and attach `nsg-fra-lz-hub-cen-mon-pe`.
 
    <img src="../images/PE_OPSI_GLOBAL.png" height="180" align="center">
 
 6. Verify connectivity between the target database and the private endpoint.
 
-   The add-on creates the required NSGs for the Global model. Confirm the target database uses `sn-fra-lz-shared-exacs-db`, confirm the service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target ExaDB-D SCAN listener on port `1521`.
+   The add-on creates the required NSGs for the centralized model. Confirm the target database uses `sn-fra-lz-shared-exacs-db`, confirm the service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target ExaDB-D SCAN listener on port `1521`.
 
 ## Enable Database Management for ExaDB-D
 

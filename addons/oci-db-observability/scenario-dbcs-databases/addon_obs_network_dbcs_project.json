@@ -2,7 +2,7 @@
     "network_configuration": {
         "default_enable_cis_checks": false,
         "network_configuration_categories": {
-            "Add_Local_DBM_OPSI_NSGs": {
+            "Add_Project_DBM_OPSI_NSGs": {
                 "inject_into_existing_vcns": {
                     "VCN-FRA-LZ-PROD-PROJECTS-KEY": {
                         "vcn_id": "VCN-FRA-LZ-PROD-PROJECTS-KEY",
@@ -20,8 +20,8 @@
                                     }
                                 },
                                 "ingress_rules": {
-                                    "ingress_local_database_subnet": {
-                                        "description": "Allow communication between local DBM/OPSI PEs and the DBCS database listener in the Prod DB subnet",
+                                    "ingress_project_database_subnet": {
+                                        "description": "Allow communication between project DBM/OPSI PEs and the DBCS database listener in the Prod DB subnet",
                                         "dst_port_max": 1521,
                                         "dst_port_min": 1521,
                                         "protocol": "TCP",
@@ -49,8 +49,8 @@
                                     }
                                 },
                                 "ingress_rules": {
-                                    "ingress_local_database_subnet": {
-                                        "description": "Allow communication between local DBM/OPSI PEs and the DBCS database listener in the Preprod DB subnet",
+                                    "ingress_project_database_subnet": {
+                                        "description": "Allow communication between project DBM/OPSI PEs and the DBCS database listener in the Preprod DB subnet",
                                         "dst_port_max": 1521,
                                         "dst_port_min": 1521,
                                         "protocol": "TCP",

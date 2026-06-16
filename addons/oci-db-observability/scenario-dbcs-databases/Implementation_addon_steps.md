@@ -2,7 +2,7 @@
 
 Follow these steps:
 
-1. From the DBCS scenario README, click the ORM deployment button that matches the selected deployment type: GLOBAL or LOCAL. The button opens a new ORM stack with the JSON files for that option preloaded.
+1. From the DBCS scenario README, click the ORM deployment button that matches the selected deployment type: OPTION 1. CENTRALIZED APPROACH or OPTION 2. PROJECT APPROACH. The button opens a new ORM stack with the JSON files for that option preloaded.
 2. Accept terms and wait for the configuration to load.
 3. Set the working directory to `rms-facade`.
 4. Set the stack name you prefer.
@@ -20,11 +20,11 @@ Follow these steps:
 
 
 
-Note: The add-on creates a dedicated Observability Vault and Key. To grant the `grp-lz-global-mon-admins` group in the common One-OE identity domain access to specific resources, you can optionally modify the following two statements in the `pcy-global-mon-admin` policy by adding a `where` condition. Check the IAM file selected for your deployment option.
+Note: The add-on creates dedicated Observability Vault and Key resources. To grant the selected monitoring admin group in the common One-OE identity domain access to specific resources, you can optionally modify the vault and key statements in the relevant security admin policy by adding a `where` condition. For the centralized option, use `pcy-centralized-mon-security-admin`. For the project option, use the environment-specific `pcy-prod-proj1-mon-security-admin` or `pcy-preprod-proj1-mon-security-admin` policy.
 
 ```
-allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use vaults in compartment cmp-landingzone:cmp-lz-security where target.vault.id='ocid1.vault.oc1.region.xxxx'
-allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use keys in compartment cmp-landingzone:cmp-lz-security where target.key.id='ocid1.key.oc1.region.xxx'
+allow group 'id_lz_common'/'<monitoring-admin-group>' to use vaults in compartment <security-compartment-path> where target.vault.id='ocid1.vault.oc1.region.xxxx'
+allow group 'id_lz_common'/'<monitoring-admin-group>' to use keys in compartment <security-compartment-path> where target.key.id='ocid1.key.oc1.region.xxx'
 ```
 
 >[!NOTE] If you add `where` conditions, replace the placeholder OCIDs with your own Vault and Key OCIDs.

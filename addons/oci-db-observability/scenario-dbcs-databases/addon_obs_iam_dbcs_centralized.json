@@ -6,7 +6,7 @@
             "CMP-LZ-MONITORING-KEY": {
                 "parent_id":"CMP-LZ-PLATFORM-KEY",
                 "name": "cmp-lz-monitoring",
-                "description": "Observability Global Compartment"
+                "description": "Observability Centralized Compartment"
             }
         }
     },
@@ -16,7 +16,11 @@
         "groups": {
             "GRP-OBS-ADMINS": {
                 "name": "grp-lz-global-mon-admins",
-                "description": "Tenancy global Observability administrator group."
+                "description": "Centralized Observability administrator group."
+            },
+            "GRP-OBS-READERS": {
+                "name": "grp-lz-global-mon-readers",
+                "description": "Centralized Observability reader group."
             }
         }
     },
@@ -48,8 +52,8 @@
 
                 ]
             },
-            "PCY-MON-ADMINISTRATION": {
-                "name": "pcy-global-mon-admin",
+            "PCY-CENTRALIZED-MON-ADMINISTRATION": {
+                "name": "pcy-centralized-mon-admin",
                 "description": "Policy to allow grp-lz-global-mon-admins group users to manage Observability services/resources in tenancy.",
                 "compartment_id": "TENANCY-ROOT",
                 "statements": [
@@ -79,8 +83,41 @@
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage management-agent-install-keys in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage loganalytics-features-family in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage loganalytics-ingesttime-rule in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage loganalytics-resources-family in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage management-dashboard in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage management-saved-search in tenancy"
+                ]
+            },
+            "PCY-CENTRALIZED-MON-READERS": {
+                "name": "pcy-centralized-mon-readers",
+                "description": "Policy to allow grp-lz-global-mon-readers group users to read Observability services/resources in tenancy.",
+                "compartment_id": "TENANCY-ROOT",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to inspect all-resources in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read users in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read compartments in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read dbmgmt-private-endpoints in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read dbmgmt-work-requests in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read dbmgmt-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read database-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read metrics in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read alarms in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read ons-topics in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read opsi-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read management-dashboard-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read vnics in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read subnets in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read network-security-groups in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read security-lists in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read virtual-network-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to inspect secret-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read management-agents in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read management-agent-install-keys in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read loganalytics-features-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read loganalytics-ingesttime-rule in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read loganalytics-resources-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read management-dashboard in tenancy",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read management-saved-search in tenancy"
                 ]
             },
             "PCY-MON-DYNAMIC-GROUP": {
@@ -92,9 +129,9 @@
                     "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy"
                 ]
             },
-            "PCY-GLOBAL-MON-SECURITY-ADMINISTRATION": {
-                "name": "pcy-global-mon-security-admin",
-                "description": "Policy to allow grp-lz-global-mon-admins group users to manage global Observability security resources.",
+            "PCY-CENTRALIZED-MON-SECURITY-ADMINISTRATION": {
+                "name": "pcy-centralized-mon-security-admin",
+                "description": "Policy to allow grp-lz-global-mon-admins group users to manage centralized Observability security resources.",
                 "compartment_id": "CMP-LANDINGZONE-KEY",
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
@@ -102,9 +139,19 @@
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ]
             },
-            "PCY-GLOBAL-MON-NETWORK-ADMINISTRATION": {
-                "name": "pcy-global-mon-network-admin",
-                "description": "Policy to allow grp-lz-global-mon-admins group users to manage global Observability private endpoint network resources.",
+            "PCY-CENTRALIZED-MON-SECURITY-READERS": {
+                "name": "pcy-centralized-mon-security-readers",
+                "description": "Policy to allow grp-lz-global-mon-readers group users to read centralized Observability security resources.",
+                "compartment_id": "CMP-LANDINGZONE-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to inspect secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
+                ]
+            },
+            "PCY-CENTRALIZED-MON-NETWORK-ADMINISTRATION": {
+                "name": "pcy-centralized-mon-network-admin",
+                "description": "Policy to allow grp-lz-global-mon-admins group users to manage centralized Observability private endpoint network resources.",
                 "compartment_id": "CMP-LANDINGZONE-KEY",
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use security-lists in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
@@ -115,6 +162,20 @@
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage network-security-groups in compartment cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage network-security-groups in compartment cmp-lz-preprod:cmp-lz-preprod-projects:cmp-lz-preprod-proj1"
+                ]
+            },
+            "PCY-CENTRALIZED-MON-NETWORK-READERS": {
+                "name": "pcy-centralized-mon-network-readers",
+                "description": "Policy to allow grp-lz-global-mon-readers group users to read centralized Observability private endpoint network resources.",
+                "compartment_id": "CMP-LANDINGZONE-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read security-lists in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read subnets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read network-security-groups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read network-security-groups in compartment cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read network-security-groups in compartment cmp-lz-preprod:cmp-lz-preprod-projects:cmp-lz-preprod-proj1"
                 ]
             },
 
@@ -133,6 +194,21 @@
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage management-dashboard-family in compartment cmp-lz-prod-proj1"
                 ]
             },
+            "PCY-PROD-PROJ1-MON-READERS": {
+                "name": "pcy-prod-proj1-mon-readers",
+                "description": "Policy to allow grp-lz-global-mon-readers group users to read DBCS observability resources in the Prod proj1 compartment.",
+                "compartment_id": "CMP-LZ-PROD-PROJ1-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read dbmgmt-private-endpoints in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read dbmgmt-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read dbmgmt-work-requests in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read database-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to inspect secret-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read opsi-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read loganalytics-resources-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read management-dashboard-family in compartment cmp-lz-prod-proj1"
+                ]
+            },
             "PCY-PREPROD-PROJ1-MON-ADMINISTRATION": {
                 "name": "pcy-preprod-proj1-mon-admin",
                 "description": "Policy to allow monitoring groups to manage DBCS observability resources in the Preprod proj1 compartment.",
@@ -146,6 +222,21 @@
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage opsi-family in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage loganalytics-resources-family in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-global-mon-admins' to manage management-dashboard-family in compartment cmp-lz-preprod-proj1"
+                ]
+            },
+            "PCY-PREPROD-PROJ1-MON-READERS": {
+                "name": "pcy-preprod-proj1-mon-readers",
+                "description": "Policy to allow grp-lz-global-mon-readers group users to read DBCS observability resources in the Preprod proj1 compartment.",
+                "compartment_id": "CMP-LZ-PREPROD-PROJ1-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read dbmgmt-private-endpoints in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read dbmgmt-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read dbmgmt-work-requests in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read database-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to inspect secret-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read opsi-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read loganalytics-resources-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-global-mon-readers' to read management-dashboard-family in compartment cmp-lz-preprod-proj1"
                 ]
             }
 

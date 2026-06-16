@@ -2,13 +2,13 @@
     "network_configuration": {
         "default_enable_cis_checks": false,
         "network_configuration_categories": {
-            "Add_Global_DBM_OPSI_NSGs": {
+            "Add_Centralized_DBM_OPSI_NSGs": {
                 "inject_into_existing_vcns": {
                     "VCN-FRA-LZ-HUB-KEY": {
                         "vcn_id": "VCN-FRA-LZ-HUB-KEY",
                         "network_security_groups": {
-                            "NSG-FRA-LZ-HUB-GLOBAL-MON-PE-KEY": {
-                                "display_name": "nsg-fra-lz-hub-global-mon-pe",
+                            "NSG-FRA-LZ-HUB-CEN-MON-PE-KEY": {
+                                "display_name": "nsg-fra-lz-hub-cen-mon-pe",
                                 "compartment_id": "CMP-LZ-NETWORK-KEY",
                                 "egress_rules": {
                                     "anywhere": {
@@ -21,7 +21,7 @@
                                 },
                                 "ingress_rules": {
                                     "ingress_shared_exacs_database_subnet": {
-                                        "description": "Allow communication from sn-fra-lz-shared-exacs-db in vcn-fra-lz-shared-exacs to the global DBM/OPSI PEs",
+                                        "description": "Allow communication from sn-fra-lz-shared-exacs-db in vcn-fra-lz-shared-exacs to the centralized DBM/OPSI PEs",
                                         "dst_port_max": 1521,
                                         "dst_port_min": 1521,
                                         "protocol": "TCP",
@@ -49,8 +49,8 @@
                                     }
                                 },
                                 "ingress_rules": {
-                                    "ingress_global_pe_monitoring_subnet": {
-                                        "description": "Allow ingress from the global DBM/OPSI PEs in the hub monitoring subnet to sn-fra-lz-shared-exacs-db",
+                                    "ingress_centralized_pe_monitoring_subnet": {
+                                        "description": "Allow ingress from the centralized DBM/OPSI PEs in the hub monitoring subnet to sn-fra-lz-shared-exacs-db",
                                         "dst_port_max": 1521,
                                         "dst_port_min": 1521,
                                         "protocol": "TCP",

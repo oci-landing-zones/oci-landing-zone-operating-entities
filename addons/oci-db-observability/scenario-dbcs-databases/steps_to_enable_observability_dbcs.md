@@ -5,14 +5,15 @@ This guide describes how to enable OCI observability capabilities for Oracle Bas
 
 ## Prerequisites Already Created by the Landing Zone Add-on
 
-The Observability Landing Zone add-on deployment already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics:
+The Observability Landing Zone add-on deployment already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics. The exact resources depend on the selected deployment option:
 
-- Monitoring compartments.
-- Monitoring groups such as `grp-lz-global-mon-admins`, and in the local deployment option, the environment-specific monitoring groups.
+- In OPTION 1. CENTRALIZED APPROACH, the add-on creates the centralized monitoring compartment `cmp-lz-monitoring`.
+- In OPTION 2. PROJECT APPROACH, the add-on does not create monitoring compartments; it uses the existing project compartments `cmp-lz-prod-proj1` and `cmp-lz-preprod-proj1`.
+- Monitoring groups. The centralized option creates `grp-lz-global-mon-admins` and `grp-lz-global-mon-readers`. The project option creates `grp-lz-prod-proj1-mon-admin`, `grp-lz-prod-proj1-mon-reader`, `grp-lz-preprod-proj1-mon-admin`, and `grp-lz-preprod-proj1-mon-reader`.
 - The Management Agent dynamic group `id_lz_common/dg-lz-mon-dynamic-group` in the COMMON Identity Domain.
 - IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, and the required network access.
 - Network Security Groups for the DBM/OPSI private endpoint connectivity.
-- The Observability Vault and Key, `vlt-lz-shared-mon-security` and `key-lz-mon-bkt`.
+- Observability Vault and Key resources. The centralized option creates `vlt-lz-shared-mon-security` and `key-lz-mon-bkt`. The project option creates `vlt-lz-prod-mon-security` / `key-lz-prod-mon-bkt` in `cmp-lz-prod-security`, and `vlt-lz-preprod-mon-security` / `key-lz-preprod-mon-bkt` in `cmp-lz-preprod-security`.
 - For Logging Analytics, a Service Gateway is required for database hosts to send logs to Logging Analytics. This is included in the One-OE project VCNs by default. If you are using a custom VCN, make sure a Service Gateway is configured.
 
 
@@ -38,9 +39,13 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
    GRANT EXECUTE ON DBMS_WORKLOAD_REPOSITORY to C##OCI_MON_USER;
    ```
 
-3. Create a secret for the `C##OCI_MON_USER` password in the Observability Vault created by the Observability Landing Zone add-on deployment.
+3. Create a secret for the `C##OCI_MON_USER` password in the Observability Vault created by the selected Observability Landing Zone add-on deployment option.
 
-   In the OCI Console, go to **Identity & Security** -> **Key Management** -> **Secret Management** and use `vlt-lz-shared-mon-security`.
+   In the OCI Console, go to **Identity & Security** -> **Key Management** -> **Secret Management**.
+
+   For OPTION 1. CENTRALIZED APPROACH, use `vlt-lz-shared-mon-security`.
+
+   For OPTION 2. PROJECT APPROACH, use the vault that matches the target database environment: `vlt-lz-prod-mon-security` for Prod databases, or `vlt-lz-preprod-mon-security` for Preprod databases.
 
    Create a secret for the `C##OCI_MON_USER` password.
 
@@ -58,7 +63,7 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 
 6. Verify connectivity between the target database and the private endpoint.
 
-   The add-on creates the required NSGs for the selected global or local model. Confirm the target database and service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target database listener on port `1521`.
+   The add-on creates the required NSGs for the selected centralized or project approach. Confirm the target database and service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target database listener on port `1521`.
 
 ## Enable Database Management for DBCS
 
