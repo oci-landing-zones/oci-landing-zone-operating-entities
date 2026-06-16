@@ -1,4 +1,4 @@
-// environments with shared_project_network still get env/project security zones and env network observability
+// environments with shared_project_network get environment security zones and env network observability
 local multi = import 'gen/landing_zone_multi.jsonnet';
 local outputs = multi({
   cis_level: 1,
@@ -20,6 +20,7 @@ local log_groups = obs.logging_configuration.log_groups;
   has_env_network_rule: std.objectHas(rules, 'RUL-LZ-PROD-NOTIFY-NETWORK-KEY'),
   has_env_network_target: std.objectHas(zones, 'SZ-TGT-LZ-PROD-ENVIRONMENT-NETWORK-KEY'),
   has_env_security_rule: std.objectHas(rules, 'RUL-LZ-PROD-NOTIFY-SECURITY-KEY'),
+  has_env_target: std.objectHas(zones, 'SZ-TGT-LZ-PROD-ENVIRONMENT-KEY'),
   has_env_subnet_flow_log: std.objectHas(flow_logs, 'LOG-LZ-PROD-SUBNET-FLOW-KEY'),
   has_env_vcn_flow_log: std.objectHas(flow_logs, 'LOG-LZ-PROD-VCN-FLOW-KEY'),
   has_project_target: std.objectHas(zones, 'SZ-TGT-LZ-PROD-PROJ1-KEY'),

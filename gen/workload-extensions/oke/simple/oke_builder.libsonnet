@@ -116,18 +116,6 @@ local oke_context = import './oke_context.libsonnet';
   render(params)::
     local metadata = self.metadata(params);
     local ctx = oke_context.build(params, metadata);
-    local security_zone_contribution =
-      if ctx.scope.allow_security_target then {
-        security_zones_configuration+: {
-          security_zones+: {
-            [ctx.n.key_global('SZ-TGT', [ctx.env, 'PLATFORM', ctx.plat])]: {
-              name: ctx.n.display_global('sz-tgt', ctx.display_segments),
-              compartment_id: ctx.cmp_key,
-              recipe_key: 'SZ-RCP-LZ-05-WORKLOAD-KEY',
-            },
-          },
-        },
-      } else {};
     {
       metadata: metadata,
 
@@ -136,10 +124,6 @@ local oke_context = import './oke_context.libsonnet';
         oke_clusters: oke_clusters(ctx),
         network_pre: oke_network(ctx),
         iam: oke_iam(ctx),
-
-        // security_cis1/security_cis2 share the same security-zone target.
-        security_cis1: security_zone_contribution,
-        security_cis2: security_zone_contribution,
       },
     },
 }

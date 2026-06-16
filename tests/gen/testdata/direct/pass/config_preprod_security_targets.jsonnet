@@ -1,4 +1,4 @@
-// preprod security-zone targets include environment network, project, and oke platform compartments
+// preprod security-zone targets use the environment compartment target
 local multi = import 'gen/landing_zone_multi.jsonnet';
 local outputs = multi({
   region: 'eu-frankfurt-1',

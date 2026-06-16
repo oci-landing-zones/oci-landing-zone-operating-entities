@@ -10,11 +10,40 @@
 // function(config, n, realm_constants, topo) → { cis1_pre, cis1, cis2_pre, cis2 }
 
 function(config, n, realm_constants, topo)
-  local security_target_networked_env_names = topo.security_target_networked_env_names();
+  local security_target_env_names = topo.security_target_env_names();
   local szp = realm_constants.security_zone_policy_ocids;
+  local cis_label(cis_level) = 'L%s' % cis_level;
+  local cis_recipe_key(cis_level) = n.key_global('SZ-RCP', ['01', 'CIS', cis_label(cis_level)]);
+  local shared_network_recipe_key = n.key_global('SZ-RCP', ['02', 'SHARED', 'NETWORK']);
+  local environment_recipe_key(env_name) = n.key_global('SZ-RCP', ['03', env_name, 'ENVIRONMENT']);
+  local recipe_set(cis_level) = {
+    [cis_recipe_key(cis_level)]: {
+      name: n.display_global('sz-rcp', ['01', 'cis', cis_label(cis_level)]),
+      description: 'Recipe 01 CIS Level %s' % cis_level,
+      compartment_id: n.key_global('CMP', ['SECURITY']),
+      cis_level: '%s' % cis_level,
+    },
+
+    [shared_network_recipe_key]: {
+      name: n.display_global('sz-rcp', ['02', 'shared', 'network']),
+      description: 'Recipe 02 Shared Network',
+      compartment_id: n.key_global('CMP', ['SECURITY']),
+      cis_level: '%s' % cis_level,
+      security_policies_ocids: szp.shared_network,
+    },
+  } + {
+    [environment_recipe_key(env_name)]: {
+      name: n.display_global('sz-rcp', ['03', env_name, 'environment']),
+      description: 'Recipe 03 %s Environment' % topo.env_display(env_name),
+      compartment_id: n.key_global('CMP', ['SECURITY']),
+      cis_level: '%s' % cis_level,
+      security_policies_ocids: szp.environment,
+    }
+    for env_name in security_target_env_names
+  };
 
   // --- Base security (shared across all CIS levels) ---
-  local base = {
+  local base(cis_level) = {
     cloud_guard_configuration: {
       compartment_id: 'TENANCY-ROOT',
       reporting_region: config.region,
@@ -71,91 +100,40 @@ function(config, n, realm_constants, topo)
     security_zones_configuration: {
       reporting_region: config.region,
       tenancy_ocid: 'TENANCY-ROOT',
-
-      recipes: {
-        [n.key_global('SZ-RCP', ['01', 'CIS', 'L1'])]: {
-          name: n.display_global('sz-rcp', ['01', 'cis', 'l1']),
-          description: 'Recipe 01 CIS Level 1',
-          compartment_id: n.key_global('CMP', ['SECURITY']),
-          cis_level: '1',
-        },
-
-        [n.key_global('SZ-RCP', ['02', 'CIS', 'L2'])]: {
-          name: n.display_global('sz-rcp', ['02', 'cis', 'l2']),
-          description: 'Recipe 02 CIS Level 2',
-          compartment_id: n.key_global('CMP', ['SECURITY']),
-          cis_level: '2',
-        },
-
-        [n.key_global('SZ-RCP', ['03', 'SHARED', 'NETWORK'])]: {
-          name: n.display_global('sz-rcp', ['03', 'shared', 'network']),
-          description: 'Recipe 03 Shared Network',
-          compartment_id: n.key_global('CMP', ['SECURITY']),
-          cis_level: '2',
-          security_policies_ocids: szp.shared_network,
-        },
-
-        [n.key_global('SZ-RCP', ['04', 'ENVIRONMENT', 'NETWORK'])]: {
-          name: n.display_global('sz-rcp', ['04', 'environment', 'network']),
-          description: 'Recipe 04 Environment Network',
-          compartment_id: n.key_global('CMP', ['SECURITY']),
-          cis_level: '2',
-          security_policies_ocids: szp.environment_network,
-        },
-
-        [n.key_global('SZ-RCP', ['05', 'WORKLOAD'])]: {
-          name: n.display_global('sz-rcp', ['05', 'workload']),
-          description: 'Recipe 05 Workload',
-          compartment_id: n.key_global('CMP', ['SECURITY']),
-          cis_level: '2',
-          security_policies_ocids: szp.workload,
-        },
-      },
+      recipes: recipe_set(cis_level),
     },
   };
 
   // --- CIS1 pre: base + CIS L1 zone only ---
-  local cis1_pre = base {
+  local cis1_pre = base(1) {
     security_zones_configuration+: {
       security_zones: {
         [n.key_global('SZ-TGT', ['CIS', 'L1'])]: {
           name: n.display_global('sz-tgt', ['cis', 'l1']),
           compartment_id: 'CMP-LANDINGZONE-KEY',
-          recipe_key: n.key_global('SZ-RCP', ['01', 'CIS', 'L1']),
+          recipe_key: cis_recipe_key(1),
         },
       },
     },
   };
 
-  // --- Per-env security zone targets (shared network + env network + project workloads) ---
+  // --- Per-env security zone targets (shared network + environment compartments) ---
   // The topology helper decides which environments are security targets.
   // Config mode defaults this to all environments; published profiles can pin a narrower list.
   local env_zone_targets = {
     [n.key_global('SZ-TGT', ['SHARED', 'NETWORK'])]: {
       name: n.display_global('sz-tgt', ['shared', 'network']),
       compartment_id: n.key_global('CMP', ['NETWORK']),
-      recipe_key: n.key_global('SZ-RCP', ['03', 'SHARED', 'NETWORK']),
+      recipe_key: shared_network_recipe_key,
     },
-  } + std.foldl(
-    function(acc, env_name)
-      local project_names = topo.project_names(env_name);
-      acc + {
-        [n.key_global('SZ-TGT', [env_name, 'ENVIRONMENT', 'NETWORK'])]: {
-          name: n.display_global('sz-tgt', [env_name, 'environment', 'network']),
-          compartment_id: n.key_global('CMP', [env_name, 'NETWORK']),
-          recipe_key: n.key_global('SZ-RCP', ['04', 'ENVIRONMENT', 'NETWORK']),
-        },
-      } + {
-        [n.key_global('SZ-TGT', [env_name, proj])]: {
-          name: n.display_global('sz-tgt', [env_name, proj]),
-          compartment_id: n.key_global('CMP', [env_name, proj]),
-          recipe_key: n.key_global('SZ-RCP', ['05', 'WORKLOAD']),
-        }
-        for proj in project_names
-      },
-    security_target_networked_env_names,
-    {}
-  );
+  } + {
+    [n.key_global('SZ-TGT', [env_name, 'ENVIRONMENT'])]: {
+      name: n.display_global('sz-tgt', [env_name, 'environment']),
+      compartment_id: n.key_global('CMP', [env_name]),
+      recipe_key: environment_recipe_key(env_name),
+    }
+    for env_name in security_target_env_names
+  };
 
   // --- CIS1: cis1_pre + env-specific targets ---
   local cis1 = cis1_pre {
@@ -164,14 +142,14 @@ function(config, n, realm_constants, topo)
     },
   };
 
-  // --- CIS2 pre: same base as cis1_pre but with CIS L2 zone + vaults ---
-  local cis2_pre = base {
+  // --- CIS2 pre: same base as cis1_pre but with CIS L2 recipe + vaults ---
+  local cis2_pre = base(2) {
     security_zones_configuration+: {
       security_zones: {
         [n.key_global('SZ-TGT', ['CIS', 'L2'])]: {
           name: n.display_global('sz-tgt', ['cis', 'l2']),
           compartment_id: 'CMP-LANDINGZONE-KEY',
-          recipe_key: n.key_global('SZ-RCP', ['02', 'CIS', 'L2']),
+          recipe_key: cis_recipe_key(2),
         },
       },
     },

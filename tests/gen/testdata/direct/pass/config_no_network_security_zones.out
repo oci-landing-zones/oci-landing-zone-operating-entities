@@ -1,9 +1,11 @@
 {
   "has_env_network_target": false,
+  "has_env_target": true,
   "has_project_target": false,
   "has_shared_network_target": true,
   "zone_keys": [
     "SZ-TGT-LZ-CIS-L1-KEY",
+    "SZ-TGT-LZ-PROD-ENVIRONMENT-KEY",
     "SZ-TGT-LZ-SHARED-NETWORK-KEY"
   ]
 }

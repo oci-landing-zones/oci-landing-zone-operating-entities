@@ -1,0 +1,18 @@
+{
+  "exacc_single_stack_cis1": true,
+  "exacc_single_stack_cis1_pre": true,
+  "exacc_single_stack_cis2": true,
+  "exacc_single_stack_cis2_pre": true,
+  "exacs_single_stack_cis1": true,
+  "exacs_single_stack_cis1_pre": true,
+  "exacs_single_stack_cis2": true,
+  "exacs_single_stack_cis2_pre": true,
+  "oke_multi_stack_cis1": true,
+  "oke_multi_stack_cis1_pre": true,
+  "oke_multi_stack_cis2": true,
+  "oke_multi_stack_cis2_pre": true,
+  "oke_single_stack_cis1": true,
+  "oke_single_stack_cis1_pre": true,
+  "oke_single_stack_cis2": true,
+  "oke_single_stack_cis2_pre": true
+}
