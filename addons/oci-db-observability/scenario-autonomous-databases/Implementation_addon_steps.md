@@ -22,11 +22,11 @@ Follow these steps:
 
 Note: The add-on creates the dedicated Observability Vault and Key resources for the selected deployment option. CENTRALIZED creates the shared vault in `cmp-landingzone:cmp-lz-security`; PROJECT creates environment-specific vaults in `cmp-lz-prod-security` and `cmp-lz-preprod-security`.
 
-For CENTRALIZED, to grant the `grp-lz-global-mon-admins` group in the common One-OE identity domain access to specific resources, you can optionally replace the vault and key statements in the `pcy-centralized-mon-security-admin` policy with statements scoped to specific Vault and Key OCIDs. Check the IAM file selected for your deployment option.
+For CENTRALIZED, to grant the `grp-lz-centralized-mon-admin` group in the common One-OE identity domain access to specific resources, you can optionally replace the vault and key statements in the `pcy-centralized-mon-security-admin` policy with statements scoped to specific Vault and Key OCIDs. Check the IAM file selected for your deployment option.
 
 ```
-allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use vaults in compartment cmp-landingzone:cmp-lz-security where target.vault.id='ocid1.vault.oc1.region.xxxx'
-allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use keys in compartment cmp-landingzone:cmp-lz-security where target.key.id='ocid1.key.oc1.region.xxx'
+allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to use vaults in compartment cmp-landingzone:cmp-lz-security where target.vault.id='ocid1.vault.oc1.region.xxxx'
+allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to use keys in compartment cmp-landingzone:cmp-lz-security where target.key.id='ocid1.key.oc1.region.xxx'
 ```
 
 >[!NOTE] If you add `where` conditions, replace the placeholder OCIDs with your own Vault and Key OCIDs. For PROJECT, apply the same restriction pattern to the prod or preprod project monitoring policies if you want to scope access to a specific environment vault and key.
