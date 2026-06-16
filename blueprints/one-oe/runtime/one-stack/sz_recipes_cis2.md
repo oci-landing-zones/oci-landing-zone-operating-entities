@@ -2,7 +2,7 @@
 ### Overview
 The One-OE Landing Zone implements a subset of the **CIS Level 2** controls through a set of layered Security Zone recipes. Each recipe builds upon the controls defined in the previous recipe and introduces additional security restrictions.
 
-This document provides the list of Security Zone recipes assigned to One-OE Landing Zone compartments based on their security requirements. These assignments help establish a consistent and scalable security posture across the compartment hierarchy.
+This document describes the Security Zone recipes defined in the [oneoe_security_cis2_pre.json](oneoe_security_cis2_pre.json) and [oneoe_security_cis2.json](oneoe_security_cis2.json) files and their assignment across the One-OE Landing Zone compartment hierarchy.
 
 &nbsp;
 #### [Security Zone](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/security-zones.htm) and [Recipe](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/managing-recipes.htm) assignment across the [One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe) Landing Zone compartment hierarchy
