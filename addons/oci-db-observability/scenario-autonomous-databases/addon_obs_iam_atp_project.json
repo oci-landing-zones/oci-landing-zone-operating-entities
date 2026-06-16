@@ -46,8 +46,7 @@
                     "Allow service operations-insights to read autonomous-database-family in tenancy where ALL{request.operation='GenerateAutonomousDatabaseWallet'}",
                     "Allow service operations-insights to read secret-family in tenancy",
                     "Allow service loganalytics to use metrics in tenancy",
-                    "Allow service loganalytics to read loganalytics-features-family in tenancy",
-                    "Allow service dpd to read secret-family in compartment cmp-landingzone:cmp-lz-security"
+                    "Allow service loganalytics to read loganalytics-features-family in tenancy"
 
                 ]
             },
@@ -102,7 +101,7 @@
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to inspect secret-family in compartment cmp-lz-preprod-security"
                 ]
             },
-               "PCY-PROD-PROJ1-MON-NETWORK-ADMINISTRATION": {
+            "PCY-PROD-PROJ1-MON-NETWORK-ADMINISTRATION": {
                 "name": "pcy-prod-proj1-mon-network-admin",
                 "description": "Policy to allow grp-lz-prod-proj1-mon-admin group users to manage production Observability private endpoint network resources.",
                 "compartment_id": "CMP-LZ-PROD-NETWORK-KEY",
@@ -213,7 +212,6 @@
                 "description": "Policy to allow monitoring groups to manage Autonomous Database observability resources in the Preprod proj1 compartment.",
                 "compartment_id": "CMP-LZ-PREPROD-PROJ1-KEY",
                 "statements": [
-                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage secret-family in compartment cmp-lz-preprod-security",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to read dbmgmt-work-requests in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use database-family in compartment cmp-lz-preprod-proj1",
@@ -231,15 +229,14 @@
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage loganalytics-ingesttime-rule in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage loganalytics-resources-family in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage management-dashboard in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage management-saved-search in compartment cmp-lz-preprod-proj1"        
-                 ]
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage management-saved-search in compartment cmp-lz-preprod-proj1"
+                ]
             },
             "PCY-PREPROD-PROJ1-MON-READERS": {
                 "name": "pcy-preprod-proj1-mon-reader",
                 "description": "Policy to allow grp-lz-preprod-proj1-mon-reader group users to read Autonomous Database observability resources in the Preprod proj1 compartment.",
                 "compartment_id": "CMP-LZ-PREPROD-PROJ1-KEY",
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to inspect secret-family in compartment cmp-lz-preprod-security",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read dbmgmt-private-endpoints in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read dbmgmt-work-requests in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read database-family in compartment cmp-lz-preprod-proj1",
