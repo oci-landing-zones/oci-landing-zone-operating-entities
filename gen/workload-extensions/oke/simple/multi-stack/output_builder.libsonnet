@@ -4,7 +4,7 @@ local platforms = import '../../../../platforms.libsonnet';
 local render_context = import '../../../../render_context.libsonnet';
 local oke_builder = import '../oke_builder.libsonnet';
 
-function(profile, env_name='preprod', platform_name='oke') {
+function(profile, env_name='prod', platform_name='oke') {
   local config = profile.config,
   local ctx = render_context.from_raw_config(config),
   local n = ctx.n,

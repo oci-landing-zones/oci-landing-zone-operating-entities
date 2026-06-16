@@ -22,41 +22,41 @@
                         "description"                          : "Shared Platform Compartment"
                     },
 
-                    "CMP-LZ-PREPROD-KEY": {
-                        "name"                                 : "cmp-lz-preprod",
-                        "description"                          : "Pre-Production Environment Compartment",
+                    "CMP-LZ-PROD-KEY": {
+                        "name"                                 : "cmp-lz-prod",
+                        "description"                          : "Production Environment Compartment",
 
                         "children": {
-                            "CMP-LZ-PREPROD-NETWORK-KEY": {
-                                "name"                         : "cmp-lz-preprod-network",
-                                "description"                  : "Pre-Production Workload Environment, Common Network Compartment",
+                            "CMP-LZ-PROD-NETWORK-KEY": {
+                                "name"                         : "cmp-lz-prod-network",
+                                "description"                  : "Prod Workload Environment, Common Network Compartment",
 
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role": "lz-network-admin"
                                 }
                             },
 
-                            "CMP-LZ-PREPROD-PLATFORM-KEY": {
-                                "name"                         : "cmp-lz-preprod-platform",
-                                "description"                  : "Pre-Production Workload Environment, Common Platform Compartment",
+                            "CMP-LZ-PROD-PLATFORM-KEY": {
+                                "name"                         : "cmp-lz-prod-platform",
+                                "description"                  : "Production Workload Environment, Common Platform Compartment",
 
                                 "children": {
-                                    "CMP-LZ-PREPROD-OKE-KEY": {
-                                        "name"                 : "cmp-lz-preprod-oke",
-                                        "description"          : "Pre-Production Platform Oke Compartment"
+                                    "CMP-LZ-PROD-OKE-KEY": {
+                                        "name"                 : "cmp-lz-prod-oke",
+                                        "description"          : "Production Platform Oke Compartment"
                                     }
                                 }
                             },
 
-                            "CMP-LZ-PREPROD-PROJECTS-KEY": {
-                                "name"                         : "cmp-lz-preprod-projects",
-                                "description"                  : "Pre-Production Workload Environment, Common Projects Compartment",
+                            "CMP-LZ-PROD-PROJECTS-KEY": {
+                                "name"                         : "cmp-lz-prod-projects",
+                                "description"                  : "Production Workload Environment, Common Projects Compartment",
                                 "children"                     : {}
                             },
 
-                            "CMP-LZ-PREPROD-SECURITY-KEY": {
-                                "name"                         : "cmp-lz-preprod-security",
-                                "description"                  : "Pre-Production Workload Environment, Common Security Compartment",
+                            "CMP-LZ-PROD-SECURITY-KEY": {
+                                "name"                         : "cmp-lz-prod-security",
+                                "description"                  : "Production Workload Environment, Common Security Compartment",
 
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role": "lz-security-admin"
@@ -80,19 +80,19 @@
 
     "groups_configuration": {
         "groups": {
-            "GRP-LZ-PREPROD-PLATFORM-OKE-ADMINS-KEY": {
-                "name"                                         : "grp-lz-preprod-oke-admins",
-                "description"                                  : "Landing Zone Pre-Production environment OKE platform cluster management administration access group."
+            "GRP-LZ-PROD-PLATFORM-OKE-ADMINS-KEY": {
+                "name"                                         : "grp-lz-prod-oke-admins",
+                "description"                                  : "Landing Zone Production environment OKE platform cluster management administration access group."
             },
 
-            "GRP-LZ-PREPROD-PLATFORM-OKE-RBAC-ADMIN-KEY": {
-                "name"                                         : "grp-lz-preprod-oke-rbac-admin",
-                "description"                                  : "Landing Zone Pre-Production environment OKE platform Kubernetes RBAC administration access group."
+            "GRP-LZ-PROD-PLATFORM-OKE-RBAC-ADMIN-KEY": {
+                "name"                                         : "grp-lz-prod-oke-rbac-admin",
+                "description"                                  : "Landing Zone Production environment OKE platform Kubernetes RBAC administration access group."
             },
 
-            "GRP-LZ-PREPROD-PLATFORM-OKE-RBAC-VIEWER-KEY": {
-                "name"                                         : "grp-lz-preprod-oke-rbac-viewer",
-                "description"                                  : "Landing Zone Pre-Production environment OKE platform Kubernetes RBAC viewer access group."
+            "GRP-LZ-PROD-PLATFORM-OKE-RBAC-VIEWER-KEY": {
+                "name"                                         : "grp-lz-prod-oke-rbac-viewer",
+                "description"                                  : "Landing Zone Production environment OKE platform Kubernetes RBAC viewer access group."
             }
         }
     },
@@ -281,38 +281,38 @@
                 ]
             },
 
-            "PCY-LZ-PREPROD-PLATFORM-OKE-ADMINS-KEY": {
-                "name"                                         : "pcy-lz-preprod-oke-admins",
-                "description"                                  : "Grants grp-lz-preprod-oke-admins OKE platform administration access in the Pre-Production environment OKE platform and network compartments.",
+            "PCY-LZ-PROD-PLATFORM-OKE-ADMINS-KEY": {
+                "name"                                         : "pcy-lz-prod-oke-admins",
+                "description"                                  : "Grants grp-lz-prod-oke-admins OKE platform administration access in the Production environment OKE platform and network compartments.",
                 "compartment_id"                               : "TENANCY-ROOT",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-admins' to read all-resources in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-admins' to manage cluster-family in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-admins' to manage instance-family in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-admins' to use vnics in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-admins' to inspect compartments in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-admins' to read virtual-network-family in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-admins' to use subnets in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-admins' to use network-security-groups in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-admins' to use vnics in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-admins' to manage private-ips in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-network"
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to read all-resources in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to manage cluster-family in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to manage instance-family in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use vnics in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to inspect compartments in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to read virtual-network-family in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use subnets in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use network-security-groups in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use vnics in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to manage private-ips in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network"
                 ]
             },
 
-            "PCY-LZ-PREPROD-PLATFORM-OKE-RBAC-ROLE-KEY": {
-                "name"                                         : "pcy-lz-preprod-oke-rbac-roles",
-                "description"                                  : "Grants OKE RBAC administrator and viewer groups Kubernetes cluster access in the Pre-Production environment OKE platform compartment.",
+            "PCY-LZ-PROD-PLATFORM-OKE-RBAC-ROLE-KEY": {
+                "name"                                         : "pcy-lz-prod-oke-rbac-roles",
+                "description"                                  : "Grants OKE RBAC administrator and viewer groups Kubernetes cluster access in the Production environment OKE platform compartment.",
                 "compartment_id"                               : "TENANCY-ROOT",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-rbac-admin' to use cluster in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-oke-rbac-viewer' to use cluster in compartment cmp-landingzone:cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-oke"
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-rbac-admin' to use cluster in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-rbac-viewer' to use cluster in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke"
                 ]
             },
 
-            "PCY-LZ-PREPROD-PLATFORM-OKE-VCN-CNI-KEY": {
-                "name"                                         : "pcy-lz-preprod-oke-vcn-cni",
+            "PCY-LZ-PROD-PLATFORM-OKE-VCN-CNI-KEY": {
+                "name"                                         : "pcy-lz-prod-oke-vcn-cni",
                 "description"                                  : "Unsafe: grants OKE clusters tenancy-wide VCN CNI permissions for instance, private IP, and network security group resources.",
                 "compartment_id"                               : "TENANCY-ROOT",
                 "//"                                           : "This is potentially unsafe as it can be used for privilege escalation across environments. See https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-OCI_CNI_plugin.htm for restricting permissions.",

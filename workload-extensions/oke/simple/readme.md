@@ -20,7 +20,7 @@ This OKE Landing Zone Extension provides **two published quickstart approaches**
 
 For customized OKE landing zones generated from a configuration file, see [OKE Config-Driven Generation](config-driven.md).
 
-The published simple quickstarts create one pre-production OKE platform by default. Use config-driven generation to add a production OKE platform or additional OKE platforms.
+The published simple quickstarts create one production OKE platform by default. Use config-driven generation to add pre-production or additional OKE platforms.
 
 
 ### **Choosing the Right Approach**

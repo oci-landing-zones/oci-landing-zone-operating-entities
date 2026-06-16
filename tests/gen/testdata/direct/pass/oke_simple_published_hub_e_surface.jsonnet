@@ -12,25 +12,25 @@ local workers = (import 'gen/workload-extensions/oke/simple/single-stack/oke_wor
 
 local hub = single['0-shared'].vcns['VCN-FRA-LZ-HUB-KEY'];
 local hub_gateways = single['0-shared'].non_vcn_specific_gateways;
-local oke = single['preprod-platform-oke'].vcns['VCN-FRA-LZ-PREPROD-PLATFORM-OKE-KEY'];
-local multi_oke = multi['preprod-platform-oke'];
+local oke = single['prod-platform-oke'].vcns['VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY'];
+local multi_oke = multi['prod-platform-oke'];
 local generic_project_vcns = [
   'VCN-FRA-LZ-PROD-PROJECTS-KEY',
   'VCN-FRA-LZ-PREPROD-PROJECTS-KEY',
 ];
 local profile_configs = {
-  hub_a: published_profiles.hub_a_preprod_oke_config,
-  hub_b: published_profiles.hub_b_preprod_oke_config,
-  hub_c: published_profiles.hub_c_preprod_oke_config,
-  hub_e: published_profiles.hub_e_preprod_oke_config,
+  hub_a: published_profiles.hub_a_prod_oke_config,
+  hub_b: published_profiles.hub_b_prod_oke_config,
+  hub_c: published_profiles.hub_c_prod_oke_config,
+  hub_e: published_profiles.hub_e_prod_oke_config,
 };
 local profile_envs_without_generic_projects = {
   [hub_kind]: {
     environments: std.objectFields(profile_configs[hub_kind].environments),
     has_shared_project_network:
-      std.objectHas(profile_configs[hub_kind].environments.preprod, 'shared_project_network'),
+      std.objectHas(profile_configs[hub_kind].environments.prod, 'shared_project_network'),
     has_projects:
-      std.objectHas(profile_configs[hub_kind].environments.preprod, 'projects'),
+      std.objectHas(profile_configs[hub_kind].environments.prod, 'projects'),
   }
   for hub_kind in std.objectFields(profile_configs)
 };
@@ -75,6 +75,6 @@ local profile_envs_without_generic_projects = {
       std.objectFields(multi_oke.non_vcn_specific_gateways.inject_into_existing_drgs),
     drg_route_table_key:
       multi_oke.non_vcn_specific_gateways.inject_into_existing_drgs['DRG-FRA-LZ-HUB-KEY']
-        .drg_attachments['DRGATT-FRA-LZ-PREPROD-PLATFORM-OKE-KEY'].drg_route_table_key,
+        .drg_attachments['DRGATT-FRA-LZ-PROD-PLATFORM-OKE-KEY'].drg_route_table_key,
   },
 }

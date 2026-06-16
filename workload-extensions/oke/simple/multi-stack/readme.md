@@ -34,7 +34,7 @@ This published simple multi-stack deployment uses the [OCI Landing Zone Orchestr
 
 The simple multi-stack path is a Hub E quickstart. For Hub A, Hub B, Hub C, multiple OKE platforms, overlay networking, or custom landing zone shapes, use [OKE Config-Driven Generation](../config-driven.md).
 
-The published quickstart creates one pre-production OKE platform by default. Add production or additional OKE platforms through config-driven generation.
+The published quickstart creates one production OKE platform by default. Add pre-production or additional OKE platforms through config-driven generation.
 
 **Key Features:**
 - **Automated Dependency Resolution**: Network resources (VCN, subnets, NSGs) are automatically linked to the OKE cluster using configuration keys using dependency exchange across stacks

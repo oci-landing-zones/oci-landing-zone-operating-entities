@@ -1,14 +1,14 @@
 {
   "multi_stack": {
     "categories": [
-      "preprod-platform-oke"
+      "prod-platform-oke"
     ],
     "drg_route_table_key": "DRGRT-FRA-LZ-SPOKES-KEY",
     "injected_drgs": [
       "DRG-FRA-LZ-HUB-KEY"
     ],
     "vcn_keys": [
-      "VCN-FRA-LZ-PREPROD-PLATFORM-OKE-KEY"
+      "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY"
     ]
   },
   "ordinary_hub_e_default_keeps_project_vcns": {
@@ -18,28 +18,28 @@
   "profile_configs": {
     "hub_a": {
       "environments": [
-        "preprod"
+        "prod"
       ],
       "has_projects": false,
       "has_shared_project_network": false
     },
     "hub_b": {
       "environments": [
-        "preprod"
+        "prod"
       ],
       "has_projects": false,
       "has_shared_project_network": false
     },
     "hub_c": {
       "environments": [
-        "preprod"
+        "prod"
       ],
       "has_projects": false,
       "has_shared_project_network": false
     },
     "hub_e": {
       "environments": [
-        "preprod"
+        "prod"
       ],
       "has_projects": false,
       "has_shared_project_network": false
@@ -48,10 +48,10 @@
   "single_stack": {
     "categories": [
       "0-shared",
-      "preprod-platform-oke"
+      "prod-platform-oke"
     ],
     "cluster_keys": [
-      "CLR-FRA-LZ-PREPROD-OKE-KEY"
+      "CLR-FRA-LZ-PROD-OKE-KEY"
     ],
     "generic_project_vcns_present": [],
     "hub_has_firewall_subnets": false,
@@ -68,7 +68,7 @@
       "10.0.80.0/20"
     ],
     "worker_keys": [
-      "NDP-FRA-LZ-PREPROD-OKE-KEY"
+      "NDP-FRA-LZ-PROD-OKE-KEY"
     ]
   }
 }
