@@ -26,6 +26,7 @@ Find below the list of available workload landing zones and our backlog. Be free
 | 6 | [<img src="../commons/images/icon_exadb-d.jpg" height="30" align="center">](./exacs) | A Pluggable **ExaDB-D** Landing Zone Extension. | [Available](./exacs/) |
 | 7 | [<img src="../commons/images/icon_hpc.png" height="30" align="center">](./hpc) | A Pluggable **HPC** Landing Zone Extension. | [Available](./hpc/) |
 | 8 | [<img src="openshift/contents/icon_openshift.png" height="30" align="center">](./openshift) | A Pluggable **Openshift** Landing Zone Extension. | [Available](./openshift/) |
+| 9 | [<img src="" height="30" align="center">](./odb-azure) | A Pluggable **Oracle Database@Azure** Landing Zone Extension. | [Available](./odb-azure/) |
 
 &nbsp; 
 
