@@ -72,7 +72,7 @@
                 ]
             },
             "PCY-PREPROD-PROJ1-MON-SECURITY-ADMINISTRATION": {
-                "name": "pcy-preprod-proj1-mon-admin",
+                "name": "pcy-preprod-proj1-mon-security-admin",
                 "description": "Policy to allow grp-lz-preprod-proj1-mon-admin group users to manage pre-production Observability security resources.",
                 "compartment_id": "CMP-LZ-PREPROD-SECURITY-KEY",
                 "statements": [
@@ -96,8 +96,8 @@
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use network-security-groups in compartment cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1"
                 ]
             },
-            "PCY-PREPROD-PROJ1MON-NETWORK-ADMINISTRATION": {
-                "name": "pcy-preprod-proj1-mon-admin",
+            "PCY-PREPROD-PROJ1-MON-NETWORK-ADMINISTRATION": {
+                "name": "pcy-preprod-proj1-mon-network-admin",
                 "description": "Policy to allow grp-lz-preprod-proj1-mon-admin group users to manage pre-production Observability private endpoint network resources.",
                 "compartment_id": "CMP-LZ-PREPROD-NETWORK-KEY",
                 "statements": [

@@ -6,11 +6,11 @@ This guide describes how to enable OCI observability capabilities for Autonomous
 
 The Observability Landing Zone add-on deployment already creates the OCI-side prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
-- Monitoring compartments and monitoring groups.
+- Monitoring compartments and/or existing project compartments, plus monitoring groups.
 - IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, and network access.
 - Network Security Groups for the selected DBM/OPSI private endpoint connectivity model.
-- The Observability Vault and Key, `vlt-lz-shared-mon-security` and `key-lz-mon-bkt`.
-- The monitoring agent VM `vm-fra-lz-shared-mon-agent`.
+- The selected Observability Vault and Key: `vlt-lz-shared-mon-security` and `key-lz-mon-bkt` for CENTRALIZED, or the environment-specific PROJECT vaults and keys `vlt-lz-prod-mon-security` / `key-lz-prod-mon-bkt` and `vlt-lz-preprod-mon-security` / `key-lz-preprod-mon-bkt`.
+- The selected monitoring agent VM: `vm-fra-lz-shared-mon-agent` for CENTRALIZED or `vm-fra-lz-prod-proj1-mon-agent` for PROJECT.
 
 Do not recreate these IAM policies, groups, NSGs, vaults, keys, or the monitoring agent VM manually as part of Step 2: Enable OCI Observability.
 
@@ -19,10 +19,10 @@ Do not recreate these IAM policies, groups, NSGs, vaults, keys, or the monitorin
 The detailed sections below include screenshot-based steps. At a high level, Step 2: Enable OCI Observability covers these manual service-onboarding actions:
 
 1. Confirm that the Autonomous Database uses private endpoint access and the NSG model deployed by the Landing Zone add-on.
-2. Create the Database Management private endpoint using either the Global or Local model selected for the Landing Zone add-on.
+2. Create the Database Management private endpoint using either the CENTRALIZED or PROJECT approach selected for the Landing Zone add-on.
 3. Prepare the database monitoring user and store the password in the Observability Vault.
 4. Enable Database Management and select the Database Management private endpoint.
-5. Create the Operations Insights private endpoint using either the Global or Local model selected for the Landing Zone add-on.
+5. Create the Operations Insights private endpoint using either the CENTRALIZED or PROJECT approach selected for the Landing Zone add-on.
 6. Enable Operations Insights and select the Operations Insights private endpoint.
 7. Use the monitoring agent VM created by the Landing Zone add-on to complete Logging Analytics onboarding.
    
@@ -95,7 +95,7 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 
 <td align="left">
 
-* In a **local approach**, DBM PEs and the ATP PE will reside in the same database subnet (sn-fra-lz-prod-db), and the nsg-fra-lz-prod-proj1-mon-pe-db1 NSGs will allow communication between them. Example: pe_lz_p_dbm.
+* In a **PROJECT approach**, DBM PEs and the ATP PE will reside in the same database subnet (sn-fra-lz-prod-db), and the nsg-fra-lz-prod-proj1-mon-pe-db1 NSGs will allow communication between them. Example: pe_lz_p_dbm.
 
 &nbsp; 
 <img src="../images/LOCAL_PE.png" height="100" width="200"  align="left">
@@ -131,7 +131,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 <td align="left">4</td>
 <td align="left">
 
-Create a secret in the vlt-lz-shared-mon-security vault located within the cmp-landingzone:cmp-lz-security compartment.
+Create a secret in the Observability Vault for the selected deployment option. For CENTRALIZED, use `vlt-lz-shared-mon-security` in `cmp-landingzone:cmp-lz-security`. For PROJECT, use the environment-specific vault: `vlt-lz-prod-mon-security` in `cmp-lz-prod-security`, or `vlt-lz-preprod-mon-security` in `cmp-lz-preprod-security`.
 
 If mTLS is required, download the Autonomous Database wallet, extract `cwallet.sso`, and store it in OCI Vault as a separate secret. Tag the wallet secret so Database Management can discover it:
 
@@ -268,7 +268,7 @@ This operation can be easily automated with [Terraform](https://registry.terrafo
 <tr>
 <td align="left">
 
-* In a **local approach**, OPSI PEs and the ATP PE will reside in the same database subnet (sn-fra-lz-prod-db), and the nsg-fra-lz-prod-proj1-mon-pe-db1 NSGs will allow communication between them. Example: pe_lz_p_opsi.
+* In a **PROJECT approach**, OPSI PEs and the ATP PE will reside in the same database subnet (sn-fra-lz-prod-db), and the nsg-fra-lz-prod-proj1-mon-pe-db1 NSGs will allow communication between them. Example: pe_lz_p_opsi.
 
 <img src="../images/PE_OPSI_LOCAL.png" height="100" align="left" > </img>
 
@@ -302,7 +302,7 @@ To connect to a database placed in a private subnet you can follow this [blog](h
 <tr>
 <td align="left">4</td>
 <td align="left">
-Create a secret in the vlt-lz-shared-mon-security vault located in the cmp-landingzone:cmp-lz-security compartment.
+Create a secret in the Observability Vault for the selected deployment option. For CENTRALIZED, use `vlt-lz-shared-mon-security` in `cmp-landingzone:cmp-lz-security`. For PROJECT, use the environment-specific vault: `vlt-lz-prod-mon-security` in `cmp-lz-prod-security`, or `vlt-lz-preprod-mon-security` in `cmp-lz-preprod-security`.
 
 **Note**: If you have already completed this step to enable Database Management, you can skip this step.
 
@@ -332,7 +332,7 @@ For the full feature set, configure the required credential, database user, Vaul
 
 <td align="left" rowspan="2">     
 
-Remember to select the private OPSI endpoint created earlier in the Enable OCI Observability flow. Choose the appropriate PE based on whether you're using a Global or Local approach.
+Remember to select the private OPSI endpoint created earlier in the Enable OCI Observability flow. Choose the appropriate PE based on whether you're using the CENTRALIZED or PROJECT approach.
 
 </td>
 </tr>
@@ -383,7 +383,7 @@ Click the 'Add database' button. Then, go to the work request and check the prog
 
 For Autonomous Database, Logging Analytics collects database records by connecting to the database over JDBC and running SQL against approved tables or views. It does not collect database server host files, because the database hosts are managed by Oracle.
 
-The Landing Zone add-on creates the IAM prerequisites, dynamic group, network access, and the monitoring agent VM `vm-fra-lz-shared-mon-agent`. Use that VM as the Management Agent host unless your implementation requires another approved host with JDBC connectivity to the Autonomous Database.
+The Landing Zone add-on creates the IAM prerequisites, dynamic group, network access, and the selected monitoring agent VM. Use `vm-fra-lz-shared-mon-agent` for CENTRALIZED, or `vm-fra-lz-prod-proj1-mon-agent` for PROJECT, unless your implementation requires another approved host with JDBC connectivity to the Autonomous Database.
 
 ### 1. Decide What To Collect
 
@@ -440,7 +440,7 @@ Recommended fields:
 
 ### 3. Prepare The Management Agent And Wallet
 
-1. Connect to the monitoring agent VM created by the Landing Zone add-on: `vm-fra-lz-shared-mon-agent`.
+1. Connect to the monitoring agent VM created by the Landing Zone add-on: `vm-fra-lz-shared-mon-agent` for CENTRALIZED, or `vm-fra-lz-prod-proj1-mon-agent` for PROJECT.
 2. Install the [OCI Management Agent](https://docs.oracle.com/en-us/iaas/management-agents/doc/install-management-agent-chapter.html).
 3. Confirm the Management Agent is `Active`.
 4. Confirm the Log Analytics service plugin is `Running`.
