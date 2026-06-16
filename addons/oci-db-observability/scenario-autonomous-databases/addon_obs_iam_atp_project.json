@@ -11,12 +11,12 @@
                 "name": "grp-lz-preprod-proj1-mon-admin",
                 "description": "Preprod Observability admin group."
             },
-            "GRP-PROD-MON-READER": {
-                "name": "grp-lz-prod-mon-reader",
+            "GRP-PROD-PROJ1-MON-READER": {
+                "name": "grp-lz-prod-proj1-mon-reader",
                 "description": "Production Observability reader group."
             },
-            "GRP-PREPROD-MON-READER": {
-                "name": "grp-lz-preprod-mon-reader",
+            "GRP-PREPROD-PROJ1-MON-READER": {
+                "name": "grp-lz-preprod-proj1-mon-reader",
                 "description": "Preprod Observability reader group."
             }
         }
@@ -71,6 +71,16 @@
                     "Allow service dpd to read secret-family in compartment cmp-lz-prod-security"
                 ]
             },
+            "PCY-PROD-PROJ1-MON-SECURITY-READERS": {
+                "name": "pcy-prod-proj1-mon-security-reader",
+                "description": "Policy to allow grp-lz-prod-proj1-mon-reader group users to read production Observability security resources.",
+                "compartment_id": "CMP-LZ-PROD-SECURITY-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read vaults in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read keys in compartment cmp-lz-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to inspect secret-family in compartment cmp-lz-prod-security"
+                ]
+            },
             "PCY-PREPROD-PROJ1-MON-SECURITY-ADMINISTRATION": {
                 "name": "pcy-preprod-proj1-mon-security-admin",
                 "description": "Policy to allow grp-lz-preprod-proj1-mon-admin group users to manage pre-production Observability security resources.",
@@ -80,6 +90,16 @@
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use keys in compartment cmp-lz-preprod-security",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage secret-family in compartment cmp-lz-preprod-security",
                     "Allow service dpd to read secret-family in compartment cmp-lz-preprod-security"
+                ]
+            },
+            "PCY-PREPROD-PROJ1-MON-SECURITY-READERS": {
+                "name": "pcy-preprod-proj1-mon-security-reader",
+                "description": "Policy to allow grp-lz-preprod-proj1-mon-reader group users to read pre-production Observability security resources.",
+                "compartment_id": "CMP-LZ-PREPROD-SECURITY-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read vaults in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read keys in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to inspect secret-family in compartment cmp-lz-preprod-security"
                 ]
             },
                "PCY-PROD-PROJ1-MON-NETWORK-ADMINISTRATION": {
@@ -96,6 +116,19 @@
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-admin' to use network-security-groups in compartment cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1"
                 ]
             },
+            "PCY-PROD-PROJ1-MON-NETWORK-READERS": {
+                "name": "pcy-prod-proj1-mon-network-reader",
+                "description": "Policy to allow grp-lz-prod-proj1-mon-reader group users to read production Observability private endpoint network resources.",
+                "compartment_id": "CMP-LZ-PROD-NETWORK-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read security-lists in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read virtual-network-family in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read subnets in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read vnics in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read network-security-groups in compartment cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read network-security-groups in compartment cmp-lz-prod:cmp-lz-prod-projects:cmp-lz-prod-proj1"
+                ]
+            },
             "PCY-PREPROD-PROJ1-MON-NETWORK-ADMINISTRATION": {
                 "name": "pcy-preprod-proj1-mon-network-admin",
                 "description": "Policy to allow grp-lz-preprod-proj1-mon-admin group users to manage pre-production Observability private endpoint network resources.",
@@ -108,6 +141,19 @@
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use network-security-groups in compartment cmp-lz-preprod-network",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use virtual-network-family in compartment cmp-lz-preprod-network",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to use network-security-groups in compartment cmp-lz-preprod:cmp-lz-preprod-projects:cmp-lz-preprod-proj1"
+                ]
+            },
+            "PCY-PREPROD-PROJ1-MON-NETWORK-READERS": {
+                "name": "pcy-preprod-proj1-mon-network-reader",
+                "description": "Policy to allow grp-lz-preprod-proj1-mon-reader group users to read pre-production Observability private endpoint network resources.",
+                "compartment_id": "CMP-LZ-PREPROD-NETWORK-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read security-lists in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read virtual-network-family in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read subnets in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read vnics in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read network-security-groups in compartment cmp-lz-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read network-security-groups in compartment cmp-lz-preprod:cmp-lz-preprod-projects:cmp-lz-preprod-proj1"
                 ]
             },
             "PCY-PROD-PROJ1-MON-ADMINISTRATION": {
@@ -137,6 +183,31 @@
 
                 ]
             },
+            "PCY-PROD-PROJ1-MON-READERS": {
+                "name": "pcy-prod-proj1-mon-reader",
+                "description": "Policy to allow grp-lz-prod-proj1-mon-reader group users to read Autonomous Database observability resources in the Prod proj1 compartment.",
+                "compartment_id": "CMP-LZ-PROD-PROJ1-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read compartments in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read dbmgmt-private-endpoints in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read dbmgmt-work-requests in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read database-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read autonomous-database-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read metrics in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read ons-topics in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read opsi-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read management-dashboard-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read management-agents in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read management-agent-install-keys in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read instance-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read instance-agent-plugins in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read loganalytics-features-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read loganalytics-ingesttime-rule in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read loganalytics-resources-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read management-dashboard in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-mon-reader' to read management-saved-search in compartment cmp-lz-prod-proj1"
+                ]
+            },
             "PCY-PREPROD-PROJ1-MON-ADMINISTRATION": {
                 "name": "pcy-preprod-proj1-mon-admin",
                 "description": "Policy to allow monitoring groups to manage Autonomous Database observability resources in the Preprod proj1 compartment.",
@@ -162,6 +233,31 @@
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage management-dashboard in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-admin' to manage management-saved-search in compartment cmp-lz-preprod-proj1"        
                  ]
+            },
+            "PCY-PREPROD-PROJ1-MON-READERS": {
+                "name": "pcy-preprod-proj1-mon-reader",
+                "description": "Policy to allow grp-lz-preprod-proj1-mon-reader group users to read Autonomous Database observability resources in the Preprod proj1 compartment.",
+                "compartment_id": "CMP-LZ-PREPROD-PROJ1-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to inspect secret-family in compartment cmp-lz-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read dbmgmt-private-endpoints in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read dbmgmt-work-requests in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read database-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read autonomous-database-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read metrics in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read ons-topics in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read opsi-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read management-dashboard-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read management-agents in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read management-agent-install-keys in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read instance-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read instance-agent-plugins in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read loganalytics-features-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read loganalytics-ingesttime-rule in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read loganalytics-resources-family in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read management-dashboard in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-mon-reader' to read management-saved-search in compartment cmp-lz-preprod-proj1"
+                ]
             }
 
         }
