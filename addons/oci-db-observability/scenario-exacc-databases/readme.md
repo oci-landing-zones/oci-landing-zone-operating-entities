@@ -56,7 +56,7 @@ Deploy the Observability Landing zone add-on:
 |---|
 | Use this deployment when ExaDB-C@C observability is enabled through Management Agent, with optional Management Gateway connectivity to OCI endpoints. |
 | Resources created:<br><br>Compartments: `cmp-lz-monitoring`.<br><br>Groups: `grp-lz-centralized-mon-admin`.<br><br>Policies: `pcy-mon-services`, `pcy-centralized-mon-admin`, `pcy-mon-dynamic-group`, `pcy-mon-agent-cert-dynamic-group`, `pcy-centralized-mon-security-admin`, `pcy-shared-exacc-mon-admin`.<br><br>COMMON Identity Domain dynamic groups: `id_lz_common/dg-lz-mon-dynamic-group`, `id_lz_common/dg-lz-mon-credential-dynamic-group`.<br><br>Vault and key: `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`. |
-| <img src="../images/EXACC_GLOBAL.png" height="250" align="center"> |
+| <img src="../images/EXACC_CEN.png" height="250" align="center"> |
 | <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacc-databases/addon_obs_iam_exacc_centralized.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacc-databases/addon_obs_security_exacc.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
 | Files loaded:<br>[addon_obs_iam_exacc_centralized.json](addon_obs_iam_exacc_centralized.json)<br>[addon_obs_security_exacc.json](addon_obs_security_exacc.json) |
 

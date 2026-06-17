@@ -46,7 +46,7 @@ Deploy the Observability Landing Zone add-on using Option 1.
 | **NSG egress behavior:** egress is intentionally left open to `0.0.0.0/0` for DBM/OPSI private endpoint connectivity. The centralized hub PE NSG uses all protocols, and the shared ExaDB-D DB-side NSG uses TCP. |
 | **Vault and key:** `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`. |
 | **Monitoring instance:** none; Logging Analytics uses a Management Agent installed on the monitored ExaDB-D VM Cluster database hosts. |
-| <img src="../images/EXADB_D_GLOBAL.png" height="250" align="center"> |
+| <img src="../images/EXADB_D_CEN.png" height="250" align="center"> |
 | Files loaded:<br>[addon_obs_iam_exacs_centralized.json](addon_obs_iam_exacs_centralized.json)<br>[addon_obs_network_exacs_centralized.json](addon_obs_network_exacs_centralized.json)<br>[addon_obs_security_exacs.json](addon_obs_security_exacs.json) |
 | ORM deployment:<br><a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacs-databases/addon_obs_iam_exacs_centralized.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacs-databases/addon_obs_network_exacs_centralized.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacs-databases/addon_obs_security_exacs.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
 

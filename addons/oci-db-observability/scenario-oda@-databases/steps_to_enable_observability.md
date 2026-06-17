@@ -52,7 +52,7 @@ The Observability Landing Zone add-on deployment already creates the OCI-side pr
 
    For the Global approach, the private endpoint is created in the hub monitoring subnet and uses the global monitoring NSG.
 
-   <img src="../images/GLOBAL_PE.png" height="220" align="center">
+   <img src="../images/CEN_PE.png" height="220" align="center">
 
 5. Create the private endpoint for Operations Insights. Use the Global subnet and NSG model from the Observability Landing Zone add-on deployment. The ODA@ database hosts are in `vcn-fra-lz-shared-oda`, subnet `sn-fra-lz-shared-oda-db`.
 
@@ -62,7 +62,7 @@ The Observability Landing Zone add-on deployment already creates the OCI-side pr
 
    The form is equivalent to the Database Management private endpoint flow: place the endpoint in the hub monitoring subnet and attach `nsg-fra-lz-hub-global-mon-pe`.
 
-   <img src="../images/PE_OPSI_GLOBAL.png" height="180" align="center">
+   <img src="../images/PE_OPSI_CEN.png" height="180" align="center">
 
 6. Verify connectivity between the target database and the private endpoint.
 

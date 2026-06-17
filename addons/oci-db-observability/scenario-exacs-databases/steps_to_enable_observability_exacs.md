@@ -54,7 +54,7 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 
    For the centralized approach, the private endpoint is created in the hub monitoring subnet and uses the centralized monitoring NSG.
 
-   <img src="../images/GLOBAL_PE.png" height="220" align="center">
+   <img src="../images/CEN_PE.png" height="220" align="center">
 
 5. Create the private endpoint for Operations Insights. Use the centralized subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
@@ -64,7 +64,7 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 
    The form is equivalent to the Database Management private endpoint flow: place the endpoint in the hub monitoring subnet and attach `nsg-fra-lz-hub-cen-mon-pe`.
 
-   <img src="../images/PE_OPSI_GLOBAL.png" height="180" align="center">
+   <img src="../images/PE_OPSI_CEN.png" height="180" align="center">
 
 6. Verify connectivity between the target database and the private endpoint.
 

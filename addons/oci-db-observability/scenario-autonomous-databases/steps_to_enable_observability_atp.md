@@ -80,7 +80,7 @@ Create the DBM private endpoint.
 * In a **CENTRALIZED approach**, DBM PEs will be placed in the monitoring subnet (`sn-fra-lz-hub-mon`) in the hub VCN and should be assigned to the centralized PE NSG (`nsg-fra-lz-hub-cen-mon-pe`). Example: `pe_lz_centralized_dbm`.
 
 &nbsp; 
-<img src="../images/GLOBAL_PE.png" height="100" width="200"  align="left">
+<img src="../images/CEN_PE.png" height="100" width="200"  align="left">
 </td>
 
 
@@ -255,7 +255,7 @@ Create the OPSI private endpoint.
 
 * In a **CENTRALIZED approach**, OPSI PEs will be placed in the monitoring subnet (`sn-fra-lz-hub-mon`) in the hub VCN and should be assigned to the centralized PE NSG (`nsg-fra-lz-hub-cen-mon-pe`). Example: `pe_lz_centralized_opsi`.
 
-<img src="../images/PE_OPSI_GLOBAL.png" height="100" align="left" > </img>
+<img src="../images/PE_OPSI_CEN.png" height="100" align="left" > </img>
 
 
 </td>
@@ -354,7 +354,7 @@ Remember to select the private OPSI endpoint created earlier in the Enable OCI O
 &nbsp; 
 &nbsp; 
 
-<img src="../images/OPSI_GLOBAL.png" height="100" width="200" align="left"></img>
+<img src="../images/OPSI_CEN.png" height="100" width="200" align="left"></img>
 &nbsp; 
 &nbsp; 
 &nbsp; 
