@@ -32,5 +32,5 @@ local cis2_vault_key =
   output_files: std.sort(std.objectFields(outputs)),
   services_key_policy_statement: service_policy.statements[std.length(service_policy.statements) - 1],
   shared_network_policy_ocid:
-    security_recipes['SZ-RCP-LZ-03-SHARED-NETWORK-KEY'].security_policies_ocids[0],
+    security_recipes['SZ-RCP-LZ-02-SHARED-NETWORK-KEY'].security_policies_ocids[0],
 }

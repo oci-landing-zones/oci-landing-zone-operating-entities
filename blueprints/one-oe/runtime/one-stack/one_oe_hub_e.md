@@ -31,6 +31,10 @@ Two deployment options are available: One-Stack deployment with **CIS Level 1** 
 
 &nbsp; 
 
+For details on the Security Zone policies included in each deployment option, see [Security Zones - CIS Level 1](./sz_recipes_cis1.md) and [Security Zones - CIS Level 2](./sz_recipes_cis2.md).
+
+&nbsp; 
+
 ---
 
  ### Input configurations for **CIS Level 1** 
@@ -40,7 +44,7 @@ Two deployment options are available: One-Stack deployment with **CIS Level 1** 
 | **IAM configuration**</br> [oneoe_iam.json](oneoe_iam.json) | • Compartments</br> • Identity Domain</br> • IAM groups and policies |
 | **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespace </br> • Tag key definition|
 | **Network configuration** </br> [oneoe_network_hub_e.json](oneoe_network_hub_e.json) | • [Hub E](/addons/oci-hub-models/hub_e/readme.md) VCN with associated subnets </br> • Internet, NAT and Service gateways</br> • Dynamic Routing Gateway (DRG)</br> • Route Tables with corresponding route rules</br> • Two Spoke VCNs (Prod and PreProd) with private-only subnets </br> • NAT and Service gateways in the Spoke VCNs</br> • Security Lists (SLs) and Network Security Groups (NSGs) </br> • Public Load Balancer ([free tier LBaaS](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm#loadbalancing)) with two example backend IP addresses from the production web tier: 10.0.64.10 and 10.0.64.20. The LBaaS and backend configurations are provided solely for example purposes and should be updated to reference actual workload instances |
-| **Security configuration** for </br> **Step 1**: [oneoe_security_cis1_pre.json](oneoe_security_cis1_pre.json)</br> and</br> **Step 2**: [oneoe_security_cis1.json](oneoe_security_cis1.json)</br></br> | • Cloud Guard</br> • Security Zones</br> • Vulnerability Scanning |
+| **Security configuration** for </br> **Step 1**: [oneoe_security_cis1_pre.json](oneoe_security_cis1_pre.json)</br> and</br> **Step 2**: [oneoe_security_cis1.json](oneoe_security_cis1.json)</br></br> | • Cloud Guard</br> • [Security Zones and recipes (CIS Level 1)](./sz_recipes_cis1.md)</br> • Vulnerability Scanning |
 | **Observability configuration** for</br> **Step 1**: [oneoe_observability_cis1_pre.json](oneoe_observability_cis1_pre.json)</br> and</br> **Step 2**: [oneoe_observability_cis1.json](oneoe_observability_cis1.json) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | • Events</br> • Alarms</br> • Logging</br> • Notifications |
 
 &nbsp;
@@ -63,7 +67,7 @@ And follow these steps:
   
   1. **Security - Security Zones, Vulnerability Scanning Service**:</br></br>
     Use the configuration [oneoe_security_cis1.json](oneoe_security_cis1.json) to complete the security implementation by adding the following components:
-      - Security Zone Targets to apply more restrictive Security Zone Recipes to the following compartments: Hub network compartment, Production network compartment, and Project 1 workload compartment.</br>
+      - Security Zone Targets to apply more restrictive Security Zone Recipes to the following compartments: Hub network compartment and Production compartment.</br>
       - Vulnerability Scanning on all Host targets within the Landing Zone enclosing compartment.
     
   2. **Observability - Flow Logs**:</br>
@@ -84,7 +88,7 @@ Once all required updates are applied, rerun the ORM stack.
 | **IAM configuration**</br> [oneoe_iam.json](oneoe_iam.json) | • Compartments</br> • Identity Domain</br> • IAM groups and policies |
 | **Governance configuration**</br> [oneoe_governance.json](oneoe_governance.json)| • Tag namespace </br> • Tag key definition|
 | **Network configuration** </br> [oneoe_network_hub_e.json](oneoe_network_hub_e.json) | • [Hub E](/addons/oci-hub-models/hub_e/readme.md) VCN with associated subnets </br> • Internet, NAT and Service gateways</br> • Dynamic Routing Gateway (DRG)</br> • Route Tables with corresponding route rules</br> • Two Spoke VCNs (Prod and PreProd) with private-only subnets </br> • NAT and Service gateways in the Spoke VCNs</br> • Security Lists (SLs) and Network Security Groups (NSGs) </br> • Public Load Balancer ([free tier LBaaS](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm#loadbalancing)) with two example backend IP addresses from the production web tier: 10.0.64.10 and 10.0.64.20. The LBaaS and backend configurations are provided solely for example purposes and should be updated to reference actual workload instances |
-| **Security configuration** for </br> **Step 1**: [oneoe_security_cis2_pre.json](oneoe_security_cis2_pre.json)</br> and</br> **Step 2**: [oneoe_security_cis2.json](oneoe_security_cis2.json)</br></br> | • Cloud Guard</br> • Security Zones</br> • Vulnerability Scanning</br> • Vault and Software Key |
+| **Security configuration** for </br> **Step 1**: [oneoe_security_cis2_pre.json](oneoe_security_cis2_pre.json)</br> and</br> **Step 2**: [oneoe_security_cis2.json](oneoe_security_cis2.json)</br></br> | • Cloud Guard</br> • [Security Zones and recipes (CIS Level 2)](./sz_recipes_cis2.md)</br> • Vulnerability Scanning</br> • Vault and Software Key |
 | **Observability configuration** for</br> **Step 1**: [oneoe_observability_cis2_pre.json](oneoe_observability_cis2_pre.json)</br> and</br> **Step 2**: [oneoe_observability_cis2.json](oneoe_observability_cis2.json) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | • Events</br> • Alarms</br> • Logging</br> • Notifications |
 
 &nbsp;
