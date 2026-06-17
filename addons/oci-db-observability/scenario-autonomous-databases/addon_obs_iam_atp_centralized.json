@@ -70,7 +70,6 @@
                     "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to manage opsi-family in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to manage management-dashboard-family in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to manage management-agents in tenancy",
-                    "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to inspect ons-topics in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to manage management-agent-install-keys in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to read instance-family in tenancy",
                     "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to read instance-agent-plugins in tenancy",
@@ -139,7 +138,6 @@
                 "compartment_id": "CMP-LANDINGZONE-KEY",
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to use security-lists in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to use subnets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to use network-security-groups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
