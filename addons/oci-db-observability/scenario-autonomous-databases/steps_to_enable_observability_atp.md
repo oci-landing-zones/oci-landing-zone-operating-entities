@@ -77,7 +77,7 @@ The Landing Zone add-on already provisions the required compartments, subnets, a
 <td align="left">
 Create the DBM private endpoint. 
 
-* In a **CENTRALIZED approach**, DBM PEs will be placed in the monitoring subnet (`sn-fra-lz-hub-mon`) in the hub VCN and should be assigned to the centralized PE NSG (`nsg-fra-lz-hub-global-mon-pe`). Example: `pe_lz_centralized_dbm`.
+* In a **CENTRALIZED approach**, DBM PEs will be placed in the monitoring subnet (`sn-fra-lz-hub-mon`) in the hub VCN and should be assigned to the centralized PE NSG (`nsg-fra-lz-hub-cen-mon-pe`). Example: `pe_lz_centralized_dbm`.
 
 &nbsp; 
 <img src="../images/GLOBAL_PE.png" height="100" width="200"  align="left">
@@ -253,7 +253,7 @@ The Landing Zone add-on already provisions the required compartments, subnets, a
 <td align="left">
 Create the OPSI private endpoint. 
 
-* In a **CENTRALIZED approach**, OPSI PEs will be placed in the monitoring subnet (`sn-fra-lz-hub-mon`) in the hub VCN and should be assigned to the centralized PE NSG (`nsg-fra-lz-hub-global-mon-pe`). Example: `pe_lz_centralized_opsi`.
+* In a **CENTRALIZED approach**, OPSI PEs will be placed in the monitoring subnet (`sn-fra-lz-hub-mon`) in the hub VCN and should be assigned to the centralized PE NSG (`nsg-fra-lz-hub-cen-mon-pe`). Example: `pe_lz_centralized_opsi`.
 
 <img src="../images/PE_OPSI_GLOBAL.png" height="100" align="left" > </img>
 

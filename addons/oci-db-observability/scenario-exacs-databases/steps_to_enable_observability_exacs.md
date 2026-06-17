@@ -8,7 +8,7 @@ This guide describes how to enable OCI observability capabilities for Oracle Exa
 The Observability Landing Zone add-on deployment already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
 - Monitoring compartments.
-- Monitoring group `grp-lz-global-mon-admins`.
+- Monitoring group `grp-lz-centralized-mon-admin`.
 - The Management Agent dynamic group `id_lz_common/dg-lz-mon-dynamic-group` in the COMMON Identity Domain.
 - IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, and the required network access.
 - Network Security Groups for the DBM/OPSI private endpoint connectivity.

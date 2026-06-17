@@ -6,7 +6,7 @@
             "CMP-LZ-MONITORING-KEY": {
                 "parent_id":"CMP-LZ-PLATFORM-KEY",
                 "name": "cmp-lz-monitoring",
-                "description": "Observability Global Compartment"
+                "description": "Observability Centralized Compartment"
             }
         }
     },

@@ -9,7 +9,7 @@ This document does not apply to Autonomous Clusters.
 The Observability Landing Zone add-on deployment already creates the OCI-side prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
 - Monitoring compartments.
-- Monitoring group `grp-lz-global-mon-admins`.
+- Monitoring group `grp-lz-centralized-mon-admin`.
 - The Management Agent dynamic groups `id_lz_common/dg-lz-mon-dynamic-group` and `id_lz_common/dg-lz-mon-credential-dynamic-group` in the COMMON Identity Domain.
 - IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, certificates, vaults, and keys.
 - The Observability Vault and Key, `vlt-lz-shared-mon-security` and `key-lz-mon-bkt`.

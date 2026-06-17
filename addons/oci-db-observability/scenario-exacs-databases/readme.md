@@ -39,7 +39,7 @@ Deploy the Observability Landing Zone add-on using Option 1.
 | * Use this deployment when DBM/OPSI private endpoints are shared centralized endpoints to be created in the hub monitoring subnet. <br> * One centralized observability team manages DBM, OPSI, Logging Analytics, and shared monitoring resources for all ExaDB-D databases. <br> * Logging Analytics requires a Management Agent on each monitored ExaDB-D VM Cluster database host and the required ingestion policies. This add-on provides the IAM and network prerequisites for that flow, but it does not deploy a separate VM. <br> * Enabling Database Management or Ops Insights for an ExaDB-D database requires a database user and password. These credentials must be stored as secrets in the centralized Observability Vault `vlt-lz-shared-mon-security`, created in `cmp-landingzone:cmp-lz-security` by the CENTRALIZED implementation option. The required policies to access the secret are included in the add-on. |
 | **Resources created** |
 | **Compartments:** `cmp-lz-monitoring`. |
-| **Groups:** `grp-lz-global-mon-admins`. |
+| **Groups:** `grp-lz-centralized-mon-admin`. |
 | **Policies:** `pcy-mon-services`, `pcy-centralized-mon-admin`, `pcy-mon-dynamic-group`, `pcy-centralized-mon-security-admin`, `pcy-centralized-mon-network-admin`, `pcy-shared-exacs-mon-admin`. |
 | **COMMON Identity Domain dynamic group:** `id_lz_common/dg-lz-mon-dynamic-group`. |
 | **NSGs:** `nsg-fra-lz-hub-cen-mon-pe`, `nsg-fra-lz-shared-exacs-mon-pe` in `vcn-fra-lz-shared-exacs` for `sn-fra-lz-shared-exacs-db`. |

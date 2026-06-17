@@ -20,11 +20,11 @@ Follow these steps:
 
 
 
-Note: The add-on creates a dedicated Observability Vault and Key. To grant the `grp-lz-global-mon-admins` group in the common One-OE identity domain access to specific resources, you can optionally modify the following two statements in the `pcy-centralized-mon-admin` policy by adding a `where` condition. Check the CENTRALIZED IAM file selected for this deployment.
+Note: The add-on creates a dedicated Observability Vault and Key. To grant the `grp-lz-centralized-mon-admin` group in the common One-OE identity domain access to specific resources, you can optionally modify the following two statements in the `pcy-centralized-mon-admin` policy by adding a `where` condition. Check the CENTRALIZED IAM file selected for this deployment.
 
 ```
-allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use vaults in compartment cmp-landingzone:cmp-lz-security where target.vault.id='ocid1.vault.oc1.region.xxxx'
-allow group 'id_lz_common'/'grp-lz-global-mon-admins' to use keys in compartment cmp-landingzone:cmp-lz-security where target.key.id='ocid1.key.oc1.region.xxx'
+allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to use vaults in compartment cmp-landingzone:cmp-lz-security where target.vault.id='ocid1.vault.oc1.region.xxxx'
+allow group 'id_lz_common'/'grp-lz-centralized-mon-admin' to use keys in compartment cmp-landingzone:cmp-lz-security where target.key.id='ocid1.key.oc1.region.xxx'
 ```
 
 >[!NOTE] If you add `where` conditions, replace the placeholder OCIDs with your own Vault and Key OCIDs.

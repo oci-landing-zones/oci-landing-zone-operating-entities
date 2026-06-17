@@ -13,7 +13,7 @@
                 "protection_mode": "SOFTWARE",
                 "vault_key": "VLT-LZ-SHARED-MON-KEY",
                 "service_grantees": ["objectstorage-eu-frankfurt-1"],
-                "group_grantees": ["grp-lz-global-mon-admins"],
+                "group_grantees": ["grp-lz-centralized-mon-admin"],
                 "versions": ["1","2"]
             }
         }
