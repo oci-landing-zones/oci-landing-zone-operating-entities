@@ -9,7 +9,7 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 
 - In OPTION 1. CENTRALIZED APPROACH, the add-on creates the centralized monitoring compartment `cmp-lz-monitoring`.
 - In OPTION 2. PROJECT APPROACH, the add-on does not create monitoring compartments; it uses the existing project compartments `cmp-lz-prod-proj1` and `cmp-lz-preprod-proj1`.
-- Monitoring groups. The centralized option creates `grp-lz-centralized-mon-admin` and `grp-lz-centralized-mon-reader`. The project option creates `grp-lz-prod-proj1-mon-admin`, `grp-lz-prod-proj1-mon-reader`, `grp-lz-preprod-proj1-mon-admin`, and `grp-lz-preprod-proj1-mon-reader`.
+- Monitoring groups. The centralized option creates `grp-lz-centralized-mon-admin` and `grp-lz-centralized-mon-reader`. The project option uses the existing project administration groups `grp-lz-prod-proj1-admin` and `grp-lz-preprod-proj1-admin`.
 - The Management Agent dynamic group `id_lz_common/dg-lz-mon-dynamic-group` in the COMMON Identity Domain.
 - IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, and the required network access.
 - Network Security Groups for the DBM/OPSI private endpoint connectivity.

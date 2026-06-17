@@ -20,7 +20,7 @@ Follow these steps:
 
 
 
-Note: The add-on creates dedicated Observability Vault and Key resources. To grant the selected monitoring admin group in the common One-OE identity domain access to specific resources, you can optionally modify the vault and key statements in the relevant security admin policy by adding a `where` condition. For the centralized option, use `pcy-centralized-mon-security-admin`. For the project option, use the environment-specific `pcy-prod-proj1-mon-security-admin` or `pcy-preprod-proj1-mon-security-admin` policy.
+Note: The add-on creates dedicated Observability Vault and Key resources. To grant the selected monitoring admin group in the common One-OE identity domain access to specific centralized resources, you can optionally modify the vault and key statements in the `pcy-centralized-mon-security-admin` policy by adding a `where` condition. For the project option, the add-on uses the existing project administration groups through the key `group_grantees` in `addon_obs_security_dbcs_project.json`; no separate project security admin IAM policy is emitted.
 
 ```
 allow group 'id_lz_common'/'<monitoring-admin-group>' to use vaults in compartment <security-compartment-path> where target.vault.id='ocid1.vault.oc1.region.xxxx'

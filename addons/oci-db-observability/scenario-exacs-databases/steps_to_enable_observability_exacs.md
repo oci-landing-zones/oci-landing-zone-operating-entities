@@ -8,7 +8,7 @@ This guide describes how to enable OCI observability capabilities for Oracle Exa
 The Observability Landing Zone add-on deployment already creates the prerequisites for Database Management, Operations Insights, and Logging Analytics:
 
 - Monitoring compartments.
-- Monitoring group `grp-lz-centralized-mon-admin`.
+- Monitoring group `grp-lz-platform-mon-admin`.
 - The Management Agent dynamic group `id_lz_common/dg-lz-mon-dynamic-group` in the COMMON Identity Domain.
 - IAM policies for Database Management, Operations Insights, Logging Analytics, dashboards, alerts, Management Agent, secrets, and the required network access.
 - Network Security Groups for the DBM/OPSI private endpoint connectivity.
@@ -46,17 +46,17 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 
    <img src="../images/SECRET.png" height="160" align="center">
 
-4. Create the private endpoint for Database Management. Use the centralized subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
+4. Create the private endpoint for Database Management. Use the platform subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
    Go to **Observability & Management** -> **Database Management** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
    If you are creating the private endpoint for a RAC database, select **Use private endpoint**.
 
-   For the centralized approach, the private endpoint is created in the hub monitoring subnet and uses the centralized monitoring NSG.
+   For the Platform approach, the private endpoint is created in the hub monitoring subnet and uses the platform monitoring NSG.
 
    <img src="../images/CEN_PE.png" height="220" align="center">
 
-5. Create the private endpoint for Operations Insights. Use the centralized subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
+5. Create the private endpoint for Operations Insights. Use the platform subnet and NSG model from the Observability Landing Zone add-on deployment. The ExaDB-D database hosts are in `vcn-fra-lz-shared-exacs`, subnet `sn-fra-lz-shared-exacs-db`.
 
    Go to **Observability & Management** -> **Operations Insights** -> **Administration** -> **Private Endpoint** -> **Create Endpoint**.
 
@@ -68,7 +68,7 @@ The Observability Landing Zone add-on deployment already creates the prerequisit
 
 6. Verify connectivity between the target database and the private endpoint.
 
-   The add-on creates the required NSGs for the centralized model. Confirm the target database uses `sn-fra-lz-shared-exacs-db`, confirm the service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target ExaDB-D SCAN listener on port `1521`.
+   The add-on creates the required NSGs for the platform model. Confirm the target database uses `sn-fra-lz-shared-exacs-db`, confirm the service private endpoints use the expected subnet and NSG assignments, and verify that the private endpoint network can reach the target ExaDB-D SCAN listener on port `1521`.
 
 ## Enable Database Management for ExaDB-D
 

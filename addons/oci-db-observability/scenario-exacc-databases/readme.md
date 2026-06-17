@@ -26,7 +26,7 @@ Use these links to review the relevant OCI documentation:
 
 ### Credentials and Vault
 
-Enabling Database Management or Ops Insights for an ExaDB-C@C database requires a database user and password. These credentials must be stored as secrets in the dedicated Observability Vault provisioned by the CENTRALIZED implementation. The required policies to access the secret are included in the add-on.
+Enabling Database Management or Ops Insights for an ExaDB-C@C database requires a database user and password. These credentials must be stored as secrets in the dedicated Observability Vault provisioned by the Platform implementation. The required policies to access the secret are included in the add-on.
 
 ### Management Agent for Logging Analytics
 
@@ -52,13 +52,13 @@ Deploy the One-OE + ExaDB-C@C use case 1 in single stack. You can follow these [
 
 Deploy the Observability Landing zone add-on:
 
-| CENTRALIZED |
+| PLATFORM APPROACH |
 |---|
 | Use this deployment when ExaDB-C@C observability is enabled through Management Agent, with optional Management Gateway connectivity to OCI endpoints. |
-| Resources created:<br><br>Compartments: `cmp-lz-monitoring`.<br><br>Groups: `grp-lz-centralized-mon-admin`.<br><br>Policies: `pcy-mon-services`, `pcy-centralized-mon-admin`, `pcy-mon-dynamic-group`, `pcy-mon-agent-cert-dynamic-group`, `pcy-centralized-mon-security-admin`, `pcy-shared-exacc-mon-admin`.<br><br>COMMON Identity Domain dynamic groups: `id_lz_common/dg-lz-mon-dynamic-group`, `id_lz_common/dg-lz-mon-credential-dynamic-group`.<br><br>Vault and key: `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`. |
+| Resources created:<br><br>Compartments: `cmp-lz-monitoring`.<br><br>Groups: `grp-lz-platform-mon-admin`.<br><br>Policies: `pcy-mon-services`, `pcy-platform-mon-admin`, `pcy-mon-dynamic-group`, `pcy-mon-agent-cert-dynamic-group`, `pcy-platform-mon-security-admin`, `pcy-shared-exacc-mon-admin`.<br><br>COMMON Identity Domain dynamic groups: `id_lz_common/dg-lz-mon-dynamic-group`, `id_lz_common/dg-lz-mon-credential-dynamic-group`.<br><br>Vault and key: `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`. |
 | <img src="../images/EXACC_CEN.png" height="250" align="center"> |
-| <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacc-databases/addon_obs_iam_exacc_centralized.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacc-databases/addon_obs_security_exacc.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
-| Files loaded:<br>[addon_obs_iam_exacc_centralized.json](addon_obs_iam_exacc_centralized.json)<br>[addon_obs_security_exacc.json](addon_obs_security_exacc.json) |
+| <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacc-databases/addon_obs_iam_exacc_platform.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacc-databases/addon_obs_security_exacc.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
+| Files loaded:<br>[addon_obs_iam_exacc_platform.json](addon_obs_iam_exacc_platform.json)<br>[addon_obs_security_exacc.json](addon_obs_security_exacc.json) |
 
 For step-by-step instructions, see [Implementation add-on steps](./Implementation_addon_steps.md).
 

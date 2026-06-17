@@ -10,6 +10,7 @@
             }
         }
     },
+
     "identity_domain_groups_configuration": {
         "default_identity_domain_id": "COMMON-DOMAIN",
         "ignore_external_membership_updates": true,
@@ -24,6 +25,7 @@
             }
         }
     },
+
     "identity_domain_dynamic_groups_configuration": {
         "default_identity_domain_id": "COMMON-DOMAIN",
         "default_defined_tags": null,
@@ -35,7 +37,8 @@
             "matching_rule": "ALL {resource.type='managementagent'}"
           }
         }
-      },
+    },
+    
     "policies_configuration": {
         "enable_cis_benchmark_checks": "false",
         "supplied_policies": {
@@ -45,11 +48,11 @@
                 "compartment_id": "TENANCY-ROOT",
                 "statements": [
                     "Allow service operations-insights to use ons-topics in tenancy",
-                    "Allow service operations-insights to read autonomous-database-family in tenancy where ALL{request.operation='GenerateAutonomousDatabaseWallet'}",
                     "Allow service operations-insights to read secret-family in tenancy",
+                    "Allow service operations-insights to read autonomous-database-family in tenancy where ALL{request.operation='GenerateAutonomousDatabaseWallet'}",
                     "Allow service loganalytics to use metrics in tenancy",
                     "Allow service loganalytics to read loganalytics-features-family in tenancy",
-                    "Allow service dpd to read secret-family in compartment cmp-landingzone:cmp-lz-security"
+                    "Allow service dpd to read secret-family in tenancy"
 
                 ]
             },
