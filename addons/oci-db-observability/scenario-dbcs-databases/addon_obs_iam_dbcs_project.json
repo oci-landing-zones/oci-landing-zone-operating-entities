@@ -42,6 +42,7 @@
                 "description": "Policy to allow monitoring groups to manage DBCS observability resources in the Prod proj1 compartment.",
                 "compartment_id": "CMP-LZ-PROD-PROJ1-KEY",
                 "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage compartments in compartment cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage dbmgmt-family in compartment cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage ons-topics in compartment cmp-lz-prod-proj1",
@@ -61,6 +62,7 @@
                 "description": "Policy to allow monitoring groups to manage DBCS observability resources in the Preprod proj1 compartment.",
                 "compartment_id": "CMP-LZ-PREPROD-PROJ1-KEY",
                 "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage compartments in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage dbmgmt-family in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage ons-topics in compartment cmp-lz-preprod-proj1",

@@ -19,7 +19,7 @@
                 "protection_mode": "SOFTWARE",
                 "vault_key": "VLT-LZ-PROD-MON-KEY",
                 "service_grantees": ["objectstorage-eu-frankfurt-1"],
-                "group_grantees": ["grp-lz-prod-proj1-mon-admin"],
+                "group_grantees": ["grp-lz-prod-proj1-admin"],
                 "versions": ["1","2"]
             },
             "KEY-LZ-PREPROD-MON-KEY": {
@@ -28,7 +28,7 @@
                 "protection_mode": "SOFTWARE",
                 "vault_key": "VLT-LZ-PREPROD-MON-KEY",
                 "service_grantees": ["objectstorage-eu-frankfurt-1"],
-                "group_grantees": ["grp-lz-preprod-proj1-mon-admin"],
+                "group_grantees": ["grp-lz-preprod-proj1-admin"],
                 "versions": ["1","2"]
             }
         }
