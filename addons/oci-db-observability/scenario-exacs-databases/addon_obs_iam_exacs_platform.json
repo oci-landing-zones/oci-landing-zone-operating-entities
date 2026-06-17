@@ -14,9 +14,9 @@
         "default_identity_domain_id": "COMMON-DOMAIN",
         "ignore_external_membership_updates": true,
         "groups": {
-            "GRP-OBS-ADMINS": {
-                "name": "grp-lz-platform-mon-admin",
-                "description": "Platform Observability administrator group."
+            "GRP-EXACS-OBS-ADMINS": {
+                "name": "grp-lz-exacs-mon-admin",
+                "description": "Exacs Observability administrator group."
             }
         }
     },

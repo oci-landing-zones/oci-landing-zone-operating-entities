@@ -31,7 +31,7 @@ Following the guidelines explained here reduces the overall management complexit
 
 To configure this add-on, select the operating model that best matches the customer's organizational structure and the way observability responsibilities are assigned.
 
-<img src="./images/ROLES.png" height="300" align="center">
+<img src="./images/OPTIONS.png" height="300" align="center">
 
 | Approach | Description | Design impact |
 |---|---|---|
