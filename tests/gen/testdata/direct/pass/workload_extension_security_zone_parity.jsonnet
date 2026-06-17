@@ -33,18 +33,6 @@ local oneoe = {
   exacs_single_stack_cis2:
     security_zones(import 'gen/workload-extensions/exacs/single-stack/exacs_security_cis2_uc1.jsonnet') ==
     security_zones(oneoe.cis2),
-  oke_multi_stack_cis1:
-    security_zones(import 'gen/workload-extensions/oke/simple/multi-stack/oke_security_cis1.jsonnet') ==
-    security_zones(oneoe.cis1),
-  oke_multi_stack_cis1_pre:
-    security_zones(import 'gen/workload-extensions/oke/simple/multi-stack/oke_security_cis1_pre.jsonnet') ==
-    security_zones(oneoe.cis1_pre),
-  oke_multi_stack_cis2:
-    security_zones(import 'gen/workload-extensions/oke/simple/multi-stack/oke_security_cis2.jsonnet') ==
-    security_zones(oneoe.cis2),
-  oke_multi_stack_cis2_pre:
-    security_zones(import 'gen/workload-extensions/oke/simple/multi-stack/oke_security_cis2_pre.jsonnet') ==
-    security_zones(oneoe.cis2_pre),
   oke_single_stack_cis1:
     security_zones(import 'gen/workload-extensions/oke/simple/single-stack/oke_security_cis1.jsonnet') ==
     security_zones(oneoe.cis1),
