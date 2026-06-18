@@ -12,13 +12,13 @@ local oke_platform = {
     },
   },
 };
-local hub_oke_config(hub_kind) = {
+local hub_e_prod_oke_config = {
   region: 'eu-frankfurt-1',
   region_short_name: 'fra',
   realm: 'oc1',
   security_targets: ['prod'],
   hub: {
-    kind: hub_kind,
+    kind: 'hub_e',
     network: { vcn: '10.0.0.0/21' },
   },
   environments: {
@@ -37,8 +37,5 @@ local hub_oke_config(hub_kind) = {
 
   oke_platform: oke_platform,
 
-  hub_a_prod_oke_config: hub_oke_config('hub_a'),
-  hub_b_prod_oke_config: hub_oke_config('hub_b'),
-  hub_c_prod_oke_config: hub_oke_config('hub_c'),
-  hub_e_prod_oke_config: hub_oke_config('hub_e'),
+  hub_e_prod_oke_config: hub_e_prod_oke_config,
 }

@@ -15,35 +15,13 @@
     "preprod": true,
     "prod": true
   },
-  "profile_configs": {
-    "hub_a": {
-      "environments": [
-        "prod"
-      ],
-      "has_projects": false,
-      "has_shared_project_network": false
-    },
-    "hub_b": {
-      "environments": [
-        "prod"
-      ],
-      "has_projects": false,
-      "has_shared_project_network": false
-    },
-    "hub_c": {
-      "environments": [
-        "prod"
-      ],
-      "has_projects": false,
-      "has_shared_project_network": false
-    },
-    "hub_e": {
-      "environments": [
-        "prod"
-      ],
-      "has_projects": false,
-      "has_shared_project_network": false
-    }
+  "profile_config": {
+    "environments": [
+      "prod"
+    ],
+    "has_projects": false,
+    "has_shared_project_network": false,
+    "hub_kind": "hub_e"
   },
   "single_stack": {
     "categories": [

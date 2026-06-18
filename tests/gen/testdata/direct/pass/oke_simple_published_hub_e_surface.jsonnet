@@ -18,25 +18,17 @@ local generic_project_vcns = [
   'VCN-FRA-LZ-PROD-PROJECTS-KEY',
   'VCN-FRA-LZ-PREPROD-PROJECTS-KEY',
 ];
-local profile_configs = {
-  hub_a: published_profiles.hub_a_prod_oke_config,
-  hub_b: published_profiles.hub_b_prod_oke_config,
-  hub_c: published_profiles.hub_c_prod_oke_config,
-  hub_e: published_profiles.hub_e_prod_oke_config,
-};
-local profile_envs_without_generic_projects = {
-  [hub_kind]: {
-    environments: std.objectFields(profile_configs[hub_kind].environments),
-    has_shared_project_network:
-      std.objectHas(profile_configs[hub_kind].environments.prod, 'shared_project_network'),
-    has_projects:
-      std.objectHas(profile_configs[hub_kind].environments.prod, 'projects'),
-  }
-  for hub_kind in std.objectFields(profile_configs)
-};
+local profile_config = published_profiles.hub_e_prod_oke_config;
 
 {
-  profile_configs: profile_envs_without_generic_projects,
+  profile_config: {
+    hub_kind: profile_config.hub.kind,
+    environments: std.objectFields(profile_config.environments),
+    has_shared_project_network:
+      std.objectHas(profile_config.environments.prod, 'shared_project_network'),
+    has_projects:
+      std.objectHas(profile_config.environments.prod, 'projects'),
+  },
   ordinary_hub_e_default_keeps_project_vcns: {
     prod: std.objectHas(defaults.hub_e.environments.prod, 'shared_project_network'),
     preprod: std.objectHas(defaults.hub_e.environments.preprod, 'shared_project_network'),
