@@ -41,6 +41,10 @@ Deploy the Observability Landing Zone add-on. Choose the option that best fits y
   </thead>
   <tbody>
     <tr>
+      <td align="center"><img src="../images/ATP_CEN.png" height="250" alt="Autonomous Database centralized approach"></td>
+      <td align="center"><img src="../images/ATP_PROJECT.png" height="250" alt="Autonomous Database project approach"></td>
+    </tr>
+    <tr>
       <td>
         <ul>
           <li>Use this deployment when DBM/OPSI private endpoints are shared centralized endpoints to be created in the hub monitoring subnet.</li>
@@ -96,10 +100,6 @@ Deploy the Observability Landing Zone add-on. Choose the option that best fits y
     <tr>
       <td><strong>Monitoring instance:</strong> <code>vm-fra-lz-shared-mon-agent</code>.</td>
       <td><strong>Monitoring instances:</strong> <code>vm-fra-lz-prod-proj1-mon-agent</code> in <code>cmp-lz-prod-proj1</code>, and <code>vm-fra-lz-preprod-proj1-mon-agent</code> in <code>cmp-lz-preprod-proj1</code>.</td>
-    </tr>
-    <tr>
-      <td align="center"><img src="../images/ATP_CEN.png" height="250" alt="Autonomous Database centralized approach"></td>
-      <td align="center"><img src="../images/ATP_PROJECT.png" height="250" alt="Autonomous Database project approach"></td>
     </tr>
     <tr>
       <td>Files loaded:<br><a href="addon_obs_iam_atp_centralized.json">addon_obs_iam_atp_centralized.json</a><br><a href="addon_obs_network_atp_centralized.json">addon_obs_network_atp_centralized.json</a><br><a href="addon_obs_security_atp_centralized.json">addon_obs_security_atp_centralized.json</a><br><a href="addon_obs_instance_atp_centralized.json">addon_obs_instance_atp_centralized.json</a></td>
