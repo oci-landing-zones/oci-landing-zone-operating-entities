@@ -112,19 +112,51 @@
                 ]
             },
 
-            "PCY-SHARED-EXACS-MON-ADMINISTRATION": {
-                "name": "pcy-shared-exacs-mon-admin",
-                "description": "Policy to allow monitoring groups to manage ExaDB-D observability resources in the shared ExaDB-D database compartment.",
+            "PCY-SHARED-EXACS-MON-READ": {
+                "name": "pcy-shared-exacs-mon-read",
+                "description": "Policy to allow the ExaDB-D global database administration group to read ExaDB-D observability resources in the shared ExaDB-D database compartment.",
                 "compartment_id": "CMP-LZ-SHARED-EXACS-DB-KEY",
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-shared-exacs-db",
-                    "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to manage dbmgmt-family in compartment cmp-lz-shared-exacs-db",
-                    "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to read dbmgmt-work-requests in compartment cmp-lz-shared-exacs-db",
-                    "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to use database-family in compartment cmp-lz-shared-exacs-db",
-                    "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to manage secret-family in compartment cmp-lz-shared-exacs-db",
-                    "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to manage opsi-family in compartment cmp-lz-shared-exacs-db",
-                    "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to manage loganalytics-resources-family in compartment cmp-lz-shared-exacs-db",
-                    "allow group 'id_lz_common'/'grp-lz-platform-mon-admin' to manage management-dashboard-family in compartment cmp-lz-shared-exacs-db"
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to read dbmgmt-private-endpoints in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to read dbmgmt-family in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to read dbmgmt-work-requests in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to read database-family in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to read secret-family in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to read opsi-family in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to read loganalytics-resources-family in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-db-admin' to read management-dashboard-family in compartment cmp-lz-shared-exacs-db"
+                ]
+            },
+
+            "PCY-SHARED-EXACS-INFRA-MON-READ": {
+                "name": "pcy-shared-exacs-infra-mon-read",
+                "description": "Policy to allow the ExaDB-D global infrastructure administration group to read ExaDB-D observability resources in the shared ExaDB-D infrastructure compartment.",
+                "compartment_id": "CMP-LZ-SHARED-EXACS-INFRA-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-infra-admin' to read dbmgmt-private-endpoints in compartment cmp-lz-shared-exacs-infra",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-infra-admin' to read dbmgmt-family in compartment cmp-lz-shared-exacs-infra",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-infra-admin' to read dbmgmt-work-requests in compartment cmp-lz-shared-exacs-infra",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-infra-admin' to read database-family in compartment cmp-lz-shared-exacs-infra",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-infra-admin' to read secret-family in compartment cmp-lz-shared-exacs-infra",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-infra-admin' to read opsi-family in compartment cmp-lz-shared-exacs-infra",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-infra-admin' to read loganalytics-resources-family in compartment cmp-lz-shared-exacs-infra",
+                    "allow group 'id_lz_common'/'grp-lz-global-exacs-infra-admin' to read management-dashboard-family in compartment cmp-lz-shared-exacs-infra"
+                ]
+            },
+
+            "PCY-SHARED-EXACS-PROJ1-MON-READ": {
+                "name": "pcy-shared-exacs-proj1-mon-read",
+                "description": "Policy to allow Project 1 ExaDB-D administration groups to read ExaDB-D observability resources in the shared ExaDB-D database compartment.",
+                "compartment_id": "CMP-LZ-SHARED-EXACS-DB-KEY",
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacs-admin','id_lz_common'/'grp-lz-preprod-proj1-exacs-admin' to read dbmgmt-private-endpoints in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacs-admin','id_lz_common'/'grp-lz-preprod-proj1-exacs-admin' to read dbmgmt-family in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacs-admin','id_lz_common'/'grp-lz-preprod-proj1-exacs-admin' to read dbmgmt-work-requests in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacs-admin','id_lz_common'/'grp-lz-preprod-proj1-exacs-admin' to read database-family in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacs-admin','id_lz_common'/'grp-lz-preprod-proj1-exacs-admin' to read secret-family in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacs-admin','id_lz_common'/'grp-lz-preprod-proj1-exacs-admin' to read opsi-family in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacs-admin','id_lz_common'/'grp-lz-preprod-proj1-exacs-admin' to read loganalytics-resources-family in compartment cmp-lz-shared-exacs-db",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacs-admin','id_lz_common'/'grp-lz-preprod-proj1-exacs-admin' to read management-dashboard-family in compartment cmp-lz-shared-exacs-db"
                 ]
             }
 
