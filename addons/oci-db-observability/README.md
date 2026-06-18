@@ -9,7 +9,7 @@ Welcome to the **OCI Landing Zone Database Observability add-on**.
 
 This guide provides the configuration steps required to enable OCI Observability native services, including **Database Management**, **Operations Insights**, and **Logging Analytics**, as add-on capabilities to the Operating Entities blueprints. The One-OE model is used as the default reference architecture throughout this guide.
 
-* **Database Management service** (DBM) offers a comprehensive set of database performance monitoring and management features. Diagnostics & Management enables you to monitor and manage Oracle databases, HeatWave and External MySQL DB systems, and infrastructure components such as DB system components and Exadata storage servers in multi-cloud and hybrid deployments.
+* **Database Management service** (DBM) offers a comprehensive set of database performance monitoring and management features. Diagnostics & Management enables you to monitor and manage Oracle databases and infrastructure components such as DB system components and Exadata storage servers in multi-cloud and hybrid deployments.
 
 * **Ops Insights** (OPSI) provides comprehensive information about the resource use and capacity of databases and hosts. Use this service to analyze CPU and storage resources, forecast capacity issues, and proactively identify SQL performance issues across a database fleet.
 
@@ -46,7 +46,7 @@ The slected approach impacts on OCI Group and Policies, OCI Private End Point de
 
 ## 3.1 OCI Group and Policies
 
-Independently from the selected approach, we recommend the creation of the following OCI groups. This allows quicker onboarding of the Observability services across all three approaches.
+Independently from the selected approach, we recommend the creation of the following OCI groups. This allows quicker onboarding of the Observability services across all three approaches (depending on the approach the groups can be created or extra policies will be added to existing groups, details will be covered in each scenario).
 
 | Group Name | Group description |
 |---|---|
