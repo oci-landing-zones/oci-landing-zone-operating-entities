@@ -1,4 +1,4 @@
-local base = import './templates/connectivity-hub_iam.auto.tfvars.json';
+local base = import './templates/connectivity-hub_iam.json';
 
 base + {
   identity_domain_groups_configuration+: {

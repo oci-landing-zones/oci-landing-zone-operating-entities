@@ -116,7 +116,7 @@ Configuration details:
 >- `Requestor` Tenancy → OCID of the Tenancy2.
 >- `Acceptor` Tenancy → OCID of Tenancy1.
 > 
-> Refer to the tenancy1_iam.auto.tfvars.json and tenancy2_iam.auto.tfvars.json files for the complete IAM (Compartments, Groups & Policies) configuration sample template based on One-OE.
+> Refer to the tenancy1_iam.json and tenancy2_iam.json files for the complete IAM (Compartments, Groups & Policies) configuration sample template based on One-OE.
 >
 > For more details, refer to the [OCI Cross Tenancy RPC Policy Documentation](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-iam.htm#scenario_m__IAM_cross-tenancy). 
 

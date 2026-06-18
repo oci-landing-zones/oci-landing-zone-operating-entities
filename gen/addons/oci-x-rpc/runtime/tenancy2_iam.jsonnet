@@ -1,4 +1,4 @@
-local base = import './templates/oe1_iam.auto.tfvars.json';
+local base = import './templates/oe1_iam.json';
 
 base + {
   identity_domain_groups_configuration+: {

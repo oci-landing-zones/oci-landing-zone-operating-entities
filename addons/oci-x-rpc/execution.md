@@ -51,9 +51,9 @@ This initial deployment creates the networking administrator group whose OCID is
 
 Launch the ORM stack and execute the following configuration files:
 
-- [runtime/tenancy2_iam.auto.tfvars.json](./runtime/tenancy2_iam.auto.tfvars.json)
+- [runtime/tenancy2_iam.json](./runtime/tenancy2_iam.json)
 
-- [runtime/tenancy2_governance.auto.tfvars.json](./runtime/tenancy2_governance.auto.tfvars.json)
+- [runtime/tenancy2_governance.json](./runtime/tenancy2_governance.json)
 
 Ensure the RPC requester policy includes the correct **Acceptor Tenancy OCID (Tenancy1 OCID)** before deployment.
 
@@ -121,11 +121,11 @@ Update the Tenancy1 IAM configuration with:
 
 Launch the ORM stack in **Tenancy1** using the following configuration files:
 
-- [runtime/tenancy1_iam.auto.tfvars.json](./runtime/tenancy1_iam.auto.tfvars.json)
+- [runtime/tenancy1_iam.json](./runtime/tenancy1_iam.json)
 
-- [runtime/tenancy1_network.auto.tfvars.json](./runtime/tenancy1_network.auto.tfvars.json)
+- [runtime/tenancy1_network.json](./runtime/tenancy1_network.json)
 
-- [runtime/tenancy1_governance.auto.tfvars.json](./runtime/tenancy1_governance.auto.tfvars.json)
+- [runtime/tenancy1_governance.json](./runtime/tenancy1_governance.json)
 
 ---
 
@@ -185,7 +185,7 @@ Example:
 
 Launch or update the ORM stack using the following configuration file:
 
-- [runtime/tenancy2_network.auto.tfvars.json](./runtime/tenancy2_network.auto.tfvars.json)
+- [runtime/tenancy2_network.json](./runtime/tenancy2_network.json)
 
 Re-run the ORM stack deployment after updating the `peer_id`.
 
@@ -217,19 +217,19 @@ The RPC status can be verified from:
 
 ## Tenancy1
 
-- [runtime/tenancy1_iam.auto.tfvars.json](./runtime/tenancy1_iam.auto.tfvars.json)
+- [runtime/tenancy1_iam.json](./runtime/tenancy1_iam.json)
 
-- [runtime/tenancy1_network.auto.tfvars.json](./runtime/tenancy1_network.auto.tfvars.json)
+- [runtime/tenancy1_network.json](./runtime/tenancy1_network.json)
 
-- [runtime/tenancy1_governance.auto.tfvars.json](./runtime/tenancy1_governance.auto.tfvars.json)
+- [runtime/tenancy1_governance.json](./runtime/tenancy1_governance.json)
 
 ## Tenancy2
 
-- [runtime/tenancy2_iam.auto.tfvars.json](./runtime/tenancy2_iam.auto.tfvars.json)
+- [runtime/tenancy2_iam.json](./runtime/tenancy2_iam.json)
 
-- [runtime/tenancy2_network.auto.tfvars.json](./runtime/tenancy2_network.auto.tfvars.json)
+- [runtime/tenancy2_network.json](./runtime/tenancy2_network.json)
 
-- [runtime/tenancy2_governance.auto.tfvars.json](./runtime/tenancy2_governance.auto.tfvars.json)
+- [runtime/tenancy2_governance.json](./runtime/tenancy2_governance.json)
 
 ---
 
