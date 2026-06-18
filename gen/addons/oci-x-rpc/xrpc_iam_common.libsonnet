@@ -4,8 +4,8 @@ local acceptor_policy = {
     description: 'Open LZ policy for accepting RPC connections in the tenancy.',
     compartment_id: 'TENANCY-ROOT',
     statements: [
-      'Define group requestorGroup as ocid1.group.oc1..aaaaaaaawnzc3yhxsv5wwylpejxer3mnmisufve5xhf4jyaeu2kr5zz35yiq',
-      'Define tenancy Requestor as ocid1.tenancy.oc1..aaaaaaaatvskd4rq2srf5santd42yzwd3kskkoueyqxxhnshsxart4535oeq',
+      'Define group requestorGroup as ocid1.group.oc1..aaaaaaaawnzc3yhxsv5....sufve5xhf4jyaeu2kr5zz35yiq',
+      'Define tenancy Requestor as ocid1.tenancy.oc1..aaaaaaaatvskd4rq2s.....eyqxxhnshsxart4535oeq',
       'Admit group requestorGroup of tenancy Requestor to manage remote-peering-to in compartment cmp-landingzone:cmp-lz-network',
     ],
   },

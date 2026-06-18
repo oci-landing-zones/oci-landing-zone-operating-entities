@@ -143,16 +143,10 @@
         },
 
         "security_zones": {
-            "SZ-TGT-LZ-CIS-L1-KEY": {
-                "name"                              : "sz-tgt-lz-cis-l1",
+            "SZ-TGT-LZ-CIS-L2-KEY": {
+                "name"                              : "sz-tgt-lz-cis-l2",
                 "compartment_id"                    : "CMP-LANDINGZONE-KEY",
-                "recipe_key"                        : "SZ-RCP-LZ-01-CIS-L1-KEY"
-            },
-
-            "SZ-TGT-LZ-SHARED-NETWORK-KEY": {
-                "name"                              : "sz-tgt-lz-shared-network",
-                "compartment_id"                    : "CMP-LZ-NETWORK-KEY",
-                "recipe_key"                        : "SZ-RCP-LZ-03-SHARED-NETWORK-KEY"
+                "recipe_key"                        : "SZ-RCP-LZ-02-CIS-L2-KEY"
             },
 
             "SZ-TGT-LZ-PROD-ENVIRONMENT-NETWORK-KEY": {
@@ -165,6 +159,33 @@
                 "name"                              : "sz-tgt-lz-prod-proj1",
                 "compartment_id"                    : "CMP-LZ-PROD-PROJ1-KEY",
                 "recipe_key"                        : "SZ-RCP-LZ-05-WORKLOAD-KEY"
+            },
+
+            "SZ-TGT-LZ-SHARED-NETWORK-KEY": {
+                "name"                              : "sz-tgt-lz-shared-network",
+                "compartment_id"                    : "CMP-LZ-NETWORK-KEY",
+                "recipe_key"                        : "SZ-RCP-LZ-03-SHARED-NETWORK-KEY"
+            }
+        }
+    },
+
+    "vaults_configuration": {
+        "default_compartment_id"                    : "CMP-LZ-SECURITY-KEY",
+
+        "keys": {
+            "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY": {
+                "name"                              : "key-lz-shared-oss-audit-bkt",
+                "group_grantees"                    : ["grp-lz-shared-security-key-admin"],
+                "protection_mode"                   : "SOFTWARE",
+                "service_grantees"                  : ["objectstorage-eu-frankfurt-1"],
+                "vault_key"                         : "VLT-LZ-SHARED-SECURITY-KEY",
+                "versions"                          : ["1", "2"]
+            }
+        },
+
+        "vaults": {
+            "VLT-LZ-SHARED-SECURITY-KEY": {
+                "name"                              : "vlt-lz-shared-security"
             }
         }
     }

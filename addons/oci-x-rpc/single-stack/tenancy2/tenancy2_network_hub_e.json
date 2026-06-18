@@ -69,11 +69,11 @@
                                 "display_name"                         : "rt-fra-lz-hub-lb",
 
                                 "route_rules": {
-                                    "rt-fra-preprod-projects": {
-                                        "description"                  : "Route to VCN PreProd Projects through DRG",
-                                        "destination"                  : "10.1.128.0/21",
+                                    "rt-internet": {
+                                        "description"                  : "Route to the Internet through Internet GW",
+                                        "destination"                  : "0.0.0.0/0",
                                         "destination_type"             : "CIDR_BLOCK",
-                                        "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
+                                        "network_entity_key"           : "IGW-FRA-LZ-HUB-KEY"
                                     },
 
                                     "rt-fra-prod-projects": {
@@ -83,11 +83,11 @@
                                         "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rt-internet": {
-                                        "description"                  : "Route to the Internet through Internet GW",
-                                        "destination"                  : "0.0.0.0/0",
+                                    "rt-fra-preprod-projects": {
+                                        "description"                  : "Route to VCN PreProd Projects through DRG",
+                                        "destination"                  : "10.1.128.0/21",
                                         "destination_type"             : "CIDR_BLOCK",
-                                        "network_entity_key"           : "IGW-FRA-LZ-HUB-KEY"
+                                        "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
                                     "rt-vcn-tenancy1": {
@@ -103,11 +103,11 @@
                                 "display_name"                         : "rt-fra-lz-hub-mgmt",
 
                                 "route_rules": {
-                                    "rt-fra-preprod-projects": {
-                                        "description"                  : "Route to VCN PreProd Projects through DRG",
-                                        "destination"                  : "10.1.128.0/21",
+                                    "rt-natgw": {
+                                        "description"                  : "Route to Internet through NAT GW",
+                                        "destination"                  : "0.0.0.0/0",
                                         "destination_type"             : "CIDR_BLOCK",
-                                        "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
+                                        "network_entity_key"           : "NGW-FRA-LZ-HUB-KEY"
                                     },
 
                                     "rt-fra-prod-projects": {
@@ -117,11 +117,11 @@
                                         "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rt-natgw": {
-                                        "description"                  : "Route to Internet through NAT GW",
-                                        "destination"                  : "0.0.0.0/0",
+                                    "rt-fra-preprod-projects": {
+                                        "description"                  : "Route to VCN PreProd Projects through DRG",
+                                        "destination"                  : "10.1.128.0/21",
                                         "destination_type"             : "CIDR_BLOCK",
-                                        "network_entity_key"           : "NGW-FRA-LZ-HUB-KEY"
+                                        "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
                                     "rt-sgw": {
@@ -688,6 +688,13 @@
                                 "display_name"                         : "rt-fra-lz-prod-proj-generic",
 
                                 "route_rules": {
+                                    "rt-natgw": {
+                                        "description"                  : "Route to the Internet through NAT GW",
+                                        "destination"                  : "0.0.0.0/0",
+                                        "destination_type"             : "CIDR_BLOCK",
+                                        "network_entity_key"           : "NGW-FRA-LZ-PROD-PROJ-KEY"
+                                    },
+
                                     "rt-fra-lz-hub": {
                                         "description"                  : "Route to the Hub VCN through DRG",
                                         "destination"                  : "10.1.0.0/21",
@@ -700,13 +707,6 @@
                                         "destination"                  : "10.1.128.0/21",
                                         "destination_type"             : "CIDR_BLOCK",
                                         "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rt-natgw": {
-                                        "description"                  : "Route to the Internet through NAT GW",
-                                        "destination"                  : "0.0.0.0/0",
-                                        "destination_type"             : "CIDR_BLOCK",
-                                        "network_entity_key"           : "NGW-FRA-LZ-PROD-PROJ-KEY"
                                     },
 
                                     "rt-vcn-tenancy1": {
@@ -989,11 +989,11 @@
                                 "display_name"                         : "rt-fra-lz-preprod-proj-generic",
 
                                 "route_rules": {
-                                    "rt-fra-lz-hub": {
-                                        "description"                  : "Route to the Hub VCN through DRG",
-                                        "destination"                  : "10.1.0.0/21",
+                                    "rt-natgw": {
+                                        "description"                  : "Route to the Internet through NAT GW",
+                                        "destination"                  : "0.0.0.0/0",
                                         "destination_type"             : "CIDR_BLOCK",
-                                        "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
+                                        "network_entity_key"           : "NGW-FRA-LZ-PREPROD-PROJ-KEY"
                                     },
 
                                     "rt-fra-prod-projects": {
@@ -1003,11 +1003,11 @@
                                         "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rt-natgw": {
-                                        "description"                  : "Route to the Internet through NAT GW",
-                                        "destination"                  : "0.0.0.0/0",
+                                    "rt-fra-lz-hub": {
+                                        "description"                  : "Route to the Hub VCN through DRG",
+                                        "destination"                  : "10.1.0.0/21",
                                         "destination_type"             : "CIDR_BLOCK",
-                                        "network_entity_key"           : "NGW-FRA-LZ-PREPROD-PROJ-KEY"
+                                        "network_entity_key"           : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
                                     "rt-vcn-tenancy1": {
