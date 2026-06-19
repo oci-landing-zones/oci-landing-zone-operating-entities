@@ -400,6 +400,36 @@ function(config, n, realm_constants, topo)
       "endorse group %s to read objects in tenancy usage-report" % domain_grp(grp_cost),
     ] else [];
 
+  local rpc_connections =
+    if std.objectHas(config.hub.network, 'remote_peering_connections') then
+      config.hub.network.remote_peering_connections
+    else {};
+  local rpc_name_segment(value) = std.strReplace(value, '_', '-');
+  local rpc_cross_tenancy_policies = {
+    [n.key('PCY', ['HUB', 'RPC', rpc_name_segment(rpc_name)])]:
+      local rpc = rpc_connections[rpc_name];
+      local is_requester = rpc.peer_id != null;
+      local peer_tenancy_alias = if is_requester then 'Acceptor' else 'Requestor';
+      local rpc_segment = rpc_name_segment(rpc_name);
+      {
+        name: n.display('pcy', ['hub', 'rpc', rpc_segment]),
+        description: 'Grants cross-tenancy remote peering permissions for %s' %
+          n.display('rpc', ['hub', rpc_segment]),
+        compartment_id: 'TENANCY-ROOT',
+        statements: [
+          'Define group requestorGroup as %s' % rpc.requestor_group_ocid,
+          'Define tenancy %s as %s' % [peer_tenancy_alias, rpc.peer_tenancy_ocid],
+        ] + if is_requester then [
+          'Allow group requestorGroup to manage remote-peering-from in compartment cmp-landingzone:cmp-lz-network',
+          'Endorse group requestorGroup to manage remote-peering-to in tenancy Acceptor',
+        ] else [
+          'Admit group requestorGroup of tenancy Requestor to manage remote-peering-to in compartment cmp-landingzone:cmp-lz-network',
+        ],
+      }
+    for rpc_name in std.objectFields(rpc_connections)
+    if rpc_connections[rpc_name].peer_tenancy_ocid != null
+  };
+
   local policies_configuration = {
     enable_cis_benchmark_checks: 'false',
     supplied_policies: {
@@ -519,7 +549,7 @@ function(config, n, realm_constants, topo)
           tbac_allow(grp_network, 'read', 'logging-family', cmp_lz, tag_security),
         ],
       },
-    } + env_project_policies + {
+    } + env_project_policies + rpc_cross_tenancy_policies + {
       [n.key_global('PCY', ['SECURITY', 'ADMIN'])]: {
         name: n.display_global('PCY', ['SECURITY', 'ADMIN']),
         description: desc.policy.grants(

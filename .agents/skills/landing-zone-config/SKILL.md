@@ -54,6 +54,7 @@ Do not use this skill as the first response to an open-ended customer request su
 | CIS level | `cis_level` is optional and defaults to `2`; set `1` to emit CIS level 1 security/observability files instead. |
 | Extensions | Extension `type` must be registered in `gen/landing_zone.libsonnet`. |
 | Config-mode network outputs | `network.json` is canonical final output; `network_pre.json` appears only for staged hubs. |
+| RPC config | For explicit RPC/remote-peering requests, model peering under `hub.network.remote_peering_connections`; collect remote CIDRs, peer region, role, peer RPC reference for requestor sides, and cross-tenancy requestor tenancy/group OCIDs. |
 | Artifact placement | Ask for both the config file location and the output directory before creating customer artifacts; do not default them into `tests/`. |
 | Unsupported resources | Do not add unsupported config keys or fake extension types. Generate only supported prerequisites, then document the unsupported resource as manual post-deployment configuration. |
 | Networked extension CIDRs | Include CIDRs only for network scopes the selected config will emit; do not allocate for unchosen optional placement branches or networkless/infrastructure-only scopes. |
