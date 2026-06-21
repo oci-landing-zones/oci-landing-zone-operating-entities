@@ -427,37 +427,37 @@
                 "compartment_id"                                               : "CMP-LZ-OE-ALPHA-PREPROD-PROJ1-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read all-resources in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read bucket in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to inspect object in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read audit-events in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read work-requests in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read instance-agent-plugins in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use network-security-groups in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use load-balancers in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use vnics in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use key-delegate in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage api-gateway-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage streams in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage cluster-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage alarms in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage metrics in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage logging-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage instance-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage volume-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1 where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage object-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1 where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage file-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1 where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage repos in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage orm-stacks in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage orm-jobs in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage orm-config-source-providers in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage bastion-session in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage cloudevents-rules in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage keys in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage secret-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage database-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage autonomous-database-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage data-safe-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1"
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read all-resources in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read bucket in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to inspect object in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read audit-events in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read work-requests in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read instance-agent-plugins in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use network-security-groups in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use load-balancers in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use vnics in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use key-delegate in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage api-gateway-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage streams in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage cluster-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage alarms in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage metrics in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage logging-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage instance-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage volume-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1 where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage object-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1 where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage file-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1 where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage repos in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage orm-stacks in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage orm-jobs in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage orm-config-source-providers in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage bastion-session in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage cloudevents-rules in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage keys in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage secret-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage database-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage autonomous-database-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage data-safe-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-projects:cmp-lz-oe-alpha-preprod-proj1"
                 ]
             },
 
@@ -467,10 +467,10 @@
                 "compartment_id"                                               : "CMP-LZ-OE-ALPHA-PREPROD-NETWORK-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use virtual-network-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use subnets in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use vnics in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage private-ips in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-network"
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use virtual-network-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use subnets in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use vnics in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage private-ips in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-network"
                 ]
             },
 
@@ -480,12 +480,12 @@
                 "compartment_id"                                               : "CMP-LZ-OE-ALPHA-PREPROD-SECURITY-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read ons-topics in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use vaults in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage instance-images in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use vss-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use bastion in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read logging-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security"
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read ons-topics in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use vaults in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to manage instance-images in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use vss-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to use bastion in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-preprod-proj1-admin' to read logging-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-preprod:cmp-lz-oe-alpha-preprod-security"
                 ]
             },
 
@@ -495,37 +495,37 @@
                 "compartment_id"                                               : "CMP-LZ-OE-ALPHA-PROD-PROJ1-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read all-resources in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read bucket in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to inspect object in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read audit-events in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read work-requests in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read instance-agent-plugins in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use network-security-groups in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use load-balancers in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use vnics in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use key-delegate in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage api-gateway-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage streams in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage cluster-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage alarms in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage metrics in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage logging-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage instance-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage volume-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1 where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage object-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1 where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage file-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1 where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage repos in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage orm-stacks in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage orm-jobs in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage orm-config-source-providers in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage bastion-session in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage cloudevents-rules in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage keys in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage secret-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage database-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage autonomous-database-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage data-safe-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1"
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read all-resources in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read bucket in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to inspect object in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read audit-events in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read work-requests in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read instance-agent-plugins in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use network-security-groups in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use load-balancers in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use vnics in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use key-delegate in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage api-gateway-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage streams in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage cluster-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage alarms in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage metrics in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage logging-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage instance-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage volume-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1 where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage object-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1 where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage file-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1 where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage repos in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage orm-stacks in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage orm-jobs in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage orm-config-source-providers in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage bastion-session in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage cloudevents-rules in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage keys in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage secret-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage database-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage autonomous-database-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage data-safe-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-projects:cmp-lz-oe-alpha-prod-proj1"
                 ]
             },
 
@@ -535,10 +535,10 @@
                 "compartment_id"                                               : "CMP-LZ-OE-ALPHA-PROD-NETWORK-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use virtual-network-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use subnets in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use vnics in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage private-ips in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-network"
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use virtual-network-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use subnets in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use vnics in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage private-ips in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-network"
                 ]
             },
 
@@ -548,12 +548,12 @@
                 "compartment_id"                                               : "CMP-LZ-OE-ALPHA-PROD-SECURITY-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read ons-topics in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use vaults in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage instance-images in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use vss-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use bastion in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read logging-family in compartment cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security"
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read ons-topics in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use vaults in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to manage instance-images in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use vss-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to use bastion in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-alpha-prod-proj1-admin' to read logging-family in compartment cmp-landingzone:cmp-lz-oe-alpha:cmp-lz-oe-alpha-prod:cmp-lz-oe-alpha-prod-security"
                 ]
             },
 
@@ -563,37 +563,37 @@
                 "compartment_id"                                               : "CMP-LZ-OE-BETA-PREPROD-PROJ1-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read all-resources in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read bucket in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to inspect object in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read audit-events in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read work-requests in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read instance-agent-plugins in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use network-security-groups in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use load-balancers in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use vnics in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use key-delegate in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage api-gateway-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage streams in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage cluster-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage alarms in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage metrics in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage logging-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage instance-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage volume-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1 where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage object-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1 where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage file-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1 where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage repos in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage orm-stacks in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage orm-jobs in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage orm-config-source-providers in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage bastion-session in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage cloudevents-rules in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage keys in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage secret-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage database-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage autonomous-database-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage data-safe-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1"
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read all-resources in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read bucket in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to inspect object in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read audit-events in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read work-requests in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read instance-agent-plugins in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use network-security-groups in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use load-balancers in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use vnics in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use key-delegate in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage api-gateway-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage streams in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage cluster-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage alarms in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage metrics in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage logging-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage instance-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage volume-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1 where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage object-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1 where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage file-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1 where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage repos in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage orm-stacks in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage orm-jobs in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage orm-config-source-providers in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage bastion-session in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage cloudevents-rules in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage keys in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage secret-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage database-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage autonomous-database-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage data-safe-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-projects:cmp-lz-oe-beta-preprod-proj1"
                 ]
             },
 
@@ -603,10 +603,10 @@
                 "compartment_id"                                               : "CMP-LZ-OE-BETA-PREPROD-NETWORK-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use virtual-network-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use subnets in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use vnics in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage private-ips in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-network"
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use virtual-network-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use subnets in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use vnics in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage private-ips in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-network"
                 ]
             },
 
@@ -616,12 +616,12 @@
                 "compartment_id"                                               : "CMP-LZ-OE-BETA-PREPROD-SECURITY-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read ons-topics in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use vaults in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage instance-images in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use vss-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use bastion in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read logging-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security"
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read ons-topics in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use vaults in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to manage instance-images in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use vss-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to use bastion in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-preprod-proj1-admin' to read logging-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-preprod:cmp-lz-oe-beta-preprod-security"
                 ]
             },
 
@@ -631,37 +631,37 @@
                 "compartment_id"                                               : "CMP-LZ-OE-BETA-PROD-PROJ1-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read all-resources in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read bucket in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to inspect object in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read audit-events in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read work-requests in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read instance-agent-plugins in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use network-security-groups in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use load-balancers in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use vnics in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use key-delegate in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage api-gateway-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage streams in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage cluster-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage alarms in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage metrics in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage logging-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage instance-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage volume-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1 where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage object-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1 where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage file-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1 where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage repos in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage orm-stacks in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage orm-jobs in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage orm-config-source-providers in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage bastion-session in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage cloudevents-rules in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage keys in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage secret-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage database-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage autonomous-database-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage data-safe-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1"
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read all-resources in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read bucket in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to inspect object in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read audit-events in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read work-requests in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read instance-agent-plugins in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use network-security-groups in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use load-balancers in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use vnics in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use key-delegate in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage api-gateway-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage streams in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage cluster-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage alarms in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage metrics in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage logging-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage instance-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage volume-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1 where all{request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage object-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1 where all{request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage file-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1 where all{request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage repos in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage orm-stacks in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage orm-jobs in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage orm-config-source-providers in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage bastion-session in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage cloudevents-rules in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage keys in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage secret-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage database-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage autonomous-database-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage data-safe-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-projects:cmp-lz-oe-beta-prod-proj1"
                 ]
             },
 
@@ -671,10 +671,10 @@
                 "compartment_id"                                               : "CMP-LZ-OE-BETA-PROD-NETWORK-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use virtual-network-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use subnets in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use vnics in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage private-ips in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-network"
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use virtual-network-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use subnets in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use vnics in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage private-ips in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-network"
                 ]
             },
 
@@ -684,12 +684,12 @@
                 "compartment_id"                                               : "CMP-LZ-OE-BETA-PROD-SECURITY-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read ons-topics in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use vaults in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage instance-images in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use vss-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use bastion in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security",
-                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read logging-family in compartment cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security"
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read ons-topics in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use vaults in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to manage instance-images in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use vss-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to use bastion in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security",
+                    "allow group 'id_lz_common'/'grp-lz-oe-beta-prod-proj1-admin' to read logging-family in compartment cmp-landingzone:cmp-lz-oe-beta:cmp-lz-oe-beta-prod:cmp-lz-oe-beta-prod-security"
                 ]
             },
 

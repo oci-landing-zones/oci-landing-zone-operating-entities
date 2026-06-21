@@ -312,9 +312,23 @@ function(config, n, realm_constants, topo)
     local proj_sec_key = n.key_global('PCY', entry.key_segments + [proj_name, 'ADMIN', 'SEC']);
 
     local grp = 'allow group %s' % domain_grp(proj_grp_name(entry, proj_name));
-    local proj_cmp = topo.env_project_compartment_path(entry, proj_name);
-    local net_cmp = topo.env_child_compartment_path(entry, 'network');
-    local sec_cmp = topo.env_child_compartment_path(entry, 'security');
+    local policy_compartment_name_or_path(entry, name, path) =
+      if entry.mode == 'one_oe' then name else path;
+    local proj_cmp = policy_compartment_name_or_path(
+      entry,
+      topo.env_project_compartment_name(entry, proj_name),
+      topo.env_project_compartment_path(entry, proj_name)
+    );
+    local net_cmp = policy_compartment_name_or_path(
+      entry,
+      topo.env_child_compartment_name(entry, 'network'),
+      topo.env_child_compartment_path(entry, 'network')
+    );
+    local sec_cmp = policy_compartment_name_or_path(
+      entry,
+      topo.env_child_compartment_name(entry, 'security'),
+      topo.env_child_compartment_path(entry, 'security')
+    );
     local proj_cmp_key = topo.env_project_compartment_key(entry, proj_name);
     local net_cmp_key = topo.env_child_compartment_key(entry, 'NETWORK');
     local sec_cmp_key = topo.env_child_compartment_key(entry, 'SECURITY');

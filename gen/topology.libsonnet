@@ -120,11 +120,7 @@ function(config, n)
     std.asciiLower(project),
   ];
   local env_compartment_path(entry) =
-    local lo = [std.asciiLower(s) for s in entry.compartment_segments];
-    std.join(':', [
-      'cmp-lz-' + std.join('-', lo[0:i+1])
-      for i in std.range(0, std.length(lo) - 1)
-    ]);
+    n.compartment_path(entry.compartment_segments);
   local env_child_compartment_path(entry, child) = '%s:%s' % [
     env_compartment_path(entry),
     env_child_compartment_name(entry, child),

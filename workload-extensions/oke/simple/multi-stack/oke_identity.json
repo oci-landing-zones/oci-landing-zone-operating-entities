@@ -38,16 +38,16 @@
                 "compartment_id"                      : "TENANCY-ROOT",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to read all-resources in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to manage cluster-family in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to manage instance-family in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use vnics in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to inspect compartments in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to read virtual-network-family in compartment cmp-lz-prod:cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use subnets in compartment cmp-lz-prod:cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use network-security-groups in compartment cmp-lz-prod:cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use vnics in compartment cmp-lz-prod:cmp-lz-prod-network",
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to manage private-ips in compartment cmp-lz-prod:cmp-lz-prod-network"
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to read all-resources in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to manage cluster-family in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to manage instance-family in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use vnics in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to inspect compartments in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to read virtual-network-family in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use subnets in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use network-security-groups in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to use vnics in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to manage private-ips in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-network"
                 ]
             },
 
@@ -57,8 +57,8 @@
                 "compartment_id"                      : "TENANCY-ROOT",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-rbac-admin' to use cluster in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
-                    "allow group 'id_lz_common'/'grp-lz-prod-oke-rbac-viewer' to use cluster in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke"
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-rbac-admin' to use cluster in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
+                    "allow group 'id_lz_common'/'grp-lz-prod-oke-rbac-viewer' to use cluster in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke"
                 ]
             },
 
