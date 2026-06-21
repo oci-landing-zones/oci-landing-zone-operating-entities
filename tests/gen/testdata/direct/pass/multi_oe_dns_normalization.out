@@ -1,0 +1,20 @@
+{
+  "files": {
+    "display_name": "File Services",
+    "dns": "fl"
+  },
+  "finance": {
+    "display_name": "finance",
+    "dns": "fi"
+  },
+  "has_root_environments": false,
+  "oe_names": [
+    "files",
+    "finance",
+    "retail_bank"
+  ],
+  "retail_bank": {
+    "display_name": "Retail Bank",
+    "dns": "rb"
+  }
+}
