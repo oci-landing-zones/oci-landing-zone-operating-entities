@@ -58,6 +58,9 @@ gen/
 └── blueprints/one-oe/runtime/one-stack/  # Entry-point .jsonnet files (default mode)
     ├── profiles.libsonnet
     └── *.jsonnet
+└── blueprints/multi-oe/generic_v1/runtime/one-stack/
+    ├── profiles.libsonnet
+    └── *.jsonnet
 ```
 
 ## 2. Generation Mental Model
@@ -128,6 +131,7 @@ Update this diagram when any of these change:
 - `jsonnet --multi` is reserved for `bash gen/generate.sh --config ...`. It must not be used to generate the committed snapshot files under `blueprints/` or `workload-extensions/`.
 - Each published family owns its local profiles file:
   - `gen/blueprints/one-oe/runtime/one-stack/profiles.libsonnet`
+  - `gen/blueprints/multi-oe/generic_v1/runtime/one-stack/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/multi-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacc/single-stack/profiles.libsonnet`
@@ -215,6 +219,28 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
   },
 }
 ```
+
+Multi-OE config mode uses top-level `operating_entities`:
+
+```jsonnet
+{
+  hub: { kind: 'hub_a', network: { vcn: '10.0.0.0/21' } },
+  security_targets: ['prod'],
+  operating_entities: {
+    finance: {
+      display_name: 'Finance',
+      environments: {
+        prod: {
+          shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+          projects: { proj1: {} },
+        },
+      },
+    },
+  },
+}
+```
+
+When top-level `operating_entities` is present, each operating entity owns an `environments` object with the same per-environment shape used by One-OE. Do not set top-level `environments` and `operating_entities` together.
 
 Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`) and must be one of the realms in `constants.libsonnet`. `cis_level` defaults to `2` and must be `1` or `2`; config mode emits only the selected CIS security and observability file pair. `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Missing subnets are still auto-calculated from VCN CIDRs using `auto_subnets()`.
 
@@ -370,7 +396,7 @@ Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produce
 
 For customer-use artifact placement and deployment defaults, follow root `AGENTS.md`. This generator guide defines emitted files and generator behavior only.
 
-Config mode validates required fields during normalization. `config.environments` must be present and non-empty; omitted environments are a hard error rather than an implicit default.
+Config mode validates required fields during normalization. `config.environments` or `config.operating_entities` must be present and non-empty; omitted environment definitions are a hard error rather than an implicit default.
 
 ## 10. Network Artifact Phases
 

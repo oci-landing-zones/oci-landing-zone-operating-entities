@@ -116,6 +116,8 @@ Read these as semantic context, not as incidental locals:
 - `topo` owns environment and platform semantics
 - `realm` owns realm-specific constants
 
+For Multi-OE configs, `topology.libsonnet` exposes OE-aware environment entries. Builders should use those entries for resource keys, display segments, DNS segments, and compartment paths instead of raw environment names.
+
 When several later expressions look dense, check whether they are really just using `n` or `topo` rather than inventing new behavior locally.
 
 That shared setup now lives behind `render_context.libsonnet`, which exposes one stable entrypoint:
