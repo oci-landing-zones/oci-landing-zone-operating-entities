@@ -16,13 +16,16 @@ function(config, n, realm_constants, topo)
   // Project display name for compartment/group descriptions: 'proj1' → 'Project 1'.
   local proj_display(proj_name) = labels.project_display(proj_name);
 
-  local env_names = topo.ordered_env_names();
+  local env_entries = topo.ordered_env_entries();
 
   // --- Per-environment / per-project helpers ---
 
   // Group name (lowercase)
-  local proj_grp_name(env_name, proj_name) =
-    'grp-lz-%s-%s-admin' % [std.asciiLower(env_name), std.asciiLower(proj_name)];
+  local proj_grp_name(entry, proj_name) =
+    'grp-lz-%s-%s-admin' % [
+      std.join('-', [std.asciiLower(s) for s in entry.key_segments]),
+      std.asciiLower(proj_name),
+    ];
 
   // Key helpers: n.key_global already inserts 'LZ', so segments must NOT repeat it.
   // GRP-LZ-{ENV}-{PROJ}-ADMIN-KEY → n.key_global('GRP', [env, proj, 'ADMIN'])
@@ -73,12 +76,12 @@ function(config, n, realm_constants, topo)
 
   // --- Compartments ---
 
-  local platform_children(env_name) =
-    local env = config.environments[env_name];
+  local platform_children(entry) =
+    local env = entry.env;
     if std.objectHas(env, 'platforms') then {
-      [topo.env_platform(env_name, p_name).compartment_key]: {
-        name: topo.env_platform(env_name, p_name).compartment_name,
-        description: topo.env_platform(env_name, p_name).compartment_description,
+      [topo.env_platform(entry, p_name).compartment_key]: {
+        name: topo.env_platform(entry, p_name).compartment_name,
+        description: topo.env_platform(entry, p_name).compartment_description,
       }
       for p_name in std.objectFields(env.platforms)
     } else {};
@@ -93,24 +96,23 @@ function(config, n, realm_constants, topo)
     } else {};
 
   // Per-environment children compartments
-  local env_compartment_children(env_name) =
-    local env = config.environments[env_name];
-    local elo = std.asciiLower(env_name);
+  local env_compartment_children(entry) =
+    local env_name = entry.env_name;
 
     // Per-project compartments inside PROJECTS
-    local project_names = topo.project_names(env_name);
+    local project_names = topo.project_names(entry);
 
     local proj_children = {
-      [n.key_global('CMP', [env_name, proj_name])]: {
-        name: 'cmp-lz-%s-%s' % [elo, std.asciiLower(proj_name)],
+      [topo.env_project_compartment_key(entry, proj_name)]: {
+        name: topo.env_project_compartment_name(entry, proj_name),
         description: '%s environment, %s compartment' % [env_desc(env_name), proj_display(proj_name)],
       }
       for proj_name in project_names
     };
 
     {
-      [n.key_global('CMP', [env_name, 'NETWORK'])]: {
-        name: 'cmp-lz-%s-network' % elo,
+      [topo.env_child_compartment_key(entry, 'NETWORK')]: {
+        name: topo.env_child_compartment_name(entry, 'network'),
         // 'prod' is abbreviated to "Prod" for the NETWORK compartment (matches hand-written JSON).
         description: '%s Workload Environment, Common Network Compartment' % topo.env_display_network(env_name),
         defined_tags: {
@@ -118,23 +120,23 @@ function(config, n, realm_constants, topo)
         },
       },
 
-      [n.key_global('CMP', [env_name, 'PLATFORM'])]: {
-        name: 'cmp-lz-%s-platform' % elo,
+      [topo.env_child_compartment_key(entry, 'PLATFORM')]: {
+        name: topo.env_child_compartment_name(entry, 'platform'),
         description: '%s Workload Environment, Common Platform Compartment' % env_desc(env_name),
       } + (
-        if std.length(std.objectFields(platform_children(env_name))) > 0 then {
-          children: platform_children(env_name),
+        if std.length(std.objectFields(platform_children(entry))) > 0 then {
+          children: platform_children(entry),
         } else {}
       ),
 
-      [n.key_global('CMP', [env_name, 'PROJECTS'])]: {
-        name: 'cmp-lz-%s-projects' % elo,
+      [topo.env_child_compartment_key(entry, 'PROJECTS')]: {
+        name: topo.env_child_compartment_name(entry, 'projects'),
         description: '%s Workload Environment, Common Projects Compartment' % env_desc(env_name),
         children: proj_children,
       },
 
-      [n.key_global('CMP', [env_name, 'SECURITY'])]: {
-        name: 'cmp-lz-%s-security' % elo,
+      [topo.env_child_compartment_key(entry, 'SECURITY')]: {
+        name: topo.env_child_compartment_name(entry, 'security'),
         description: '%s Workload Environment, Common Security Compartment' % env_desc(env_name),
         defined_tags: {
           [tbac_tag]: tag_security,
@@ -143,18 +145,48 @@ function(config, n, realm_constants, topo)
     };
 
   // All env children (merged into LANDINGZONE children)
-  local env_compartments = std.foldl(
-    function(acc, env_name)
+  local one_oe_env_compartments = std.foldl(
+    function(acc, entry)
       acc + {
-        [n.key_global('CMP', [env_name])]: {
-          name: 'cmp-lz-%s' % std.asciiLower(env_name),
-          description: '%s Environment Compartment' % env_desc(env_name),
-          children: env_compartment_children(env_name),
+        [topo.env_compartment_key(entry)]: {
+          name: topo.env_compartment_name(entry),
+          description: '%s Environment Compartment' % env_desc(entry.env_name),
+          children: env_compartment_children(entry),
         },
       },
-    env_names,
+    env_entries,
     {}
   );
+
+  local multi_oe_compartments =
+    if std.objectHas(config, 'operating_entities') then {
+      [n.key_global('CMP', [std.strReplace(oe_name, '_', '-')])]: {
+        name: 'cmp-lz-%s' % std.asciiLower(std.strReplace(oe_name, '_', '-')),
+        description: '%s Operating Entity Compartment' % config.operating_entities[oe_name].display_name,
+        children: std.foldl(
+          function(acc, entry)
+            if entry.oe_name == oe_name then
+              acc + {
+                [topo.env_compartment_key(entry)]: {
+                  name: topo.env_compartment_name(entry),
+                  description: '%s %s Environment Compartment' % [
+                    config.operating_entities[oe_name].display_name,
+                    env_desc(entry.env_name),
+                  ],
+                  children: env_compartment_children(entry),
+                },
+              }
+            else acc,
+          env_entries,
+          {}
+        ),
+      }
+      for oe_name in std.objectFields(config.operating_entities)
+    } else {};
+
+  local env_compartments =
+    if std.objectHas(config, 'operating_entities') then multi_oe_compartments
+    else one_oe_env_compartments;
 
   local compartments_configuration = {
     enable_delete: 'true',
@@ -195,20 +227,20 @@ function(config, n, realm_constants, topo)
 
   // Per-environment per-project admin groups
   local env_project_groups = std.foldl(
-    function(acc, env_name)
-      local project_names = topo.project_names(env_name);
+    function(acc, entry)
+      local project_names = topo.project_names(entry);
       acc + std.foldl(
         function(gacc, proj_name)
           gacc + {
-            [n.key_global('GRP', [env_name, proj_name, 'ADMIN'])]: {
-              name: proj_grp_name(env_name, proj_name),
-              description: desc.group.project(env_desc(env_name), proj_name, 'administration'),
+            [n.key_global('GRP', entry.key_segments + [proj_name, 'ADMIN'])]: {
+              name: proj_grp_name(entry, proj_name),
+              description: desc.group.project(env_desc(entry.env_name), proj_name, 'administration'),
             },
           },
         project_names,
         {}
       ),
-    env_names,
+    env_entries,
     {}
   );
 
@@ -273,22 +305,24 @@ function(config, n, realm_constants, topo)
   // --- Policies ---
 
   // Per-project policies: 3 policies per project (admin, net, sec)
-  local proj_policies(env_name, proj_name) =
-    local proj_key = n.key_global('PCY', [env_name, proj_name, 'ADMIN']);
-    local proj_net_key = n.key_global('PCY', [env_name, proj_name, 'ADMIN', 'NET']);
-    local proj_sec_key = n.key_global('PCY', [env_name, proj_name, 'ADMIN', 'SEC']);
+  local proj_policies(entry, proj_name) =
+    local env_name = entry.env_name;
+    local proj_key = n.key_global('PCY', entry.key_segments + [proj_name, 'ADMIN']);
+    local proj_net_key = n.key_global('PCY', entry.key_segments + [proj_name, 'ADMIN', 'NET']);
+    local proj_sec_key = n.key_global('PCY', entry.key_segments + [proj_name, 'ADMIN', 'SEC']);
 
-    local grp = 'allow group %s' % domain_grp(proj_grp_name(env_name, proj_name));
-    local proj_cmp = 'cmp-lz-%s-%s' % [std.asciiLower(env_name), std.asciiLower(proj_name)];
-    local net_cmp = 'cmp-lz-%s-network' % std.asciiLower(env_name);
-    local sec_cmp = 'cmp-lz-%s-security' % std.asciiLower(env_name);
-    local proj_cmp_key = n.key_global('CMP', [env_name, proj_name]);
-    local net_cmp_key = n.key_global('CMP', [env_name, 'NETWORK']);
-    local sec_cmp_key = n.key_global('CMP', [env_name, 'SECURITY']);
-    local grp_name = proj_grp_name(env_name, proj_name);
+    local grp = 'allow group %s' % domain_grp(proj_grp_name(entry, proj_name));
+    local proj_cmp = topo.env_project_compartment_path(entry, proj_name);
+    local net_cmp = topo.env_child_compartment_path(entry, 'network');
+    local sec_cmp = topo.env_child_compartment_path(entry, 'security');
+    local proj_cmp_key = topo.env_project_compartment_key(entry, proj_name);
+    local net_cmp_key = topo.env_child_compartment_key(entry, 'NETWORK');
+    local sec_cmp_key = topo.env_child_compartment_key(entry, 'SECURITY');
+    local grp_name = proj_grp_name(entry, proj_name);
+    local name_segments = [std.asciiLower(s) for s in entry.key_segments] + [std.asciiLower(proj_name)];
     {
       [proj_key]: {
-        name: 'pcy-lz-%s-%s-admin' % [std.asciiLower(env_name), std.asciiLower(proj_name)],
+        name: 'pcy-lz-%s-admin' % std.join('-', name_segments),
         description: desc.policy.grants(
           grp_name,
           'administration access',
@@ -331,7 +365,7 @@ function(config, n, realm_constants, topo)
       },
 
       [proj_net_key]: {
-        name: 'pcy-lz-%s-%s-admin-net' % [std.asciiLower(env_name), std.asciiLower(proj_name)],
+        name: 'pcy-lz-%s-admin-net' % std.join('-', name_segments),
         description: desc.policy.grants(
           grp_name,
           'shared network resource usage',
@@ -347,7 +381,7 @@ function(config, n, realm_constants, topo)
       },
 
       [proj_sec_key]: {
-        name: 'pcy-lz-%s-%s-admin-sec' % [std.asciiLower(env_name), std.asciiLower(proj_name)],
+        name: 'pcy-lz-%s-admin-sec' % std.join('-', name_segments),
         description: desc.policy.grants(
           grp_name,
           'shared security resource usage',
@@ -367,14 +401,14 @@ function(config, n, realm_constants, topo)
 
   // Collect all per-env per-project policies
   local env_project_policies = std.foldl(
-    function(acc, env_name)
-      local project_names = topo.project_names(env_name);
+    function(acc, entry)
+      local project_names = topo.project_names(entry);
       acc + std.foldl(
-        function(pacc, proj_name) pacc + proj_policies(env_name, proj_name),
+        function(pacc, proj_name) pacc + proj_policies(entry, proj_name),
         project_names,
         {}
       ),
-    env_names,
+    env_entries,
     {}
   );
 

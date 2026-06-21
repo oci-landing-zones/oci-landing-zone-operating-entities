@@ -36,6 +36,7 @@ function(config, n)
   };
 
   local title_case(name) = labels.title_case(name);
+  local key_segment(name) = std.strReplace(name, '_', '-');
   local env_label(env_name) =
     if std.objectHas(env_labels, env_name) then env_labels[env_name]
     else {
@@ -64,16 +65,17 @@ function(config, n)
 
   local multi_oe_env_entries = std.flattenArrays([
     [
+      local oe_segment = key_segment(oe_name);
       {
         mode: 'multi_oe',
         oe_name: oe_name,
         oe_display_name: config.operating_entities[oe_name].display_name,
         oe_dns: config.operating_entities[oe_name].dns,
         env_name: env_name,
-        qualified_name: '%s-%s' % [oe_name, env_name],
-        key_segments: [oe_name, env_name],
+        qualified_name: '%s-%s' % [oe_segment, env_name],
+        key_segments: [oe_segment, env_name],
         display_segments: [config.operating_entities[oe_name].display_name, env_label(env_name).short],
-        compartment_segments: [oe_name, env_name],
+        compartment_segments: [oe_segment, env_name],
         dns_segments: [config.operating_entities[oe_name].dns, env_label(env_name).dns],
         env: config.operating_entities[oe_name].environments[env_name],
       }
@@ -117,7 +119,12 @@ function(config, n)
     std.join('-', [std.asciiLower(s) for s in entry.compartment_segments]),
     std.asciiLower(project),
   ];
-  local env_compartment_path(entry) = n.compartment_path(entry.compartment_segments);
+  local env_compartment_path(entry) =
+    local lo = [std.asciiLower(s) for s in entry.compartment_segments];
+    std.join(':', [
+      'cmp-lz-' + std.join('-', lo[0:i+1])
+      for i in std.range(0, std.length(lo) - 1)
+    ]);
   local env_child_compartment_path(entry, child) = '%s:%s' % [
     env_compartment_path(entry),
     env_child_compartment_name(entry, child),

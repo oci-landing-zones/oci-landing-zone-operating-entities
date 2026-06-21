@@ -4,8 +4,8 @@
 // contains: "CMP-LZ-RETAIL-BANK-PROD-KEY"
 // contains: "VCN-FRA-LZ-FINANCE-PROD-PROJECTS-KEY"
 // contains: "VCN-FRA-LZ-RETAIL-BANK-PROD-PROJECTS-KEY"
-// contains: "cmp-lz-finance:cmp-lz-finance-prod:cmp-lz-finance-prod-network"
-// contains: "cmp-lz-retail-bank:cmp-lz-retail-bank-prod:cmp-lz-retail-bank-prod-network"
+// contains: cmp-lz-finance:cmp-lz-finance-prod:cmp-lz-finance-prod-network
+// contains: cmp-lz-retail-bank:cmp-lz-retail-bank-prod:cmp-lz-retail-bank-prod-network
 {
   region: 'eu-frankfurt-1',
   region_short_name: 'fra',
