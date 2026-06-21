@@ -25,6 +25,9 @@ local validation = import 'validation.libsonnet';
     ),
 
   local values(obj) = [obj[key] for key in std.objectFields(obj)],
+  local reverse(values) =
+    if std.length(values) == 0 then []
+    else [values[std.length(values) - 1 - i] for i in std.range(0, std.length(values) - 1)],
 
   local letters(source) = [
     c
@@ -36,10 +39,9 @@ local validation = import 'validation.libsonnet';
     local cs = chars(std.asciiLower(source));
     if std.length(cs) == 0 then []
     else [
-      local c = cs[i];
-      c
+      cs[i]
       for i in std.range(0, std.length(cs) - 1)
-      if is_letter(c) && (i == 0 || !is_alnum(cs[i - 1]))
+      if is_letter(cs[i]) && (i == 0 || !is_alnum(cs[i - 1]))
     ],
 
   local dns_candidates(source, label) =
@@ -55,7 +57,7 @@ local validation = import 'validation.libsonnet';
       for i in std.range(1, std.length(ls) - 1)
     ]),
 
-  validate_dns(dns, label)::
+  local validate_dns(dns, label) =
     local cs = chars(dns);
     assert std.type(dns) == 'string' && std.length(cs) == 2 && is_letter(cs[0]) && is_letter(cs[1]) && dns == std.asciiLower(dns) :
       '%s must be exactly two lowercase letters' % label;
@@ -63,8 +65,13 @@ local validation = import 'validation.libsonnet';
 
   assign_dns(raw_oes)::
     local names = std.objectFields(raw_oes);
+    local generated_names = reverse(std.sort([
+      name
+      for name in names
+      if !(std.objectHas(raw_oes[name], 'dns') && raw_oes[name].dns != null)
+    ]));
     local explicit = {
-      [name]: self.validate_dns(raw_oes[name].dns, 'operating_entities.%s.dns' % name)
+      [name]: validate_dns(raw_oes[name].dns, 'operating_entities.%s.dns' % name)
       for name in names
       if std.objectHas(raw_oes[name], 'dns') && raw_oes[name].dns != null
     };
@@ -82,7 +89,7 @@ local validation = import 'validation.libsonnet';
           assert std.length(candidates) > 0 :
             'operating_entities.%s.dns could not be generated uniquely; set operating_entities.%s.dns explicitly' % [name, name];
           acc + { [name]: candidates[0] },
-      names,
+      generated_names,
       explicit
     ),
 

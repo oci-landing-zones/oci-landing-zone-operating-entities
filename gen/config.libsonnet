@@ -3,6 +3,7 @@
 local cidrs = import 'lib/cidrs.libsonnet';
 local collections = import 'lib/collections.libsonnet';
 local constants = import 'constants.libsonnet';
+local operating_entities = import 'lib/operating_entities.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
 local validation = import 'lib/validation.libsonnet';
 
@@ -40,9 +41,48 @@ local validation = import 'lib/validation.libsonnet';
     assert std.member(supported_hub_kinds, hub_kind) :
       'config.hub.kind must be one of: %s' % std.join(', ', supported_hub_kinds);
     local hub_network = validation.required_object(hub, 'network', 'config.hub.network');
-    local environments = validation.required_object(config, 'environments', 'config.environments');
-    local env_names = std.objectFields(environments);
-    assert std.length(std.objectFields(environments)) > 0 : 'config.environments must have at least one environment';
+    local has_root_environments = std.objectHas(config, 'environments') && config.environments != null;
+    local has_operating_entities =
+      std.objectHas(config, 'operating_entities') && config.operating_entities != null;
+    assert has_root_environments || has_operating_entities :
+      'config.environments or config.operating_entities is required';
+    assert !(has_root_environments && has_operating_entities) :
+      'config must define either environments or operating_entities, not both';
+
+    local raw_operating_entities =
+      if has_operating_entities then operating_entities.normalize(config.operating_entities)
+      else null;
+
+    local environments =
+      if has_operating_entities then {}
+      else validation.required_object(config, 'environments', 'config.environments');
+
+    local env_names =
+      if has_operating_entities then
+        std.foldl(
+          function(acc, oe_name)
+            acc + [
+              env_name
+              for env_name in std.objectFields(raw_operating_entities[oe_name].environments)
+              if !std.member(acc, env_name)
+            ],
+          std.objectFields(raw_operating_entities),
+          []
+        )
+      else std.objectFields(environments);
+
+    assert std.length(env_names) > 0 :
+      if has_operating_entities then
+        'config.operating_entities must define at least one environment'
+      else
+        'config.environments must have at least one environment';
+
+    local force_operating_entity_dns =
+      if has_operating_entities then [
+        raw_operating_entities[oe_name].dns
+        for oe_name in std.objectFields(raw_operating_entities)
+      ] else [];
+    assert std.length(std.join('', force_operating_entity_dns)) >= 0;
 
     local security_target_names =
       if std.objectHas(config, 'security_targets') && config.security_targets != null then
@@ -154,8 +194,8 @@ local validation = import 'lib/validation.libsonnet';
         network+: normalize_auto_subnet_network(network, network_label, spoke_subnet_names),
       };
 
-    local norm_envs = {
-      [env_name]: local env = environments[env_name]; env {
+    local norm_env(env_name, env) =
+      env {
         [if std.objectHas(env, 'shared_project_network') then 'shared_project_network']:
           norm_spn(env_name, env),
 
@@ -163,16 +203,30 @@ local validation = import 'lib/validation.libsonnet';
           [p_name]: norm_platform(env.platforms[p_name], p_name)
           for p_name in std.objectFields(env.platforms)
         },
-      }
+      };
+
+    local norm_envs = {
+      [env_name]: norm_env(env_name, environments[env_name])
       for env_name in std.objectFields(environments)
     };
+
+    local norm_operating_entities =
+      if has_operating_entities then {
+        [oe_name]: raw_operating_entities[oe_name] {
+          environments: {
+            [env_name]: norm_env(env_name, raw_operating_entities[oe_name].environments[env_name])
+            for env_name in std.objectFields(raw_operating_entities[oe_name].environments)
+          },
+        }
+        for oe_name in std.objectFields(raw_operating_entities)
+      } else null;
 
     local norm_shared = if std.objectHas(config, 'shared_platforms') then {
       [p_name]: norm_platform(config.shared_platforms[p_name], p_name)
       for p_name in std.objectFields(config.shared_platforms)
     } else {};
 
-    local env_vcn_entries = std.flattenArrays([
+    local one_oe_env_vcn_entries = std.flattenArrays([
       local env = norm_envs[env_name];
       (if std.objectHas(env, 'shared_project_network') then [
         {
@@ -190,6 +244,32 @@ local validation = import 'lib/validation.libsonnet';
          ] else [])
       for env_name in std.objectFields(norm_envs)
     ]);
+    local multi_oe_env_vcn_entries =
+      if has_operating_entities then std.flattenArrays([
+        std.flattenArrays([
+          local env = norm_operating_entities[oe_name].environments[env_name];
+          (if std.objectHas(env, 'shared_project_network') then [
+            {
+              label: 'Operating entity %s environment %s shared project network' % [oe_name, env_name],
+              cidr: env.shared_project_network.network.vcn,
+            },
+          ] else [])
+          + (if std.objectHas(env, 'platforms') then [
+               {
+                 label: 'Operating entity %s platform %s/%s' % [oe_name, env_name, p_name],
+                 cidr: env.platforms[p_name].network.vcn,
+               }
+               for p_name in std.objectFields(env.platforms)
+               if std.objectHas(env.platforms[p_name], 'network') && env.platforms[p_name].network != null
+             ] else [])
+          for env_name in std.objectFields(norm_operating_entities[oe_name].environments)
+        ])
+        for oe_name in std.objectFields(norm_operating_entities)
+      ]) else [];
+
+    local env_vcn_entries =
+      if has_operating_entities then multi_oe_env_vcn_entries
+      else one_oe_env_vcn_entries;
     local shared_vcn_entries = [
       {
         label: 'Shared platform %s' % p_name,
@@ -209,7 +289,8 @@ local validation = import 'lib/validation.libsonnet';
       realm: realm,
       cis_level: cis_level,
       hub+: { network+: { subnets: hub_subnets } },
-      environments: norm_envs,
+      [if !has_operating_entities then 'environments']: norm_envs,
+      [if has_operating_entities then 'operating_entities']: norm_operating_entities,
       [if security_target_names != null then 'security_targets']: security_target_names,
       [if std.length(std.objectFields(norm_shared)) > 0 then 'shared_platforms']: norm_shared,
     },
