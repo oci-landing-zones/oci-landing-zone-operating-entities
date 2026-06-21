@@ -5,7 +5,7 @@
         "compartments": {
             "CMP-LZ-PROD-OKE-KEY": {
                 "name"                                : "cmp-lz-prod-oke",
-                "description"                         : "Production Platform Oke Compartment",
+                "description"                         : "Prod Platform Oke Compartment",
                 "parent_id"                           : "CMP-LZ-PROD-PLATFORM-KEY"
             }
         }
@@ -15,17 +15,17 @@
         "groups": {
             "GRP-LZ-PROD-PLATFORM-OKE-ADMINS-KEY": {
                 "name"                                : "grp-lz-prod-oke-admins",
-                "description"                         : "Landing Zone Production environment OKE platform cluster management administration access group."
+                "description"                         : "Landing Zone Prod environment OKE platform cluster management administration access group."
             },
 
             "GRP-LZ-PROD-PLATFORM-OKE-RBAC-ADMIN-KEY": {
                 "name"                                : "grp-lz-prod-oke-rbac-admin",
-                "description"                         : "Landing Zone Production environment OKE platform Kubernetes RBAC administration access group."
+                "description"                         : "Landing Zone Prod environment OKE platform Kubernetes RBAC administration access group."
             },
 
             "GRP-LZ-PROD-PLATFORM-OKE-RBAC-VIEWER-KEY": {
                 "name"                                : "grp-lz-prod-oke-rbac-viewer",
-                "description"                         : "Landing Zone Production environment OKE platform Kubernetes RBAC viewer access group."
+                "description"                         : "Landing Zone Prod environment OKE platform Kubernetes RBAC viewer access group."
             }
         }
     },
@@ -34,7 +34,7 @@
         "supplied_policies": {
             "PCY-LZ-PROD-PLATFORM-OKE-ADMINS-KEY": {
                 "name"                                : "pcy-lz-prod-oke-admins",
-                "description"                         : "Grants grp-lz-prod-oke-admins OKE platform administration access in the Production environment OKE platform and network compartments.",
+                "description"                         : "Grants grp-lz-prod-oke-admins OKE platform administration access in the Prod environment OKE platform and network compartments.",
                 "compartment_id"                      : "TENANCY-ROOT",
 
                 "statements": [
@@ -53,7 +53,7 @@
 
             "PCY-LZ-PROD-PLATFORM-OKE-RBAC-ROLE-KEY": {
                 "name"                                : "pcy-lz-prod-oke-rbac-roles",
-                "description"                         : "Grants OKE RBAC administrator and viewer groups Kubernetes cluster access in the Production environment OKE platform compartment.",
+                "description"                         : "Grants OKE RBAC administrator and viewer groups Kubernetes cluster access in the Prod environment OKE platform compartment.",
                 "compartment_id"                      : "TENANCY-ROOT",
 
                 "statements": [

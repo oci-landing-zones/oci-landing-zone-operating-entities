@@ -419,7 +419,7 @@
 
             "NOTT-LZ-PREPROD-EXACC-PROJECTS-KEY": {
                 "name"                                       : "nott-lz-preprod-exacc",
-                "description"                                : "Topic for Pre-Production ExaDB-C@C project notifications.",
+                "description"                                : "Topic for PreProd ExaDB-C@C project notifications.",
                 "compartment_id"                             : "CMP-LZ-PREPROD-SECURITY-KEY",
 
                 "subscriptions": [
@@ -432,7 +432,7 @@
 
             "NOTT-LZ-PROD-EXACC-PROJECTS-KEY": {
                 "name"                                       : "nott-lz-prod-exacc",
-                "description"                                : "Topic for Production ExaDB-C@C project notifications.",
+                "description"                                : "Topic for Prod ExaDB-C@C project notifications.",
                 "compartment_id"                             : "CMP-LZ-PROD-SECURITY-KEY",
 
                 "subscriptions": [
