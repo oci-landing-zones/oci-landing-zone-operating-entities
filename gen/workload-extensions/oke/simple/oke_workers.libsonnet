@@ -2,11 +2,10 @@
 
 function(ctx) {
   oke_workers_configuration+: {
-    default_compartment_id: ctx.cmp_key,
-
     node_pools+: {
       [ctx.node_pool_key]: {
         name: ctx.node_pool_name,
+        compartment_id: ctx.cmp_key,
         cluster_id: ctx.cluster_key,
         enable_cycling: false,
         size: 1,

@@ -1,10 +1,9 @@
 {
     "oke_clusters_configuration": {
-        "default_compartment_id"                       : "CMP-LZ-PROD-OKE-KEY",
-
         "clusters": {
             "CLR-FRA-LZ-PROD-OKE-KEY": {
                 "name"                                 : "clr-fra-lz-prod-oke",
+                "compartment_id"                       : "CMP-LZ-PROD-OKE-KEY",
                 "cni_type"                             : "native",
                 "is_enhanced"                          : true,
                 "kubernetes_version"                   : "v1.35.2",
