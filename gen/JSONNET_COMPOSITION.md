@@ -129,6 +129,16 @@ local ctx = render_context.from_raw_config(raw_config);
 
 Use that helper when a renderer or publication adapter needs normalized config plus derived semantic lists such as ordered spoke environments, platform entries, VCN metadata, example LB backends, or the shared-only config view. Keep final document assembly in the caller. `render_context.libsonnet` is the input-preparation layer, not the merge owner.
 
+Multi-OE Generic multi-stack publications use that same context through their published adapter:
+
+```jsonnet
+local profiles = import '../profiles.libsonnet';
+local published = import '../published.libsonnet';
+published.render(profiles.hub_e.config).op01.network_hub_e
+```
+
+That adapter owns only OP01/OP02/OP03 publication projections; shared landing-zone composition still belongs to `landing_zone.libsonnet`.
+
 ### Collect Semantic Entries Before Building Objects
 
 `landing_zone.libsonnet` often builds arrays of semantic entries first, then turns them into objects later:

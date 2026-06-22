@@ -10,8 +10,8 @@
 // function(config, n, realm_constants, topo) → { cis1_pre, cis1, cis2_pre, cis2 }
 
 function(config, n, realm_constants, topo)
-  local env_names = topo.ordered_env_names();
-  local networked_env_names = topo.networked_env_names();
+  local env_entries = topo.ordered_env_entries();
+  local networked_env_entries = topo.networked_env_entries();
   local security_cmp_key = n.key_global('CMP', ['SECURITY']);
 
   // --- Event type constants ---
@@ -115,29 +115,29 @@ function(config, n, realm_constants, topo)
   // Each env gets a security notify rule. Only envs with shared_project_network
   // get network notify rules because only those envs have env network compartments.
   local env_security_event_rules = std.foldl(
-    function(acc, env_name)
+    function(acc, entry)
       acc + {
-        [n.key_global('RUL', [env_name, 'NOTIFY', 'SECURITY'])]: {
-          compartment_id: n.key_global('CMP', [env_name, 'SECURITY']),
+        [n.key_global('RUL', entry.key_segments + ['NOTIFY', 'SECURITY'])]: {
+          compartment_id: topo.env_child_compartment_key(entry, 'SECURITY'),
           destination_topic_ids: [n.key_global('NOTT', ['SECURITY'])],
-          event_display_name: n.display_global('rul', [env_name, 'notify', 'security']),
+          event_display_name: n.display_global('rul', entry.name_segments + ['notify', 'security']),
           supplied_events: security_events,
         },
       },
-    env_names,
+    env_entries,
     {}
   );
   local env_network_event_rules = std.foldl(
-    function(acc, env_name)
+    function(acc, entry)
       acc + {
-        [n.key_global('RUL', [env_name, 'NOTIFY', 'NETWORK'])]: {
-          compartment_id: n.key_global('CMP', [env_name, 'NETWORK']),
+        [n.key_global('RUL', entry.key_segments + ['NOTIFY', 'NETWORK'])]: {
+          compartment_id: topo.env_child_compartment_key(entry, 'NETWORK'),
           destination_topic_ids: [n.key_global('NOTT', ['NETWORK'])],
-          event_display_name: n.display_global('rul', [env_name, 'notify', 'network']),
+          event_display_name: n.display_global('rul', entry.name_segments + ['notify', 'network']),
           supplied_events: network_events,
         },
       },
-    networked_env_names,
+    networked_env_entries,
     {}
   );
 
@@ -249,32 +249,32 @@ function(config, n, realm_constants, topo)
 
   // --- Per-env flow logs and log groups (CIS2 only) ---
   local env_flow_logs = std.foldl(
-    function(acc, env_name)
+    function(acc, entry)
       acc + {
-        [n.key_global('LOG', [env_name, 'SUBNET', 'FLOW'])]: {
-          log_group_id: n.key_global('LGRP', [env_name, 'VCN', 'FLOW']),
-          target_compartment_ids: [n.key_global('CMP', [env_name, 'NETWORK'])],
+        [n.key_global('LOG', entry.key_segments + ['SUBNET', 'FLOW'])]: {
+          log_group_id: n.key_global('LGRP', entry.key_segments + ['VCN', 'FLOW']),
+          target_compartment_ids: [topo.env_child_compartment_key(entry, 'NETWORK')],
           target_resource_type: 'subnet',
         },
-        [n.key_global('LOG', [env_name, 'VCN', 'FLOW'])]: {
-          log_group_id: n.key_global('LGRP', [env_name, 'VCN', 'FLOW']),
-          target_compartment_ids: [n.key_global('CMP', [env_name, 'NETWORK'])],
+        [n.key_global('LOG', entry.key_segments + ['VCN', 'FLOW'])]: {
+          log_group_id: n.key_global('LGRP', entry.key_segments + ['VCN', 'FLOW']),
+          target_compartment_ids: [topo.env_child_compartment_key(entry, 'NETWORK')],
           target_resource_type: 'vcn',
         },
       },
-    networked_env_names,
+    networked_env_entries,
     {}
   );
 
   local env_log_groups = std.foldl(
-    function(acc, env_name)
+    function(acc, entry)
       acc + {
-        [n.key_global('LGRP', [env_name, 'VCN', 'FLOW'])]: {
-          name: n.display_global('lgrp', [env_name, 'vcn', 'flow']),
-          compartment_id: n.key_global('CMP', [env_name, 'SECURITY']),
+        [n.key_global('LGRP', entry.key_segments + ['VCN', 'FLOW'])]: {
+          name: n.display_global('lgrp', entry.name_segments + ['vcn', 'flow']),
+          compartment_id: topo.env_child_compartment_key(entry, 'SECURITY'),
         },
       },
-    networked_env_names,
+    networked_env_entries,
     {}
   );
 

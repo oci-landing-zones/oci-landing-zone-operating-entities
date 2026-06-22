@@ -58,9 +58,10 @@ gen/
 └── blueprints/one-oe/runtime/one-stack/  # Entry-point .jsonnet files (default mode)
     ├── profiles.libsonnet
     └── *.jsonnet
-└── blueprints/multi-oe/generic_v1/runtime/one-stack/
+└── blueprints/multi-oe/generic/runtime/
     ├── profiles.libsonnet
-    └── *.jsonnet
+    ├── single-stack/
+    └── multi-stack/
 ```
 
 ## 2. Generation Mental Model
@@ -131,7 +132,7 @@ Update this diagram when any of these change:
 - `jsonnet --multi` is reserved for `bash gen/generate.sh --config ...`. It must not be used to generate the committed snapshot files under `blueprints/` or `workload-extensions/`.
 - Each published family owns its local profiles file:
   - `gen/blueprints/one-oe/runtime/one-stack/profiles.libsonnet`
-  - `gen/blueprints/multi-oe/generic_v1/runtime/one-stack/profiles.libsonnet`
+  - `gen/blueprints/multi-oe/generic/runtime/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/multi-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacc/single-stack/profiles.libsonnet`
@@ -174,6 +175,7 @@ Rules:
 Current adapters:
 
 - `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. It reuses `gen/render_context.libsonnet` for normalization/topology-derived inputs while preserving the hub-only network contract and shared-only IAM/governance projections.
+- `gen/blueprints/multi-oe/generic/runtime/multi-stack/published.libsonnet` — owns Multi-OE Generic OP01/OP02/OP03 publication projections for shared services, OE onboarding, and project onboarding stack boundaries.
 - `gen/workload-extensions/exacc/{single-stack,multi-stack}/published.libsonnet` — own ExaDB-C@C stack-local publication projections.
 - `gen/workload-extensions/exacs/multi-stack/published.libsonnet` — owns ExaDB-D / ExaCS multi-stack publication projections.
 

@@ -1,0 +1,62 @@
+{
+  "op01_keys": [
+    "governance",
+    "iam",
+    "network_hub_a",
+    "network_hub_a_pre",
+    "network_hub_b",
+    "network_hub_b_pre",
+    "network_hub_c",
+    "network_hub_c_backends",
+    "network_hub_c_pre",
+    "network_hub_e",
+    "observability_cis1",
+    "observability_cis1_pre",
+    "observability_cis2",
+    "observability_cis2_pre",
+    "security_cis1",
+    "security_cis1_pre",
+    "security_cis2",
+    "security_cis2_pre"
+  ],
+  "op02_alpha_keys": [
+    "iam",
+    "network_hub_a",
+    "network_hub_a_pre",
+    "network_hub_b",
+    "network_hub_b_pre",
+    "network_hub_c",
+    "network_hub_c_pre",
+    "network_hub_e",
+    "observability_cis1",
+    "observability_cis1_pre",
+    "observability_cis2",
+    "observability_cis2_pre",
+    "security_cis1",
+    "security_cis1_pre",
+    "security_cis2",
+    "security_cis2_pre"
+  ],
+  "op02_oes": [
+    "oe_alpha"
+  ],
+  "op03_alpha_envs": [
+    "preprod",
+    "prod"
+  ],
+  "op03_alpha_preprod_projects": [
+    "proj1"
+  ],
+  "op03_alpha_prod_projects": [
+    "proj1"
+  ],
+  "op03_alpha_proj1_keys": [
+    "iam",
+    "network"
+  ],
+  "top_level_ops": [
+    "op01",
+    "op02",
+    "op03"
+  ]
+}

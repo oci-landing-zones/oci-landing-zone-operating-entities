@@ -1,0 +1,9 @@
+{
+  "has_beta_project_compartment": false,
+  "has_beta_project_group": false,
+  "has_preprod_project_compartment": false,
+  "has_preprod_project_group": false,
+  "has_project_compartment": true,
+  "has_project_group": true,
+  "has_projects_parent_as_managed_compartment": false
+}

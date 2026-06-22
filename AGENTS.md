@@ -304,7 +304,7 @@ When helping customers, make no assumptions and do not hallucinate data, file pa
 - Config mode: `bash gen/generate.sh --config <config_file> [output_dir]`
 - Generator tests: `python3 -m unittest discover -s tests -p 'test_*.py'`
 
-`jsonnet` must be available on `PATH`.
+Generation and tests need a Jsonnet renderer on `PATH`. Local scripts prefer `jrsonnet` when it is installed and fall back to `jsonnet`; CI/CD runs must use canonical `jsonnet`.
 
 ## Generator Guardrails
 

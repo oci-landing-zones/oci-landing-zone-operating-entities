@@ -37,6 +37,7 @@ local products = import '../../exadb/products.libsonnet';
       descriptions: descriptions,
       entries: exacc_entries,
       tag_key: tag_key,
+      topology: ctx.topo,
     });
 
     local shared_entries = [entry for entry in exacc_entries if entry.scope.scope_type == 'shared'];

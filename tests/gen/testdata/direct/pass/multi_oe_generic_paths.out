@@ -1,0 +1,16 @@
+{
+  "alpha_envs": [
+    "preprod",
+    "prod"
+  ],
+  "beta_envs": [
+    "preprod",
+    "prod"
+  ],
+  "profile_hubs": [
+    "hub_a",
+    "hub_b",
+    "hub_c",
+    "hub_e"
+  ]
+}

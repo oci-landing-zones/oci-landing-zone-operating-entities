@@ -13,13 +13,14 @@ function(profile, env_name='prod', platform_name='oke') {
     ctx.extension_resolve_entry_inputs({ oke_simple: oke_builder }, platform_entry)
   ),
   local rendered_extension = oke_builder.render(resolved.render_params),
-  local rendered_lz = lz(config),
-  local scope = resolved.render_params.topology,
-  local env = scope.scope_name,
-  local plat = scope.platform_name,
-  local category_key = platforms.publication_category_key(scope),
-  local drg_key = n.key('DRG', ['HUB']),
-  local vcn_key = n.key('VCN', [env, 'PLATFORM', plat]),
+	  local rendered_lz = lz(config),
+	  local scope = resolved.render_params.topology,
+	  local env = scope.qualified_name,
+	  local plat = scope.platform_name,
+	  local category_key = platforms.publication_category_key(scope),
+	  local drg_key = n.key('DRG', ['HUB']),
+	  local route_segments = scope.key_segments + ['PLATFORM', plat],
+	  local vcn_key = n.key('VCN', route_segments),
   local oke_category =
     rendered_extension.contributions.network_pre.network_configuration.network_configuration_categories[category_key],
   local multi_stack_category =
@@ -30,8 +31,8 @@ function(profile, env_name='prod', platform_name='oke') {
             drg_id: drg_key,
 
             drg_attachments+: {
-              [n.key('DRGATT', [env, 'PLATFORM', plat])]: {
-                display_name: n.display('drgatt', [env, plat]),
+	              [n.key('DRGATT', route_segments)]: {
+	                display_name: n.display('drgatt', scope.name_segments + [plat]),
                 drg_route_table_key: n.key('DRGRT', ['SPOKES']),
 
                 network_details: {

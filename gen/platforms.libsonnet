@@ -9,6 +9,19 @@ local common = import 'hub/hub_common.libsonnet';
       [entry.qualified_name]: topo.project_names(entry)
       for entry in ordered_env_entries
     };
+    local environment_entries = {
+      [entry.qualified_name]: entry
+      for entry in ordered_env_entries
+    };
+    local environment_entries_by_env_name = {
+      [entry.env_name]: entry
+      for entry in ordered_env_entries
+      if std.length([
+        other
+        for other in ordered_env_entries
+        if other.env_name == entry.env_name
+      ]) == 1
+    };
     local environment_projects_by_env_name = {
       [entry.env_name]: topo.project_names(entry)
       for entry in ordered_env_entries
@@ -23,6 +36,7 @@ local common = import 'hub/hub_common.libsonnet';
         scope_title: std.join(' ', entry.display_segments),
         scope_long_title: std.join(' ', entry.display_segments),
         env_name: entry.env_name,
+        entry: entry,
       }
       for entry in ordered_env_entries
     };
@@ -34,6 +48,8 @@ local common = import 'hub/hub_common.libsonnet';
               scope: topo.env_platform(entry, p_name),
               scope_config: {
                 projects: topo.project_names(entry),
+                environment_entries: environment_entries,
+                environment_entries_by_env_name: environment_entries_by_env_name,
                 environment_projects: environment_projects,
                 environment_projects_by_env_name: environment_projects_by_env_name,
                 environment_labels: environment_labels,
@@ -52,6 +68,8 @@ local common = import 'hub/hub_common.libsonnet';
             scope: topo.shared_platform(p_name),
             scope_config: {
               projects: [],
+              environment_entries: environment_entries,
+              environment_entries_by_env_name: environment_entries_by_env_name,
               environment_projects: environment_projects,
               environment_projects_by_env_name: environment_projects_by_env_name,
               environment_labels: environment_labels,
@@ -79,6 +97,7 @@ local common = import 'hub/hub_common.libsonnet';
   vcn_label(pe):: {
     raw_name: '%s-platform-%s' % [pe.scope.qualified_name, pe.scope.platform_name],
     display: '%s %s' % [pe.scope.scope_title, std.asciiUpper(pe.scope.platform_name)],
+    name_segments: pe.scope.name_segments + [pe.scope.platform_name],
   },
 
   publication_category_key(scope):: '%s-platform-%s' % [
@@ -139,7 +158,7 @@ local common = import 'hub/hub_common.libsonnet';
           kind: 'spoke',
           drg_att_key: n.key('DRGATT', s.entry.key_segments + ['PROJ']),
           vcn_key: n.key('VCN', s.entry.key_segments + ['PROJECTS']),
-          drg_att_display: n.display('drgatt', s.entry.display_segments + ['proj']),
+          drg_att_display: n.display('drgatt', s.entry.name_segments + ['proj']),
           route_key: n.route_rule([n.region] + s.entry.key_segments + ['projects']),
           route_desc: route_desc,
         },
@@ -163,7 +182,7 @@ local common = import 'hub/hub_common.libsonnet';
           kind: 'platform',
           drg_att_key: n.key('DRGATT', route_segments),
           vcn_key: n.key('VCN', route_segments),
-          drg_att_display: n.display('drgatt', pe.scope.display_segments + [pe.scope.platform_name]),
+          drg_att_display: n.display('drgatt', pe.scope.name_segments + [pe.scope.platform_name]),
           route_key: n.route_rule([n.region, 'vcn', label.raw_name]),
           route_desc: route_desc,
         },
@@ -217,7 +236,7 @@ local common = import 'hub/hub_common.libsonnet';
       else false;
     local scope = pe.scope;
     local plat = scope.platform_name;
-    local display_segments = scope.display_segments + [plat];
+    local display_segments = scope.name_segments + [plat];
     local route_segments = scope.key_segments + ['PLATFORM', plat];
     local vcn_cidr = pe.platform_config.network.vcn;
     local plat_subnets = pe.platform_config.network.subnets;

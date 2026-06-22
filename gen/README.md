@@ -21,6 +21,7 @@ If you set `hub.network.subnets` explicitly, provide the full canonical subnet s
 For networked extension-backed platforms, explicit `platform.network.subnets` overrides must match the extension metadata-defined subnet set exactly; otherwise omit subnets and let the extension auto-allocate. Extensions declare network behavior with `metadata.network_mode`: `required`, `forbidden`, or `optional`. Legacy `metadata.requires_network: true|false` is still supported and maps to `required` or `forbidden`. Optional-network extensions may omit `platform.network` for IAM/observability-only contributions, or include it to emit `network_pre`.
 Multi-OE config mode uses top-level `operating_entities`. One-OE remains the default when `operating_entities` is omitted.
 Generated IAM is checked against a 400-statement safety budget per root-to-leaf compartment chain. OCI documents a hard limit of 500 statements per chain; this repo keeps headroom for customer extensions and manual policies.
+The Multi-OE Generic runtime source lives under `gen/blueprints/multi-oe/generic/runtime`. Its `single-stack` entrypoints publish full-stack snapshots, and its `multi-stack` adapter publishes OP01 shared services, OP02 OE onboarding, and OP03 project onboarding projections.
 
 Change the Jsonnet sources under `gen/` first. Checked-in JSON under `blueprints/` and `workload-extensions/` are generated snapshots, not hand-maintained source files.
 

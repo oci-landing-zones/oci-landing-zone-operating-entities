@@ -131,19 +131,20 @@ local products = import '../../exadb/products.libsonnet';
 
     local security_compartment_for(scope) =
       if scope.scope_type == 'shared' then security_compartment
-      else n.key_global('CMP', [scope.scope_name, 'SECURITY']);
+      else n.key_global('CMP', scope.key_segments + ['SECURITY']);
     local flow_logs = std.foldl(
       function(acc, spec)
         local scope = spec.entry.scope;
+        local segments = scope.key_segments + ['PLATFORM', scope.platform_name];
         local log_group_key =
-          n.key_global('LGRP', [scope.scope_name, 'PLATFORM', scope.platform_name, 'VCN', 'FLOW']);
+          n.key_global('LGRP', segments + ['VCN', 'FLOW']);
         acc + {
-          [n.key_global('LOG', [scope.scope_name, 'PLATFORM', scope.platform_name, 'SUBNET', 'FLOW'])]: {
+          [n.key_global('LOG', segments + ['SUBNET', 'FLOW'])]: {
             log_group_id: log_group_key,
             target_compartment_ids: [scope.network_compartment_key],
             target_resource_type: 'subnet',
           },
-          [n.key_global('LOG', [scope.scope_name, 'PLATFORM', scope.platform_name, 'VCN', 'FLOW'])]: {
+          [n.key_global('LOG', segments + ['VCN', 'FLOW'])]: {
             log_group_id: log_group_key,
             target_compartment_ids: [scope.network_compartment_key],
             target_resource_type: 'vcn',
@@ -155,9 +156,10 @@ local products = import '../../exadb/products.libsonnet';
     local log_groups = std.foldl(
       function(acc, spec)
         local scope = spec.entry.scope;
+        local segments = scope.key_segments + ['PLATFORM', scope.platform_name];
         acc + {
-          [n.key_global('LGRP', [scope.scope_name, 'PLATFORM', scope.platform_name, 'VCN', 'FLOW'])]: {
-            name: n.display_global('lgrp', [scope.scope_name, scope.platform_name, 'vcn', 'flow']),
+          [n.key_global('LGRP', segments + ['VCN', 'FLOW'])]: {
+            name: n.display_global('lgrp', scope.name_segments + [scope.platform_name, 'vcn', 'flow']),
             compartment_id: security_compartment_for(scope),
           },
         },
