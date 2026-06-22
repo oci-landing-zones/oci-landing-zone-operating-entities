@@ -30,13 +30,18 @@ For customized OKE landing zones generated from a configuration file, see [OKE C
 
 ## **2. Architecture Overview**
 
-This deployment uses the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator) to provision both the network infrastructure and OKE cluster in a single deployment. The orchestrator automatically resolves dependencies between resources using configuration keys instead of OCIDs.
+This published simple multi-stack deployment uses the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator) to add OKE to an existing **Hub E** landing zone. The orchestrator automatically resolves dependencies between resources using configuration keys instead of OCIDs.
+
+The simple multi-stack path is a Hub E quickstart. For Hub A, Hub B, Hub C, multiple OKE platforms, overlay networking, or custom landing zone shapes, use [OKE Config-Driven Generation](../config-driven.md).
+
+The published quickstart creates one production OKE platform by default. Add pre-production or additional OKE platforms through config-driven generation.
 
 **Key Features:**
 - **Automated Dependency Resolution**: Network resources (VCN, subnets, NSGs) are automatically linked to the OKE cluster using configuration keys using dependency exchange across stacks
 - **CIS-Compliant**: Uses the CIS-compliant OKE module from [terraform-oci-modules-workloads](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
 - **OKE Network Modes**: Published JSON is VCN-native by default; config-driven generation can also emit an overlay network shape for Flannel-compatible clusters
-- **Multi-Step Deployment**: Deploy OKE together in one ORM stack and Landing Zone separately
+- **No Hub L7 Load Balancer**: The published OKE stack does not provision a hub-level OCI L7 Load Balancer; Kubernetes `Service` resources of type `LoadBalancer` create OCI load balancers through OKE
+- **Multi-Step Deployment**: Deploy the Hub E landing zone first, then deploy the OKE stack separately
 
 &nbsp;
 
@@ -68,9 +73,9 @@ The published surface includes companion JSONs with CIS-aligned observability se
 
 ### Prerequisites <!-- omit from toc -->
 
-- An existing OCI Landing Zone deployment (ONE-OE or similar)
+- An existing One-OE Hub E landing zone deployment
 - Access to OCI Console with appropriate permissions
-- DRG (Dynamic Routing Gateway) already created in your Landing Zone
+- DRG (Dynamic Routing Gateway) already created in your Hub E landing zone
 
 ### Option A: Deploy via OCI Resource Manager
 

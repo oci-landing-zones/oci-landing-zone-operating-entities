@@ -2,11 +2,10 @@
 
 function(ctx) {
   oke_clusters_configuration+: {
-    default_compartment_id: ctx.cmp_key,
-
     clusters+: {
       [ctx.cluster_key]: {
         name: ctx.cluster_name,
+        compartment_id: ctx.cmp_key,
         cni_type: ctx.cluster_cni_type,
         is_enhanced: true,
         kubernetes_version: ctx.params.config_params.kubernetes_version,

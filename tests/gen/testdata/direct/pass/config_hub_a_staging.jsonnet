@@ -48,14 +48,23 @@ local pre_categories = network_pre.network_configuration.network_configuration_c
 local statements =
   pre_categories['0-shared'].non_vcn_specific_gateways.dynamic_routing_gateways['DRG-FRA-LZ-HUB-KEY']
     .drg_route_distributions['DRGRD-FRA-LZ-HUB-KEY'].statements;
-local backend_sets =
-  pre_categories['0-shared'].non_vcn_specific_gateways.l7_load_balancers['LB-FRA-LZ-PROD-01-KEY'].backend_sets;
+local hub_vcn = pre_categories['0-shared'].vcns['VCN-FRA-LZ-HUB-KEY'];
+local clusters = outputs['oke_clusters.json'].oke_clusters_configuration.clusters;
+local node_pools = outputs['oke_workers.json'].oke_workers_configuration.node_pools;
 {
   pre_categories: std.sort(std.objectFields(pre_categories)),
   final_categories: std.sort(std.objectFields(network.network_configuration.network_configuration_categories)),
-  backend_ips: {
-    prod01: backend_sets['LBBKST-FRA-LZ-PROD-01-KEY'].backends['LBBE-FRA-LZ-PROD-01-KEY'].ip_address,
-    prod02: backend_sets['LBBKST-FRA-LZ-PROD-02-KEY'].backends['LBBE-FRA-LZ-PROD-02-KEY'].ip_address,
+  cluster_compartment_ids: {
+    prod: clusters['CLR-FRA-LZ-PROD-OKE-KEY'].compartment_id,
+    preprod: clusters['CLR-FRA-LZ-PREPROD-OKE-KEY'].compartment_id,
+  },
+  hub_l7_load_balancers_present:
+    std.objectHas(pre_categories['0-shared'].non_vcn_specific_gateways, 'l7_load_balancers'),
+  hub_lb_subnet_present: std.objectHas(hub_vcn.subnets, 'SN-FRA-LZ-HUB-LB-KEY'),
+  hub_lb_nsg_present: std.objectHas(hub_vcn.network_security_groups, 'NSG-FRA-LZ-HUB-LB-KEY'),
+  node_pool_compartment_ids: {
+    prod: node_pools['NDP-FRA-LZ-PROD-OKE-KEY'].compartment_id,
+    preprod: node_pools['NDP-FRA-LZ-PREPROD-OKE-KEY'].compartment_id,
   },
   route_statement_priorities: {
     prod: statements['ROUTE-TO-VCN-PROD-KEY'].priority,
