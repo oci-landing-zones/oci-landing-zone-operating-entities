@@ -6,7 +6,7 @@ This document describes the Security Zone recipes defined in the [oneoe_security
 
 &nbsp;
 #### [Security Zone](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/security-zones.htm) and [Recipe](https://docs.oracle.com/en-us/iaas/Content/security-zone/using/managing-recipes.htm) assignment across the [One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe) Landing Zone compartment hierarchy
-<img src="../../design/images/sz-design.png" width="725" height="value">
+<img src="../../design/images/3_security_view_security_zones.png" width="980" height="value">
 
 &nbsp;
 
