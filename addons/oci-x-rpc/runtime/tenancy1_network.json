@@ -1,0 +1,923 @@
+{
+    "network_configuration": {
+        "default_compartment_id"                                          : "CMP-LZ-NETWORK-KEY",
+        "default_enable_cis_checks"                                       : false,
+
+        "network_configuration_categories": {
+            "0-shared": {
+                "category_compartment_id"                                 : "CMP-LZ-NETWORK-KEY",
+
+                "vcns": {
+                    "VCN-FRA-LZ-HUB-KEY": {
+                        "display_name"                                    : "vcn-fra-lz-hub",
+                        "cidr_blocks"                                     : ["10.0.0.0/21"],
+                        "dns_label"                                       : "vcnfralzphub",
+                        "block_nat_traffic"                               : false,
+                        "is_attach_drg"                                   : false,
+                        "is_create_igw"                                   : false,
+                        "is_ipv6enabled"                                  : false,
+                        "is_oracle_gua_allocation_enabled"                : false,
+
+                        "subnets": {
+                            "SN-FRA-LZ-HUB-FW-DMZ-KEY": {
+                                "display_name"                            : "sn-fra-lz-hub-fw-dmz",
+                                "cidr_block"                              : "10.0.0.0/24",
+                                "dns_label"                               : "snfrahubfwdmz",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : false,
+                                "prohibit_public_ip_on_vnic"              : false,
+                                "route_table_key"                         : "RT-02-FRA-LZ-HUB-VCN-FWDMZ-KEY",
+                                "security_list_keys"                      : ["default_security_list"]
+                            },
+
+                            "SN-FRA-LZ-HUB-LB-KEY": {
+                                "display_name"                            : "sn-fra-lz-hub-lb",
+                                "cidr_block"                              : "10.0.1.0/24",
+                                "dns_label"                               : "snfrahublb",
+                                "availability_domain"                     : null,
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : false,
+                                "prohibit_public_ip_on_vnic"              : false,
+                                "route_table_key"                         : "RT-01-FRA-LZ-HUB-VCN-LB-KEY",
+                                "security_list_keys"                      : ["default_security_list"]
+                            },
+
+                            "SN-FRA-LZ-HUB-FW-INT-KEY": {
+                                "display_name"                            : "sn-fra-lz-hub-fw-int",
+                                "cidr_block"                              : "10.0.2.0/24",
+                                "dns_label"                               : "snfrahubfwint",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-03-FRA-LZ-HUB-VCN-FWINT-KEY",
+                                "security_list_keys"                      : ["default_security_list"]
+                            },
+
+                            "SN-FRA-LZ-HUB-MGMT-KEY": {
+                                "display_name"                            : "sn-fra-lz-hub-mgmt",
+                                "cidr_block"                              : "10.0.3.0/24",
+                                "dns_label"                               : "snfrahubmgmt",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-06-LZ-HUB-VCN-MGMT-KEY",
+                                "security_list_keys"                      : ["SL-FRA-LZ-HUB-MGMT-KEY"]
+                            },
+
+                            "SN-FRA-LZ-HUB-LOGS-KEY": {
+                                "display_name"                            : "sn-fra-lz-hub-logs",
+                                "cidr_block"                              : "10.0.4.0/24",
+                                "dns_label"                               : "snfrahublogs",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-06-LZ-HUB-VCN-MGMT-KEY",
+                                "security_list_keys"                      : ["default_security_list"]
+                            },
+
+                            "SN-FRA-LZ-HUB-DNS": {
+                                "display_name"                            : "sn-fra-lz-hub-dns",
+                                "cidr_block"                              : "10.0.5.0/24",
+                                "dns_label"                               : "snfrahubdns",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-06-LZ-HUB-VCN-MGMT-KEY",
+                                "security_list_keys"                      : ["default_security_list"]
+                            }
+                        },
+
+                        "route_tables": {
+                            "RT-00-FRA-LZ-HUB-VCN-INGRESS-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-ingress",
+                                "route_rules"                             : {}
+                            },
+
+                            "RT-01-FRA-LZ-HUB-VCN-LB-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-lb",
+
+                                "route_rules": {
+                                    "rt-vcn-fra-preprod-projects": {
+                                        "description"                     : "Route to VCN Preprod Projects through DRG",
+                                        "destination"                     : "10.0.128.0/21",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "rt-vcn-fra-prod-projects": {
+                                        "description"                     : "Route to VCN Prod Projects through DRG",
+                                        "destination"                     : "10.0.64.0/21",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
+                            "RT-02-FRA-LZ-HUB-VCN-FWDMZ-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-dmz",
+
+                                "route_rules": {
+                                    "rt-igw": {
+                                        "description"                     : "Route to Internet through DMZ FW",
+                                        "destination"                     : "0.0.0.0/0",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "IGW-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
+                            "RT-03-FRA-LZ-HUB-VCN-FWINT-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-internal",
+
+                                "route_rules": {
+                                    "rt-natgw": {
+                                        "description"                     : "Route to Internet through Private FW",
+                                        "destination"                     : "0.0.0.0/0",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "NGW-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "rt-vcn-fra-preprod-projects": {
+                                        "description"                     : "Route to VCN Preprod Projects through DRG",
+                                        "destination"                     : "10.0.128.0/21",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "rt-vcn-fra-prod-projects": {
+                                        "description"                     : "Route to VCN Prod Projects through DRG",
+                                        "destination"                     : "10.0.64.0/21",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
+                            "RT-04-FRA-LZ-HUB-VCN-NATGW-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-natgw",
+                                "route_rules"                             : {}
+                            },
+
+                            "RT-05-FRA-LZ-HUB-VCN-IGW-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-igw",
+                                "route_rules"                             : {}
+                            },
+
+                            "RT-06-LZ-HUB-VCN-MGMT-KEY": {
+                                "display_name"                            : "rt-fra-lz-hub-mgmt",
+
+                                "route_rules": {
+                                    "rt-sgw": {
+                                        "description"                     : "Route for sgw",
+                                        "destination"                     : "all-services",
+                                        "destination_type"                : "SERVICE_CIDR_BLOCK",
+                                        "network_entity_key"              : "SGW-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "rt-vcn-fra-preprod-projects": {
+                                        "description"                     : "Route to VCN dr",
+                                        "destination"                     : "192.168.0.0/16",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "rt-vcn-fra-prod-projects": {
+                                        "description"                     : "Route to VCN Prod Projects through DRG",
+                                        "destination"                     : "10.0.64.0/21",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            }
+                        },
+
+                        "default_security_list": {
+                            "egress_rules"                                : [],
+
+                            "ingress_rules": [
+                                {
+                                    "description"                         : "ICMP type 3 code 4",
+                                    "src"                                 : "0.0.0.0/0",
+                                    "src_type"                            : "CIDR_BLOCK",
+                                    "protocol"                            : "ICMP",
+                                    "icmp_type"                           : 3,
+                                    "icmp_code"                           : 4,
+                                    "stateless"                           : false
+                                }
+                            ]
+                        },
+
+                        "security_lists": {
+                            "SL-FRA-LZ-HUB-MGMT-KEY": {
+                                "display_name"                            : "sl-fra-lz-hub-mgmt",
+
+                                "ingress_rules": [
+                                    {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 0,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ingress from the Bastion Managed Service private endpoint IP address",
+                                        "src"                             : "192.168.0.0/16",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 22,
+                                        "dst_port_max"                    : 22,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ingress from the Bastion Managed Service private endpoint IP address",
+                                        "src"                             : "10.0.0.0/16",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 22,
+                                        "dst_port_max"                    : 22,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "egress to 0.0.0.0/0 over ALL protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                ]
+                            }
+                        },
+
+                        "network_security_groups": {
+                            "NSG-FRA-LZ-HUB-FW-DMZ-KEY": {
+                                "display_name"                            : "nsg-fra-lz-hub-fw-dmz",
+
+                                "ingress_rules": {
+                                    "all_tcp": {
+                                        "description"                     : "ingress from anywhere to any TCP port (response from IGW)",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
+                                    "icmp_dont_fragment": {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "icmp_code"                       : 4,
+                                        "stateless"                       : true
+                                    },
+
+                                    "icmp_echo": {
+                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : true
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                     : "egress to 0.0.0.0/0 over ALL protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : true
+                                    }
+                                }
+                            },
+
+                            "NSG-FRA-LZ-HUB-LB-KEY": {
+                                "display_name"                            : "nsg-fra-lz-hub-lb",
+
+                                "ingress_rules": {
+                                    "http_80": {
+                                        "description"                     : "ingress from 0.0.0.0/0 over HTTP 80",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 80,
+                                        "dst_port_max"                    : 80,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+
+                                    "http_443": {
+                                        "description"                     : "ingress from 0.0.0.0/0 over HTTPS 443",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 443,
+                                        "dst_port_max"                    : 443,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                     : "egress to 0.0.0.0/0 over TCP",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    }
+                                }
+                            },
+
+                            "NSG-FRA-LZ-HUB-FW-INT-KEY": {
+                                "display_name"                            : "nsg-fra-lz-hub-fw-int",
+
+                                "ingress_rules": {
+                                    "all_tcp": {
+                                        "description"                     : "ingress from anywhere to any TCP port (response from NAT)",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
+                                    "icmp_dont_fragment": {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "icmp_code"                       : 4,
+                                        "stateless"                       : true
+                                    },
+
+                                    "icmp_echo": {
+                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : true
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                     : "egress to 0.0.0.0/0 over ALL protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : true
+                                    }
+                                }
+                            },
+
+                            "NSG-FRA-LZ-HUB-JUMPSERVER-KEY": {
+                                "display_name"                            : "nsg-fra-lz-hub-jumpserver",
+
+                                "ingress_rules": {
+                                    "ssh_22": {
+                                        "description"                     : "ingress from 0.0.0.0/0 over SSH",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                     : "egress to 0.0.0.0/0 over TCP",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                }
+                            }
+                        },
+
+                        "vcn_specific_gateways": {
+                            "internet_gateways": {
+                                "IGW-FRA-LZ-HUB-KEY": {
+                                    "display_name"                        : "igw-fra-lz-hub",
+                                    "route_table_key"                     : "RT-05-FRA-LZ-HUB-VCN-IGW-KEY"
+                                }
+                            },
+
+                            "nat_gateways": {
+                                "NGW-FRA-LZ-HUB-KEY": {
+                                    "display_name"                        : "ngw-fra-lz-hub",
+                                    "route_table_key"                     : "RT-04-FRA-LZ-HUB-VCN-NATGW-KEY"
+                                }
+                            },
+
+                            "service_gateways": {
+                                "SGW-FRA-LZ-HUB-KEY": {
+                                    "display_name"                        : "sgw-fra-lz-hub",
+                                    "services"                            : "all-services"
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "non_vcn_specific_gateways": {
+                    "dynamic_routing_gateways": {
+                        "DRG-FRA-LZ-HUB-KEY": {
+                            "display_name"                                : "drg-fra-hub",
+
+                            "drg_attachments": {
+                                "DRGATT-FRA-LZ-HUB-VCN-KEY": {
+                                    "display_name"                        : "drgatt-fra-lz-hub-vcn",
+                                    "drg_route_table_key"                 : "DRGRT-FRA-LZ-HUB-KEY",
+
+                                    "network_details": {
+                                        "type"                            : "VCN",
+                                        "attached_resource_key"           : "VCN-FRA-LZ-HUB-KEY",
+                                        "route_table_key"                 : "RT-00-FRA-LZ-HUB-VCN-INGRESS-KEY"
+                                    }
+                                },
+
+                                "DRGATT-FRA-LZ-PREPROD-PROJECTS-VCN-KEY": {
+                                    "display_name"                        : "drgatt-fra-lz-preprod-projects-vcn",
+                                    "drg_route_table_key"                 : "DRGRT-FRA-LZ-SPOKES-KEY",
+
+                                    "network_details": {
+                                        "type"                            : "VCN",
+                                        "attached_resource_key"           : "VCN-FRA-LZ-PREPROD-PROJECTS-KEY"
+                                    }
+                                },
+
+                                "DRGATT-FRA-LZ-PROD-PROJECTS-VCN-KEY": {
+                                    "display_name"                        : "drgatt-fra-lz-prod-projects-vcn",
+                                    "drg_route_table_key"                 : "DRGRT-FRA-LZ-SPOKES-KEY",
+
+                                    "network_details": {
+                                        "type"                            : "VCN",
+                                        "attached_resource_key"           : "VCN-FRA-LZ-PROD-PROJECTS-KEY"
+                                    }
+                                },
+
+                                "DRGATT-FRA-LZ-RPC-KEY": {
+                                    "display_name"                        : "drgatt-fra-lz-rpc",
+                                    "drg_route_table_key"                 : "DRGRT-FRA-LZ-RPC-KEY",
+
+                                    "network_details": {
+                                        "type"                            : "REMOTE_PEERING_CONNECTION",
+                                        "attached_resource_key"           : "RPC-FRA-LZ-DRG-OE1-KEY"
+                                    }
+                                }
+                            },
+
+                            "drg_route_distributions": {
+                                "DRGRD-FRA-LZ-HUB-KEY": {
+                                    "display_name"                        : "drgrd-fra-lz-hub",
+                                    "distribution_type"                   : "IMPORT",
+
+                                    "statements": {
+                                        "ROUTE-TO-VCN-PROD-KEY": {
+                                            "action"                      : "ACCEPT",
+                                            "priority"                    : 10,
+
+                                            "match_criteria": {
+                                                "match_type"              : "DRG_ATTACHMENT_ID",
+                                                "attachment_type"         : "VCN",
+                                                "drg_attachment_key"      : "DRGATT-FRA-LZ-PROD-PROJECTS-VCN-KEY"
+                                            }
+                                        },
+
+                                        "ROUTE-TO-VCN-PREPROD-KEY": {
+                                            "action"                      : "ACCEPT",
+                                            "priority"                    : 20,
+
+                                            "match_criteria": {
+                                                "match_type"              : "DRG_ATTACHMENT_ID",
+                                                "attachment_type"         : "VCN",
+                                                "drg_attachment_key"      : "DRGATT-FRA-LZ-PREPROD-PROJECTS-VCN-KEY"
+                                            }
+                                        },
+
+                                        "ROUTE-TO-RPC-KEY": {
+                                            "action"                      : "ACCEPT",
+                                            "priority"                    : 30,
+
+                                            "match_criteria": {
+                                                "match_type"              : "DRG_ATTACHMENT_TYPE",
+                                                "attachment_type"         : "REMOTE_PEERING_CONNECTION",
+                                                "drg_attachment_key"      : "DRGATT-FRA-LZ-RPC-KEY"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+
+                            "drg_route_tables": {
+                                "DRGRT-FRA-LZ-HUB-KEY": {
+                                    "display_name"                        : "drgrt-fra-lz-hub",
+                                    "import_drg_route_distribution_key"   : "DRGRD-FRA-LZ-HUB-KEY",
+                                    "is_ecmp_enabled"                     : false,
+                                    "route_rules"                         : {}
+                                },
+
+                                "DRGRT-FRA-LZ-RPC-KEY": {
+                                    "display_name"                        : "drgrt-fra-lz-rpc",
+                                    "is_ecmp_enabled"                     : false,
+
+                                    "route_rules": {
+                                        "DRGRT-FRA-LZ-RPC-STATIC-ROUTE": {
+                                            "destination"                 : "0.0.0.0/0",
+                                            "destination_type"            : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key" : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                        }
+                                    }
+                                },
+
+                                "DRGRT-FRA-LZ-SPOKES-KEY": {
+                                    "display_name"                        : "drgrt-fra-lz-spokes",
+                                    "is_ecmp_enabled"                     : false,
+
+                                    "route_rules": {
+                                        "DRGRT-FRA-LZ-SPOKES-STATIC-ROUTE": {
+                                            "destination"                 : "0.0.0.0/0",
+                                            "destination_type"            : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key" : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                        }
+                                    }
+                                }
+                            },
+
+                            "remote_peering_connections": {
+                                "RPC-FRA-LZ-DRG-OE1-KEY": {
+                                    "display_name"                        : "rpc-fra-lz-drg-oe1",
+                                    "peer_region_name"                    : "eu-frankfurt-1"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "1-prod": {
+                "category_compartment_id"                                 : "CMP-LZ-PROD-NETWORK-KEY",
+
+                "vcns": {
+                    "VCN-FRA-LZ-PROD-PROJECTS-KEY": {
+                        "display_name"                                    : "vcn-fra-lz-prod-projects",
+                        "cidr_blocks"                                     : ["10.0.64.0/21"],
+                        "dns_label"                                       : "vcnfralzppprojs",
+                        "block_nat_traffic"                               : false,
+                        "is_attach_drg"                                   : false,
+                        "is_create_igw"                                   : false,
+                        "is_ipv6enabled"                                  : false,
+                        "is_oracle_gua_allocation_enabled"                : false,
+                        "network_security_groups"                         : {},
+
+                        "subnets": {
+                            "SN-FRA-LZ-PROD-WEB-KEY": {
+                                "display_name"                            : "sn-fra-lz-prod-web",
+                                "cidr_block"                              : "10.0.64.0/24",
+                                "dns_label"                               : "ssnfralzppweb",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-01-LZ-PROD-PROJECTS-VCN-GEN-KEY",
+                                "security_list_keys"                      : ["default_security_list"]
+                            },
+
+                            "SN-FRA-LZ-PROD-APP-KEY": {
+                                "display_name"                            : "sn-fra-lz-prod-app",
+                                "cidr_block"                              : "10.0.65.0/24",
+                                "dns_label"                               : "ssnfralzppapp",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-01-LZ-PROD-PROJECTS-VCN-GEN-KEY",
+                                "security_list_keys"                      : ["SL-LZ-PROD-PROJECTS-GENERIC-KEY"]
+                            },
+
+                            "SN-FRA-LZ-PROD-DB-KEY": {
+                                "display_name"                            : "sn-fra-lz-prod-db",
+                                "cidr_block"                              : "10.0.66.0/24",
+                                "dns_label"                               : "ssnfralzppdb",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-01-LZ-PROD-PROJECTS-VCN-GEN-KEY",
+                                "security_list_keys"                      : ["SL-LZ-PROD-PROJECTS-GENERIC-KEY"]
+                            },
+
+                            "SN-FRA-LZ-PROD-INFRA": {
+                                "display_name"                            : "sn-fra-lz-prod-infra",
+                                "cidr_block"                              : "10.0.67.0/24",
+                                "dns_label"                               : "ssnfralzppinfra",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-01-LZ-PROD-PROJECTS-VCN-GEN-KEY",
+                                "security_list_keys"                      : ["SL-LZ-PROD-PROJECTS-GENERIC-KEY"]
+                            }
+                        },
+
+                        "route_tables": {
+                            "RT-01-LZ-PROD-PROJECTS-VCN-GEN-KEY": {
+                                "display_name"                            : "rt-01-lz-prod-projects-vcn-gen",
+
+                                "route_rules": {
+                                    "drg_route": {
+                                        "description"                     : "Route to DRG",
+                                        "destination"                     : "0.0.0.0/0",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "sgw_route": {
+                                        "description"                     : "Route for sgw",
+                                        "destination"                     : "all-services",
+                                        "destination_type"                : "SERVICE_CIDR_BLOCK",
+                                        "network_entity_key"              : "SGW-FRA-LZ-PROD-PROJECTS-KEY"
+                                    }
+                                }
+                            }
+                        },
+
+                        "default_security_list": {
+                            "egress_rules"                                : [],
+
+                            "ingress_rules": [
+                                {
+                                    "description"                         : "ICMP type 3 code 4",
+                                    "src"                                 : "0.0.0.0/0",
+                                    "src_type"                            : "CIDR_BLOCK",
+                                    "protocol"                            : "ICMP",
+                                    "icmp_type"                           : 3,
+                                    "icmp_code"                           : 4,
+                                    "stateless"                           : false
+                                },
+                                {
+                                    "description"                         : "ICMP type 8 (Echo)",
+                                    "src"                                 : "10.0.0.0/21",
+                                    "src_type"                            : "CIDR_BLOCK",
+                                    "protocol"                            : "ICMP",
+                                    "icmp_type"                           : 8,
+                                    "icmp_code"                           : 0,
+                                    "stateless"                           : false
+                                }
+                            ]
+                        },
+
+                        "security_lists": {
+                            "SL-LZ-PROD-PROJECTS-GENERIC-KEY": {
+                                "display_name"                            : "sl-lz-prod-projects-generic",
+
+                                "ingress_rules": [
+                                    {
+                                        "description"                     : "ingress from 10.0.3.0/24 over TCP22",
+                                        "src"                             : "10.0.3.0/24",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 22,
+                                        "dst_port_max"                    : 22,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "icmp_code"                       : 4,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "egress to 0.0.0.0/0 over ALL protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "egress rule for OSN",
+                                        "dst"                             : "all-services",
+                                        "dst_type"                        : "SERVICE_CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                ]
+                            }
+                        },
+
+                        "vcn_specific_gateways": {
+                            "service_gateways": {
+                                "SGW-FRA-LZ-PROD-PROJECTS-KEY": {
+                                    "display_name"                        : "sgw-fra-lz-prod-projects",
+                                    "services"                            : "all-services"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "2-preprod": {
+                "category_compartment_id"                                 : "CMP-LZ-PREPROD-NETWORK-KEY",
+
+                "vcns": {
+                    "VCN-FRA-LZ-PREPROD-PROJECTS-KEY": {
+                        "display_name"                                    : "vcn-fra-lz-preprod-projects",
+                        "cidr_blocks"                                     : ["10.0.128.0/21"],
+                        "dns_label"                                       : "vcnfralzpppproj",
+                        "block_nat_traffic"                               : false,
+                        "is_attach_drg"                                   : false,
+                        "is_create_igw"                                   : false,
+                        "is_ipv6enabled"                                  : false,
+                        "is_oracle_gua_allocation_enabled"                : false,
+                        "network_security_groups"                         : {},
+
+                        "subnets": {
+                            "SN-FRA-LZ-PREPROD-WEB-KEY": {
+                                "display_name"                            : "sn-fra-lz-preprod-web",
+                                "cidr_block"                              : "10.0.128.0/24",
+                                "dns_label"                               : "ssnfralzpppweb",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-01-LZ-PREPROD-PROJECTS-VCN-GEN-KEY",
+                                "security_list_keys"                      : ["default_security_list"]
+                            },
+
+                            "SN-FRA-LZ-PREPROD-APP-KEY": {
+                                "display_name"                            : "sn-fra-lz-preprod-app",
+                                "cidr_block"                              : "10.0.129.0/24",
+                                "dns_label"                               : "ssnfralzpppapp",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-01-LZ-PREPROD-PROJECTS-VCN-GEN-KEY",
+                                "security_list_keys"                      : ["SL-LZ-PREPROD-PROJECTS-GENERIC-KEY"]
+                            },
+
+                            "SN-FRA-LZ-PREPROD-DB-KEY": {
+                                "display_name"                            : "sn-fra-lz-preprod-db",
+                                "cidr_block"                              : "10.0.130.0/24",
+                                "dns_label"                               : "ssnfralzpppdb",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-01-LZ-PREPROD-PROJECTS-VCN-GEN-KEY",
+                                "security_list_keys"                      : ["SL-LZ-PREPROD-PROJECTS-GENERIC-KEY"]
+                            },
+
+                            "SN-FRA-LZ-PREPROD-INFRA": {
+                                "display_name"                            : "sn-fra-lz-preprod-infra",
+                                "cidr_block"                              : "10.0.131.0/24",
+                                "dns_label"                               : "ssnfralzpppinfr",
+                                "dhcp_options_key"                        : "default_dhcp_options",
+                                "prohibit_internet_ingress"               : true,
+                                "prohibit_public_ip_on_vnic"              : true,
+                                "route_table_key"                         : "RT-01-LZ-PREPROD-PROJECTS-VCN-GEN-KEY",
+                                "security_list_keys"                      : ["SL-LZ-PREPROD-PROJECTS-GENERIC-KEY"]
+                            }
+                        },
+
+                        "route_tables": {
+                            "RT-01-LZ-PREPROD-PROJECTS-VCN-GEN-KEY": {
+                                "display_name"                            : "rt-01-lz-prod-projects-vcn-gen",
+
+                                "route_rules": {
+                                    "drg_route": {
+                                        "description"                     : "Route to DRG",
+                                        "destination"                     : "0.0.0.0/0",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_key"              : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "sgw_route": {
+                                        "description"                     : "Route for sgw",
+                                        "destination"                     : "all-services",
+                                        "destination_type"                : "SERVICE_CIDR_BLOCK",
+                                        "network_entity_key"              : "SGW-FRA-LZ-PREPROD-PROJECTS-KEY"
+                                    }
+                                }
+                            }
+                        },
+
+                        "default_security_list": {
+                            "egress_rules"                                : [],
+
+                            "ingress_rules": [
+                                {
+                                    "description"                         : "ICMP type 3 code 4",
+                                    "src"                                 : "0.0.0.0/0",
+                                    "src_type"                            : "CIDR_BLOCK",
+                                    "protocol"                            : "ICMP",
+                                    "icmp_type"                           : 3,
+                                    "icmp_code"                           : 4,
+                                    "stateless"                           : false
+                                },
+                                {
+                                    "description"                         : "ICMP type 8 (Echo)",
+                                    "src"                                 : "10.0.0.0/21",
+                                    "src_type"                            : "CIDR_BLOCK",
+                                    "protocol"                            : "ICMP",
+                                    "icmp_type"                           : 8,
+                                    "icmp_code"                           : 0,
+                                    "stateless"                           : false
+                                }
+                            ]
+                        },
+
+                        "security_lists": {
+                            "SL-LZ-PREPROD-PROJECTS-GENERIC-KEY": {
+                                "display_name"                            : "sl-lz-preprod-projects-generic",
+
+                                "ingress_rules": [
+                                    {
+                                        "description"                     : "ingress from 10.0.3.0/24 over TCP22",
+                                        "src"                             : "10.0.3.0/24",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 22,
+                                        "dst_port_max"                    : 22,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 3 code 4",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 3,
+                                        "icmp_code"                       : 4,
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "ICMP type 8 (Echo)",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "icmp_type"                       : 8,
+                                        "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "egress to 0.0.0.0/0 over ALL protocols",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    },
+                                    {
+                                        "description"                     : "egress rule for OSN",
+                                        "dst"                             : "all-services",
+                                        "dst_type"                        : "SERVICE_CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                ]
+                            }
+                        },
+
+                        "vcn_specific_gateways": {
+                            "service_gateways": {
+                                "SGW-FRA-LZ-PREPROD-PROJECTS-KEY": {
+                                    "display_name"                        : "sgw-fra-lz-preprod-projects",
+                                    "services"                            : "all-services"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
