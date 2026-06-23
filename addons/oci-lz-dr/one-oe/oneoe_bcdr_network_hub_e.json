@@ -1,0 +1,7 @@
+{
+  "network_configuration": {
+    "default_compartment_id": "CMP-LZ-NETWORK-KEY",
+    "default_enable_cis_checks": false,
+    "network_configuration_categories": {}
+  }
+}

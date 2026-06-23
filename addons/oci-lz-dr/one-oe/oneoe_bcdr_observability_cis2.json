@@ -1,0 +1,28 @@
+{
+  "alarms_configuration": {
+    "default_compartment_id": "CMP-LZ-NETWORK-KEY",
+    "alarms": {}
+  },
+  "events_configuration": {
+    "default_compartment_id": "CMP-LANDINGZONE-KEY",
+    "event_rules": {}
+  },
+  "home_region_events_configuration": {
+    "default_compartment_id": "CMP-LANDINGZONE-KEY",
+    "event_rules": {}
+  },
+  "logging_configuration": {
+    "default_compartment_id": "CMP-LZ-NETWORK-KEY",
+    "log_groups": {},
+    "flow_logs": {}
+  },
+  "notifications_configuration": {
+    "default_compartment_id": "CMP-LZ-NETWORK-KEY",
+    "topics": {}
+  },
+  "service_connectors_configuration": {
+    "default_compartment_id": "CMP-LZ-NETWORK-KEY",
+    "buckets": {},
+    "service_connectors": {}
+  }
+}
