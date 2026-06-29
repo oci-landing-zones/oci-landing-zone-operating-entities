@@ -17,6 +17,7 @@ An **add-on** is Landing Zone complementary element, or mechanisms that provide 
 | <img src="oci-secure-desktops/content/sd_icon.png" height="40" align="center"> | **[OCI Secure Desktops](/addons/oci-secure-desktops/readme.md)** | Guidelines to enable and configure **OCI Secure Desktops** in your Landing Zone. 
 | <img src="oci-tbac/content/tbac_icon.svg" height="45" align="center"> | **[OCI TBAC](./oci-tbac/README.md)**| Use roles to manage IAM permissions for projects onboarding with **Tag-Based Access Controls**.|
 | <img src="oci-finops/images/finops_icon.png" height="30" align="center"> | **[OCI FinOps](./oci-finops/README.md)**| A set of **OCI FinOps** configurations with FOCUS to enable cost visibility, governance, and optimization. |
+|  | **[OCI Bastion Access](./oci-bastion/README.md)** | Guidelines for **VM-based bastions** and **OCI Bastion service sessions** in hub-and-spoke Landing Zones. |
 
 &nbsp; 
 
