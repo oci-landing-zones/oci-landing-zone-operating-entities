@@ -66,23 +66,9 @@
                                 "display_name"                        : "rt-fra-lz-prod-oke-cp",
 
                                 "route_rules": {
-                                    "rr-fra-prod-projects": {
-                                        "description"                 : "Route to VCN Prod Projects through DRG",
-                                        "destination"                 : "10.0.64.0/21",
-                                        "destination_type"            : "CIDR_BLOCK",
-                                        "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
                                     "rr-fra-hub": {
                                         "description"                 : "Route to the Hub VCN through DRG",
                                         "destination"                 : "10.0.0.0/21",
-                                        "destination_type"            : "CIDR_BLOCK",
-                                        "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rr-fra-preprod-projects": {
-                                        "description"                 : "Route to VCN PreProd Projects through DRG",
-                                        "destination"                 : "10.0.128.0/21",
                                         "destination_type"            : "CIDR_BLOCK",
                                         "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
                                     },
@@ -100,23 +86,9 @@
                                 "display_name"                        : "rt-fra-lz-prod-oke-int-lb",
 
                                 "route_rules": {
-                                    "rr-fra-prod-projects": {
-                                        "description"                 : "Route to VCN Prod Projects through DRG",
-                                        "destination"                 : "10.0.64.0/21",
-                                        "destination_type"            : "CIDR_BLOCK",
-                                        "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
                                     "rr-fra-hub": {
                                         "description"                 : "Route to the Hub VCN through DRG",
                                         "destination"                 : "10.0.0.0/21",
-                                        "destination_type"            : "CIDR_BLOCK",
-                                        "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rr-fra-preprod-projects": {
-                                        "description"                 : "Route to VCN PreProd Projects through DRG",
-                                        "destination"                 : "10.0.128.0/21",
                                         "destination_type"            : "CIDR_BLOCK",
                                         "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
                                     },
@@ -134,23 +106,9 @@
                                 "display_name"                        : "rt-fra-lz-prod-oke-pods",
 
                                 "route_rules": {
-                                    "rr-fra-prod-projects": {
-                                        "description"                 : "Route to VCN Prod Projects through DRG",
-                                        "destination"                 : "10.0.64.0/21",
-                                        "destination_type"            : "CIDR_BLOCK",
-                                        "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
                                     "rr-fra-hub": {
                                         "description"                 : "Route to the Hub VCN through DRG",
                                         "destination"                 : "10.0.0.0/21",
-                                        "destination_type"            : "CIDR_BLOCK",
-                                        "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rr-fra-preprod-projects": {
-                                        "description"                 : "Route to VCN PreProd Projects through DRG",
-                                        "destination"                 : "10.0.128.0/21",
                                         "destination_type"            : "CIDR_BLOCK",
                                         "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
                                     },
@@ -168,23 +126,9 @@
                                 "display_name"                        : "rt-fra-lz-prod-oke-workers",
 
                                 "route_rules": {
-                                    "rr-fra-prod-projects": {
-                                        "description"                 : "Route to VCN Prod Projects through DRG",
-                                        "destination"                 : "10.0.64.0/21",
-                                        "destination_type"            : "CIDR_BLOCK",
-                                        "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
                                     "rr-fra-hub": {
                                         "description"                 : "Route to the Hub VCN through DRG",
                                         "destination"                 : "10.0.0.0/21",
-                                        "destination_type"            : "CIDR_BLOCK",
-                                        "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rr-fra-preprod-projects": {
-                                        "description"                 : "Route to VCN PreProd Projects through DRG",
-                                        "destination"                 : "10.0.128.0/21",
                                         "destination_type"            : "CIDR_BLOCK",
                                         "network_entity_key"          : "DRG-FRA-LZ-HUB-KEY"
                                     },

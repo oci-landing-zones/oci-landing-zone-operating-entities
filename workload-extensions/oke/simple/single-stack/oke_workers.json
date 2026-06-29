@@ -1,10 +1,9 @@
 {
     "oke_workers_configuration": {
-        "default_compartment_id"         : "CMP-LZ-PROD-OKE-KEY",
-
         "node_pools": {
             "NDP-FRA-LZ-PROD-OKE-KEY": {
                 "name"                   : "ndp-fra-lz-prod-oke",
+                "compartment_id"         : "CMP-LZ-PROD-OKE-KEY",
                 "cluster_id"             : "CLR-FRA-LZ-PROD-OKE-KEY",
                 "enable_cycling"         : false,
                 "size"                   : 1,

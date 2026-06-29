@@ -16,23 +16,27 @@ This workload extension uses the [One-OE](https://github.com/oracle-quickstart/t
 
 ## **3. Deployment Options**
 
-This OKE Landing Zone Extension provides **two deployment approaches**, [single-stack](single-stack/) and  [multi-stack](multi-stack/), to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator) for automated dependency resolution with configuration keys.
+This OKE Landing Zone Extension provides **two published quickstart approaches**, [single-stack](single-stack/) and  [multi-stack](multi-stack/), to accommodate different use cases and architectural preferences. Both published simple approaches are based on **Hub E**. For other hub models, use config-driven generation with `oke_simple`.
 
 For customized OKE landing zones generated from a configuration file, see [OKE Config-Driven Generation](config-driven.md).
+
+The published simple quickstarts create one production OKE platform by default. Use config-driven generation to add pre-production or additional OKE platforms.
 
 
 ### **Choosing the Right Approach**
 
 | Consideration | [Single-stack](single-stack/) | [Multi-stack](multi-stack/) |
 |---------------|-------------|--------------|
-| **Use Case** | PoC, Exploration | Production deployment |
-| **Hub Model** |  [Hub E (free)](../../../addons/oci-hub-models/hub_e/) |  [Hub A](../../../addons/oci-hub-models/hub_a/) |
-| **Routing Configuration** |  Automatic Hub route updates | Manual Hub route updates |
+| **Use Case** | PoC, Exploration | Existing Hub E quickstart with separate lifecycle |
+| **Hub Model** |  [Hub E (free)](../../../addons/oci-hub-models/hub_e/) |  Existing [Hub E](../../../addons/oci-hub-models/hub_e/) landing zone |
+| **Routing Configuration** |  Automatic Hub route updates | OKE spoke attachment and Hub E route coordination |
 | **Landing Zone** | Created together  | Already exists |
 | **Deployment Steps** | Single deployment operation | Deploy LZ first, then OKE extension |
 | **Terraform State** |  Combined (1 state) | Separate (2 states) |
 | **Resource Lifecycle** | Coupled | Independent |
 | **Complexity** | Self-contained | Requires key coordination across stacks |
+
+The simple path is intentionally an example quickstart. Use [OKE Config-Driven Generation](config-driven.md) when the landing zone must use Hub A, Hub B, Hub C, multiple OKE platforms, multiple environments, overlay networking, or custom CIDR/subnet layouts beyond the published examples.
 
 
 ### Common Features (Both Approaches)
@@ -43,6 +47,7 @@ Both deployment options provide:
 - **OKE CNI Network Modes**: VCN-native pod networking by default, with config-driven overlay networking for Flannel-compatible clusters
 - **Comprehensive NSG Configuration**: Control plane, workers, load balancers, and, for native networking, pods
 - **Hub-and-Spoke Topology**: OKE VCN as spoke connected to Hub via DRG
+- **No Hub L7 Load Balancer**: The OKE quickstart keeps the Hub LB subnet available but does not provision a hub-level OCI L7 Load Balancer; OKE creates OCI load balancers from Kubernetes `Service` resources
 - **Service Gateway**: Direct connectivity to OCI services
 
 ### OKE Network Modes

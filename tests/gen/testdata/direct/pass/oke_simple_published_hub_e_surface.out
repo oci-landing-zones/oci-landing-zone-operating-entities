@@ -1,0 +1,52 @@
+{
+  "multi_stack": {
+    "categories": [
+      "prod-platform-oke"
+    ],
+    "drg_route_table_key": "DRGRT-FRA-LZ-SPOKES-KEY",
+    "injected_drgs": [
+      "DRG-FRA-LZ-HUB-KEY"
+    ],
+    "vcn_keys": [
+      "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY"
+    ]
+  },
+  "ordinary_hub_e_default_keeps_project_vcns": {
+    "preprod": true,
+    "prod": true
+  },
+  "profile_config": {
+    "environments": [
+      "prod"
+    ],
+    "has_projects": false,
+    "has_shared_project_network": false,
+    "hub_kind": "hub_e"
+  },
+  "single_stack": {
+    "categories": [
+      "0-shared",
+      "prod-platform-oke"
+    ],
+    "cluster_keys": [
+      "CLR-FRA-LZ-PROD-OKE-KEY"
+    ],
+    "generic_project_vcns_present": [],
+    "hub_has_firewall_subnets": false,
+    "hub_l7_load_balancers_present": false,
+    "hub_lb_nsg_present": true,
+    "hub_lb_subnet_present": true,
+    "hub_subnets": [
+      "SN-FRA-LZ-HUB-DNS-KEY",
+      "SN-FRA-LZ-HUB-LB-KEY",
+      "SN-FRA-LZ-HUB-MGMT-KEY",
+      "SN-FRA-LZ-HUB-MON-KEY"
+    ],
+    "oke_vcn_cidr": [
+      "10.0.80.0/20"
+    ],
+    "worker_keys": [
+      "NDP-FRA-LZ-PROD-OKE-KEY"
+    ]
+  }
+}

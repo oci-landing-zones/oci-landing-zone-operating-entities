@@ -162,7 +162,7 @@ The next two diagrams depict the **security zones** of the landing zones and the
 
 &nbsp; 
 
-<img src="images/3_security_view_security_zones.jpg" alt= “” width="1000" height="value">
+<img src="images/3_security_view_security_zones.png" alt= “” width="1000" height="value">
 
 &nbsp; 
 
