@@ -226,42 +226,38 @@ local validation = import 'lib/validation.libsonnet';
       for p_name in std.objectFields(config.shared_platforms)
     } else {};
 
-    local one_oe_env_vcn_entries = std.flattenArrays([
-      local env = norm_envs[env_name];
+    local env_vcn_entries(env, shared_label, platform_label) =
       (if std.objectHas(env, 'shared_project_network') then [
         {
-          label: 'Environment %s shared project network' % env_name,
+          label: shared_label,
           cidr: env.shared_project_network.network.vcn,
         },
       ] else [])
       + (if std.objectHas(env, 'platforms') then [
            {
-             label: 'Platform %s/%s' % [env_name, p_name],
+             label: platform_label(p_name),
              cidr: env.platforms[p_name].network.vcn,
            }
            for p_name in std.objectFields(env.platforms)
            if std.objectHas(env.platforms[p_name], 'network') && env.platforms[p_name].network != null
-         ] else [])
+         ] else []);
+
+    local one_oe_env_vcn_entries = std.flattenArrays([
+      env_vcn_entries(
+        norm_envs[env_name],
+        'Environment %s shared project network' % env_name,
+        function(p_name) 'Platform %s/%s' % [env_name, p_name]
+      )
       for env_name in std.objectFields(norm_envs)
     ]);
     local multi_oe_env_vcn_entries =
       if has_operating_entities then std.flattenArrays([
         std.flattenArrays([
-          local env = norm_operating_entities[oe_name].environments[env_name];
-          (if std.objectHas(env, 'shared_project_network') then [
-            {
-              label: 'Operating entity %s environment %s shared project network' % [oe_name, env_name],
-              cidr: env.shared_project_network.network.vcn,
-            },
-          ] else [])
-          + (if std.objectHas(env, 'platforms') then [
-               {
-                 label: 'Operating entity %s platform %s/%s' % [oe_name, env_name, p_name],
-                 cidr: env.platforms[p_name].network.vcn,
-               }
-               for p_name in std.objectFields(env.platforms)
-               if std.objectHas(env.platforms[p_name], 'network') && env.platforms[p_name].network != null
-             ] else [])
+          env_vcn_entries(
+            norm_operating_entities[oe_name].environments[env_name],
+            'Operating entity %s environment %s shared project network' % [oe_name, env_name],
+            function(p_name) 'Operating entity %s platform %s/%s' % [oe_name, env_name, p_name]
+          )
           for env_name in std.objectFields(norm_operating_entities[oe_name].environments)
         ])
         for oe_name in std.objectFields(norm_operating_entities)

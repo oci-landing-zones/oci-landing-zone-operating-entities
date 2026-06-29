@@ -3,11 +3,7 @@
 // Takes a raw config, normalizes it, builds the hub, generates spoke VCNs
 // for each environment with shared_project_network, and composes the output.
 //
-// function(raw_config) → { network, network_pre, network_backends? }
-//
-// Task 8: Config normalization, hub dispatch, spoke VCN generation, per-project NSGs.
-// Task 9: DRG attachments, route injection into hub, NFW NSG rules, post-deploy routes.
-// Task 10: Platform/extension VCNs (OKE, etc.)
+// function(raw_config) -> { network, network_pre, network_backends?, iam, ... }
 local governance_builder = import 'builders/governance.libsonnet';
 local hub_integration_builder = import 'builders/hub_integration.libsonnet';
 local iam_builder = import 'builders/iam.libsonnet';

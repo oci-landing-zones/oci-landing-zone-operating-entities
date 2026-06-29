@@ -1,0 +1,167 @@
+// gen/builders/iam/compartments.libsonnet
+// Compartment tree construction for the IAM output.
+
+function(ctx)
+  local config = ctx.config;
+  local n = ctx.n;
+  local topo = ctx.topo;
+  local env_entries = ctx.env_entries;
+  local tbac_tag = ctx.tbac_tag;
+  local tag_network = ctx.tag_network;
+  local tag_security = ctx.tag_security;
+
+  // --- Compartments ---
+
+  local platform_children(entry) =
+    local env = entry.env;
+    if std.objectHas(env, 'platforms') then {
+      [platform.compartment_key]: {
+        name: platform.compartment_name,
+        description: platform.compartment_description,
+      }
+      for platform in [
+        topo.env_platform(entry, p_name)
+        for p_name in std.objectFields(env.platforms)
+      ]
+    } else {};
+
+  local shared_platform_children =
+    if std.objectHas(config, 'shared_platforms') then {
+      [platform.compartment_key]: {
+        name: platform.compartment_name,
+        description: platform.compartment_description,
+      }
+      for platform in [
+        topo.shared_platform(p_name)
+        for p_name in std.objectFields(config.shared_platforms)
+      ]
+    } else {};
+
+  // Per-environment children compartments
+  local env_compartment_children(entry) =
+    local env_name = entry.env_name;
+    local platform_kids = platform_children(entry);
+
+    // Per-project compartments inside PROJECTS
+    local project_names = topo.project_names(entry);
+
+    local proj_children = {
+      [topo.env_project_compartment_key(entry, proj_name)]: {
+        name: topo.env_project_compartment_name(entry, proj_name),
+        description: '%s environment, %s compartment' % [ctx.env_desc(env_name), ctx.proj_display(proj_name)],
+      }
+      for proj_name in project_names
+    };
+
+    {
+      [topo.env_child_compartment_key(entry, 'NETWORK')]: {
+        name: topo.env_child_compartment_name(entry, 'network'),
+        // 'prod' is abbreviated to "Prod" for the NETWORK compartment (matches hand-written JSON).
+        description: '%s Workload Environment, Common Network Compartment' % topo.env_display_network(env_name),
+        defined_tags: {
+          [tbac_tag]: tag_network,
+        },
+      },
+
+      [topo.env_child_compartment_key(entry, 'PLATFORM')]: {
+        name: topo.env_child_compartment_name(entry, 'platform'),
+        description: '%s Workload Environment, Common Platform Compartment' % ctx.env_desc(env_name),
+      } + (
+        if std.length(std.objectFields(platform_kids)) > 0 then {
+          children: platform_kids,
+        } else {}
+      ),
+
+      [topo.env_child_compartment_key(entry, 'PROJECTS')]: {
+        name: topo.env_child_compartment_name(entry, 'projects'),
+        description: '%s Workload Environment, Common Projects Compartment' % ctx.env_desc(env_name),
+        children: proj_children,
+      },
+
+      [topo.env_child_compartment_key(entry, 'SECURITY')]: {
+        name: topo.env_child_compartment_name(entry, 'security'),
+        description: '%s Workload Environment, Common Security Compartment' % ctx.env_desc(env_name),
+        defined_tags: {
+          [tbac_tag]: tag_security,
+        },
+      },
+    };
+
+  // All env children (merged into LANDINGZONE children)
+  local one_oe_env_compartments = std.foldl(
+    function(acc, entry)
+      acc + {
+        [topo.env_compartment_key(entry)]: {
+          name: topo.env_compartment_name(entry),
+          description: '%s Environment Compartment' % ctx.env_desc(entry.env_name),
+          children: env_compartment_children(entry),
+        },
+      },
+    env_entries,
+    {}
+  );
+
+  local multi_oe_compartments =
+    if std.objectHas(config, 'operating_entities') then {
+      [n.key_global('CMP', [std.strReplace(oe_name, '_', '-')])]: {
+        name: 'cmp-lz-%s' % std.asciiLower(std.strReplace(oe_name, '_', '-')),
+        description: '%s Operating Entity Compartment' % config.operating_entities[oe_name].display_name,
+        children: std.foldl(
+          function(acc, entry)
+            if entry.oe_name == oe_name then
+              acc + {
+                [topo.env_compartment_key(entry)]: {
+                  name: topo.env_compartment_name(entry),
+                  description: '%s %s Environment Compartment' % [
+                    config.operating_entities[oe_name].display_name,
+                    ctx.env_desc(entry.env_name),
+                  ],
+                  children: env_compartment_children(entry),
+                },
+              }
+            else acc,
+          env_entries,
+          {}
+        ),
+      }
+      for oe_name in std.objectFields(config.operating_entities)
+    } else {};
+
+  local env_compartments =
+    if std.objectHas(config, 'operating_entities') then multi_oe_compartments
+    else one_oe_env_compartments;
+
+  {
+    enable_delete: 'true',
+    compartments: {
+      'CMP-LANDINGZONE-KEY': {
+        name: 'cmp-landingzone',
+        description: 'Enclosing Landing Zone Compartment',
+        children: {
+          [n.key_global('CMP', ['NETWORK'])]: {
+            name: 'cmp-lz-network',
+            description: 'Shared Network Compartment',
+            defined_tags: {
+              [tbac_tag]: tag_network,
+            },
+          },
+          [n.key_global('CMP', ['PLATFORM'])]: {
+            name: 'cmp-lz-platform',
+            description: 'Shared Platform Compartment',
+          } + (
+            if std.length(std.objectFields(shared_platform_children)) > 0 then {
+              children: shared_platform_children,
+            } else {}
+          ),
+        } + env_compartments + {
+          [n.key_global('CMP', ['SECURITY'])]: {
+            name: 'cmp-lz-security',
+            description: 'Shared Security Compartment',
+            defined_tags: {
+              [tbac_tag]: tag_security,
+            },
+          },
+        },
+      },
+    },
+  }

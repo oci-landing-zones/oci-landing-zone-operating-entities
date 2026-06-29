@@ -129,15 +129,24 @@ local ctx = render_context.from_raw_config(raw_config);
 
 Use that helper when a renderer or publication adapter needs normalized config plus derived semantic lists such as ordered spoke environments, platform entries, VCN metadata, example LB backends, or the shared-only config view. Keep final document assembly in the caller. `render_context.libsonnet` is the input-preparation layer, not the merge owner.
 
-Multi-OE Generic multi-stack publications use that same context through their published adapter:
+Multi-OE Generic publishes one runtime shape. Its entrypoints use the shared landing-zone composition directly:
 
 ```jsonnet
-local profiles = import '../profiles.libsonnet';
-local published = import '../published.libsonnet';
-published.render(profiles.hub_e.config).op01.network_hub_e
+local profiles = import './profiles.libsonnet';
+local lz = import '../../../../landing_zone.libsonnet';
+lz(profiles.hub_e.config).network
 ```
 
-That adapter owns only OP01/OP02/OP03 publication projections; shared landing-zone composition still belongs to `landing_zone.libsonnet`.
+Do not reintroduce a Multi-OE multi-stack publication adapter unless a future task explicitly restores that product surface. Keep shared landing-zone composition in `landing_zone.libsonnet`.
+
+IAM follows the same facade pattern at the domain-builder level:
+
+```jsonnet
+local iam_builder = import 'builders/iam.libsonnet';
+iam_builder(config, n, realm, topo)
+```
+
+The facade owns the public IAM builder contract, while `builders/iam/` owns compartments, identity domain objects, project policies, and tenancy/shared policies. Keep policy statement text in the owning policy module rather than hiding it behind generic string builders unless that removes real duplication.
 
 ### Collect Semantic Entries Before Building Objects
 
@@ -216,6 +225,8 @@ Generic extension outputs that belong in config mode stay under `result.extra`, 
 Published family entrypoints are a separate concern. If a published snapshot needs a projection that is not part of the generic config result contract, build it in a dedicated published adapter near the entrypoints instead of leaking publication mode through extension params.
 
 That separation matters. It keeps the main result contract stable, keeps config mode predictable, and makes publication-only behavior explicit in repo-owned selector code instead of extension configuration.
+
+When publication adapters need to strip local NAT routes or reshape network categories for multi-stack artifacts, use `gen/lib/publication_network.libsonnet`. Do not put publication-only helpers in `gen/platforms.libsonnet`; that file owns platform entries, routed VCN metadata, and generic platform network categories.
 
 ## Traced Example: From Entrypoint To `network`
 

@@ -13,6 +13,9 @@ gen/
 ├── naming.libsonnet             # Single naming template for all resources
 ├── topology.libsonnet           # Shared topology semantics (env labels, platform scope, targeting)
 ├── generate.sh                  # Entry point: default mode or --config mode
+├── lib/
+│   ├── extension_components.libsonnet # Cross-entry extension component summary
+│   └── publication_network.libsonnet  # Publication-only network projection helpers
 │
 ├── hub/                         # Hub builders (one per hub type)
 │   ├── hub_common.libsonnet     # Shared building blocks (subnets, gateways, ICMP, NSGs)
@@ -26,7 +29,12 @@ gen/
 ├── builders/                    # Domain and network-assembly builders
 │   ├── hub_integration.libsonnet
 │   ├── network_spokes.libsonnet
-│   ├── iam.libsonnet
+│   ├── iam.libsonnet            # IAM facade; subdomains live under builders/iam/
+│   ├── iam/
+│   │   ├── compartments.libsonnet
+│   │   ├── identity_domains.libsonnet
+│   │   ├── project_policies.libsonnet
+│   │   └── tenancy_policies.libsonnet
 │   ├── security.libsonnet
 │   ├── observability.libsonnet
 │   └── governance.libsonnet
@@ -37,6 +45,10 @@ gen/
 │   ├── exacs/                   # ExaDB-D / ExaCS extension; see workload-extensions/exacs/AGENTS.md
 │   └── oke/simple/
 │       ├── oke_builder.libsonnet # Shared OKE builder internals
+│       ├── oke_network.libsonnet # Public OKE network wrapper
+│       ├── oke_network_resources.libsonnet
+│       ├── oke_network_rule_factories.libsonnet
+│       ├── oke_network_hub_public_lb_rules.libsonnet
 │       ├── oke_simple.libsonnet # Generic extension wrapper
 │       ├── single-stack/
 │       │   ├── profiles.libsonnet
@@ -60,8 +72,7 @@ gen/
     └── *.jsonnet
 └── blueprints/multi-oe/generic/runtime/
     ├── profiles.libsonnet
-    ├── single-stack/
-    └── multi-stack/
+    └── *.jsonnet
 ```
 
 ## 2. Generation Mental Model
@@ -110,8 +121,10 @@ flowchart TD
 - `config.libsonnet` handles normalization and auto-subnet calculation.
 - `render_context.libsonnet` centralizes normalized config, topology, spoke ordering, VCN lists, shared-only config, and example LB backend derivation for render-time consumers.
 - `landing_zone.libsonnet` is the shared composition engine, merge owner, and output assembler.
+- `gen/builders/iam.libsonnet` is a facade. IAM subdomain ownership lives under `gen/builders/iam/`: compartments, identity domain objects, project policies, and tenancy/shared policies.
 - Detailed spoke rendering is delegated to `gen/builders/network_spokes.libsonnet`.
 - DRG and hub integration overlays are delegated to `gen/builders/hub_integration.libsonnet`.
+- `extensions.libsonnet` owns extension metadata/render contract resolution. Cross-entry extension component summary lives in `gen/lib/extension_components.libsonnet`.
 - `landing_zone_multi.jsonnet` is the config-mode wrapper that maps result fields to filenames.
 - `format_json.py` is the final presentation formatting step invoked after Jsonnet evaluation.
 
@@ -175,7 +188,6 @@ Rules:
 Current adapters:
 
 - `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. It reuses `gen/render_context.libsonnet` for normalization/topology-derived inputs while preserving the hub-only network contract and shared-only IAM/governance projections.
-- `gen/blueprints/multi-oe/generic/runtime/multi-stack/published.libsonnet` — owns Multi-OE Generic OP01/OP02/OP03 publication projections for shared services, OE onboarding, and project onboarding stack boundaries.
 - `gen/workload-extensions/exacc/{single-stack,multi-stack}/published.libsonnet` — own ExaDB-C@C stack-local publication projections.
 - `gen/workload-extensions/exacs/multi-stack/published.libsonnet` — owns ExaDB-D / ExaCS multi-stack publication projections.
 
@@ -354,6 +366,8 @@ Contract phases:
   - Any other generic key (e.g. `oke_clusters`, `oke_workers`): collected into `result.extra`
 
 Generic extension contracts must not change emitted artifact sets based on repo publication mode. If a published family needs additional projections, create a dedicated adapter next to the published entrypoints and keep profile-local configs free of publication flags.
+
+Publication-only network reshaping that is shared by adapters belongs in `gen/lib/publication_network.libsonnet`, not in generic platform rendering helpers. Keep `gen/platforms.libsonnet` focused on platform entries, routed VCN metadata, and generic platform network categories.
 
 Extension guides for networked extensions: any extension with `network_mode: required` or `network_mode: optional` must document the sizing inputs and CIDR-relevant ranges that customer guidance needs before customer guidance proposes concrete CIDRs. Keep those extension-specific placement, scale, and address-range questions in the extension's local `AGENTS.md`; root `AGENTS.md` owns the customer discovery ordering.
 

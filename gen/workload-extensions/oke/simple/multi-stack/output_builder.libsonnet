@@ -1,6 +1,6 @@
 local extensions = import '../../../../extensions.libsonnet';
 local lz = import '../../../../landing_zone.libsonnet';
-local platforms = import '../../../../platforms.libsonnet';
+local publication_network = import '../../../../lib/publication_network.libsonnet';
 local render_context = import '../../../../render_context.libsonnet';
 local oke_builder = import '../oke_builder.libsonnet';
 
@@ -17,14 +17,14 @@ function(profile, env_name='prod', platform_name='oke') {
 	  local scope = resolved.render_params.topology,
 	  local env = scope.qualified_name,
 	  local plat = scope.platform_name,
-	  local category_key = platforms.publication_category_key(scope),
+	  local category_key = publication_network.category_key(scope),
 	  local drg_key = n.key('DRG', ['HUB']),
 	  local route_segments = scope.key_segments + ['PLATFORM', plat],
 	  local vcn_key = n.key('VCN', route_segments),
   local oke_category =
     rendered_extension.contributions.network_pre.network_configuration.network_configuration_categories[category_key],
   local multi_stack_category =
-    platforms.publication_network_category(oke_category, n) {
+    publication_network.network_category(oke_category, n) {
       non_vcn_specific_gateways+: {
         inject_into_existing_drgs+: {
           [drg_key]+: {

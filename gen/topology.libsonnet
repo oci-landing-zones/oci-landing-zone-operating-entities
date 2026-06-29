@@ -46,41 +46,48 @@ function(config, n)
       dns: env_name[0:2],
     };
 
-  local one_oe_env_entries = [
+  local env_entry(mode, oe_name, oe_display_name, oe_dns, env_name, env_config) =
+    local is_multi = mode == 'multi_oe';
+    local oe_segment = if is_multi then key_segment(oe_name) else null;
+    local key_segments = if is_multi then [oe_segment, env_name] else [env_name];
+    local display_segments =
+      if is_multi then [oe_display_name, env_label(env_name).short]
+      else [env_label(env_name).short];
+    local dns_segments =
+      if is_multi then [oe_dns, env_label(env_name).dns]
+      else [env_label(env_name).dns];
     {
-      mode: 'one_oe',
-      oe_name: null,
-      oe_display_name: null,
-      oe_dns: null,
-      env_name: name,
-      qualified_name: name,
-      key_segments: [name],
-      display_segments: [env_label(name).short],
-      name_segments: [name],
-      compartment_segments: [name],
-      dns_segments: [env_label(name).dns],
-      env: config.environments[name],
-    }
+      mode: mode,
+      oe_name: oe_name,
+      oe_display_name: oe_display_name,
+      oe_dns: oe_dns,
+      env_name: env_name,
+      qualified_name:
+        if is_multi then '%s-%s' % [oe_segment, env_name]
+        else env_name,
+      key_segments: key_segments,
+      display_segments: display_segments,
+      name_segments: key_segments,
+      compartment_segments: key_segments,
+      dns_segments: dns_segments,
+      env: env_config,
+    };
+
+  local one_oe_env_entries = [
+    env_entry('one_oe', null, null, null, name, config.environments[name])
     for name in ordered_env_names
   ];
 
   local multi_oe_env_entries = std.flattenArrays([
     [
-      local oe_segment = key_segment(oe_name);
-      {
-        mode: 'multi_oe',
-        oe_name: oe_name,
-        oe_display_name: config.operating_entities[oe_name].display_name,
-        oe_dns: config.operating_entities[oe_name].dns,
-        env_name: env_name,
-        qualified_name: '%s-%s' % [oe_segment, env_name],
-        key_segments: [oe_segment, env_name],
-        display_segments: [config.operating_entities[oe_name].display_name, env_label(env_name).short],
-        name_segments: [oe_segment, env_name],
-        compartment_segments: [oe_segment, env_name],
-        dns_segments: [config.operating_entities[oe_name].dns, env_label(env_name).dns],
-        env: config.operating_entities[oe_name].environments[env_name],
-      }
+      env_entry(
+        'multi_oe',
+        oe_name,
+        config.operating_entities[oe_name].display_name,
+        config.operating_entities[oe_name].dns,
+        env_name,
+        config.operating_entities[oe_name].environments[env_name]
+      )
       for env_name in ordered_env_names
       if std.objectHas(config.operating_entities[oe_name].environments, env_name)
     ]

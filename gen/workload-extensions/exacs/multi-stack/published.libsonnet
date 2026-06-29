@@ -1,6 +1,6 @@
 local extensions = import '../../../extensions.libsonnet';
 local lz = import '../../../landing_zone.libsonnet';
-local platforms = import '../../../platforms.libsonnet';
+local publication_network = import '../../../lib/publication_network.libsonnet';
 local render_context = import '../../../render_context.libsonnet';
 local exacs = import '../exacs.libsonnet';
 local descriptions = import '../descriptions.libsonnet';
@@ -55,27 +55,27 @@ local products = import '../../exadb/products.libsonnet';
       local scope = spec.entry.scope;
       local exacs_category =
         spec.result.contributions.network_pre.network_configuration.network_configuration_categories[
-          platforms.publication_category_key(scope)
+          publication_network.category_key(scope)
         ];
-      platforms.publication_network_category(
+      publication_network.network_category(
         exacs_category,
         n,
         if drop_drg_routes then drg_route_keys(exacs_category) else [],
         false
       );
     local network_categories = {
-      [platforms.publication_category_key(spec.entry.scope)]: multi_stack_category(spec)
+      [publication_network.category_key(spec.entry.scope)]: multi_stack_category(spec)
       for spec in networked_specs
     };
     local network_pre_categories = {
-      [platforms.publication_category_key(spec.entry.scope)]: multi_stack_category(spec, true)
+      [publication_network.category_key(spec.entry.scope)]: multi_stack_category(spec, true)
       for spec in networked_specs
     };
     local full_network = lz(config).network;
     local full_network_categories =
       full_network.network_configuration.network_configuration_categories;
     local extension_category_keys = [
-      platforms.publication_category_key(spec.entry.scope)
+      publication_network.category_key(spec.entry.scope)
       for spec in networked_specs
     ];
     local hub_post = full_network {
