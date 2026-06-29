@@ -17,7 +17,7 @@ This workload extension uses the [One-OE](https://github.com/oracle-quickstart/t
 
 These are the required steps to provision the OKE workload:
 
- 1. It's required to already have deployed OCI LZ. In this guide we will build on top of the One-OE LZ with Hub model A Light option. Any other OCI landing zone, such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime), can also used as a baseline landing zone as well.
+ 1. It's required to already have deployed OCI LZ. In this guide we will build on top of the One-OE LZ with Hub model A Light option. Any other OCI landing zone, such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic/runtime), can also used as a baseline landing zone as well.
  2. Deploy the base infrastructure from the [Step 1 - OKE Extension](1_oke_extension) guide.
  3. Create OKE cluster in [Step 2 - OKE cluster creation](2_oke/).
 

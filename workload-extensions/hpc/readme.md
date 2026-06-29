@@ -20,7 +20,7 @@ This workload extension uses the [One-OE](https://github.com/oci-landing-zones/t
 
 These are the required steps to provision the HPC landing zone extension:
 
- 1. It's required to already have deployed an OCI Landing Zone. In this guide we will build on top of the One-OE LZ with Hub model A Light option. Any other OCI landing zone, such as the [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic_v1/runtime) can also used as a baseline landing zone as well.
+ 1. It's required to already have deployed an OCI Landing Zone. In this guide we will build on top of the One-OE LZ with Hub model A Light option. Any other OCI landing zone, such as the [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [Multi-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/multi-oe/generic/runtime) can also used as a baseline landing zone as well.
  2. Deploy the base infrastructure from the [Step 1 - HPC Extension](1_hpc_extension/)
  3. Deploy **HPC** in [Step 2 - HPC](2_hpc/)
 

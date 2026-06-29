@@ -3,11 +3,7 @@
 // Takes a raw config, normalizes it, builds the hub, generates spoke VCNs
 // for each environment with shared_project_network, and composes the output.
 //
-// function(raw_config) → { network, network_pre, network_backends? }
-//
-// Task 8: Config normalization, hub dispatch, spoke VCN generation, per-project NSGs.
-// Task 9: DRG attachments, route injection into hub, NFW NSG rules, post-deploy routes.
-// Task 10: Platform/extension VCNs (OKE, etc.)
+// function(raw_config) -> { network, network_pre, network_backends?, iam, ... }
 local governance_builder = import 'builders/governance.libsonnet';
 local hub_integration_builder = import 'builders/hub_integration.libsonnet';
 local iam_builder = import 'builders/iam.libsonnet';
@@ -15,6 +11,7 @@ local network_spokes_builder = import 'builders/network_spokes.libsonnet';
 local observability_builder = import 'builders/observability.libsonnet';
 local security_builder = import 'builders/security.libsonnet';
 local extensions = import 'extensions.libsonnet';
+local policy_limits = import 'lib/policy_limits.libsonnet';
 local platforms = import 'platforms.libsonnet';
 local render_context = import 'render_context.libsonnet';
 local hub_builders = {
@@ -91,7 +88,7 @@ function(raw_config)
   local network_only_categories = if std.length(network_only_platforms) > 0 then {
     ['%d-%s-platform-%s' % [
       std.length(spoke_env_indexed) + i + 1,
-      network_only_platforms[i].scope.scope_name,
+      network_only_platforms[i].scope.qualified_name,
       network_only_platforms[i].scope.platform_name,
     ]]:
       platforms.build_network_category({
@@ -120,6 +117,8 @@ function(raw_config)
   local extension_observability_cis1 = extension_state.observability_cis1;
   local extension_observability_cis2 = extension_state.observability_cis2;
   local extension_extra = extension_state.extra;
+  local assembled_iam = iam_builder(config, n, realm, topo) + extension_iam;
+  local checked_iam = policy_limits.validate(assembled_iam, 400);
 
   // --- Build security, observability, governance ---
   local security = security_builder(config, n, realm, topo);
@@ -151,7 +150,7 @@ function(raw_config)
       else null,
 
     // IAM output: compartments, groups, identity domains, policies
-    iam: iam_builder(config, n, realm, topo) + extension_iam,
+    iam: checked_iam,
 
     // Governance output: tag namespaces and definitions
     governance: governance_builder(config, n),

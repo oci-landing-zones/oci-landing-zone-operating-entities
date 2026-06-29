@@ -59,10 +59,10 @@ local common = import 'hub/hub_common.libsonnet';
     local config = cfg_lib.normalize(raw_config);
     local n = naming(config.region_short_name);
     local topo = topology(config, n);
-    local spoke_env_names = topo.ordered_spoke_env_names();
+    local spoke_env_entries = topo.ordered_spoke_env_entries();
     local spoke_envs = [
-      { name: name, env: config.environments[name] }
-      for name in spoke_env_names
+      { entry: entry, name: entry.qualified_name, env: entry.env }
+      for entry in spoke_env_entries
     ];
     local platform_state = platforms.collect_entries(config, topo);
     local all_platform_entries = platform_state.all_platform_entries;
@@ -80,7 +80,7 @@ local common = import 'hub/hub_common.libsonnet';
       network_only_platforms: platform_state.network_only_platforms,
       all_vcn_entries: all_vcn_entries,
       lb_env_name:
-        if std.length(spoke_envs) > 0 then spoke_envs[0].name
+        if std.length(spoke_envs) > 0 then spoke_envs[0].entry.qualified_name
         else 'prod',
       lb_backends:
         if std.length(spoke_envs) > 0 then

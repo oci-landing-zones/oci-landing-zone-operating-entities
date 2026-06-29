@@ -51,7 +51,10 @@ local desc = import '../../descriptions.libsonnet';
 
   project_policy(scope, project_name)::
     desc.policy.grants(
-      'grp-lz-%s-%s-exacc-admin' % [std.asciiLower(scope.scope_name), std.asciiLower(project_name)],
+      'grp-lz-%s-%s-exacc-admin' % [
+        std.join('-', [std.asciiLower(s) for s in scope.name_segments]),
+        std.asciiLower(project_name),
+      ],
       '%s Autonomous Database administration access' % self.product,
       desc.scope.project_db_compartment(scope.scope_long_title, project_name)
     ),

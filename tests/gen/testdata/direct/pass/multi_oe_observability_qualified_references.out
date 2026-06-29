@@ -1,0 +1,6 @@
+{
+  "has_alpha_prod_security": true,
+  "has_beta_prod_security": true,
+  "has_unqualified_preprod_security": false,
+  "has_unqualified_prod_security": false
+}

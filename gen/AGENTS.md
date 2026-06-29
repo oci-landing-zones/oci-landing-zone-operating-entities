@@ -13,6 +13,9 @@ gen/
 ├── naming.libsonnet             # Single naming template for all resources
 ├── topology.libsonnet           # Shared topology semantics (env labels, platform scope, targeting)
 ├── generate.sh                  # Entry point: default mode or --config mode
+├── lib/
+│   ├── extension_components.libsonnet # Cross-entry extension component summary
+│   └── publication_network.libsonnet  # Publication-only network projection helpers
 │
 ├── hub/                         # Hub builders (one per hub type)
 │   ├── hub_common.libsonnet     # Shared building blocks (subnets, gateways, ICMP, NSGs)
@@ -26,7 +29,12 @@ gen/
 ├── builders/                    # Domain and network-assembly builders
 │   ├── hub_integration.libsonnet
 │   ├── network_spokes.libsonnet
-│   ├── iam.libsonnet
+│   ├── iam.libsonnet            # IAM facade; subdomains live under builders/iam/
+│   ├── iam/
+│   │   ├── compartments.libsonnet
+│   │   ├── identity_domains.libsonnet
+│   │   ├── project_policies.libsonnet
+│   │   └── tenancy_policies.libsonnet
 │   ├── security.libsonnet
 │   ├── observability.libsonnet
 │   └── governance.libsonnet
@@ -37,6 +45,10 @@ gen/
 │   ├── exacs/                   # ExaDB-D / ExaCS extension; see workload-extensions/exacs/AGENTS.md
 │   └── oke/simple/
 │       ├── oke_builder.libsonnet # Shared OKE builder internals
+│       ├── oke_network.libsonnet # Public OKE network wrapper
+│       ├── oke_network_resources.libsonnet
+│       ├── oke_network_rule_factories.libsonnet
+│       ├── oke_network_hub_public_lb_rules.libsonnet
 │       ├── oke_simple.libsonnet # Generic extension wrapper
 │       ├── single-stack/
 │       │   ├── profiles.libsonnet
@@ -56,6 +68,9 @@ gen/
 │   └── hub_e/
 │
 └── blueprints/one-oe/runtime/one-stack/  # Entry-point .jsonnet files (default mode)
+    ├── profiles.libsonnet
+    └── *.jsonnet
+└── blueprints/multi-oe/generic/runtime/
     ├── profiles.libsonnet
     └── *.jsonnet
 ```
@@ -106,8 +121,10 @@ flowchart TD
 - `config.libsonnet` handles normalization and auto-subnet calculation.
 - `render_context.libsonnet` centralizes normalized config, topology, spoke ordering, VCN lists, shared-only config, and example LB backend derivation for render-time consumers.
 - `landing_zone.libsonnet` is the shared composition engine, merge owner, and output assembler.
+- `gen/builders/iam.libsonnet` is a facade. IAM subdomain ownership lives under `gen/builders/iam/`: compartments, identity domain objects, project policies, and tenancy/shared policies.
 - Detailed spoke rendering is delegated to `gen/builders/network_spokes.libsonnet`.
 - DRG and hub integration overlays are delegated to `gen/builders/hub_integration.libsonnet`.
+- `extensions.libsonnet` owns extension metadata/render contract resolution. Cross-entry extension component summary lives in `gen/lib/extension_components.libsonnet`.
 - `landing_zone_multi.jsonnet` is the config-mode wrapper that maps result fields to filenames.
 - `format_json.py` is the final presentation formatting step invoked after Jsonnet evaluation.
 
@@ -128,6 +145,7 @@ Update this diagram when any of these change:
 - `jsonnet --multi` is reserved for `bash gen/generate.sh --config ...`. It must not be used to generate the committed snapshot files under `blueprints/` or `workload-extensions/`.
 - Each published family owns its local profiles file:
   - `gen/blueprints/one-oe/runtime/one-stack/profiles.libsonnet`
+  - `gen/blueprints/multi-oe/generic/runtime/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/multi-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacc/single-stack/profiles.libsonnet`
@@ -215,6 +233,28 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
   },
 }
 ```
+
+Multi-OE config mode uses top-level `operating_entities`:
+
+```jsonnet
+{
+  hub: { kind: 'hub_a', network: { vcn: '10.0.0.0/21' } },
+  security_targets: ['prod'],
+  operating_entities: {
+    finance: {
+      display_name: 'Finance',
+      environments: {
+        prod: {
+          shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+          projects: { proj1: {} },
+        },
+      },
+    },
+  },
+}
+```
+
+When top-level `operating_entities` is present, each operating entity owns an `environments` object with the same per-environment shape used by One-OE. Do not set top-level `environments` and `operating_entities` together.
 
 Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`) and must be one of the realms in `constants.libsonnet`. `cis_level` defaults to `2` and must be `1` or `2`; config mode emits only the selected CIS security and observability file pair. `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Missing subnets are still auto-calculated from VCN CIDRs using `auto_subnets()`.
 
@@ -327,6 +367,8 @@ Contract phases:
 
 Generic extension contracts must not change emitted artifact sets based on repo publication mode. If a published family needs additional projections, create a dedicated adapter next to the published entrypoints and keep profile-local configs free of publication flags.
 
+Publication-only network reshaping that is shared by adapters belongs in `gen/lib/publication_network.libsonnet`, not in generic platform rendering helpers. Keep `gen/platforms.libsonnet` focused on platform entries, routed VCN metadata, and generic platform network categories.
+
 Extension guides for networked extensions: any extension with `network_mode: required` or `network_mode: optional` must document the sizing inputs and CIDR-relevant ranges that customer guidance needs before customer guidance proposes concrete CIDRs. Keep those extension-specific placement, scale, and address-range questions in the extension's local `AGENTS.md`; root `AGENTS.md` owns the customer discovery ordering.
 
 Current extension ownership:
@@ -370,7 +412,7 @@ Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produce
 
 For customer-use artifact placement and deployment defaults, follow root `AGENTS.md`. This generator guide defines emitted files and generator behavior only.
 
-Config mode validates required fields during normalization. `config.environments` must be present and non-empty; omitted environments are a hard error rather than an implicit default.
+Config mode validates required fields during normalization. `config.environments` or `config.operating_entities` must be present and non-empty; omitted environment definitions are a hard error rather than an implicit default.
 
 ## 10. Network Artifact Phases
 

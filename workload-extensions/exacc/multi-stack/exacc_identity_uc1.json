@@ -5,13 +5,13 @@
         "compartments": {
             "CMP-LZ-PREPROD-EXACC-KEY": {
                 "name"                                 : "cmp-lz-preprod-exacc",
-                "description"                          : "Pre-Production Platform ExaDB-C@C Compartment",
+                "description"                          : "PreProd Platform ExaDB-C@C Compartment",
                 "parent_id"                            : "CMP-LZ-PREPROD-PLATFORM-KEY",
 
                 "children": {
                     "CMP-LZ-PREPROD-EXACC-DB-KEY": {
                         "name"                         : "cmp-lz-preprod-exacc-db",
-                        "description"                  : "Pre-Production Platform ExaDB-C@C Database Compartment",
+                        "description"                  : "PreProd Platform ExaDB-C@C Database Compartment",
 
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
@@ -20,7 +20,7 @@
 
                     "CMP-LZ-PREPROD-EXACC-INFRA-KEY": {
                         "name"                         : "cmp-lz-preprod-exacc-infra",
-                        "description"                  : "Pre-Production Platform ExaDB-C@C Infrastructure Compartment",
+                        "description"                  : "PreProd Platform ExaDB-C@C Infrastructure Compartment",
 
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
@@ -35,7 +35,7 @@
 
             "CMP-LZ-PREPROD-PROJ1-EXACC-DB-KEY": {
                 "name"                                 : "cmp-lz-preprod-proj1-exacc-db",
-                "description"                          : "Pre-Production environment, Project 1 ExaDB-C@C database compartment",
+                "description"                          : "PreProd environment, Project 1 ExaDB-C@C database compartment",
                 "parent_id"                            : "CMP-LZ-PREPROD-PROJ1-KEY",
 
                 "defined_tags": {
@@ -45,13 +45,13 @@
 
             "CMP-LZ-PROD-EXACC-KEY": {
                 "name"                                 : "cmp-lz-prod-exacc",
-                "description"                          : "Production Platform ExaDB-C@C Compartment",
+                "description"                          : "Prod Platform ExaDB-C@C Compartment",
                 "parent_id"                            : "CMP-LZ-PROD-PLATFORM-KEY",
 
                 "children": {
                     "CMP-LZ-PROD-EXACC-DB-KEY": {
                         "name"                         : "cmp-lz-prod-exacc-db",
-                        "description"                  : "Production Platform ExaDB-C@C Database Compartment",
+                        "description"                  : "Prod Platform ExaDB-C@C Database Compartment",
 
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role": "lz-exacc-db-admin"
@@ -60,7 +60,7 @@
 
                     "CMP-LZ-PROD-EXACC-INFRA-KEY": {
                         "name"                         : "cmp-lz-prod-exacc-infra",
-                        "description"                  : "Production Platform ExaDB-C@C Infrastructure Compartment",
+                        "description"                  : "Prod Platform ExaDB-C@C Infrastructure Compartment",
 
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role": "lz-exacc-infra-admin"
@@ -75,7 +75,7 @@
 
             "CMP-LZ-PROD-PROJ1-EXACC-DB-KEY": {
                 "name"                                 : "cmp-lz-prod-proj1-exacc-db",
-                "description"                          : "Production environment, Project 1 ExaDB-C@C database compartment",
+                "description"                          : "Prod environment, Project 1 ExaDB-C@C database compartment",
                 "parent_id"                            : "CMP-LZ-PROD-PROJ1-KEY",
 
                 "defined_tags": {
@@ -131,12 +131,12 @@
 
             "GRP-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
                 "name"                                 : "grp-lz-preprod-proj1-exacc-admin",
-                "description"                          : "Landing Zone Pre-Production environment, Project 1 ExaDB-C@C database administration access group."
+                "description"                          : "Landing Zone PreProd environment, Project 1 ExaDB-C@C database administration access group."
             },
 
             "GRP-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
                 "name"                                 : "grp-lz-prod-proj1-exacc-admin",
-                "description"                          : "Landing Zone Production environment, Project 1 ExaDB-C@C database administration access group."
+                "description"                          : "Landing Zone Prod environment, Project 1 ExaDB-C@C database administration access group."
             }
         }
     },
@@ -211,7 +211,7 @@
 
             "PCY-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-preprod-exacc-proj1-admin",
-                "description"                          : "Grants grp-lz-preprod-proj1-exacc-admin ExaDB-C@C Autonomous Database administration access in the Project 1 database compartment in the Pre-Production environment.",
+                "description"                          : "Grants grp-lz-preprod-proj1-exacc-admin ExaDB-C@C Autonomous Database administration access in the Project 1 database compartment in the PreProd environment.",
                 "compartment_id"                       : "CMP-LZ-PREPROD-PROJ1-EXACC-DB-KEY",
 
                 "statements": [
@@ -230,7 +230,7 @@
 
             "PCY-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
                 "name"                                 : "pcy-lz-prod-exacc-proj1-admin",
-                "description"                          : "Grants grp-lz-prod-proj1-exacc-admin ExaDB-C@C Autonomous Database administration access in the Project 1 database compartment in the Production environment.",
+                "description"                          : "Grants grp-lz-prod-proj1-exacc-admin ExaDB-C@C Autonomous Database administration access in the Project 1 database compartment in the Prod environment.",
                 "compartment_id"                       : "CMP-LZ-PROD-PROJ1-EXACC-DB-KEY",
 
                 "statements": [

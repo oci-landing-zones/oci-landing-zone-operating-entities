@@ -1,4 +1,4 @@
-// config without environments is rejected
+// config without environments or operating_entities is rejected.
 {
   region: 'eu-frankfurt-1',
   region_short_name: 'fra',
