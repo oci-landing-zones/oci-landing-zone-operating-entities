@@ -13,6 +13,7 @@ local hub_integration_builder = import 'builders/hub_integration.libsonnet';
 local iam_builder = import 'builders/iam.libsonnet';
 local network_spokes_builder = import 'builders/network_spokes.libsonnet';
 local observability_builder = import 'builders/observability.libsonnet';
+local remote_peering_builder = import 'builders/remote_peering.libsonnet';
 local security_builder = import 'builders/security.libsonnet';
 local extensions = import 'extensions.libsonnet';
 local platforms = import 'platforms.libsonnet';
@@ -52,6 +53,17 @@ function(raw_config)
 
   // Hub CIDRs needed for spoke NSG/security list rules
   local hub_vcn_cidr = config.hub.network.vcn;
+  local remote_peering_connections =
+    if std.objectHas(config, 'remote_peering_connections') then
+      config.remote_peering_connections
+    else {};
+  local remote_peering = remote_peering_builder({
+    naming: n,
+    connections: remote_peering_connections,
+    local_vcn_entries: all_vcn_entries,
+    hub_has_spoke_natgw: config.hub.kind == 'hub_e',
+  });
+  local all_routed_cidr_entries = all_vcn_entries + remote_peering.route_entries;
 
   // Number categories starting from 1 using the spoke-environment semantic order.
   local spoke_env_indexed = std.mapWithIndex(
@@ -64,7 +76,7 @@ function(raw_config)
     hub_config: config.hub,
     vcn_list: [
       { name: entry.name, cidr: entry.vcn }
-      for entry in all_vcn_entries
+      for entry in all_routed_cidr_entries
     ],
     create_l7_load_balancer: create_hub_l7_load_balancer,
     lb_backends: lb_backends,
@@ -75,6 +87,7 @@ function(raw_config)
     naming: n,
     hub: hub,
     all_vcn_entries: all_vcn_entries,
+    remote_peering: remote_peering,
   });
   local hub_integration_pre = hub_integration.pre;
   local hub_integration_post = hub_integration.post;
@@ -84,7 +97,7 @@ function(raw_config)
     topology: topo,
     hub_network: config.hub.network,
     spoke_env_indexed: spoke_env_indexed,
-    all_peer_vcn_entries: all_vcn_entries,
+    all_peer_vcn_entries: all_routed_cidr_entries,
     hub_has_spoke_natgw: hub.has_spoke_natgw,
   });
 
@@ -98,7 +111,7 @@ function(raw_config)
         platform_entry: network_only_platforms[i],
         naming: n,
         hub_vcn_cidr: hub_vcn_cidr,
-        routed_vcn_entries: all_vcn_entries,
+        routed_vcn_entries: all_routed_cidr_entries,
         hub_has_spoke_natgw: hub.has_spoke_natgw,
       })
     for i in std.range(0, std.length(network_only_platforms) - 1)
@@ -110,7 +123,7 @@ function(raw_config)
     naming: n,
     hub_vcn_cidr: hub_vcn_cidr,
     hub_lb_cidr: config.hub.network.subnets.lb,
-    routed_vcn_entries: all_vcn_entries,
+    routed_vcn_entries: all_routed_cidr_entries,
     hub_has_spoke_natgw: hub.has_spoke_natgw,
   });
   local extension_network_pre = extension_state.network_pre;

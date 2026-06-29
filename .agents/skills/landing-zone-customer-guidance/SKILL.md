@@ -61,6 +61,11 @@ If the selected published path, config generator, or workload extension does not
 - Do not treat non-production as an automatic reason to recommend a no-firewall hub. Firewall-based designs are still the recommended default unless the customer explicitly accepts the tradeoff for a simpler non-production layout.
 - When the customer asks for public access, do not assume the chosen hub needs a brand-new public load balancer design. Check the selected hub guide or runtime artifacts first; in the One-OE one-stack runtime, each hub family already includes a public load balancer example with placeholder backends.
 
+## RPC Requests
+
+- For explicit RPC, Remote Peering Connection, inter-region OCI VCN peering, same-tenancy remote peering, or cross-tenancy remote peering requests, complete the standard landing zone discovery sequence and then use `landing-zone-config`.
+- Model RPC through config mode with top-level `remote_peering_connections`.
+
 ## ExaDB-D / ExaCS-Specific Guardrails
 
 - If the customer says ExaDB-D, Exadata Database Service on Dedicated Infrastructure, Autonomous Database Dedicated, ExaCS, VMC, or AVMC, complete the base landing-zone discovery first.

@@ -24,6 +24,81 @@ local validation = import 'lib/validation.libsonnet';
       validation.required(network, 'vcn', '%s.vcn' % label)
     ),
 
+  local has_prefix(value, prefix) =
+    std.substr(value, 0, std.length(prefix)) == prefix,
+
+  local optional_non_empty_string(parent, key, label) =
+    if std.objectHas(parent, key) && parent[key] != null then
+      assert std.type(parent[key]) == 'string' && parent[key] != '' :
+        '%s must be a non-empty string' % label;
+      parent[key]
+    else null,
+
+  local normalize_remote_peering_connections(connections, region) =
+    local values = validation.object(
+      connections,
+      'config.remote_peering_connections'
+    );
+    {
+      [connection_name]:
+        local label = 'config.remote_peering_connections.%s' % connection_name;
+        local entry = validation.allowed_keys(
+          validation.object(values[connection_name], label),
+          label,
+          [
+            'remote_cidrs',
+            'peer_id',
+            'peer_region_name',
+            'peer_tenancy_ocid',
+            'requestor_group_ocid',
+          ]
+        );
+        local remote_cidrs = validation.array(
+          validation.required(entry, 'remote_cidrs', '%s.remote_cidrs' % label),
+          '%s.remote_cidrs' % label,
+          require_non_empty=true
+        );
+        local peer_id = optional_non_empty_string(entry, 'peer_id', '%s.peer_id' % label);
+        local peer_region_name =
+          if std.objectHas(entry, 'peer_region_name') && entry.peer_region_name != null then
+            assert std.type(entry.peer_region_name) == 'string' && entry.peer_region_name != '' :
+              '%s.peer_region_name must be a non-empty string' % label;
+            entry.peer_region_name
+          else region;
+        local peer_tenancy_ocid = optional_non_empty_string(
+          entry,
+          'peer_tenancy_ocid',
+          '%s.peer_tenancy_ocid' % label
+        );
+        local requestor_group_ocid = optional_non_empty_string(
+          entry,
+          'requestor_group_ocid',
+          '%s.requestor_group_ocid' % label
+        );
+        assert peer_id == null || !has_prefix(peer_id, 'ocid1.tenancy') :
+          '%s.peer_id must reference a remote peering connection OCID or dependency key, not a tenancy OCID' % label;
+        assert peer_tenancy_ocid == null || has_prefix(peer_tenancy_ocid, 'ocid1.tenancy') :
+          '%s.peer_tenancy_ocid must start with ocid1.tenancy' % label;
+        assert requestor_group_ocid == null || has_prefix(requestor_group_ocid, 'ocid1.group') :
+          '%s.requestor_group_ocid must start with ocid1.group' % label;
+        assert peer_tenancy_ocid != null || requestor_group_ocid == null :
+          '%s.peer_tenancy_ocid is required when requestor_group_ocid is provided' % label;
+        assert requestor_group_ocid != null || peer_tenancy_ocid == null :
+          '%s.requestor_group_ocid is required when peer_tenancy_ocid is provided' % label;
+        {
+          name: connection_name,
+          remote_cidrs: [
+            cidrs.validate('%s.remote_cidrs[%d]' % [label, i], remote_cidrs[i])
+            for i in std.range(0, std.length(remote_cidrs) - 1)
+          ],
+          peer_id: peer_id,
+          peer_region_name: peer_region_name,
+          peer_tenancy_ocid: peer_tenancy_ocid,
+          requestor_group_ocid: requestor_group_ocid,
+        }
+      for connection_name in std.objectFields(values)
+    },
+
   local normalize_auto_subnet_network(network, label, subnet_names) =
     local vcn = required_vcn(network, label);
     network {
@@ -93,6 +168,11 @@ local validation = import 'lib/validation.libsonnet';
       if std.objectHas(hub_network, 'subnets') then
         subnet_utils.validate_subnet_map(hub_network.subnets, hub_subnet_keys, hub_subnet_label, hub_vcn)
       else subnet_utils.auto_subnets_24(hub_vcn, hub_subnet_keys);
+    local remote_peering_connections =
+      if std.objectHas(config, 'remote_peering_connections') &&
+         config.remote_peering_connections != null then
+        normalize_remote_peering_connections(config.remote_peering_connections, region)
+      else {};
 
     local norm_platform(plat, p_name) =
       local extension =
@@ -208,7 +288,11 @@ local validation = import 'lib/validation.libsonnet';
       region_short_name: region_short_name,
       realm: realm,
       cis_level: cis_level,
-      hub+: { network+: { subnets: hub_subnets } },
+      hub+: {
+        network+: { subnets: hub_subnets },
+      },
+      [if std.length(std.objectFields(remote_peering_connections)) > 0 then 'remote_peering_connections']:
+        remote_peering_connections,
       environments: norm_envs,
       [if security_target_names != null then 'security_targets']: security_target_names,
       [if std.length(std.objectFields(norm_shared)) > 0 then 'shared_platforms']: norm_shared,

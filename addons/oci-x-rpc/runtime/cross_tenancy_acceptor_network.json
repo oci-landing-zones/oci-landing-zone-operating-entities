@@ -1,0 +1,158 @@
+{
+    "network_configuration": {
+        "network_configuration_categories": {
+            "0-shared": {
+                "vcns": {
+                    "VCN-FRA-LZ-HUB-KEY": {
+                        "route_tables": {
+                            "RT-FRA-LZ-HUB-INGRESS-KEY": {
+                                "display_name"                                  : "rt-fra-lz-hub-ingress",
+
+                                "route_rules": {
+                                    "rr-fra-rpc-tenancy2-1": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.0.0/16 through Internal OCI Network Firewall",
+                                        "destination"                           : "10.1.0.0/16",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    }
+                                }
+                            },
+
+                            "RT-FRA-LZ-HUB-LB-KEY": {
+                                "display_name"                                  : "rt-fra-lz-hub-lb",
+
+                                "route_rules": {
+                                    "rr-fra-rpc-tenancy2-1": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.0.0/16 through DRG",
+                                        "destination"                           : "10.1.0.0/16",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
+                            "RT-FRA-LZ-HUB-FW-INT-KEY": {
+                                "display_name"                                  : "rt-fra-lz-hub-fw-int",
+
+                                "route_rules": {
+                                    "rr-fra-rpc-tenancy2-1": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.0.0/16 through DRG",
+                                        "destination"                           : "10.1.0.0/16",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
+                            "RT-FRA-LZ-HUB-NATGW-KEY": {
+                                "display_name"                                  : "rt-fra-lz-hub-natgw",
+
+                                "route_rules": {
+                                    "rr-fra-rpc-tenancy2-1": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.0.0/16 through Internal OCI Network Firewall",
+                                        "destination"                           : "10.1.0.0/16",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    }
+                                }
+                            },
+
+                            "RT-FRA-LZ-HUB-MGMT-KEY": {
+                                "display_name"                                  : "rt-fra-lz-hub-mgmt",
+
+                                "route_rules": {
+                                    "rr-fra-rpc-tenancy2-1": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.0.0/16 through DRG",
+                                        "destination"                           : "10.1.0.0/16",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "network_firewalls_configuration": {
+                    "network_firewall_policies": {
+                        "NFW-FRA-LZ-POLICY-INT-01-KEY": {
+                            "address_lists": {
+                                "NFW-FRA-LZ-ADDRLIST-SPOKES-KEY": {
+                                    "name"                                      : "nfw-fra-lz-addrlist-spokes",
+                                    "type"                                      : "IP",
+                                    "addresses"                                 : ["10.0.64.0/21", "10.1.0.0/16"]
+                                },
+
+                                "NFW-FRA-LZ-ADDRLIST-TENANCY2-1-KEY": {
+                                    "name"                                      : "nfw-fra-lz-addrlist-tenancy2-1",
+                                    "type"                                      : "IP",
+                                    "addresses"                                 : ["10.1.0.0/16"]
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "non_vcn_specific_gateways": {
+                    "dynamic_routing_gateways": {
+                        "DRG-FRA-LZ-HUB-KEY": {
+                            "drg_attachments": {
+                                "DRGATT-FRA-LZ-HUB-RPC-TENANCY2-KEY": {
+                                    "display_name"                              : "drgatt-fra-lz-hub-rpc-tenancy2",
+                                    "drg_route_table_key"                       : "DRGRT-FRA-LZ-RPC-TENANCY2-KEY",
+
+                                    "network_details": {
+                                        "type"                                  : "REMOTE_PEERING_CONNECTION",
+                                        "attached_resource_key"                 : "RPC-FRA-LZ-HUB-TENANCY2-KEY"
+                                    }
+                                }
+                            },
+
+                            "drg_route_distributions": {
+                                "DRGRD-FRA-LZ-HUB-KEY": {
+                                    "display_name"                              : "drgrd-fra-lz-hub",
+                                    "distribution_type"                         : "IMPORT",
+
+                                    "statements": {
+                                        "ROUTE-TO-RPC-LZ-TENANCY2-KEY": {
+                                            "action"                            : "ACCEPT",
+                                            "priority"                          : 20,
+
+                                            "match_criteria": {
+                                                "match_type"                    : "DRG_ATTACHMENT_TYPE",
+                                                "attachment_type"               : "REMOTE_PEERING_CONNECTION",
+                                                "drg_attachment_key"            : "DRGATT-FRA-LZ-HUB-RPC-TENANCY2-KEY"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+
+                            "drg_route_tables": {
+                                "DRGRT-FRA-LZ-RPC-TENANCY2-KEY": {
+                                    "display_name"                              : "drgrt-fra-lz-rpc-tenancy2",
+                                    "is_ecmp_enabled"                           : false,
+
+                                    "route_rules": {
+                                        "DRGRT-FRA-LZ-RPC-TENANCY2-STATIC-ROUTE": {
+                                            "destination"                       : "0.0.0.0/0",
+                                            "destination_type"                  : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key"       : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                        }
+                                    }
+                                }
+                            },
+
+                            "remote_peering_connections": {
+                                "RPC-FRA-LZ-HUB-TENANCY2-KEY": {
+                                    "display_name"                              : "rpc-fra-lz-hub-tenancy2",
+                                    "peer_region_name"                          : "eu-frankfurt-1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
