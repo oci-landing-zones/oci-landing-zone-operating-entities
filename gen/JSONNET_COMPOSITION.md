@@ -127,6 +127,15 @@ local ctx = render_context.from_raw_config(raw_config);
 
 Use that helper when a renderer or publication adapter needs normalized config plus derived semantic lists such as ordered spoke environments, platform entries, VCN metadata, example LB backends, or the shared-only config view. Keep final document assembly in the caller. `render_context.libsonnet` is the input-preparation layer, not the merge owner.
 
+IAM follows the same facade pattern at the domain-builder level:
+
+```jsonnet
+local iam_builder = import 'builders/iam.libsonnet';
+iam_builder(config, n, realm, topo)
+```
+
+The facade owns the public IAM builder contract, while `builders/iam/` owns compartments, identity domain objects, project policies, and tenancy/shared policies. Keep policy statement text in the owning policy module rather than hiding it behind generic string builders unless that removes real duplication.
+
 ### Collect Semantic Entries Before Building Objects
 
 `landing_zone.libsonnet` often builds arrays of semantic entries first, then turns them into objects later:
