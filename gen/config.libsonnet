@@ -37,11 +37,11 @@ local validation = import 'lib/validation.libsonnet';
   local normalize_remote_peering_connections(connections, region) =
     local values = validation.object(
       connections,
-      'config.hub.network.remote_peering_connections'
+      'config.remote_peering_connections'
     );
     {
       [connection_name]:
-        local label = 'config.hub.network.remote_peering_connections.%s' % connection_name;
+        local label = 'config.remote_peering_connections.%s' % connection_name;
         local entry = validation.allowed_keys(
           validation.object(values[connection_name], label),
           label,
@@ -169,9 +169,9 @@ local validation = import 'lib/validation.libsonnet';
         subnet_utils.validate_subnet_map(hub_network.subnets, hub_subnet_keys, hub_subnet_label, hub_vcn)
       else subnet_utils.auto_subnets_24(hub_vcn, hub_subnet_keys);
     local remote_peering_connections =
-      if std.objectHas(hub_network, 'remote_peering_connections') &&
-         hub_network.remote_peering_connections != null then
-        normalize_remote_peering_connections(hub_network.remote_peering_connections, region)
+      if std.objectHas(config, 'remote_peering_connections') &&
+         config.remote_peering_connections != null then
+        normalize_remote_peering_connections(config.remote_peering_connections, region)
       else {};
 
     local norm_platform(plat, p_name) =
@@ -289,11 +289,10 @@ local validation = import 'lib/validation.libsonnet';
       realm: realm,
       cis_level: cis_level,
       hub+: {
-        network+: { subnets: hub_subnets }
-          + (if std.length(std.objectFields(remote_peering_connections)) > 0 then {
-               remote_peering_connections: remote_peering_connections,
-             } else {}),
+        network+: { subnets: hub_subnets },
       },
+      [if std.length(std.objectFields(remote_peering_connections)) > 0 then 'remote_peering_connections']:
+        remote_peering_connections,
       environments: norm_envs,
       [if security_target_names != null then 'security_targets']: security_target_names,
       [if std.length(std.objectFields(norm_shared)) > 0 then 'shared_platforms']: norm_shared,

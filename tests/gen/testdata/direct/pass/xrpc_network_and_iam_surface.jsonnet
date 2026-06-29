@@ -21,9 +21,9 @@ local base_config(hub_kind, rpc) = {
     kind: hub_kind,
     network: {
       vcn: '10.0.0.0/21',
-      remote_peering_connections: rpc,
     },
   },
+  remote_peering_connections: rpc,
   environments: {
     prod: {
       shared_project_network: { network: { vcn: '10.0.64.0/21' } },

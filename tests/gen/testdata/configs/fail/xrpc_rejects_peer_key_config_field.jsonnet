@@ -7,12 +7,12 @@
     kind: 'hub_e',
     network: {
       vcn: '10.0.0.0/21',
-      remote_peering_connections: {
-        region_b: {
-          remote_cidrs: ['10.1.0.0/16'],
-          peer_key: 'RPC-FRA-LZ-HUB-REGION-B-KEY',
-        },
-      },
+    },
+  },
+  remote_peering_connections: {
+    region_b: {
+      remote_cidrs: ['10.1.0.0/16'],
+      peer_key: 'RPC-FRA-LZ-HUB-REGION-B-KEY',
     },
   },
   environments: {

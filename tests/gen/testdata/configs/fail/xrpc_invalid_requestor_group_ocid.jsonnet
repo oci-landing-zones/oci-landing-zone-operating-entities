@@ -7,13 +7,13 @@
     kind: 'hub_e',
     network: {
       vcn: '10.0.0.0/21',
-      remote_peering_connections: {
-        region_b: {
-          remote_cidrs: ['10.1.0.0/16'],
-          peer_tenancy_ocid: 'ocid1.tenancy.oc1..requestor',
-          requestor_group_ocid: 'not-a-group',
-        },
-      },
+    },
+  },
+  remote_peering_connections: {
+    region_b: {
+      remote_cidrs: ['10.1.0.0/16'],
+      peer_tenancy_ocid: 'ocid1.tenancy.oc1..requestor',
+      requestor_group_ocid: 'not-a-group',
     },
   },
   environments: {

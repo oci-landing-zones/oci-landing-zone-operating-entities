@@ -48,8 +48,8 @@ function(raw_config)
   // Hub CIDRs needed for spoke NSG/security list rules
   local hub_vcn_cidr = config.hub.network.vcn;
   local remote_peering_connections =
-    if std.objectHas(config.hub.network, 'remote_peering_connections') then
-      config.hub.network.remote_peering_connections
+    if std.objectHas(config, 'remote_peering_connections') then
+      config.remote_peering_connections
     else {};
   local remote_peering = remote_peering_builder({
     naming: n,

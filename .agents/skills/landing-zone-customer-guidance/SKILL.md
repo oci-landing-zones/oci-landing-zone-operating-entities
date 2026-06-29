@@ -64,7 +64,7 @@ If the selected published path, config generator, or workload extension does not
 ## RPC Requests
 
 - For explicit RPC, Remote Peering Connection, inter-region OCI VCN peering, same-tenancy remote peering, or cross-tenancy remote peering requests, complete the standard landing zone discovery sequence and then use `landing-zone-config`.
-- Model RPC through config mode with `hub.network.remote_peering_connections`.
+- Model RPC through config mode with top-level `remote_peering_connections`.
 
 ## ExaDB-D / ExaCS-Specific Guardrails
 

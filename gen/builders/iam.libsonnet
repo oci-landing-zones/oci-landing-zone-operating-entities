@@ -401,8 +401,8 @@ function(config, n, realm_constants, topo)
     ] else [];
 
   local rpc_connections =
-    if std.objectHas(config.hub.network, 'remote_peering_connections') then
-      config.hub.network.remote_peering_connections
+    if std.objectHas(config, 'remote_peering_connections') then
+      config.remote_peering_connections
     else {};
   local rpc_name_segment(value) = std.strReplace(value, '_', '-');
   local rpc_cross_tenancy_policies = {

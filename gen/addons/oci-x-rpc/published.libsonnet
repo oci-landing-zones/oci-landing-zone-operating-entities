@@ -112,8 +112,8 @@ local landing_zone = import '../../landing_zone.libsonnet';
     local result = landing_zone(config).network;
     local categories = result.network_configuration.network_configuration_categories;
     local remote_cidrs = std.flattenArrays([
-      config.hub.network.remote_peering_connections[name].remote_cidrs
-      for name in std.objectFields(config.hub.network.remote_peering_connections)
+      config.remote_peering_connections[name].remote_cidrs
+      for name in std.objectFields(config.remote_peering_connections)
     ]);
     {
       network_configuration: {

@@ -4,7 +4,7 @@
 // function(params) -> { route_entries, network_overlay }
 //
 // params.naming: naming object
-// params.connections: normalized hub.network.remote_peering_connections map
+// params.connections: normalized top-level remote_peering_connections map
 // params.local_vcn_entries: routed local VCN entries from platforms.libsonnet
 // params.hub_has_spoke_natgw: true for Hub E direct routing, false for firewall hubs
 

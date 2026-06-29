@@ -7,10 +7,10 @@
     kind: 'hub_e',
     network: {
       vcn: '10.0.0.0/21',
-      remote_peering_connections: {
-        region_b: {},
-      },
     },
+  },
+  remote_peering_connections: {
+    region_b: {},
   },
   environments: {
     prod: {
