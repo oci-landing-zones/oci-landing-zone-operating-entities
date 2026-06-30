@@ -127,6 +127,8 @@ local ctx = render_context.from_raw_config(raw_config);
 
 Use that helper when a renderer or publication adapter needs normalized config plus derived semantic lists such as ordered spoke environments, platform entries, VCN metadata, example LB backends, or the shared-only config view. Keep final document assembly in the caller. `render_context.libsonnet` is the input-preparation layer, not the merge owner.
 
+`topology.libsonnet` exposes structured environment entries for builders that need more than a raw environment name. Use those entries for resource keys, display segments, DNS segments, project lookups, and compartment paths so builders do not each reconstruct naming assumptions locally.
+
 IAM follows the same facade pattern at the domain-builder level:
 
 ```jsonnet
@@ -213,6 +215,8 @@ Generic extension outputs that belong in config mode stay under `result.extra`, 
 Published family entrypoints are a separate concern. If a published snapshot needs a projection that is not part of the generic config result contract, build it in a dedicated published adapter near the entrypoints instead of leaking publication mode through extension params.
 
 That separation matters. It keeps the main result contract stable, keeps config mode predictable, and makes publication-only behavior explicit in repo-owned selector code instead of extension configuration.
+
+When workload-extension publication adapters, such as OKE or Exa multi-stack artifacts, need to strip local NAT routes or reshape network categories, use `gen/lib/publication_network.libsonnet`. Do not put publication-only helpers in `gen/platforms.libsonnet`; that file owns platform entries, routed VCN metadata, and generic platform network categories.
 
 ## Traced Example: From Entrypoint To `network`
 

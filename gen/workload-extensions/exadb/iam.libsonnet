@@ -29,15 +29,17 @@
       else ['GLOBAL', product_upper, role, 'ADMIN'];
     local group_name(role) =
       'grp-lz-global-%s-%s-admin' % [product.code, std.asciiLower(role)];
+    local scope_name(spec) =
+      std.join('-', [std.asciiLower(s) for s in spec.scope.name_segments]);
     local project_group_name(spec) =
       'grp-lz-%s-%s-%s-admin' % [
-        std.asciiLower(spec.env_name),
+        scope_name(spec),
         std.asciiLower(spec.project_name),
         product.code,
       ];
     local project_policy_name(spec) =
       'pcy-lz-%s-%s-%s-admin' % [
-        std.asciiLower(spec.env_name),
+        scope_name(spec),
         product.code,
         std.asciiLower(spec.project_name),
       ];
@@ -58,7 +60,7 @@
       },
     } else {});
     local project_groups = {
-      [n.key_global('GRP', [spec.env_name, product_upper, spec.project_name, 'ADMIN'])]: {
+      [n.key_global('GRP', spec.scope.key_segments + [product_upper, spec.project_name, 'ADMIN'])]: {
         name: project_group_name(spec),
         description: descriptions.project_group(spec.scope, spec.project_name),
       }
@@ -147,12 +149,12 @@
     } else {};
 
     local project_policies = {
-      [n.key_global('PCY', [spec.env_name, product_upper, spec.project_name, 'ADMIN'])]: {
+      [n.key_global('PCY', spec.scope.key_segments + [product_upper, spec.project_name, 'ADMIN'])]: {
         name: project_policy_name(spec),
         description: descriptions.project_policy(spec.scope, spec.project_name),
-        compartment_id: inputs.project_db_key(spec.env_name, spec.project_name),
+        compartment_id: inputs.project_db_key(spec.scope, spec.project_name),
         local grp_name = project_group_name(spec),
-        local cmp_name = inputs.project_db_name(spec.env_name, spec.project_name),
+        local cmp_name = inputs.project_db_name(spec.scope, spec.project_name),
         statements: [
           'allow group %s to read all-resources in compartment %s' % [domain_grp(grp_name), cmp_name],
           'allow group %s to manage alarms in compartment %s' % [domain_grp(grp_name), cmp_name],

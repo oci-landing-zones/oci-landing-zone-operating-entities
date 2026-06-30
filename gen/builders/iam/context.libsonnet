@@ -8,22 +8,6 @@ function(config, n, realm_constants, topo)
   local naming = n;
   local realm = realm_constants;
   local topology = topo;
-  local env_entry(env_name) = {
-    mode: 'one_oe',
-    env_name: env_name,
-    key_segments: [env_name],
-    env: config.environments[env_name],
-  };
-  local env_entries = [env_entry(env_name) for env_name in topology.ordered_env_names()];
-  local env_child_compartment_name(entry, child) = 'cmp-lz-%s-%s' % [
-    std.asciiLower(entry.env_name),
-    std.asciiLower(child),
-  ];
-  local env_project_compartment_name(entry, project) = 'cmp-lz-%s-%s' % [
-    std.asciiLower(entry.env_name),
-    std.asciiLower(project),
-  ];
-  local env_compartment_path(entry) = naming.compartment_path([entry.env_name]);
 
   {
     config:: config_input,
@@ -32,31 +16,13 @@ function(config, n, realm_constants, topo)
     topo:: topology,
     desc:: desc,
 
-    env_entries:: env_entries,
+    env_entries:: topology.ordered_env_entries(),
 
     // --- Display-name helpers ---
     env_desc(env_name):: topology.env_display_long(env_name),
 
     // Project display name for compartment/group descriptions: 'proj1' -> 'Project 1'.
     proj_display(proj_name):: labels.project_display(proj_name),
-
-    project_names(entry):: topology.project_names(entry.env_name),
-    env_platform(entry, platform_name):: topology.env_platform(entry.env_name, platform_name),
-    env_compartment_key(entry):: naming.key_global('CMP', [entry.env_name]),
-    env_child_compartment_key(entry, child):: naming.key_global('CMP', [entry.env_name, child]),
-    env_project_compartment_key(entry, project):: naming.key_global('CMP', [entry.env_name, project]),
-    env_compartment_name(entry):: 'cmp-lz-%s' % std.asciiLower(entry.env_name),
-    env_child_compartment_name(entry, child):: env_child_compartment_name(entry, child),
-    env_project_compartment_name(entry, project):: env_project_compartment_name(entry, project),
-    env_compartment_path(entry):: env_compartment_path(entry),
-    env_child_compartment_path(entry, child):: '%s:%s' % [
-      self.env_compartment_path(entry),
-      self.env_child_compartment_name(entry, child),
-    ],
-    env_project_compartment_path(entry, project):: '%s:%s' % [
-      self.env_child_compartment_path(entry, 'projects'),
-      self.env_project_compartment_name(entry, project),
-    ],
 
     // --- Per-environment / per-project helpers ---
 

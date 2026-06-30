@@ -3,6 +3,7 @@
 
 function(ctx)
   local n = ctx.n;
+  local topo = ctx.topo;
   local desc = ctx.desc;
   local env_entries = ctx.env_entries;
   local domain_grp = ctx.domain_grp;
@@ -22,22 +23,22 @@ function(ctx)
       if entry.mode == 'one_oe' then name else path;
     local proj_cmp = policy_compartment_name_or_path(
       entry,
-      ctx.env_project_compartment_name(entry, proj_name),
-      ctx.env_project_compartment_path(entry, proj_name)
+      topo.env_project_compartment_name(entry, proj_name),
+      topo.env_project_compartment_path(entry, proj_name)
     );
     local net_cmp = policy_compartment_name_or_path(
       entry,
-      ctx.env_child_compartment_name(entry, 'network'),
-      ctx.env_child_compartment_path(entry, 'network')
+      topo.env_child_compartment_name(entry, 'network'),
+      topo.env_child_compartment_path(entry, 'network')
     );
     local sec_cmp = policy_compartment_name_or_path(
       entry,
-      ctx.env_child_compartment_name(entry, 'security'),
-      ctx.env_child_compartment_path(entry, 'security')
+      topo.env_child_compartment_name(entry, 'security'),
+      topo.env_child_compartment_path(entry, 'security')
     );
-    local proj_cmp_key = ctx.env_project_compartment_key(entry, proj_name);
-    local net_cmp_key = ctx.env_child_compartment_key(entry, 'NETWORK');
-    local sec_cmp_key = ctx.env_child_compartment_key(entry, 'SECURITY');
+    local proj_cmp_key = topo.env_project_compartment_key(entry, proj_name);
+    local net_cmp_key = topo.env_child_compartment_key(entry, 'NETWORK');
+    local sec_cmp_key = topo.env_child_compartment_key(entry, 'SECURITY');
     local grp_name = ctx.proj_grp_name(entry, proj_name);
     local name_segments = [std.asciiLower(s) for s in entry.key_segments] + [std.asciiLower(proj_name)];
     {
@@ -122,7 +123,7 @@ function(ctx)
   // Collect all per-env per-project policies
   std.foldl(
     function(acc, entry)
-      local project_names = ctx.project_names(entry);
+      local project_names = topo.project_names(entry);
       acc + std.foldl(
         function(pacc, proj_name) pacc + proj_policies(entry, proj_name),
         project_names,

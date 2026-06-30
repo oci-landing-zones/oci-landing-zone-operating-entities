@@ -9,13 +9,14 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
   assert std.objectHas(params.config_params, 'api_endpoint_allowed_cidrs') :
     'oke_simple requires config_params.api_endpoint_allowed_cidrs';
 
-  local n = params.naming;
-  local scope = params.topology;
-  local env = scope.scope_name;
-  local env_long_title = scope.scope_long_title;
-  local plat = scope.platform_name;
-  local display_segments = [env, plat];
-  local cmp_key = scope.compartment_key;
+	  local n = params.naming;
+	  local scope = params.topology;
+	  local env = scope.qualified_name;
+	  local env_long_title = scope.scope_long_title;
+	  local plat = scope.platform_name;
+	  local key_segments = scope.key_segments + ['PLATFORM', plat];
+	  local display_segments = scope.name_segments + [plat];
+	  local cmp_key = scope.compartment_key;
   local routing = if std.objectHas(params, 'routing') then params.routing else null;
   local has_hub = routing != null && routing.hub != null;
   local hub_lb_cidr =
@@ -26,7 +27,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     then routing.internet_default_target
     else 'local_natgw';
   local use_local_natgw = internet_default_target == 'local_natgw';
-  local category_key = '%s-platform-%s' % [std.asciiLower(env), std.asciiLower(plat)];
+	  local category_key = '%s-platform-%s' % [std.asciiLower(scope.qualified_name), std.asciiLower(plat)];
   local services_cidr =
     local validated = cidrs.validate('config_params.services_cidr', params.config_params.services_cidr);
     assert !cidrs.overlaps(validated, params.network.vcn) :
@@ -124,10 +125,10 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
       params.config_params.worker_image
     else
       '8.10';
-  local sn_key(suffix) =
-    n.key('SN', [env, 'PLATFORM', plat, suffix]);
-  local rt_key(suffix) =
-    n.key('RT', [env, 'PLATFORM', plat, suffix]);
+	  local sn_key(suffix) =
+	    n.key('SN', key_segments + [suffix]);
+	  local rt_key(suffix) =
+	    n.key('RT', key_segments + [suffix]);
   local checked_oke_name(label, value, max_len) =
     assert std.length(value) <= max_len :
       '%s must be %d characters or less: %s (%d)' % [label, max_len, value, std.length(value)];
@@ -144,11 +145,12 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     params: params,
     metadata: metadata,
     n: n,
-    scope: scope,
-    env: env,
+	    scope: scope,
+	    env: env,
     env_long_title: env_long_title,
-    plat: plat,
-    display_segments: display_segments,
+	    plat: plat,
+	    key_segments: key_segments,
+	    display_segments: display_segments,
     cmp_key: cmp_key,
     routing: routing,
     has_hub: has_hub,
@@ -171,9 +173,9 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     node_pool_key: node_pool_key,
     node_pool_name: node_pool_name,
     subnets: params.network.subnets,
-    vcn_key: n.key('VCN', [env, 'PLATFORM', plat]),
-    sgw_key: n.key('SGW', [env, 'PLATFORM', plat]),
-    ngw_key: n.key('NGW', [env, 'PLATFORM', plat]),
+	    vcn_key: n.key('VCN', key_segments),
+	    sgw_key: n.key('SGW', key_segments),
+	    ngw_key: n.key('NGW', key_segments),
     drg_key: n.key('DRG', ['HUB']),
     sn_cp_key: sn_key('CP'),
     sn_lb_key: sn_key('INT-LB'),
@@ -183,14 +185,14 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     rt_lb_key: rt_key('INT-LB'),
     rt_pods_key: rt_key('PODS'),
     rt_workers_key: rt_key('WORKERS'),
-    sl_cp_key: n.key('SL', [env, 'PLATFORM', plat, 'CP']),
-    sl_lb_key: n.key('SL', [env, 'PLATFORM', plat, 'INT-LB']),
-    sl_pods_key: n.key('SL', [env, 'PLATFORM', plat, 'PODS']),
-    sl_workers_key: n.key('SL', [env, 'PLATFORM', plat, 'WORKERS']),
-    nsg_cp_key: n.key('NSG', [env, 'PLATFORM', plat, 'CP']),
-    nsg_lb_key: n.key('NSG', [env, 'PLATFORM', plat, 'INT-LB']),
-    nsg_pods_key: n.key('NSG', [env, 'PLATFORM', plat, 'PODS']),
-    nsg_workers_key: n.key('NSG', [env, 'PLATFORM', plat, 'WORKERS']),
+	    sl_cp_key: n.key('SL', key_segments + ['CP']),
+	    sl_lb_key: n.key('SL', key_segments + ['INT-LB']),
+	    sl_pods_key: n.key('SL', key_segments + ['PODS']),
+	    sl_workers_key: n.key('SL', key_segments + ['WORKERS']),
+	    nsg_cp_key: n.key('NSG', key_segments + ['CP']),
+	    nsg_lb_key: n.key('NSG', key_segments + ['INT-LB']),
+	    nsg_pods_key: n.key('NSG', key_segments + ['PODS']),
+	    nsg_workers_key: n.key('NSG', key_segments + ['WORKERS']),
     dns: scope.dns,
   },
 }

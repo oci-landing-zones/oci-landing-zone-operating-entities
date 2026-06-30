@@ -15,7 +15,8 @@ gen/
 ├── generate.sh                  # Entry point: default mode or --config mode
 ├── lib/
 │   ├── extension_components.libsonnet # Cross-entry extension component summary
-│   └── policy_limits.libsonnet        # Generated IAM policy safety checks
+│   ├── policy_limits.libsonnet        # Generated IAM policy safety checks
+│   └── publication_network.libsonnet  # Publication-only network projection helpers
 │
 ├── hub/                         # Hub builders (one per hub type)
 │   ├── hub_common.libsonnet     # Shared building blocks (subnets, gateways, ICMP, NSGs)
@@ -116,6 +117,7 @@ flowchart TD
 - `render_context.libsonnet` centralizes normalized config, topology, spoke ordering, VCN lists, shared-only config, and example LB backend derivation for render-time consumers.
 - `landing_zone.libsonnet` is the shared composition engine, merge owner, and output assembler.
 - `gen/builders/iam.libsonnet` is a facade. IAM subdomain ownership lives under `gen/builders/iam/`: compartments, identity domain objects, project policies, and tenancy/shared policies.
+- Builders that need environment identity, resource key segments, display segments, DNS segments, or compartment paths should use topology entries from `topology.libsonnet` instead of passing raw environment-name strings across builder boundaries.
 - Detailed spoke rendering is delegated to `gen/builders/network_spokes.libsonnet`.
 - DRG and hub integration overlays are delegated to `gen/builders/hub_integration.libsonnet`.
 - `extensions.libsonnet` owns extension metadata/render contract resolution. Cross-entry extension component summary lives in `gen/lib/extension_components.libsonnet`.
@@ -337,6 +339,8 @@ Contract phases:
   - Any other generic key (e.g. `oke_clusters`, `oke_workers`): collected into `result.extra`
 
 Generic extension contracts must not change emitted artifact sets based on repo publication mode. If a published family needs additional projections, create a dedicated adapter next to the published entrypoints and keep profile-local configs free of publication flags.
+
+Publication-only network reshaping for workload-extension adapters, such as OKE or Exa multi-stack artifacts, belongs in `gen/lib/publication_network.libsonnet`, not in generic platform rendering helpers. Keep `gen/platforms.libsonnet` focused on platform entries, routed VCN metadata, and generic platform network categories.
 
 Extension guides for networked extensions: any extension with `network_mode: required` or `network_mode: optional` must document the sizing inputs and CIDR-relevant ranges that customer guidance needs before customer guidance proposes concrete CIDRs. Keep those extension-specific placement, scale, and address-range questions in the extension's local `AGENTS.md`; root `AGENTS.md` owns the customer discovery ordering.
 
