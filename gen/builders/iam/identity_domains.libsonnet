@@ -4,6 +4,7 @@
 {
   groups(ctx)::
     local n = ctx.n;
+    local topo = ctx.topo;
     local desc = ctx.desc;
     local env_entries = ctx.env_entries;
 
@@ -12,7 +13,7 @@
     // Per-environment per-project admin groups
     local env_project_groups = std.foldl(
       function(acc, entry)
-        local project_names = ctx.project_names(entry);
+        local project_names = topo.project_names(entry);
         acc + std.foldl(
           function(gacc, proj_name)
             gacc + {

@@ -4,36 +4,64 @@ local common = import 'hub/hub_common.libsonnet';
   has_network(pe):: std.objectHas(pe.platform_config, 'network') && pe.platform_config.network != null,
 
   collect_entries(config, topo)::
-    local ordered_env_names = topo.ordered_env_names();
+    local ordered_env_entries = topo.ordered_env_entries();
     local environment_projects = {
-      [env_name]: topo.project_names(env_name)
-      for env_name in ordered_env_names
+      [entry.qualified_name]: topo.project_names(entry)
+      for entry in ordered_env_entries
+    };
+    local environment_entries = {
+      [entry.qualified_name]: entry
+      for entry in ordered_env_entries
+    };
+    local environment_entries_by_env_name = {
+      [entry.env_name]: entry
+      for entry in ordered_env_entries
+      if std.length([
+        other
+        for other in ordered_env_entries
+        if other.env_name == entry.env_name
+      ]) == 1
+    };
+    local environment_projects_by_env_name = {
+      [entry.env_name]: topo.project_names(entry)
+      for entry in ordered_env_entries
+      if std.length([
+        other
+        for other in ordered_env_entries
+        if other.env_name == entry.env_name
+      ]) == 1
     };
     local environment_labels = {
-      [env_name]: {
-        scope_title: topo.env_display(env_name),
-        scope_long_title: topo.env_display_long(env_name),
+      [entry.qualified_name]: {
+        scope_title: std.join(' ', entry.display_segments),
+        scope_long_title:
+          if entry.mode == 'one_oe' then topo.env_display_long(entry.env_name)
+          else std.join(' ', entry.display_segments),
+        env_name: entry.env_name,
+        entry: entry,
       }
-      for env_name in ordered_env_names
+      for entry in ordered_env_entries
     };
     local env_platform_entries = std.flatMap(
-      function(env_name)
-        local env = config.environments[env_name];
-        if std.objectHas(env, 'platforms') then
+      function(entry)
+        if std.objectHas(entry.env, 'platforms') then
           [
             {
-              scope: topo.env_platform(env_name, p_name),
+              scope: topo.env_platform(entry, p_name),
               scope_config: {
-                projects: environment_projects[env_name],
+                projects: topo.project_names(entry),
+                environment_entries: environment_entries,
+                environment_entries_by_env_name: environment_entries_by_env_name,
                 environment_projects: environment_projects,
+                environment_projects_by_env_name: environment_projects_by_env_name,
                 environment_labels: environment_labels,
               },
-              platform_config: env.platforms[p_name],
+              platform_config: entry.env.platforms[p_name],
             }
-            for p_name in std.objectFields(env.platforms)
+            for p_name in std.objectFields(entry.env.platforms)
           ]
         else [],
-      ordered_env_names
+      ordered_env_entries
     );
     local shared_platform_entries =
       if std.objectHas(config, 'shared_platforms') then
@@ -42,7 +70,10 @@ local common = import 'hub/hub_common.libsonnet';
             scope: topo.shared_platform(p_name),
             scope_config: {
               projects: [],
+              environment_entries: environment_entries,
+              environment_entries_by_env_name: environment_entries_by_env_name,
               environment_projects: environment_projects,
+              environment_projects_by_env_name: environment_projects_by_env_name,
               environment_labels: environment_labels,
             },
             platform_config: config.shared_platforms[p_name],
@@ -66,70 +97,30 @@ local common = import 'hub/hub_common.libsonnet';
     },
 
   vcn_label(pe):: {
-    raw_name: '%s-platform-%s' % [pe.scope.scope_name, pe.scope.platform_name],
+    raw_name: '%s-platform-%s' % [pe.scope.qualified_name, pe.scope.platform_name],
     display: '%s %s' % [pe.scope.scope_title, std.asciiUpper(pe.scope.platform_name)],
+    name_segments: pe.scope.name_segments + [pe.scope.platform_name],
   },
 
-  publication_category_key(scope):: '%s-platform-%s' % [
-    std.asciiLower(scope.scope_name),
-    std.asciiLower(scope.platform_name),
-  ],
-
-  strip_publication_local_routes(vcn, n, route_keys_to_drop=[], strip_nat_gateways=true)::
-    local route_drop_keys = [n.route_rule([n.region, 'default'])] + route_keys_to_drop;
-    vcn {
-      route_tables: {
-        [rt_key]: vcn.route_tables[rt_key] {
-          route_rules: {
-            [route_key]: vcn.route_tables[rt_key].route_rules[route_key]
-            for route_key in std.objectFields(vcn.route_tables[rt_key].route_rules)
-            if !std.member(route_drop_keys, route_key)
-          },
-        }
-        for rt_key in std.objectFields(vcn.route_tables)
-      },
-      vcn_specific_gateways:
-        if strip_nat_gateways && std.objectHas(vcn.vcn_specific_gateways, 'nat_gateways') then
-          {
-            [gateway_type]: vcn.vcn_specific_gateways[gateway_type]
-            for gateway_type in std.objectFields(vcn.vcn_specific_gateways)
-            if gateway_type != 'nat_gateways'
-          }
-        else vcn.vcn_specific_gateways,
-    },
-
-  publication_network_category(category, n, route_keys_to_drop=[], strip_nat_gateways=true)::
-    category {
-      vcns: {
-        [key]: $.strip_publication_local_routes(
-          category.vcns[key],
-          n,
-          route_keys_to_drop,
-          strip_nat_gateways
-        )
-        for key in std.objectFields(category.vcns)
-      },
-    },
-
   build_routed_vcn_entries(config, all_platform_entries, topo, n)::
-    local spoke_env_names = topo.ordered_spoke_env_names();
+    local spoke_env_entries = topo.ordered_spoke_env_entries();
     local spoke_envs = [
-      { name: name, env: config.environments[name] }
-      for name in spoke_env_names
+      { entry: entry, name: entry.qualified_name, env: entry.env }
+      for entry in spoke_env_entries
     ];
     local spoke_vcn_entries = std.mapWithIndex(
       function(i, s)
-        local route_desc = 'Route to VCN %s Projects' % topo.env_display(s.name);
+        local route_desc = 'Route to VCN %s Projects' % std.join(' ', s.entry.display_segments);
         {
-          name: s.name,
-          display: topo.env_display(s.name),
+          name: s.entry.qualified_name,
+          display: std.join(' ', s.entry.display_segments),
           vcn: s.env.shared_project_network.network.vcn,
           priority: (i + 1) * 10,
           kind: 'spoke',
-          drg_att_key: n.key('DRGATT', [s.name, 'PROJ']),
-          vcn_key: n.key('VCN', [s.name, 'PROJECTS']),
-          drg_att_display: n.display('drgatt', [s.name, 'proj']),
-          route_key: n.route_rule([n.region, s.name, 'projects']),
+          drg_att_key: n.key('DRGATT', s.entry.key_segments + ['PROJ']),
+          vcn_key: n.key('VCN', s.entry.key_segments + ['PROJECTS']),
+          drg_att_display: n.display('drgatt', s.entry.name_segments + ['proj']),
+          route_key: n.route_rule([n.region] + s.entry.key_segments + ['projects']),
           route_desc: route_desc,
         },
       spoke_envs
@@ -143,15 +134,16 @@ local common = import 'hub/hub_common.libsonnet';
       function(i, pe)
         local label = $.vcn_label(pe);
         local route_desc = 'Route to VCN %s' % label.display;
+        local route_segments = pe.scope.key_segments + ['PLATFORM', pe.scope.platform_name];
         {
           name: label.raw_name,
           display: label.display,
           vcn: pe.platform_config.network.vcn,
           priority: (std.length(spoke_envs) + i + 1) * 10,
           kind: 'platform',
-          drg_att_key: n.key('DRGATT', [pe.scope.scope_name, 'PLATFORM', pe.scope.platform_name]),
-          vcn_key: n.key('VCN', [pe.scope.scope_name, 'PLATFORM', pe.scope.platform_name]),
-          drg_att_display: n.display('drgatt', [pe.scope.scope_name, pe.scope.platform_name]),
+          drg_att_key: n.key('DRGATT', route_segments),
+          vcn_key: n.key('VCN', route_segments),
+          drg_att_display: n.display('drgatt', pe.scope.name_segments + [pe.scope.platform_name]),
           route_key: n.route_rule([n.region, 'vcn', label.raw_name]),
           route_desc: route_desc,
         },
@@ -174,7 +166,7 @@ local common = import 'hub/hub_common.libsonnet';
       else true;
     if hub_vcn_cidr == null then null
     else
-      local target_vcn_key = n.key('VCN', [pe.scope.scope_name, 'PLATFORM', pe.scope.platform_name]);
+      local target_vcn_key = n.key('VCN', pe.scope.key_segments + ['PLATFORM', pe.scope.platform_name]);
       {
         hub: {
           route_key: n.route_rule([n.region, 'hub']),
@@ -204,15 +196,16 @@ local common = import 'hub/hub_common.libsonnet';
       if std.objectHas(inputs, 'hub_has_spoke_natgw') then inputs.hub_has_spoke_natgw
       else false;
     local scope = pe.scope;
-    local env_name = scope.scope_name;
     local plat = scope.platform_name;
-    local display_segments = [env_name, plat];
-    local dns = scope.dns;
+    local display_segments = scope.name_segments + [plat];
+    local route_segments = scope.key_segments + ['PLATFORM', plat];
     local vcn_cidr = pe.platform_config.network.vcn;
     local plat_subnets = pe.platform_config.network.subnets;
-    local rt_key = n.key('RT', [env_name, 'PLATFORM', plat, 'GENERIC']);
-    local sl_key = n.key('SL', [env_name, 'PLATFORM', plat, 'GENERIC']);
-    local vcn_key = n.key('VCN', [env_name, 'PLATFORM', plat]);
+    local rt_key = n.key('RT', route_segments + ['GENERIC']);
+    local sl_key = n.key('SL', route_segments + ['GENERIC']);
+    local vcn_key = n.key('VCN', route_segments);
+    local sgw_key = n.key('SGW', route_segments);
+    local ngw_key = n.key('NGW', route_segments);
     local peer_routes = {
       [e.route_key]: {
         description: '%s through DRG' % e.route_desc,
@@ -228,7 +221,7 @@ local common = import 'hub/hub_common.libsonnet';
         description: 'Route to Oracle Services Network through Service GW',
         destination: 'all-services',
         destination_type: 'SERVICE_CIDR_BLOCK',
-        network_entity_key: n.key('SGW', [env_name, 'PLATFORM', plat]),
+        network_entity_key: sgw_key,
       },
     } + if hub_has_spoke_natgw then
       {
@@ -242,7 +235,7 @@ local common = import 'hub/hub_common.libsonnet';
           description: 'Route to the Internet through NAT GW',
           destination: '0.0.0.0/0',
           destination_type: 'CIDR_BLOCK',
-          network_entity_key: n.key('NGW', [env_name, 'PLATFORM', plat]),
+          network_entity_key: ngw_key,
         },
       } + peer_routes
     else {
@@ -259,7 +252,7 @@ local common = import 'hub/hub_common.libsonnet';
         [vcn_key]: {
           display_name: n.display('vcn', display_segments),
           cidr_blocks: [vcn_cidr],
-          dns_label: n.dns_label(['vcn', n.region, 'lz', dns, plat]),
+          dns_label: n.dns_label(['vcn', n.region, 'lz'] + scope.dns_segments + [plat]),
           block_nat_traffic: false,
           is_attach_drg: false,
           is_create_igw: false,
@@ -288,7 +281,7 @@ local common = import 'hub/hub_common.libsonnet';
             },
           },
           subnets: {
-            [n.key('SN', [env_name, 'PLATFORM', plat, sn_name])]: {
+            [n.key('SN', route_segments + [sn_name])]: {
               display_name: n.display('sn', display_segments + [sn_name]),
               cidr_block: plat_subnets[sn_name],
               dhcp_options_key: 'default_dhcp_options',
@@ -301,13 +294,13 @@ local common = import 'hub/hub_common.libsonnet';
           },
           vcn_specific_gateways: {
             [if hub_has_spoke_natgw then 'nat_gateways']: {
-              [n.key('NGW', [env_name, 'PLATFORM', plat])]: {
+              [ngw_key]: {
                 display_name: n.display('ngw', display_segments),
                 block_traffic: false,
               },
             },
             service_gateways: {
-              [n.key('SGW', [env_name, 'PLATFORM', plat])]: {
+              [sgw_key]: {
                 display_name: n.display('sgw', display_segments),
                 services: 'all-services',
               },

@@ -35,10 +35,10 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
       cfg: cfg,
       components: components,
     });
-    local project_db_key(env_name, project_name) =
-      exadb_project_db.project_db_key(product, n, env_name, project_name);
-    local project_db_name(env_name, project_name) =
-      exadb_project_db.project_db_name(product, env_name, project_name);
+    local project_db_key(project_scope, project_name) =
+      exadb_project_db.project_db_key_for_scope(product, n, project_scope, project_name);
+    local project_db_name(project_scope, project_name) =
+      exadb_project_db.project_db_name_for_scope(product, project_scope, project_name);
     local iam = exadb_iam.render({
       product: product,
       naming: n,

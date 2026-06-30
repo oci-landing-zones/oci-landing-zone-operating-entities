@@ -1,6 +1,6 @@
 local extensions = import '../../../extensions.libsonnet';
 local lz = import '../../../landing_zone.libsonnet';
-local platforms = import '../../../platforms.libsonnet';
+local publication_network = import '../../../lib/publication_network.libsonnet';
 local render_context = import '../../../render_context.libsonnet';
 local exacs = import '../exacs.libsonnet';
 local descriptions = import '../descriptions.libsonnet';
@@ -55,27 +55,27 @@ local products = import '../../exadb/products.libsonnet';
       local scope = spec.entry.scope;
       local exacs_category =
         spec.result.contributions.network_pre.network_configuration.network_configuration_categories[
-          platforms.publication_category_key(scope)
+          publication_network.category_key(scope)
         ];
-      platforms.publication_network_category(
+      publication_network.network_category(
         exacs_category,
         n,
         if drop_drg_routes then drg_route_keys(exacs_category) else [],
         false
       );
     local network_categories = {
-      [platforms.publication_category_key(spec.entry.scope)]: multi_stack_category(spec)
+      [publication_network.category_key(spec.entry.scope)]: multi_stack_category(spec)
       for spec in networked_specs
     };
     local network_pre_categories = {
-      [platforms.publication_category_key(spec.entry.scope)]: multi_stack_category(spec, true)
+      [publication_network.category_key(spec.entry.scope)]: multi_stack_category(spec, true)
       for spec in networked_specs
     };
     local full_network = lz(config).network;
     local full_network_categories =
       full_network.network_configuration.network_configuration_categories;
     local extension_category_keys = [
-      platforms.publication_category_key(spec.entry.scope)
+      publication_network.category_key(spec.entry.scope)
       for spec in networked_specs
     ];
     local hub_post = full_network {
@@ -131,19 +131,20 @@ local products = import '../../exadb/products.libsonnet';
 
     local security_compartment_for(scope) =
       if scope.scope_type == 'shared' then security_compartment
-      else n.key_global('CMP', [scope.scope_name, 'SECURITY']);
+      else n.key_global('CMP', scope.key_segments + ['SECURITY']);
     local flow_logs = std.foldl(
       function(acc, spec)
         local scope = spec.entry.scope;
+        local segments = scope.key_segments + ['PLATFORM', scope.platform_name];
         local log_group_key =
-          n.key_global('LGRP', [scope.scope_name, 'PLATFORM', scope.platform_name, 'VCN', 'FLOW']);
+          n.key_global('LGRP', segments + ['VCN', 'FLOW']);
         acc + {
-          [n.key_global('LOG', [scope.scope_name, 'PLATFORM', scope.platform_name, 'SUBNET', 'FLOW'])]: {
+          [n.key_global('LOG', segments + ['SUBNET', 'FLOW'])]: {
             log_group_id: log_group_key,
             target_compartment_ids: [scope.network_compartment_key],
             target_resource_type: 'subnet',
           },
-          [n.key_global('LOG', [scope.scope_name, 'PLATFORM', scope.platform_name, 'VCN', 'FLOW'])]: {
+          [n.key_global('LOG', segments + ['VCN', 'FLOW'])]: {
             log_group_id: log_group_key,
             target_compartment_ids: [scope.network_compartment_key],
             target_resource_type: 'vcn',
@@ -155,9 +156,10 @@ local products = import '../../exadb/products.libsonnet';
     local log_groups = std.foldl(
       function(acc, spec)
         local scope = spec.entry.scope;
+        local segments = scope.key_segments + ['PLATFORM', scope.platform_name];
         acc + {
-          [n.key_global('LGRP', [scope.scope_name, 'PLATFORM', scope.platform_name, 'VCN', 'FLOW'])]: {
-            name: n.display_global('lgrp', [scope.scope_name, scope.platform_name, 'vcn', 'flow']),
+          [n.key_global('LGRP', segments + ['VCN', 'FLOW'])]: {
+            name: n.display_global('lgrp', scope.name_segments + [scope.platform_name, 'vcn', 'flow']),
             compartment_id: security_compartment_for(scope),
           },
         },
