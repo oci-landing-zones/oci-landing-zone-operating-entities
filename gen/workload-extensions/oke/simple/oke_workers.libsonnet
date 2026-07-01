@@ -29,6 +29,11 @@ function(ctx) {
           image: ctx.worker_image,
           node_shape: 'VM.Standard.E5.Flex',
 
+          encryption: {
+            enable_encrypt_in_transit: true,
+            kms_key_id: ctx.kube_secret_key,
+          },
+
           flex_shape_settings: {
             memory: 8,
             ocpus: 1,

@@ -7,9 +7,108 @@
     "injected_drgs": [
       "DRG-FRA-LZ-HUB-KEY"
     ],
+    "security_cis1_key_keys": [
+      "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY"
+    ],
+    "security_cis1_vault_keys": [
+      "VLT-LZ-SHARED-SECURITY-KEY"
+    ],
+    "security_cis2_key_keys": [
+      "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY"
+    ],
+    "security_cis2_vault_keys": [
+      "VLT-LZ-SHARED-SECURITY-KEY"
+    ],
     "vcn_keys": [
       "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY"
     ]
+  },
+  "oke_encryption": {
+    "cis1_key_has_service_grantees": false,
+    "cis1_key_present": true,
+    "cis1_vault_present": true,
+    "cis2_audit_key_preserved": true,
+    "cis2_audit_vault_preserved": true,
+    "cis2_oke_key_present": true,
+    "cis2_shared_vault_present": true,
+    "cluster_key_reference": "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY",
+    "worker_boot_volume_encryption": {
+      "enable_encrypt_in_transit": true,
+      "kms_key_id": "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY"
+    },
+    "worker_image": "9\\.[0-9]+"
+  },
+  "oke_service_policies": {
+    "compute_policy": {
+      "compartment_id": "CMP-LZ-PROD-OKE-KEY",
+      "key_present": true,
+      "statements": [
+        "allow any-user to manage instances in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }",
+        "allow any-user to read instance-images in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }"
+      ]
+    },
+    "forbidden_broad_grants_present": [],
+    "network_hub_policy": {
+      "compartment_id": "CMP-LZ-NETWORK-KEY",
+      "key_present": true,
+      "statements": [
+        "allow any-user to manage public-ips in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to use private-ips in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage floating-ips in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage network-security-groups in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage vcns in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage load-balancers in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage network-load-balancers in compartment cmp-lz-network where all { request.principal.type = 'cluster' }"
+      ]
+    },
+    "network_policy": {
+      "compartment_id": "CMP-LZ-PROD-NETWORK-KEY",
+      "key_present": true,
+      "statements": [
+        "allow any-user to use private-ips in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage network-security-groups in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage vcns in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage load-balancers in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage network-load-balancers in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }"
+      ]
+    },
+    "old_storage_keys_policy_present": false,
+    "old_vcn_cni_policy_present": false,
+    "security_policy": {
+      "blockstorage_key_statements": [
+        "allow service blockstorage to use keys in compartment cmp-lz-security"
+      ],
+      "compartment_id": "CMP-LZ-SECURITY-KEY",
+      "key_present": true,
+      "plural_key_delegate_statements": [],
+      "statements": [
+        "allow any-user to use keys in compartment cmp-lz-security where all { request.principal.type = 'cluster' }",
+        "allow any-user to use key-delegate in compartment cmp-lz-security where all { request.principal.type = 'nodepool' }",
+        "allow any-user to use key-delegate in compartment cmp-lz-security where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage certificate-authority-family in compartment cmp-lz-security where all { request.principal.type = 'cluster' }",
+        "allow service blockstorage to use keys in compartment cmp-lz-security"
+      ],
+      "target_key_id_statements": []
+    },
+    "storage_policy": {
+      "compartment_id": "CMP-LZ-PROD-OKE-KEY",
+      "key_present": true,
+      "statements": [
+        "allow any-user to manage volume-backups in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }",
+        "allow any-user to use volumes in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage file-family in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }"
+      ]
+    },
+    "tagging_policy": {
+      "compartment_id": "TENANCY-ROOT",
+      "key_present": true,
+      "lz_role_namespace_constrained": true,
+      "singular_tag_namespace_statements": [],
+      "statements": [
+        "allow any-user to use tag-namespaces in tenancy where all { request.principal.type = 'cluster', target.tag-namespace.name = 'tagns-lz-role' }"
+      ]
+    },
+    "virtual_network_family_grants_present": []
   },
   "ordinary_hub_e_default_keeps_project_vcns": {
     "preprod": true,

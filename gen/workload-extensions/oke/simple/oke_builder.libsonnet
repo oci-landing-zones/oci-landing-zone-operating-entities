@@ -16,6 +16,7 @@ local oke_workers = import './oke_workers.libsonnet';
 local oke_clusters = import './oke_clusters.libsonnet';
 local oke_network = import './oke_network.libsonnet';
 local oke_iam = import './oke_iam.libsonnet';
+local oke_security = import './oke_security.libsonnet';
 local oke_context = import './oke_context.libsonnet';
 
 {
@@ -124,6 +125,8 @@ local oke_context = import './oke_context.libsonnet';
         oke_clusters: oke_clusters(ctx),
         network_pre: oke_network(ctx),
         iam: oke_iam(ctx),
+        security_cis1: oke_security(ctx),
+        security_cis2: oke_security(ctx),
       },
     },
 }

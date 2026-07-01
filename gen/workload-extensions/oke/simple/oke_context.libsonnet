@@ -123,7 +123,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
         'config_params.worker_image must be a string';
       params.config_params.worker_image
     else
-      '8.10';
+      '9\\.[0-9]+';
   local sn_key(suffix) =
     n.key('SN', [env, 'PLATFORM', plat, suffix]);
   local rt_key(suffix) =
@@ -140,6 +140,10 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     n.key('NDP', display_segments);
   local node_pool_name =
     checked_oke_name('OKE node pool name', n.display('ndp', display_segments), 32);
+  local vault_key =
+    n.key_global('VLT', ['SHARED', 'SECURITY']);
+  local kube_secret_key =
+    n.key('KEY', display_segments + ['KUBE', 'SECRETS']);
   {
     params: params,
     metadata: metadata,
@@ -170,6 +174,10 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     cluster_name: cluster_name,
     node_pool_key: node_pool_key,
     node_pool_name: node_pool_name,
+    vault_key: vault_key,
+    vault_name: n.display_global('vlt', ['shared', 'security']),
+    kube_secret_key: kube_secret_key,
+    kube_secret_key_name: n.display('key', display_segments + ['kube', 'secrets']),
     subnets: params.network.subnets,
     vcn_key: n.key('VCN', [env, 'PLATFORM', plat]),
     sgw_key: n.key('SGW', [env, 'PLATFORM', plat]),

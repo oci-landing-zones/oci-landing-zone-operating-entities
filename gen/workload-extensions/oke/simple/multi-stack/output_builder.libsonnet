@@ -68,6 +68,8 @@ function(profile, env_name='prod', platform_name='oke') {
   oke_observability_cis1_pre: rendered_lz.observability_cis1_pre,
   oke_observability_cis2: rendered_lz.observability_cis2,
   oke_observability_cis2_pre: rendered_lz.observability_cis2_pre,
+  oke_security_cis1: rendered_extension.contributions.security_cis1,
+  oke_security_cis2: rendered_extension.contributions.security_cis2,
   oke_clusters: rendered_lz.extra.oke_clusters,
   oke_workers: rendered_lz.extra.oke_workers,
 }

@@ -277,12 +277,14 @@ The generated file set commonly includes:
 | `governance.json` | Tag namespaces and governance configuration. |
 | `oke_clusters.json` | OKE cluster configuration. |
 | `oke_workers.json` | OKE node pool configuration. |
-| `security_cis*.json` | Security baseline configuration. |
+| `security_cis*.json` | Security baseline plus the shared security Vault and one encryption key per OKE cluster. |
 | `observability_cis*.json` | Observability baseline configuration. |
 
 Some hub models, including Hub A, also generate `network_pre.json`. This file is used for staged network deployment before the final `network.json`.
 
 For native OKE, check that the worker node pool includes `pods_subnet_id` and `pods_nsg_ids`.
+
+For every OKE network mode, check that each cluster's `encryption.kube_secret_kms_key_id` references its own key in the selected final `security_cis*.json`. The worker node pool uses the same key for boot-volume encryption and enables boot-volume encryption in transit. All OKE keys use the generic `VLT-LZ-SHARED-SECURITY-KEY` Vault in the Landing Zone security compartment. The default worker image selector is `9\\.[0-9]+`, which allows the downstream OKE module to select a matching Oracle Linux 9 OKE image without matching Oracle Linux 8 images.
 
 For overlay OKE, check that:
 
