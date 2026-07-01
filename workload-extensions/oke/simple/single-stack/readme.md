@@ -57,6 +57,7 @@ The published quickstart creates one production OKE platform. Use config-driven 
 - **Automated Routing**: Hub route tables pre-configured  with OKE CIDR (10.0.80.0/20)
 - **DRG Integration**: Dynamic Routing Gateway with route distributions configured for Hub-Spoke communication
 - **CIS-Compliant OKE**: Uses the CIS-compliant OKE module from [terraform-oci-modules-workloads](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
+- **Customer-Managed Encryption**: Uses the shared security Vault and creates an HSM key for the cluster, then uses that key for Kubernetes secrets and worker boot volumes
 - **OKE Network Modes**: Published JSON is VCN-native by default; config-driven generation can also emit an overlay network shape for Flannel-compatible clusters
 
 &nbsp;
@@ -120,8 +121,9 @@ For config-driven overlay generation, the OKE VCN uses only the Control Plane, I
 - **Kubernetes Version**: v1.35.2
 - **Cluster Type**: Enhanced cluster
 - **Control Plane**: Private endpoint in dedicated subnet
-- **Worker Pool**: 1x VM.Standard.E5.Flex (1 OCPU, 8GB RAM, Oracle Linux 8.10) - easily scalable
+- **Worker Pool**: 1x VM.Standard.E5.Flex (1 OCPU, 8GB RAM, latest matching Oracle Linux 9 OKE image) - easily scalable
 - **CNI**: VCN-native pod networking in the published JSON; config-driven overlay generation requests Flannel
+- **Kubernetes Secrets and Worker Boot Volume Encryption**: Customer-managed key `KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY` in the shared security Vault, with worker boot-volume encryption in transit enabled
 
 &nbsp;
 
@@ -142,7 +144,7 @@ For config-driven subnetting, prefer auto-subnet profiles. If `cluster_size` is 
 
 ## **4. Configuration Files**
 
-The deployment uses five JSON configuration files:
+The deployment uses six JSON configuration files. Select the security file matching the CIS profile you are deploying.
 
 | File | Purpose  |
 | --- | --- |
@@ -151,10 +153,11 @@ The deployment uses five JSON configuration files:
 | `oke_governance.json` | Tag namespaces and governance definitions |
 | `oke_clusters.json` | OKE cluster configuration |
 | `oke_workers.json` | OKE Node pool configuration |
+| `oke_security_cis1.json` or `oke_security_cis2.json` | Shared security Vault and cluster encryption key |
 
 ### Additional Published Security & Observability Outputs <!-- omit from toc -->
 
-The published package also includes companion JSONs that capture CIS-aligned security and observability settings for reference or downstream consumption. The one-click ORM link above wires only the core deployment inputs; it does **not** consume these companion files. If you want to apply them, fetch and handle them separately in your own workflow.
+The published package also includes companion JSONs that capture CIS-aligned security and observability settings. The selected final security file is required because it creates the Vault and key referenced by `oke_clusters.json`. The pre security and observability files remain available for workflows that deploy the complete Landing Zone baseline in stages.
 
 | File | Purpose |
 | --- | --- |
@@ -190,7 +193,7 @@ The published package also includes companion JSONs that capture CIS-aligned sec
    Create the stack from the pinned orchestrator release and set the working directory to `rms-facade`.
 
 2. **Stage Configuration Files in a Private Source**
-   - Upload `oke_governance.json`, `oke_identity.json`, `oke_network.json`, `oke_clusters.json`, and `oke_workers.json` to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
+   - Upload `oke_governance.json`, `oke_identity.json`, `oke_network.json`, `oke_clusters.json`, `oke_workers.json`, and the final security file matching your CIS profile to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
    - The previous public repo-hosted one-click example is not the recommended customer deployment path.
 
 3. **Review Configuration** (Optional Customization)
@@ -383,7 +386,7 @@ Edit the JSON file to modify CIDR blocks:
     "node_pools": {
       "NDP-FRA-LZ-PROD-OKE-KEY": {
         "node_config_details": {
-          "image": "8.10",
+          "image": "9\\.[0-9]+",
           "node_shape": "VM.Standard.E5.Flex",
           "flex_shape_settings": {
             "ocpus": 2,        // Changed from 1 to 2

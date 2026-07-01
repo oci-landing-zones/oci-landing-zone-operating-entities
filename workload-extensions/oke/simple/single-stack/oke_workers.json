@@ -2,37 +2,42 @@
     "oke_workers_configuration": {
         "node_pools": {
             "NDP-FRA-LZ-PROD-OKE-KEY": {
-                "name"                   : "ndp-fra-lz-prod-oke",
-                "compartment_id"         : "CMP-LZ-PROD-OKE-KEY",
-                "cluster_id"             : "CLR-FRA-LZ-PROD-OKE-KEY",
-                "enable_cycling"         : false,
-                "size"                   : 1,
+                "name"                             : "ndp-fra-lz-prod-oke",
+                "compartment_id"                   : "CMP-LZ-PROD-OKE-KEY",
+                "cluster_id"                       : "CLR-FRA-LZ-PROD-OKE-KEY",
+                "enable_cycling"                   : false,
+                "size"                             : 1,
 
                 "cloud_init": [
                     {
-                        "content"        : "runcmd:\n  - sudo /usr/libexec/oci-growfs -y\n",
-                        "content_type"   : "text/cloud-config"
+                        "content"                  : "runcmd:\n  - sudo /usr/libexec/oci-growfs -y\n",
+                        "content_type"             : "text/cloud-config"
                     }
                 ],
 
                 "freeform_tags": {
-                    "cluster"            : "clr-fra-lz-prod-oke"
+                    "cluster"                      : "clr-fra-lz-prod-oke"
                 },
 
                 "networking": {
-                    "pods_nsg_ids"       : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"],
-                    "pods_subnet_id"     : "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
-                    "workers_nsg_ids"    : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"],
-                    "workers_subnet_id"  : "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
+                    "pods_nsg_ids"                 : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"],
+                    "pods_subnet_id"               : "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+                    "workers_nsg_ids"              : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"],
+                    "workers_subnet_id"            : "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
                 },
 
                 "node_config_details": {
-                    "image"              : "8.10",
-                    "node_shape"         : "VM.Standard.E5.Flex",
+                    "image"                        : "9\\.[0-9]+",
+                    "node_shape"                   : "VM.Standard.E5.Flex",
+
+                    "encryption": {
+                        "enable_encrypt_in_transit": true,
+                        "kms_key_id"               : "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY"
+                    },
 
                     "flex_shape_settings": {
-                        "memory"         : 8,
-                        "ocpus"          : 1
+                        "memory"                   : 8,
+                        "ocpus"                    : 1
                     }
                 }
             }

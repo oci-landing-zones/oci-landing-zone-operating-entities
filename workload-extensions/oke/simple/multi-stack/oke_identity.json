@@ -1,12 +1,12 @@
 {
     "compartments_configuration": {
-        "enable_delete"                               : "true",
+        "enable_delete"                                   : "true",
 
         "compartments": {
             "CMP-LZ-PROD-OKE-KEY": {
-                "name"                                : "cmp-lz-prod-oke",
-                "description"                         : "Production Platform Oke Compartment",
-                "parent_id"                           : "CMP-LZ-PROD-PLATFORM-KEY"
+                "name"                                    : "cmp-lz-prod-oke",
+                "description"                             : "Production Platform Oke Compartment",
+                "parent_id"                               : "CMP-LZ-PROD-PLATFORM-KEY"
             }
         }
     },
@@ -14,28 +14,68 @@
     "groups_configuration": {
         "groups": {
             "GRP-LZ-PROD-PLATFORM-OKE-ADMINS-KEY": {
-                "name"                                : "grp-lz-prod-oke-admins",
-                "description"                         : "Landing Zone Production environment OKE platform cluster management administration access group."
+                "name"                                    : "grp-lz-prod-oke-admins",
+                "description"                             : "Landing Zone Production environment OKE platform cluster management administration access group."
             },
 
             "GRP-LZ-PROD-PLATFORM-OKE-RBAC-ADMIN-KEY": {
-                "name"                                : "grp-lz-prod-oke-rbac-admin",
-                "description"                         : "Landing Zone Production environment OKE platform Kubernetes RBAC administration access group."
+                "name"                                    : "grp-lz-prod-oke-rbac-admin",
+                "description"                             : "Landing Zone Production environment OKE platform Kubernetes RBAC administration access group."
             },
 
             "GRP-LZ-PROD-PLATFORM-OKE-RBAC-VIEWER-KEY": {
-                "name"                                : "grp-lz-prod-oke-rbac-viewer",
-                "description"                         : "Landing Zone Production environment OKE platform Kubernetes RBAC viewer access group."
+                "name"                                    : "grp-lz-prod-oke-rbac-viewer",
+                "description"                             : "Landing Zone Production environment OKE platform Kubernetes RBAC viewer access group."
             }
         }
     },
 
     "policies_configuration": {
         "supplied_policies": {
+            "PCY-LZ-OKE-SERVICE-NETWORK-HUB-KEY": {
+                "name"                                    : "pcy-lz-oke-service-network-hub",
+                "description"                             : "Grants OKE clusters network and load balancer permissions for OKE-managed public load balancers in the Landing Zone shared hub network compartment.",
+                "compartment_id"                          : "CMP-LZ-NETWORK-KEY",
+
+                "statements": [
+                    "allow any-user to manage public-ips in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+                    "allow any-user to use private-ips in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage floating-ips in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage network-security-groups in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage vcns in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage load-balancers in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage network-load-balancers in compartment cmp-lz-network where all { request.principal.type = 'cluster' }"
+                ]
+            },
+
+            "PCY-LZ-OKE-SERVICE-SECURITY-KEY": {
+                "name"                                    : "pcy-lz-oke-service-security",
+                "description"                             : "Grants OKE clusters, node pools, and the Block Storage service key and certificate authority permissions for OKE-managed resources and persistent volumes in the Landing Zone shared security compartment.",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+
+                "statements": [
+                    "allow any-user to use keys in compartment cmp-lz-security where all { request.principal.type = 'cluster' }",
+                    "allow any-user to use key-delegate in compartment cmp-lz-security where all { request.principal.type = 'nodepool' }",
+                    "allow any-user to use key-delegate in compartment cmp-lz-security where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage certificate-authority-family in compartment cmp-lz-security where all { request.principal.type = 'cluster' }",
+                    "allow service blockstorage to use keys in compartment cmp-lz-security"
+                ]
+            },
+
+            "PCY-LZ-OKE-SERVICE-TAGGING-KEY": {
+                "name"                                    : "pcy-lz-oke-service-tagging",
+                "description"                             : "Grants OKE clusters tag namespace permissions for OKE-managed resources in the Landing Zone role tag namespace.",
+                "compartment_id"                          : "TENANCY-ROOT",
+
+                "statements": [
+                    "allow any-user to use tag-namespaces in tenancy where all { request.principal.type = 'cluster', target.tag-namespace.name = 'tagns-lz-role' }"
+                ]
+            },
+
             "PCY-LZ-PROD-PLATFORM-OKE-ADMINS-KEY": {
-                "name"                                : "pcy-lz-prod-oke-admins",
-                "description"                         : "Grants grp-lz-prod-oke-admins OKE platform administration access in the Production environment OKE platform and network compartments.",
-                "compartment_id"                      : "TENANCY-ROOT",
+                "name"                                    : "pcy-lz-prod-oke-admins",
+                "description"                             : "Grants grp-lz-prod-oke-admins OKE platform administration access in the Production environment OKE platform and network compartments.",
+                "compartment_id"                          : "TENANCY-ROOT",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-oke-admins' to read all-resources in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
@@ -52,9 +92,9 @@
             },
 
             "PCY-LZ-PROD-PLATFORM-OKE-RBAC-ROLE-KEY": {
-                "name"                                : "pcy-lz-prod-oke-rbac-roles",
-                "description"                         : "Grants OKE RBAC administrator and viewer groups Kubernetes cluster access in the Production environment OKE platform compartment.",
-                "compartment_id"                      : "TENANCY-ROOT",
+                "name"                                    : "pcy-lz-prod-oke-rbac-roles",
+                "description"                             : "Grants OKE RBAC administrator and viewer groups Kubernetes cluster access in the Production environment OKE platform compartment.",
+                "compartment_id"                          : "TENANCY-ROOT",
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-oke-rbac-admin' to use cluster in compartment cmp-landingzone:cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-oke",
@@ -62,16 +102,40 @@
                 ]
             },
 
-            "PCY-LZ-PROD-PLATFORM-OKE-VCN-CNI-KEY": {
-                "name"                                : "pcy-lz-prod-oke-vcn-cni",
-                "description"                         : "Unsafe: grants OKE clusters tenancy-wide VCN CNI permissions for instance, private IP, and network security group resources.",
-                "compartment_id"                      : "TENANCY-ROOT",
-                "//"                                  : "This is potentially unsafe as it can be used for privilege escalation across environments. See https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-OCI_CNI_plugin.htm for restricting permissions.",
+            "PCY-LZ-PROD-PLATFORM-OKE-SERVICE-COMPUTE-KEY": {
+                "name"                                    : "pcy-lz-prod-oke-service-compute",
+                "description"                             : "Grants OKE clusters compute permissions for OKE-managed resources in the Production environment OKE platform compartment.",
+                "compartment_id"                          : "CMP-LZ-PROD-OKE-KEY",
 
                 "statements": [
-                    "allow any-user to manage instances in tenancy where all { request.principal.type = 'cluster'}",
-                    "allow any-user to use private-ips in tenancy where all { request.principal.type = 'cluster'}",
-                    "allow any-user to use network-security-groups in tenancy where all { request.principal.type = 'cluster'}"
+                    "allow any-user to manage instances in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }",
+                    "allow any-user to read instance-images in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }"
+                ]
+            },
+
+            "PCY-LZ-PROD-PLATFORM-OKE-SERVICE-NETWORK-KEY": {
+                "name"                                    : "pcy-lz-prod-oke-service-network",
+                "description"                             : "Unsafe: grants OKE clusters network and load balancer permissions for OKE-managed resources.",
+                "compartment_id"                          : "CMP-LZ-PROD-NETWORK-KEY",
+
+                "statements": [
+                    "allow any-user to use private-ips in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage network-security-groups in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage vcns in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage load-balancers in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage network-load-balancers in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }"
+                ]
+            },
+
+            "PCY-LZ-PROD-PLATFORM-OKE-SERVICE-STORAGE-KEY": {
+                "name"                                    : "pcy-lz-prod-oke-service-storage",
+                "description"                             : "Grants OKE clusters persistent volume, backup, and file storage permissions in the Production environment OKE platform compartment.",
+                "compartment_id"                          : "CMP-LZ-PROD-OKE-KEY",
+
+                "statements": [
+                    "allow any-user to manage volume-backups in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }",
+                    "allow any-user to use volumes in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }",
+                    "allow any-user to manage file-family in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }"
                 ]
             }
         }

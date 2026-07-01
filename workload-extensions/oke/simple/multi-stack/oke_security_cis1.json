@@ -1,0 +1,19 @@
+{
+    "vaults_configuration": {
+        "default_compartment_id"                  : "CMP-LZ-SECURITY-KEY",
+
+        "keys": {
+            "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY": {
+                "name"                            : "key-fra-lz-prod-oke-kube-secrets",
+                "protection_mode"                 : "HSM",
+                "vault_key"                       : "VLT-LZ-SHARED-SECURITY-KEY"
+            }
+        },
+
+        "vaults": {
+            "VLT-LZ-SHARED-SECURITY-KEY": {
+                "name"                            : "vlt-lz-shared-security"
+            }
+        }
+    }
+}

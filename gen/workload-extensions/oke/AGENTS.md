@@ -32,7 +32,8 @@ For published OKE deployment investigations, inspect the exact orchestrator tag 
 - Do not use `flannel` as a workload-extension `config_params.cni_type`; `cni_type` is the workload-extension network shape and only accepts `native` or `overlay`.
 - For native, the generator creates and wires a dedicated pod subnet in the OKE VCN through `pods_subnet_id`.
 - For overlay, the generator does not emit pod subnet, pod route table, pod security list, pod NSG, worker `pods_subnet_id`, or worker `pods_nsg_ids`.
-- `oke_simple` defaults `worker_image` to `'8.10'`, which the generator emits as `node_config_details.image`.
+- `oke_simple` defaults `worker_image` to the OL9 family selector `'9\\.[0-9]+'`, which the generator emits as `node_config_details.image`. The downstream OKE module inserts this value into its Oracle Linux image-name regular expression, so newer OL9 minor releases can be selected without matching OL8 images.
+- Every generated sample node pool enables boot-volume encryption in transit and uses its cluster-specific generated key as `node_config_details.encryption.kms_key_id`.
 - `services_cidr` remains the explicit Kubernetes service CIDR in the repo's standard native examples and is emitted under `options.kubernetes_network_config` in the cluster payload consumed by `cis-oke`.
 - `pods_cidr` is not required for the standard native `oke_simple` path, but if a config explicitly sets it the generator preserves it under `options.kubernetes_network_config` as a passthrough to the downstream `cis-oke` module.
 - For overlay, `pods_cidr` defaults to `10.244.0.0/16` and is emitted under `options.kubernetes_network_config`.
@@ -43,6 +44,15 @@ For published OKE deployment investigations, inspect the exact orchestrator tag 
 - `cluster_size` cannot be used together with `platform.network.subnets`. With `cluster_size`, the extension owns the fixed subnet layout for the OKE platform VCN.
 - For new customer-facing config examples, prefer the auto-subnet profiles as the normal subnetting path. Use manual `platform.network.subnets` only when the profile layouts do not fit the required address plan.
 - Manual native subnet maps must include exactly `control-plane`, `int-lb`, `workers`, and `pods`. Manual overlay subnet maps must include exactly `control-plane`, `int-lb`, and `workers`.
+- Every `oke_simple` cluster uses a customer-managed key for Kubernetes secrets encryption.
+- The extension contributes the generic shared security Vault, `VLT-LZ-SHARED-SECURITY-KEY`, in `CMP-LZ-SECURITY-KEY` and creates one HSM key per cluster. In combined CIS2 composition, this entry merges with the baseline shared security Vault. A separately deployed multi-stack extension creates the generically named Vault in its own state because the current downstream dependency contract cannot import that Vault definition.
+- Cluster `encryption.kube_secret_kms_key_id` references the cluster-specific generated key by configuration key; the Orchestrator resolves that key through `kms_dependency`.
+- Cluster and node pool KMS IAM permissions are limited to `cmp-landingzone:cmp-lz-security`. Exact `target.key.id` restrictions are not emitted because the current downstream Vault module cannot substitute generated key OCIDs into `any-user` principal statements.
+- OKE cluster principals can manage `certificate-authority-family` only in the shared Landing Zone security compartment; the generator does not define a separate certificate compartment.
+- OKE-created volumes, dynamic volume backups, and dynamically provisioned file systems default to the OKE platform compartment, which also contains the cluster and managed node pool. The OKE service storage policy scopes `volume-backups`, `volumes`, and `file-family` permissions to that compartment.
+- The shared OKE security policy allows the Block Storage service to use keys throughout `cmp-lz-security`. The statement is intentionally not constrained to the generated cluster key because OKE persistent volumes can use different customer-managed keys.
+- The shared OKE hub-network policy is attached to `CMP-LZ-NETWORK-KEY` and scopes public IP, private IP, floating IP, NSG, VCN, Load Balancer, and Network Load Balancer permissions to `cmp-lz-network`, where the hub VCN and its public load-balancer subnet live. Every statement is restricted to OKE cluster principals.
+- OKE category policies are attached to the compartment that owns their resources and use that compartment's short name in their statements. Shared security and tagging grants are emitted once rather than once per cluster. Tenancy-wide public/floating IP and tagging statements remain in clearly named root policies.
 
 ## Auto-Subnet Profiles
 

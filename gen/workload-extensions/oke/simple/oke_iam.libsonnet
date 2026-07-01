@@ -7,6 +7,13 @@ function(ctx) {
   local root = self,
   local cmp_path = ctx.scope.compartment_path,
   local net_path = ctx.scope.network_compartment_path,
+  // Policies attached to their target compartment must use its short name, not a root-relative path.
+  local cmp_name = ctx.scope.compartment_name,
+  local net_name =
+    if ctx.scope.scope_type == 'shared' then n.display_global('cmp', ['network'])
+    else n.display_global('cmp', [ctx.env, 'network']),
+  local security_cmp_name = n.display_global('cmp', ['security']),
+  local hub_network_cmp_name = n.display_global('cmp', ['network']),
 
   groups_configuration+: {
     groups+: {
@@ -65,19 +72,103 @@ function(ctx) {
         ],
       },
 
-      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'VCN-CNI'])]: {
-        name: n.display_global('pcy', ctx.display_segments + ['vcn-cni']),
+      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'SERVICE', 'NETWORK'])]: {
+        name: n.display_global('pcy', ctx.display_segments + ['service', 'network']),
         description: desc.policy.unsafe_grants(
           'OKE clusters',
-          'tenancy-wide VCN CNI permissions for instance, private IP, and network security group resources'
+          'network and load balancer permissions for OKE-managed resources'
         ),
-        compartment_id: 'TENANCY-ROOT',
-        '//': 'This is potentially unsafe as it can be used for privilege escalation across environments. See https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-OCI_CNI_plugin.htm for restricting permissions.',
+        compartment_id: ctx.scope.network_compartment_key,
 
         statements: [
-          "allow any-user to manage instances in tenancy where all { request.principal.type = 'cluster'}",
-          "allow any-user to use private-ips in tenancy where all { request.principal.type = 'cluster'}",
-          "allow any-user to use network-security-groups in tenancy where all { request.principal.type = 'cluster'}",
+          "allow any-user to use private-ips in compartment %s where all { request.principal.type = 'cluster' }" % net_name,
+          "allow any-user to manage network-security-groups in compartment %s where all { request.principal.type = 'cluster' }" % net_name,
+          "allow any-user to manage vcns in compartment %s where all { request.principal.type = 'cluster' }" % net_name,
+          "allow any-user to manage load-balancers in compartment %s where all { request.principal.type = 'cluster' }" % net_name,
+          "allow any-user to manage network-load-balancers in compartment %s where all { request.principal.type = 'cluster' }" % net_name,
+        ],
+      },
+
+      [n.key_global('PCY', ['OKE', 'SERVICE', 'NETWORK', 'HUB'])]: {
+        name: n.display_global('pcy', ['oke', 'service', 'network', 'hub']),
+        description: desc.policy.grants(
+          'OKE clusters',
+          'network and load balancer permissions for OKE-managed public load balancers',
+          'the Landing Zone shared hub network compartment'
+        ),
+        compartment_id: n.key_global('CMP', ['NETWORK']),
+
+        statements: [
+          "allow any-user to manage public-ips in compartment %s where all { request.principal.type = 'cluster' }" % hub_network_cmp_name,
+          "allow any-user to use private-ips in compartment %s where all { request.principal.type = 'cluster' }" % hub_network_cmp_name,
+          "allow any-user to manage floating-ips in compartment %s where all { request.principal.type = 'cluster' }" % hub_network_cmp_name,
+          "allow any-user to manage network-security-groups in compartment %s where all { request.principal.type = 'cluster' }" % hub_network_cmp_name,
+          "allow any-user to manage vcns in compartment %s where all { request.principal.type = 'cluster' }" % hub_network_cmp_name,
+          "allow any-user to manage load-balancers in compartment %s where all { request.principal.type = 'cluster' }" % hub_network_cmp_name,
+          "allow any-user to manage network-load-balancers in compartment %s where all { request.principal.type = 'cluster' }" % hub_network_cmp_name,
+        ],
+      },
+
+      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'SERVICE', 'COMPUTE'])]: {
+        name: n.display_global('pcy', ctx.display_segments + ['service', 'compute']),
+        description: desc.policy.grants(
+          'OKE clusters',
+          'compute permissions for OKE-managed resources',
+          'the %s environment OKE platform compartment' % ctx.env_long_title
+        ),
+        compartment_id: ctx.cmp_key,
+
+        statements: [
+          "allow any-user to manage instances in compartment %s where all { request.principal.type = 'cluster' }" % cmp_name,
+          "allow any-user to read instance-images in compartment %s where all { request.principal.type = 'cluster' }" % cmp_name,
+        ],
+      },
+
+      [n.key_global('PCY', ['OKE', 'SERVICE', 'SECURITY'])]: {
+        name: n.display_global('pcy', ['oke', 'service', 'security']),
+        description: desc.policy.grants(
+          'OKE clusters, node pools, and the Block Storage service',
+          'key and certificate authority permissions for OKE-managed resources and persistent volumes',
+          'the Landing Zone shared security compartment'
+        ),
+        compartment_id: n.key_global('CMP', ['SECURITY']),
+
+        statements: [
+          "allow any-user to use keys in compartment %s where all { request.principal.type = 'cluster' }" % security_cmp_name,
+          "allow any-user to use key-delegate in compartment %s where all { request.principal.type = 'nodepool' }" % security_cmp_name,
+          "allow any-user to use key-delegate in compartment %s where all { request.principal.type = 'cluster' }" % security_cmp_name,
+          "allow any-user to manage certificate-authority-family in compartment %s where all { request.principal.type = 'cluster' }" % security_cmp_name,
+          'allow service blockstorage to use keys in compartment %s' % security_cmp_name,
+        ],
+      },
+
+      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'SERVICE', 'STORAGE'])]: {
+        name: n.display_global('pcy', ctx.display_segments + ['service', 'storage']),
+        description: desc.policy.grants(
+          'OKE clusters',
+          'persistent volume, backup, and file storage permissions',
+          'the %s environment OKE platform compartment' % ctx.env_long_title
+        ),
+        compartment_id: ctx.cmp_key,
+
+        statements: [
+          "allow any-user to manage volume-backups in compartment %s where all { request.principal.type = 'cluster' }" % cmp_name,
+          "allow any-user to use volumes in compartment %s where all { request.principal.type = 'cluster' }" % cmp_name,
+          "allow any-user to manage file-family in compartment %s where all { request.principal.type = 'cluster' }" % cmp_name,
+        ],
+      },
+
+      [n.key_global('PCY', ['OKE', 'SERVICE', 'TAGGING'])]: {
+        name: n.display_global('pcy', ['oke', 'service', 'tagging']),
+        description: desc.policy.grants(
+          'OKE clusters',
+          'tag namespace permissions for OKE-managed resources',
+          'the Landing Zone role tag namespace'
+        ),
+        compartment_id: 'TENANCY-ROOT',
+
+        statements: [
+          "allow any-user to use tag-namespaces in tenancy where all { request.principal.type = 'cluster', target.tag-namespace.name = 'tagns-lz-role' }",
         ],
       },
     },

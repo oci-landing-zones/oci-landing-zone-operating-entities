@@ -1,0 +1,94 @@
+{
+  "cis1": {
+    "default_compartment_id": "CMP-LZ-SECURITY-KEY",
+    "key_keys": [
+      "KEY-FRA-LZ-PREPROD-OKE-KUBE-SECRETS-KEY",
+      "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY"
+    ],
+    "key_vault_references": {
+      "KEY-FRA-LZ-PREPROD-OKE-KUBE-SECRETS-KEY": "VLT-LZ-SHARED-SECURITY-KEY",
+      "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY": "VLT-LZ-SHARED-SECURITY-KEY"
+    },
+    "vault_keys": [
+      "VLT-LZ-SHARED-SECURITY-KEY"
+    ]
+  },
+  "cis2": {
+    "audit_key_preserved": true,
+    "preprod_key_present": true,
+    "prod_key_present": true,
+    "shared_security_vault_present": true
+  },
+  "cluster_key_references": {
+    "CLR-FRA-LZ-PREPROD-OKE-KEY": "KEY-FRA-LZ-PREPROD-OKE-KUBE-SECRETS-KEY",
+    "CLR-FRA-LZ-PROD-OKE-KEY": "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY"
+  },
+  "hub_network_policies": {
+    "compartments": {
+      "PCY-LZ-OKE-SERVICE-NETWORK-HUB-KEY": "CMP-LZ-NETWORK-KEY"
+    },
+    "keys": [
+      "PCY-LZ-OKE-SERVICE-NETWORK-HUB-KEY"
+    ],
+    "statements": {
+      "PCY-LZ-OKE-SERVICE-NETWORK-HUB-KEY": [
+        "allow any-user to manage public-ips in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to use private-ips in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage floating-ips in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage network-security-groups in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage vcns in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage load-balancers in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage network-load-balancers in compartment cmp-lz-network where all { request.principal.type = 'cluster' }"
+      ]
+    }
+  },
+  "security_policies": {
+    "blockstorage_key_statements": [
+      "allow service blockstorage to use keys in compartment cmp-lz-security"
+    ],
+    "certificate_authority_statements": [
+      "allow any-user to manage certificate-authority-family in compartment cmp-lz-security where all { request.principal.type = 'cluster' }"
+    ],
+    "compartments": {
+      "PCY-LZ-OKE-SERVICE-SECURITY-KEY": "CMP-LZ-SECURITY-KEY"
+    },
+    "keys": [
+      "PCY-LZ-OKE-SERVICE-SECURITY-KEY"
+    ],
+    "statements_outside_security_compartment": [],
+    "target_key_id_statements": []
+  },
+  "storage_policies": {
+    "compartments": {
+      "PCY-LZ-PREPROD-PLATFORM-OKE-SERVICE-STORAGE-KEY": "CMP-LZ-PREPROD-OKE-KEY",
+      "PCY-LZ-PROD-PLATFORM-OKE-SERVICE-STORAGE-KEY": "CMP-LZ-PROD-OKE-KEY"
+    },
+    "keys": [
+      "PCY-LZ-PREPROD-PLATFORM-OKE-SERVICE-STORAGE-KEY",
+      "PCY-LZ-PROD-PLATFORM-OKE-SERVICE-STORAGE-KEY"
+    ],
+    "old_shared_keys_policy_present": false,
+    "statements": {
+      "PCY-LZ-PREPROD-PLATFORM-OKE-SERVICE-STORAGE-KEY": [
+        "allow any-user to manage volume-backups in compartment cmp-lz-preprod-oke where all { request.principal.type = 'cluster' }",
+        "allow any-user to use volumes in compartment cmp-lz-preprod-oke where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage file-family in compartment cmp-lz-preprod-oke where all { request.principal.type = 'cluster' }"
+      ],
+      "PCY-LZ-PROD-PLATFORM-OKE-SERVICE-STORAGE-KEY": [
+        "allow any-user to manage volume-backups in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }",
+        "allow any-user to use volumes in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }",
+        "allow any-user to manage file-family in compartment cmp-lz-prod-oke where all { request.principal.type = 'cluster' }"
+      ]
+    }
+  },
+  "worker_encryption": {
+    "NDP-FRA-LZ-PREPROD-OKE-KEY": {
+      "enable_encrypt_in_transit": true,
+      "kms_key_id": "KEY-FRA-LZ-PREPROD-OKE-KUBE-SECRETS-KEY"
+    },
+    "NDP-FRA-LZ-PROD-OKE-KEY": {
+      "enable_encrypt_in_transit": true,
+      "kms_key_id": "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY"
+    }
+  }
+}
