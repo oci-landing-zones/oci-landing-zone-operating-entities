@@ -37,7 +37,7 @@ The simple multi-stack path is a Hub E quickstart that creates one production OK
 - **Encryption**: The included OKE cluster and worker files use CIS1 with OCI-managed encryption. Worker boot-volume encryption in transit is enabled only for CIS2 generation.
 - **IAM profile**: `oke_identity.json` is rendered from CIS2 and includes compartment-scoped KMS authority. It is dormant for this quickstart because the CIS1 cluster and worker files contain no KMS key reference; keep unrelated keys out of the OKE platform compartment.
 - **OKE Network Mode**: The committed JSON uses VCN-native networking
-- **Public workload ingress**: OKE has narrowly scoped permissions to create public OCI Load Balancers and Network Load Balancers in the prepared Hub subnet; the quickstart does not provision a Terraform-managed Hub L7 Load Balancer
+- **Public workload ingress**: OKE has narrowly scoped permissions to create public OCI Load Balancers in the prepared Hub subnet; the quickstart does not provision a Terraform-managed Hub L7 Load Balancer
 - **Multi-Step Deployment**: Deploy the Hub E landing zone first, then deploy the OKE stack separately
 
 Before granting Kubernetes Service permissions, review the shared [operational and security notes](../readme.md#operational-and-security-notes).
@@ -52,7 +52,7 @@ The deployment uses five JSON configuration files.
 | --- | --- |
 | `oke_identity.json` | IAM resources rendered from CIS2: compartments, groups, and policies for OKE |
 | `oke_governance.json` | OKE platform tag namespace and tag definition; include it in the initial apply before introducing tagged network, IAM, or cluster resources |
-| `oke_network.json` | Network infrastructure: OKE VCN, subnets, NSGs, route tables, service gateway, DRG attachment, and a platform-tagged frontend NSG injected into the existing Hub VCN through `network_dependency` |
+| `oke_network.json` | Network infrastructure: OKE VCN, subnets, NSGs, route tables, service gateway, DRG attachment, and a Hub-network-owned, platform-tagged frontend NSG injected into the existing Hub VCN through `network_dependency` |
 | `oke_clusters.json` | OKE cluster configuration: cluster settings, Kubernetes version, CNI type, networking |
 | `oke_workers.json` | Node pool configuration: worker nodes, shape, size, networking, cloud-init |
 

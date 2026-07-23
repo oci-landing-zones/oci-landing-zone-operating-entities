@@ -4,6 +4,10 @@
 // contains: "platform_kms_statement_count": 3
 // contains: "public_hub_network_rules": []
 // contains: "public_frontend_nsgs": []
+// contains: "platform_nsg_policy_present": false
+// contains: "environment_network_nsg_management_statement_count": 1
+// contains: "hub_nsg_management_statements": []
+// contains: "cluster_nsg_membership_statements": []
 local lz = import 'gen/landing_zone.libsonnet';
 local result = lz({
   region: 'eu-frankfurt-1',
@@ -33,11 +37,12 @@ local result = lz({
 });
 local policies = result.iam.policies_configuration.supplied_policies;
 local security_policy = policies['PCY-LZ-PROD-PLATFORM-OKE-SERVICE-SECURITY-KEY'];
+local platform_nsg_policy_key = 'PCY-LZ-PROD-PLATFORM-OKE-SERVICE-NETWORK-KEY';
 local kms_statements = [
   statement
   for statement in security_policy.statements
   if std.length(std.findSubstr(' keys ', statement)) > 0 ||
-     std.length(std.findSubstr(' key-delegate ', statement)) > 0
+     std.length(std.findSubstr(' key-delegate', statement)) > 0
 ];
 local prod_vcn = result.network.network_configuration.network_configuration_categories['prod-platform-oke']
   .vcns['VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY'];
@@ -64,5 +69,25 @@ local hub_nsgs = result.network.network_configuration.network_configuration_cate
     key
     for key in std.objectFields(hub_nsgs)
     if std.length(std.findSubstr('PLATFORM-OKE-PUBLIC-LB', key)) > 0
+  ],
+  platform_nsg_policy_present: std.objectHas(policies, platform_nsg_policy_key),
+  environment_network_nsg_management_statement_count: std.length([
+    statement
+    for key in std.objectFields(policies)
+    for statement in policies[key].statements
+    if std.startsWith(statement, 'allow any-user to manage network-security-groups')
+  ]),
+  hub_nsg_management_statements: [
+    statement
+    for key in std.objectFields(policies)
+    for statement in policies[key].statements
+    if policies[key].compartment_id == 'CMP-LZ-NETWORK-KEY' &&
+       std.startsWith(statement, 'allow any-user to manage network-security-groups')
+  ],
+  cluster_nsg_membership_statements: [
+    statement
+    for key in std.objectFields(policies)
+    for statement in policies[key].statements
+    if std.startsWith(statement, 'allow any-user to use network-security-groups')
   ],
 }

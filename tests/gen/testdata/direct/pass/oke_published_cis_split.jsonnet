@@ -37,7 +37,7 @@ local kms_statement_count(identity) =
     statement
     for statement in identity.policies_configuration.supplied_policies[security_policy_key].statements
     if std.length(std.findSubstr(' keys ', statement)) > 0 ||
-       std.length(std.findSubstr(' key-delegate ', statement)) > 0
+       std.length(std.findSubstr(' key-delegate', statement)) > 0
   ]);
 local cluster_kms_references(clusters) = [
   key

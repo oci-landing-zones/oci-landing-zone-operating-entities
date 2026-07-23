@@ -9,7 +9,7 @@ The simple multi-stack OKE package is based on **Hub E**. It is a quickstart for
 - The Hub DRG spokes route table key is `DRGRT-FRA-LZ-SPOKES-KEY`.
 - The OKE platform VCN is `10.0.80.0/20`.
 - The OKE platform VCN uses its own NAT gateway and service gateway.
-- The quickstart enables OKE-created public OCI Load Balancers and Network Load Balancers in the Hub LB subnet and injects a platform-tagged frontend NSG into the existing Hub VCN through `network_dependency`. It does not create a Terraform-managed hub-level OCI L7 Load Balancer. Apply the shared [operational and security notes](../readme.md#operational-and-security-notes).
+- The quickstart enables OKE-created public OCI Load Balancers in the Hub LB subnet and injects a platform-tagged frontend NSG into the existing Hub VCN and Hub network compartment through `network_dependency`. At creation, set `oci.oraclecloud.com/compartment-id` to the Hub network compartment and `service.beta.kubernetes.io/oci-load-balancer-subnet1` to the Hub LB subnet, but do not include an NSG annotation. Wait until the endpoint is active, then add the approved matching-tag NSG annotation with security-rule management mode `None`. OKE receives only this post-create membership permission; the network team retains exclusive NSG rule, tag, movement, and lifecycle control. Initial creation with an NSG and CCM NSG management mode are unsupported. The quickstart does not create a Terraform-managed hub-level OCI L7 Load Balancer.
 
 ## Multi-Stack Network Output
 

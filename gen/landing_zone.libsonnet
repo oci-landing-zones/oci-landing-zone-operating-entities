@@ -161,10 +161,12 @@ function(raw_config)
     // Governance output: tag namespaces and definitions
     governance: governance_builder(config, n) + extension_governance,
 
-    // Security outputs: 4 CIS variants (merged with extension contributions)
-    security_cis1_pre: security.cis1_pre,
+    // Security outputs: extension-owned prerequisites must be available in the
+    // pre phase as well as the final phase. Consumers deploy the pre artifact
+    // before extension resources such as OKE clusters and node pools.
+    security_cis1_pre: security.cis1_pre + extension_security_cis1,
     security_cis1: security.cis1 + extension_security_cis1,
-    security_cis2_pre: security.cis2_pre,
+    security_cis2_pre: security.cis2_pre + extension_security_cis2,
     security_cis2: security.cis2 + extension_security_cis2,
 
     // Observability outputs: 4 CIS variants. Extension observability is

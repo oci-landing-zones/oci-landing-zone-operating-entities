@@ -18,6 +18,9 @@
     "allow group 'id_lz_common'/'grp-cost-admin' to manage usage-budgets in tenancy"
   ],
   "observability_bucket_cis_level": "1",
+  "os_management_service_statements": [
+    "allow service osmh to read instances in tenancy"
+  ],
   "output_files": [
     "governance.json",
     "iam.json",

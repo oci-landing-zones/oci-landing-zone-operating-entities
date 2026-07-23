@@ -105,6 +105,7 @@ function(ctx) {
           ],
         ],
       },
+
     } + (if ctx.public_load_balancer || ctx.cis_level == 2 then {
       [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'SERVICE', 'SECURITY'])]: {
         name: n.display_global('pcy', ctx.display_segments + ['service', 'security']),

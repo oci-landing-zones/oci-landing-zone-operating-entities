@@ -57,7 +57,7 @@ The quickstart creates one production OKE platform.
 - **Encryption**: The included OKE cluster and worker files use CIS1 with OCI-managed encryption. Worker boot-volume encryption in transit is enabled only for CIS2 generation.
 - **IAM profile**: `oke_identity.json` is rendered from CIS2 and includes compartment-scoped KMS authority. It is dormant for this quickstart because the CIS1 cluster and worker files contain no KMS key reference; keep unrelated keys out of the OKE platform compartment.
 - **OKE Network Mode**: The committed JSON uses VCN-native networking
-- **Public workload ingress**: OKE has narrowly scoped permissions to create public OCI Load Balancers and Network Load Balancers in the prepared Hub subnet
+- **Public workload ingress**: OKE has narrowly scoped permissions to create public OCI Load Balancers in the prepared Hub subnet.
 
 &nbsp;
 
@@ -97,7 +97,7 @@ The deployment includes the complete OneOE blueprint with:
 - NSG for Pods (pod-to-pod, pod-to-services)
 - NSG for Internal Load Balancers (NodePort range)
 
-The OKE quickstart does not create a hub-level OCI L7 Load Balancer. The Hub LB subnet is used for OKE-created public OCI Load Balancers and Network Load Balancers when Kubernetes workloads define `Service` resources of type `LoadBalancer`.
+The OKE quickstart does not create a hub-level OCI L7 Load Balancer. The Hub LB subnet is used for OKE-created public OCI Load Balancers when Kubernetes workloads define `Service` resources of type `LoadBalancer`.
 
 Before granting Kubernetes Service permissions, review the shared [operational and security notes](../readme.md#operational-and-security-notes).
 

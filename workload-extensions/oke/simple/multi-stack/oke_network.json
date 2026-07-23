@@ -1094,7 +1094,7 @@
 
                                 "egress_rules": {
                                     "oke_platform_tcp": {
-                                        "description"                       : "Allow frontend LB and NLB traffic only to the owning OKE platform VCN",
+                                        "description"                       : "Allow frontend LB traffic only to the owning OKE platform VCN",
                                         "dst"                               : "10.0.80.0/20",
                                         "dst_type"                          : "CIDR_BLOCK",
                                         "protocol"                          : "TCP",

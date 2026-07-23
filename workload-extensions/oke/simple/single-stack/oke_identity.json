@@ -287,13 +287,12 @@
 
             "PCY-LZ-OKE-SERVICE-PUBLIC-LB-HUB-KEY": {
                 "name"                                             : "pcy-lz-oke-service-public-lb-hub",
-                "description"                                      : "Grants OKE cluster resource principals opted-in public Load Balancer, Network Load Balancer, and frontend NSG permissions plus cluster-wide Hub IP permissions in the Landing Zone shared Hub network boundary.",
+                "description"                                      : "Grants OKE cluster resource principals opted-in public Load Balancer lifecycle, matching-tag post-create NSG attachment, Hub subnet discovery, and Hub IP permissions in the Landing Zone shared Hub network boundary.",
                 "compartment_id"                                   : "CMP-LZ-NETWORK-KEY",
 
                 "statements": [
                     "allow any-user to manage load-balancers in compartment cmp-lz-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke', any { request.permission = 'LOAD_BALANCER_INSPECT', request.permission = 'LOAD_BALANCER_READ', request.permission = 'LOAD_BALANCER_CREATE', all { request.principal.compartment.tag.tagns-lz-oke.platform = target.resource.tag.tagns-lz-oke.platform, request.permission != 'LOAD_BALANCER_MOVE' } } }",
-                    "allow any-user to manage network-load-balancers in compartment cmp-lz-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke', any { request.permission = 'NETWORK_LOAD_BALANCER_INSPECT', request.permission = 'NETWORK_LOAD_BALANCER_READ', request.permission = 'NETWORK_LOAD_BALANCER_CREATE', all { request.principal.compartment.tag.tagns-lz-oke.platform = target.resource.tag.tagns-lz-oke.platform, request.permission != 'NETWORK_LOAD_BALANCER_MOVE' } } }",
-                    "allow any-user to use network-security-groups in compartment cmp-lz-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke' }",
+                    "allow any-user to use network-security-groups in compartment cmp-lz-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke', request.principal.compartment.tag.tagns-lz-oke.platform = target.resource.tag.tagns-lz-oke.platform }",
                     "allow any-user to use subnets in compartment cmp-lz-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke' }",
                     "allow any-user to read vcns in compartment cmp-lz-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke' }",
                     "allow any-user to manage public-ips in compartment cmp-lz-network where all { request.principal.type = 'cluster' }",
@@ -319,9 +318,9 @@
 
                 "statements": [
                     "allow any-user to use private-ips in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
-                    "allow any-user to manage network-security-groups in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke', request.permission != 'NETWORK_SECURITY_GROUP_MOVE' }",
-                    "allow any-user to manage vcns in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke', any { request.operation = 'CreateNetworkSecurityGroup', request.operation = 'DeleteNetworkSecurityGroup' } }",
-                    "allow any-user to read vcns in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke' }",
+                    "allow any-user to manage network-security-groups in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster', request.permission != 'NETWORK_SECURITY_GROUP_MOVE' }",
+                    "allow any-user to manage vcns in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster', any { request.operation = 'CreateNetworkSecurityGroup', request.operation = 'DeleteNetworkSecurityGroup' } }",
+                    "allow any-user to read vcns in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
                     "allow any-user to manage load-balancers in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke', any { request.permission = 'LOAD_BALANCER_INSPECT', request.permission = 'LOAD_BALANCER_READ', request.permission = 'LOAD_BALANCER_CREATE', all { request.principal.compartment.tag.tagns-lz-oke.platform = target.resource.tag.tagns-lz-oke.platform, request.permission != 'LOAD_BALANCER_MOVE' } } }",
                     "allow any-user to manage network-load-balancers in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke', any { request.permission = 'NETWORK_LOAD_BALANCER_INSPECT', request.permission = 'NETWORK_LOAD_BALANCER_READ', request.permission = 'NETWORK_LOAD_BALANCER_CREATE', all { request.principal.compartment.tag.tagns-lz-oke.platform = target.resource.tag.tagns-lz-oke.platform, request.permission != 'NETWORK_LOAD_BALANCER_MOVE' } } }"
                 ]
@@ -475,7 +474,7 @@
                     "allow service vulnerability-scanning-service to read repos in tenancy",
                     "allow service vulnerability-scanning-service to read vnics in tenancy",
                     "allow service vulnerability-scanning-service to read vnic-attachments in tenancy",
-                    "allow service osms to read instances in tenancy",
+                    "allow service osmh to read instances in tenancy",
                     "allow service blockstorage, oke, streaming, Fssoc1Prod, objectstorage-eu-frankfurt-1 to use keys in tenancy"
                 ]
             }

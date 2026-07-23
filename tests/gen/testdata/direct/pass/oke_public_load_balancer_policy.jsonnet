@@ -1,27 +1,29 @@
-// Public-LB access is opt-in; LB/NLB lifecycle uses target matching while Hub NSG membership is source-scoped.
+// Public-LB access is opt-in; Hub NSGs are membership-only while the OKE environment network retains NSG lifecycle authority.
 // contains: "public_policy_present": true
-// contains: "public_policy_statement_count": 8
-// contains: "lb_nlb_nsg_statements_have_one_enabled_platform_allowlist": true
-// contains: "disabled_platform_absent_from_lb_nlb_nsg_allowlist": true
+// contains: "public_policy_statement_count": 7
+// contains: "lb_statement_has_one_enabled_platform_allowlist": true
+// contains: "disabled_platform_absent_from_lb_allowlist": true
+// contains: "disabled_platform_absent_from_hub_nsg_allowlist": true
 // contains: "target_isolation_statement_count": 2
 // contains: "frontend_nsg_present": true
 // contains: "disabled_platform_frontend_nsg_present": false
+// contains: "frontend_nsg_owned_by_hub_network_compartment": true
 // contains: "enabled_compartment_tags": {
 // contains: "removed_compartment_tags": []
-// contains: "nsg_membership_only_statement_present": true
-// contains: "hub_nsg_target_tag_condition_absent": true
+// contains: "platform_nsg_policy_present": false
+// contains: "restricted_hub_nsg_membership_statement_present": true
+// contains: "hub_nsg_statement_count": 1
 // contains: "hub_vcn_subnet_prerequisites_present": true
-// contains: "spoke_nsg_lifecycle_statement_present": true
-// contains: "spoke_nsg_create_allowed": true
-// contains: "spoke_nsg_move_excluded": true
-// contains: "spoke_nsg_target_tag_condition_absent": true
-// contains: "spoke_nsg_vcn_prerequisites_present": true
+// contains: "environment_network_nsg_lifecycle_contract_present": true
+// contains: "hub_nsg_management_statements": []
+// contains: "unexpected_cluster_nsg_membership_statements": []
 // contains: "load_balancer_move_excluded": true
-// contains: "network_load_balancer_move_excluded": true
 // contains: "load_balancer_work_request_read_allowed": true
-// contains: "network_load_balancer_work_request_read_allowed": true
+// contains: "private_network_load_balancer_work_request_read_allowed": true
+// contains: "public_network_load_balancer_statements": []
 // contains: "forbidden_nsg_lifecycle_or_rule_permissions": []
 // contains: "forbidden_network_permissions": []
+// contains: "cluster_generic_vcn_administration_statements": []
 // contains: "hub_ip_statements_allow_all_clusters_without_tags": true
 // contains: "unconditional_public_any_user_statements": []
 // contains: "private_network_allowlists_are_scope_specific": true
@@ -79,6 +81,7 @@ local public_statements = public_policy.statements;
 local prod_network_statements = policies['PCY-LZ-PROD-OKE-SERVICE-NETWORK-KEY'].statements;
 local preprod_network_statements = policies['PCY-LZ-PREPROD-OKE-SERVICE-NETWORK-KEY'].statements;
 local security_statements = policies['PCY-LZ-PROD-PLATFORM-OKE-SERVICE-SECURITY-KEY'].statements;
+local platform_network_policy_key = 'PCY-LZ-PROD-PLATFORM-OKE-SERVICE-NETWORK-KEY';
 local cluster_certificate_statements = [
   statement
   for statement in security_statements
@@ -92,10 +95,13 @@ local preprod_compartment = root.children['CMP-LZ-PREPROD-KEY'].children['CMP-LZ
   .children['CMP-LZ-PREPROD-OKE-KEY'];
 local hub_nsgs = result.network.network_configuration.network_configuration_categories['0-shared']
   .vcns['VCN-FRA-LZ-HUB-KEY'].network_security_groups;
+local frontend_nsg = hub_nsgs['NSG-FRA-LZ-HUB-PROD-PLATFORM-OKE-PUBLIC-LB-KEY'];
 local required_platform_match =
   'request.principal.compartment.tag.tagns-lz-oke.platform = target.resource.tag.tagns-lz-oke.platform';
 local required_enabled_platform =
   "request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke'";
+local expected_hub_nsg_membership_statement =
+  "allow any-user to use network-security-groups in compartment cmp-lz-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke', request.principal.compartment.tag.tagns-lz-oke.platform = target.resource.tag.tagns-lz-oke.platform }";
 local hub_ip_statements = [
   s
   for s in public_statements
@@ -103,17 +109,22 @@ local hub_ip_statements = [
      std.startsWith(s, 'allow any-user to use private-ips') ||
      std.startsWith(s, 'allow any-user to manage floating-ips')
 ];
-local hub_lb_nlb_nsg_statements = [
+local hub_lb_statements = [
   s
   for s in public_statements
-  if std.startsWith(s, 'allow any-user to manage load-balancers') ||
-     std.startsWith(s, 'allow any-user to manage network-load-balancers') ||
-     std.startsWith(s, 'allow any-user to use network-security-groups')
+  if std.startsWith(s, 'allow any-user to manage load-balancers')
 ];
-local prod_spoke_nsg_statements = [
+local hub_nsg_statements = [
+  s
+  for s in public_statements
+  if std.length(std.findSubstr('network-security-groups', s)) > 0
+];
+local environment_network_nsg_lifecycle_statements = [
   s
   for s in prod_network_statements
-  if std.startsWith(s, 'allow any-user to manage network-security-groups')
+  if std.length(std.findSubstr('network-security-groups', s)) > 0 ||
+     std.startsWith(s, 'allow any-user to manage vcns') ||
+     std.startsWith(s, 'allow any-user to read vcns')
 ];
 local all_policy_statements = [
   statement
@@ -136,35 +147,34 @@ local platform_service_any_user_statements = [
 {
   public_policy_present: std.objectHas(policies, public_policy_key),
   public_policy_statement_count: std.length(public_statements),
-  lb_nlb_nsg_statements_have_one_enabled_platform_allowlist:
+  lb_statement_has_one_enabled_platform_allowlist:
     std.length([
       s
-      for s in hub_lb_nlb_nsg_statements
+      for s in hub_lb_statements
       if std.length(std.findSubstr(required_enabled_platform, s)) == 1
-    ]) == 3,
-  disabled_platform_absent_from_lb_nlb_nsg_allowlist:
-    std.length([s for s in hub_lb_nlb_nsg_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 0,
+    ]) == 1,
+  disabled_platform_absent_from_lb_allowlist:
+    std.length([s for s in hub_lb_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 0,
+  disabled_platform_absent_from_hub_nsg_allowlist:
+    std.length([s for s in hub_nsg_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 0,
   target_isolation_statement_count:
     std.length([s for s in public_statements if std.length(std.findSubstr(required_platform_match, s)) > 0]),
   frontend_nsg_present:
     std.objectHas(hub_nsgs, 'NSG-FRA-LZ-HUB-PROD-PLATFORM-OKE-PUBLIC-LB-KEY'),
   disabled_platform_frontend_nsg_present:
     std.objectHas(hub_nsgs, 'NSG-FRA-LZ-HUB-PREPROD-PLATFORM-OKE-PUBLIC-LB-KEY'),
+  frontend_nsg_owned_by_hub_network_compartment:
+    frontend_nsg.compartment_id == 'CMP-LZ-NETWORK-KEY',
   enabled_compartment_tags: prod_compartment.defined_tags,
   removed_compartment_tags: [
     tag
     for tag in ['tagns-lz-oke.managed-by', 'tagns-lz-oke.network-scope', 'tagns-lz-oke.public-load-balancer']
     if std.objectHas(prod_compartment.defined_tags, tag) || std.objectHas(preprod_compartment.defined_tags, tag)
   ],
-  nsg_membership_only_statement_present:
-    std.length([s for s in public_statements if std.startsWith(s, 'allow any-user to use network-security-groups')]) == 1,
-  hub_nsg_target_tag_condition_absent:
-    std.length([
-      s
-      for s in public_statements
-      if std.startsWith(s, 'allow any-user to use network-security-groups') &&
-         std.length(std.findSubstr('target.resource.tag.', s)) == 0
-    ]) == 1,
+  platform_nsg_policy_present: std.objectHas(policies, platform_network_policy_key),
+  restricted_hub_nsg_membership_statement_present:
+    hub_nsg_statements == [expected_hub_nsg_membership_statement],
+  hub_nsg_statement_count: std.length(hub_nsg_statements),
   hub_vcn_subnet_prerequisites_present:
     std.length([
       s
@@ -174,43 +184,50 @@ local platform_service_any_user_statements = [
          std.length(std.findSubstr(required_enabled_platform, s)) > 0 &&
          std.length(std.findSubstr('target.resource.tag.', s)) == 0
     ]) == 2,
-  spoke_nsg_lifecycle_statement_present:
-    std.length(prod_spoke_nsg_statements) == 1 &&
-    std.length(std.findSubstr(required_enabled_platform, prod_spoke_nsg_statements[0])) > 0,
-  spoke_nsg_create_allowed:
-    std.length(prod_spoke_nsg_statements) == 1 &&
-    std.startsWith(prod_spoke_nsg_statements[0], 'allow any-user to manage network-security-groups'),
-  spoke_nsg_move_excluded:
-    std.length(prod_spoke_nsg_statements) == 1 &&
-    std.length(std.findSubstr("request.permission != 'NETWORK_SECURITY_GROUP_MOVE'", prod_spoke_nsg_statements[0])) > 0,
-  spoke_nsg_target_tag_condition_absent:
-    std.length(prod_spoke_nsg_statements) == 1 &&
-    std.length(std.findSubstr('target.resource.tag.', prod_spoke_nsg_statements[0])) == 0,
-  spoke_nsg_vcn_prerequisites_present:
+  environment_network_nsg_lifecycle_contract_present:
+    std.length(environment_network_nsg_lifecycle_statements) == 3 &&
     std.length([
-      s
-      for s in prod_network_statements
-      if std.startsWith(s, 'allow any-user to manage vcns') &&
-         std.length(std.findSubstr("request.operation = 'CreateNetworkSecurityGroup'", s)) > 0 &&
-         std.length(std.findSubstr("request.operation = 'DeleteNetworkSecurityGroup'", s)) > 0 &&
-         std.length(std.findSubstr(required_enabled_platform, s)) > 0
+      statement
+      for statement in environment_network_nsg_lifecycle_statements
+      if std.startsWith(statement, 'allow any-user to manage network-security-groups') &&
+         std.length(std.findSubstr('tagns-lz-oke.platform', statement)) == 0 &&
+         std.length(std.findSubstr("request.permission != 'NETWORK_SECURITY_GROUP_MOVE'", statement)) == 1
     ]) == 1 &&
     std.length([
-      s
-      for s in prod_network_statements
-      if std.startsWith(s, 'allow any-user to read vcns') &&
-         std.length(std.findSubstr(required_enabled_platform, s)) > 0
+      statement
+      for statement in environment_network_nsg_lifecycle_statements
+      if std.startsWith(statement, 'allow any-user to manage vcns') &&
+         std.length(std.findSubstr('tagns-lz-oke.platform', statement)) == 0 &&
+         std.length(std.findSubstr("request.operation = 'CreateNetworkSecurityGroup'", statement)) == 1 &&
+         std.length(std.findSubstr("request.operation = 'DeleteNetworkSecurityGroup'", statement)) == 1
     ]) == 1,
+  hub_nsg_management_statements: [
+    statement
+    for statement in public_statements
+    if std.startsWith(statement, 'allow any-user to manage network-security-groups') ||
+       std.startsWith(statement, 'allow any-user to manage vcns')
+  ],
+  unexpected_cluster_nsg_membership_statements: [
+    statement
+    for key in std.objectFields(policies)
+    for statement in policies[key].statements
+    if std.startsWith(statement, 'allow any-user to use network-security-groups') &&
+       (key != public_policy_key || statement != expected_hub_nsg_membership_statement)
+  ],
   load_balancer_move_excluded:
     std.length([s for s in public_statements if std.length(std.findSubstr("request.permission != 'LOAD_BALANCER_MOVE'", s)) > 0]) == 1,
-  network_load_balancer_move_excluded:
-    std.length([s for s in public_statements if std.length(std.findSubstr("request.permission != 'NETWORK_LOAD_BALANCER_MOVE'", s)) > 0]) == 1,
   load_balancer_work_request_read_allowed:
     std.length([s for s in public_statements if std.length(std.findSubstr("request.permission = 'LOAD_BALANCER_READ'", s)) > 0]) == 1 &&
     std.length([s for s in prod_network_statements if std.length(std.findSubstr("request.permission = 'LOAD_BALANCER_READ'", s)) > 0]) == 1,
-  network_load_balancer_work_request_read_allowed:
-    std.length([s for s in public_statements if std.length(std.findSubstr("request.permission = 'NETWORK_LOAD_BALANCER_READ'", s)) > 0]) == 1 &&
+  private_network_load_balancer_work_request_read_allowed:
+    std.length([s for s in public_statements if std.length(std.findSubstr("request.permission = 'NETWORK_LOAD_BALANCER_READ'", s)) > 0]) == 0 &&
     std.length([s for s in prod_network_statements if std.length(std.findSubstr("request.permission = 'NETWORK_LOAD_BALANCER_READ'", s)) > 0]) == 1,
+  public_network_load_balancer_statements: [
+    s
+    for s in public_statements
+    if std.length(std.findSubstr('network-load-balancers', s)) > 0 ||
+       std.length(std.findSubstr('NETWORK_LOAD_BALANCER_', s)) > 0
+  ],
   forbidden_nsg_lifecycle_or_rule_permissions: [
     permission
     for permission in [
@@ -224,8 +241,19 @@ local platform_service_any_user_statements = [
   ],
   forbidden_network_permissions: [
     forbidden
-    for forbidden in ['manage virtual-network-family', 'manage vcns', "request.permission = 'NETWORK_LOAD_BALANCER_MOVE'"]
+    for forbidden in [
+      'manage virtual-network-family',
+      'manage vcns',
+      'manage network-load-balancers',
+      "request.permission = 'NETWORK_LOAD_BALANCER_MOVE'",
+    ]
     if std.length([s for s in public_statements if std.length(std.findSubstr(forbidden, s)) > 0]) > 0
+  ],
+  cluster_generic_vcn_administration_statements: [
+    statement
+    for statement in all_policy_statements
+    if std.startsWith(statement, 'allow any-user ') &&
+       std.length(std.findSubstr('virtual-network-family', statement)) > 0
   ],
   hub_ip_statements_allow_all_clusters_without_tags:
     std.length(hub_ip_statements) == 3 &&
@@ -242,9 +270,9 @@ local platform_service_any_user_statements = [
     if std.startsWith(s, 'allow any-user ') && std.length(std.findSubstr(' where ', s)) == 0
   ],
   private_network_allowlists_are_scope_specific:
-    std.length([s for s in prod_network_statements if std.length(std.findSubstr("'prod-oke'", s)) > 0]) == 5 &&
+    std.length([s for s in prod_network_statements if std.length(std.findSubstr("'prod-oke'", s)) > 0]) == 2 &&
     std.length([s for s in prod_network_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 0 &&
-    std.length([s for s in preprod_network_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 5 &&
+    std.length([s for s in preprod_network_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 2 &&
     std.length([s for s in preprod_network_statements if std.length(std.findSubstr("'prod-oke'", s)) > 0]) == 0,
   private_ip_statements_allow_all_clusters_without_tags:
     std.length([

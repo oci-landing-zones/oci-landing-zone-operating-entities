@@ -10,9 +10,10 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
   public_lb_frontend_nsg(ctx):: {
     [ctx.hub_frontend_nsg_key]: {
       display_name: ctx.n.display('nsg', ['hub'] + ctx.display_segments + ['public-lb']),
-      // Required for multi-stack injection: the surrounding category belongs
-      // to the OKE network compartment, while this NSG belongs with the
-      // existing Hub VCN and the Hub-scoped IAM policy.
+      // The public frontend NSG is a Hub network resource created and governed
+      // by network-team-controlled IaC. OKE can attach it only after endpoint
+      // creation when its platform tag matches the cluster platform tag; OKE
+      // cannot manage its rules, tags, placement, or lifecycle.
       compartment_id: ctx.n.key_global('CMP', ['NETWORK']),
       defined_tags: {
         [public_lb.platform_tag]: ctx.platform_tag_value,
@@ -39,7 +40,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
       },
       egress_rules: {
         oke_platform_tcp: {
-          description: 'Allow frontend LB and NLB traffic only to the owning OKE platform VCN',
+          description: 'Allow frontend LB traffic only to the owning OKE platform VCN',
           dst: ctx.params.network.vcn,
           dst_type: 'CIDR_BLOCK',
           protocol: 'TCP',

@@ -10,7 +10,7 @@ local oke_platform = {
       services_cidr: services_cidr,
       api_endpoint_allowed_cidrs: api_endpoint_allowed_cidrs,
       // Published OKE packages allow Kubernetes Services to create public OCI
-      // Load Balancers and Network Load Balancers in the prepared Hub subnet.
+      // Load Balancers in the prepared Hub subnet.
       // Customer guidance requires controlled Service changes and OCI
       // integration validation before production use.
       public_load_balancer: true,

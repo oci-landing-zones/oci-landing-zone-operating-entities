@@ -47,7 +47,7 @@ local key_statements = [
   for key in security_policy_keys
   for statement in policies[key].statements
   if std.length(std.findSubstr(' keys ', statement)) > 0 ||
-     std.length(std.findSubstr(' key-delegate ', statement)) > 0
+     std.length(std.findSubstr(' key-delegate', statement)) > 0
 ];
 local prod_category = result.network.network_configuration.network_configuration_categories['prod-platform-oke'];
 local prod_vcn = prod_category.vcns[std.objectFields(prod_category.vcns)[0]];

@@ -334,7 +334,7 @@ Contract phases:
 - `render(params)`: returns contributions keyed by domain:
   - `network_pre`: merged into `network_configuration_categories` for networked extensions
   - `iam`: merged into IAM output
-  - `security_cis1`, `security_cis2`: merged into security outputs
+  - `security_cis1`, `security_cis2`: merged into both pre and final security outputs so extension prerequisites exist before extension resources are deployed
   - `observability_cis1`, `observability_cis2`: merged into observability outputs
   - Any other generic key (e.g. `oke_clusters`, `oke_workers`): collected into `result.extra`
 

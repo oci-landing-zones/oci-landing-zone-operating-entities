@@ -47,26 +47,99 @@ Both deployment options provide:
 - **OKE CNI Network Mode**: VCN-native pod networking
 - **Comprehensive NSG Configuration**: Control plane, workers, load balancers, and, for native networking, pods
 - **Hub-and-Spoke Topology**: OKE VCN as spoke connected to Hub via DRG
-- **Public workload ingress**: Kubernetes `Service` resources can create public OCI Load Balancers and Network Load Balancers in the prepared Hub subnet
+- **Public workload ingress**: Kubernetes `Service` resources can create public OCI Load Balancers in the prepared Hub subnet.
 - **Service Gateway**: Direct connectivity to OCI services
 
 ### Deployment Components
 
-Both approaches deploy these resources:
-- **IAM Configuration**: Compartments, groups, and policies for OKE
-- **Network Infrastructure**: VCN, subnets, NSGs, route tables, service gateway, and DRG attachment
-- **OKE Cluster**: Kubernetes cluster with VCN-native networking (v1.35.2)
-- **Worker Nodes**: Compute instances for running workloads (VM.Standard.E5.Flex, Oracle Linux 9 OKE image)
+Both approaches deploy the same main components:
 
-### Operational and security notes
-
-| Area | Important facts and required action |
+| Component | What is deployed |
 | --- | --- |
-| Kubernetes resources | This repository creates OCI infrastructure only. Install and operate namespaces, service accounts, cert-manager, ingress controllers, Services, ConfigMaps, RBAC, and admission policies through an approved Kubernetes delivery process. |
-| Public ingress | The quickstarts enable public ingress. Anyone who can create or update a `LoadBalancer` Service can request a public endpoint. Use the included platform frontend NSG, set `oci.oraclecloud.com/security-rule-management-mode: "None"`, and reject the LB and NLB `initial-defined-tags-override` and `initial-freeform-tags-override` annotations. Validate LB and NLB creation, update, deletion, and platform tagging before production use. |
-| TLS and certificates | OCI Network Load Balancer cannot terminate TLS with an OCI certificate; use TCP pass-through to an in-cluster TLS endpoint. OCI Load Balancer can terminate TLS with `tls-certificate-map` and an approved certificate in the owning OKE platform compartment. OKE can read and associate that certificate but cannot renew it. Use OCI-managed renewal, or a security-owned external pipeline for imported certificates. For Let's Encrypt, cert-manager renews automatically only when TLS terminates in Kubernetes. |
-| IAM boundary | The quickstarts assume one cluster in the OKE platform compartment. The platform allowlist controls Hub access, and platform-tag equality isolates existing LB and NLB resources. OKE receives read-only Hub VCN access, subnet attachment, and membership-only access to existing Hub NSGs; it cannot create Hub NSGs or modify their rules. OCI does not expose a referenced NSG's tags during LB creation, so an opted-in cluster can attach any existing NSG in the Hub network compartment. Public-, private-, and floating-IP permissions apply to every OKE cluster principal and must be monitored as a shared boundary. |
-| Capacity reservations | OKE administrators, the OKE service, and managed node pools can use an existing Compute capacity reservation in the owning OKE platform compartment. The extension does not create, select, update, or delete capacity reservations. |
+| IAM | OKE administrator and resource-principal policies, compartments, and groups. |
+| Network | An OKE VCN with cluster, worker, pod, and private load-balancer subnets and NSGs; Hub routing and public-ingress prerequisites are included. |
+| OKE | A Kubernetes cluster with VCN-native pod networking. |
+| Workers | A managed node pool using `VM.Standard.E5.Flex` and an Oracle Linux 9 OKE image. |
+| Workload load balancing | Private OCI Load Balancers use the OKE VCN. Public OCI Load Balancers use the Hub LB subnet and a network-team-controlled frontend NSG. |
+
+This repository deploys OCI infrastructure only. Deploy Kubernetes workloads and `Service` resources through an approved Kubernetes delivery process.
+
+### Deploying workload load balancers
+
+Use the deployed network-stack outputs to resolve subnet and NSG OCIDs.
+
+#### Private OCI Load Balancer
+
+A private load balancer stays in the OKE VCN and uses the cluster's configured private services subnet. Add the generated internal-LB NSG at creation and disable controller-managed security rules:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-private-service
+  annotations:
+    oci.oraclecloud.com/load-balancer-type: "lb"
+    service.beta.kubernetes.io/oci-load-balancer-internal: "true"
+    oci.oraclecloud.com/security-rule-management-mode: "None"
+    oci.oraclecloud.com/oci-network-security-groups: "<internal-lb-nsg-ocid>"
+spec:
+  type: LoadBalancer
+  selector:
+    app: my-app
+  ports:
+    - port: 443
+      targetPort: 8443
+```
+
+Apply the manifest and wait for the Service to receive a private address. If an alternative private subnet is required, add `service.beta.kubernetes.io/oci-load-balancer-subnet1: "<private-subnet-ocid>"`.
+
+#### Public OCI Load Balancer
+
+A public load balancer is created in the Hub network compartment and Hub LB subnet. Attach the approved Hub frontend NSG only after the load balancer is active:
+
+1. Create the Service without `oci.oraclecloud.com/oci-network-security-groups`. Set security-rule management mode to `None` so OKE does not modify security lists or NSG rules.
+
+   ```yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: my-public-service
+     annotations:
+       oci.oraclecloud.com/load-balancer-type: "lb"
+       oci.oraclecloud.com/compartment-id: "<hub-network-compartment-ocid>"
+       service.beta.kubernetes.io/oci-load-balancer-subnet1: "<hub-lb-subnet-ocid>"
+       oci.oraclecloud.com/security-rule-management-mode: "None"
+   spec:
+     type: LoadBalancer
+     selector:
+       app: my-app
+     ports:
+       - port: 443
+         targetPort: 8443
+   ```
+
+2. Wait until the OCI Load Balancer is active and the Service reports its public address.
+3. Add the approved NSG and reapply the Service:
+
+   ```yaml
+   metadata:
+     annotations:
+       oci.oraclecloud.com/oci-network-security-groups: "<approved-hub-frontend-nsg-ocid>"
+       oci.oraclecloud.com/security-rule-management-mode: "None"
+   ```
+
+OKE then attaches the NSG and continues listener and backend reconciliation. Do not include the NSG during initial creation: the matching-tag IAM restriction is enforceable only during post-create attachment.
+
+The network team exclusively manages the Hub frontend NSG's placement, platform tag, rules, movement, and lifecycle. OKE can attach it only when its `tagns-lz-oke.platform` tag matches the cluster platform tag. Approval is cluster-to-NSG, not Service-to-NSG, so the cluster can reuse that approved NSG on its other public load balancers. IAM remains the enforcement boundary even if Kubernetes admission or RBAC is bypassed.
+
+See the [summary of OKE load-balancer annotations](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingloadbalancer_topic-Summaryofannotations.htm) for the complete annotation reference.
+
+### Additional operational notes
+
+- OCI Load Balancer can terminate TLS with an approved certificate in the owning OKE platform compartment. OKE can read and associate the certificate but cannot renew it. TCP pass-through to an in-cluster TLS endpoint is also supported.
+- The initial public-LB state remains closed only while the Hub LB subnet security list does not permit public ingress. Changing or removing the approved NSG's platform tag causes later attachment requests to fail.
+- When public workload ingress is enabled, the shared Hub policy grants public-IP and floating-IP management plus private-IP use to every OKE cluster principal without platform-tag filtering. The platform-tag restrictions still apply to public Load Balancer lifecycle, Hub subnet/VCN access, and approved NSG attachment.
+- OKE administrators, the OKE service, and managed node pools can use an existing Compute capacity reservation in the owning OKE platform compartment. The extension does not create, select, update, or delete reservations.
 
 &nbsp;
 

@@ -1,0 +1,14 @@
+{
+  "cluster_key_resolves_from_pre": true,
+  "final_retains_pre_key": true,
+  "pre_key": {
+    "compartment_id": "CMP-LZ-VALIDATION-OKE-KEY",
+    "defined_tags": {
+      "tagns-lz-oke.platform": "validation-oke"
+    },
+    "name": "key-fra-lz-validation-oke-kube-secrets",
+    "protection_mode": "HSM",
+    "vault_key": "VLT-LZ-SHARED-SECURITY-KEY"
+  },
+  "worker_key_resolves_from_pre": true
+}

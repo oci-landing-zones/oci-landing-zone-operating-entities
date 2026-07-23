@@ -4,6 +4,7 @@
 // contains: "platform_kms_statement_counts": {
 // contains: "PCY-LZ-PREPROD-PLATFORM-OKE-SERVICE-SECURITY-KEY": 3
 // contains: "PCY-LZ-PROD-PLATFORM-OKE-SERVICE-SECURITY-KEY": 3
+// contains: "unexpected_service_oke_key_delegate_grants": []
 // contains: "kms_source_boundary_failures": []
 // contains: "unexpected_oke_volume_key_grants": []
 // contains: "baseline_blockstorage_key_use_present": true
@@ -57,7 +58,7 @@ local kms_statements(env) = [
   statement
   for statement in policies[expected[env].policy].statements
   if std.length(std.findSubstr(' keys ', statement)) > 0 ||
-     std.length(std.findSubstr(' key-delegate ', statement)) > 0
+     std.length(std.findSubstr(' key-delegate', statement)) > 0
 ];
 local all_kms_statements = [
   statement
@@ -97,6 +98,11 @@ local all_kms_statements = [
           'request.principal.compartment.id = target.compartment.id',
           statement
         )) == 0)
+  ],
+  unexpected_service_oke_key_delegate_grants: [
+    statement
+    for statement in all_kms_statements
+    if std.startsWith(statement, 'allow service oke to use key-delegates ')
   ],
   unexpected_oke_volume_key_grants: [
     statement

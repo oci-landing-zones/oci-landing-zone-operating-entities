@@ -1,11 +1,14 @@
 // Three CIS2 OKE platforms keep shared IAM statement counts fixed, use tag equality for isolation, and remain below policy limits.
 // contains: "network_policy_statement_count": 6
-// contains: "hub_public_policy_statement_count": 8
+// contains: "hub_public_policy_statement_count": 7
 // contains: "tagging_policy_statement_count": 1
 // contains: "frontend_nsg_count": 3
 // contains: "unique_frontend_platform_tags": 3
 // contains: "shared_source_allowlist_has_all_platforms": true
 // contains: "shared_reconciliation_platform_tag_equality_count": 4
+// contains: "hub_nsg_membership_statement_count": 1
+// contains: "hub_nsg_source_platform_condition_count": 3
+// contains: "public_nlb_statements": []
 // contains: "platform_certificate_policy_failures": []
 // contains: "below_repository_safety_budget": true
 // contains: "below_oci_limit": true
@@ -51,6 +54,11 @@ local frontend_nsgs = {
 local max_chain = policy_limits.max_chain_statement_count(result.iam);
 local tag_equality =
   'request.principal.compartment.tag.tagns-lz-oke.platform = target.resource.tag.tagns-lz-oke.platform';
+local hub_nsg_membership_statements = [
+  statement
+  for statement in hub_policy.statements
+  if std.startsWith(statement, 'allow any-user to use network-security-groups')
+];
 local expected_platform_policies = {
   okea: {
     compartment: 'CMP-LZ-PROD-OKEA-KEY',
@@ -92,6 +100,22 @@ local expected_platform_policies = {
       for statement in network_policy.statements + hub_policy.statements
       if std.length(std.findSubstr(tag_equality, statement)) > 0
     ]),
+  hub_nsg_membership_statement_count: std.length(hub_nsg_membership_statements),
+  hub_nsg_source_platform_condition_count:
+    if std.length(hub_nsg_membership_statements) != 1 then 0
+    else std.length([
+      platform
+      for platform in ['prod-okea', 'prod-okeb', 'prod-okec']
+      if std.length(std.findSubstr(
+        "request.principal.compartment.tag.tagns-lz-oke.platform = '%s'" % platform,
+        hub_nsg_membership_statements[0]
+      )) == 1
+    ]),
+  public_nlb_statements: [
+    statement
+    for statement in hub_policy.statements
+    if std.length(std.findSubstr('network-load-balancers', statement)) > 0
+  ],
   platform_certificate_policy_failures: [
     platform
     for platform in std.objectFields(expected_platform_policies)

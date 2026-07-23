@@ -3,7 +3,7 @@
 // Policies and statement counts stay constant as platforms are added. Generated
 // platform allowlists select the permitted network scope and public-LB opt-in;
 // direct principal-to-target platform tag comparison prevents cross-platform
-// reconciliation.
+// LB/NLB reconciliation and NSG attachment.
 
 local desc = import '../../../descriptions.libsonnet';
 local contract = import './oke_public_load_balancer.libsonnet';
@@ -34,7 +34,8 @@ function(contexts)
   // The source allowlist and target equality are separate controls. The
   // allowlist selects platforms assigned to this network scope (or opted in to
   // the Hub public-LB scope). Equality then prevents an allowed platform from
-  // reconciling another platform's existing LB, NLB, or NSG.
+  // reconciling another platform's existing LB or NLB, or attaching another
+  // platform's NSG.
   local matching_target = [
     "request.principal.compartment.tag.%s = target.resource.tag.%s" % [
       contract.platform_tag,
@@ -52,11 +53,12 @@ function(contexts)
     ]);
   local target_condition(source_conditions) =
     all_conditions(source_conditions + matching_target);
-  // OKE CCM does not apply service_lb_config defined tags to the frontend NSG
-  // it creates in NSG management mode. The spoke network compartment is
-  // therefore the authorization boundary for NSG lifecycle.
-  local spoke_nsg_condition(source_conditions) =
-    all_conditions(source_conditions + [
+  // OKE owns NSG lifecycle only inside its environment network scope. This is
+  // required by the generated native worker and pod NSG attachments and by
+  // optional OKE-managed private Service NSGs. Hub NSGs use the separate,
+  // membership-only matching-tag policy below.
+  local spoke_nsg_condition =
+    all_conditions(any_cluster_source + [
       "request.permission != 'NETWORK_SECURITY_GROUP_MOVE'",
     ]);
   local network_scope_keys = std.uniq(std.sort([
@@ -88,18 +90,19 @@ function(contexts)
         ],
         "allow any-user to manage network-security-groups in compartment %s where %s" % [
           cmp_name,
-          spoke_nsg_condition(source),
+          spoke_nsg_condition,
         ],
         "allow any-user to manage vcns in compartment %s where %s" % [
           cmp_name,
-          all_conditions(source + [
+          all_conditions(any_cluster_source + [
             "any { request.operation = 'CreateNetworkSecurityGroup', request.operation = 'DeleteNetworkSecurityGroup' }",
           ]),
         ],
         "allow any-user to read vcns in compartment %s where %s" % [
           cmp_name,
-          all_conditions(source),
+          all_conditions(any_cluster_source),
         ],
+      ] + [
         "allow any-user to manage load-balancers in compartment %s where %s" % [
           cmp_name,
           lifecycle_condition(
@@ -129,28 +132,26 @@ function(contexts)
       name: n.display_global('pcy', ['oke', 'service', 'public-lb', 'hub']),
       description: desc.policy.grants(
         'OKE cluster resource principals',
-        'opted-in public Load Balancer, Network Load Balancer, and frontend NSG permissions plus cluster-wide Hub IP permissions',
+        'opted-in public Load Balancer lifecycle, matching-tag post-create NSG attachment, Hub subnet discovery, and Hub IP permissions',
         'the Landing Zone shared Hub network boundary'
       ),
       compartment_id: n.key_global('CMP', ['NETWORK']),
       local hub_cmp = n.display_global('cmp', ['network']),
       statements: [
         "allow any-user to manage load-balancers in compartment %s where %s" % [hub_cmp, lifecycle_condition(public_source, ['LOAD_BALANCER_INSPECT', 'LOAD_BALANCER_READ', 'LOAD_BALANCER_CREATE'], 'LOAD_BALANCER_MOVE')],
-        "allow any-user to manage network-load-balancers in compartment %s where %s" % [hub_cmp, lifecycle_condition(public_source, ['NETWORK_LOAD_BALANCER_INSPECT', 'NETWORK_LOAD_BALANCER_READ', 'NETWORK_LOAD_BALANCER_CREATE'], 'NETWORK_LOAD_BALANCER_MOVE')],
-        // CreateLoadBalancer evaluates Hub NSG membership without exposing the
-        // referenced NSG's target tags to IAM. Keep this membership-only and
-        // source-allowlisted; OKE still cannot create NSGs or change rules.
-        "allow any-user to use network-security-groups in compartment %s where %s" % [hub_cmp, all_conditions(public_source)],
+        // The Service must create the LB without an NSG, wait for it to
+        // become active, then declare the network-team-approved NSG with
+        // security-rule management mode None. IAM exposes target NSG tags only
+        // for that post-create membership update, so the initial create path
+        // excludes NSG attachment.
+        "allow any-user to use network-security-groups in compartment %s where %s" % [hub_cmp, target_condition(public_source)],
         // Public LBs use an alternative subnet in the Hub VCN. These grants
         // permit discovery and attachment without VCN or subnet mutation.
         "allow any-user to use subnets in compartment %s where %s" % [hub_cmp, all_conditions(public_source)],
         "allow any-user to read vcns in compartment %s where %s" % [hub_cmp, all_conditions(public_source)],
-        // OKE's cross-compartment reserved-IP contracts differ for LB and NLB.
-        // A Service selects an existing reserved address; it does not create
-        // the reservation. OCI nevertheless requires manage public-ips for the
-        // NLB path, which includes broader public-IP lifecycle permissions.
-        // Keep the principal-type boundary, but deliberately do not use
-        // platform tags for IP access.
+        // OCI does not expose target tags for IP create/list operations. Keep
+        // these Hub IP contracts available to every OKE cluster principal;
+        // LB lifecycle and NSG membership retain their separate restrictions.
         "allow any-user to manage public-ips in compartment %s where %s" % [hub_cmp, all_conditions(any_cluster_source)],
         "allow any-user to use private-ips in compartment %s where %s" % [hub_cmp, all_conditions(any_cluster_source)],
         "allow any-user to manage floating-ips in compartment %s where %s" % [hub_cmp, all_conditions(any_cluster_source)],
