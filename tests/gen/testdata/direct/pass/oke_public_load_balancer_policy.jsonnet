@@ -8,6 +8,9 @@
 // contains: "frontend_nsg_present": true
 // contains: "disabled_platform_frontend_nsg_present": false
 // contains: "frontend_nsg_owned_by_hub_network_compartment": true
+// contains: "frontend_nsg_platform_tag": "prod-oke"
+// contains: "environment_nsg_platform_tags": []
+// contains: "cluster_kms_key_platform_tags": []
 // contains: "enabled_compartment_tags": {
 // contains: "removed_compartment_tags": []
 // contains: "platform_nsg_policy_present": false
@@ -96,6 +99,9 @@ local preprod_compartment = root.children['CMP-LZ-PREPROD-KEY'].children['CMP-LZ
 local hub_nsgs = result.network.network_configuration.network_configuration_categories['0-shared']
   .vcns['VCN-FRA-LZ-HUB-KEY'].network_security_groups;
 local frontend_nsg = hub_nsgs['NSG-FRA-LZ-HUB-PROD-PLATFORM-OKE-PUBLIC-LB-KEY'];
+local prod_network_nsgs = result.network.network_configuration.network_configuration_categories['prod-platform-oke']
+  .vcns['VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY'].network_security_groups;
+local prod_kms_key = result.security_cis2.vaults_configuration.keys['KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY'];
 local required_platform_match =
   'request.principal.compartment.tag.tagns-lz-oke.platform = target.resource.tag.tagns-lz-oke.platform';
 local required_enabled_platform =
@@ -165,6 +171,18 @@ local platform_service_any_user_statements = [
     std.objectHas(hub_nsgs, 'NSG-FRA-LZ-HUB-PREPROD-PLATFORM-OKE-PUBLIC-LB-KEY'),
   frontend_nsg_owned_by_hub_network_compartment:
     frontend_nsg.compartment_id == 'CMP-LZ-NETWORK-KEY',
+  frontend_nsg_platform_tag: frontend_nsg.defined_tags['tagns-lz-oke.platform'],
+  environment_nsg_platform_tags: [
+    key
+    for key in std.objectFields(prod_network_nsgs)
+    if std.objectHas(prod_network_nsgs[key], 'defined_tags') &&
+       std.objectHas(prod_network_nsgs[key].defined_tags, 'tagns-lz-oke.platform')
+  ],
+  cluster_kms_key_platform_tags: [
+    tag
+    for tag in if std.objectHas(prod_kms_key, 'defined_tags') then std.objectFields(prod_kms_key.defined_tags) else []
+    if tag == 'tagns-lz-oke.platform'
+  ],
   enabled_compartment_tags: prod_compartment.defined_tags,
   removed_compartment_tags: [
     tag

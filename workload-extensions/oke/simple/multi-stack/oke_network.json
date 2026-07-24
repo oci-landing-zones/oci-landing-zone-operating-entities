@@ -506,10 +506,6 @@
                                         "protocol"                          : "TCP",
                                         "stateless"                         : true
                                     }
-                                },
-
-                                "defined_tags": {
-                                    "tagns-lz-oke.platform"                 : "prod-oke"
                                 }
                             },
 
@@ -610,10 +606,6 @@
                                         "protocol"                          : "UDP",
                                         "stateless"                         : true
                                     }
-                                },
-
-                                "defined_tags": {
-                                    "tagns-lz-oke.platform"                 : "prod-oke"
                                 }
                             },
 
@@ -778,10 +770,6 @@
                                         "protocol"                          : "ALL",
                                         "stateless"                         : true
                                     }
-                                },
-
-                                "defined_tags": {
-                                    "tagns-lz-oke.platform"                 : "prod-oke"
                                 }
                             },
 
@@ -1042,10 +1030,6 @@
                                         "protocol"                          : "ALL",
                                         "stateless"                         : true
                                     }
-                                },
-
-                                "defined_tags": {
-                                    "tagns-lz-oke.platform"                 : "prod-oke"
                                 }
                             }
                         },

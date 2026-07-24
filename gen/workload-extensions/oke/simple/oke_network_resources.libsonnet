@@ -240,13 +240,9 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
 
   network_security_groups(ctx)::
     local n = ctx.n;
-    local lifecycle_tags = {
-      [public_lb.platform_tag]: ctx.platform_tag_value,
-    };
     ({
       [ctx.nsg_cp_key]: {
         display_name: n.display('nsg', ctx.display_segments + ['cp']),
-        defined_tags: lifecycle_tags,
 
         egress_rules: {
           nsg_cp_6443: nsg.tcp_egress('Allow TCP egress for Kubernetes control plane inter-communication', ctx.nsg_cp_key, '6443'),
@@ -276,7 +272,6 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
 
       [ctx.nsg_lb_key]: {
         display_name: n.display('nsg', ctx.display_segments + ['int-lb', 'default-backend']),
-        defined_tags: lifecycle_tags,
         ingress_rules: {
           nsg_workers_10256: nsg.tcp_ingress_src('Allow TCP ingress from worker nodes to load balancers for health check responses on source port 10256', ctx.nsg_workers_key, '10256'),
           nsg_workers_tcp: nsg.tcp_ingress_src_range('Allow TCP ingress from worker nodes to load balancers for service responses on source ports 30000-32767', ctx.nsg_workers_key, '30000', '32767'),
@@ -298,7 +293,6 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     } + (if ctx.is_overlay_network then {} else {
       [ctx.nsg_pods_key]: {
         display_name: n.display('nsg', ctx.display_segments + ['pods']),
-        defined_tags: lifecycle_tags,
 
         egress_rules: {
           anywhere: {
@@ -330,7 +324,6 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     }) + {
       [ctx.nsg_workers_key]: {
         display_name: n.display('nsg', ctx.display_segments + ['workers']),
-        defined_tags: lifecycle_tags,
 
         egress_rules: {
           anywhere: {
