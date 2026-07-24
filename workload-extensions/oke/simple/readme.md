@@ -79,6 +79,7 @@ metadata:
   name: my-private-service
   annotations:
     oci.oraclecloud.com/load-balancer-type: "lb"
+    oci.oraclecloud.com/compartment-id: "<environment-network-compartment-ocid>"
     service.beta.kubernetes.io/oci-load-balancer-internal: "true"
     oci.oraclecloud.com/security-rule-management-mode: "None"
     oci.oraclecloud.com/oci-network-security-groups: "<internal-lb-nsg-ocid>"
@@ -91,7 +92,7 @@ spec:
       targetPort: 8443
 ```
 
-Apply the manifest and wait for the Service to receive a private address. If an alternative private subnet is required, add `service.beta.kubernetes.io/oci-load-balancer-subnet1: "<private-subnet-ocid>"`.
+The compartment annotation is required because OKE otherwise creates the load balancer in the cluster compartment, while this extension authorizes private load-balancer lifecycle in the environment network compartment. Apply the manifest and wait for the Service to receive a private address. If an alternative private subnet is required, add `service.beta.kubernetes.io/oci-load-balancer-subnet1: "<private-subnet-ocid>"`.
 
 #### Public OCI Load Balancer
 

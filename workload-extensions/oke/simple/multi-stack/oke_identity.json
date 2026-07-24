@@ -64,10 +64,11 @@
 
             "PCY-LZ-PROD-OKE-SERVICE-NETWORK-KEY": {
                 "name"                                     : "pcy-lz-prod-oke-service-network",
-                "description"                              : "Grants OKE cluster resource principals scope-allowlisted private Load Balancer, Network Load Balancer, and NSG permissions plus the VCN prerequisites for NSG lifecycle and cluster-wide private-IP use in the prod network compartment.",
+                "description"                              : "Grants OKE cluster resource principals scope-allowlisted private Load Balancer, Network Load Balancer, subnet, and NSG permissions plus the VCN prerequisites for NSG lifecycle and cluster-wide private-IP use in the prod network compartment.",
                 "compartment_id"                           : "CMP-LZ-PROD-NETWORK-KEY",
 
                 "statements": [
+                    "allow any-user to use subnets in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster', request.principal.compartment.tag.tagns-lz-oke.platform = 'prod-oke' }",
                     "allow any-user to use private-ips in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster' }",
                     "allow any-user to manage network-security-groups in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster', request.permission != 'NETWORK_SECURITY_GROUP_MOVE' }",
                     "allow any-user to manage vcns in compartment cmp-lz-prod-network where all { request.principal.type = 'cluster', any { request.operation = 'CreateNetworkSecurityGroup', request.operation = 'DeleteNetworkSecurityGroup' } }",

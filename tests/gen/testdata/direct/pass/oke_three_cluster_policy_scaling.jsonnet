@@ -1,5 +1,5 @@
 // Three CIS2 OKE platforms keep shared IAM statement counts fixed, use tag equality for isolation, and remain below policy limits.
-// contains: "network_policy_statement_count": 6
+// contains: "network_policy_statement_count": 7
 // contains: "hub_public_policy_statement_count": 7
 // contains: "tagging_policy_statement_count": 1
 // contains: "frontend_nsg_count": 3

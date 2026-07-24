@@ -17,6 +17,7 @@
 // contains: "restricted_hub_nsg_membership_statement_present": true
 // contains: "hub_nsg_statement_count": 1
 // contains: "hub_vcn_subnet_prerequisites_present": true
+// contains: "private_subnet_prerequisites_are_scope_specific": true
 // contains: "environment_network_nsg_lifecycle_contract_present": true
 // contains: "hub_nsg_management_statements": []
 // contains: "unexpected_cluster_nsg_membership_statements": []
@@ -202,6 +203,21 @@ local platform_service_any_user_statements = [
          std.length(std.findSubstr(required_enabled_platform, s)) > 0 &&
          std.length(std.findSubstr('target.resource.tag.', s)) == 0
     ]) == 2,
+  private_subnet_prerequisites_are_scope_specific:
+    std.length([
+      s
+      for s in prod_network_statements
+      if std.startsWith(s, 'allow any-user to use subnets') &&
+         std.length(std.findSubstr("'prod-oke'", s)) == 1 &&
+         std.length(std.findSubstr("'preprod-oke'", s)) == 0
+    ]) == 1 &&
+    std.length([
+      s
+      for s in preprod_network_statements
+      if std.startsWith(s, 'allow any-user to use subnets') &&
+         std.length(std.findSubstr("'preprod-oke'", s)) == 1 &&
+         std.length(std.findSubstr("'prod-oke'", s)) == 0
+    ]) == 1,
   environment_network_nsg_lifecycle_contract_present:
     std.length(environment_network_nsg_lifecycle_statements) == 3 &&
     std.length([
@@ -288,9 +304,9 @@ local platform_service_any_user_statements = [
     if std.startsWith(s, 'allow any-user ') && std.length(std.findSubstr(' where ', s)) == 0
   ],
   private_network_allowlists_are_scope_specific:
-    std.length([s for s in prod_network_statements if std.length(std.findSubstr("'prod-oke'", s)) > 0]) == 2 &&
+    std.length([s for s in prod_network_statements if std.length(std.findSubstr("'prod-oke'", s)) > 0]) == 3 &&
     std.length([s for s in prod_network_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 0 &&
-    std.length([s for s in preprod_network_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 2 &&
+    std.length([s for s in preprod_network_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 3 &&
     std.length([s for s in preprod_network_statements if std.length(std.findSubstr("'prod-oke'", s)) > 0]) == 0,
   private_ip_statements_allow_all_clusters_without_tags:
     std.length([

@@ -77,13 +77,17 @@ function(contexts)
       name: n.display_global('pcy', [scope_label(first), 'oke', 'service', 'network']),
       description: desc.policy.grants(
         'OKE cluster resource principals',
-        'scope-allowlisted private Load Balancer, Network Load Balancer, and NSG permissions plus the VCN prerequisites for NSG lifecycle and cluster-wide private-IP use',
+        'scope-allowlisted private Load Balancer, Network Load Balancer, subnet, and NSG permissions plus the VCN prerequisites for NSG lifecycle and cluster-wide private-IP use',
         'the %s network compartment' % scope_label(first)
       ),
       compartment_id: scope_key,
       local cmp_name = scope_compartment_name(first),
       local source = platform_source(scope_contexts),
       statements: [
+        "allow any-user to use subnets in compartment %s where %s" % [
+          cmp_name,
+          all_conditions(source),
+        ],
         "allow any-user to use private-ips in compartment %s where %s" % [
           cmp_name,
           all_conditions(any_cluster_source),
