@@ -24,6 +24,13 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     if routing != null && std.objectHas(routing, 'hub_lb_cidr') then routing.hub_lb_cidr
     else null;
   local public_load_balancer = public_lb.public_load_balancer_enabled(params.platform_config);
+  local create_fss =
+    if std.objectHas(params.config_params, 'create_fss') && params.config_params.create_fss != null then
+      assert std.type(params.config_params.create_fss) == 'boolean' :
+        'config_params.create_fss must be a boolean';
+      params.config_params.create_fss
+    else
+      false;
   assert !public_load_balancer || has_hub :
     'oke_simple config_params.public_load_balancer requires a hub-backed platform network';
   assert !public_load_balancer || hub_lb_cidr != null :
@@ -166,6 +173,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     has_hub: has_hub,
     hub_lb_cidr: hub_lb_cidr,
     public_load_balancer: public_load_balancer,
+    create_fss: create_fss,
     platform_tag_value: public_lb.platform_tag_value(scope.qualified_name, plat),
     internet_default_target: internet_default_target,
     use_local_natgw: use_local_natgw,
@@ -196,18 +204,22 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
 	    ngw_key: n.key('NGW', key_segments),
     drg_key: n.key('DRG', ['HUB']),
     sn_cp_key: sn_key('CP'),
+    sn_fss_key: sn_key('FSS'),
     sn_lb_key: sn_key('INT-LB'),
     sn_pods_key: sn_key('PODS'),
     sn_workers_key: sn_key('WORKERS'),
     rt_cp_key: rt_key('CP'),
+    rt_fss_key: rt_key('FSS'),
     rt_lb_key: rt_key('INT-LB'),
     rt_pods_key: rt_key('PODS'),
     rt_workers_key: rt_key('WORKERS'),
 	    sl_cp_key: n.key('SL', key_segments + ['CP']),
+	    sl_fss_key: n.key('SL', key_segments + ['FSS']),
 	    sl_lb_key: n.key('SL', key_segments + ['INT-LB']),
 	    sl_pods_key: n.key('SL', key_segments + ['PODS']),
 	    sl_workers_key: n.key('SL', key_segments + ['WORKERS']),
 	    nsg_cp_key: n.key('NSG', key_segments + ['CP']),
+	    nsg_fss_key: n.key('NSG', key_segments + ['FSS']),
 	    nsg_lb_key: n.key('NSG', key_segments + ['INT-LB']),
 	    nsg_pods_key: n.key('NSG', key_segments + ['PODS']),
 	    nsg_workers_key: n.key('NSG', key_segments + ['WORKERS']),
