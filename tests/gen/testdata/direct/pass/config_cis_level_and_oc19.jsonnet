@@ -30,6 +30,12 @@ local cis2_vault_key =
   cost_policy_statements: cost_policy.statements,
   observability_bucket_cis_level: observability_bucket.cis_level,
   output_files: std.sort(std.objectFields(outputs)),
+  os_management_service_statements: [
+    statement
+    for statement in service_policy.statements
+    if std.length(std.findSubstr('service osms', statement)) > 0 ||
+       std.length(std.findSubstr('service osmh', statement)) > 0
+  ],
   services_key_policy_statement: service_policy.statements[std.length(service_policy.statements) - 1],
   shared_network_policy_ocid:
     security_recipes['SZ-RCP-LZ-02-SHARED-NETWORK-KEY'].security_policies_ocids[0],

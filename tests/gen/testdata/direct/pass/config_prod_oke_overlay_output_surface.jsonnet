@@ -1,4 +1,7 @@
 // config-mode prod OKE overlay emits flannel-compatible cluster and worker outputs without pod network resources
+// contains: "cluster_cni_type": "flannel"
+// contains: "pod_nsg_reference_count": 0
+// contains: "public_lb_rule_count": 6
 local multi = import 'gen/landing_zone_multi.jsonnet';
 local outputs = multi({
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
@@ -16,6 +19,7 @@ local outputs = multi({
               services_cidr: '10.96.0.0/16',
               cni_type: 'overlay',
               api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
+              public_load_balancer: true,
             },
           },
         },
@@ -57,4 +61,10 @@ local rule_references_pods(rule) =
     egress: std.sort(std.objectFields(vcn.network_security_groups['NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY'].egress_rules)),
     ingress: std.sort(std.objectFields(vcn.network_security_groups['NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY'].ingress_rules)),
   },
+  public_lb_rule_count: std.length([
+    key
+    for direction in ['egress_rules', 'ingress_rules']
+    for key in std.objectFields(vcn.network_security_groups['NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY'][direction])
+    if std.startsWith(key, 'hub_public_lb')
+  ]),
 }

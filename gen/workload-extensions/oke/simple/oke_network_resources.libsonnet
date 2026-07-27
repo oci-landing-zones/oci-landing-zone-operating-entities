@@ -4,8 +4,52 @@ local rules = import './oke_network_rule_factories.libsonnet';
 local nsg = rules.nsg;
 local service = rules.service;
 local hub_public_lb = import './oke_network_hub_public_lb_rules.libsonnet';
+local public_lb = import './oke_public_load_balancer.libsonnet';
 
 {
+  public_lb_frontend_nsg(ctx):: {
+    [ctx.hub_frontend_nsg_key]: {
+      display_name: ctx.n.display('nsg', ['hub'] + ctx.display_segments + ['public-lb']),
+      // The public frontend NSG is a Hub network resource created and governed
+      // by network-team-controlled IaC. OKE can attach it only after endpoint
+      // creation when its platform tag matches the cluster platform tag; OKE
+      // cannot manage its rules, tags, placement, or lifecycle.
+      compartment_id: ctx.n.key_global('CMP', ['NETWORK']),
+      defined_tags: {
+        [public_lb.platform_tag]: ctx.platform_tag_value,
+      },
+      ingress_rules: {
+        http_80: {
+          description: 'Allow public HTTP ingress for application traffic and ACME HTTP-01 challenges',
+          src: '0.0.0.0/0',
+          src_type: 'CIDR_BLOCK',
+          dst_port_min: 80,
+          dst_port_max: 80,
+          protocol: 'TCP',
+          stateless: false,
+        },
+        https_443: {
+          description: 'Allow public HTTPS ingress for OKE application traffic',
+          src: '0.0.0.0/0',
+          src_type: 'CIDR_BLOCK',
+          dst_port_min: 443,
+          dst_port_max: 443,
+          protocol: 'TCP',
+          stateless: false,
+        },
+      },
+      egress_rules: {
+        oke_platform_tcp: {
+          description: 'Allow frontend LB traffic only to the owning OKE platform VCN',
+          dst: ctx.params.network.vcn,
+          dst_type: 'CIDR_BLOCK',
+          protocol: 'TCP',
+          stateless: false,
+        },
+      },
+    },
+  },
+
   subnets(ctx)::
     local n = ctx.n;
     ({

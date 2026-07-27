@@ -15,26 +15,22 @@ function(ctx)
   local platform_children(entry) =
     local env = entry.env;
     if std.objectHas(env, 'platforms') then {
-      [platform.compartment_key]: {
-        name: platform.compartment_name,
-        description: platform.compartment_description,
+      [scope.compartment_key]: {
+        name: scope.compartment_name,
+        description: scope.compartment_description,
       }
-      for platform in [
-        topo.env_platform(entry, p_name)
-        for p_name in std.objectFields(env.platforms)
-      ]
+      for platform_name in std.objectFields(env.platforms)
+      for scope in [topo.env_platform(entry, platform_name)]
     } else {};
 
   local shared_platform_children =
     if std.objectHas(config, 'shared_platforms') then {
-      [platform.compartment_key]: {
-        name: platform.compartment_name,
-        description: platform.compartment_description,
+      [scope.compartment_key]: {
+        name: scope.compartment_name,
+        description: scope.compartment_description,
       }
-      for platform in [
-        topo.shared_platform(p_name)
-        for p_name in std.objectFields(config.shared_platforms)
-      ]
+      for platform_name in std.objectFields(config.shared_platforms)
+      for scope in [topo.shared_platform(platform_name)]
     } else {};
 
   // Per-environment children compartments

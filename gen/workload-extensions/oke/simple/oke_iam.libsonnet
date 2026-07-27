@@ -7,7 +7,19 @@ function(ctx) {
   local root = self,
   local cmp_path = ctx.scope.compartment_path,
   local net_path = ctx.scope.network_compartment_path,
-
+  // Policies attached to their target compartment must use its short name, not a root-relative path.
+  local cmp_name = ctx.scope.compartment_name,
+  // Policies target the owning OKE compartment. Principal/target compartment
+  // equality ensures that only the cluster or node pool in that compartment
+  // can use them, without relying on the platform tag or literal OCIDs.
+  local cluster_compartment_source_conditions = [
+    "request.principal.type = 'cluster'",
+    'request.principal.compartment.id = target.compartment.id',
+  ],
+  local nodepool_compartment_source_conditions = [
+    "request.principal.type = 'nodepool'",
+    'request.principal.compartment.id = target.compartment.id',
+  ],
   groups_configuration+: {
     groups+: {
       [n.key_global('GRP', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
@@ -47,6 +59,7 @@ function(ctx) {
           "allow group 'id_lz_common'/'%s' to use network-security-groups in compartment %s" % [root._group_names.admins, net_path],
           "allow group 'id_lz_common'/'%s' to use vnics in compartment %s" % [root._group_names.admins, net_path],
           "allow group 'id_lz_common'/'%s' to manage private-ips in compartment %s" % [root._group_names.admins, net_path],
+          "allow group 'id_lz_common'/'%s' to use compute-capacity-reservations in compartment %s" % [root._group_names.admins, cmp_path],
         ],
       },
 
@@ -65,21 +78,102 @@ function(ctx) {
         ],
       },
 
-      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'VCN-CNI'])]: {
-        name: n.display_global('pcy', ctx.display_segments + ['vcn-cni']),
-        description: desc.policy.unsafe_grants(
-          'OKE clusters',
-          'tenancy-wide VCN CNI permissions for instance, private IP, and network security group resources'
+    } + {
+
+      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'SERVICE', 'COMPUTE'])]: {
+        name: n.display_global('pcy', ctx.display_segments + ['service', 'compute']),
+        description: desc.policy.grants(
+          'OKE service, clusters, and node pools',
+          'compute and capacity-reservation permissions for OKE-managed resources',
+          'the %s environment OKE platform compartment' % ctx.env_long_title
         ),
-        compartment_id: 'TENANCY-ROOT',
-        '//': 'This is potentially unsafe as it can be used for privilege escalation across environments. See https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-OCI_CNI_plugin.htm for restricting permissions.',
+        compartment_id: ctx.cmp_key,
 
         statements: [
-          "allow any-user to manage instances in tenancy where all { request.principal.type = 'cluster'}",
-          "allow any-user to use private-ips in tenancy where all { request.principal.type = 'cluster'}",
-          "allow any-user to use network-security-groups in tenancy where all { request.principal.type = 'cluster'}",
+          "allow any-user to manage instances in compartment %s where all { %s }" % [
+            cmp_name,
+            std.join(', ', cluster_compartment_source_conditions),
+          ],
+          "allow any-user to read instance-images in compartment %s where all { %s }" % [
+            cmp_name,
+            std.join(', ', cluster_compartment_source_conditions),
+          ],
+          "allow service oke to use compute-capacity-reservations in compartment %s" % cmp_name,
+          "allow any-user to use compute-capacity-reservations in compartment %s where all { %s }" % [
+            cmp_name,
+            std.join(', ', nodepool_compartment_source_conditions),
+          ],
         ],
       },
+
+    } + (if ctx.public_load_balancer || ctx.cis_level == 2 then {
+      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'SERVICE', 'SECURITY'])]: {
+        name: n.display_global('pcy', ctx.display_segments + ['service', 'security']),
+        description: desc.policy.grants(
+          'security administrators and the OKE platform resource principals',
+          'the enabled platform-scoped certificate and CIS2 encryption-key permissions',
+          'the %s environment OKE platform compartment' % ctx.env_long_title
+        ),
+        compartment_id: ctx.cmp_key,
+
+        statements: (if ctx.public_load_balancer then [
+          "allow group 'id_lz_common'/'%s' to manage leaf-certificate-family in compartment %s" % [
+            n.display_global('grp', ['security', 'admin']),
+            cmp_name,
+          ],
+          // OKE's OCI Certificates integration requires the aggregate leaf
+          // certificate family grant. The owning platform compartment is the
+          // target boundary and must contain only certificates approved for
+          // its cluster.
+          "allow any-user to manage leaf-certificate-family in compartment %s where all { %s }" % [
+            cmp_name,
+            "request.principal.type = 'cluster'",
+          ],
+        ] else []) + (if ctx.cis_level == 2 then [
+          // The platform compartment contains one OKE cluster and one
+          // cluster-specific key. Compartment placement is the target boundary;
+          // no key OCID or target-key tag condition is required.
+          "allow group 'id_lz_common'/'%s' to manage keys in compartment %s" % [
+            n.display_global('grp', ['security', 'admin']),
+            cmp_name,
+          ],
+          "allow any-user to use keys in compartment %s where all { %s }" % [
+            cmp_name,
+            std.join(', ', cluster_compartment_source_conditions),
+          ],
+          "allow any-user to use key-delegate in compartment %s where all { %s }" % [
+            cmp_name,
+            std.join(', ', nodepool_compartment_source_conditions),
+          ],
+        ] else []),
+      },
+    } else {}) + {
+
+      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'SERVICE', 'STORAGE'])]: {
+        name: n.display_global('pcy', ctx.display_segments + ['service', 'storage']),
+        description: desc.policy.grants(
+          'OKE clusters',
+          'persistent volume, backup, and file storage permissions',
+          'the %s environment OKE platform compartment' % ctx.env_long_title
+        ),
+        compartment_id: ctx.cmp_key,
+
+        statements: [
+          "allow any-user to manage volume-backups in compartment %s where all { %s }" % [
+            cmp_name,
+            std.join(', ', cluster_compartment_source_conditions),
+          ],
+          "allow any-user to use volumes in compartment %s where all { %s }" % [
+            cmp_name,
+            std.join(', ', cluster_compartment_source_conditions),
+          ],
+          "allow any-user to manage file-family in compartment %s where all { %s }" % [
+            cmp_name,
+            std.join(', ', cluster_compartment_source_conditions),
+          ],
+        ],
+      },
+
     },
   },
 

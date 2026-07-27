@@ -5,6 +5,7 @@ function(ctx) {
     node_pools+: {
       [ctx.node_pool_key]: {
         name: ctx.node_pool_name,
+        cis_level: '%d' % ctx.cis_level,
         compartment_id: ctx.cmp_key,
         cluster_id: ctx.cluster_key,
         enable_cycling: false,
@@ -28,12 +29,16 @@ function(ctx) {
         node_config_details: {
           image: ctx.worker_image,
           node_shape: 'VM.Standard.E5.Flex',
-
           flex_shape_settings: {
             memory: 8,
             ocpus: 1,
           },
-        },
+        } + (if ctx.cis_level == 2 then {
+          encryption: {
+            enable_encrypt_in_transit: true,
+            kms_key_id: ctx.kube_secret_key,
+          },
+        } else {}),
       },
     },
   },

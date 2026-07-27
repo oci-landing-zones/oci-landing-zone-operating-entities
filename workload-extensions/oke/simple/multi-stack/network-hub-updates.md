@@ -1,19 +1,17 @@
 # Hub E Routing Notes <!-- omit from toc -->
 
-The published simple multi-stack OKE package is based on **Hub E**. It is a quickstart-style example for adding one OKE platform VCN as a spoke to an existing Hub E landing zone.
-
-For Hub A, Hub B, Hub C, or more customized routing models, use config-driven generation with `oke_simple` instead of treating this published simple multi-stack package as a generic hub-model adapter.
+The simple multi-stack OKE package is based on **Hub E**. It is a quickstart for adding one OKE platform VCN as a spoke to an existing Hub E landing zone.
 
 ## Hub E Assumptions
 
 - The Hub E landing zone already exists.
-- The Hub DRG key is `DRG-FRA-LZ-HUB-KEY` in the published Frankfurt example.
+- The Hub DRG key is `DRG-FRA-LZ-HUB-KEY` in the Frankfurt configuration.
 - The Hub DRG spokes route table key is `DRGRT-FRA-LZ-SPOKES-KEY`.
-- The OKE platform VCN is `10.0.80.0/20` in the published example.
+- The OKE platform VCN is `10.0.80.0/20`.
 - The OKE platform VCN uses its own NAT gateway and service gateway.
-- The Hub LB subnet remains available for OKE-created public load balancers, but this quickstart does not create a hub-level OCI L7 Load Balancer.
+- The quickstart enables OKE-created public OCI Load Balancers in the Hub LB subnet and injects a platform-tagged frontend NSG into the existing Hub VCN and Hub network compartment through `network_dependency`. At creation, set `oci.oraclecloud.com/compartment-id` to the Hub network compartment and `service.beta.kubernetes.io/oci-load-balancer-subnet1` to the Hub LB subnet, but do not include an NSG annotation. Wait until the endpoint is active, then add the approved matching-tag NSG annotation with security-rule management mode `None`. OKE receives only this post-create membership permission; the network team retains exclusive NSG rule, tag, movement, and lifecycle control. Initial creation with an NSG and CCM NSG management mode are unsupported. The quickstart does not create a Terraform-managed hub-level OCI L7 Load Balancer.
 
-## Published Multi-Stack Network Output
+## Multi-Stack Network Output
 
 The generated `oke_network.json` contains only the OKE platform network category and injects an OKE VCN attachment into the existing Hub DRG. It does not publish Hub A firewall route-table updates or a hub-level OCI L7 Load Balancer.
 
@@ -25,15 +23,6 @@ DRG route table: DRGRT-FRA-LZ-SPOKES-KEY
 Attached VCN: VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY
 OKE VCN CIDR: 10.0.80.0/20
 ```
-
-## When To Use Config-Driven Generation
-
-Use config-driven generation when the target landing zone is not this simple Hub E quickstart, including:
-
-- Hub A, Hub B, or Hub C.
-- Multiple OKE clusters or environments.
-- Overlay OKE networking.
-- Custom OKE CIDR sizes or manual subnet maps.
 
 &nbsp;
 

@@ -1,4 +1,4 @@
-# OKE Config-Driven Generation <!-- omit from toc -->
+# OKE generation options <!-- omit from toc -->
 
 - [**1. Overview**](#1-overview)
 - [**2. Prerequisites**](#2-prerequisites)
@@ -8,11 +8,16 @@
 - [**6. OKE VCN Sizing**](#6-oke-vcn-sizing)
 - [**7. Manual OKE Subnet CIDRs**](#7-manual-oke-subnet-cidrs)
 - [**8. Generate the JSON Files**](#8-generate-the-json-files)
-- [**9. Review the Output**](#9-review-the-output)
+- [**9. Generated Output Contract**](#9-generated-output-contract)
 
 ## **1. Overview**
 
-Use config-driven generation when the published OKE JSON files do not match the landing zone you need. This is useful when you need custom CIDR ranges, multiple environments, more than one OKE cluster, or overlay networking.
+Use one of the supported Landing Zone add-on entry paths when the committed OKE JSON files do not match the required landing zone:
+
+- [OCI LZ Blueprint Factory](../../../addons/oci-lz-blueprint-factory/README.md) for a directly authored and reviewed source configuration.
+- [OCI LZ AI Agent](../../../addons/oci-lz-ai-agent/README.md) for AI-assisted discovery, source-configuration drafting, and review.
+
+Both paths produce a reviewed source input and generated deployment package. They support custom CIDR ranges, multiple environments, multiple OKE platforms with one cluster per platform, and overlay networking.
 
 The OKE simple workload extension is configured as a platform extension named `oke_simple`. It can generate two OKE network modes:
 
@@ -34,18 +39,18 @@ Before generating the files:
 
 ## **3. What `oke_simple` Means**
 
-`oke_simple` is the OKE workload extension type used by config-driven generation. When a platform uses `extension.type: 'oke_simple'`, the generator adds the OKE network, IAM, cluster, worker, security, and observability JSON needed for that platform.
+`oke_simple` is the OKE workload extension type selected through either supported add-on. When a platform uses `extension.type: 'oke_simple'`, generation adds the OKE network, IAM, cluster, worker, security, and observability JSON needed for that platform.
 
-This is different from the published deployment folders:
+This is different from the committed quickstart folders:
 
 | Option | What it is | When to use it |
 | --- | --- | --- |
-| `oke_simple` | The config-driven OKE extension type. | Use this when generating a customized landing zone from a configuration file. |
-| `simple/single-stack` | A published OKE JSON package that deploys the landing zone and OKE together. | Use this for the standard Hub E single-stack deployment. |
-| `simple/multi-stack` | A published OKE JSON package that adds OKE to an existing landing zone. | Use this for the standard multi-stack deployment path. |
+| `oke_simple` | The OKE extension type. | Use this when generating a landing zone whose requirements are outside the committed quickstart configurations. |
+| `simple/single-stack` | A committed OKE JSON package that deploys the landing zone and OKE together. | Use this for the standard Hub E single-stack deployment. |
+| `simple/multi-stack` | A committed OKE JSON package that adds OKE to an existing landing zone. | Use this for the standard multi-stack deployment path. |
 | `advanced` | A separate guided deployment path with more manual steps. | Use this only when following the advanced OKE extension documentation. |
 
-In config-driven generation, use `oke_simple` for OKE platforms.
+In either add-on path, use `oke_simple` for OKE platforms.
 
 ## **4. Native OKE Example**
 
@@ -88,6 +93,7 @@ Create a configuration file, for example `oke-native.jsonnet`:
               cni: 'vcn_native',
               cluster_size: 'small',
               api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
+              public_load_balancer: true,
             },
           },
         },
@@ -98,6 +104,12 @@ Create a configuration file, for example `oke-native.jsonnet`:
 ```
 
 Native mode is the default. It creates an OCI pod subnet and wires the worker node pool with pod subnet and pod NSG references.
+
+OKE compute and persistent-storage permissions target only the owning OKE platform compartment and require the requesting cluster compartment to equal the target resource compartment. A cluster resource principal from another OKE platform therefore cannot use those statements against this platform's instances, images, volumes, backups, or file systems. Platform-tag equality isolates existing public Hub LB resources and post-create Hub NSG attachment. Create the Service/LB with the Hub network compartment and Hub LB subnet annotations, but without a Hub NSG annotation. Wait for the endpoint to become active, then add the network-team-approved matching-tag Hub NSG annotation with security-rule management mode `None`. OKE can attach that existing Hub NSG and continue reconciliation, but cannot create or manage NSGs in the Hub. Initial creation with a Hub NSG is unsupported. This explicit Hub compartment selection is required when the OKE platform compartment is protected by a CIS2 Security Zone, because OCI rejects public LBs in that platform compartment. The separate environment-network policy retains cluster-principal LB/NLB and NSG lifecycle authority without TBAC, with movement excluded, for native worker/pod networking and private Services.
+
+Direct OCI Certificates integration stores every certificate in the owning OKE platform compartment. The generated policy grants OKE cluster principals `manage leaf-certificate-family` in that compartment because narrower certificate and association permissions do not support OKE listener reconciliation. The platform compartment—not certificate resource tags—is the authorization boundary and must contain only certificates approved for that OKE platform. Certificates in the shared security compartment are not supported, and the grant does not include Certificate Authority administration.
+
+The generator creates no Kubernetes certificate-renewal identity. For OCI LB termination, use an OCI-managed certificate or a security-owned external pipeline that updates an imported Let's Encrypt certificate. For automatic cert-manager renewal inside Kubernetes, terminate TLS in an approved ingress controller and use OCI LB TCP pass-through. Review the shared [operational and security notes](readme.md#operational-and-security-notes) before enabling public ingress.
 
 ## **5. Overlay OKE Example**
 
@@ -266,30 +278,38 @@ bash gen/generate.sh --config ./oke-overlay-hub-a.jsonnet ./generated/oke-overla
 
 The generated directory contains the JSON files to use with the OCI Landing Zone Orchestrator.
 
-## **9. Review the Output**
+## **9. Generated Output Contract**
 
 The generated file set commonly includes:
 
 | File | Purpose |
 | --- | --- |
-| `network.json` | Hub, spoke, platform, OKE VCNs, subnets, route tables, gateways, security lists, and NSGs. |
+| `network.json` | Hub, spoke, platform, OKE VCNs, subnets, route tables, gateways, security lists, and NSGs. Every platform with `public_load_balancer: true` receives its own tagged frontend NSG in the Hub VCN and Hub network compartment. |
 | `iam.json` | Compartments, groups, and policies. |
 | `governance.json` | Tag namespaces and governance configuration. |
 | `oke_clusters.json` | OKE cluster configuration. |
 | `oke_workers.json` | OKE node pool configuration. |
-| `security_cis*.json` | Security baseline configuration. |
+| `security_cis*.json` | Security baseline. For CIS2, this also includes the shared security-compartment Vault and one encryption key in each OKE platform compartment. CIS1 omits OKE Vault and CMEK resources. |
 | `observability_cis*.json` | Observability baseline configuration. |
 
 Some hub models, including Hub A, also generate `network_pre.json`. This file is used for staged network deployment before the final `network.json`.
 
-For native OKE, check that the worker node pool includes `pods_subnet_id` and `pods_nsg_ids`.
+Public frontend NSGs scale as one Hub network resource per opted-in OKE platform. Each NSG permits public TCP 80/443 and TCP egress only to its owning OKE VCN. The shared Hub IAM policy remains one seven-statement policy as platforms are added; a generated allowlist selects enabled source platforms and source-to-target platform tag comparison isolates public LB reconciliation and post-create NSG attachment. The network team owns NSG rules, tags, movement, deletion, and lifecycle. OKE receives only matching-tag membership permission in the Hub network compartment. Approval is cluster-to-NSG rather than Service-to-NSG, so the cluster may reuse an approved NSG on its other public LBs even if Kubernetes admission or RBAC is bypassed.
 
-For overlay OKE, check that:
+For native OKE, the generated worker node pool includes `pods_subnet_id` and `pods_nsg_ids`.
 
-- `oke_clusters.json` requests Flannel in the downstream OKE cluster configuration.
-- `oke_clusters.json` contains `pods_cidr` and `services_cidr`.
-- `oke_workers.json` does not contain `pods_subnet_id` or `pods_nsg_ids`.
-- `network.json` does not contain an OKE pod subnet, pod route table, pod security list, or pod NSG.
+The top-level `cis_level` controls OKE encryption behavior as well as the selected security and observability files. For CIS2, each cluster's `encryption.kube_secret_kms_key_id` references its generated key in `security_cis2.json`, and the worker node pool uses the same key for boot-volume encryption with in-transit encryption enabled. The generator derives these configuration keys from the canonical landing-zone naming convention rather than accepting a customer-supplied OKE KMS-key option. The pinned Orchestrator resolves both references through `kms_dependency`; no key OCID or policy substitution is required. The shared Vault remains in the Landing Zone security compartment, while each HSM key is created in its owning OKE platform compartment. For CIS1, cluster and worker CMEK references and OKE Vault/key resources are omitted; worker boot volumes use OCI-managed encryption and in-transit encryption is disabled.
+
+For CIS2 deployment validation, confirm the Vault and key compartments, confirm that the cluster and node pool reference the same generated configuration key, and verify the three generated platform-compartment KMS statements before deployment. Worker boot-volume delegation is granted only to same-compartment node-pool principals. Confirm the Landing Zone baseline service policy supplies Block Storage key use. Persistent volumes use a separately governed key. For split stacks, pass the security-stack KMS dependency output to the OKE stack instead of replacing configuration keys with literal OCIDs or editing generated IAM.
+
+The default worker image selector is `9\\.[0-9]+`.
+
+For overlay OKE, the generator:
+
+- Requests Flannel in the downstream OKE cluster configuration.
+- Emits `pods_cidr` and `services_cidr` in `oke_clusters.json`.
+- Omits `pods_subnet_id` and `pods_nsg_ids` from `oke_workers.json`.
+- Omits the OKE pod subnet, pod route table, pod security list, and pod NSG from `network.json`.
 
 &nbsp;
 

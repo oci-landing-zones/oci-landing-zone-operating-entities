@@ -35,31 +35,6 @@ local shared_plain = multi({
     },
   },
 });
-local shared_oke = multi({
-  region: 'eu-frankfurt-1',
-  region_short_name: 'fra',
-  realm: 'oc1',
-  hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
-  environments: {
-    prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
-      projects: { proj1: {} },
-    },
-  },
-  shared_platforms: {
-    oke: {
-      network: { vcn: '10.0.80.0/20' },
-      extension: {
-        type: 'oke_simple',
-        params: {
-          kubernetes_version: 'v1.35.2',
-          services_cidr: '10.96.0.0/16',
-          api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
-        },
-      },
-    },
-  },
-});
 local mixed = multi({
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
@@ -93,18 +68,6 @@ local mixed = multi({
     prod_plain['network.json'].network_configuration.network_configuration_categories['2-prod-platform-data'].category_compartment_id,
   shared_plain_compartment:
     shared_plain['network.json'].network_configuration.network_configuration_categories['2-shared-platform-data'].category_compartment_id,
-  shared_oke: {
-    platform_children:
-      std.sort(std.objectFields(
-        shared_oke['iam.json'].compartments_configuration.compartments['CMP-LANDINGZONE-KEY']
-          .children['CMP-LZ-PLATFORM-KEY'].children
-      )),
-    platform_name:
-      shared_oke['iam.json'].compartments_configuration.compartments['CMP-LANDINGZONE-KEY']
-        .children['CMP-LZ-PLATFORM-KEY'].children['CMP-LZ-SHARED-OKE-KEY'].name,
-    category_compartment_id:
-      shared_oke['network.json'].network_configuration.network_configuration_categories['shared-platform-oke'].category_compartment_id,
-  },
   prod_oke:
     mixed['iam.json'].compartments_configuration.compartments['CMP-LANDINGZONE-KEY']
       .children['CMP-LZ-PROD-KEY'].children['CMP-LZ-PROD-PLATFORM-KEY']

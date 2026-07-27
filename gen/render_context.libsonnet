@@ -129,12 +129,14 @@ local common = import 'hub/hub_common.libsonnet';
         {
           extension_registry: extension_registry,
           extension_entries: extension_entries,
+          cis_level: config.cis_level,
         } + self.extension_routing_context(hub_has_spoke_natgw),
 
       extension_resolve_entry_inputs(extension_registry, platform_entry, hub_has_spoke_natgw=true)::
         {
           extension_registry: extension_registry,
           platform_entry: platform_entry,
+          cis_level: config.cis_level,
         } + self.extension_routing_context(hub_has_spoke_natgw),
     },
 }

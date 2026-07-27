@@ -6,7 +6,7 @@
 //     metadata(params):: { default_subnets, subnet_order },
 //     render(params):: { metadata, contributions },
 //   }
-//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, pods_cidr?, cni_type?, cni?, cluster_size?}
+//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, pods_cidr?, cni_type?, cni?, cluster_size?, public_load_balancer?}
 //   params.network       — {vcn: 'cidr', subnets: {name: cidr}}
 //   params.naming        — naming object
 //   params.topology      — platform scope semantics from topology.libsonnet
@@ -16,10 +16,16 @@ local oke_workers = import './oke_workers.libsonnet';
 local oke_clusters = import './oke_clusters.libsonnet';
 local oke_network = import './oke_network.libsonnet';
 local oke_iam = import './oke_iam.libsonnet';
+local oke_iam_shared = import './oke_iam_shared.libsonnet';
+local oke_compartments = import './oke_compartments.libsonnet';
+local oke_governance = import './oke_governance.libsonnet';
+local oke_security = import './oke_security.libsonnet';
 local oke_context = import './oke_context.libsonnet';
 
 {
   metadata(params):: {
+    assert params.topology.scope_type == 'environment' :
+      'oke_simple is supported only under environments.<environment>.platforms',
     local raw_cni_type =
       if std.objectHas(params.config_params, 'cni_type') && params.config_params.cni_type != null then
         params.config_params.cni_type
@@ -124,6 +130,16 @@ local oke_context = import './oke_context.libsonnet';
         oke_clusters: oke_clusters(ctx),
         network_pre: oke_network(ctx),
         iam: oke_iam(ctx),
+        security_cis2: if ctx.cis_level == 2 then oke_security(ctx) else {},
       },
+    },
+  aggregate(results)::
+    local contexts = [
+      oke_context.build(result.render_params, result.metadata)
+      for result in results
+    ];
+    {
+      iam: oke_compartments(contexts) + oke_iam_shared(contexts),
+      governance: oke_governance,
     },
 }

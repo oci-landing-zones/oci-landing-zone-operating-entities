@@ -3,7 +3,7 @@
 local cidr = (import './oke_network_rule_factories.libsonnet').cidr;
 
 {
-  pod_ingress(ctx):: if ctx.hub_lb_cidr == null then {} else {
+  pod_ingress(ctx):: if !ctx.public_load_balancer || ctx.hub_lb_cidr == null then {} else {
     hub_public_lb_tcp: cidr.tcp_ingress(
       'Allow TCP ingress to pods from Hub public LB subnet %s. OKE can create public LBs there; cross-VCN rule uses CIDR instead of NSG.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr
@@ -14,7 +14,7 @@ local cidr = (import './oke_network_rule_factories.libsonnet').cidr;
     ),
   },
 
-  pod_egress(ctx):: if ctx.hub_lb_cidr == null then {} else {
+  pod_egress(ctx):: if !ctx.public_load_balancer || ctx.hub_lb_cidr == null then {} else {
     hub_public_lb_tcp: cidr.tcp_egress(
       'Return pair: allow TCP egress from pods to Hub public LB subnet %s for public LB traffic responses.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr
@@ -25,7 +25,7 @@ local cidr = (import './oke_network_rule_factories.libsonnet').cidr;
     ),
   },
 
-  worker_ingress(ctx):: if ctx.hub_lb_cidr == null then {} else {
+  worker_ingress(ctx):: if !ctx.public_load_balancer || ctx.hub_lb_cidr == null then {} else {
     hub_public_lb_10256: cidr.tcp_ingress_dst(
       'Allow TCP ingress to workers from Hub public LB subnet %s for health checks on port 10256. Cross-VCN rule uses CIDR instead of NSG.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr,
@@ -45,7 +45,7 @@ local cidr = (import './oke_network_rule_factories.libsonnet').cidr;
     ),
   },
 
-  worker_egress(ctx):: if ctx.hub_lb_cidr == null then {} else {
+  worker_egress(ctx):: if !ctx.public_load_balancer || ctx.hub_lb_cidr == null then {} else {
     hub_public_lb_10256: cidr.tcp_egress_src(
       'Return pair: allow TCP egress from workers to Hub public LB subnet %s with source port 10256 for health checks.' % ctx.hub_lb_cidr,
       ctx.hub_lb_cidr,

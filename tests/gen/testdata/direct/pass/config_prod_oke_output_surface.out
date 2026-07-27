@@ -46,5 +46,9 @@
     "SN-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY"
   ],
   "unexpected_split_output_files_present": [],
-  "worker_image": "8.10"
+  "worker_boot_volume_encryption": {
+    "enable_encrypt_in_transit": true,
+    "kms_key_id": "KEY-FRA-LZ-PROD-OKE-KUBE-SECRETS-KEY"
+  },
+  "worker_image": "9\\.[0-9]+"
 }

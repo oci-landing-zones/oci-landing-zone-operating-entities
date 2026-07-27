@@ -121,7 +121,7 @@ flowchart TD
 - Builders that need environment identity, resource key segments, display segments, DNS segments, or compartment paths should use topology entries from `topology.libsonnet` instead of passing raw environment-name strings across builder boundaries.
 - Detailed spoke rendering is delegated to `gen/builders/network_spokes.libsonnet`.
 - DRG and hub integration overlays are delegated to `gen/builders/hub_integration.libsonnet`.
-- `extensions.libsonnet` owns extension metadata/render contract resolution. Cross-entry extension component summary lives in `gen/lib/extension_components.libsonnet`.
+- `extensions.libsonnet` owns extension metadata/render contract resolution. An extension builder may also expose `aggregate(results)` to contribute shared artifacts across all instances of its type; the composition core merges those contributions without importing extension-specific code. Cross-entry extension component summary lives in `gen/lib/extension_components.libsonnet`.
 - `landing_zone_multi.jsonnet` is the config-mode wrapper that maps result fields to filenames.
 - `format_json.py` is the final presentation formatting step invoked after Jsonnet evaluation.
 
@@ -337,7 +337,7 @@ Contract phases:
 - `render(params)`: returns contributions keyed by domain:
   - `network_pre`: merged into `network_configuration_categories` for networked extensions
   - `iam`: merged into IAM output
-  - `security_cis1`, `security_cis2`: merged into security outputs
+  - `security_cis1`, `security_cis2`: merged into both pre and final security outputs so extension prerequisites exist before extension resources are deployed
   - `observability_cis1`, `observability_cis2`: merged into observability outputs
   - Any other generic key (e.g. `oke_clusters`, `oke_workers`): collected into `result.extra`
 
@@ -408,7 +408,7 @@ Config mode validates required fields during normalization. `config.environments
 - `landing_zone.libsonnet` and builder modules may consume topology ordering helpers, but they must not define their own `preferred_env_names` list.
 - Environment platform compartments live under `CMP-LZ-<ENV>-PLATFORM-KEY`, but their child keys omit the redundant parent segment: `CMP-LZ-<ENV>-<NAME>-KEY`.
 - Shared platform compartments live under `CMP-LZ-PLATFORM-KEY`, but their child keys omit the redundant parent segment: `CMP-LZ-SHARED-<NAME>-KEY`.
-- Shared platform OCI compartment names include the shared scope without repeating the parent platform segment. Example: shared OKE uses `cmp-lz-shared-oke` and `cmp-landingzone:cmp-lz-platform:cmp-lz-shared-oke`.
+- Shared platform OCI compartment names include the shared scope without repeating the parent platform segment. Example: a shared ExaCS platform uses `cmp-lz-shared-exacs` and `cmp-landingzone:cmp-lz-platform:cmp-lz-shared-exacs`. Individual workload extensions may reject shared placement; `oke_simple` is environment-only.
 - Platform identity/resources use platform compartments, while platform network categories use the scope's network compartment references.
 - Integrated IAM owns platform child compartments for config-driven outputs.
 - Standalone multi-stack OKE may overlay the same platform child compartment only to stay self-contained.

@@ -1,6 +1,7 @@
 // OKE render context and customer-authored parameter validation.
 
 local cidrs = import '../../../lib/cidrs.libsonnet';
+local public_lb = import './oke_public_load_balancer.libsonnet';
 
 {
   build(params, metadata)::
@@ -22,6 +23,11 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
   local hub_lb_cidr =
     if routing != null && std.objectHas(routing, 'hub_lb_cidr') then routing.hub_lb_cidr
     else null;
+  local public_load_balancer = public_lb.public_load_balancer_enabled(params.platform_config);
+  assert !public_load_balancer || has_hub :
+    'oke_simple config_params.public_load_balancer requires a hub-backed platform network';
+  assert !public_load_balancer || hub_lb_cidr != null :
+    'oke_simple config_params.public_load_balancer requires the Hub load balancer subnet';
   local internet_default_target =
     if routing != null && std.objectHas(routing, 'internet_default_target')
     then routing.internet_default_target
@@ -124,11 +130,11 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
         'config_params.worker_image must be a string';
       params.config_params.worker_image
     else
-      '8.10';
-	  local sn_key(suffix) =
-	    n.key('SN', key_segments + [suffix]);
-	  local rt_key(suffix) =
-	    n.key('RT', key_segments + [suffix]);
+      '9\\.[0-9]+';
+  local sn_key(suffix) =
+    n.key('SN', key_segments + [suffix]);
+  local rt_key(suffix) =
+    n.key('RT', key_segments + [suffix]);
   local checked_oke_name(label, value, max_len) =
     assert std.length(value) <= max_len :
       '%s must be %d characters or less: %s (%d)' % [label, max_len, value, std.length(value)];
@@ -141,6 +147,10 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     n.key('NDP', display_segments);
   local node_pool_name =
     checked_oke_name('OKE node pool name', n.display('ndp', display_segments), 32);
+  local vault_key =
+    n.key_global('VLT', ['SHARED', 'SECURITY']);
+  local kube_secret_key =
+    n.key('KEY', display_segments + ['KUBE', 'SECRETS']);
   {
     params: params,
     metadata: metadata,
@@ -155,6 +165,8 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     routing: routing,
     has_hub: has_hub,
     hub_lb_cidr: hub_lb_cidr,
+    public_load_balancer: public_load_balancer,
+    platform_tag_value: public_lb.platform_tag_value(scope.qualified_name, plat),
     internet_default_target: internet_default_target,
     use_local_natgw: use_local_natgw,
     category_key: category_key,
@@ -168,12 +180,18 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     is_overlay_network: is_overlay_network,
     optional_cluster_kubernetes_network_config: optional_cluster_kubernetes_network_config,
     worker_image: worker_image,
+    cis_level: params.cis_level,
     cluster_key: cluster_key,
     cluster_name: cluster_name,
     node_pool_key: node_pool_key,
     node_pool_name: node_pool_name,
+    vault_key: vault_key,
+    vault_name: n.display_global('vlt', ['shared', 'security']),
+    kube_secret_key: kube_secret_key,
+    kube_secret_key_name: n.display('key', display_segments + ['kube', 'secrets']),
     subnets: params.network.subnets,
 	    vcn_key: n.key('VCN', key_segments),
+	    hub_vcn_key: n.key('VCN', ['HUB']),
 	    sgw_key: n.key('SGW', key_segments),
 	    ngw_key: n.key('NGW', key_segments),
     drg_key: n.key('DRG', ['HUB']),
@@ -193,6 +211,7 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
 	    nsg_lb_key: n.key('NSG', key_segments + ['INT-LB']),
 	    nsg_pods_key: n.key('NSG', key_segments + ['PODS']),
 	    nsg_workers_key: n.key('NSG', key_segments + ['WORKERS']),
+    hub_frontend_nsg_key: n.key('NSG', ['HUB'] + key_segments + ['PUBLIC-LB']),
     dns: scope.dns,
   },
 }
