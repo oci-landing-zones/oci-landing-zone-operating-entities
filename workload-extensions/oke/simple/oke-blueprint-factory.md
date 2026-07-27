@@ -93,6 +93,7 @@ Create a configuration file, for example `oke-native.jsonnet`:
               cni_type: 'native',
               cni: 'vcn_native',
               cluster_size: 'small',
+              worker_boot_volume_size: 60,
               api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
               public_load_balancer: true,
             },
@@ -344,6 +345,8 @@ Public frontend NSGs scale as one Hub network resource per opted-in OKE platform
 For native OKE, the generated worker node pool includes `pods_subnet_id` and `pods_nsg_ids`.
 
 The top-level `cis_level` controls OKE encryption behavior as well as the selected security and observability files. For CIS2, each cluster's `encryption.kube_secret_kms_key_id` references its generated key in `security_cis2.json`, and the worker node pool uses the same key for boot-volume encryption with in-transit encryption enabled. The generator derives these configuration keys from the canonical landing-zone naming convention rather than accepting a customer-supplied OKE KMS-key option. The pinned Orchestrator resolves both references through `kms_dependency`; no key OCID or policy substitution is required. The shared Vault remains in the Landing Zone security compartment, while each HSM key is created in its owning OKE platform compartment. For CIS1, cluster and worker CMEK references and OKE Vault/key resources are omitted; worker boot volumes use OCI-managed encryption and in-transit encryption is disabled.
+
+`worker_boot_volume_size` defaults to `60` GB and accepts an integer from `50` through `32768`. Worker initialization runs `oci-growfs` at both CIS levels so the root partition and filesystem consume the configured boot-volume size. It then fetches and executes the OKE-provided bootstrap script from instance metadata; this step must remain in custom worker initialization so nodes can join the cluster. CIS2 initialization also installs `oci-fss-utils` from the developer repository matching the node's runtime Oracle Linux major version (`ol8_developer` or `ol9_developer`). This prepares CIS2 workers for encrypted OCI File Storage mounts; CIS1 does not install the package.
 
 For CIS2 deployment validation, confirm the Vault and key compartments, confirm that the cluster and node pool reference the same generated configuration key, and verify the three generated platform-compartment KMS statements before deployment. Worker boot-volume delegation is granted only to same-compartment node-pool principals. Confirm the Landing Zone baseline service policy supplies Block Storage key use. Persistent volumes use a separately governed key. For split stacks, pass the security-stack KMS dependency output to the OKE stack instead of replacing configuration keys with literal OCIDs or editing generated IAM.
 

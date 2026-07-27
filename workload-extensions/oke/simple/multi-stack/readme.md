@@ -199,9 +199,9 @@ Edit `oke_workers.json`:
 - **Instance Shape**: Modify `node_shape`, `ocpus`, `memory` for different compute resources
 - **Worker Image**: The default `9\\.[0-9]+` selector chooses a matching Oracle Linux 9 OKE image; update `node_config_details.image` after checking the supported images for the target Kubernetes version
 - **Encryption**: The committed multi-stack files use CIS1 with OCI-managed encryption and leave boot-volume encryption in transit disabled.
-- **Boot Volume**: Adjust `boot_volume.size` for storage requirements
+- **Boot Volume**: Adjust `node_config_details.boot_volume_size` for storage requirements. Keep the generated `oci-growfs` cloud-init command so the root filesystem uses the configured capacity.
 - **SSH Access**: Update `default_ssh_public_key_path` with your SSH public key path
-- **Cloud-init**: Customize `cloud_init` for additional node configuration
+- **Cloud-init**: Customize `node_config_details.cloud_init.heredoc_script` for additional node configuration without removing the generated `oci-growfs` command or the OKE bootstrap fetched from instance metadata.
 
 ### Network Configuration <!-- omit from toc -->
 

@@ -138,6 +138,20 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
       params.config_params.worker_image
     else
       '9\\.[0-9]+';
+  local worker_boot_volume_size =
+    if std.objectHas(params.config_params, 'worker_boot_volume_size') &&
+       params.config_params.worker_boot_volume_size != null then
+      assert std.type(params.config_params.worker_boot_volume_size) == 'number' :
+        'config_params.worker_boot_volume_size must be a number';
+      assert std.floor(params.config_params.worker_boot_volume_size) ==
+             params.config_params.worker_boot_volume_size :
+        'config_params.worker_boot_volume_size must be an integer';
+      assert params.config_params.worker_boot_volume_size >= 50 &&
+             params.config_params.worker_boot_volume_size <= 32768 :
+        'config_params.worker_boot_volume_size must be between 50 and 32768 GB';
+      params.config_params.worker_boot_volume_size
+    else
+      60;
   local sn_key(suffix) =
     n.key('SN', key_segments + [suffix]);
   local rt_key(suffix) =
@@ -188,6 +202,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     is_overlay_network: is_overlay_network,
     optional_cluster_kubernetes_network_config: optional_cluster_kubernetes_network_config,
     worker_image: worker_image,
+    worker_boot_volume_size: worker_boot_volume_size,
     cis_level: params.cis_level,
     cluster_key: cluster_key,
     cluster_name: cluster_name,

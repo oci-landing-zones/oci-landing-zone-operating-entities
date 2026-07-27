@@ -6,7 +6,7 @@
 //     metadata(params):: { default_subnets, subnet_order },
 //     render(params):: { metadata, contributions },
 //   }
-//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, pods_cidr?, cni_type?, cni?, cluster_size?, public_load_balancer?, create_fss?}
+//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, worker_boot_volume_size?, pods_cidr?, cni_type?, cni?, cluster_size?, public_load_balancer?, create_fss?}
 //   params.network       — {vcn: 'cidr', subnets: {name: cidr}}
 //   params.naming        — naming object
 //   params.topology      — platform scope semantics from topology.libsonnet
