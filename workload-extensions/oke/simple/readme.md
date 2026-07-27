@@ -60,17 +60,17 @@ Both approaches deploy the same main components:
 | Network | An OKE VCN with cluster, worker, pod, and private load-balancer subnets and NSGs; Hub routing and public-ingress prerequisites are included. |
 | OKE | A Kubernetes cluster with VCN-native pod networking. |
 | Workers | A managed node pool using `VM.Standard.E5.Flex` and an Oracle Linux 9 OKE image. |
-| Workload load balancing | Private OCI Load Balancers use the OKE VCN. Public OCI Load Balancers use the Hub LB subnet and a network-team-controlled frontend NSG. |
+| Workload load balancing | Private OCI Load Balancers and Network Load Balancers use the OKE VCN. Public OCI Load Balancers use the Hub LB subnet and a network-team-controlled frontend NSG. |
 
 This repository deploys OCI infrastructure only. Deploy Kubernetes workloads and `Service` resources through an approved Kubernetes delivery process.
 
 ### Deploying workload load balancers
 
-Use the deployed network-stack outputs to resolve subnet and NSG OCIDs.
+Use the deployed network-stack outputs to resolve compartment, subnet, and NSG OCIDs. The generated `int-lb-default-backend` NSG is for Service backends. In private deployments, OKE can create and manage a separate frontend NSG in the environment network compartment. Public Hub frontend NSGs remain network-team-managed.
 
 #### Private OCI Load Balancer
 
-A private load balancer stays in the OKE VCN and uses the cluster's configured private services subnet. Add the generated internal-LB NSG at creation and disable controller-managed security rules:
+A private load balancer stays in the OKE VCN and uses the cluster's configured private services subnet. Use NSG management mode so OKE creates the frontend NSG and rules in the environment network compartment. Attach the generated default backend NSG separately:
 
 ```yaml
 apiVersion: v1
@@ -81,8 +81,8 @@ metadata:
     oci.oraclecloud.com/load-balancer-type: "lb"
     oci.oraclecloud.com/compartment-id: "<environment-network-compartment-ocid>"
     service.beta.kubernetes.io/oci-load-balancer-internal: "true"
-    oci.oraclecloud.com/security-rule-management-mode: "None"
-    oci.oraclecloud.com/oci-network-security-groups: "<internal-lb-nsg-ocid>"
+    oci.oraclecloud.com/security-rule-management-mode: "NSG"
+    oci.oraclecloud.com/oci-backend-network-security-group: "<default-backend-nsg-ocid>"
 spec:
   type: LoadBalancer
   selector:
@@ -93,6 +93,34 @@ spec:
 ```
 
 The compartment annotation is required because OKE otherwise creates the load balancer in the cluster compartment, while this extension authorizes private load-balancer lifecycle in the environment network compartment. Apply the manifest and wait for the Service to receive a private address. If an alternative private subnet is required, add `service.beta.kubernetes.io/oci-load-balancer-subnet1: "<private-subnet-ocid>"`.
+
+#### Private OCI Network Load Balancer
+
+A private Network Load Balancer uses NLB-specific subnet and internal annotations. The same spoke-network policy lets OKE create its frontend NSG, while the generated default backend NSG is attached to the Service backends:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-private-nlb-service
+  annotations:
+    oci.oraclecloud.com/load-balancer-type: "nlb"
+    oci.oraclecloud.com/compartment-id: "<environment-network-compartment-ocid>"
+    oci-network-load-balancer.oraclecloud.com/internal: "true"
+    oci-network-load-balancer.oraclecloud.com/subnet: "<internal-lb-subnet-ocid>"
+    oci.oraclecloud.com/security-rule-management-mode: "NSG"
+    oci.oraclecloud.com/oci-backend-network-security-group: "<default-backend-nsg-ocid>"
+spec:
+  type: LoadBalancer
+  selector:
+    app: my-app
+  ports:
+    - port: 443
+      targetPort: 8443
+  externalTrafficPolicy: Local
+```
+
+`externalTrafficPolicy: Local` preserves the client source address. Review the application traffic pattern before using it because only nodes with a local ready endpoint receive traffic.
 
 #### Public OCI Load Balancer
 
@@ -110,6 +138,7 @@ A public load balancer is created in the Hub network compartment and Hub LB subn
        oci.oraclecloud.com/compartment-id: "<hub-network-compartment-ocid>"
        service.beta.kubernetes.io/oci-load-balancer-subnet1: "<hub-lb-subnet-ocid>"
        oci.oraclecloud.com/security-rule-management-mode: "None"
+       oci.oraclecloud.com/oci-backend-network-security-group: "<default-backend-nsg-ocid>"
    spec:
      type: LoadBalancer
      selector:
@@ -133,7 +162,15 @@ OKE then attaches the NSG and continues listener and backend reconciliation. Do 
 
 The network team exclusively manages the Hub frontend NSG's placement, platform tag, rules, movement, and lifecycle. OKE can attach it only when its `tagns-lz-oke.platform` tag matches the cluster platform tag. Approval is cluster-to-NSG, not Service-to-NSG, so the cluster can reuse that approved NSG on its other public load balancers. IAM remains the enforcement boundary even if Kubernetes admission or RBAC is bypassed.
 
-See the [summary of OKE load-balancer annotations](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingloadbalancer_topic-Summaryofannotations.htm) for the complete annotation reference.
+To reuse a reserved public IPv4 address, create it in the Hub network compartment and add `oci.oraclecloud.com/reserved-ips: "<reserved-public-ip-address>"` during initial Service creation. The annotation takes the IP address value, not the public-IP OCID.
+
+#### Public OCI Network Load Balancer
+
+Public Network Load Balancers in the Hub are not supported by the current `oke_simple` contract. The generated Hub policy intentionally permits public OCI Load Balancer lifecycle only; it does not grant `manage network-load-balancers` in the Hub network compartment. A public NLB Service targeting the Hub subnet therefore fails authorization.
+
+Manual post-deployment configuration is required if a public NLB is needed. The customer must define and govern the Hub NLB, frontend NSG, public IP, IAM, and lifecycle outside the generated OKE workload extension. Do not adapt the public LB example by changing only `load-balancer-type` to `nlb`.
+
+See the [summary of OKE load-balancer annotations](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingloadbalancer_topic-Summaryofannotations.htm) for the complete LB and NLB annotation reference.
 
 ### Additional operational notes
 

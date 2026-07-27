@@ -40,7 +40,7 @@ The simple multi-stack path is a Hub E quickstart that creates one production OK
 - **Public workload ingress**: OKE has narrowly scoped permissions to create public OCI Load Balancers in the prepared Hub subnet; the quickstart does not provision a Terraform-managed Hub L7 Load Balancer
 - **Multi-Step Deployment**: Deploy the Hub E landing zone first, then deploy the OKE stack separately
 
-Before granting Kubernetes Service permissions, review the shared [operational and security notes](../readme.md#operational-and-security-notes).
+Before granting Kubernetes Service permissions, review the shared [private and public LB/NLB Service examples](../readme.md#deploying-workload-load-balancers) and [additional operational notes](../readme.md#additional-operational-notes).
 
 &nbsp;
 
