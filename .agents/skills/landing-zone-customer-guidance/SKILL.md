@@ -17,10 +17,10 @@ Core principle: guide the customer through the required design decisions one at 
 
 - A customer asks for landing zone design, deployment, or recommendation help
 - The request is outcome-first, such as "I want landing zone to run OKE"
-- The customer may not know repo or generator terms
-- You need to determine whether the standard published path or the config-driven path fits
+- The customer may not know repository or OCI LZ Blueprint Factory terms
+- You need to determine whether the standard published path or the OCI LZ Blueprint Factory fits
 
-Do not use this skill for repo-development work. Once the request is clearly on the config-driven path and the customer decisions are already known, switch to `landing-zone-config`.
+Do not use this skill for repo-development work. Once the request is clearly on the OCI LZ Blueprint Factory path and the customer decisions are already known, switch to `landing-zone-config`.
 
 ## Workflow
 
@@ -36,7 +36,7 @@ Do not use this skill for repo-development work. Once the request is clearly on 
 
 ## Unsupported Requirements
 
-If the selected published path, config generator, or workload extension does not support a requested resource, service, topology, or behavior:
+If the selected published path, OCI LZ Blueprint Factory, or workload extension does not support a requested resource, service, topology, or behavior:
 
 - Say plainly that it is not supported by the Landing Zone framework today.
 - Do not invent config keys, edit generated JSON, or imply the framework can create it.

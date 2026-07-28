@@ -1,5 +1,7 @@
 # Local Set-up
 
+The `gen/` Jsonnet implementation powers the [OCI LZ Blueprint Factory](../addons/oci-lz-blueprint-factory/README.md). This contributor guide uses implementation terms such as generator, config mode, and Jsonnet where technical precision is required.
+
 Run `bash gen/generate.sh` the first time you work on the generator. It sets up the repo hooks, checks that a Jsonnet renderer is installed, and regenerates the checked-in outputs.
 
 ## Documentation Map

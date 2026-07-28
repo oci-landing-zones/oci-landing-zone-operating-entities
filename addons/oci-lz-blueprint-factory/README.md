@@ -28,11 +28,11 @@ For standard deployments that do not require updates, using the published bluepr
 The Blueprint Factory can be used in three ways:
 
 <p align="center">
-  <img src="images/workflow.png" alt="Blueprint Factory access paths for AI-assisted, direct config, and published blueprint usage" width="800">
+  <img src="images/workflow.png" alt="Blueprint Factory access paths for OCI LZ AI Agent, direct factory, and published blueprint usage" width="800">
 </p>
 
-- **AI-assisted path**: use the [OCI LZ AI Agent](/addons/oci-lz-ai-agent/README.md) to help discover requirements and draft a config-driven input.
-- **Direct config path**: write or update the configuration directly, then run config mode generation.
+- **OCI LZ AI Agent path**: use the [OCI LZ AI Agent](/addons/oci-lz-ai-agent/README.md) to help discover requirements and draft a Blueprint Factory input.
+- **Direct Blueprint Factory path**: write or update the source configuration directly, then run the factory.
 - **Published blueprint path**: select an existing repository blueprint, workload extension, or add-on when the target design already matches a published option.
 
 Paths 1 and 2 produce customer-specific generated files. Path 3 does not require a custom factory run.
@@ -41,7 +41,7 @@ Paths 1 and 2 produce customer-specific generated files. Path 3 does not require
 
 ## 3. Configuration Syntax and Examples
 
-The source configuration for the Blueprint Factory is a JSON document. JSON keeps the input easy to review, store, and compare in normal code review workflows. The generator also accepts Jsonnet for advanced composition, but the examples in this add-on use JSON.
+The source configuration for the Blueprint Factory is a JSON document. JSON keeps the input easy to review, store, and compare in normal code review workflows. The underlying implementation also accepts Jsonnet for advanced composition, but the examples in this add-on use JSON.
 
 A typical configuration describes the target Landing Zone in a few top-level blocks:
 
@@ -117,7 +117,7 @@ Use the examples as readable patterns. Replace region, hub model, environment na
 
 ## 4. Generation Workflow
 
-The factory flow starts with a source configuration and produces a generated file set for review and deployment. Run config mode from the repository root:
+The factory flow starts with a source configuration and produces a generated file set for review and deployment. Run Blueprint Factory config mode from the repository root:
 
 ```bash
 bash gen/generate.sh --config <config_file> [output_dir]
@@ -142,7 +142,7 @@ The output package commonly includes files such as:
 
 Some configurations emit `*_pre.json` files, such as `network_pre.json` or `observability_*_pre.json`. These files support staged deployments where some resources need to exist before dependent resources are configured.
 
-See the [Generator README](/gen/README.md) for local setup and command details.
+See the [Blueprint Factory implementation README](/gen/README.md) for local setup and command details.
 
 &nbsp;
 
@@ -187,9 +187,9 @@ Deployment follows the standard [Terraform deployment guide](/commons/content/te
 
 | Resource | Purpose |
 |---|---|
-| [OCI LZ AI Agent](/addons/oci-lz-ai-agent/README.md) | AI-assisted discovery and config drafting guidance. |
-| [Generator README](/gen/README.md) | Local setup and generator commands. |
-| [Generator Architecture](/gen/AGENTS.md) | Advanced generator reference for repository contributors. |
+| [OCI LZ AI Agent](/addons/oci-lz-ai-agent/README.md) | AI-assisted discovery and Blueprint Factory input drafting guidance. |
+| [Blueprint Factory implementation](/gen/README.md) | Local setup and factory commands. |
+| [Blueprint Factory implementation architecture](/gen/AGENTS.md) | Advanced implementation reference for repository contributors. |
 | [Jsonnet Composition Guide](/gen/JSONNET_COMPOSITION.md) | Advanced composition reference for repository contributors. |
 | [One-OE Runtime Documentation](/blueprints/one-oe/runtime/one-stack/readme.md) | Published blueprint runtime reference. |
 | [OCI Network Hubs](/addons/oci-hub-models/readme.md) | Published hub model add-ons. |

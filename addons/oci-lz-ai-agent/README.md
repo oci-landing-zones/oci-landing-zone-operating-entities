@@ -1,5 +1,5 @@
 # **[OCI LZ AI Agent](#)**
-## **An OCI Open LZ [Addon](#) for AI assisted Landing Zones**
+## **An OCI Open LZ [Addon](#) for AI-assisted Landing Zones**
 
 &nbsp;
 
@@ -17,20 +17,20 @@
 
 ## 1. Overview
 
-The **OCI LZ AI Agent** addon helps to use AI coding agents with the OCI Landing Zone Operating Entities repository. It aligns landing zone design with repository knowledge, json structure and review before manual deployment.
+The **OCI LZ AI Agent** add-on guides AI coding agents through the OCI Landing Zone Operating Entities repository. It aligns landing zone design with repository knowledge, JSON structure, and review before manual deployment.
 
 <p align="center">
   <img src="images/oci-lz-ai-agent-flow.png" alt="Three step flow for AI guided Operating Entities setup" width="600">
 </p>
 
 > [!IMPORTANT]
-> AI assisted landing zone generation, modification or deployment guidance is provided at your own risk. Review all outputs for correctness, security and regulatory or internal compliance before deploying them.
+> OCI LZ AI Agent-assisted landing zone generation, modification, or deployment guidance is provided at your own risk. Review all outputs for correctness, security, and regulatory or internal compliance before deploying them.
 
 This addon supports faster landing zone discovery while keeping architecture ownership and deployment control with your organization.
 
 - **Faster discovery**: AI helps structure requirements for environments, networking, IAM, security, observability and governance.
 - **Reviewable documentation**: Initial drafts are prepared for architecture and security review before deployment decisions.
-- **Security centered review**: AI Security checks are applied to all AI generated configurations. Assumptions and open questions are surfaced before deployment.
+- **Security-centered review**: AI security checks are applied to all AI-generated configurations. Assumptions and open questions are surfaced before deployment.
 - **Guided deployment**: Deployment steps and review of landing zone is guided by AI.
 
 &nbsp;
@@ -44,7 +44,7 @@ Before using this addon:
 
 1. Select an AI coding agent that fits organizational security and operational requirements.
 1. Install and configure the selected AI coding agent with official documentation, such as the [Codex App documentation](https://developers.openai.com/codex/app) or [Claude Code setup](https://code.claude.com/docs/en/setup).
-1. Install Jsonnet which is required for LZ generation. Make sure the `jsonnet` command is available on `$PATH`. For installation instruction use the [Google go-jsonnet repository](https://github.com/google/go-jsonnet).
+1. Install Jsonnet, which the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md) requires for Landing Zone generation. Make sure the `jsonnet` command is available on `$PATH`. For installation instructions, use the [Google go-jsonnet repository](https://github.com/google/go-jsonnet).
 1. Clone the OCI Landing Zone Operating Entities repository locally.
 1. Always make sure to launch your agent in the Operating Entities folder you've cloned.
 
@@ -64,7 +64,7 @@ Recommended inputs:
 - Workloads to be deployed on top of OCI Landing Zone.
 - Security, observability, governance and compliance requirements.
 
-The AI Agent works within the [Blueprint Factory](../oci-lz-blueprint-factory/README.md) to:
+The OCI LZ AI Agent works with the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md) to:
 
 1. **Discover**: AI asks questions to understand your landing zone requirements.
 2. **Select Templates**: AI identifies the best-fit published blueprint or determines if customization is needed.
@@ -127,24 +127,24 @@ Follow additional documentation for both deployment paths of Landing Zones:
 
 ## 3. Engineered Security from the Ground-up
 
-AI assistance remains anchored in the OCI Landing Zone Operating Entities repository model. The AI agent creates or updates structured inputs and review artifacts. It does not invent landing zone files from memory or produce deployment artifacts outside the repository model.
+OCI LZ AI Agent assistance remains anchored in the OCI Landing Zone Operating Entities repository model. The OCI LZ AI Agent creates or updates structured inputs and review artifacts. It does not invent landing zone files from memory or produce deployment artifacts outside the repository model.
 
-The [Blueprint Factory](../oci-lz-blueprint-factory/README.md) provides the foundational input layer that keeps the design traceable and repeatable. It helps prevent arbitrary landing zone output from AI memory and halucinations by keeping design intent aligned with repository owned landing zone patterns.
+The [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md) provides the foundational input layer that keeps the design traceable and repeatable. It helps prevent arbitrary landing zone output from AI memory and hallucinations by keeping design intent aligned with repository-owned landing zone patterns.
 
 - **Structured design surface**: Landing zone intent is captured in a structured format before deployment artifacts are considered.
 - **Repository based behavior**: Outputs are derived from OCI Landing Zone Operating Entities repository logic.
 - **Repeatable Composition**: The same inputs always produce identical JSON outputs, supporting GitOps workflows.
 - **Reviewable change**: Design updates are inspected as focused diffs before deployment.
-- **Reduced hallucination risk**: AI cannot invent resources outside the generator's contract. Unsupported requirements are clearly marked as manual post-deployment steps.
+- **Reduced hallucination risk**: The OCI LZ AI Agent cannot invent resources outside the OCI LZ Blueprint Factory contract. Unsupported requirements are clearly marked as manual post-deployment steps.
 - **Ownership boundary**: AI assists with drafting and review while architecture, security, compliance and deployment approval remain with your organization.
 
-Review [Blueprint Factory Add-on](../oci-lz-blueprint-factory/README.md) for more details.
+Review the [OCI LZ Blueprint Factory add-on](../oci-lz-blueprint-factory/README.md) for more details.
 
 &nbsp;
 
 ## 4. Complementary Resources
 
-- **[Blueprint Factory Documentation](../oci-lz-blueprint-factory/README.md)** - Deep dive into how the Blueprint Factory works, including architecture, composition patterns, and advanced customization techniques.
+- **[OCI LZ Blueprint Factory documentation](../oci-lz-blueprint-factory/README.md)** - Deep dive into how the Blueprint Factory works, including architecture, composition patterns, and advanced customization techniques.
 - **[One-OE Blueprint](../../blueprints/one-oe/design)** - Landing zone design principles and architecture
 
 &nbsp;

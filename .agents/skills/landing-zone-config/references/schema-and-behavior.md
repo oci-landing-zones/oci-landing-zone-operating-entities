@@ -4,7 +4,7 @@
 
 - `gen/config.libsonnet` validates the required config shape and normalizes omitted values.
 - `gen/landing_zone.libsonnet` turns normalized config into hub, spoke, platform, IAM, governance, security, observability, and extension outputs.
-- `gen/landing_zone_multi.jsonnet` decides which output files appear in config mode.
+- `gen/landing_zone_multi.jsonnet` decides which output files appear in Blueprint Factory config mode.
 - `gen/AGENTS.md` explains the intended architecture, naming conventions, and publication guardrails.
 
 ## Minimal Config Shape
@@ -37,7 +37,7 @@ Optional but important:
 - `region`, defaulting to `eu-frankfurt-1`
 - `region_short_name`, defaulting to `fra`
 - `realm`, defaulting to `oc1` (including when explicitly `null`); supported values are `oc1` and `oc19`
-- `cis_level`, defaulting to `2`; config mode emits only the selected CIS level's security and observability files
+- `cis_level`, defaulting to `2`; Blueprint Factory config mode emits only the selected CIS level's security and observability files
 - `hub.network.subnets`
 - `shared_platforms`
 - `environments.<env>.platforms`
@@ -146,4 +146,4 @@ Conditional outputs:
 2. Add one environment or platform at a time.
 3. Run `bash gen/generate.sh --config <config_file> [output_dir]`.
 4. Validate `network.json` as the canonical final network artifact; expect `network_pre.json` only for staged hubs.
-5. When changing schema or extension assumptions, update tests or regression fixtures that cover config mode.
+5. When changing schema or extension assumptions, update tests or regression fixtures that cover Blueprint Factory config mode.
