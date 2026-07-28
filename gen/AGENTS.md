@@ -429,3 +429,8 @@ Config mode validates required fields during normalization. `config.environments
 - **Optional parameters**: Use `null` as default, not empty array/object. Test with `!= null`.
 - **Named parameters**: Always use named parameters when calling functions with optional args.
 - **Comments**: Use `//` style. Include function signature and parameter docs in header comment.
+
+Generator tests under `tests/gen/` are governed by
+`tests/gen/AGENTS.md`. Read that guide before adding or changing fixtures; it
+defines fixture-framework coverage, outcome-focused test admission, guarantee
+ownership, and the prohibition on incidental resource-count assertions.

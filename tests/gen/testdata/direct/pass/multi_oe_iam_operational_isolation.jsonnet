@@ -3,12 +3,11 @@
 // contains: "mandatory_oe_policies": true
 // contains: "shared_tags_are_isolated": true
 // contains: "oe_tags_are_local": true
-// contains: "oe_policy_statement_count": 68
 // contains: "shared_policy_cannot_match_oe_tags": true
 // contains: "oe_policy_cannot_match_peer_or_shared_tags": true
 // contains: "generic_permissions_only_add_oe_network_admins": true
 // contains: "common_domain_and_no_umbrella_admin": true
-// contains: "peer_oe_chain_count_stable": true
+// contains: "policy_chains_within_oci_limit": true
 local lz = import 'gen/landing_zone.libsonnet';
 local policy_limits = import 'gen/lib/policy_limits.libsonnet';
 
@@ -40,13 +39,7 @@ local config(operating_entities) = {
 local two_oes =
   oe('alpha', 'OE Alpha', 'oa', 1)
   + oe('beta', 'OE Beta', 'ob', 2);
-local four_oes =
-  two_oes
-  + oe('gamma', 'OE Gamma', 'og', 3)
-  + oe('delta', 'OE Delta', 'od', 4);
-
 local two = lz(config(two_oes)).iam;
-local four = lz(config(four_oes)).iam;
 local groups = two.identity_domain_groups_configuration.groups;
 local policies = two.policies_configuration.supplied_policies;
 local root_children = two.compartments_configuration.compartments['CMP-LANDINGZONE-KEY'].children;
@@ -81,8 +74,6 @@ local alpha_policy_text = std.manifestJsonEx(
   oe_tags_are_local:
     alpha_children['CMP-LZ-ALPHA-PROD-NETWORK-KEY'].defined_tags['tagns-lz-role.tag-lz-role'] == 'lz-network-admin'
     && alpha_children['CMP-LZ-ALPHA-PROD-SECURITY-KEY'].defined_tags['tagns-lz-role.tag-lz-role'] == 'lz-security-admin',
-  oe_policy_statement_count:
-    std.length(alpha_network_policy.statements) + std.length(alpha_security_policy.statements),
   alpha_network_policy_is_local:
     std.length(std.findSubstr('in compartment cmp-lz-alpha', std.manifestJsonEx(alpha_network_policy.statements, '  '))) > 0,
   shared_policy_cannot_match_oe_tags:
@@ -103,6 +94,6 @@ local alpha_policy_text = std.manifestJsonEx(
     && std.objectHas(two.identity_domains_configuration.identity_domains, 'COMMON-DOMAIN')
     && !std.objectHas(groups, 'GRP-LZ-ALPHA-ADMIN-KEY')
     && !std.objectHas(groups, 'GRP-LZ-BETA-ADMIN-KEY'),
-  peer_oe_chain_count_stable:
-    policy_limits.max_chain_statement_count(two) == policy_limits.max_chain_statement_count(four),
+  policy_chains_within_oci_limit:
+    policy_limits.max_chain_statement_count(two) <= 400,
 }

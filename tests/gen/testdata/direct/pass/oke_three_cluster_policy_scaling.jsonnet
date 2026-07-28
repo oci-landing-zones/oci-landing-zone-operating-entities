@@ -1,17 +1,11 @@
-// Three CIS2 OKE platforms keep shared IAM statement counts fixed, use tag equality for isolation, and remain below policy limits.
-// contains: "network_policy_statement_count": 7
-// contains: "hub_public_policy_statement_count": 7
-// contains: "tagging_policy_statement_count": 1
-// contains: "frontend_nsg_count": 3
-// contains: "unique_frontend_platform_tags": 3
+// Three CIS2 OKE platforms remain isolated by tag and below policy limits.
+// contains: "frontend_platform_tags_match_inputs": true
 // contains: "shared_source_allowlist_has_all_platforms": true
-// contains: "shared_reconciliation_platform_tag_equality_count": 4
-// contains: "hub_nsg_membership_statement_count": 1
-// contains: "hub_nsg_source_platform_condition_count": 3
+// contains: "shared_reconciliation_uses_platform_tag_equality": true
+// contains: "hub_nsg_membership_covers_all_platforms": true
 // contains: "public_nlb_statements": []
 // contains: "platform_certificate_policy_failures": []
 // contains: "below_repository_safety_budget": true
-// contains: "below_oci_limit": true
 local lz = import 'gen/landing_zone.libsonnet';
 local policy_limits = import 'gen/lib/policy_limits.libsonnet';
 local oke(vcn, services) = {
@@ -75,15 +69,11 @@ local expected_platform_policies = {
 };
 
 {
-  network_policy_statement_count: std.length(network_policy.statements),
-  hub_public_policy_statement_count: std.length(hub_policy.statements),
-  tagging_policy_statement_count: std.length(tagging_policy.statements),
-  frontend_nsg_count: std.length(std.objectFields(frontend_nsgs)),
-  unique_frontend_platform_tags:
-    std.length(std.uniq(std.sort([
+  frontend_platform_tags_match_inputs:
+    std.uniq(std.sort([
       frontend_nsgs[key].defined_tags['tagns-lz-oke.platform']
       for key in std.objectFields(frontend_nsgs)
-    ]))),
+    ])) == ['prod-okea', 'prod-okeb', 'prod-okec'],
   shared_source_allowlist_has_all_platforms:
     std.length([
       platform
@@ -94,23 +84,26 @@ local expected_platform_policies = {
         if std.length(std.findSubstr("tagns-lz-oke.platform = '%s'" % platform, statement)) > 0
       ]) > 0
     ]) == 3,
-  shared_reconciliation_platform_tag_equality_count:
+  shared_reconciliation_uses_platform_tag_equality:
     std.length([
       statement
       for statement in network_policy.statements + hub_policy.statements
       if std.length(std.findSubstr(tag_equality, statement)) > 0
-    ]),
-  hub_nsg_membership_statement_count: std.length(hub_nsg_membership_statements),
-  hub_nsg_source_platform_condition_count:
-    if std.length(hub_nsg_membership_statements) != 1 then 0
-    else std.length([
-      platform
-      for platform in ['prod-okea', 'prod-okeb', 'prod-okec']
-      if std.length(std.findSubstr(
-        "request.principal.compartment.tag.tagns-lz-oke.platform = '%s'" % platform,
-        hub_nsg_membership_statements[0]
-      )) == 1
-    ]),
+    ]) > 0,
+  hub_nsg_membership_covers_all_platforms:
+    std.length(hub_nsg_membership_statements) > 0
+    && std.length([
+        platform
+        for platform in ['prod-okea', 'prod-okeb', 'prod-okec']
+        if std.length([
+          statement
+          for statement in hub_nsg_membership_statements
+          if std.length(std.findSubstr(
+            "request.principal.compartment.tag.tagns-lz-oke.platform = '%s'" % platform,
+            statement
+          )) > 0
+        ]) > 0
+      ]) == 3,
   public_nlb_statements: [
     statement
     for statement in hub_policy.statements
@@ -124,5 +117,4 @@ local expected_platform_policies = {
        policies[contract.certificate].compartment_id != contract.compartment
   ],
   below_repository_safety_budget: max_chain < 400,
-  below_oci_limit: max_chain < 500,
 }

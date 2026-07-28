@@ -1,9 +1,7 @@
 // CIS2 OKE clusters use one generated platform-compartment key and the same key configuration reference in cluster and worker inputs.
 // contains: "shared_security_vault_present": true
 // contains: "key_contract_failures": []
-// contains: "platform_kms_statement_counts": {
-// contains: "PCY-LZ-PREPROD-PLATFORM-OKE-SERVICE-SECURITY-KEY": 3
-// contains: "PCY-LZ-PROD-PLATFORM-OKE-SERVICE-SECURITY-KEY": 3
+// contains: "platforms_missing_kms_authorization": []
 // contains: "unexpected_service_oke_key_delegate_grants": []
 // contains: "kms_source_boundary_failures": []
 // contains: "unexpected_oke_volume_key_grants": []
@@ -83,10 +81,11 @@ local all_kms_statements = [
     for env in std.objectFields(expected)
     if workers[expected[env].worker].node_config_details.encryption.enable_encrypt_in_transit != true
   ],
-  platform_kms_statement_counts: {
-    [expected[env].policy]: std.length(kms_statements(env))
+  platforms_missing_kms_authorization: [
+    env
     for env in std.objectFields(expected)
-  },
+    if std.length(kms_statements(env)) == 0
+  ],
   kms_source_boundary_failures: [
     statement
     for env in std.objectFields(expected)

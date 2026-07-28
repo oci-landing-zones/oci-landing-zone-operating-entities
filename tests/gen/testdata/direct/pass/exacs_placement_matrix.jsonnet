@@ -173,11 +173,11 @@ local exacs_policy_statements(result) = std.flattenArrays([
   if std.length(std.findSubstr('EXACS', key)) > 0
 ]);
 
-local count_statements(result, needle) = std.length([
+local matching_statements(result, needle) = [
   statement
   for statement in exacs_policy_statements(result)
   if std.length(std.findSubstr(needle, statement)) > 0
-]);
+];
 
 {
   shared_autonomous: summarize(shared_autonomous),
@@ -189,8 +189,10 @@ local count_statements(result, needle) = std.length([
       for key in std.objectFields(infra_only['iam.json'].identity_domain_groups_configuration.groups)
       if std.length(std.findSubstr('EXACS', key)) > 0
     ]),
-    cloud_vmcluster_statement_count: count_statements(infra_only, 'cloud-vmclusters'),
-    autonomous_vmcluster_statement_count: count_statements(infra_only, 'autonomous-vmclusters'),
+    cloud_vmcluster_statements:
+      matching_statements(infra_only, 'cloud-vmclusters'),
+    autonomous_vmcluster_statements:
+      matching_statements(infra_only, 'autonomous-vmclusters'),
   },
   dedicated: summarize(dedicated),
 }

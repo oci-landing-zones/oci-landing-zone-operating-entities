@@ -19,7 +19,6 @@ local security_policy_text = std.manifestJsonEx(policies['PCY-LZ-SECURITY-ADMIN-
     one.identity_domains_configuration.identity_domains['COMMON-DOMAIN'].display_name,
   project_group_name: groups['GRP-LZ-PROD-PROJ1-ADMIN-KEY'].name,
   project_admin_first_statement: project_policy.statements[0],
-  project_admin_statement_count: std.length(project_policy.statements),
   project_network_policy_compartment_id:
     policies['PCY-LZ-PROD-PROJ1-ADMIN-NET-KEY'].compartment_id,
   project_security_policy_compartment_id:
