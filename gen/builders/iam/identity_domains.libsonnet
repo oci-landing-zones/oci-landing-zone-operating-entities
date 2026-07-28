@@ -19,7 +19,7 @@
             gacc + {
               [n.key_global('GRP', entry.key_segments + [proj_name, 'ADMIN'])]: {
                 name: ctx.proj_grp_name(entry, proj_name),
-                description: desc.group.project(ctx.env_desc(entry.env_name), proj_name, 'administration'),
+                description: desc.group.project(ctx.env_entry_desc(entry), proj_name, 'administration'),
               },
             },
           project_names,
@@ -28,6 +28,25 @@
       env_entries,
       {}
     );
+
+    // Multi-OE requires independent network and security ownership per OE.
+    local oe_operational_groups =
+      if topo.mode != 'multi_oe' then {}
+      else std.foldl(
+        function(acc, oe)
+          acc + {
+            [n.key_global('GRP', oe.key_segments + ['NETWORK', 'ADMIN'])]: {
+              name: ctx.oe_grp_name(oe, 'network'),
+              description: desc.group.landing_zone(oe.display_name, 'network administration'),
+            },
+            [n.key_global('GRP', oe.key_segments + ['SECURITY', 'ADMIN'])]: {
+              name: ctx.oe_grp_name(oe, 'security'),
+              description: desc.group.landing_zone(oe.display_name, 'security administration'),
+            },
+          },
+        topo.ordered_oe_entries(),
+        {}
+      );
 
     {
       default_identity_domain_id: 'COMMON-DOMAIN',
@@ -49,7 +68,7 @@
           name: n.display_global('GRP', ['NETWORK', 'ADMIN']),
           description: desc.group.landing_zone('shared', 'network administration'),
         },
-      } + env_project_groups + {
+      } + oe_operational_groups + env_project_groups + {
         [n.key_global('GRP', ['SECURITY', 'ADMIN'])]: {
           name: n.display_global('GRP', ['SECURITY', 'ADMIN']),
           description: desc.group.landing_zone('shared', 'security administration'),
@@ -70,7 +89,9 @@
       identity_domains: {
         'COMMON-DOMAIN': {
           display_name: 'id_lz_common',
-          description: 'One-OE LZ common Identity Domain',
+          description:
+            if ctx.topo.mode == 'multi_oe' then 'Multi-OE LZ common Identity Domain'
+            else 'One-OE LZ common Identity Domain',
           compartment_id: null,
           admin_email: null,
           admin_first_name: null,

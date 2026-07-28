@@ -34,8 +34,8 @@ function(ctx) {
       for route_key in std.objectFields(peer_routes)
     } else {}),
   local function_suffix(fn) = std.asciiLower(fn.suffix),
-  local nsg_key(fn) = n.key('NSG', [ctx.env, 'PLATFORM', ctx.plat, fn.suffix]),
-  local rt_key(fn) = n.key('RT', [ctx.env, 'PLATFORM', ctx.plat, fn.suffix]),
+  local nsg_key(fn) = n.key('NSG', ctx.key_segments + [fn.suffix]),
+  local rt_key(fn) = n.key('RT', ctx.key_segments + [fn.suffix]),
   network_configuration+: {
       network_configuration_categories+: {
         [ctx.category_key]: {
@@ -44,7 +44,12 @@ function(ctx) {
             [ctx.vcn_key]: {
               display_name: n.display('vcn', ctx.display_segments),
               cidr_blocks: [ctx.params.network.vcn],
-              dns_label: n.dns_label(['vcn', n.region, 'lz', ctx.dns, ctx.plat]),
+              dns_label:
+                n.dns_label(
+                  ['vcn', n.region, 'lz'] +
+                  ctx.dns_segments +
+                  [ctx.dns_platform_suffix]
+                ),
               block_nat_traffic: false,
               is_attach_drg: false,
               is_create_igw: false,
@@ -54,7 +59,11 @@ function(ctx) {
               subnets: {
                 [ctx.provisioning_subnet_key]: {
                   display_name: n.display('sn', ctx.display_segments + ['provisioning']),
-                  dns_label: n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, 'prov']),
+                  dns_label:
+                    if ctx.is_qualified_scope then
+                      n.dns_label(['sn'] + ctx.dns_segments + [ctx.dns_platform_suffix, 'prov'])
+                    else
+                      n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, 'prov']),
                   cidr_block: ctx.params.network.subnets.provisioning,
                   dhcp_options_key: 'default_dhcp_options',
                   prohibit_internet_ingress: true,

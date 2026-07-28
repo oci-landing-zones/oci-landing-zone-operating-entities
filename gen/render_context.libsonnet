@@ -23,7 +23,7 @@
 //     shared_only_config,
 //     extension_entries_by_type(type),
 //     require_extension_entries(type, label),
-//     env_platform_entry(env_name, platform_name),
+//     env_platform_entry(qualified_name, platform_name),
 //     extension_routing_context(hub_has_spoke_natgw=true),
 //     extension_resolve_inputs(registry, entries, hub_has_spoke_natgw=true),
 //     extension_resolve_entry_inputs(registry, entry, hub_has_spoke_natgw=true),
@@ -93,7 +93,9 @@ local common = import 'hub/hub_common.libsonnet';
           backend1_ip: '0.0.0.0',
           backend2_ip: '0.0.0.0',
         },
-      shared_only_config: config { environments: {} },
+      shared_only_config:
+        if topo.mode == 'multi_oe' then config { operating_entities: {} }
+        else config { environments: {} },
 
       extension_entries_by_type(ext_type)::
         extensions.select_entries_by_type(self.extension_entries, ext_type),
@@ -101,17 +103,17 @@ local common = import 'hub/hub_common.libsonnet';
       require_extension_entries(ext_type, label)::
         extensions.entries_by_type(self.extension_entries, ext_type, label),
 
-      env_platform_entry(env_name, platform_name)::
+      env_platform_entry(qualified_name, platform_name)::
         local matches = [
           entry
           for entry in self.all_platform_entries
           if entry.scope.scope_type == 'environment' &&
-             entry.scope.scope_name == env_name &&
+             entry.scope.qualified_name == qualified_name &&
              entry.scope.platform_name == platform_name
         ];
         assert std.length(matches) == 1 :
           'Expected exactly one platform %s/%s, found %d' % [
-            env_name,
+            qualified_name,
             platform_name,
             std.length(matches),
           ];

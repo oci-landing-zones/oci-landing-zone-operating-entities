@@ -28,6 +28,8 @@ Scope: this file covers `gen/workload-extensions/exacs/**` and published ExaCS s
 - Environment-specific infrastructure plus environment-specific AVMC/VMC uses only networked `environments.<env>.platforms.exacs`.
 - Autonomous Dedicated project tiers are added only through `project_db_compartments` for selected projects.
 - Shared ExaCS without `network` means shared infrastructure-only. Do not grant AVMC/VMC permissions for that shared scope.
+- In Multi-OE configs, shared ExaCS `project_db_compartments` keys must use qualified environment names such as `alpha-prod`; raw names such as `prod` are rejected as ambiguous.
+- Environment-scoped ExaCS network, IAM, observability, and project-database resources use the topology-qualified OE/environment scope. Shared ExaCS remains under the central shared platform tree.
 
 ## Extension Discovery Addendum
 

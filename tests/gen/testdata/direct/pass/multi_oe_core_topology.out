@@ -1,0 +1,121 @@
+{
+  "normalized_display_defaults": "alpha",
+  "ordered_entries": [
+    {
+      "compartment_segments": [
+        "alpha",
+        "prod"
+      ],
+      "display_segments": [
+        "alpha",
+        "Prod"
+      ],
+      "dns_segments": [
+        "aa",
+        "p"
+      ],
+      "env_name": "prod",
+      "key_segments": [
+        "alpha",
+        "prod"
+      ],
+      "mode": "multi_oe",
+      "name_segments": [
+        "alpha",
+        "prod"
+      ],
+      "oe_display_name": "alpha",
+      "oe_dns": "aa",
+      "oe_name": "alpha",
+      "qualified_name": "alpha-prod"
+    },
+    {
+      "compartment_segments": [
+        "alpha",
+        "dev"
+      ],
+      "display_segments": [
+        "alpha",
+        "Dev"
+      ],
+      "dns_segments": [
+        "aa",
+        "d"
+      ],
+      "env_name": "dev",
+      "key_segments": [
+        "alpha",
+        "dev"
+      ],
+      "mode": "multi_oe",
+      "name_segments": [
+        "alpha",
+        "dev"
+      ],
+      "oe_display_name": "alpha",
+      "oe_dns": "aa",
+      "oe_name": "alpha",
+      "qualified_name": "alpha-dev"
+    },
+    {
+      "compartment_segments": [
+        "beta",
+        "prod"
+      ],
+      "display_segments": [
+        "Beta Group",
+        "Prod"
+      ],
+      "dns_segments": [
+        "bb",
+        "p"
+      ],
+      "env_name": "prod",
+      "key_segments": [
+        "beta",
+        "prod"
+      ],
+      "mode": "multi_oe",
+      "name_segments": [
+        "beta",
+        "prod"
+      ],
+      "oe_display_name": "Beta Group",
+      "oe_dns": "bb",
+      "oe_name": "beta",
+      "qualified_name": "beta-prod"
+    },
+    {
+      "compartment_segments": [
+        "beta",
+        "preprod"
+      ],
+      "display_segments": [
+        "Beta Group",
+        "PreProd"
+      ],
+      "dns_segments": [
+        "bb",
+        "pp"
+      ],
+      "env_name": "preprod",
+      "key_segments": [
+        "beta",
+        "preprod"
+      ],
+      "mode": "multi_oe",
+      "name_segments": [
+        "beta",
+        "preprod"
+      ],
+      "oe_display_name": "Beta Group",
+      "oe_dns": "bb",
+      "oe_name": "beta",
+      "qualified_name": "beta-preprod"
+    }
+  ],
+  "security_targets": [
+    "alpha-prod",
+    "beta-preprod"
+  ]
+}

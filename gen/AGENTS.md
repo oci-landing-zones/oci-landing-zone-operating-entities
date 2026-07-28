@@ -142,6 +142,7 @@ Update this diagram when any of these change:
 - `jsonnet --multi` is reserved for `bash gen/generate.sh --config ...`. It must not be used to generate the committed snapshot files under `blueprints/` or `workload-extensions/`.
 - Each published family owns its local profiles file:
   - `gen/blueprints/one-oe/runtime/one-stack/profiles.libsonnet`
+  - `gen/blueprints/multi-oe/generic/runtime/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/multi-stack/profiles.libsonnet`
   - `gen/workload-extensions/ocvs/profiles.libsonnet`
@@ -155,6 +156,13 @@ Update this diagram when any of these change:
   - call either `landing_zone.libsonnet`, a local `output_builder.libsonnet`, or a local `published.libsonnet` adapter with one profile config
   - select exactly one result field
 - Published entrypoints must not rewrite outputs, compose checked-in JSONs together, import another published entrypoint as a wrapper, or push publication flags down into generic extension params.
+
+The generator accepts exactly one non-null environment root:
+
+- `environments` preserves the published One-OE structure and identifiers.
+- `operating_entities` adds one OE compartment around the existing environment subtree. OE keys match `[a-z][a-z0-9_]*`; underscores normalize to hyphens and the normalized key is the qualifier.
+
+Multi-OE shared network, security, and platform compartments remain direct Landing Zone children. Environment references crossing an OE boundary use qualified names such as `alpha-prod`.
 
 ### Profile Output Builder Pattern (`output_builder.libsonnet`)
 

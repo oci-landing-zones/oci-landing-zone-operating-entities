@@ -113,7 +113,7 @@ local realm = constants[config.realm];
 Read these as semantic context, not as incidental locals:
 
 - `n` owns key, display-name, DNS-label, and compartment-path patterns
-- `topo` owns environment and platform semantics
+- `topo` owns One-OE/Multi-OE environment, OE, and platform semantics
 - `realm` owns realm-specific constants
 
 When several later expressions look dense, check whether they are really just using `n` or `topo` rather than inventing new behavior locally.
@@ -128,6 +128,8 @@ local ctx = render_context.from_raw_config(raw_config);
 Use that helper when a renderer or publication adapter needs normalized config plus derived semantic lists such as ordered spoke environments, platform entries, VCN metadata, example LB backends, or the shared-only config view. Keep final document assembly in the caller. `render_context.libsonnet` is the input-preparation layer, not the merge owner.
 
 `topology.libsonnet` exposes structured environment entries for builders that need more than a raw environment name. Use those entries for resource keys, display segments, DNS segments, project lookups, and compartment paths so builders do not each reconstruct naming assumptions locally.
+
+Both public roots normalize into that same entry shape. `environments` produces the unchanged One-OE segments. `operating_entities` adds the normalized OE key to each local segment and nests the existing environment subtree below one OE compartment. Shared network, security, and platform scopes remain direct children of the Landing Zone.
 
 IAM follows the same facade pattern at the domain-builder level:
 

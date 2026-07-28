@@ -21,6 +21,44 @@ Use this when you need the smallest config that still exercises the new config-d
 
 This keeps hub and spoke subnets implicit, so normalization fills them in.
 
+## Minimal Multi-OE Example
+
+Use this when two operating entities intentionally repeat the same environment and project names.
+
+```jsonnet
+{
+  region: 'eu-frankfurt-1',
+  region_short_name: 'fra',
+  realm: 'oc1',
+  hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
+  operating_entities: {
+    alpha: {
+      display_name: 'Alpha',
+      dns: 'al',
+      environments: {
+        prod: {
+          shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+          projects: { proj1: {} },
+        },
+      },
+    },
+    beta: {
+      display_name: 'Beta',
+      dns: 'be',
+      environments: {
+        prod: {
+          shared_project_network: { network: { vcn: '10.1.64.0/21' } },
+          projects: { proj1: {} },
+        },
+      },
+    },
+  },
+  security_targets: ['alpha-prod', 'beta-prod'],
+}
+```
+
+The normalized OE key is used directly, so these scopes generate `alpha-prod` and `beta-prod`. A key such as `oe_alpha` generates `oe-alpha-prod`; the generator does not add or remove an `oe-` prefix.
+
 ## Environment Platform Example
 
 Based on `tests/gen/testdata/direct/pass/config_preprod_security_targets.jsonnet`.

@@ -1,0 +1,18 @@
+{
+  "alpha_environments": [
+    "CMP-LZ-ALPHA-PROD-KEY"
+  ],
+  "beta_platform_lookup": "beta-prod",
+  "has_qualified_flow_log": true,
+  "has_qualified_network_event": true,
+  "network_category_keys": [
+    "0-shared",
+    "1-alpha-prod",
+    "2-beta-prod",
+    "3-beta-prod-platform-data"
+  ],
+  "platform_category_compartment": "CMP-LZ-BETA-PROD-NETWORK-KEY",
+  "security_environment_targets": [
+    "SZ-TGT-LZ-BETA-PROD-ENVIRONMENT-KEY"
+  ]
+}

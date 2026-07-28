@@ -109,3 +109,9 @@ If those assumptions are missing, present the CIDRs as an example or starting po
 - For overlay OKE questions, do not add or require pod OCI subnets unless the contract changes.
 - When multiple OKE platforms are generated, each OKE VCN route table must reference only gateways in that same VCN for NAT and service gateway routes.
 - When changing the OKE contract, update the generator, fixtures, tests, published JSON, and OKE docs in the same change.
+
+## Multi-OE Semantics
+
+- Environment-scoped OKE keys, display names, IAM objects, network categories, and dependencies use the topology-qualified OE/environment scope.
+- OKE VCN and subnet DNS labels include the OE and environment DNS segments in Multi-OE mode so identical environment and platform names remain unique.
+- Existing One-OE OKE names and DNS labels remain unchanged.

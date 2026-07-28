@@ -18,9 +18,12 @@ Run `bash gen/generate.sh` the first time you work on the generator. It sets up 
 Config-mode network artifacts use one canonical final file: `network.json`. Only hubs that require staged deployment also emit `network_pre.json`.
 Config-mode security and observability artifacts follow `cis_level`: omit it for the default CIS level 2 files, or set `cis_level: 1` to emit the CIS level 1 file pair instead.
 Config-mode extension outputs are emitted as additional files from `result.extra`; for example, OKE emits `oke_clusters.json` and `oke_workers.json`.
+Config accepts exactly one non-null environment root. Use `environments` for the existing One-OE shape, or `operating_entities` for Multi-OE. Multi-OE reuses the One-OE environment structure below each OE and requires qualified cross-scope references such as `alpha-prod`.
 If you set `hub.network.subnets` explicitly, provide the full canonical subnet set for that hub kind; partial hub subnet overrides are rejected during normalization.
 For networked extension-backed platforms, explicit `platform.network.subnets` overrides must match the extension metadata-defined subnet set exactly; otherwise omit subnets and let the extension auto-allocate. Extensions declare network behavior with `metadata.network_mode`: `required`, `forbidden`, or `optional`. Legacy `metadata.requires_network: true|false` is still supported and maps to `required` or `forbidden`. Optional-network extensions may omit `platform.network` for IAM/observability-only contributions, or include it to emit `network_pre`.
 Generated IAM is checked against a 400-statement safety budget per root-to-leaf compartment chain. OCI documents a hard limit of 500 statements per chain; this repo keeps headroom for customer extensions and manual policies.
+
+Generated Multi-OE configurations containing OKE are proven against the Orchestrator `v2.1.3` direct-root variables. The `v2.1.3` `rms-facade` loader still searches for legacy OKE keys, so use the direct Terraform root for that combination until a compatible facade version is selected.
 
 Change the Jsonnet sources under `gen/` first. Checked-in JSON under `blueprints/` and `workload-extensions/` are generated snapshots, not hand-maintained source files.
 

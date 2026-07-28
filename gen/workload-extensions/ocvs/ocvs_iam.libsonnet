@@ -7,7 +7,7 @@ function(ctx) {
 
   groups_configuration+: {
     groups+: {
-      [n.key_global('GRP', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
+      [n.key_global('GRP', ctx.key_segments + ['ADMINS'])]: {
         name: group_name,
         description: desc.group.platform(ctx.scope.scope_long_title, 'OCVS', 'SDDC administration'),
       },
@@ -16,7 +16,7 @@ function(ctx) {
 
   policies_configuration+: {
     supplied_policies+: {
-      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
+      [n.key_global('PCY', ctx.key_segments + ['ADMINS'])]: {
         name: policy_name,
         description: desc.policy.grants(
           group_name,

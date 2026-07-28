@@ -190,6 +190,8 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     kube_secret_key: kube_secret_key,
     kube_secret_key_name: n.display('key', display_segments + ['kube', 'secrets']),
     subnets: params.network.subnets,
+	    dns_segments: scope.dns_segments,
+	    is_qualified_scope: std.length(scope.dns_segments) > 1,
 	    vcn_key: n.key('VCN', key_segments),
 	    hub_vcn_key: n.key('VCN', ['HUB']),
 	    sgw_key: n.key('SGW', key_segments),

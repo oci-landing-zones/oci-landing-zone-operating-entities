@@ -22,15 +22,15 @@ function(ctx) {
   ],
   groups_configuration+: {
     groups+: {
-      [n.key_global('GRP', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
+      [n.key_global('GRP', ctx.key_segments + ['ADMINS'])]: {
         name: root._group_names.admins,
         description: desc.group.platform(ctx.env_long_title, 'OKE', 'cluster management administration'),
       },
-      [n.key_global('GRP', [ctx.env, 'PLATFORM', ctx.plat, 'RBAC-ADMIN'])]: {
+      [n.key_global('GRP', ctx.key_segments + ['RBAC-ADMIN'])]: {
         name: root._group_names.rbac_admin,
         description: desc.group.platform(ctx.env_long_title, 'OKE', 'Kubernetes RBAC administration'),
       },
-      [n.key_global('GRP', [ctx.env, 'PLATFORM', ctx.plat, 'RBAC-VIEWER'])]: {
+      [n.key_global('GRP', ctx.key_segments + ['RBAC-VIEWER'])]: {
         name: root._group_names.rbac_viewer,
         description: desc.group.platform(ctx.env_long_title, 'OKE', 'Kubernetes RBAC viewer'),
       },
@@ -39,7 +39,7 @@ function(ctx) {
 
   policies_configuration+: {
     supplied_policies+: {
-      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
+      [n.key_global('PCY', ctx.key_segments + ['ADMINS'])]: {
         name: n.display_global('pcy', ctx.display_segments + ['admins']),
         description: desc.policy.grants(
           root._group_names.admins,
@@ -63,7 +63,7 @@ function(ctx) {
         ],
       },
 
-      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'RBAC-ROLE'])]: {
+      [n.key_global('PCY', ctx.key_segments + ['RBAC-ROLE'])]: {
         name: n.display_global('pcy', ctx.display_segments + ['rbac-roles']),
         description: desc.policy.grants(
           'OKE RBAC administrator and viewer groups',
@@ -80,7 +80,7 @@ function(ctx) {
 
     } + {
 
-      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'SERVICE', 'COMPUTE'])]: {
+      [n.key_global('PCY', ctx.key_segments + ['SERVICE', 'COMPUTE'])]: {
         name: n.display_global('pcy', ctx.display_segments + ['service', 'compute']),
         description: desc.policy.grants(
           'OKE service, clusters, and node pools',
@@ -107,7 +107,7 @@ function(ctx) {
       },
 
     } + (if ctx.public_load_balancer || ctx.cis_level == 2 then {
-      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'SERVICE', 'SECURITY'])]: {
+      [n.key_global('PCY', ctx.key_segments + ['SERVICE', 'SECURITY'])]: {
         name: n.display_global('pcy', ctx.display_segments + ['service', 'security']),
         description: desc.policy.grants(
           'security administrators and the OKE platform resource principals',
@@ -149,7 +149,7 @@ function(ctx) {
       },
     } else {}) + {
 
-      [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'SERVICE', 'STORAGE'])]: {
+      [n.key_global('PCY', ctx.key_segments + ['SERVICE', 'STORAGE'])]: {
         name: n.display_global('pcy', ctx.display_segments + ['service', 'storage']),
         description: desc.policy.grants(
           'OKE clusters',

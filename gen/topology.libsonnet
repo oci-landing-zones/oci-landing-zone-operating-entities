@@ -5,11 +5,14 @@
 
 function(config, n)
   local labels = import './labels.libsonnet';
-  local raw_env_names = std.objectFields(config.environments);
+  local operating_entities = import './lib/operating_entities.libsonnet';
+  local is_multi_oe =
+    std.objectHas(config, 'operating_entities') && config.operating_entities != null;
   local preferred_env_names = ['prod', 'preprod', 'staging', 'uat', 'dev', 'test'];
-  local ordered_env_names =
-    [name for preferred_name in preferred_env_names for name in raw_env_names if name == preferred_name]
-    + [name for name in raw_env_names if !std.member(preferred_env_names, name)];
+  local ordered_names(environments) =
+    local raw_names = std.objectFields(environments);
+    [name for preferred_name in preferred_env_names for name in raw_names if name == preferred_name]
+    + [name for name in raw_names if !std.member(preferred_env_names, name)];
 
   local env_labels = {
     prod: { short: 'Prod', long: 'Production', network: 'Prod', dns: 'p' },
@@ -30,12 +33,15 @@ function(config, n)
       dns: env_name[0:2],
     };
 
-  local env_entry(env_name, env_config) =
+  local one_oe_env_entry(env_name, env_config) =
     local key_segments = [env_name];
     local display_segments = [env_label(env_name).short];
     local dns_segments = [env_label(env_name).dns];
     {
       mode: 'one_oe',
+      oe_name: null,
+      oe_display_name: null,
+      oe_dns: null,
       env_name: env_name,
       qualified_name: env_name,
       key_segments: key_segments,
@@ -46,10 +52,54 @@ function(config, n)
       env: env_config,
     };
 
-  local env_entries = [
-    env_entry(name, config.environments[name])
-    for name in ordered_env_names
-  ];
+  local oe_entry(oe_name) =
+    local oe = config.operating_entities[oe_name];
+    local normalized_name = operating_entities.normalize_name(oe_name);
+    {
+      name: oe_name,
+      normalized_name: normalized_name,
+      display_name: oe.display_name,
+      dns: oe.dns,
+      key_segments: [normalized_name],
+      name_segments: [normalized_name],
+      compartment_segments: [normalized_name],
+      config: oe,
+    };
+
+  local ordered_oe_entries =
+    if is_multi_oe then [oe_entry(name) for name in std.sort(std.objectFields(config.operating_entities))]
+    else [];
+
+  local multi_oe_env_entry(oe, env_name, env_config) =
+    local key_segments = oe.key_segments + [env_name];
+    {
+      mode: 'multi_oe',
+      oe_name: oe.name,
+      oe_display_name: oe.display_name,
+      oe_dns: oe.dns,
+      env_name: env_name,
+      qualified_name: operating_entities.qualified_environment_name(oe.name, env_name),
+      key_segments: key_segments,
+      display_segments: [oe.display_name, env_label(env_name).short],
+      name_segments: key_segments,
+      compartment_segments: key_segments,
+      dns_segments: [oe.dns, env_label(env_name).dns],
+      env: env_config,
+    };
+
+  local env_entries =
+    if is_multi_oe then std.flattenArrays([
+      [
+        multi_oe_env_entry(oe, env_name, oe.config.environments[env_name])
+        for env_name in ordered_names(oe.config.environments)
+      ]
+      for oe in ordered_oe_entries
+    ])
+    else [
+      one_oe_env_entry(name, config.environments[name])
+      for name in ordered_names(config.environments)
+    ];
+  local ordered_env_names = [entry.qualified_name for entry in env_entries];
 
   local ordered_spoke_env_entries = [
     entry
@@ -62,7 +112,7 @@ function(config, n)
       [
         entry
         for entry in env_entries
-        if std.member(config.security_targets, entry.env_name)
+        if std.member(config.security_targets, entry.qualified_name)
       ]
     else env_entries;
   local security_target_env_names = [entry.qualified_name for entry in security_target_env_entries];
@@ -137,7 +187,7 @@ function(config, n)
 
       allow_security_target:
         if std.objectHas(config, 'security_targets') && config.security_targets != null then
-          std.member(config.security_targets, entry.env_name)
+          std.member(config.security_targets, entry.qualified_name)
         else true,
     };
 
@@ -170,6 +220,8 @@ function(config, n)
     };
 
   {
+    mode:: if is_multi_oe then 'multi_oe' else 'one_oe',
+    ordered_oe_entries():: ordered_oe_entries,
     ordered_env_names():: ordered_env_names,
     ordered_env_entries():: env_entries,
     ordered_spoke_env_names():: ordered_spoke_env_names,
@@ -204,6 +256,17 @@ function(config, n)
     env_display_long(env_name):: self.env_label(env_name).long,
     env_display_network(env_name):: self.env_label(env_name).network,
     env_dns(env_name):: self.env_label(env_name).dns,
+    env_entry_display(entry):: std.join(' ', entry.display_segments),
+    env_entry_display_long(entry)::
+      if entry.mode == 'one_oe' then self.env_display_long(entry.env_name)
+      else '%s %s' % [entry.oe_display_name, self.env_display_long(entry.env_name)],
+    env_entry_display_network(entry)::
+      if entry.mode == 'one_oe' then self.env_display_network(entry.env_name)
+      else '%s %s' % [entry.oe_display_name, self.env_display_network(entry.env_name)],
+
+    oe_compartment_key(oe):: n.key_global('CMP', oe.key_segments),
+    oe_compartment_name(oe):: 'cmp-lz-%s' % oe.normalized_name,
+    oe_compartment_path(oe):: n.compartment_path(oe.compartment_segments),
 
     env_compartment_key(entry):: env_compartment_key(entry),
     env_child_compartment_key(entry, child):: env_child_compartment_key(entry, child),

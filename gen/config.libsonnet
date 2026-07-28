@@ -3,6 +3,7 @@
 local cidrs = import 'lib/cidrs.libsonnet';
 local collections = import 'lib/collections.libsonnet';
 local constants = import 'constants.libsonnet';
+local operating_entities = import 'lib/operating_entities.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
 local validation = import 'lib/validation.libsonnet';
 
@@ -40,25 +41,6 @@ local validation = import 'lib/validation.libsonnet';
     assert std.member(supported_hub_kinds, hub_kind) :
       'config.hub.kind must be one of: %s' % std.join(', ', supported_hub_kinds);
     local hub_network = validation.required_object(hub, 'network', 'config.hub.network');
-    local environments = validation.required_object(config, 'environments', 'config.environments');
-    local env_names = std.objectFields(environments);
-    assert std.length(std.objectFields(environments)) > 0 : 'config.environments must have at least one environment';
-
-    local security_target_names =
-      if std.objectHas(config, 'security_targets') && config.security_targets != null then
-        local targets = validation.array(config.security_targets, 'config.security_targets');
-        assert collections.all([
-          std.member(env_names, env_name)
-          for env_name in targets
-        ]) :
-          'config.security_targets must only reference defined environments: %s' % std.join(', ', [
-            env_name
-            for env_name in targets
-            if !std.member(env_names, env_name)
-          ]);
-        targets
-      else null;
-
     local has_region = std.objectHas(config, 'region') && config.region != null;
     local has_region_short_name =
       std.objectHas(config, 'region_short_name') && config.region_short_name != null;
@@ -94,29 +76,30 @@ local validation = import 'lib/validation.libsonnet';
         subnet_utils.validate_subnet_map(hub_network.subnets, hub_subnet_keys, hub_subnet_label, hub_vcn)
       else subnet_utils.auto_subnets_24(hub_vcn, hub_subnet_keys);
 
-    local norm_platform(plat, p_name) =
+    local norm_platform(plat, p_name, env_scope=null) =
+      local platform_scope = if env_scope == null then p_name else '%s/%s' % [env_scope, p_name];
       local extension =
         if std.objectHas(plat, 'extension') then
           local ext = validation.required_object(
             plat,
             'extension',
-            'Platform %s.extension' % p_name
+            'Platform %s.extension' % platform_scope
           );
           ext {
-            type: validation.required(ext, 'type', 'Platform %s.extension.type' % p_name),
+            type: validation.required(ext, 'type', 'Platform %s.extension.type' % platform_scope),
             params: validation.required_object(
               ext,
               'params',
-              'Platform %s.extension.params' % p_name
+              'Platform %s.extension.params' % platform_scope
             ),
           }
         else null;
       local has_network = std.objectHas(plat, 'network') && plat.network != null;
-      assert has_network || extension != null : 'Platform %s.network is required' % p_name;
+      assert has_network || extension != null : 'Platform %s.network is required' % platform_scope;
       local normalized_network =
         if has_network then
-          local network = validation.object(plat.network, 'Platform %s.network' % p_name);
-          local network_label = 'Platform %s.network' % p_name;
+          local network = validation.object(plat.network, 'Platform %s.network' % platform_scope);
+          local network_label = 'Platform %s.network' % platform_scope;
           local platform_vcn = required_vcn(network, network_label);
           {
             network: network {
@@ -130,7 +113,7 @@ local validation = import 'lib/validation.libsonnet';
                     platform_vcn
                   )
                 else if extension != null then null
-                else error 'Platform %s requires explicit subnets (no extension to auto-compute from)' % p_name,
+                else error 'Platform %s requires explicit subnets (no extension to auto-compute from)' % platform_scope,
             },
           }
         else {};
@@ -138,34 +121,61 @@ local validation = import 'lib/validation.libsonnet';
       + (if extension != null then { extension: extension } else {})
       + normalized_network;
 
-    local norm_spn(env_name, env) =
+    local norm_spn(env_scope, env) =
       local spn = validation.required_object(
         env,
         'shared_project_network',
-        'Environment %s.shared_project_network' % env_name
+        'Environment %s.shared_project_network' % env_scope
       );
       local network = validation.required_object(
         spn,
         'network',
-        'Environment %s.shared_project_network.network' % env_name
+        'Environment %s.shared_project_network.network' % env_scope
       );
-      local network_label = 'Environment %s.shared_project_network.network' % env_name;
+      local network_label = 'Environment %s.shared_project_network.network' % env_scope;
       spn {
         network+: normalize_auto_subnet_network(network, network_label, spoke_subnet_names),
       };
 
-    local norm_envs = {
-      [env_name]: local env = environments[env_name]; env {
-        [if std.objectHas(env, 'shared_project_network') then 'shared_project_network']:
-          norm_spn(env_name, env),
+    local norm_environments(environments, oe_name=null) = {
+      [env_name]:
+        local env = environments[env_name];
+        local env_scope = operating_entities.qualified_environment_name(oe_name, env_name);
+        env {
+          [if std.objectHas(env, 'shared_project_network') then 'shared_project_network']:
+            norm_spn(env_scope, env),
 
-        [if std.objectHas(env, 'platforms') then 'platforms']: {
-          [p_name]: norm_platform(env.platforms[p_name], p_name)
-          for p_name in std.objectFields(env.platforms)
-        },
-      }
+          [if std.objectHas(env, 'platforms') then 'platforms']: {
+            [p_name]: norm_platform(
+              env.platforms[p_name],
+              p_name,
+              env_scope=if oe_name == null then null else env_scope
+            )
+            for p_name in std.objectFields(env.platforms)
+          },
+        }
       for env_name in std.objectFields(environments)
     };
+
+    local root = operating_entities.normalize(config, norm_environments);
+
+    local security_target_names =
+      if std.objectHas(config, 'security_targets') && config.security_targets != null then
+        local targets = validation.array(config.security_targets, 'config.security_targets');
+        assert collections.all([
+          std.member(root.target_names, target)
+          for target in targets
+        ]) :
+          'config.security_targets must only reference defined%s environments: %s' % [
+            if root.mode == 'multi_oe' then ' qualified' else '',
+            std.join(', ', [
+              target
+              for target in targets
+              if !std.member(root.target_names, target)
+            ]),
+          ];
+        targets
+      else null;
 
     local norm_shared = if std.objectHas(config, 'shared_platforms') then {
       [p_name]: norm_platform(config.shared_platforms[p_name], p_name)
@@ -173,22 +183,26 @@ local validation = import 'lib/validation.libsonnet';
     } else {};
 
     local env_vcn_entries = std.flattenArrays([
-      local env = norm_envs[env_name];
-      (if std.objectHas(env, 'shared_project_network') then [
-        {
-          label: 'Environment %s shared project network' % env_name,
-          cidr: env.shared_project_network.network.vcn,
-        },
-      ] else [])
-      + (if std.objectHas(env, 'platforms') then [
-           {
-             label: 'Platform %s/%s' % [env_name, p_name],
-             cidr: env.platforms[p_name].network.vcn,
-           }
-           for p_name in std.objectFields(env.platforms)
-           if std.objectHas(env.platforms[p_name], 'network') && env.platforms[p_name].network != null
-         ] else [])
-      for env_name in std.objectFields(norm_envs)
+      std.flattenArrays([
+        local env = scope.environments[env_name];
+        local env_scope = operating_entities.qualified_environment_name(scope.oe_name, env_name);
+        (if std.objectHas(env, 'shared_project_network') then [
+          {
+            label: 'Environment %s shared project network' % env_scope,
+            cidr: env.shared_project_network.network.vcn,
+          },
+        ] else [])
+        + (if std.objectHas(env, 'platforms') then [
+             {
+               label: 'Platform %s/%s' % [env_scope, p_name],
+               cidr: env.platforms[p_name].network.vcn,
+             }
+             for p_name in std.objectFields(env.platforms)
+             if std.objectHas(env.platforms[p_name], 'network') && env.platforms[p_name].network != null
+           ] else [])
+        for env_name in std.objectFields(scope.environments)
+      ])
+      for scope in root.environment_scopes
     ]);
     local shared_vcn_entries = [
       {
@@ -203,13 +217,12 @@ local validation = import 'lib/validation.libsonnet';
       'VCN CIDRs'
     );
 
-    config {
+    config + root.config_fields + {
       region: region,
       region_short_name: region_short_name,
       realm: realm,
       cis_level: cis_level,
       hub+: { network+: { subnets: hub_subnets } },
-      environments: norm_envs,
       [if security_target_names != null then 'security_targets']: security_target_names,
       [if std.length(std.objectFields(norm_shared)) > 0 then 'shared_platforms']: norm_shared,
     },
