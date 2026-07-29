@@ -1,0 +1,81 @@
+name: OCI native database observability add-on
+
+on:
+  push:
+    paths:
+      - "addons/oci-native-mon/**"
+      - ".github/workflows/oci-native-mon.yml"
+  pull_request:
+    paths:
+      - "addons/oci-native-mon/**"
+      - ".github/workflows/oci-native-mon.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: ${{ matrix.terraform_version }}
+
+      - name: Validate add-on contracts
+        shell: bash
+        run: |
+          python3 addons/oci-native-mon/tests/validate.py
+          bash -n addons/oci-native-mon/scripts/run-fleet.sh
+          if python3 addons/oci-native-mon/tests/validate.py \
+            addons/oci-native-mon/tests/fixtures/addon-spec-invalid.json; then
+            exit 1
+          fi
+
+      - name: Validate pinned Terraform adapter
+        shell: bash
+        run: |
+          roots=(
+            addons/oci-native-mon/fleet-onboarding
+            addons/oci-native-mon/foundation-policy
+            addons/oci-native-mon/scenario-autonomous-databases/terraform
+            addons/oci-native-mon/scenario-base-databases/terraform
+            addons/oci-native-mon/scenario-exacs-databases/terraform
+            addons/oci-native-mon/scenario-exacc-databases/terraform
+            addons/oci-native-mon/scenario-external-databases/terraform
+          )
+          for root in "${roots[@]}"; do
+            terraform -chdir="$root" fmt -check
+            terraform -chdir="$root" init -backend=false -input=false
+            terraform -chdir="$root" validate
+          done
+
+      - name: Exercise guarded fleet renderer
+        shell: bash
+        run: |
+          addons/oci-native-mon/scripts/run-fleet.sh render \
+            addons/oci-native-mon/tests/fixtures/fleet-valid.json \
+            rendered-fleet
+          test -f rendered-fleet/wave-001/.terraform.lock.hcl
+          test -f rendered-fleet/wave-001/schema.yaml
+          cmp \
+            addons/oci-native-mon/fleet-onboarding/.terraform.lock.hcl \
+            rendered-fleet/wave-001/.terraform.lock.hcl
+          test "$(stat -c '%a' rendered-fleet/wave-001/terraform.auto.tfvars.json)" = "600"
+          terraform -chdir=rendered-fleet/wave-001 init \
+            -backend=false -input=false -lockfile=readonly
+          terraform -chdir=rendered-fleet/wave-001 validate
+          terraform -chdir=rendered-fleet/wave-001 console \
+            <<< 'var.database_observability_configuration.operation_stage' \
+            | grep -q '"ENABLE"'
+          addons/oci-native-mon/scripts/run-fleet.sh package \
+            rendered-fleet/wave-001 "$RUNNER_TEMP/wave-001.zip"
+          unzip -l "$RUNNER_TEMP/wave-001.zip" | grep -q ' schema.yaml$'
+          unzip -l "$RUNNER_TEMP/wave-001.zip"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        terraform_version: ["1.5.0", "1.14.4"]

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "region": "eu-frankfurt-1",
+  "fleet": {
+    "name": "ci-fleet",
+    "lifecycle_id": "ci-fleet-lifecycle",
+    "default_compartment_id": "CI-COMPARTMENT-KEY",
+    "operation_stage": "ENABLE",
+    "wave_size": 25
+  },
+  "dependencies": {},
+  "targets": [
+    {
+      "key": "CI-DB",
+      "platform": "BASE_DATABASE",
+      "products": {
+        "database_management": true,
+        "operations_insights": false,
+        "log_analytics": false
+      },
+      "database": {
+        "database_id": "CI-DATABASE-KEY",
+        "database_type": "NON_CDB",
+        "dbm_private_endpoint_id": "CI-DBM-PE-KEY",
+        "service_name": "ci.example",
+        "password_secret_id": "CI-SECRET-KEY"
+      }
+    }
+  ]
+}

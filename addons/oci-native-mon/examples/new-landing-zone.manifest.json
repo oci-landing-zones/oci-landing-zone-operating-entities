@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "region": "eu-frankfurt-1",
+  "fleet": {
+    "name": "landing-zone-database-fleet",
+    "lifecycle_id": "landing-zone-db-observability",
+    "default_compartment_id": "CMP-LZP-PROJECT-DB",
+    "operation_stage": "ENABLE",
+    "wave_size": 25
+  },
+  "dependencies": {
+    "compartments_dependency": {
+      "CMP-LZP-PROJECT-DB": {"id": "<DATABASE_COMPARTMENT_OCID>"}
+    },
+    "databases_dependency": {
+      "DB-KEY": {"id": "<DATABASE_OCID>"}
+    },
+    "vault_secrets_dependency": {
+      "DB-MONITORING-SECRET": {"id": "<VAULT_SECRET_OCID>"}
+    },
+    "dbm_private_endpoints_dependency": {
+      "DBM-PE-KEY": {"id": "<DBM_PRIVATE_ENDPOINT_OCID>"}
+    },
+    "opsi_private_endpoints_dependency": {
+      "OPSI-PE-KEY": {"id": "<OPSI_PRIVATE_ENDPOINT_OCID>"}
+    }
+  },
+  "targets": [
+    {
+      "key": "DB-KEY",
+      "platform": "BASE_DATABASE",
+      "products": {
+        "database_management": true,
+        "operations_insights": true,
+        "log_analytics": true
+      },
+      "database": {
+        "database_id": "DB-KEY",
+        "database_type": "NON_CDB",
+        "dbm_private_endpoint_id": "DBM-PE-KEY",
+        "service_name": "<DATABASE_SERVICE_NAME>",
+        "password_secret_id": "DB-MONITORING-SECRET"
+      },
+      "operations_insights": {
+        "private_endpoint_id": "OPSI-PE-KEY",
+        "deployment_type": "VIRTUAL_MACHINE"
+      },
+      "log_analytics": {
+        "namespace": "<LOG_ANALYTICS_NAMESPACE>",
+        "compartment_id": "<LOG_ANALYTICS_COMPARTMENT_OCID>",
+        "log_group_id": "<LOG_GROUP_OCID>",
+        "entity_id": "<DATABASE_ENTITY_OCID>",
+        "agent_id": "<MANAGEMENT_AGENT_OCID>",
+        "sources": ["Database Alert Logs"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OCI Native Database Observability Add-on Specification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "name", "module", "scale", "products", "target_catalog"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "name": {"const": "oci-native-database-observability"},
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "version", "commit", "role"],
+      "properties": {
+        "source": {"const": "github.com/adibirzu/terraform-oci-database-observability"},
+        "version": {"pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "commit": {"pattern": "^[0-9a-f]{40}$"},
+        "role": {"const": "landing_zone_automation_dependency"}
+      }
+    },
+    "scale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_targets_per_manifest", "maximum_targets_per_wave", "state_boundary"],
+      "properties": {
+        "maximum_targets_per_manifest": {"const": 1000},
+        "maximum_targets_per_wave": {"const": 200},
+        "state_boundary": {"const": "one OCI Resource Manager stack state per wave"}
+      }
+    },
+    "products": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["database_management", "operations_insights", "log_analytics"],
+      "properties": {
+        "database_management": {"$ref": "#/$defs/product"},
+        "operations_insights": {
+          "allOf": [
+            {"$ref": "#/$defs/product"},
+            {"type": "object", "required": ["requires"]}
+          ]
+        },
+        "log_analytics": {"$ref": "#/$defs/product"}
+      }
+    },
+    "target_catalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["Autonomous database", "Base Database", "EXACS", "EXACC", "External Databases"],
+      "properties": {
+        "Autonomous database": {"const": "scenario-autonomous-databases/terraform"},
+        "Base Database": {"const": "scenario-base-databases/terraform"},
+        "EXACS": {"const": "scenario-exacs-databases/terraform"},
+        "EXACC": {"const": "scenario-exacc-databases/terraform"},
+        "External Databases": {"const": "scenario-external-databases/terraform"}
+      }
+    }
+  },
+  "$defs": {
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["platforms"],
+      "properties": {
+        "platforms": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+        "requires": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "foundation_only": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      }
+    }
+  }
+}

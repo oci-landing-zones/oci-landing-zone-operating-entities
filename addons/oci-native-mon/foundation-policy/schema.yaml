@@ -1,0 +1,70 @@
+title: OCI Landing Zone Database Observability Vault Policy
+description: Create a resource-scoped IAM policy for Database Management and Operations Insights access to a reviewed OCI Vault secret and key.
+stackDescription: Creates one IAM policy with exact Vault and key conditions. It does not create credentials, Vaults, keys, or database resources.
+schemaVersion: 1.1.0
+version: "20260730"
+locale: en
+source:
+  type: quickstart
+  reference: oci-native-mon-foundation-policy
+allowViewState: false
+informationalText: Compare this policy with existing Landing Zone policy before apply to avoid duplicate or overlapping grants.
+instructions: Select the policy compartment and region, enter the approved group, security compartment path, Vault OCID, and key OCID, then review the Resource Manager plan.
+troubleshooting: Verify IAM administration permissions, exact compartment path, group name, and that the Vault and key OCIDs belong to the reviewed security boundary.
+
+variableGroups:
+  - title: OCI Scope
+    variables:
+      - region
+      - policy_compartment_id
+  - title: Policy
+    variables:
+      - policy_name
+      - group_name
+      - security_compartment_path
+      - vault_id
+      - key_id
+
+variables:
+  region:
+    title: OCI Region
+    type: oci:identity:region:name
+    required: true
+  policy_compartment_id:
+    title: Policy Compartment
+    type: oci:identity:compartment:id
+    required: true
+  policy_name:
+    title: Policy Name
+    type: string
+    required: true
+    default: pcy-lzp-database-observability-secret-access
+  group_name:
+    title: Landing Zone Operator Group
+    type: string
+    required: true
+    default: grp-lzp-mon-admins
+  security_compartment_path:
+    title: Security Compartment Path
+    type: string
+    required: true
+  vault_id:
+    title: OCI Vault OCID
+    type: string
+    required: true
+    pattern: "^ocid1\\.vault\\."
+  key_id:
+    title: OCI Vault Key OCID
+    type: string
+    required: true
+    pattern: "^ocid1\\.key\\."
+
+outputGroups:
+  - title: IAM Policy
+    outputs:
+      - policy_id
+
+outputs:
+  policy_id:
+    type: copyableString
+    title: Policy OCID

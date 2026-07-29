@@ -1,0 +1,42 @@
+title: OCI Landing Zone Database Observability Fleet Wave
+description: Apply one pre-rendered, bounded Database Management and Operations Insights rollout wave.
+stackDescription: Uses existing Landing Zone dependencies and Vault secret references. The rendered terraform.auto.tfvars.json is the reviewed wave contract.
+schemaVersion: 1.1.0
+version: "20260730"
+locale: en
+source:
+  type: quickstart
+  reference: oci-native-mon-fleet-wave
+allowViewState: false
+informationalText: Create one Resource Manager stack per wave. Do not edit the rendered target set between the reviewed plan and apply.
+instructions: Upload the generated wave package, select the matching region, review the plan, apply the canary, and verify current DBM, OPSI, and Log Analytics evidence before promotion.
+troubleshooting: Verify Landing Zone dependency keys, private connectivity, Vault policy, monitoring-user grants, target family grouping, and operation stage.
+
+variableGroups:
+  - title: OCI Region
+    variables:
+      - region
+
+variables:
+  region:
+    title: OCI Region
+    type: oci:identity:region:name
+    required: true
+
+outputGroups:
+  - title: Database Observability
+    outputs:
+      - database_management
+      - database_insights
+      - operation_receipt
+
+outputs:
+  database_management:
+    type: json
+    title: Database Management Targets
+  database_insights:
+    type: json
+    title: Operations Insights Targets
+  operation_receipt:
+    type: json
+    title: Operation Receipt

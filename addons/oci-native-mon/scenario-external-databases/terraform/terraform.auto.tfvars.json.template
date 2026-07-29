@@ -1,0 +1,20 @@
+{
+  "region": "<OCI_REGION>",
+  "external_database_management_configuration": {
+    "operation_stage": "ENABLE",
+    "targets": {
+      "EXT-NONCDB-01": {
+        "compartment_id": "CMP-LZP-PROJECT-DB",
+        "display_name": "external-noncdb-01",
+        "database_type": "NON_CDB",
+        "management_agent_id": "EXT-HOST-01-AGENT"
+      }
+    }
+  },
+  "compartments_dependency": {
+    "CMP-LZP-PROJECT-DB": {"id": "<DATABASE_COMPARTMENT_OCID>"}
+  },
+  "management_agents_dependency": {
+    "EXT-HOST-01-AGENT": {"id": "<MANAGEMENT_AGENT_OCID>"}
+  }
+}

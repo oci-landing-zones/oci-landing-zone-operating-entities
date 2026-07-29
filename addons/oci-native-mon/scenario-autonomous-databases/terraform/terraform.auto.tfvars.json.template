@@ -1,0 +1,26 @@
+{
+  "region": "<OCI_REGION>",
+  "autonomous_database_dbm_configuration": {
+    "targets": {
+      "ADB-PROD-01": {
+        "autonomous_database_id": "ADB-PROD-01",
+        "private_endpoint_id": "DBM-PE-GLOBAL-01",
+        "password_secret_id": "ADB-PROD-01-ADBSNMP-SECRET",
+        "service_name": "<ADB_SERVICE_NAME>",
+        "user_name": "ADBSNMP",
+        "protocol": "TCP",
+        "port": 1522,
+        "enable_database_management": true
+      }
+    }
+  },
+  "autonomous_databases_dependency": {
+    "ADB-PROD-01": {"id": "<AUTONOMOUS_DATABASE_OCID>"}
+  },
+  "dbm_private_endpoints_dependency": {
+    "DBM-PE-GLOBAL-01": {"id": "<DBM_PRIVATE_ENDPOINT_OCID>"}
+  },
+  "vault_secrets_dependency": {
+    "ADB-PROD-01-ADBSNMP-SECRET": {"id": "<VAULT_SECRET_OCID>"}
+  }
+}

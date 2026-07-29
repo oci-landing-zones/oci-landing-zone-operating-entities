@@ -1,0 +1,155 @@
+title: Database Management for EXACC
+description: Register Exadata Cloud at Customer databases and enable or disable Database Management through OCI Management Agents.
+stackDescription: Creates optional bounded Management Agent install keys and external database registrations. Agent installation, plug-ins, database grants, and named credentials remain customer-controlled prerequisites.
+schemaVersion: 1.1.0
+version: "20260730"
+locale: en
+source:
+  type: quickstart
+  reference: oci-native-mon-exacc
+allowViewState: false
+informationalText: No database password is accepted. Apply DISABLE_TARGETS and verify it before DISABLE_CDB.
+instructions: Complete host and database prerequisites, populate the target and dependency maps from Landing Zone outputs, plan, apply a canary, and verify current DBM metrics.
+troubleshooting: Verify agent and plug-in health, named credentials, C##OCI_MON_USER grants, customer-network connectivity, and CDB-before-PDB ordering.
+
+variableGroups:
+  - title: OCI Region
+    variables:
+      - region
+  - title: EXACC Targets
+    variables:
+      - exacc_database_management_configuration
+  - title: Landing Zone Dependencies
+    variables:
+      - compartments_dependency
+      - management_agents_dependency
+
+variables:
+  region:
+    title: OCI Region
+    type: oci:identity:region:name
+    required: true
+
+  exacc_database_management_configuration:
+    title: EXACC Database Management Configuration
+    description: Install-key and target maps. Use the included terraform.auto.tfvars.json.template as the input contract.
+    type: object
+    attributes:
+      - exaccOperationStage
+      - exaccInstallKeys
+      - exaccTargets
+    required: true
+
+  exaccOperationStage:
+    type: enum
+    enum:
+      - ENABLE
+      - DISABLE_TARGETS
+      - DISABLE_CDB
+    actualName: operation_stage
+    visible: false
+
+  exaccInstallKeys:
+    type: map
+    valueType: installKey
+    actualName: install_keys
+    visible: false
+
+  installKey:
+    type: object
+    attributes:
+      - installKeyCompartmentId
+      - installKeyDisplayName
+      - installKeyAllowedCount
+      - installKeyExpires
+    visible: false
+
+  installKeyCompartmentId:
+    type: string
+    actualName: compartment_id
+    visible: false
+  installKeyDisplayName:
+    type: string
+    actualName: display_name
+    visible: false
+  installKeyAllowedCount:
+    type: number
+    actualName: allowed_key_install_count
+    visible: false
+  installKeyExpires:
+    type: string
+    actualName: time_expires
+    visible: false
+
+  exaccTargets:
+    type: map
+    valueType: externalTarget
+    actualName: targets
+    visible: false
+
+  externalTarget:
+    type: object
+    attributes:
+      - externalTargetCompartmentId
+      - externalTargetDisplayName
+      - externalTargetDatabaseType
+      - externalTargetParentKey
+      - externalTargetAgentId
+    visible: false
+
+  externalTargetCompartmentId:
+    type: string
+    actualName: compartment_id
+    visible: false
+  externalTargetDisplayName:
+    type: string
+    actualName: display_name
+    visible: false
+  externalTargetDatabaseType:
+    type: string
+    actualName: database_type
+    visible: false
+  externalTargetParentKey:
+    type: string
+    actualName: parent_database_key
+    visible: false
+  externalTargetAgentId:
+    type: string
+    actualName: management_agent_id
+    visible: false
+
+  compartments_dependency:
+    title: Compartment Dependencies
+    type: map
+    valueType: dependencyRecord
+    required: true
+
+  management_agents_dependency:
+    title: Management Agent Dependencies
+    type: map
+    valueType: dependencyRecord
+    required: true
+
+  dependencyRecord:
+    type: object
+    attributes:
+      - dependencyId
+    visible: false
+  dependencyId:
+    type: string
+    actualName: id
+    visible: false
+
+outputGroups:
+  - title: EXACC Database Management
+    outputs:
+      - management_agent_install_keys
+      - external_databases
+
+outputs:
+  management_agent_install_keys:
+    type: json
+    title: Management Agent Install Key IDs
+  external_databases:
+    type: json
+    title: Registered EXACC Databases

@@ -1,0 +1,229 @@
+title: Database Management for EXACS
+description: Enable Database Management and optional Operations Insights for Exadata Database Service on Dedicated Infrastructure.
+stackDescription: Uses Landing Zone dependency maps, private endpoints, and OCI Vault secret references. No database password is accepted.
+schemaVersion: 1.1.0
+version: "20260730"
+locale: en
+source:
+  type: quickstart
+  reference: oci-native-mon-exacs
+allowViewState: false
+informationalText: Use one Resource Manager stack state per reviewed rollout wave. Keep each CDB and its PDBs in the same stack.
+instructions: Populate the configuration and dependency maps from Landing Zone outputs, plan, apply a canary, and verify current DBM and selected OPSI data.
+troubleshooting: Verify monitoring-user grants, Vault-secret policy, private-endpoint routing and NSGs, listener details, and the selected operation stage.
+
+variableGroups:
+  - title: OCI Region
+    variables:
+      - region
+  - title: EXACS Observability Wave
+    variables:
+      - database_observability_configuration
+  - title: Landing Zone Dependencies
+    variables:
+      - compartments_dependency
+      - vcns_dependency
+      - subnets_dependency
+      - network_security_groups_dependency
+      - databases_dependency
+      - managed_databases_dependency
+      - vault_secrets_dependency
+      - dbm_private_endpoints_dependency
+      - opsi_private_endpoints_dependency
+
+variables:
+  region:
+    title: OCI Region
+    type: oci:identity:region:name
+    required: true
+
+  database_observability_configuration:
+    title: Database Observability Configuration
+    description: One bounded EXACS rollout wave. Use the included terraform.auto.tfvars.json.template as the input contract.
+    type: object
+    attributes:
+      - defaultCompartmentId
+      - lifecycleId
+      - operationStage
+      - databaseTargets
+    required: true
+
+  defaultCompartmentId:
+    type: string
+    actualName: default_compartment_id
+    visible: false
+
+  lifecycleId:
+    type: string
+    actualName: lifecycle_id
+    visible: false
+
+  operationStage:
+    type: enum
+    enum:
+      - ENABLE
+      - DISABLE_TARGETS
+      - DISABLE_CDB
+    actualName: operation_stage
+    visible: false
+
+  databaseTargets:
+    type: map
+    valueType: databaseTarget
+    actualName: databases
+    visible: false
+
+  databaseTarget:
+    type: object
+    attributes:
+      - targetCompartmentId
+      - targetDatabaseId
+      - targetDatabaseType
+      - targetParentDatabaseKey
+      - targetManagedDatabaseId
+      - targetDbmPrivateEndpointId
+      - targetOpsiPrivateEndpointId
+      - targetEnableOperationsInsights
+      - targetDeploymentType
+      - targetManagementType
+      - targetServiceName
+      - targetPasswordSecretId
+      - targetSslSecretId
+      - targetMonitoringUser
+      - targetRole
+      - targetProtocol
+      - targetPort
+    visible: false
+
+  targetCompartmentId:
+    type: string
+    actualName: compartment_id
+    visible: false
+  targetDatabaseId:
+    type: string
+    actualName: database_id
+    visible: false
+  targetDatabaseType:
+    type: string
+    actualName: database_type
+    visible: false
+  targetParentDatabaseKey:
+    type: string
+    actualName: parent_database_key
+    visible: false
+  targetManagedDatabaseId:
+    type: string
+    actualName: managed_database_id
+    visible: false
+  targetDbmPrivateEndpointId:
+    type: string
+    actualName: dbm_private_endpoint_id
+    visible: false
+  targetOpsiPrivateEndpointId:
+    type: string
+    actualName: opsi_private_endpoint_id
+    visible: false
+  targetEnableOperationsInsights:
+    type: boolean
+    actualName: enable_operations_insights
+    visible: false
+  targetDeploymentType:
+    type: string
+    actualName: deployment_type
+    visible: false
+  targetManagementType:
+    type: string
+    actualName: management_type
+    visible: false
+  targetServiceName:
+    type: string
+    actualName: service_name
+    visible: false
+  targetPasswordSecretId:
+    type: string
+    actualName: password_secret_id
+    visible: false
+  targetSslSecretId:
+    type: string
+    actualName: ssl_secret_id
+    visible: false
+  targetMonitoringUser:
+    type: string
+    actualName: monitoring_user
+    visible: false
+  targetRole:
+    type: string
+    actualName: role
+    visible: false
+  targetProtocol:
+    type: string
+    actualName: protocol
+    visible: false
+  targetPort:
+    type: number
+    actualName: port
+    visible: false
+
+  compartments_dependency:
+    title: Compartment Dependencies
+    type: map
+    valueType: dependencyRecord
+  vcns_dependency:
+    title: VCN Dependencies
+    type: map
+    valueType: dependencyRecord
+  subnets_dependency:
+    title: Subnet Dependencies
+    type: map
+    valueType: dependencyRecord
+  network_security_groups_dependency:
+    title: Network Security Group Dependencies
+    type: map
+    valueType: dependencyRecord
+  databases_dependency:
+    title: Database Dependencies
+    type: map
+    valueType: dependencyRecord
+    required: true
+  managed_databases_dependency:
+    title: Managed Database Dependencies
+    type: map
+    valueType: dependencyRecord
+  vault_secrets_dependency:
+    title: Vault Secret Dependencies
+    type: map
+    valueType: dependencyRecord
+    required: true
+  dbm_private_endpoints_dependency:
+    title: Database Management Private Endpoint Dependencies
+    type: map
+    valueType: dependencyRecord
+    required: true
+  opsi_private_endpoints_dependency:
+    title: Operations Insights Private Endpoint Dependencies
+    type: map
+    valueType: dependencyRecord
+
+  dependencyRecord:
+    type: object
+    attributes:
+      - dependencyId
+    visible: false
+  dependencyId:
+    type: string
+    actualName: id
+    visible: false
+
+outputGroups:
+  - title: Database Observability
+    outputs:
+      - database_management
+      - operation_receipt
+
+outputs:
+  database_management:
+    type: json
+    title: Database Management Targets
+  operation_receipt:
+    type: json
+    title: Operation Receipt

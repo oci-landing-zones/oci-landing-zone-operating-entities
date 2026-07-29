@@ -1,0 +1,7 @@
+{
+  "region": "<OCI_REGION>",
+  "policy_compartment_id": "<POLICY_COMPARTMENT_OCID>",
+  "security_compartment_path": "cmp-landingzone-p:cmp-lzp-security",
+  "vault_id": "<VAULT_OCID>",
+  "key_id": "<KEY_OCID>"
+}

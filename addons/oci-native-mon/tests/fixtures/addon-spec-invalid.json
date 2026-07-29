@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "name": "oci-native-database-observability",
+  "module": {
+    "source": "github.com/adibirzu/terraform-oci-database-observability",
+    "version": "v0.3.0",
+    "commit": "not-a-commit",
+    "role": "standalone",
+    "unexpected": true
+  },
+  "scale": {
+    "maximum_targets_per_manifest": 1000,
+    "maximum_targets_per_wave": 999,
+    "state_boundary": "shared state"
+  },
+  "products": {},
+  "target_catalog": {}
+}

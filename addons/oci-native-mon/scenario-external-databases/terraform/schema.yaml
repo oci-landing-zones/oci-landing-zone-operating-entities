@@ -1,0 +1,118 @@
+title: Database Management for External Databases
+description: Register external CDB, PDB, and non-CDB targets and enable or disable Database Management through OCI Management Agents.
+stackDescription: Uses existing Management Agents and customer-created named credentials. Agent installation, plug-ins, and database grants remain customer-controlled prerequisites.
+schemaVersion: 1.1.0
+version: "20260730"
+locale: en
+source:
+  type: quickstart
+  reference: oci-native-mon-external-database
+allowViewState: false
+informationalText: No database password is accepted. Apply DISABLE_TARGETS and verify it before DISABLE_CDB.
+instructions: Complete host and database prerequisites, populate the target and dependency maps from Landing Zone outputs, plan, apply a canary, and verify current DBM metrics.
+troubleshooting: Verify agent and plug-in health, named credentials, database grants, network connectivity, and CDB-before-PDB ordering.
+
+variableGroups:
+  - title: OCI Region
+    variables:
+      - region
+  - title: External Database Targets
+    variables:
+      - external_database_management_configuration
+  - title: Landing Zone Dependencies
+    variables:
+      - compartments_dependency
+      - management_agents_dependency
+
+variables:
+  region:
+    title: OCI Region
+    type: oci:identity:region:name
+    required: true
+
+  external_database_management_configuration:
+    title: External Database Management Configuration
+    description: Target map. Use the included terraform.auto.tfvars.json.template as the input contract.
+    type: object
+    attributes:
+      - externalOperationStage
+      - externalTargets
+    required: true
+
+  externalOperationStage:
+    type: enum
+    enum:
+      - ENABLE
+      - DISABLE_TARGETS
+      - DISABLE_CDB
+    actualName: operation_stage
+    visible: false
+
+  externalTargets:
+    type: map
+    valueType: externalTarget
+    actualName: targets
+    visible: false
+
+  externalTarget:
+    type: object
+    attributes:
+      - externalTargetCompartmentId
+      - externalTargetDisplayName
+      - externalTargetDatabaseType
+      - externalTargetParentKey
+      - externalTargetAgentId
+    visible: false
+
+  externalTargetCompartmentId:
+    type: string
+    actualName: compartment_id
+    visible: false
+  externalTargetDisplayName:
+    type: string
+    actualName: display_name
+    visible: false
+  externalTargetDatabaseType:
+    type: string
+    actualName: database_type
+    visible: false
+  externalTargetParentKey:
+    type: string
+    actualName: parent_database_key
+    visible: false
+  externalTargetAgentId:
+    type: string
+    actualName: management_agent_id
+    visible: false
+
+  compartments_dependency:
+    title: Compartment Dependencies
+    type: map
+    valueType: dependencyRecord
+    required: true
+
+  management_agents_dependency:
+    title: Management Agent Dependencies
+    type: map
+    valueType: dependencyRecord
+    required: true
+
+  dependencyRecord:
+    type: object
+    attributes:
+      - dependencyId
+    visible: false
+  dependencyId:
+    type: string
+    actualName: id
+    visible: false
+
+outputGroups:
+  - title: External Database Management
+    outputs:
+      - external_databases
+
+outputs:
+  external_databases:
+    type: json
+    title: Registered External Databases

@@ -1,0 +1,36 @@
+{
+  "region": "<OCI_REGION>",
+  "exacc_database_management_configuration": {
+    "operation_stage": "ENABLE",
+    "install_keys": {
+      "EXACC-AGENT-INSTALL-KEY": {
+        "compartment_id": "CMP-LZP-MONITORING",
+        "display_name": "exacc-db-management-agent-install",
+        "allowed_key_install_count": 2,
+        "time_expires": "<RFC3339_EXPIRATION>"
+      }
+    },
+    "targets": {
+      "EXACC-CDB-01": {
+        "compartment_id": "CMP-LZP-PROJECT-DB",
+        "display_name": "exacc-cdb-01",
+        "database_type": "CDB",
+        "management_agent_id": "EXACC-NODE-01-AGENT"
+      },
+      "EXACC-PDB-01": {
+        "compartment_id": "CMP-LZP-PROJECT-DB",
+        "display_name": "exacc-pdb-01",
+        "database_type": "PDB",
+        "parent_database_key": "EXACC-CDB-01",
+        "management_agent_id": "EXACC-NODE-01-AGENT"
+      }
+    }
+  },
+  "compartments_dependency": {
+    "CMP-LZP-MONITORING": {"id": "<MONITORING_COMPARTMENT_OCID>"},
+    "CMP-LZP-PROJECT-DB": {"id": "<DATABASE_COMPARTMENT_OCID>"}
+  },
+  "management_agents_dependency": {
+    "EXACC-NODE-01-AGENT": {"id": "<MANAGEMENT_AGENT_OCID>"}
+  }
+}

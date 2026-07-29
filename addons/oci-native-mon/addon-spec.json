@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "name": "oci-native-database-observability",
+  "module": {
+    "source": "github.com/adibirzu/terraform-oci-database-observability",
+    "version": "v0.3.1",
+    "commit": "1e54f354f6a79fd0279f95413b88aed75013bdc7",
+    "role": "landing_zone_automation_dependency"
+  },
+  "scale": {
+    "maximum_targets_per_manifest": 1000,
+    "maximum_targets_per_wave": 200,
+    "state_boundary": "one OCI Resource Manager stack state per wave"
+  },
+  "products": {
+    "database_management": {
+      "platforms": [
+        "AUTONOMOUS_DATABASE",
+        "BASE_DATABASE",
+        "EXADATA_DATABASE_SERVICE",
+        "EXADATA_CLOUD_AT_CUSTOMER",
+        "EXTERNAL_DATABASE"
+      ]
+    },
+    "operations_insights": {
+      "platforms": [
+        "BASE_DATABASE",
+        "EXADATA_DATABASE_SERVICE"
+      ],
+      "requires": ["database_management"]
+    },
+    "log_analytics": {
+      "platforms": [
+        "BASE_DATABASE",
+        "EXADATA_DATABASE_SERVICE",
+        "EXADATA_CLOUD_AT_CUSTOMER",
+        "EXTERNAL_DATABASE"
+      ],
+      "foundation_only": ["AUTONOMOUS_DATABASE"]
+    }
+  },
+  "target_catalog": {
+    "Autonomous database": "scenario-autonomous-databases/terraform",
+    "Base Database": "scenario-base-databases/terraform",
+    "EXACS": "scenario-exacs-databases/terraform",
+    "EXACC": "scenario-exacc-databases/terraform",
+    "External Databases": "scenario-external-databases/terraform"
+  }
+}

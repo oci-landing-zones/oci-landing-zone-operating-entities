@@ -1,0 +1,29 @@
+{
+  "region": "<OCI_REGION>",
+  "database_observability_configuration": {
+    "default_compartment_id": "CMP-LZP-PROJECT-DB",
+    "lifecycle_id": "base-database-management-prod",
+    "operation_stage": "ENABLE",
+    "databases": {
+      "BASE-DB-01": {
+        "database_id": "BASE-DB-01",
+        "database_type": "NON_CDB",
+        "dbm_private_endpoint_id": "DBM-PE-GLOBAL-01",
+        "service_name": "<DATABASE_SERVICE_NAME>",
+        "password_secret_id": "BASE-DB-01-DBSNMP-SECRET"
+      }
+    }
+  },
+  "compartments_dependency": {
+    "CMP-LZP-PROJECT-DB": {"id": "<DATABASE_COMPARTMENT_OCID>"}
+  },
+  "databases_dependency": {
+    "BASE-DB-01": {"id": "<BASE_DATABASE_OCID>"}
+  },
+  "vault_secrets_dependency": {
+    "BASE-DB-01-DBSNMP-SECRET": {"id": "<VAULT_SECRET_OCID>"}
+  },
+  "dbm_private_endpoints_dependency": {
+    "DBM-PE-GLOBAL-01": {"id": "<DBM_PRIVATE_ENDPOINT_OCID>"}
+  }
+}

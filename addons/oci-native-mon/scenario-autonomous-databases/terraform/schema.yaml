@@ -1,0 +1,144 @@
+title: Database Management for Autonomous Database
+description: Enable or disable OCI Database Management for Autonomous Database targets from an OCI Landing Zone.
+stackDescription: Uses existing Autonomous Databases, Database Management private endpoints, and OCI Vault secrets. No database password is accepted.
+schemaVersion: 1.1.0
+version: "20260730"
+locale: en
+source:
+  type: quickstart
+  reference: oci-native-mon-autonomous-database
+allowViewState: false
+informationalText: Terraform is the single owner of DBM feature state in this stack. Review the Resource Manager plan before apply.
+instructions: Prepare ADBSNMP and its documented grants, populate the target and dependency maps from Landing Zone outputs, run a plan, and verify current DBM metrics after apply.
+troubleshooting: Verify ADBSNMP grants, Vault-secret access, private-endpoint routing and NSGs, service name, listener port, and regional DBM availability.
+
+variableGroups:
+  - title: OCI Region
+    variables:
+      - region
+  - title: Autonomous Database Targets
+    variables:
+      - autonomous_database_dbm_configuration
+  - title: Landing Zone Dependencies
+    variables:
+      - autonomous_databases_dependency
+      - dbm_private_endpoints_dependency
+      - vault_secrets_dependency
+
+variables:
+  region:
+    title: OCI Region
+    type: oci:identity:region:name
+    required: true
+
+  autonomous_database_dbm_configuration:
+    title: Autonomous Database DBM Configuration
+    description: Target map. Use the included terraform.auto.tfvars.json.template as the input contract.
+    type: object
+    attributes:
+      - adbTargets
+    required: true
+
+  adbTargets:
+    type: map
+    valueType: adbTarget
+    actualName: targets
+    visible: false
+
+  adbTarget:
+    type: object
+    attributes:
+      - adbDatabaseId
+      - adbPrivateEndpointId
+      - adbPasswordSecretId
+      - adbServiceName
+      - adbUserName
+      - adbRole
+      - adbProtocol
+      - adbPort
+      - adbEnableDatabaseManagement
+    visible: false
+
+  adbDatabaseId:
+    type: string
+    actualName: autonomous_database_id
+    visible: false
+
+  adbPrivateEndpointId:
+    type: string
+    actualName: private_endpoint_id
+    visible: false
+
+  adbPasswordSecretId:
+    type: string
+    actualName: password_secret_id
+    visible: false
+
+  adbServiceName:
+    type: string
+    actualName: service_name
+    visible: false
+
+  adbUserName:
+    type: string
+    actualName: user_name
+    visible: false
+
+  adbRole:
+    type: string
+    actualName: role
+    visible: false
+
+  adbProtocol:
+    type: string
+    actualName: protocol
+    visible: false
+
+  adbPort:
+    type: number
+    actualName: port
+    visible: false
+
+  adbEnableDatabaseManagement:
+    type: boolean
+    actualName: enable_database_management
+    visible: false
+
+  autonomous_databases_dependency:
+    title: Autonomous Database Dependencies
+    type: map
+    valueType: dependencyRecord
+    required: true
+
+  dbm_private_endpoints_dependency:
+    title: Database Management Private Endpoint Dependencies
+    type: map
+    valueType: dependencyRecord
+    required: true
+
+  vault_secrets_dependency:
+    title: Vault Secret Dependencies
+    type: map
+    valueType: dependencyRecord
+    required: true
+
+  dependencyRecord:
+    type: object
+    attributes:
+      - dependencyId
+    visible: false
+
+  dependencyId:
+    type: string
+    actualName: id
+    visible: false
+
+outputGroups:
+  - title: Database Management Targets
+    outputs:
+      - autonomous_database_management
+
+outputs:
+  autonomous_database_management:
+    type: json
+    title: Autonomous Database Management Actions
