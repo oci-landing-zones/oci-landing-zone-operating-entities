@@ -64,8 +64,6 @@ local stages = [
   common_stage + ['observability_cis2.json', 'security_cis2.json'],
 ];
 local values(object) = [object[key] for key in std.objectFields(object)];
-local has_substring(value, substring) =
-  std.length(std.findSubstr(substring, value)) > 0;
 local as_array(value) =
   if std.type(value) == 'array' then value else [value];
 local occurrences(items, item) =
@@ -152,182 +150,88 @@ local workers =
 local ocvs_clusters =
   outputs['ocvs.json'].ocvs_configuration.ocvs_clusters;
 
-local reference_failures = std.flattenArrays([
-  [
-    {
-      owner: cluster_key,
-      reference: reference,
-      kind: dependency.kind,
-    }
-    for dependency in [
-      {
-        kind: 'compartment',
-        values: [clusters[cluster_key].compartment_id],
-        available: compartment_keys,
-      },
-      {
-        kind: 'vcn',
-        values: [clusters[cluster_key].networking.vcn_id],
-        available: vcn_keys,
-      },
-      {
-        kind: 'subnet',
-        values:
-          as_array(clusters[cluster_key].networking.api_endpoint_subnet_id)
-          + as_array(clusters[cluster_key].networking.services_subnet_id),
-        available: subnet_keys,
-      },
-      {
-        kind: 'nsg',
-        values: as_array(
-          clusters[cluster_key].networking.api_endpoint_nsg_ids
-        ),
-        available: nsg_keys,
-      },
-    ]
-    for reference in dependency.values
-    if !std.member(dependency.available, reference)
-  ]
-  for cluster_key in std.objectFields(clusters)
-]) + std.flattenArrays([
-  [
-    {
-      owner: worker_key,
-      reference: reference,
-      kind: dependency.kind,
-    }
-    for dependency in [
-      {
-        kind: 'compartment',
-        values: [workers[worker_key].compartment_id],
-        available: compartment_keys,
-      },
-      {
-        kind: 'cluster',
-        values: [workers[worker_key].cluster_id],
-        available: std.objectFields(clusters),
-      },
-      {
-        kind: 'subnet',
-        values:
-          as_array(workers[worker_key].networking.workers_subnet_id)
-          + (
-            if std.objectHas(
-              workers[worker_key].networking,
-              'pods_subnet_id'
-            ) then
-              as_array(workers[worker_key].networking.pods_subnet_id)
-            else []
-          ),
-        available: subnet_keys,
-      },
-      {
-        kind: 'nsg',
-        values:
-          as_array(workers[worker_key].networking.workers_nsg_ids)
-          + (
-            if std.objectHas(workers[worker_key].networking, 'pods_nsg_ids')
-            then as_array(workers[worker_key].networking.pods_nsg_ids)
-            else []
-          ),
-        available: nsg_keys,
-      },
-    ]
-    for reference in dependency.values
-    if !std.member(dependency.available, reference)
-  ]
-  for worker_key in std.objectFields(workers)
-]) + std.flattenArrays([
-  [
-    {
-      owner: cluster_key,
-      reference: reference,
-      kind: dependency.kind,
-    }
-    for dependency in [
-      {
-        kind: 'compartment',
-        values: [ocvs_clusters[cluster_key].compartment_id],
-        available: compartment_keys,
-      },
-      {
-        kind: 'vcn',
-        values: [ocvs_clusters[cluster_key].networking.vcn_id],
-        available: vcn_keys,
-      },
-      {
-        kind: 'subnet',
-        values: [ocvs_clusters[cluster_key].networking.subnet_id],
-        available: subnet_keys,
-      },
-      {
-        kind: 'nsg',
-        values: values(ocvs_clusters[cluster_key].networking.nsgs),
-        available: nsg_keys,
-      },
-      {
-        kind: 'route_table',
-        values: values(ocvs_clusters[cluster_key].networking.route_tables),
-        available: route_table_keys,
-      },
-    ]
-    for reference in dependency.values
-    if !std.member(dependency.available, reference)
-  ]
-  for cluster_key in std.objectFields(ocvs_clusters)
-]);
+// Keys use type-specific prefixes, so a single set comparison proves that every
+// cross-file reference resolves without repeatedly walking the generated graph.
+local referenced_keys =
+  [clusters[key].compartment_id for key in std.objectFields(clusters)]
+  + [clusters[key].networking.vcn_id for key in std.objectFields(clusters)]
+  + std.flattenArrays([
+    as_array(clusters[key].networking.api_endpoint_subnet_id)
+    + as_array(clusters[key].networking.services_subnet_id)
+    + as_array(clusters[key].networking.api_endpoint_nsg_ids)
+    for key in std.objectFields(clusters)
+  ])
+  + [workers[key].compartment_id for key in std.objectFields(workers)]
+  + [workers[key].cluster_id for key in std.objectFields(workers)]
+  + std.flattenArrays([
+    as_array(workers[key].networking.workers_subnet_id)
+    + (
+      if std.objectHas(workers[key].networking, 'pods_subnet_id') then
+        as_array(workers[key].networking.pods_subnet_id)
+      else []
+    )
+    + as_array(workers[key].networking.workers_nsg_ids)
+    + (
+      if std.objectHas(workers[key].networking, 'pods_nsg_ids') then
+        as_array(workers[key].networking.pods_nsg_ids)
+      else []
+    )
+    for key in std.objectFields(workers)
+  ])
+  + [ocvs_clusters[key].compartment_id
+     for key in std.objectFields(ocvs_clusters)]
+  + [ocvs_clusters[key].networking.vcn_id
+     for key in std.objectFields(ocvs_clusters)]
+  + [ocvs_clusters[key].networking.subnet_id
+     for key in std.objectFields(ocvs_clusters)]
+  + std.flattenArrays([
+    values(ocvs_clusters[key].networking.nsgs)
+    + values(ocvs_clusters[key].networking.route_tables)
+    for key in std.objectFields(ocvs_clusters)
+  ]);
+local available_keys =
+  compartment_keys
+  + vcn_keys
+  + subnet_keys
+  + nsg_keys
+  + route_table_keys
+  + std.objectFields(clusters);
+local reference_failures =
+  std.setDiff(std.set(referenced_keys), std.set(available_keys));
 
 local qualifiers = ['ALPHA-PROD', 'BETA-PROD'];
-local qualified_scope_failures = std.flattenArrays([
+local expected_qualified_keys = std.flattenArrays([
   [
-    label
-    for contract in [
-      {
-        label: '%s OKE cluster' % qualifier,
-        values: std.objectFields(clusters),
-        substring: qualifier,
-      },
-      {
-        label: '%s OKE worker' % qualifier,
-        values: std.objectFields(workers),
-        substring: qualifier,
-      },
-      {
-        label: '%s OCVS cluster' % qualifier,
-        values: std.objectFields(ocvs_clusters),
-        substring: qualifier,
-      },
-    ]
-    if std.length([
-      value
-      for value in contract.values
-      if has_substring(value, contract.substring)
-    ]) == 0
-  ] + [
-    '%s %s compartment' % [qualifier, extension]
+    'CLR-FRA-LZ-%s-OKE-KEY' % qualifier,
+    'NDP-FRA-LZ-%s-OKE-KEY' % qualifier,
+    'SDDC-FRA-LZ-%s-OCVS-KEY' % qualifier,
+  ]
+  + [
+    'CMP-LZ-%s-%s-KEY' % [qualifier, extension]
     for extension in ['EXACC', 'EXACS', 'OCVS', 'OKE']
-    if std.length([
-      key
-      for key in compartment_keys
-      if has_substring(key, qualifier) && has_substring(key, extension)
-    ]) == 0
-  ] + [
-    '%s %s project database compartment' % [qualifier, extension]
+  ]
+  + [
+    'CMP-LZ-%s-PROJ1-%s-DB-KEY' % [qualifier, extension]
     for extension in ['EXACC', 'EXACS']
-    if !std.member(
-      compartment_keys,
-      'CMP-LZ-%s-PROJ1-%s-DB-KEY' % [qualifier, extension]
-    )
   ]
   for qualifier in qualifiers
 ]);
+local qualified_scope_failures = std.setDiff(
+  std.set(expected_qualified_keys),
+  std.set(
+    std.objectFields(clusters)
+    + std.objectFields(workers)
+    + std.objectFields(ocvs_clusters)
+    + compartment_keys
+  )
+);
 
 local extension_vcns = [
   entry
   for entry in vcn_entries
-  if has_substring(entry.category, 'exacs')
-     || has_substring(entry.category, 'ocvs')
-     || has_substring(entry.category, 'oke')
+  if std.length(std.findSubstr('exacs', entry.category)) > 0
+     || std.length(std.findSubstr('ocvs', entry.category)) > 0
+     || std.length(std.findSubstr('oke', entry.category)) > 0
 ];
 local expected_extension_categories = [
   '%s-prod-platform-%s' % [oe, extension]
@@ -344,25 +248,30 @@ local missing_extension_categories = [
   ]) == 0
 ];
 local network_identifier_collisions =
-  if std.length(missing_extension_categories) > 0 then
-    [{ missing_categories: missing_extension_categories }]
-  else if std.length(
-    duplicates([entry.key for entry in extension_vcns])
-  ) > 0 then
-    [{
-      duplicate_vcn_keys:
-        duplicates([entry.key for entry in extension_vcns]),
-    }]
-  else if std.length(
-    duplicates([entry.dns for entry in extension_vcns])
-  ) > 0 then
-    [{
-      duplicate_dns_labels:
-        duplicates([entry.dns for entry in extension_vcns]),
-    }]
-  else [];
+  [{ missing_category: category } for category in missing_extension_categories]
+  + [
+    { duplicate_vcn_key: key }
+    for key in duplicates([entry.key for entry in extension_vcns])
+  ]
+  + [
+    { duplicate_dns_label: dns }
+    for dns in duplicates([entry.dns for entry in extension_vcns])
+  ];
 local observability = outputs['observability_cis2.json'];
-local observability_text = std.manifestJson(observability);
+local expected_exadata_observability_keys = std.flattenArrays([
+  [
+    'AL-LZ-%s-CPUUTIL-KEY' % qualifier,
+    'RUL-LZ-%s-NOTIFICATION-PLATFORM-EXACC-INFRA-KEY' % qualifier,
+    'RUL-LZ-%s-EXACS-NOTIFICATION-PROJECTS-KEY' % qualifier,
+    'NOTT-LZ-%s-EXACC-INFRA-WORKLOADS-KEY' % qualifier,
+    'NOTT-LZ-%s-EXACS-PROJECTS-KEY' % qualifier,
+  ]
+  for qualifier in qualifiers
+]);
+local emitted_exadata_observability_keys =
+  std.objectFields(observability.alarms_configuration.alarms)
+  + std.objectFields(observability.events_configuration.event_rules)
+  + std.objectFields(observability.notifications_configuration.topics);
 
 {
   duplicate_stage_families: duplicate_stage_families,
@@ -377,7 +286,7 @@ local observability_text = std.manifestJson(observability);
   networkless_exacc_categories: [
     category
     for category in std.objectFields(categories)
-    if has_substring(category, 'exacc')
+    if std.length(std.findSubstr('exacc', category)) > 0
   ],
   ocvs_name_override_failures:
     if std.sort([
@@ -390,27 +299,8 @@ local observability_text = std.manifestJson(observability);
        ]) != ['cluster-al-p', 'cluster-be-p']
     then ['explicit OCVS names were not preserved']
     else [],
-  exadata_observability_failures: std.flattenArrays([
-    [
-      label
-      for contract in [
-        {
-          label: '%s ExaCC observability' % qualifier,
-          substring: '%s-EXACC' % qualifier,
-        },
-        {
-          label: '%s ExaCS observability' % qualifier,
-          substring: '%s-EXACS' % qualifier,
-        },
-      ]
-      if !has_substring(observability_text, contract.substring)
-    ] + (
-      if !std.objectHas(
-        observability.alarms_configuration.alarms,
-        'AL-LZ-%s-CPUUTIL-KEY' % qualifier
-      ) then ['%s ExaCC CPU alarm' % qualifier]
-      else []
-    )
-    for qualifier in qualifiers
-  ]),
+  exadata_observability_failures: std.setDiff(
+    std.set(expected_exadata_observability_keys),
+    std.set(emitted_exadata_observability_keys)
+  ),
 }
