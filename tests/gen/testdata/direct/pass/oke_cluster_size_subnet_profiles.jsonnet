@@ -1,7 +1,7 @@
 // OKE cluster_size profiles generate fixed native and overlay subnet layouts
 local multi = import 'gen/landing_zone_multi.jsonnet';
 
-local generated_subnets(vcn_cidr, cluster_size=null, cni_type='native') =
+local generated_subnets(vcn_cidr, cluster_size=null, cni_type='native', create_fss=false) =
   local outputs = multi({
     hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
     environments: {
@@ -16,6 +16,7 @@ local generated_subnets(vcn_cidr, cluster_size=null, cni_type='native') =
                 services_cidr: '10.96.0.0/16',
                 cni_type: cni_type,
                 api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
+                create_fss: create_fss,
               } + (if cluster_size == null then {} else {
                 cluster_size: cluster_size,
               }),
@@ -41,4 +42,10 @@ local generated_subnets(vcn_cidr, cluster_size=null, cni_type='native') =
   overlay_small: generated_subnets('10.2.16.0/20', 'small', 'overlay'),
   overlay_medium: generated_subnets('10.2.64.0/18', 'medium', 'overlay'),
   overlay_large: generated_subnets('10.3.0.0/16', 'large', 'overlay'),
+  native_fss_small: generated_subnets('10.4.16.0/20', 'small', 'native', true),
+  native_fss_medium: generated_subnets('10.4.64.0/18', 'medium', 'native', true),
+  native_fss_large: generated_subnets('10.5.0.0/16', 'large', 'native', true),
+  overlay_fss_small: generated_subnets('10.6.16.0/20', 'small', 'overlay', true),
+  overlay_fss_medium: generated_subnets('10.6.64.0/18', 'medium', 'overlay', true),
+  overlay_fss_large: generated_subnets('10.7.0.0/16', 'large', 'overlay', true),
 }

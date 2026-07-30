@@ -1,6 +1,19 @@
 // OKE worker node pool output builder.
 
-function(ctx) {
+function(ctx)
+  local fss_utils_install =
+    if ctx.cis_level == 2 then
+      "/bin/sh -c '. /etc/os-release && sudo dnf install -y --enablerepo=ol${VERSION_ID%%.*}_developer oci-fss-utils'\n\n"
+    else '';
+  local cloud_init =
+    '#!/bin/bash\n\n' +
+    'sudo /usr/libexec/oci-growfs -y\n\n' +
+    fss_utils_install +
+    'curl --fail -H "Authorization: Bearer Oracle" -L0 ' +
+    'http://169.254.169.254/opc/v2/instance/metadata/oke_init_script ' +
+    '| base64 --decode >/var/run/oke-init.sh\n' +
+    'bash /var/run/oke-init.sh\n';
+{
   oke_workers_configuration+: {
     node_pools+: {
       [ctx.node_pool_key]: {
@@ -10,12 +23,6 @@ function(ctx) {
         cluster_id: ctx.cluster_key,
         enable_cycling: false,
         size: 1,
-        cloud_init: [
-          {
-            content: 'runcmd:\n  - sudo /usr/libexec/oci-growfs -y\n',
-            content_type: 'text/cloud-config',
-          },
-        ],
         freeform_tags: {
           cluster: ctx.cluster_name,
         },
@@ -28,6 +35,10 @@ function(ctx) {
         },
         node_config_details: {
           image: ctx.worker_image,
+          boot_volume_size: ctx.worker_boot_volume_size,
+          cloud_init: {
+            heredoc_script: cloud_init,
+          },
           node_shape: 'VM.Standard.E5.Flex',
           flex_shape_settings: {
             memory: 8,
