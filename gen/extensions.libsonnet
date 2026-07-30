@@ -5,6 +5,10 @@ local collections = import 'lib/collections.libsonnet';
 local extension_components = import 'lib/extension_components.libsonnet';
 
 {
+  local scope_name(pe) =
+    if std.objectHas(pe.scope, 'qualified_name') then pe.scope.qualified_name
+    else pe.scope.scope_name,
+
   local standard_contribution_keys = [
     'network_pre',
     'iam',
@@ -116,7 +120,7 @@ local extension_components = import 'lib/extension_components.libsonnet';
     assert std.objectHas(extension_registry, ext_type) :
            'Unknown extension type "%s" for platform %s/%s. Available: %s' % [
       ext_type,
-      pe.scope.scope_name,
+      scope_name(pe),
       pe.scope.platform_name,
       std.join(', ', std.objectFields(extension_registry)),
     ];
@@ -163,7 +167,7 @@ local extension_components = import 'lib/extension_components.libsonnet';
     assert declared_network_mode != 'required' || has_platform_network :
            'Extension "%s" for platform %s/%s requires network.vcn' % [
       ext_type,
-      pe.scope.scope_name,
+      scope_name(pe),
       pe.scope.platform_name,
     ];
     assert declared_network_mode != 'forbidden' || !has_platform_network :
@@ -171,13 +175,13 @@ local extension_components = import 'lib/extension_components.libsonnet';
               !std.objectHas(raw_ext_meta, 'network_mode') then
       'Extension "%s" for platform %s/%s does not accept platform.network because metadata.requires_network is false' % [
         ext_type,
-        pe.scope.scope_name,
+        scope_name(pe),
         pe.scope.platform_name,
       ]
     else
       'Extension "%s" for platform %s/%s does not accept platform.network because metadata.network_mode is forbidden' % [
         ext_type,
-        pe.scope.scope_name,
+        scope_name(pe),
         pe.scope.platform_name,
       ];
     local resolves_network = has_platform_network;
@@ -205,8 +209,12 @@ local extension_components = import 'lib/extension_components.libsonnet';
       ext_type,
       std.join(', ', [sn for sn in subnet_names if !std.objectHas(ext_meta.default_subnets, sn)]),
     ];
+    local qualified_scope_name = scope_name(pe);
+    local platform_label =
+      if qualified_scope_name == pe.scope.scope_name then pe.scope.platform_name
+      else '%s/%s' % [qualified_scope_name, pe.scope.platform_name];
     local subnet_label =
-      'Platform %s.network.subnets for extension %s' % [pe.scope.platform_name, ext_type];
+      'Platform %s.network.subnets for extension %s' % [platform_label, ext_type];
     local resolved_subnets =
       if ext_meta.has_network then
         if pe.platform_config.network.subnets != null then

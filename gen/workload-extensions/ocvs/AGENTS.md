@@ -21,3 +21,10 @@ This file covers `gen/workload-extensions/ocvs/**` and published OCVS snapshots/
 - The generated provisioning subnet uses the first segment of the OCVS platform VCN after four additional prefix bits: `/28`, `/27`, `/26`, or `/25` respectively.
 - The downstream OCVS module creates VLANs from the same cluster network CIDR. The generator emits the provisioning subnet, route tables, and network security groups referenced by the OCVS payload.
 - Direct OCVS deployment is contract-validated with `terraform-oci-modules-orchestrator` v2.1.3. Revalidate when changing the generated OCVS payload, dependency keys, or orchestrator ref.
+
+## Multi-OE Semantics
+
+- Environment-scoped OCVS cluster, IAM, VCN, subnet, route-table, NSG, and dependency keys use the topology-qualified OE/environment scope.
+- Multi-OE VCN and subnet DNS labels combine OE/environment DNS segments with the compact `ov` platform suffix. Existing One-OE DNS labels remain unchanged.
+- Default SDDC and cluster display names continue to use the full qualified scope and the existing 16/22-character validation. When a Multi-OE default is too long, set explicit short `sddc_display_name` and `cluster_display_name` values.
+- Multiple OCVS platforms merge into one `ocvs_configuration`; each Multi-OE cluster carries its own platform compartment and SSH-key override so root defaults cannot redirect it into another OE.

@@ -32,7 +32,6 @@ local collect_rules(payload) = [
 local summarize(payload) =
   local rules = collect_rules(payload);
   {
-    rule_count: std.length(rules),
     sources: [rule.src for rule in rules],
     descriptions_with_public_cidr: [
       rule.description

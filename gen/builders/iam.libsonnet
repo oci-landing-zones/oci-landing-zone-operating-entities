@@ -2,7 +2,7 @@
 // IAM builder: compartments, groups, identity domains, and policies.
 //
 // Generates the same structure as blueprints/one-oe/runtime/one-stack/oneoe_iam.json
-// dynamically from config.environments (and their projects).
+// dynamically from topology environments (and their projects).
 //
 // function(config, n, realm_constants, topo) -> IAM output object
 

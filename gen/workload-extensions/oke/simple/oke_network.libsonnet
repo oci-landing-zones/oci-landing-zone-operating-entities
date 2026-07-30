@@ -13,7 +13,11 @@ function(ctx, overlay_output=false) {
           [ctx.vcn_key]: {
             display_name: n.display('vcn', ctx.display_segments),
             cidr_blocks: [ctx.params.network.vcn],
-            dns_label: n.dns_label(['vcn', n.region, 'lz', ctx.dns, ctx.dns + ctx.plat]),
+            dns_label:
+              if ctx.is_qualified_scope then
+                n.dns_label(['vcn', n.region, 'lz'] + ctx.dns_segments + [ctx.plat])
+              else
+                n.dns_label(['vcn', n.region, 'lz', ctx.dns, ctx.dns + ctx.plat]),
             block_nat_traffic: false,
             default_security_list: {
               egress_rules: [],

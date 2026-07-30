@@ -13,7 +13,6 @@ function(ctx)
 
   // Per-project policies: 3 policies per project (admin, net, sec)
   local proj_policies(entry, proj_name) =
-    local env_name = entry.env_name;
     local proj_key = n.key_global('PCY', entry.key_segments + [proj_name, 'ADMIN']);
     local proj_net_key = n.key_global('PCY', entry.key_segments + [proj_name, 'ADMIN', 'NET']);
     local proj_sec_key = n.key_global('PCY', entry.key_segments + [proj_name, 'ADMIN', 'SEC']);
@@ -47,7 +46,7 @@ function(ctx)
         description: desc.policy.grants(
           grp_name,
           'administration access',
-          desc.scope.project_compartment(ctx.env_desc(env_name), proj_name)
+          desc.scope.project_compartment(ctx.env_entry_desc(entry), proj_name)
         ),
         compartment_id: proj_cmp_key,
         statements: [
@@ -90,7 +89,7 @@ function(ctx)
         description: desc.policy.grants(
           grp_name,
           'shared network resource usage',
-          desc.scope.environment_compartment(ctx.env_desc(env_name), 'network')
+          desc.scope.environment_compartment(ctx.env_entry_desc(entry), 'network')
         ),
         compartment_id: net_cmp_key,
         statements: [
@@ -106,7 +105,7 @@ function(ctx)
         description: desc.policy.grants(
           grp_name,
           'shared security resource usage',
-          desc.scope.environment_compartment(ctx.env_desc(env_name), 'security')
+          desc.scope.environment_compartment(ctx.env_entry_desc(entry), 'security')
         ),
         compartment_id: sec_cmp_key,
         statements: [

@@ -1,36 +1,21 @@
-# **The OCI Open LZ &ndash; [Multi-OE Blueprints](#)**
+# OCI Open Landing Zone Multi-OE Blueprints
 
-### Simplifying the Onboarding of Organizations, Business Units, and Subsidiaries into OCI
+Multi-OE onboards several operating entities into one tenancy. The generic model keeps shared landing-zone services at the top level and nests the One-OE environment, platform, and project structure beneath an additional compartment for each OE.
 
-&nbsp; 
+## Available models
 
-Welcome to the **OCI Open LZ Multi-OE Blueprints**. 
+| Model | Design | Deployment |
+|---|---|---|
+| Generic Multi-OE | [Draw.io source](/blueprints/multi-oe/generic/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) | [Generator-owned integrated runtime](/blueprints/multi-oe/generic/runtime/readme.md) |
+| Service provider | [Design guide](/blueprints/multi-oe/service-providers/design/readme.md) | [Runtime guide](/blueprints/multi-oe/service-providers/runtime/readme.md) |
 
-These blueprints helps onboards **several** **Operating Entities (OE)** with shared services and dedicated **environments**, **platforms**, and **projects** for each OE, in **one tenancy**. 
+The generic runtime publishes one integrated Terraform working set with Hub A, B, C, and E alternatives. It uses qualified environment names to support repeated environment and project names across OEs.
 
-There are two models available:
-1. **Generic Model**: It fits any organizational scope, with several Organization Units - such as LoBs, OpCos, Departments, Products, Brands, or Partners - in one tenancy. It can be used directly or tailored. **Note this model will be updated to version 2 soon**, matching the [One-OE](/blueprints/one-oe/runtime/) and [Multi-Tenancy Blueprint](/blueprints/multi-tenancy/readme.md) elements, with the same design and IaC building blocks such as Landing Zone Environment and Platforms. Reach out to review the new model before its published. 
-   
-2. **Service Provider Model**: Designed for managed service providers to onboard OCI in a streamlined manner, with two specializations available: 
-    - **Pod model**, where each customer gets a copy or application stack. This pattern can be seen in SaaS and managed services industries where each customer's environment is independent of another, and the only part shared is the management plane. 
-    - **Multi-tenant model**, where customer workloads are executed on shared infrastructure, but isolated from each other through mechanisms available in the underlying technology stack, like Kubernetes namespaces in Kubernetes clusters, for example. _In this context, the term **multi-tenant** refers to application design allowing customer workloads to share a common infrastructure, and does not refer to customer workloads executed in different OCI tenancies._
+The service-provider model remains separate. It covers pod and application-level multi-tenant patterns for managed service providers; application multi-tenancy here does not mean deploying customer workloads into separate OCI tenancies.
 
-&nbsp; 
+## Legacy generic paths
 
-Find below the guides to your design and deployment activities.
-
-&nbsp;
-
-| # | Description | Format   | Generic</br>Model&nbsp;v1 | Generic</br>Model&nbsp;v2 | Service Provider </br>Model
-|---|---|:-:|:-:|:-:|:-:|
-| 1 | High-level Design - MD | <img src="../../commons/images/icon_md.jpg" width="45">  |  [Available](/blueprints/multi-oe/generic_v1/design/readme.md) | *Available Soon* | [Available](/blueprints/multi-oe/service-providers/design/readme.md)
-| 2 | High-level Design - Drawio | <img src="../../commons/images/icon_drawio.jpg" width="30"> | [Available](/blueprints/multi-oe/generic_v1/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) | [Available](/blueprints/multi-oe/generic_v2/design/OCI_Open_LZ_Multi-OE-Blueprint.drawio) | [Available](/blueprints/multi-oe/service-providers/design/images/open-lz-multi-oe-service-providers.drawio) |
-| 3 |  Multi-stack Deployment for Distributed Declarative IaC Operations - Terraform + JSON | <img src="../../commons/images/icon_terraform.jpg" width="32"><img src="../../commons/images/icon_json.jpg" width="30"> | [Available](/blueprints/multi-oe/generic_v1/runtime/readme.md) | *Available Soon* | [Available](/blueprints/multi-oe/service-providers/runtime/readme.md)
-
-
-&nbsp; 
-
-&nbsp; 
+`blueprints/multi-oe/generic_v1` and `blueprints/multi-oe/generic_v2` are replaced by `blueprints/multi-oe/generic/runtime`. This is a repository-path change, not a Terraform-state migration.
 
 # License
 

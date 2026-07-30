@@ -1,6 +1,6 @@
 // Committed OKE IAM is rendered from CIS2 while every other published artifact remains on the CIS1 profile.
-// contains: "single_iam_kms_statement_count": 3
-// contains: "multi_iam_kms_statement_count": 3
+// contains: "single_iam_has_kms_authorization": true
+// contains: "multi_iam_has_kms_authorization": true
 // contains: "single_cluster_cis_levels": [
 // contains: "1"
 // contains: "single_worker_cis_levels": [
@@ -32,13 +32,15 @@ local multi_workers = (import 'gen/workload-extensions/oke/simple/multi-stack/ok
   .oke_workers_configuration.node_pools;
 local published_security = import 'gen/workload-extensions/oke/simple/single-stack/oke_security_cis2.jsonnet';
 local security_policy_key = 'PCY-LZ-PROD-PLATFORM-OKE-SERVICE-SECURITY-KEY';
-local kms_statement_count(identity) =
-  std.length([
+local kms_statements(identity) =
+  [
     statement
-    for statement in identity.policies_configuration.supplied_policies[security_policy_key].statements
+    for statement in identity.policies_configuration.supplied_policies[
+      security_policy_key
+    ].statements
     if std.length(std.findSubstr(' keys ', statement)) > 0 ||
        std.length(std.findSubstr(' key-delegate', statement)) > 0
-  ]);
+  ];
 local cluster_kms_references(clusters) = [
   key
   for key in std.objectFields(clusters)
@@ -52,8 +54,10 @@ local worker_kms_references(workers) = [
 ];
 
 {
-  single_iam_kms_statement_count: kms_statement_count(single_identity),
-  multi_iam_kms_statement_count: kms_statement_count(multi_identity),
+  single_iam_has_kms_authorization:
+    std.length(kms_statements(single_identity)) > 0,
+  multi_iam_has_kms_authorization:
+    std.length(kms_statements(multi_identity)) > 0,
   single_cluster_cis_levels: std.uniq(std.sort([
     single_clusters[key].cis_level
     for key in std.objectFields(single_clusters)

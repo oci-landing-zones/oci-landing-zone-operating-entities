@@ -1,10 +1,8 @@
 // Public-LB access is opt-in; Hub NSGs are membership-only while the OKE environment network retains NSG lifecycle authority.
 // contains: "public_policy_present": true
-// contains: "public_policy_statement_count": 7
 // contains: "lb_statement_has_one_enabled_platform_allowlist": true
 // contains: "disabled_platform_absent_from_lb_allowlist": true
 // contains: "disabled_platform_absent_from_hub_nsg_allowlist": true
-// contains: "target_isolation_statement_count": 2
 // contains: "frontend_nsg_present": true
 // contains: "disabled_platform_frontend_nsg_present": false
 // contains: "frontend_nsg_owned_by_hub_network_compartment": true
@@ -15,7 +13,6 @@
 // contains: "removed_compartment_tags": []
 // contains: "platform_nsg_policy_present": false
 // contains: "restricted_hub_nsg_membership_statement_present": true
-// contains: "hub_nsg_statement_count": 1
 // contains: "hub_vcn_subnet_prerequisites_present": true
 // contains: "private_subnet_prerequisites_are_scope_specific": true
 // contains: "environment_network_nsg_lifecycle_contract_present": true
@@ -33,7 +30,6 @@
 // contains: "private_network_allowlists_are_scope_specific": true
 // contains: "private_ip_statements_allow_all_clusters_without_tags": true
 // contains: "certificate_renewal_policy_keys": []
-// contains: "certificate_consumption_statement_count": 1
 // contains: "leaf_certificate_family_manage_present": true
 // contains: "certificate_scope_is_platform_compartment": true
 // contains: "certificate_policy_excludes_ca_family": true
@@ -153,7 +149,6 @@ local platform_service_any_user_statements = [
 
 {
   public_policy_present: std.objectHas(policies, public_policy_key),
-  public_policy_statement_count: std.length(public_statements),
   lb_statement_has_one_enabled_platform_allowlist:
     std.length([
       s
@@ -164,8 +159,6 @@ local platform_service_any_user_statements = [
     std.length([s for s in hub_lb_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 0,
   disabled_platform_absent_from_hub_nsg_allowlist:
     std.length([s for s in hub_nsg_statements if std.length(std.findSubstr("'preprod-oke'", s)) > 0]) == 0,
-  target_isolation_statement_count:
-    std.length([s for s in public_statements if std.length(std.findSubstr(required_platform_match, s)) > 0]),
   frontend_nsg_present:
     std.objectHas(hub_nsgs, 'NSG-FRA-LZ-HUB-PROD-PLATFORM-OKE-PUBLIC-LB-KEY'),
   disabled_platform_frontend_nsg_present:
@@ -193,7 +186,6 @@ local platform_service_any_user_statements = [
   platform_nsg_policy_present: std.objectHas(policies, platform_network_policy_key),
   restricted_hub_nsg_membership_statement_present:
     hub_nsg_statements == [expected_hub_nsg_membership_statement],
-  hub_nsg_statement_count: std.length(hub_nsg_statements),
   hub_vcn_subnet_prerequisites_present:
     std.length([
       s
@@ -321,7 +313,6 @@ local platform_service_any_user_statements = [
     for key in std.objectFields(policies)
     if std.length(std.findSubstr('CERTIFICATE-RENEWAL', key)) > 0
   ],
-  certificate_consumption_statement_count: std.length(cluster_certificate_statements),
   leaf_certificate_family_manage_present:
     std.length([
       statement

@@ -63,6 +63,8 @@ def render_config_outputs(config_file: Path) -> dict[str, dict]:
         run_cmd(
             [
                 jsonnet_command(),
+                "-J",
+                str(REPO_ROOT),
                 "--multi",
                 f"{tmpdir}/",
                 "--tla-code-file",
@@ -83,6 +85,8 @@ def render_config_failure(config_file: Path) -> str:
         proc = run_cmd(
             [
                 jsonnet_command(),
+                "-J",
+                str(REPO_ROOT),
                 "--multi",
                 f"{tmpdir}/",
                 "--tla-code-file",

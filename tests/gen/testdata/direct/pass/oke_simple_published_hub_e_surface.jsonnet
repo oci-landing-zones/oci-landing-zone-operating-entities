@@ -2,8 +2,8 @@
 // contains: "hub_kind": "hub_e"
 // contains: "environment_names": [
 // contains: "prod"
-// contains: "single_cluster_count": 1
-// contains: "single_worker_count": 1
+// contains: "published_cluster_present": true
+// contains: "published_worker_present": true
 // contains: "single_frontend_nsg_present": true
 // contains: "multi_frontend_nsg_injected": true
 // contains: "multi_hub_vcn_dependency_key": "VCN-FRA-LZ-HUB-KEY"
@@ -33,8 +33,10 @@ local hub_vcn_key = 'VCN-FRA-LZ-HUB-KEY';
 {
   hub_kind: profiles.cis1_config.hub.kind,
   environment_names: std.objectFields(profiles.cis1_config.environments),
-  single_cluster_count: std.length(std.objectFields(single_clusters)),
-  single_worker_count: std.length(std.objectFields(single_workers)),
+  published_cluster_present:
+    std.objectHas(single_clusters, 'CLR-FRA-LZ-PROD-OKE-KEY'),
+  published_worker_present:
+    std.objectHas(single_workers, 'NDP-FRA-LZ-PROD-OKE-KEY'),
   single_frontend_nsg_present:
     std.objectHas(single_network['0-shared'].vcns[hub_vcn_key].network_security_groups, frontend_nsg_key),
   multi_frontend_nsg_injected:

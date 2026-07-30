@@ -93,7 +93,7 @@ function(raw_config)
   local network_only_categories = if std.length(network_only_platforms) > 0 then {
     ['%d-%s-platform-%s' % [
       std.length(spoke_env_indexed) + i + 1,
-      network_only_platforms[i].scope.scope_name,
+      network_only_platforms[i].scope.qualified_name,
       network_only_platforms[i].scope.platform_name,
     ]]:
       platforms.build_network_category({

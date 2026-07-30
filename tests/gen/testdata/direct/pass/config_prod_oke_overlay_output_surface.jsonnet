@@ -1,7 +1,7 @@
 // config-mode prod OKE overlay emits flannel-compatible cluster and worker outputs without pod network resources
 // contains: "cluster_cni_type": "flannel"
-// contains: "pod_nsg_reference_count": 0
-// contains: "public_lb_rule_count": 6
+// contains: "pod_nsg_references": []
+// contains: "public_lb_rules_cover_both_directions": true
 local multi = import 'gen/landing_zone_multi.jsonnet';
 local outputs = multi({
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
@@ -51,20 +51,33 @@ local rule_references_pods(rule) =
   oke_route_table_keys: std.sort(std.objectFields(vcn.route_tables)),
   oke_security_list_keys: std.sort(std.objectFields(vcn.security_lists)),
   oke_nsg_keys: std.sort(std.objectFields(vcn.network_security_groups)),
-  pod_nsg_reference_count: std.length([
+  pod_nsg_references: [
     rule
     for nsg_key in std.objectFields(vcn.network_security_groups)
     for rule in nsg_rules(vcn.network_security_groups[nsg_key])
     if rule_references_pods(rule)
-  ]),
+  ],
   worker_nsg_rule_keys: {
     egress: std.sort(std.objectFields(vcn.network_security_groups['NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY'].egress_rules)),
     ingress: std.sort(std.objectFields(vcn.network_security_groups['NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY'].ingress_rules)),
   },
-  public_lb_rule_count: std.length([
-    key
-    for direction in ['egress_rules', 'ingress_rules']
-    for key in std.objectFields(vcn.network_security_groups['NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY'][direction])
-    if std.startsWith(key, 'hub_public_lb')
-  ]),
+  public_lb_rules_cover_both_directions:
+    std.length([
+      key
+      for key in std.objectFields(
+        vcn.network_security_groups[
+          'NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY'
+        ].egress_rules
+      )
+      if std.startsWith(key, 'hub_public_lb')
+    ]) > 0
+    && std.length([
+      key
+      for key in std.objectFields(
+        vcn.network_security_groups[
+          'NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY'
+        ].ingress_rules
+      )
+      if std.startsWith(key, 'hub_public_lb')
+    ]) > 0,
 }

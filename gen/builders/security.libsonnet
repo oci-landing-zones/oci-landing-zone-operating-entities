@@ -10,12 +10,12 @@
 // function(config, n, realm_constants, topo) → { cis1_pre, cis1, cis2_pre, cis2 }
 
 function(config, n, realm_constants, topo)
-  local security_target_env_names = topo.security_target_env_names();
+  local security_target_env_entries = topo.security_target_env_entries();
   local szp = realm_constants.security_zone_policy_ocids;
   local cis_label(cis_level) = 'L%s' % cis_level;
   local cis_recipe_key(cis_level) = n.key_global('SZ-RCP', ['01', 'CIS', cis_label(cis_level)]);
   local shared_network_recipe_key = n.key_global('SZ-RCP', ['02', 'SHARED', 'NETWORK']);
-  local environment_recipe_key(env_name) = n.key_global('SZ-RCP', ['03', env_name, 'ENVIRONMENT']);
+  local environment_recipe_key(entry) = n.key_global('SZ-RCP', ['03'] + entry.key_segments + ['ENVIRONMENT']);
   local recipe_set(cis_level) = {
     [cis_recipe_key(cis_level)]: {
       name: n.display_global('sz-rcp', ['01', 'cis', cis_label(cis_level)]),
@@ -32,14 +32,14 @@ function(config, n, realm_constants, topo)
       security_policies_ocids: szp.shared_network,
     },
   } + {
-    [environment_recipe_key(env_name)]: {
-      name: n.display_global('sz-rcp', ['03', env_name, 'environment']),
-      description: 'Recipe 03 %s Environment' % topo.env_display(env_name),
+    [environment_recipe_key(entry)]: {
+      name: n.display_global('sz-rcp', ['03'] + entry.name_segments + ['environment']),
+      description: 'Recipe 03 %s Environment' % topo.env_entry_display(entry),
       compartment_id: n.key_global('CMP', ['SECURITY']),
       cis_level: '%s' % cis_level,
       security_policies_ocids: szp.environment,
     }
-    for env_name in security_target_env_names
+    for entry in security_target_env_entries
   };
 
   // --- Base security (shared across all CIS levels) ---
@@ -127,12 +127,12 @@ function(config, n, realm_constants, topo)
       recipe_key: shared_network_recipe_key,
     },
   } + {
-    [n.key_global('SZ-TGT', [env_name, 'ENVIRONMENT'])]: {
-      name: n.display_global('sz-tgt', [env_name, 'environment']),
-      compartment_id: n.key_global('CMP', [env_name]),
-      recipe_key: environment_recipe_key(env_name),
+    [n.key_global('SZ-TGT', entry.key_segments + ['ENVIRONMENT'])]: {
+      name: n.display_global('sz-tgt', entry.name_segments + ['environment']),
+      compartment_id: topo.env_compartment_key(entry),
+      recipe_key: environment_recipe_key(entry),
     }
-    for env_name in security_target_env_names
+    for entry in security_target_env_entries
   };
 
   // --- CIS1: cis1_pre + env-specific targets ---

@@ -52,10 +52,15 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
 
   subnets(ctx)::
     local n = ctx.n;
+    local subnet_dns_label(suffix) =
+      if ctx.is_qualified_scope then
+        n.dns_label(['sn'] + ctx.dns_segments + [ctx.plat, suffix])
+      else
+        n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, suffix]);
     ({
       [ctx.sn_cp_key]: {
         display_name: n.display('sn', ctx.display_segments + ['cp']),
-        dns_label: n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, 'cp']),
+        dns_label: subnet_dns_label('cp'),
         cidr_block: ctx.subnets['control-plane'],
         dhcp_options_key: 'default_dhcp_options',
         prohibit_internet_ingress: true,
@@ -66,7 +71,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
 
       [ctx.sn_lb_key]: {
         display_name: n.display('sn', ctx.display_segments + ['lb']),
-        dns_label: n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, 'lb']),
+        dns_label: subnet_dns_label('lb'),
         cidr_block: ctx.subnets['int-lb'],
         dhcp_options_key: 'default_dhcp_options',
         prohibit_internet_ingress: true,
@@ -77,7 +82,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
 
       [ctx.sn_workers_key]: {
         display_name: n.display('sn', ctx.display_segments + ['workers']),
-        dns_label: n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, 'work']),
+        dns_label: subnet_dns_label('work'),
         cidr_block: ctx.subnets.workers,
         dhcp_options_key: 'default_dhcp_options',
         prohibit_internet_ingress: true,
@@ -88,7 +93,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     } + (if ctx.is_overlay_network then {} else {
       [ctx.sn_pods_key]: {
         display_name: n.display('sn', ctx.display_segments + ['pods']),
-        dns_label: n.dns_label(['sn', ctx.dns, 'plat', ctx.plat, 'pods']),
+        dns_label: subnet_dns_label('pods'),
         cidr_block: ctx.subnets.pods,
         dhcp_options_key: 'default_dhcp_options',
         prohibit_internet_ingress: true,

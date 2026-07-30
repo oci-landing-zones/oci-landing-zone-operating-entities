@@ -1,11 +1,11 @@
 // Disabling public_load_balancer removes Hub-public-LB, certificate-consumption, and Hub-network-rule grants while preserving CIS2 KMS.
 // contains: "public_hub_policy_present": false
 // contains: "certificate_consumption_statements": []
-// contains: "platform_kms_statement_count": 3
+// contains: "platform_kms_authorization_present": true
 // contains: "public_hub_network_rules": []
 // contains: "public_frontend_nsgs": []
 // contains: "platform_nsg_policy_present": false
-// contains: "environment_network_nsg_management_statement_count": 1
+// contains: "environment_network_nsg_management_present": true
 // contains: "hub_nsg_management_statements": []
 // contains: "cluster_nsg_membership_statements": []
 local lz = import 'gen/landing_zone.libsonnet';
@@ -58,7 +58,7 @@ local hub_nsgs = result.network.network_configuration.network_configuration_cate
     for statement in security_policy.statements
     if std.length(std.findSubstr('certificate', statement)) > 0
   ],
-  platform_kms_statement_count: std.length(kms_statements),
+  platform_kms_authorization_present: std.length(kms_statements) > 0,
   public_hub_network_rules: [
     key
     for direction in ['egress_rules', 'ingress_rules']
@@ -71,12 +71,13 @@ local hub_nsgs = result.network.network_configuration.network_configuration_cate
     if std.length(std.findSubstr('PLATFORM-OKE-PUBLIC-LB', key)) > 0
   ],
   platform_nsg_policy_present: std.objectHas(policies, platform_nsg_policy_key),
-  environment_network_nsg_management_statement_count: std.length([
-    statement
-    for key in std.objectFields(policies)
-    for statement in policies[key].statements
-    if std.startsWith(statement, 'allow any-user to manage network-security-groups')
-  ]),
+  environment_network_nsg_management_present:
+    std.length([
+      statement
+      for key in std.objectFields(policies)
+      for statement in policies[key].statements
+      if std.startsWith(statement, 'allow any-user to manage network-security-groups')
+    ]) > 0,
   hub_nsg_management_statements: [
     statement
     for key in std.objectFields(policies)

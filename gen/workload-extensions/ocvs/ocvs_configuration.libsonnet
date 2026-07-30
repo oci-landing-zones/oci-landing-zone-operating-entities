@@ -1,18 +1,21 @@
 function(ctx) {
   local n = ctx.n,
   local c = ctx.cluster,
-  local nsg_key(fn) = n.key('NSG', [ctx.env, 'PLATFORM', ctx.plat, fn.suffix]),
-  local rt_key(fn) = n.key('RT', [ctx.env, 'PLATFORM', ctx.plat, fn.suffix]),
+  local nsg_key(fn) = n.key('NSG', ctx.key_segments + [fn.suffix]),
+  local rt_key(fn) = n.key('RT', ctx.key_segments + [fn.suffix]),
   local function_by_name = {
     [fn.name]: fn
     for fn in ctx.vlan_functions
   },
 
-  ocvs_configuration: {
+  ocvs_configuration+: {
     default_compartment_id: ctx.cmp_key,
     default_ssh_authorized_keys: ctx.params.config_params.ssh_authorized_keys,
-    ocvs_clusters: {
+    ocvs_clusters+: {
       [ctx.cluster_key]: {
+        [if ctx.is_qualified_scope then 'compartment_id']: ctx.cmp_key,
+        [if ctx.is_qualified_scope then 'ssh_authorized_keys']:
+          ctx.params.config_params.ssh_authorized_keys,
         service_label:
           if std.objectHas(c, 'service_label') && c.service_label != null then c.service_label
           else n.display('ocvs', ctx.display_segments),

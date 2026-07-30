@@ -1,4 +1,6 @@
 // OKE subnet security lists stay aligned with the stateless ICMP lockdown pattern
+// contains: "multi_stack_failures": []
+// contains: "single_stack_failures": []
 local expected_pmtu_egress = {
   description: 'Required to enable Path MTU Discovery responses to work, and non-OCI communication',
   protocol: 'ICMP',
@@ -33,43 +35,53 @@ local expected_fail_fast_ingress(vcn_cidr) = {
   src_type: 'CIDR_BLOCK',
   stateless: true,
 };
-local icmp_rule_count(rules) =
-  std.length([rule for rule in rules if rule.protocol == 'ICMP']);
 local list_has_rule(rules, expected) =
   std.length([rule for rule in rules if rule == expected]) == 1;
-local summarize_security_list(vcn_cidr, sl) =
+local unexpected_icmp_rules(rules, expected) = [
+  rule
+  for rule in rules
+  if rule.protocol == 'ICMP' && !std.member(expected, rule)
+];
+local security_list_complies(vcn_cidr, sl) =
   local egress = sl.egress_rules;
   local ingress = sl.ingress_rules;
-  {
-    egress_icmp_rule_count: icmp_rule_count(egress),
-    ingress_icmp_rule_count: icmp_rule_count(ingress),
-    has_fail_fast_egress: list_has_rule(egress, expected_fail_fast_egress(vcn_cidr)),
-    has_fail_fast_ingress: list_has_rule(ingress, expected_fail_fast_ingress(vcn_cidr)),
-    has_pmtu_egress: list_has_rule(egress, expected_pmtu_egress),
-    has_pmtu_ingress: list_has_rule(ingress, expected_pmtu_ingress),
-  };
-local summarize(payload) =
+  list_has_rule(egress, expected_fail_fast_egress(vcn_cidr))
+  && list_has_rule(ingress, expected_fail_fast_ingress(vcn_cidr))
+  && list_has_rule(egress, expected_pmtu_egress)
+  && list_has_rule(ingress, expected_pmtu_ingress)
+  && unexpected_icmp_rules(
+      egress,
+      [expected_pmtu_egress, expected_fail_fast_egress(vcn_cidr)]
+    ) == []
+  && unexpected_icmp_rules(
+      ingress,
+      [expected_pmtu_ingress, expected_fail_fast_ingress(vcn_cidr)]
+    ) == [];
+local failures(payload) =
   local categories = payload.network_configuration.network_configuration_categories;
-  {
-    [category_key]: {
-      [vcn_key]:
-        local vcn = categories[category_key].vcns[vcn_key];
-        local vcn_cidr = vcn.cidr_blocks[0];
-        {
-          default_security_list: vcn.default_security_list,
-          security_lists: {
-            [sl_key]: summarize_security_list(vcn_cidr, vcn.security_lists[sl_key])
-            for sl_key in std.objectFields(vcn.security_lists)
-          },
-        }
-      for vcn_key in std.objectFields(categories[category_key].vcns)
+  [
+    {
+      category: category_key,
+      vcn: vcn_key,
+      security_list: sl_key,
     }
     for category_key in std.objectFields(categories)
     if std.length(std.findSubstr('platform-oke', category_key)) > 0
-  };
+    for vcn_key in std.objectFields(categories[category_key].vcns)
+    for vcn in [categories[category_key].vcns[vcn_key]]
+    for sl_key in std.objectFields(vcn.security_lists)
+    if vcn.default_security_list != {
+         egress_rules: [],
+         ingress_rules: [],
+       }
+       || !security_list_complies(
+         vcn.cidr_blocks[0],
+         vcn.security_lists[sl_key]
+       )
+  ];
 {
-  multi_stack:
-    summarize(import 'gen/workload-extensions/oke/simple/multi-stack/oke_network.jsonnet'),
-  single_stack:
-    summarize(import 'gen/workload-extensions/oke/simple/single-stack/oke_network.jsonnet'),
+  multi_stack_failures:
+    failures(import 'gen/workload-extensions/oke/simple/multi-stack/oke_network.jsonnet'),
+  single_stack_failures:
+    failures(import 'gen/workload-extensions/oke/simple/single-stack/oke_network.jsonnet'),
 }

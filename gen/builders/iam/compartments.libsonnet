@@ -9,6 +9,8 @@ function(ctx)
   local tbac_tag = ctx.tbac_tag;
   local tag_network = ctx.tag_network;
   local tag_security = ctx.tag_security;
+  local tag_shared_network = ctx.tag_shared_network;
+  local tag_shared_security = ctx.tag_shared_security;
 
   // --- Compartments ---
 
@@ -35,7 +37,6 @@ function(ctx)
 
   // Per-environment children compartments
   local env_compartment_children(entry) =
-    local env_name = entry.env_name;
     local platform_kids = platform_children(entry);
 
     // Per-project compartments inside PROJECTS
@@ -44,7 +45,7 @@ function(ctx)
     local proj_children = {
       [topo.env_project_compartment_key(entry, proj_name)]: {
         name: topo.env_project_compartment_name(entry, proj_name),
-        description: '%s environment, %s compartment' % [ctx.env_desc(env_name), ctx.proj_display(proj_name)],
+        description: '%s environment, %s compartment' % [ctx.env_entry_desc(entry), ctx.proj_display(proj_name)],
       }
       for proj_name in project_names
     };
@@ -53,7 +54,7 @@ function(ctx)
       [topo.env_child_compartment_key(entry, 'NETWORK')]: {
         name: topo.env_child_compartment_name(entry, 'network'),
         // 'prod' is abbreviated to "Prod" for the NETWORK compartment (matches hand-written JSON).
-        description: '%s Workload Environment, Common Network Compartment' % topo.env_display_network(env_name),
+        description: '%s Workload Environment, Common Network Compartment' % topo.env_entry_display_network(entry),
         defined_tags: {
           [tbac_tag]: tag_network,
         },
@@ -61,7 +62,7 @@ function(ctx)
 
       [topo.env_child_compartment_key(entry, 'PLATFORM')]: {
         name: topo.env_child_compartment_name(entry, 'platform'),
-        description: '%s Workload Environment, Common Platform Compartment' % ctx.env_desc(env_name),
+        description: '%s Workload Environment, Common Platform Compartment' % ctx.env_entry_desc(entry),
       } + (
         if std.length(std.objectFields(platform_kids)) > 0 then {
           children: platform_kids,
@@ -70,32 +71,55 @@ function(ctx)
 
       [topo.env_child_compartment_key(entry, 'PROJECTS')]: {
         name: topo.env_child_compartment_name(entry, 'projects'),
-        description: '%s Workload Environment, Common Projects Compartment' % ctx.env_desc(env_name),
+        description: '%s Workload Environment, Common Projects Compartment' % ctx.env_entry_desc(entry),
         children: proj_children,
       },
 
       [topo.env_child_compartment_key(entry, 'SECURITY')]: {
         name: topo.env_child_compartment_name(entry, 'security'),
-        description: '%s Workload Environment, Common Security Compartment' % ctx.env_desc(env_name),
+        description: '%s Workload Environment, Common Security Compartment' % ctx.env_entry_desc(entry),
         defined_tags: {
           [tbac_tag]: tag_security,
         },
       },
     };
 
-  // All env children (merged into LANDINGZONE children)
-  local env_compartments = std.foldl(
+  local env_compartment(entry) = {
+    [topo.env_compartment_key(entry)]: {
+      name: topo.env_compartment_name(entry),
+      description: '%s Environment Compartment' % ctx.env_entry_desc(entry),
+      children: env_compartment_children(entry),
+    },
+  };
+
+  // One-OE environments remain direct children of LANDINGZONE.
+  local one_oe_env_compartments = std.foldl(
     function(acc, entry)
-      acc + {
-        [topo.env_compartment_key(entry)]: {
-          name: topo.env_compartment_name(entry),
-          description: '%s Environment Compartment' % ctx.env_desc(entry.env_name),
-          children: env_compartment_children(entry),
-        },
-      },
+      acc + env_compartment(entry),
     env_entries,
     {}
   );
+
+  // Multi-OE environments are nested under their operating entity.
+  local oe_compartments = std.foldl(
+    function(acc, oe)
+      local oe_env_children = std.foldl(
+        function(env_acc, entry) env_acc + env_compartment(entry),
+        [entry for entry in env_entries if entry.oe_name == oe.name],
+        {}
+      );
+      acc + {
+        [topo.oe_compartment_key(oe)]: {
+          name: topo.oe_compartment_name(oe),
+          description: '%s Operating Entity Compartment' % oe.display_name,
+          children: oe_env_children,
+        },
+      },
+    topo.ordered_oe_entries(),
+    {}
+  );
+  local scoped_env_compartments =
+    if topo.mode == 'multi_oe' then oe_compartments else one_oe_env_compartments;
 
   {
     enable_delete: 'true',
@@ -108,7 +132,7 @@ function(ctx)
             name: 'cmp-lz-network',
             description: 'Shared Network Compartment',
             defined_tags: {
-              [tbac_tag]: tag_network,
+              [tbac_tag]: tag_shared_network,
             },
           },
           [n.key_global('CMP', ['PLATFORM'])]: {
@@ -119,12 +143,12 @@ function(ctx)
               children: shared_platform_children,
             } else {}
           ),
-        } + env_compartments + {
+        } + scoped_env_compartments + {
           [n.key_global('CMP', ['SECURITY'])]: {
             name: 'cmp-lz-security',
             description: 'Shared Security Compartment',
             defined_tags: {
-              [tbac_tag]: tag_security,
+              [tbac_tag]: tag_shared_security,
             },
           },
         },

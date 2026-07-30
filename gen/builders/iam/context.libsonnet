@@ -20,6 +20,7 @@ function(config, n, realm_constants, topo)
 
     // --- Display-name helpers ---
     env_desc(env_name):: topology.env_display_long(env_name),
+    env_entry_desc(entry):: topology.env_entry_display_long(entry),
 
     // Project display name for compartment/group descriptions: 'proj1' -> 'Project 1'.
     proj_display(proj_name):: labels.project_display(proj_name),
@@ -32,6 +33,11 @@ function(config, n, realm_constants, topo)
         std.join('-', [std.asciiLower(s) for s in entry.key_segments]),
         std.asciiLower(proj_name),
       ],
+
+    // Mandatory Multi-OE operational groups. Project and platform roles remain
+    // owned by their existing builders.
+    oe_grp_name(oe, role)::
+      naming.display_global('GRP', oe.key_segments + [role, 'ADMIN']),
 
     // Key helpers: n.key_global already inserts 'LZ', so segments must NOT repeat it.
     // GRP-LZ-{ENV}-{PROJ}-ADMIN-KEY -> n.key_global('GRP', [env, proj, 'ADMIN'])
@@ -53,6 +59,14 @@ function(config, n, realm_constants, topo)
     tbac_tag:: 'tagns-lz-role.tag-lz-role',
     tag_network:: 'lz-network-admin',
     tag_security:: 'lz-security-admin',
+    // In Multi-OE mode, global LZ groups must not match OE-local compartments.
+    // One-OE retains its published tag values unchanged.
+    tag_shared_network::
+      if topology.mode == 'multi_oe' then 'lz-shared-network-admin'
+      else 'lz-network-admin',
+    tag_shared_security::
+      if topology.mode == 'multi_oe' then 'lz-shared-security-admin'
+      else 'lz-security-admin',
 
     // Permission-deny restrictions for destructive operations (shared across policies)
     vol_deny:: ["request.permission != 'VOLUME_BACKUP_DELETE'", "request.permission != 'VOLUME_DELETE'", "request.permission != 'BOOT_VOLUME_BACKUP_DELETE'"],

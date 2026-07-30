@@ -3,7 +3,7 @@
 // contains: "native_has_pods_nsg": true
 // contains: "overlay_has_pods_subnet": false
 // contains: "overlay_has_pods_nsg": false
-// contains: "native_pods_hub_lb_rule_count": 4
+// contains: "native_pods_hub_lb_rules_cover_both_directions": true
 local multi = import 'gen/landing_zone_multi.jsonnet';
 
 local base_config(cni_params) = {
@@ -48,11 +48,19 @@ local workers_nsg_key = 'NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY';
   native_has_pods_nsg: std.objectHas(native_vcn.network_security_groups, pods_nsg_key),
   overlay_has_pods_subnet: std.objectHas(overlay_vcn.subnets, pods_subnet_key),
   overlay_has_pods_nsg: std.objectHas(overlay_vcn.network_security_groups, pods_nsg_key),
-  native_pods_hub_lb_rule_count:
+  native_pods_hub_lb_rules_cover_both_directions:
     std.length([
       key
-      for direction in ['egress_rules', 'ingress_rules']
-      for key in std.objectFields(native_vcn.network_security_groups[pods_nsg_key][direction])
+      for key in std.objectFields(
+        native_vcn.network_security_groups[pods_nsg_key].egress_rules
+      )
       if std.startsWith(key, 'hub_public_lb')
-    ]),
+    ]) > 0
+    && std.length([
+      key
+      for key in std.objectFields(
+        native_vcn.network_security_groups[pods_nsg_key].ingress_rules
+      )
+      if std.startsWith(key, 'hub_public_lb')
+    ]) > 0,
 }

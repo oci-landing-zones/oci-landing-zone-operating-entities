@@ -2,6 +2,7 @@
 // Tenancy and shared Landing Zone policy construction.
 
 local project_policies = import './project_policies.libsonnet';
+local role_policies = import './role_policies.libsonnet';
 
 function(ctx)
   local config = ctx.config;
@@ -10,27 +11,24 @@ function(ctx)
   local domain_grp = ctx.domain_grp;
   local tenancy_allow = ctx.tenancy_allow;
   local tenancy_allow_where = ctx.tenancy_allow_where;
-  local tbac_allow = ctx.tbac_allow;
   local grp_auditors = ctx.grp_auditors;
   local grp_cost = ctx.grp_cost;
   local grp_iam = ctx.grp_iam;
   local grp_network = ctx.grp_network;
-  local grp_security_lz = ctx.grp_security_lz;
   local grp_security_tenancy = ctx.grp_security_tenancy;
-  local cmp_lz = ctx.cmp_lz;
-  local tag_network = ctx.tag_network;
-  local tag_security = ctx.tag_security;
-  local vol_deny = ctx.vol_deny;
-  local obj_deny = ctx.obj_deny;
-  local fs_deny = ctx.fs_deny;
 
   // Combined group list for generic admin policy statement
+  local oe_network_groups =
+    if ctx.topo.mode == 'multi_oe' then [
+      domain_grp(ctx.oe_grp_name(oe, 'network'))
+      for oe in ctx.topo.ordered_oe_entries()
+    ] else [];
   local generic_admin_groups = [
     domain_grp(grp_iam),
     domain_grp(grp_auditors),
     domain_grp(grp_security_tenancy),
     domain_grp(grp_network),
-  ];
+  ] + oe_network_groups;
   local generic_admin_stmt = 'allow group %s' % std.join(', ', generic_admin_groups);
 
   // Service policy: realm-aware FSS and Object Storage service identifiers.
@@ -124,102 +122,7 @@ function(ctx)
         ],
       },
 
-      [n.key_global('PCY', ['NETWORK', 'ADMIN'])]: {
-        name: n.display_global('PCY', ['NETWORK', 'ADMIN']),
-        description: desc.policy.grants(
-          grp_network,
-          'network administration access',
-          'Landing Zone child compartments tagged for network administration'
-        ),
-        compartment_id: 'CMP-LANDINGZONE-KEY',
-        statements: [
-          // Own compartment access: network-tagged compartments
-          tbac_allow(grp_network, 'read', 'all-resources', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'virtual-network-family', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'dns', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'load-balancers', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'alarms', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'metrics', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'orm-stacks', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'orm-jobs', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'orm-config-source-providers', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'read', 'audit-events', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'read', 'work-requests', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'instance-family', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'volume-family', cmp_lz, tag_network, vol_deny),
-          tbac_allow(grp_network, 'manage', 'object-family', cmp_lz, tag_network, obj_deny),
-          tbac_allow(grp_network, 'manage', 'file-family', cmp_lz, tag_network, fs_deny),
-          tbac_allow(grp_network, 'manage', 'bastion-session', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'cloudevents-rules', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'read', 'instance-agent-plugins', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'keys', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'use', 'key-delegate', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'secret-family', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'manage', 'repos', cmp_lz, tag_network),
-          tbac_allow(grp_network, 'read', 'vss-family', cmp_lz, tag_network),
-          // Cross-compartment access: security-tagged compartments
-          tbac_allow(grp_network, 'read', 'ons-topics', cmp_lz, tag_security),
-          tbac_allow(grp_network, 'use', 'bastion', cmp_lz, tag_security),
-          tbac_allow(grp_network, 'use', 'bastion-session', cmp_lz, tag_security),
-          tbac_allow(grp_network, 'use', 'vaults', cmp_lz, tag_security),
-          tbac_allow(grp_network, 'read', 'logging-family', cmp_lz, tag_security),
-        ],
-      },
-    } + project_policies(ctx) + {
-      [n.key_global('PCY', ['SECURITY', 'ADMIN'])]: {
-        name: n.display_global('PCY', ['SECURITY', 'ADMIN']),
-        description: desc.policy.grants(
-          grp_security_lz,
-          'security administration access',
-          'Landing Zone child compartments tagged for security administration'
-        ),
-        compartment_id: 'CMP-LANDINGZONE-KEY',
-        statements: [
-          // Own compartment access: security-tagged compartments
-          tbac_allow(grp_security_lz, 'manage', 'tag-namespaces', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'tag-defaults', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'repos', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'read', 'audit-events', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'read', 'app-catalog-listing', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'read', 'instance-images', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'inspect', 'buckets', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'read', 'all-resources', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'instance-family', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'volume-family', cmp_lz, tag_security, vol_deny),
-          tbac_allow(grp_security_lz, 'manage', 'object-family', cmp_lz, tag_security, obj_deny),
-          tbac_allow(grp_security_lz, 'manage', 'file-family', cmp_lz, tag_security, fs_deny),
-          tbac_allow(grp_security_lz, 'manage', 'vaults', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'keys', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'secret-family', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'logging-family', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'serviceconnectors', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'streams', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'ons-family', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'functions-family', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'waas-family', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'security-zone', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'orm-stacks', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'orm-jobs', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'orm-config-source-providers', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'vss-family', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'read', 'work-requests', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'bastion-family', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'read', 'instance-agent-plugins', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'cloudevents-rules', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'alarms', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'manage', 'metrics', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'use', 'key-delegate', cmp_lz, tag_security),
-          // Cross-compartment access: network-tagged compartments
-          tbac_allow(grp_security_lz, 'read', 'virtual-network-family', cmp_lz, tag_network),
-          tbac_allow(grp_security_lz, 'use', 'subnets', cmp_lz, tag_network),
-          tbac_allow(grp_security_lz, 'use', 'network-security-groups', cmp_lz, tag_network),
-          tbac_allow(grp_security_lz, 'use', 'vnics', cmp_lz, tag_network),
-          tbac_allow(grp_security_lz, 'manage', 'private-ips', cmp_lz, tag_network),
-          tbac_allow(grp_security_lz, 'read', 'keys', cmp_lz, tag_network),
-          tbac_allow(grp_security_lz, 'manage', 'operator-control-family', cmp_lz, tag_security),
-        ],
-      },
-
+    } + role_policies(ctx) + project_policies(ctx) + {
       [n.key_tenancy('PCY', ['SECURITY', 'ADMIN'])]: {
         name: n.display_tenancy('PCY', ['SECURITY', 'ADMIN']),
         description: desc.policy.grants(grp_security_tenancy, 'security service administration access', 'the tenancy'),

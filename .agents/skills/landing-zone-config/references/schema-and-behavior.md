@@ -30,7 +30,9 @@ Required by `gen/config.libsonnet`:
 
 - `config.hub.kind`
 - `config.hub.network.vcn`
-- `config.environments`, with at least one environment
+- exactly one non-null environment root:
+  - `config.environments`, with at least one environment, for One-OE
+  - `config.operating_entities`, with at least one OE, for Multi-OE
 
 Optional but important:
 
@@ -41,6 +43,25 @@ Optional but important:
 - `hub.network.subnets`
 - `shared_platforms`
 - `environments.<env>.platforms`
+
+The Multi-OE root reuses the environment body shown above:
+
+```jsonnet
+operating_entities: {
+  alpha: {
+    display_name: 'Alpha',  // optional; defaults to the literal key
+    dns: 'al',
+    environments: {
+      prod: {
+        shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+        projects: { proj1: {} },
+      },
+    },
+  },
+}
+```
+
+OE keys match `[a-z][a-z0-9_]*`; `_` normalizes to `-`. The normalized names `network`, `platform`, `security`, and `shared` are reserved. `dns` is required, unique across OEs, and exactly two lowercase letters. Multi-OE references use qualified names such as `alpha-prod`.
 
 ## Normalization Rules
 
@@ -67,6 +88,8 @@ Current topology behavior worth remembering:
 - Preferred environment ordering is `prod`, `preprod`, `staging`, `uat`, `dev`, `test`, then any remaining names
 - Sample load balancer backends are derived from the first ordered workload spoke's `web` subnet
 - Security-target selection is centralized in `gen/topology.libsonnet`; omitted `security_targets` targets all defined environments
+- Multi-OE orders OEs lexically, then applies the same semantic environment order inside each OE
+- Multi-OE adds the normalized OE key to local key, name, compartment, DNS, route, DRG, security, alarm, event, group, and policy segments
 
 ## Extension Contract
 
@@ -77,6 +100,7 @@ Current registered types:
 - `oke_simple`
 - `exacc`
 - `exacs`
+- `ocvs`
 
 An extension-backed platform config looks like this:
 
@@ -113,6 +137,8 @@ It also contributes default platform subnets when the platform omits explicit `n
 - Shared infrastructure plus environment AVMC/VMC uses `shared_platforms.exacs` without `network` and networked `environments.<env>.platforms.exacs`
 - Dedicated infrastructure plus dedicated AVMC/VMC uses only networked `environments.<env>.platforms.exacs`
 
+In Multi-OE, shared ExaCS `project_db_compartments` keys are qualified environment names such as `alpha-prod`. OKE, ExaDB-C@C, ExaCS, and OCVS use the same qualified topology segments to avoid collisions when OEs repeat environment, project, or platform names.
+
 ## Output Model
 
 `gen/landing_zone_multi.jsonnet` always emits:
@@ -139,6 +165,8 @@ Conditional outputs:
 - `network_pre.json` only for staged hubs that require pre-deployment output
 - `network_backends.json` only when backends are present in the orchestrated result
 - `<extra>.json` for each extension contribution returned in `result.extra`
+
+The direct Orchestrator `v2.1.3` root accepts generated `oke_clusters_configuration`, `oke_workers_configuration`, and `ocvs_configuration` families. Its `rms-facade` loader still searches for legacy OKE keys, so a Multi-OE working set containing OKE is proven through the direct Terraform root, not through the `v2.1.3` facade.
 
 ## Operational Checklist
 
