@@ -96,12 +96,31 @@ Prepare the draft and return blockers, warnings, assumptions and review items.
 I want a landing zone with OKE.
 ```
 
+### Example of complete cross-tenancy RPC prompt
+
+```text
+Create two reviewed One-OE Landing Zone drafts for a cross-tenancy RPC:
+- Tenancy 1 is the acceptor in eu-frankfurt-1 using Hub A and CIDRs under 10.0.0.0/16.
+- Tenancy 2 is the requester in eu-amsterdam-1 using Hub E and CIDRs under 10.1.0.0/16.
+- Both sides need prod, preprod, and UAT project networks.
+- Generate all local environment and platform routing dynamically.
+- Add only RPC-specific cross-tenancy IAM policies; governance remains One-OE standard.
+- Ask me for the tenancy OCIDs, requester network-admin group OCID, exact VCN CIDRs, and acceptor RPC OCID when each value is required.
+- Keep the source configs and generated output directories separate and return blockers, assumptions, and validation checks.
+```
+
+Minimal discovery prompt:
+
+```text
+I need a cross-tenancy Remote Peering Connection between two One-OE landing zones.
+```
+
 
 ### Currently supported add-ons and workloads:
 
 ||Released|Available Soon|
 |---|---|---|
-|Add-ons|[Hub A](/addons/oci-hub-models/hub_a/readme.md), [B](/addons/oci-hub-models/hub_b/readme.md), [C](/addons/oci-hub-models/hub_c/readme.md), [E](/addons/oci-hub-models/hub_e/readme.md)|[FinOps](/addons/oci-finops/README.md), [DNS](/addons/oci-private-dns/README.md)|
+|Add-ons|[Hub A](/addons/oci-hub-models/hub_a/readme.md), [B](/addons/oci-hub-models/hub_b/readme.md), [C](/addons/oci-hub-models/hub_c/readme.md), [E](/addons/oci-hub-models/hub_e/readme.md), [Remote Peering Connections](/addons/oci-x-rpc/README.md) |[FinOps](/addons/oci-finops/README.md), [DNS](/addons/oci-private-dns/README.md)|
 |Extensions|[OKE](/workload-extensions/oke/readme.md), [ExaCS](/workload-extensions/exacs/readme.md), [ExaCC](/workload-extensions/exacc/readme.md)|[EBS](/workload-extensions/ebs/readme.md), [OpenShift](/workload-extensions/openshift/README.md), [OCVS](/workload-extensions/ocvs/README.md)|
 
 &nbsp;

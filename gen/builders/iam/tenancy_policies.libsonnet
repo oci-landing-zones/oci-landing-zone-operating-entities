@@ -2,6 +2,7 @@
 // Tenancy and shared Landing Zone policy construction.
 
 local project_policies = import './project_policies.libsonnet';
+local remote_peering_policies = import './remote_peering_policies.libsonnet';
 
 function(ctx)
   local config = ctx.config;
@@ -165,7 +166,7 @@ function(ctx)
           tbac_allow(grp_network, 'read', 'logging-family', cmp_lz, tag_security),
         ],
       },
-    } + project_policies(ctx) + {
+    } + project_policies(ctx) + remote_peering_policies(ctx) + {
       [n.key_global('PCY', ['SECURITY', 'ADMIN'])]: {
         name: n.display_global('PCY', ['SECURITY', 'ADMIN']),
         description: desc.policy.grants(

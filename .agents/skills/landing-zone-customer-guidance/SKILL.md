@@ -61,6 +61,19 @@ If the selected published path, config generator, or workload extension does not
 - Do not treat non-production as an automatic reason to recommend a no-firewall hub. Firewall-based designs are still the recommended default unless the customer explicitly accepts the tradeoff for a simpler non-production layout.
 - When the customer asks for public access, do not assume the chosen hub needs a brand-new public load balancer design. Check the selected hub guide or runtime artifacts first; in the One-OE one-stack runtime, each hub family already includes a public load balancer example with placeholder backends.
 
+## RPC Requests
+
+- For explicit RPC, Remote Peering Connection, inter-region OCI VCN peering, same-tenancy remote peering, or cross-tenancy remote peering requests, complete the standard landing zone discovery sequence and then use `landing-zone-config`.
+- Model RPC through config mode with top-level `remote_peering_connections`.
+- Read `gen/addons/oci-x-rpc/AGENTS.md` before collecting RPC-specific values or recommending a deployment sequence.
+- For more than two Landing Zones, map the tenancy/region connection graph first. Identify every requested RPC edge and the acceptor/requestor role on each edge, then complete One-OE discovery for each Landing Zone.
+- Ask whether each connection is only for access to the peer Landing Zone or whether traffic must transit through that peer to another connected Landing Zone. Do not infer transitive routing from "connect these tenancies."
+- After the normal One-OE environment, workload, hub, and CIDR decisions are known, establish whether the peering is same-tenancy or cross-tenancy and which side is acceptor versus requestor.
+- Treat environment names and counts as customer-defined. Derive local routed VCNs from the selected environments and platforms; do not assume a fixed prod/preprod/UAT topology.
+- Collect the peer region and all reviewed remote routable CIDRs for each side. A side cannot infer the other side's CIDRs from its own config.
+- For the requestor, collect the acceptor RPC OCID or approved orchestrator dependency key. For cross tenancy, also collect both tenancy OCIDs and the requestor network-administrator group OCID.
+- Explain that One-OE continues to provide governance and baseline IAM. Same-tenancy RPC adds only network changes; cross-tenancy RPC adds the minimum peering policy surface.
+
 ## ExaDB-D / ExaCS-Specific Guardrails
 
 - If the customer says ExaDB-D, Exadata Database Service on Dedicated Infrastructure, Autonomous Database Dedicated, ExaCS, VMC, or AVMC, complete the base landing-zone discovery first.

@@ -1,0 +1,17 @@
+{
+    "policies_configuration": {
+        "supplied_policies": {
+            "PCY-FRA-LZ-HUB-RPC-TENANCY2-KEY": {
+                "name"                       : "pcy-fra-lz-hub-rpc-tenancy2",
+                "description"                : "Grants cross-tenancy remote peering permissions for rpc-fra-lz-hub-tenancy2",
+                "compartment_id"             : "TENANCY-ROOT",
+
+                "statements": [
+                    "Define group requestorGroup as ocid1.group.oc1..requestor-network-admin",
+                    "Define tenancy Requestor as ocid1.tenancy.oc1..requestor",
+                    "Admit group requestorGroup of tenancy Requestor to manage remote-peering-to in compartment cmp-landingzone:cmp-lz-network"
+                ]
+            }
+        }
+    }
+}

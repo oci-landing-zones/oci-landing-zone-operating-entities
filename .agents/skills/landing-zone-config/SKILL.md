@@ -54,6 +54,7 @@ Do not use this skill as the first response to an open-ended customer request su
 | CIS level | `cis_level` is optional and defaults to `2`; set `1` to emit CIS level 1 security/observability files instead. |
 | Extensions | Extension `type` must be registered in `gen/landing_zone.libsonnet`. |
 | Config-mode network outputs | `network.json` is canonical final output; `network_pre.json` appears only for staged hubs. |
+| RPC config | Model each Landing Zone in a separate source config and each requested connection under top-level `remote_peering_connections`; read `gen/addons/oci-x-rpc/AGENTS.md`, derive local VCNs dynamically, and collect per-connection role, peer region, reviewed remote CIDRs, requestor peer reference, and paired cross-tenancy tenancy/group OCIDs. |
 | Artifact placement | Ask for both the config file location and the output directory before creating customer artifacts; do not default them into `tests/`. |
 | Unsupported resources | Do not add unsupported config keys or fake extension types. Generate only supported prerequisites, then document the unsupported resource as manual post-deployment configuration. |
 | Networked extension CIDRs | Include CIDRs only for network scopes the selected config will emit; do not allocate for unchosen optional placement branches or networkless/infrastructure-only scopes. |
@@ -72,6 +73,8 @@ Do not use this skill as the first response to an open-ended customer request su
 - When selecting CIDRs, check whether the landing zone will connect to on-premises or other clouds; any routed OCI or Kubernetes ranges must avoid overlap with those external networks.
 - When adding a new extension-backed platform, verify both the config schema and the extension contract.
 - For OKE, read `gen/workload-extensions/oke/AGENTS.md` before giving exact CIDR splits or networking contract guidance.
+- For RPC, read `gen/addons/oci-x-rpc/AGENTS.md`; create one config per Landing Zone, allow multiple named connections when the graph requires them, omit `peer_id` on each acceptor edge, require it on each requestor edge, and never hardcode environment names or counts.
+- Keep RPC `remote_cidrs` separate from local topology. Include every reviewed peer VCN range that must be reachable, and reject overlaps with local hub, environment, and platform VCNs.
 - For ExaCS, complete the placement decisions in `AGENTS.md`, then use `gen/workload-extensions/exacs/AGENTS.md` for the config mapping.
 - For ExaDB-C@C, complete the placement decisions in `AGENTS.md`, then use the generator guide under `gen/workload-extensions/exacc/` for config and publication semantics.
 - If a requested resource is unsupported by config mode, keep unsupported resources out of generated files and mark the separate work as "Manual post-deployment configuration required."
@@ -82,10 +85,12 @@ Do not use this skill as the first response to an open-ended customer request su
 - When validating a customer config, point generation at a separate output directory such as a temp directory or customer-approved working directory rather than a repo test fixture path.
 - If you need raw multi-output behavior without formatting, run `jsonnet --multi <output_dir>/ --tla-code-file config=<config_file> gen/landing_zone_multi.jsonnet`.
 - Compare generated files with the expected output set from `gen/landing_zone_multi.jsonnet`: `network.json`, `iam.json`, `governance.json`, and the selected `security_cis*` / `observability_cis*` files are emitted; `network_pre.json` appears only for staged hubs, and `network_backends.json` plus extension outputs remain conditional.
+- For RPC graphs, verify every acceptor edge omits `peer_id`/`peer_key`, every requestor edge contains the reviewed peer reference, all network outputs contain the expected per-edge RPC routes and DRG surfaces, and only cross-tenancy configs add RPC IAM policies.
 
 ## References
 
 - For the schema and behavior map, read `references/schema-and-behavior.md`.
 - For starter patterns and repo-native examples, read `references/examples.md`.
 - For config-driven OKE semantics and CIDR guardrails, read `gen/workload-extensions/oke/AGENTS.md`.
+- For config-driven RPC roles, routing, IAM, CIDR guardrails, publication, and deployment order, read `gen/addons/oci-x-rpc/AGENTS.md`.
 - For config-driven ExaCS placement and component semantics, read `gen/workload-extensions/exacs/AGENTS.md`.

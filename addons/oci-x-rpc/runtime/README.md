@@ -1,38 +1,44 @@
-# **[OCI Remote Peering Connections](#)**
-## **An OCI Open LZ [Addon](#) for Remote Peering Across Regions and Tenancies using IaC**
-&nbsp;
-## **DRG Route Table Design and Sample JSON Files**
+# OCI Remote Peering Connection Runtime Files
 
-### 1. DRG Routing Design
+## DRG Routing Reference
 
-The diagram below illustrates a sample routing setup for a multi-tenancy/multi-region RPC configuration. The left side represents Tenancy 1 with a firewall setup (HUB Model A), while the right side depicts the Tenancy 2 region setup without a firewall (HUB Model E).
-
+The diagram shows a sample cross-tenancy design with Tenancy 1 using Hub A and Tenancy 2 using Hub E.
 
 <img src="../images/drg-routing.png" width="100%">
 
-> [!NOTE]  
-> The above diagram serves as a reference for designing DRG routing based on specific architecture requirements. Tenancy 1 and Tenancy 2 may follow different DRG routing styles, such as having firewalls on both sides, only in Tenancy 1, or a mix of different routing configurations.
+> [!NOTE]
+> The diagram is a routing reference. Tenancy 1 and Tenancy 2 may use different supported One-OE hub models, including firewalls on both sides, only one side, or another reviewed combination.
 
-&nbsp;
-### 2. Sample JSON Configuration for RPC  
+## Tested Reference Samples
 
-#### Configuration Details:  
+These files are the tested working reference for the Tenancy 1 acceptor and Tenancy 2 requester design:
 
-- **Tenancy 1 Configuration**  
-  - `tenancy1_iam.json` defines the compartment groups and policies required for RPC setup in Tenancy 1.  
-  - `tenancy1_network.json` defines the Hub and Spoke network setup, including the Remote Peering Connection and associated route tables. The Tenancy 1 JSON configuration follows **OCI Open LZ - Hub A**.  
-    - To learn more about **HUB Model A**, refer to the [OCI Open LZ - Hub A Documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_a).  
+- `tenancy1_iam.json`
+- `tenancy1_network.json`
+- `tenancy1_governance.json`
+- `tenancy2_iam.json`
+- `tenancy2_network.json`
+- `tenancy2_governance.json`
 
-- **Tenancy 2 Configuration**  
-  - `tenancy2_iam.json` defines the compartment groups and policies required for RPC setup in Tenancy 2.  
-  - `tenancy2_network.json` defines the Hub and Spoke network setup, including the Remote Peering Connection and associated route tables. The Tenancy 2 JSON configuration follows **OCI Open LZ - Hub E**.  
-    - To learn more about **HUB Model E**, refer to the [OCI Open LZ - Hub E Documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_e).  
+This add-on runtime keeps only RPC-specific Tenancy 1 and Tenancy 2 configuration files. It does not include full One-OE configs; these files are working reference sample configs to establish cross-tenancy RPC.
 
-> [!NOTE]  
-> This addon runtime keeps only the RPC-specific Tenancy 1 and Tenancy 2 configuration files. It does not include full One-OE configs; these files are working reference sample configs to establish cross-tenancy RPC.
+Governance remains part of the normal One-OE deployment. The governance reference files are retained for comparison and are not generated as RPC-only fragments.
 
+## Blueprint Factory Fragments
 
-#### License
+These compact files are generated from complete One-OE profiles and projected to the RPC-only network and IAM delta:
+
+- `same_tenancy_acceptor_network.json`
+- `same_tenancy_requester_network.json`
+- `cross_tenancy_acceptor_iam.json`
+- `cross_tenancy_acceptor_network.json`
+- `cross_tenancy_requester_iam.json`
+- `cross_tenancy_requester_network.json`
+
+Use `bash gen/generate.sh --config <config_file> <output_directory>` to generate complete customer-specific One-OE outputs. Do not deploy a compact fragment as a replacement for the complete One-OE file set; merge or orchestrate it according to the target deployment workflow.
+
+## License
+
 Copyright (c) 2026 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
