@@ -1,72 +1,49 @@
-// published simple OKE profiles stay anchored to the Hub E quickstart shape
-local defaults = import 'gen/defaults.libsonnet';
-local published_profiles = import 'gen/workload-extensions/oke/simple/published_profiles.libsonnet';
-local single = (import 'gen/workload-extensions/oke/simple/single-stack/oke_network.jsonnet')
+// The committed simple OKE artifacts remain a one-platform Hub E quickstart.
+// contains: "hub_kind": "hub_e"
+// contains: "environment_names": [
+// contains: "prod"
+// contains: "single_cluster_count": 1
+// contains: "single_worker_count": 1
+// contains: "single_frontend_nsg_present": true
+// contains: "multi_frontend_nsg_injected": true
+// contains: "multi_hub_vcn_dependency_key": "VCN-FRA-LZ-HUB-KEY"
+// contains: "governance_tags": [
+// contains: "platform"
+// contains: "governance_tags_are_platform_only": true
+local profiles = import 'gen/workload-extensions/oke/simple/published_profiles.libsonnet';
+local single_network = (import 'gen/workload-extensions/oke/simple/single-stack/oke_network.jsonnet')
   .network_configuration.network_configuration_categories;
-local multi = (import 'gen/workload-extensions/oke/simple/multi-stack/oke_network.jsonnet')
-  .network_configuration.network_configuration_categories;
-local clusters = (import 'gen/workload-extensions/oke/simple/single-stack/oke_clusters.jsonnet')
+local multi_network = (import 'gen/workload-extensions/oke/simple/multi-stack/oke_network.jsonnet')
+  .network_configuration.network_configuration_categories['prod-platform-oke'];
+local single_clusters = (import 'gen/workload-extensions/oke/simple/single-stack/oke_clusters.jsonnet')
   .oke_clusters_configuration.clusters;
-local workers = (import 'gen/workload-extensions/oke/simple/single-stack/oke_workers.jsonnet')
+local single_workers = (import 'gen/workload-extensions/oke/simple/single-stack/oke_workers.jsonnet')
   .oke_workers_configuration.node_pools;
-
-local hub = single['0-shared'].vcns['VCN-FRA-LZ-HUB-KEY'];
-local hub_gateways = single['0-shared'].non_vcn_specific_gateways;
-local oke = single['prod-platform-oke'].vcns['VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY'];
-local multi_oke = multi['prod-platform-oke'];
-local generic_project_vcns = [
-  'VCN-FRA-LZ-PROD-PROJECTS-KEY',
-  'VCN-FRA-LZ-PREPROD-PROJECTS-KEY',
+local multi_governance = import 'gen/workload-extensions/oke/simple/multi-stack/oke_governance.jsonnet';
+local governance_tags = [
+  multi_governance.tags_configuration.namespaces['TAGNS-LZ-OKE-KEY'].tags[key].name
+  for key in std.objectFields(
+    multi_governance.tags_configuration.namespaces['TAGNS-LZ-OKE-KEY'].tags
+  )
 ];
-local profile_config = published_profiles.hub_e_prod_oke_config;
+
+local frontend_nsg_key = 'NSG-FRA-LZ-HUB-PROD-PLATFORM-OKE-PUBLIC-LB-KEY';
+local hub_vcn_key = 'VCN-FRA-LZ-HUB-KEY';
 
 {
-  profile_config: {
-    hub_kind: profile_config.hub.kind,
-    environments: std.objectFields(profile_config.environments),
-    has_shared_project_network:
-      std.objectHas(profile_config.environments.prod, 'shared_project_network'),
-    has_projects:
-      std.objectHas(profile_config.environments.prod, 'projects'),
-  },
-  ordinary_hub_e_default_keeps_project_vcns: {
-    prod: std.objectHas(defaults.hub_e.environments.prod, 'shared_project_network'),
-    preprod: std.objectHas(defaults.hub_e.environments.preprod, 'shared_project_network'),
-  },
-  single_stack: {
-    categories: std.objectFields(single),
-    generic_project_vcns_present: [
-      vcn_key
-      for vcn_key in generic_project_vcns
-      if std.length([
-        category
-        for category in std.objectFields(single)
-        if std.objectHas(single[category], 'vcns') &&
-           std.objectHas(single[category].vcns, vcn_key)
-      ]) > 0
-    ],
-    hub_subnets: std.objectFields(hub.subnets),
-    hub_has_firewall_subnets: std.length([
-      key
-      for key in std.objectFields(hub.subnets)
-      if std.length(std.findSubstr('FW', key)) > 0 ||
-         std.length(std.findSubstr('UNTRUST', key)) > 0 ||
-         std.length(std.findSubstr('TRUST', key)) > 0
-    ]) > 0,
-    hub_l7_load_balancers_present: std.objectHas(hub_gateways, 'l7_load_balancers'),
-    hub_lb_subnet_present: std.objectHas(hub.subnets, 'SN-FRA-LZ-HUB-LB-KEY'),
-    hub_lb_nsg_present: std.objectHas(hub.network_security_groups, 'NSG-FRA-LZ-HUB-LB-KEY'),
-    oke_vcn_cidr: oke.cidr_blocks,
-    cluster_keys: std.objectFields(clusters),
-    worker_keys: std.objectFields(workers),
-  },
-  multi_stack: {
-    categories: std.objectFields(multi),
-    vcn_keys: std.objectFields(multi_oke.vcns),
-    injected_drgs:
-      std.objectFields(multi_oke.non_vcn_specific_gateways.inject_into_existing_drgs),
-    drg_route_table_key:
-      multi_oke.non_vcn_specific_gateways.inject_into_existing_drgs['DRG-FRA-LZ-HUB-KEY']
-        .drg_attachments['DRGATT-FRA-LZ-PROD-PLATFORM-OKE-KEY'].drg_route_table_key,
-  },
+  hub_kind: profiles.cis1_config.hub.kind,
+  environment_names: std.objectFields(profiles.cis1_config.environments),
+  single_cluster_count: std.length(std.objectFields(single_clusters)),
+  single_worker_count: std.length(std.objectFields(single_workers)),
+  single_frontend_nsg_present:
+    std.objectHas(single_network['0-shared'].vcns[hub_vcn_key].network_security_groups, frontend_nsg_key),
+  multi_frontend_nsg_injected:
+    std.objectHas(
+      multi_network.inject_into_existing_vcns[hub_vcn_key].network_security_groups,
+      frontend_nsg_key
+    ),
+  multi_hub_vcn_dependency_key:
+    multi_network.inject_into_existing_vcns[hub_vcn_key].vcn_id,
+  governance_tags: governance_tags,
+  governance_tags_are_platform_only: governance_tags == ['platform'],
 }

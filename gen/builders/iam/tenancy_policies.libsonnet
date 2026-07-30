@@ -248,7 +248,7 @@ function(ctx)
           'allow service vulnerability-scanning-service to read repos in tenancy',
           'allow service vulnerability-scanning-service to read vnics in tenancy',
           'allow service vulnerability-scanning-service to read vnic-attachments in tenancy',
-          'allow service osms to read instances in tenancy',
+          'allow service osmh to read instances in tenancy',
           'allow service blockstorage, oke, streaming, %s, %s to use keys in tenancy' % [fss_service, obj_service],
         ],
       },

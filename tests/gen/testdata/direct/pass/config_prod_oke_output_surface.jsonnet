@@ -55,4 +55,5 @@ local vcn = network_category.vcns['VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY'];
     [name for name in unexpected_split_output_files if std.objectHas(outputs, name)],
   output_files: std.sort(std.objectFields(outputs)),
   worker_image: node_pool.node_config_details.image,
+  worker_boot_volume_encryption: node_pool.node_config_details.encryption,
 }

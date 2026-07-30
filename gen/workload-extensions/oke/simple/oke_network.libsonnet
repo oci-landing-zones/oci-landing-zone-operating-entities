@@ -32,6 +32,18 @@ function(ctx, overlay_output=false) {
           },
         },
       },
-    },
+    } + (if ctx.public_load_balancer then {
+      // The frontend NSG is created in the Hub VCN and Hub network compartment
+      // by network-team-controlled IaC. OKE receives only matching-tag,
+      // post-create attachment permission; it cannot manage the NSG lifecycle,
+      // rules, tags, or placement.
+      '0-shared'+: {
+        vcns+: {
+          [ctx.hub_vcn_key]+: {
+            network_security_groups+: resources.public_lb_frontend_nsg(ctx),
+          },
+        },
+      },
+    } else {}),
   },
 }

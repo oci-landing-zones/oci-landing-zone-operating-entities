@@ -241,6 +241,47 @@
                                         "stateless"                           : false
                                     }
                                 }
+                            },
+
+                            "NSG-FRA-LZ-HUB-PROD-PLATFORM-OKE-PUBLIC-LB-KEY": {
+                                "display_name"                                : "nsg-fra-lz-hub-prod-oke-public-lb",
+                                "compartment_id"                              : "CMP-LZ-NETWORK-KEY",
+
+                                "ingress_rules": {
+                                    "http_80": {
+                                        "description"                         : "Allow public HTTP ingress for application traffic and ACME HTTP-01 challenges",
+                                        "src"                                 : "0.0.0.0/0",
+                                        "src_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 80,
+                                        "dst_port_max"                        : 80,
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : false
+                                    },
+
+                                    "https_443": {
+                                        "description"                         : "Allow public HTTPS ingress for OKE application traffic",
+                                        "src"                                 : "0.0.0.0/0",
+                                        "src_type"                            : "CIDR_BLOCK",
+                                        "dst_port_min"                        : 443,
+                                        "dst_port_max"                        : 443,
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "oke_platform_tcp": {
+                                        "description"                         : "Allow frontend LB traffic only to the owning OKE platform VCN",
+                                        "dst"                                 : "10.0.80.0/20",
+                                        "dst_type"                            : "CIDR_BLOCK",
+                                        "protocol"                            : "TCP",
+                                        "stateless"                           : false
+                                    }
+                                },
+
+                                "defined_tags": {
+                                    "tagns-lz-oke.platform"                   : "prod-oke"
+                                }
                             }
                         },
 
