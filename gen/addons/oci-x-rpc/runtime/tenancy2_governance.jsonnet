@@ -1,3 +1,3 @@
-local base = import '../../../../blueprints/one-oe/runtime/one-stack/oneoe_governance.json';
-
-base
+local profiles = import '../profiles.libsonnet';
+local published = import '../published.libsonnet';
+published.complete(profiles.oe1_reference).governance

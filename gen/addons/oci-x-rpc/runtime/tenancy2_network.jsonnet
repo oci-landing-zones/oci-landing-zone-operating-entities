@@ -1,3 +1,3 @@
-local base = import './templates/oe1_network.json';
-
-base
+local profiles = import '../profiles.libsonnet';
+local published = import '../published.libsonnet';
+published.manual_network_reference(profiles.oe1_reference)

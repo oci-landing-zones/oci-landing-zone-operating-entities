@@ -1,7 +1,6 @@
-local base = import './templates/oe1_iam.json';
-
-base + {
-  identity_domain_groups_configuration+: {
-    ignore_external_membership_updates: true,
-  },
-}
+local profiles = import '../profiles.libsonnet';
+local published = import '../published.libsonnet';
+published.manual_iam_reference(
+  profiles.oe1_reference,
+  profiles.manual_iam_options.oe1
+)

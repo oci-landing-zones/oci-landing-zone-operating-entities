@@ -30,7 +30,7 @@ function(params)
   local enrich_connection(name, index) =
     local entry = connections[name];
     local segment = name_segment(name);
-    entry {
+    entry + {
       index: index,
       name_segment: segment,
       rpc_key: n.key('RPC', ['HUB', segment]),
@@ -64,6 +64,7 @@ function(params)
         vcn: entry.remote_cidrs[i],
         priority: (std.length(local_vcn_entries) + entry.index + 1) * 10,
         kind: 'remote',
+        connection_name: entry.name,
         vcn_key: null,
         drg_att_key: entry.drg_att_key,
         route_key: n.route_rule([n.region, 'rpc', entry.name_segment, '%d' % (i + 1)]),
@@ -186,7 +187,7 @@ function(params)
     for entry in entries
   };
 
-  local network_overlay =
+  local routing_overlay =
     if std.length(entries) == 0 then {}
     else {
       network_configuration+: {
@@ -217,5 +218,5 @@ function(params)
 
   {
     route_entries: route_entries,
-    network_overlay: network_overlay,
+    network_overlay: routing_overlay,
   }

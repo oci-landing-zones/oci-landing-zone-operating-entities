@@ -69,7 +69,7 @@ function(raw_config)
 
   // Number categories starting from 1 using the spoke-environment semantic order.
   local spoke_env_indexed = std.mapWithIndex(
-    function(i, s) s { index: i + 1 },
+    function(i, s) s + { index: i + 1 },
     spoke_envs
   );
   // Build hub with semantic VCN list for NFW policies and example LB backends.
@@ -78,7 +78,7 @@ function(raw_config)
     hub_config: config.hub,
     vcn_list: [
       { name: entry.name, cidr: entry.vcn }
-      for entry in all_routed_cidr_entries
+      for entry in all_vcn_entries
     ],
     create_l7_load_balancer: create_hub_l7_load_balancer,
     lb_backends: lb_backends,
@@ -143,7 +143,7 @@ function(raw_config)
   // --- Build security, observability, governance ---
   local security = security_builder(config, n, realm, topo);
   local observability = observability_builder(config, n, realm, topo);
-  local assembled_network_pre = hub.pre + hub_integration_pre + extension_network_pre {
+  local assembled_network_pre = hub.pre + hub_integration_pre + extension_network_pre + {
     network_configuration+: {
       network_configuration_categories+: spoke_network.categories + network_only_categories,
     },

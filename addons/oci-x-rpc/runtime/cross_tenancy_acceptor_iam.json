@@ -1,10 +1,10 @@
 {
     "policies_configuration": {
         "supplied_policies": {
-            "PCY-FRA-LZ-HUB-RPC-TENANCY2-KEY": {
-                "name"                       : "pcy-fra-lz-hub-rpc-tenancy2",
-                "description"                : "Grants cross-tenancy remote peering permissions for rpc-fra-lz-hub-tenancy2",
-                "compartment_id"             : "TENANCY-ROOT",
+            "PCY-FRA-LZ-HUB-RPC-REQUESTOR-KEY": {
+                "name"                        : "pcy-fra-lz-hub-rpc-requestor",
+                "description"                 : "Grants cross-tenancy remote peering permissions for rpc-fra-lz-hub-requestor",
+                "compartment_id"              : "TENANCY-ROOT",
 
                 "statements": [
                     "Define group requestorGroup as ocid1.group.oc1..requestor-network-admin",

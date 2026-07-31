@@ -1,180 +1,378 @@
 local landing_zone = import '../../landing_zone.libsonnet';
+local render_context = import '../../render_context.libsonnet';
 
 {
-  local contains(value, needle) =
-    std.length(std.findSubstr(needle, std.asciiLower(value))) > 0,
+  non_empty(obj):: std.length(std.objectFields(obj)) > 0,
 
-  local non_empty(obj) = std.length(std.objectFields(obj)) > 0,
+  without_fields(obj, fields):: {
+    [key]: obj[key]
+    for key in std.objectFields(obj)
+    if !std.member(fields, key)
+  },
 
-  local rpc_route_rules(route_rules) = {
+  legacy_env_title(name)::
+    std.asciiUpper(std.substr(name, 0, 1))
+    + std.substr(name, 1, std.length(name) - 1),
+
+  connection_names(config)::
+    std.objectFields(config.remote_peering_connections),
+
+  connection_segments(config):: [
+    std.strReplace(name, '_', '-')
+    for name in $.connection_names(config)
+  ],
+
+  remote_cidrs(config):: std.flattenArrays([
+    config.remote_peering_connections[name].remote_cidrs
+    for name in $.connection_names(config)
+  ]),
+
+  rpc_route_rules(route_rules, remote_cidrs):: {
     [rule_key]: route_rules[rule_key]
     for rule_key in std.objectFields(route_rules)
-    if contains(rule_key, 'rpc') ||
-       (std.objectHas(route_rules[rule_key], 'description') &&
-        contains(route_rules[rule_key].description, 'rpc'))
+    if std.objectHas(route_rules[rule_key], 'destination') &&
+       std.member(remote_cidrs, route_rules[rule_key].destination)
   },
 
-  local rpc_route_tables(route_tables) = {
+  rpc_route_tables(route_tables, remote_cidrs):: {
     [rt_key]:
-      local rules = rpc_route_rules(route_tables[rt_key].route_rules);
+      local rules = $.rpc_route_rules(route_tables[rt_key].route_rules, remote_cidrs);
       route_tables[rt_key] { route_rules: rules }
     for rt_key in std.objectFields(route_tables)
-    if non_empty(rpc_route_rules(route_tables[rt_key].route_rules))
+    if $.non_empty($.rpc_route_rules(route_tables[rt_key].route_rules, remote_cidrs))
   },
 
-  local rpc_vcns(vcns) = {
-    [vcn_key]:
-      local route_tables = rpc_route_tables(vcns[vcn_key].route_tables);
-      { route_tables: route_tables }
-    for vcn_key in std.objectFields(vcns)
-    if std.objectHas(vcns[vcn_key], 'route_tables') &&
-       non_empty(rpc_route_tables(vcns[vcn_key].route_tables))
-  },
-
-  local rpc_distribution_statements(statements) = {
-    [statement_key]: statements[statement_key]
-    for statement_key in std.objectFields(statements)
-    if contains(statement_key, 'rpc') ||
-       (std.objectHas(statements[statement_key], 'match_criteria') &&
-        statements[statement_key].match_criteria.attachment_type == 'REMOTE_PEERING_CONNECTION')
-  },
-
-  local rpc_route_distributions(distributions) = {
-    [distribution_key]:
-      local statements = rpc_distribution_statements(distributions[distribution_key].statements);
-      distributions[distribution_key] { statements: statements }
-    for distribution_key in std.objectFields(distributions)
-    if non_empty(rpc_distribution_statements(distributions[distribution_key].statements))
-  },
-
-  local rpc_drg_attachments(attachments) = {
-    [attachment_key]: attachments[attachment_key]
-    for attachment_key in std.objectFields(attachments)
-    if attachments[attachment_key].network_details.type == 'REMOTE_PEERING_CONNECTION'
-  },
-
-  local rpc_drg_route_tables(route_tables) = {
-    [rt_key]: route_tables[rt_key]
-    for rt_key in std.objectFields(route_tables)
-    if contains(rt_key, 'rpc')
-  },
-
-  local rpc_drgs(drgs) = {
-    [drg_key]:
-      local drg = drgs[drg_key];
-      local attachments = rpc_drg_attachments(drg.drg_attachments);
-      local distributions = rpc_route_distributions(drg.drg_route_distributions);
-      local route_tables = rpc_drg_route_tables(drg.drg_route_tables);
-      local rpcs = if std.objectHas(drg, 'remote_peering_connections') then
-        drg.remote_peering_connections
-      else {};
+  rpc_nsg_ingress_rules(network_security_groups, remote_cidrs):: {
+    [nsg_key]:
+      local ingress_rules = {
+        [rule_key]: network_security_groups[nsg_key].ingress_rules[rule_key]
+        for rule_key in std.objectFields(network_security_groups[nsg_key].ingress_rules)
+        if std.objectHas(network_security_groups[nsg_key].ingress_rules[rule_key], 'src') &&
+           std.member(remote_cidrs, network_security_groups[nsg_key].ingress_rules[rule_key].src)
+      };
       {
-        [if non_empty(attachments) then 'drg_attachments']: attachments,
-        [if non_empty(distributions) then 'drg_route_distributions']: distributions,
-        [if non_empty(route_tables) then 'drg_route_tables']: route_tables,
-        [if non_empty(rpcs) then 'remote_peering_connections']: rpcs,
+        ingress_rules: ingress_rules,
       }
-    for drg_key in std.objectFields(drgs)
-    if non_empty(rpc_drg_attachments(drgs[drg_key].drg_attachments)) ||
-       non_empty(rpc_route_distributions(drgs[drg_key].drg_route_distributions)) ||
-       non_empty(rpc_drg_route_tables(drgs[drg_key].drg_route_tables)) ||
-       (std.objectHas(drgs[drg_key], 'remote_peering_connections') &&
-        non_empty(drgs[drg_key].remote_peering_connections))
-  },
-
-  local rpc_firewall_address_lists(policies, remote_cidrs) = {
-    [policy_key]: {
-      address_lists: {
-        [list_key]: policies[policy_key].address_lists[list_key]
-        for list_key in std.objectFields(policies[policy_key].address_lists)
-        if contains(list_key, 'spokes') ||
-           std.length([
-             cidr
-             for cidr in remote_cidrs
-             if std.member(policies[policy_key].address_lists[list_key].addresses, cidr)
-           ]) > 0
-      },
-    }
-    for policy_key in std.objectFields(policies)
-    if non_empty({
-      [list_key]: policies[policy_key].address_lists[list_key]
-      for list_key in std.objectFields(policies[policy_key].address_lists)
-      if contains(list_key, 'spokes') ||
-         std.length([
-           cidr
-           for cidr in remote_cidrs
-           if std.member(policies[policy_key].address_lists[list_key].addresses, cidr)
-         ]) > 0
+    for nsg_key in std.objectFields(network_security_groups)
+    if $.non_empty({
+      [rule_key]: network_security_groups[nsg_key].ingress_rules[rule_key]
+      for rule_key in std.objectFields(network_security_groups[nsg_key].ingress_rules)
+      if std.objectHas(network_security_groups[nsg_key].ingress_rules[rule_key], 'src') &&
+         std.member(remote_cidrs, network_security_groups[nsg_key].ingress_rules[rule_key].src)
     })
   },
 
+  rpc_vcns(vcns, remote_cidrs):: {
+    [vcn_key]:
+      local route_tables =
+        if std.objectHas(vcns[vcn_key], 'route_tables') then
+          $.rpc_route_tables(vcns[vcn_key].route_tables, remote_cidrs)
+        else {};
+      local network_security_groups =
+        if std.objectHas(vcns[vcn_key], 'network_security_groups') then
+          $.rpc_nsg_ingress_rules(
+            vcns[vcn_key].network_security_groups,
+            remote_cidrs
+          )
+        else {};
+      {
+        [if $.non_empty(route_tables) then 'route_tables']: route_tables,
+        [if $.non_empty(network_security_groups) then 'network_security_groups']:
+          network_security_groups,
+      }
+    for vcn_key in std.objectFields(vcns)
+    if $.non_empty(
+      if std.objectHas(vcns[vcn_key], 'route_tables') then
+        $.rpc_route_tables(vcns[vcn_key].route_tables, remote_cidrs)
+      else {}
+    ) || $.non_empty(
+      if std.objectHas(vcns[vcn_key], 'network_security_groups') then
+        $.rpc_nsg_ingress_rules(
+          vcns[vcn_key].network_security_groups,
+          remote_cidrs
+        )
+      else {}
+    )
+  },
+
+  rpc_distribution_statements(statements):: {
+    [statement_key]: statements[statement_key]
+    for statement_key in std.objectFields(statements)
+    if std.objectHas(statements[statement_key], 'match_criteria') &&
+       statements[statement_key].match_criteria.attachment_type ==
+       'REMOTE_PEERING_CONNECTION'
+  },
+
+  rpc_route_distributions(distributions, rpc_distribution_keys):: {
+    [distribution_key]:
+      if std.member(rpc_distribution_keys, distribution_key) then
+        distributions[distribution_key]
+      else
+        local statements =
+          $.rpc_distribution_statements(distributions[distribution_key].statements);
+        distributions[distribution_key] { statements: statements }
+    for distribution_key in std.objectFields(distributions)
+    if std.member(rpc_distribution_keys, distribution_key) ||
+       $.non_empty(
+         $.rpc_distribution_statements(distributions[distribution_key].statements)
+       )
+  },
+
+  rpc_drg_attachments(attachments):: {
+    [attachment_key]: attachments[attachment_key]
+    for attachment_key in std.objectFields(attachments)
+    if attachments[attachment_key].network_details.type ==
+       'REMOTE_PEERING_CONNECTION'
+  },
+
+  rpc_drg_route_tables(route_tables, rpc_route_table_keys):: {
+    [rt_key]: route_tables[rt_key]
+    for rt_key in std.objectFields(route_tables)
+    if std.member(rpc_route_table_keys, rt_key)
+  },
+
+  rpc_drgs(drgs, rpc_route_table_keys, rpc_distribution_keys):: {
+    [drg_key]:
+      local drg = drgs[drg_key];
+      local attachments = $.rpc_drg_attachments(drg.drg_attachments);
+      local distributions = $.rpc_route_distributions(
+        drg.drg_route_distributions,
+        rpc_distribution_keys
+      );
+      local route_tables =
+        $.rpc_drg_route_tables(drg.drg_route_tables, rpc_route_table_keys);
+      local rpcs =
+        if std.objectHas(drg, 'remote_peering_connections') then
+          drg.remote_peering_connections
+        else {};
+      {
+        [if $.non_empty(attachments) then 'drg_attachments']: attachments,
+        [if $.non_empty(distributions) then 'drg_route_distributions']: distributions,
+        [if $.non_empty(route_tables) then 'drg_route_tables']: route_tables,
+        [if $.non_empty(rpcs) then 'remote_peering_connections']: rpcs,
+      }
+    for drg_key in std.objectFields(drgs)
+    if $.non_empty($.rpc_drg_attachments(drgs[drg_key].drg_attachments)) ||
+       $.non_empty(
+         $.rpc_route_distributions(
+           drgs[drg_key].drg_route_distributions,
+           rpc_distribution_keys
+         )
+       ) ||
+       $.non_empty(
+         $.rpc_drg_route_tables(
+           drgs[drg_key].drg_route_tables,
+           rpc_route_table_keys
+         )
+       ) ||
+       (
+         std.objectHas(drgs[drg_key], 'remote_peering_connections') &&
+         $.non_empty(drgs[drg_key].remote_peering_connections)
+       )
+  },
+
+  complete(config)::
+    landing_zone(config),
+
+  rpc_policy_keys(ctx):: [
+    ctx.n.key('PCY', ['HUB', 'RPC', segment])
+    for segment in $.connection_segments(ctx.config)
+  ],
+
+  rpc_policies(iam, ctx):: {
+    [policy_key]: iam.policies_configuration.supplied_policies[policy_key]
+    for policy_key in $.rpc_policy_keys(ctx)
+    if std.objectHas(
+      iam.policies_configuration.supplied_policies,
+      policy_key
+    )
+  },
+
+  // Preserve the established public IAM reference boundary while deriving every
+  // retained object and RPC policy from the shared config-driven generator.
+  manual_iam_reference(config, options={})::
+    local ctx = render_context.from_raw_config(config);
+    local iam = landing_zone(config).iam;
+    local root_key = 'CMP-LANDINGZONE-KEY';
+    local root =
+      iam.compartments_configuration.compartments[root_key];
+    local shared_network_key = ctx.n.key_global('CMP', ['NETWORK']);
+    local shared_network =
+      $.without_fields(root.children[shared_network_key], ['defined_tags']);
+    local networked_envs = ctx.topo.ordered_spoke_env_entries();
+    local environment_compartments = {
+      [ctx.topo.env_compartment_key(entry)]:
+        local environment_key = ctx.topo.env_compartment_key(entry);
+        local network_key =
+          ctx.topo.env_child_compartment_key(entry, 'NETWORK');
+        local environment = root.children[environment_key];
+        $.without_fields(environment, ['children']) + {
+          description:
+            '%s Environment Compartment' %
+            $.legacy_env_title(entry.env_name),
+          children: {
+            [network_key]:
+              $.without_fields(
+                environment.children[network_key],
+                ['defined_tags']
+              ) + {
+                description:
+                  '%s Workload Environment, Common Network Compartment' %
+                  $.legacy_env_title(entry.env_name),
+              },
+          },
+        }
+      for entry in networked_envs
+    };
+    local network_group_key =
+      ctx.n.key_global('GRP', ['NETWORK', 'ADMIN']);
+    {
+      compartments_configuration:
+        iam.compartments_configuration {
+          [if std.objectHas(options, 'enable_delete') then 'enable_delete']:
+            options.enable_delete,
+          compartments: {
+            [root_key]:
+              $.without_fields(root, ['children']) + {
+                description:
+                  if std.objectHas(options, 'root_description') then
+                    options.root_description
+                  else root.description,
+                children: {
+                  [shared_network_key]: shared_network,
+                } + environment_compartments,
+              },
+          },
+        },
+      identity_domain_groups_configuration:
+        iam.identity_domain_groups_configuration {
+          groups: {
+            [network_group_key]:
+              iam.identity_domain_groups_configuration.groups[
+                network_group_key
+              ] {
+                description:
+                  'One-OE Landing Zone, Shared network administration group, including common OE network elements.',
+              },
+          },
+        },
+      identity_domains_configuration:
+        iam.identity_domains_configuration,
+      policies_configuration:
+        iam.policies_configuration {
+          [if std.objectHas(
+            options,
+            'enable_cis_benchmark_checks'
+          ) then 'enable_cis_benchmark_checks']:
+            options.enable_cis_benchmark_checks,
+          supplied_policies: $.rpc_policies(iam, ctx),
+        },
+    },
+
+  // Preserve the established public network reference boundary while deriving
+  // the standard topology and every RPC change from the shared generator.
+  // Load balancers and Network Firewall resources are existing-LZ concerns,
+  // not changes introduced by this add-on.
+  manual_network_reference(config)::
+    local network = landing_zone(config).network;
+    local categories =
+      network.network_configuration.network_configuration_categories;
+    network {
+      network_configuration:
+        network.network_configuration {
+          network_configuration_categories: {
+            [category_key]:
+              local category = categories[category_key];
+              category {
+                [if std.objectHas(
+                  category,
+                  'non_vcn_specific_gateways'
+                ) then 'non_vcn_specific_gateways']:
+                  $.without_fields(
+                    category.non_vcn_specific_gateways,
+                    [
+                      'l7_load_balancers',
+                      'network_firewalls_configuration',
+                    ]
+                  ),
+              }
+            for category_key in std.objectFields(categories)
+          },
+        },
+    },
+
   network_fragment(config)::
+    local ctx = render_context.from_raw_config(config);
     local result = landing_zone(config).network;
-    local categories = result.network_configuration.network_configuration_categories;
-    local remote_cidrs = std.flattenArrays([
-      config.remote_peering_connections[name].remote_cidrs
-      for name in std.objectFields(config.remote_peering_connections)
-    ]);
+    local categories =
+      result.network_configuration.network_configuration_categories;
+    local remote_cidrs = $.remote_cidrs(ctx.config);
+    local rpc_route_table_keys = [
+      ctx.n.key('DRGRT', ['RPC', segment])
+      for segment in $.connection_segments(ctx.config)
+    ];
+    local rpc_distribution_keys = [
+      ctx.n.key('DRGRD', ['RPC', segment])
+      for segment in $.connection_segments(ctx.config)
+    ];
     {
       network_configuration: {
         network_configuration_categories: {
           [category_key]:
             local category = categories[category_key];
-            local vcns = if std.objectHas(category, 'vcns') then rpc_vcns(category.vcns) else {};
+            local vcns =
+              if std.objectHas(category, 'vcns') then
+                $.rpc_vcns(category.vcns, remote_cidrs)
+              else {};
             local drgs =
               if std.objectHas(category, 'non_vcn_specific_gateways') &&
-                 std.objectHas(category.non_vcn_specific_gateways, 'dynamic_routing_gateways') then
-                rpc_drgs(category.non_vcn_specific_gateways.dynamic_routing_gateways)
-              else {};
-            local firewall_policies =
-              if std.objectHas(category, 'non_vcn_specific_gateways') &&
-                 std.objectHas(category.non_vcn_specific_gateways, 'network_firewalls_configuration') then
-                rpc_firewall_address_lists(
-                  category.non_vcn_specific_gateways.network_firewalls_configuration.network_firewall_policies,
-                  remote_cidrs
+                 std.objectHas(
+                   category.non_vcn_specific_gateways,
+                   'dynamic_routing_gateways'
+                 ) then
+                $.rpc_drgs(
+                  category.non_vcn_specific_gateways.dynamic_routing_gateways,
+                  rpc_route_table_keys,
+                  rpc_distribution_keys
                 )
               else {};
             {
-              [if non_empty(vcns) then 'vcns']: vcns,
-              [if non_empty(drgs) then 'non_vcn_specific_gateways']: {
+              [if $.non_empty(vcns) then 'vcns']: vcns,
+              [if $.non_empty(drgs) then 'non_vcn_specific_gateways']: {
                 dynamic_routing_gateways: drgs,
-              },
-              [if non_empty(firewall_policies) then 'network_firewalls_configuration']: {
-                network_firewall_policies: firewall_policies,
               },
             }
           for category_key in std.objectFields(categories)
-          if non_empty(if std.objectHas(categories[category_key], 'vcns') then
-               rpc_vcns(categories[category_key].vcns)
-             else {}) ||
-             non_empty(
-               if std.objectHas(categories[category_key], 'non_vcn_specific_gateways') &&
-                  std.objectHas(categories[category_key].non_vcn_specific_gateways, 'dynamic_routing_gateways') then
-                 rpc_drgs(categories[category_key].non_vcn_specific_gateways.dynamic_routing_gateways)
-               else {}
-             ) ||
-             non_empty(
-               if std.objectHas(categories[category_key], 'non_vcn_specific_gateways') &&
-                  std.objectHas(categories[category_key].non_vcn_specific_gateways, 'network_firewalls_configuration') then
-                 rpc_firewall_address_lists(
-                   categories[category_key].non_vcn_specific_gateways.network_firewalls_configuration.network_firewall_policies,
-                   remote_cidrs
-                 )
-               else {}
-             )
+          if $.non_empty(
+            if std.objectHas(categories[category_key], 'vcns') then
+              $.rpc_vcns(categories[category_key].vcns, remote_cidrs)
+            else {}
+          ) || $.non_empty(
+            if std.objectHas(
+              categories[category_key],
+              'non_vcn_specific_gateways'
+            ) && std.objectHas(
+              categories[category_key].non_vcn_specific_gateways,
+              'dynamic_routing_gateways'
+            ) then
+              $.rpc_drgs(
+                categories[category_key].non_vcn_specific_gateways
+                .dynamic_routing_gateways,
+                rpc_route_table_keys,
+                rpc_distribution_keys
+              )
+            else {}
+          )
         },
       },
     },
 
   iam_fragment(config)::
+    local ctx = render_context.from_raw_config(config);
     local result = landing_zone(config).iam;
     {
       policies_configuration: {
-        supplied_policies: {
-          [policy_key]: result.policies_configuration.supplied_policies[policy_key]
-          for policy_key in std.objectFields(result.policies_configuration.supplied_policies)
-          if contains(policy_key, 'rpc')
-        },
+        supplied_policies: $.rpc_policies(result, ctx),
       },
     },
 }

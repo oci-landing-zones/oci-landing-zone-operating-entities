@@ -9,8 +9,8 @@
                                 "display_name"                                 : "rt-ams-lz-hub-lb",
 
                                 "route_rules": {
-                                    "rr-ams-rpc-tenancy1-1": {
-                                        "description"                          : "Route to RPC tenancy1 CIDR 10.0.0.0/16 through DRG",
+                                    "rr-ams-rpc-acceptor-1": {
+                                        "description"                          : "Route to RPC acceptor CIDR 10.0.0.0/16 through DRG",
                                         "destination"                          : "10.0.0.0/16",
                                         "destination_type"                     : "CIDR_BLOCK",
                                         "network_entity_key"                   : "DRG-AMS-LZ-HUB-KEY"
@@ -22,8 +22,8 @@
                                 "display_name"                                 : "rt-ams-lz-hub-mgmt",
 
                                 "route_rules": {
-                                    "rr-ams-rpc-tenancy1-1": {
-                                        "description"                          : "Route to RPC tenancy1 CIDR 10.0.0.0/16 through DRG",
+                                    "rr-ams-rpc-acceptor-1": {
+                                        "description"                          : "Route to RPC acceptor CIDR 10.0.0.0/16 through DRG",
                                         "destination"                          : "10.0.0.0/16",
                                         "destination_type"                     : "CIDR_BLOCK",
                                         "network_entity_key"                   : "DRG-AMS-LZ-HUB-KEY"
@@ -38,13 +38,13 @@
                     "dynamic_routing_gateways": {
                         "DRG-AMS-LZ-HUB-KEY": {
                             "drg_attachments": {
-                                "DRGATT-AMS-LZ-HUB-RPC-TENANCY1-KEY": {
-                                    "display_name"                             : "drgatt-ams-lz-hub-rpc-tenancy1",
-                                    "drg_route_table_key"                      : "DRGRT-AMS-LZ-RPC-TENANCY1-KEY",
+                                "DRGATT-AMS-LZ-HUB-RPC-ACCEPTOR-KEY": {
+                                    "display_name"                             : "drgatt-ams-lz-hub-rpc-acceptor",
+                                    "drg_route_table_key"                      : "DRGRT-AMS-LZ-RPC-ACCEPTOR-KEY",
 
                                     "network_details": {
                                         "type"                                 : "REMOTE_PEERING_CONNECTION",
-                                        "attached_resource_key"                : "RPC-AMS-LZ-HUB-TENANCY1-KEY"
+                                        "attached_resource_key"                : "RPC-AMS-LZ-HUB-ACCEPTOR-KEY"
                                     }
                                 }
                             },
@@ -55,25 +55,25 @@
                                     "distribution_type"                        : "IMPORT",
 
                                     "statements": {
-                                        "ROUTE-TO-RPC-LZ-TENANCY1-KEY": {
+                                        "ROUTE-TO-RPC-LZ-ACCEPTOR-KEY": {
                                             "action"                           : "ACCEPT",
                                             "priority"                         : 20,
 
                                             "match_criteria": {
                                                 "match_type"                   : "DRG_ATTACHMENT_TYPE",
                                                 "attachment_type"              : "REMOTE_PEERING_CONNECTION",
-                                                "drg_attachment_key"           : "DRGATT-AMS-LZ-HUB-RPC-TENANCY1-KEY"
+                                                "drg_attachment_key"           : "DRGATT-AMS-LZ-HUB-RPC-ACCEPTOR-KEY"
                                             }
                                         }
                                     }
                                 },
 
-                                "DRGRD-AMS-LZ-RPC-TENANCY1-KEY": {
-                                    "display_name"                             : "drgrd-ams-lz-rpc-tenancy1",
+                                "DRGRD-AMS-LZ-RPC-ACCEPTOR-KEY": {
+                                    "display_name"                             : "drgrd-ams-lz-rpc-acceptor",
                                     "distribution_type"                        : "IMPORT",
 
                                     "statements": {
-                                        "ROUTE-TO-RPC-LZ-TENANCY1-VCN-HUB-KEY": {
+                                        "ROUTE-TO-RPC-LZ-ACCEPTOR-VCN-HUB-KEY": {
                                             "action"                           : "ACCEPT",
                                             "priority"                         : 10,
 
@@ -84,7 +84,7 @@
                                             }
                                         },
 
-                                        "ROUTE-TO-RPC-LZ-TENANCY1-VCN-PROD-KEY": {
+                                        "ROUTE-TO-RPC-LZ-ACCEPTOR-VCN-PROD-KEY": {
                                             "action"                           : "ACCEPT",
                                             "priority"                         : 20,
 
@@ -102,14 +102,14 @@
                                     "distribution_type"                        : "IMPORT",
 
                                     "statements": {
-                                        "ROUTE-TO-RPC-LZ-TENANCY1-S-KEY": {
+                                        "ROUTE-TO-RPC-LZ-ACCEPTOR-S-KEY": {
                                             "action"                           : "ACCEPT",
                                             "priority"                         : 30,
 
                                             "match_criteria": {
                                                 "match_type"                   : "DRG_ATTACHMENT_TYPE",
                                                 "attachment_type"              : "REMOTE_PEERING_CONNECTION",
-                                                "drg_attachment_key"           : "DRGATT-AMS-LZ-HUB-RPC-TENANCY1-KEY"
+                                                "drg_attachment_key"           : "DRGATT-AMS-LZ-HUB-RPC-ACCEPTOR-KEY"
                                             }
                                         }
                                     }
@@ -117,18 +117,18 @@
                             },
 
                             "drg_route_tables": {
-                                "DRGRT-AMS-LZ-RPC-TENANCY1-KEY": {
-                                    "display_name"                             : "drgrt-ams-lz-rpc-tenancy1",
-                                    "import_drg_route_distribution_key"        : "DRGRD-AMS-LZ-RPC-TENANCY1-KEY",
+                                "DRGRT-AMS-LZ-RPC-ACCEPTOR-KEY": {
+                                    "display_name"                             : "drgrt-ams-lz-rpc-acceptor",
+                                    "import_drg_route_distribution_key"        : "DRGRD-AMS-LZ-RPC-ACCEPTOR-KEY",
                                     "is_ecmp_enabled"                          : false,
                                     "route_rules"                              : {}
                                 }
                             },
 
                             "remote_peering_connections": {
-                                "RPC-AMS-LZ-HUB-TENANCY1-KEY": {
-                                    "display_name"                             : "rpc-ams-lz-hub-tenancy1",
-                                    "peer_key"                                 : "RPC-FRA-LZ-HUB-TENANCY2-KEY",
+                                "RPC-AMS-LZ-HUB-ACCEPTOR-KEY": {
+                                    "display_name"                             : "rpc-ams-lz-hub-acceptor",
+                                    "peer_key"                                 : "RPC-FRA-LZ-HUB-REQUESTOR-KEY",
                                     "peer_region_name"                         : "eu-frankfurt-1"
                                 }
                             }
@@ -145,8 +145,8 @@
                                 "display_name"                                 : "rt-ams-lz-prod-proj-generic",
 
                                 "route_rules": {
-                                    "rr-ams-rpc-tenancy1-1": {
-                                        "description"                          : "Route to RPC tenancy1 CIDR 10.0.0.0/16 through DRG",
+                                    "rr-ams-rpc-acceptor-1": {
+                                        "description"                          : "Route to RPC acceptor CIDR 10.0.0.0/16 through DRG",
                                         "destination"                          : "10.0.0.0/16",
                                         "destination_type"                     : "CIDR_BLOCK",
                                         "network_entity_key"                   : "DRG-AMS-LZ-HUB-KEY"

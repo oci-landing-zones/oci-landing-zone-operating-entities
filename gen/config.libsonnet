@@ -34,11 +34,41 @@ local validation = import 'lib/validation.libsonnet';
       parent[key]
     else null,
 
+  local connection_name_segment(value) = std.strReplace(value, '_', '-'),
+
+  local valid_connection_name(value) =
+    local allowed = 'abcdefghijklmnopqrstuvwxyz0123456789-_';
+    std.length(value) > 0
+    && std.member('abcdefghijklmnopqrstuvwxyz0123456789', std.substr(value, 0, 1))
+    && std.member(
+      'abcdefghijklmnopqrstuvwxyz0123456789',
+      std.substr(value, std.length(value) - 1, 1)
+    )
+    && collections.all([
+      std.length(std.findSubstr(std.substr(value, i, 1), allowed)) > 0
+      for i in std.range(0, std.length(value) - 1)
+    ]),
+
   local normalize_remote_peering_connections(connections, region) =
     local values = validation.object(
       connections,
       'config.remote_peering_connections'
     );
+    local connection_names = std.objectFields(values);
+    local invalid_connection_names = [
+      name
+      for name in connection_names
+      if !valid_connection_name(name)
+    ];
+    assert std.length(invalid_connection_names) == 0 :
+      'config.remote_peering_connections connection names must use lowercase letters, numbers, hyphens, or underscores and start and end with a letter or number: %s' %
+      invalid_connection_names[0];
+    local connection_segments = [
+      connection_name_segment(name)
+      for name in connection_names
+    ];
+    assert std.length(collections.unique(connection_segments)) == std.length(connection_segments) :
+      'config.remote_peering_connections connection names must remain unique after underscores are normalized to hyphens';
     {
       [connection_name]:
         local label = 'config.remote_peering_connections.%s' % connection_name;
@@ -75,15 +105,13 @@ local validation = import 'lib/validation.libsonnet';
           'requestor_group_ocid',
           '%s.requestor_group_ocid' % label
         );
-        assert peer_id == null || !has_prefix(peer_id, 'ocid1.tenancy') :
-          '%s.peer_id must reference a remote peering connection OCID or dependency key, not a tenancy OCID' % label;
         assert peer_tenancy_ocid == null || has_prefix(peer_tenancy_ocid, 'ocid1.tenancy') :
           '%s.peer_tenancy_ocid must start with ocid1.tenancy' % label;
         assert requestor_group_ocid == null || has_prefix(requestor_group_ocid, 'ocid1.group') :
           '%s.requestor_group_ocid must start with ocid1.group' % label;
         assert peer_tenancy_ocid != null || requestor_group_ocid == null :
           '%s.peer_tenancy_ocid is required when requestor_group_ocid is provided' % label;
-        assert requestor_group_ocid != null || peer_tenancy_ocid == null :
+        assert peer_id != null || requestor_group_ocid != null || peer_tenancy_ocid == null :
           '%s.requestor_group_ocid is required when peer_tenancy_ocid is provided' % label;
         {
           name: connection_name,
