@@ -1,0 +1,45 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+.npm
+
+# Vite cache
+.vite
+
+# Generated locally from 3rd/go-jsonnet/main.go
+3rd/go-jsonnet/libjsonnet.wasm
+
+# Draw.io backup files
+*.bkp
+.$*.drawio.bkp
+
+# Environment variables
+.env.local
+.env*.local
+
+# Claude Code local
+.claude/
+.claude.local/
+CLAUDE.md
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.env
