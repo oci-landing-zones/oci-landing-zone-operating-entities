@@ -3,23 +3,20 @@
  * (default subnets per hub kind + custom subnets). Writes into the canonical
  * model's `network`. Diagram / JSON wiring comes later.
  *
- * Focus for now is hub_a; switching hub kind resets the subnets to that kind's
- * defaults.
+ * Switching hub kind resets the subnets to that kind's canonical defaults.
  */
 
 import React, { useState } from 'react';
 import { useWizard } from '../wizardContext';
 import DeleteButton from '../../components/DeleteButton';
-import { hubRoutingDefaults } from '../../model/defaults';
 import { oracle } from '../../theme';
-import { HUB_KINDS, getHubKind, hubKindDefaults, resolveHubName } from '../../services/hubKinds';
+import { HUB_KINDS, getHubKind, hubKindDefaults } from '../../services/hubKinds';
 import {
   BASE_RANGES, baseRangeOf, moveToBaseRange, parseCidr, shiftCidr, prefixToMask,
   totalIps, usableIps, freeRanges, suggestSubnetCidrs, validateSubnetCidr, validateVcnCidr,
-  hostIpInSubnet, validateHostIp,
   type BaseRangeId,
 } from '../../services/cidr';
-import type { HubKind, NetworkConfig, Subnet, VcnRouting } from '../../model/types';
+import type { HubKind, NetworkConfig, Subnet } from '../../model/types';
 import { FONT, s } from './networkEditorStyles';
 
 /** Per-hub-kind documentation shown by the ⓘ button; placeholders have none yet. */
@@ -28,59 +25,41 @@ const HUB_INFO: Partial<Record<HubKind, { title: string; body: React.ReactNode }
     title: 'Hub A — Landing Zone',
     body: (
       <>
-        <div style={s.docH}>Table of Contents</div>
-        <ol style={s.docToc}>
-          <li>Overview</li>
-          <li>Components</li>
-          <li>Specifications and Considerations</li>
-          <li>Routing</li>
-        </ol>
-
-        <div style={s.docH}>1. Overview</div>
+        <div style={s.docH}>Overview</div>
         <p style={{ margin: 0 }}>
-          Hub A is equipped with two OCI Network Firewalls — a next-generation managed network
-          firewall and an intrusion detection and prevention service. The first firewall is
-          dedicated to inbound traffic, while the second is responsible for outbound and
-          East-West traffic control and inspection.
+          Hub A uses two OCI Network Firewalls. The DMZ firewall inspects inbound traffic before
+          it reaches the public load-balancer subnet. The internal firewall inspects outbound and
+          east-west traffic. This separation provides strong traffic isolation at the cost of two firewall instances.
         </p>
 
-        <div style={s.docH}>2. Components</div>
+        <div style={s.docH}>Components</div>
         <ul style={s.docUl}>
-          <li>VCN (Virtual Cloud Network)</li>
+          <li>One hub virtual cloud network (VCN)</li>
           <li>
-            Two regional public subnets (depicted in green)
+            Two regional public subnets (shown in green)
             <ul style={s.docUl}>
-              <li>
-                public-subnet for DMZ/external OCI Network Firewall (note: even though DMZ-FW is
-                in a public subnet, it hasn&apos;t public interface, it has only single private
-                interface with private IP address)
-              </li>
-              <li>public-subnet for Public Load Balancers</li>
+              <li>DMZ firewall subnet. The firewall uses a private IP; placement in a public subnet does not give it a public interface.</li>
+              <li>Public load-balancer subnet</li>
             </ul>
           </li>
           <li>
-            Four regional private subnets (depicted in dark-orange)
+            Four regional private subnets
             <ul style={s.docUl}>
-              <li>private-subnet for Internal OCI Network Firewall</li>
-              <li>private-subnet for management workloads</li>
-              <li>private-subnet for monitoring and logs</li>
-              <li>private-subnet for DNS (for OCI DNS resolver endpoints)</li>
+              <li>Internal firewall</li>
+              <li>Management workloads</li>
+              <li>Monitoring and logs</li>
+              <li>OCI DNS resolver endpoints</li>
             </ul>
           </li>
-          <li>Internet Gateway</li>
-          <li>NAT Gateway</li>
-          <li>Service Gateway</li>
-          <li>DMZ-FW — first OCI Network Firewall: responsible for Inbound network traffic control and inspection.</li>
-          <li>Internal-FW — second OCI Network Firewall: responsible for Outbound and East-West network traffic control and inspection.</li>
-          <li>Public Load Balancer (LBaaS)</li>
+          <li>Internet, NAT, and Service gateways</li>
+          <li>Dynamic Routing Gateway attachment</li>
         </ul>
 
-        <div style={s.docH}>3. Specifications and Considerations</div>
+        <div style={s.docH}>Considerations</div>
         <ul style={s.docUl}>
-          <li>Segmentation of network traffic and increased throughput: ensures efficient traffic management and higher data transfer rates.</li>
-          <li>Visibility into Inbound traffic source on DMZ-FW: enables detailed control over traffic entering the Hub VCN.</li>
-          <li>SSL Decryption Policy configuration on DMZ-FW to allow inspect SSL traffic before sending it to the Public Load Balancer.</li>
-          <li>Higher cost compared to the Hub B model: 2 × price of the OCI Network Firewall.</li>
+          <li>Separate firewall paths improve segmentation and preserve inbound source visibility.</li>
+          <li>Inspecting encrypted inbound traffic requires an appropriate SSL decryption policy.</li>
+          <li>Hub A costs more than Hub B because it deploys two OCI Network Firewalls.</li>
         </ul>
       </>
     ),
@@ -190,9 +169,8 @@ export function CidrCalculator({ vcnCidr, subnets }: { vcnCidr: string; subnets:
  * subnet re-basing, the subnet table, the add-subnet suggestions, and the live
  * CIDR calculator. Used by the hub VCN and by every environment VCN.
  */
-export function VcnEditor({ idPrefix, tokens, vcnCidr, subnets, emptyNote, onApply }: {
+export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
   idPrefix: string;
-  tokens: { region: string; lze: string; env?: string };
   vcnCidr: string;
   subnets: Subnet[];
   emptyNote: string;
@@ -237,7 +215,7 @@ export function VcnEditor({ idPrefix, tokens, vcnCidr, subnets, emptyNote, onApp
   }
   function deleteSubnet(i: number) { setSubnets(subnets.filter((_, idx) => idx !== i)); }
 
-  const resolvedSubnets = subnets.map((sn) => ({ name: resolveHubName(sn.name, tokens), cidr: sn.cidr }));
+  const resolvedSubnets = subnets.map((sn) => ({ name: sn.name, cidr: sn.cidr }));
   const vcnError = validateVcnCidr(vcnCidr);
   const activeBase = baseRangeOf(vcnCidr);
   function subnetError(i: number): string | null {
@@ -260,49 +238,52 @@ export function VcnEditor({ idPrefix, tokens, vcnCidr, subnets, emptyNote, onApp
 
   return (
     <>
-      <div style={{ marginTop: 16 }}>
-        <label style={s.label}>Base range</label>
-        <div style={s.baseRow} role="group" aria-label="VCN base range">
-          {BASE_RANGES.map((range) => {
-            const active = range.id === activeBase;
-            return (
-              <button
-                key={range.id}
-                type="button"
-                style={active ? { ...s.basePill, ...s.basePillActive } : s.basePill}
-                aria-pressed={active}
-                title={range.cidr}
-                onClick={() => onBaseRange(range.id)}
-              >
-                {range.label}
-              </button>
-            );
-          })}
+      <div className="network-vcn-settings" style={{ marginTop: 16 }}>
+        <div>
+          <label style={s.label} htmlFor={`${idPrefix}-vcn-cidr`}>VCN CIDR</label>
+          <input
+            id={`${idPrefix}-vcn-cidr`}
+            style={vcnError ? { ...s.input, ...s.errInput } : s.input}
+            value={vcnCidr}
+            placeholder="10.0.0.0/21"
+            onChange={(e) => applyVcnCidr(e.target.value)}
+          />
+          {vcnError && <div style={s.errText}>{vcnError}</div>}
         </div>
-
-        <label style={s.label} htmlFor={`${idPrefix}-vcn-cidr`}>VCN CIDR</label>
-        <input
-          id={`${idPrefix}-vcn-cidr`}
-          style={vcnError ? { ...s.input, ...s.errInput } : s.input}
-          value={vcnCidr}
-          placeholder="10.0.0.0/21"
-          onChange={(e) => applyVcnCidr(e.target.value)}
-        />
-        {vcnError && <div style={s.errText}>{vcnError}</div>}
+        <div>
+          <label style={s.label}>Private address range</label>
+          <div style={s.baseRow} role="group" aria-label="VCN base range">
+            {BASE_RANGES.map((range) => {
+              const active = range.id === activeBase;
+              return (
+                <button
+                  key={range.id}
+                  type="button"
+                  style={active ? { ...s.basePill, ...s.basePillActive } : s.basePill}
+                  aria-pressed={active}
+                  title={range.cidr}
+                  onClick={() => onBaseRange(range.id)}
+                >
+                  {range.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div style={{ marginTop: 18 }}>
-        <div style={s.tableHead}>
+        <div style={s.tableHead} className="network-subnet-grid">
           <span>Subnet</span>
           <span>CIDR</span>
           <span />
         </div>
         {subnets.length === 0 && <div style={s.empty}>{emptyNote}</div>}
         {subnets.map((sn, i) => {
-          const resolved = resolveHubName(sn.name, tokens);
+          const resolved = sn.name;
           const err = subnetError(i);
           return (
-            <div key={i} style={s.row}>
+            <div key={i} style={s.row} className="network-subnet-grid">
               <input
                 aria-label={`Subnet ${i + 1} name`}
                 style={s.rowInput}
@@ -327,7 +308,7 @@ export function VcnEditor({ idPrefix, tokens, vcnCidr, subnets, emptyNote, onApp
 
         <div style={s.subCard}>
           <div style={s.subHead}>Add custom subnet</div>
-          <div style={s.addGrid}>
+          <div style={s.addGrid} className="network-add-subnet-grid">
             <div>
               <label style={s.addLabel} htmlFor={`${idPrefix}-new-subnet-name`}>Name</label>
               <input
@@ -389,96 +370,19 @@ export function VcnEditor({ idPrefix, tokens, vcnCidr, subnets, emptyNote, onApp
   );
 }
 
-/**
- * Per-VCN routing editor — collapsible, collapsed by default. Holds the VCN's
- * DRG attachment name + its gateway names (hub also carries the DRG name and the
- * Internet/NAT Gateway names). All routing fields are diagram-only labels.
- */
-export function RoutingEditor({ idPrefix, isHub, drgName, routing, tokens, onDrg, onRouting }: {
-  idPrefix: string;
-  isHub: boolean;
-  drgName?: string;
-  routing: VcnRouting;
-  tokens: { region: string; lze: string; env?: string };
-  onDrg?: (value: string) => void;
-  onRouting: (patch: Partial<VcnRouting>) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const field = (id: string, label: string, value: string, onChange: (v: string) => void, placeholder?: string) => (
-    <div>
-      <label style={s.label} htmlFor={`${idPrefix}-${id}`}>{label}</label>
-      <input id={`${idPrefix}-${id}`} style={s.input} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
-    </div>
-  );
-  return (
-    <div style={s.calcCard}>
-      <button type="button" style={s.calcHead} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
-        <span>Routing</span>
-        <span>{open ? '▾' : '▸'}</span>
-      </button>
-      {open && (
-        <div style={{ ...s.calcBody, display: 'grid', gap: 14 }}>
-          {isHub && onDrg && field('drg', 'DRG name', drgName ?? '', onDrg, 'DRG')}
-          {field('attach', 'VCN attachment name', resolveHubName(routing.attachmentName, tokens), (v) => onRouting({ attachmentName: v }), 'vcn-<env>-attach')}
-          <div style={{ display: 'grid', gridTemplateColumns: isHub ? '1fr 1fr 1fr' : '1fr', gap: 12 }}>
-            {isHub && field('igw', 'Internet Gateway', routing.igwName ?? '', (v) => onRouting({ igwName: v }), 'Internet Gateway')}
-            {isHub && field('nat', 'NAT Gateway', routing.natName ?? '', (v) => onRouting({ natName: v }), 'NAT Gateway')}
-            {field('sgw', 'Service Gateway', routing.sgwName, (v) => onRouting({ sgwName: v }), 'Service Gateway')}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/**
- * Network-firewall IP field. Shows the stored value, or an in-range default
- * derived from the firewall's subnet when blank; flags an out-of-range entry.
- */
-function FwIpField({ id, label, subnetCidr, value, onChange }: {
-  id: string;
-  label: string;
-  subnetCidr: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  const derived = hostIpInSubnet(subnetCidr);
-  const shown = value.trim() || derived;
-  const err = value.trim() ? validateHostIp(value, subnetCidr) : null;
-  return (
-    <div>
-      <label style={s.label} htmlFor={id}>{label}</label>
-      <input
-        id={id}
-        style={err ? { ...s.input, ...s.errInput } : s.input}
-        value={shown}
-        placeholder={derived}
-        onChange={(e) => onChange(e.target.value)}
-      />
-      {err && <div style={s.errText}>{err}</div>}
-    </div>
-  );
-}
-
 export default function HubNetworkStep() {
   const { model, setField } = useWizard();
   const n = model.network;
   const kind = getHubKind(n.hubKind);
-  // <region> / <lze> tokens in names resolve live from Step 1.
-  const tokens = { region: model.foundation.regionShortName, lze: model.presentation.landingZone };
-  const vcnResolved = resolveHubName(n.hubVcnName, tokens);
 
   const [infoOpen, setInfoOpen] = useState(false);
   const info = HUB_INFO[n.hubKind];
-  const hubRouting = n.routing ?? hubRoutingDefaults(); // stale in-memory records may predate routing
 
   function setNetwork(patch: Partial<NetworkConfig>) {
     setField('network', { ...n, ...patch });
   }
   function onHubKind(id: HubKind) {
-    // Switching hub kind resets the VCN name/CIDR + subnets to that kind's defaults,
-    // but keeps the rest of the network (firewall IPs, DRG name, routing labels) so
-    // those fields never become undefined.
+    // Switching hub kind resets the VCN CIDR + subnet keys to that generator contract.
     setField('network', { ...n, hubKind: id, ...hubKindDefaults(id) });
   }
 
@@ -528,18 +432,8 @@ export default function HubNetworkStep() {
             </div>
           ) : (
             <>
-              <label style={s.label} htmlFor="hub-vcn-name">Hub VCN name</label>
-              <input
-                id="hub-vcn-name"
-                style={s.input}
-                value={vcnResolved}
-                placeholder="vcn-<region>-<lze>-hub"
-                onChange={(e) => setNetwork({ hubVcnName: e.target.value })}
-              />
-
               <VcnEditor
                 idPrefix="hub"
-                tokens={tokens}
                 vcnCidr={n.hubVcnCidr}
                 subnets={n.subnets}
                 emptyNote="No default subnets for this hub kind — add custom subnets below."
@@ -547,35 +441,6 @@ export default function HubNetworkStep() {
                   ...(patch.vcnCidr !== undefined ? { hubVcnCidr: patch.vcnCidr } : {}),
                   ...(patch.subnets ? { subnets: patch.subnets } : {}),
                 })}
-              />
-
-              {(() => {
-                const dmzSn = n.subnets.find((sub) => sub.name.endsWith('-fw-dmz'));
-                const intSn = n.subnets.find((sub) => sub.name.endsWith('-fw-int'));
-                if (!dmzSn && !intSn) return null;
-                return (
-                  <div style={s.subCard}>
-                    <div style={s.subHead}>Network firewall IPs</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: dmzSn && intSn ? '1fr 1fr' : '1fr', gap: 12 }}>
-                      {dmzSn && (
-                        <FwIpField id="fw-dmz-ip" label="DMZ firewall IP" subnetCidr={dmzSn.cidr} value={n.fwDmzIp} onChange={(v) => setNetwork({ fwDmzIp: v })} />
-                      )}
-                      {intSn && (
-                        <FwIpField id="fw-int-ip" label="Internal firewall IP" subnetCidr={intSn.cidr} value={n.fwIntIp} onChange={(v) => setNetwork({ fwIntIp: v })} />
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
-
-              <RoutingEditor
-                idPrefix="hub"
-                isHub
-                drgName={n.drgName ?? 'DRG'}
-                routing={hubRouting}
-                tokens={tokens}
-                onDrg={(v) => setNetwork({ drgName: v })}
-                onRouting={(patch) => setNetwork({ routing: { ...hubRouting, ...patch } })}
               />
             </>
           )}

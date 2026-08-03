@@ -7,6 +7,8 @@
 import React from 'react';
 import { oracle } from '../theme';
 
+// Stable persistence namespace: changing this would make existing acceptance
+// state disappear solely because the product branding changed.
 export const DISCLAIMER_KEY = 'lzng.disclaimer.accepted';
 export const DISCLAIMER_VERSION = '1';
 

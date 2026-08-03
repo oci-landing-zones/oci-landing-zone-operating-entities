@@ -6,19 +6,51 @@ import { evaluate, setAssetLoader } from './jsonnetVm';
 import { GeneratorError, generateFromUpstreamDefaults, generateOutputs } from './generate';
 import { buildVirtualFs } from './virtualFs';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
-import { newPlatform } from '../services/platforms';
-import type { LzModel } from '../model/types';
+import { newPlatform, newSharedPlatform } from '../services/platforms';
+import { getHubKind, hubKindDefaults } from '../services/hubKinds';
+import { generatorNames } from '../services/generatorNaming';
+import type { HubKind, LzModel } from '../model/types';
 
 /** The browser fetches the engine over HTTP; under vitest we read it off disk. */
 beforeAll(() => {
   setAssetLoader(async () => ({
-    wasmExecJs: readFileSync(resolve('3rd/go-jsonnet/wasm_exec.js'), 'utf8'),
     wasmBinary: readFileSync(resolve('3rd/go-jsonnet/libjsonnet.wasm')),
   }));
 });
 
 const fixture = (name: string) =>
   JSON.parse(readFileSync(resolve('../../blueprints/one-oe/runtime/one-stack', name), 'utf8'));
+
+const PUBLIC_HUB_SUBNETS: Record<HubKind, string[]> = {
+  hub_a: ['fw-dmz', 'lb'],
+  hub_b: ['lb'],
+  hub_c: ['untrust', 'lb'],
+  hub_e: ['lb'],
+};
+
+function collectObjects(value: unknown, output: Record<string, unknown>[] = []): Record<string, unknown>[] {
+  if (!value || typeof value !== 'object') return output;
+  if (!Array.isArray(value)) output.push(value as Record<string, unknown>);
+  Object.values(value).forEach((child) => collectObjects(child, output));
+  return output;
+}
+
+function expectHubGeneratorContract(files: Record<string, string>, hubKind: HubKind) {
+  const network = JSON.parse(files['network.json']);
+  const objects = collectObjects(network);
+  expect(objects.some((entry) => entry.display_name === generatorNames.hubVcn('fra'))).toBe(true);
+  expect(objects.some((entry) => entry.display_name === generatorNames.hubDrg('fra'))).toBe(true);
+  expect(objects.some((entry) => entry.display_name === generatorNames.hubAttachment('fra'))).toBe(true);
+
+  for (const subnet of getHubKind(hubKind)!.defaultSubnets) {
+    const name = generatorNames.hubSubnet('fra', subnet.name);
+    const generated = objects.find((entry) => entry.display_name === name && entry.cidr_block === subnet.cidr);
+    expect(generated, `${hubKind} ${name}`).toBeDefined();
+    const isPublic = generated?.prohibit_internet_ingress === false
+      && generated?.prohibit_public_ip_on_vnic === false;
+    expect(isPublic, `${hubKind} ${name} public classification`).toBe(PUBLIC_HUB_SUBNETS[hubKind].includes(subnet.name));
+  }
+}
 
 describe('generated go-jsonnet runtime', () => {
   it('matches its recorded artifact checksums', () => {
@@ -82,7 +114,7 @@ describe('generator (go-jsonnet wasm)', () => {
 
   it('emits the full artifact set for a default wizard model', async () => {
     const out = await generateOutputs(emptyLzModel());
-    expect(out.primary).toEqual(['network.json', 'network_pre.json']);
+    expect(out.primary).toEqual(['network_pre.json', 'network.json']);
     // Hub A stages its rollout, so both network files exist; the rest ride along.
     expect(out.secondary).toContain('iam.json');
     expect(out.secondary).toContain('governance.json');
@@ -96,21 +128,149 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(Object.keys(net.network_configuration_categories)).toContain('0-shared');
     const hub = net.network_configuration_categories['0-shared'].vcns['VCN-FRA-LZ-HUB-KEY'];
     expect(hub.cidr_blocks).toEqual(['10.0.0.0/21']);
+    expectHubGeneratorContract(out.files, 'hub_a');
+  }, 60_000);
+
+  it('generates Hub E as a final-only no-firewall bundle', async () => {
+    const base = emptyLzModel();
+    const model: LzModel = {
+      ...base,
+      network: { ...base.network, hubKind: 'hub_e', ...hubKindDefaults('hub_e') },
+    };
+    const out = await generateOutputs(model);
+
+    expect(out.config).toContain("kind: 'hub_e'");
+    expect(out.files['network.json']).toBeDefined();
+    expect(out.files['network_pre.json']).toBeUndefined();
+    expect(out.files['network.json']).toContain('SN-FRA-LZ-HUB-LB-KEY');
+    expect(out.files['network.json']).not.toContain('NFW-FRA-LZ-HUB');
+    expectHubGeneratorContract(out.files, 'hub_e');
+  }, 60_000);
+
+  it.each(['hub_b', 'hub_c'] as const)('generates the canonical %s hub layout', async (hubKind) => {
+    const base = emptyLzModel();
+    const out = await generateOutputs({
+      ...base,
+      network: { ...base.network, hubKind, ...hubKindDefaults(hubKind) },
+    });
+
+    expect(out.config).toContain(`kind: '${hubKind}'`);
+    expect(out.files['network.json']).toBeDefined();
+    expect(out.files['network_pre.json']).toBeDefined();
+    expectHubGeneratorContract(out.files, hubKind);
+  }, 60_000);
+
+  it('keeps Hub B pre-network DRG routes separate from final firewall routes', async () => {
+    const base = emptyLzModel();
+    const out = await generateOutputs({
+      ...base,
+      network: { ...base.network, hubKind: 'hub_b', ...hubKindDefaults('hub_b') },
+    });
+    expect(out.files['network_pre.json']).toContain('Route to the 0.0.0.0/0 through DRG');
+    expect(out.files['network.json']).toContain('OCI NFW PRIVATE IP OCID');
+    expect(out.files['network.json']).toContain('Route to Public LB through the OCI Network Firewall');
+  }, 60_000);
+
+  it('includes Hub C external-firewall backend placeholders in the complete output set', async () => {
+    const base = emptyLzModel();
+    const out = await generateOutputs({
+      ...base,
+      network: { ...base.network, hubKind: 'hub_c', ...hubKindDefaults('hub_c') },
+    });
+    expect(out.files['network_pre.json']).toBeDefined();
+    expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET');
+    expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET');
   }, 60_000);
 
   it('carries an OKE platform through to the generated network config', async () => {
     const base = emptyLzModel();
     const model: LzModel = {
       ...base,
-      environments: [{ name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
+      environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
       platforms: [newPlatform('oke_simple', [])],
     };
     const out = await generateOutputs(model);
     const body = out.files['network.json'];
     // The platform's per-environment VCN lands in the prod category.
-    expect(body).toContain('10.140.0.0/21');
+    expect(body).toContain('10.0.80.0/20');
     // And OKE contributes its own extension artifacts alongside the core files.
     expect(Object.keys(out.files).some((f) => f.includes('oke'))).toBe(true);
+  }, 60_000);
+
+  it('uses generator-owned OKE profile subnets when cluster_size is selected', async () => {
+    const base = emptyLzModel();
+    const oke = newPlatform('oke_simple', []);
+    const model: LzModel = {
+      ...base,
+      environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
+      platforms: [{ ...oke, subnets: [], vcnCidr: '10.140.0.0/20', okeParams: { ...oke.okeParams!, clusterSize: 'small', cniType: 'overlay', podsCidr: '10.244.0.0/16', createFss: true, publicLoadBalancer: true } }],
+    };
+    const out = await generateOutputs(model);
+    expect(out.config).toContain("cluster_size: 'small'");
+    expect(out.config).not.toContain('subnets: {}');
+    expect(out.files['network.json']).toContain('SN-FRA-LZ-PROD-PLATFORM-OKE-FSS-KEY');
+  }, 60_000);
+
+  it('generates an OCVS platform only after its required SSH key is supplied', async () => {
+    const base = emptyLzModel();
+    const ocvs = newPlatform('ocvs', []);
+    const model: LzModel = {
+      ...base,
+      environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
+      platforms: [{ ...ocvs, ocvsParams: { ...ocvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' } }],
+    };
+    const out = await generateOutputs(model);
+
+    expect(out.files['ocvs.json']).toBeDefined();
+    expect(out.files['network_pre.json']).toContain('PROVISIONING');
+    expect(out.config).toContain("type: 'ocvs'");
+  }, 60_000);
+
+  it('generates an OCVS management cluster from the supported shared-platform scope', async () => {
+    const base = emptyLzModel();
+    const ocvs = newPlatform('ocvs', []);
+    const model: LzModel = {
+      ...base,
+      sharedPlatforms: [{
+        id: 'shared-ocv', key: 'ocv', type: 'ocvs', vcnCidr: '10.170.0.0/21', subnets: [],
+        ocvsParams: { ...ocvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' },
+      }],
+    };
+    const out = await generateOutputs(model);
+    expect(out.files['ocvs.json']).toContain('CMP-LZ-SHARED-OCV-KEY');
+    expect(out.files['network_pre.json']).toContain('SN-FRA-LZ-SHARED-PLATFORM-OCV-PROVISIONING-KEY');
+  }, 60_000);
+
+  it('generates a Custom network-only platform without an unsupported extension', async () => {
+    const base = emptyLzModel();
+    const model: LzModel = {
+      ...base,
+      environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
+      platforms: [newPlatform('custom', [])],
+    };
+    const out = await generateOutputs(model);
+    expect(out.config).not.toContain("type: 'custom'");
+    expect(out.files['network.json']).toContain('10.0.80.0/21');
+    expect(out.files['network.json']).toContain('10.0.80.0/24');
+  }, 60_000);
+
+  it('attaches every environment and shared platform VCN to the DRG', async () => {
+    const base = emptyLzModel();
+    const sharedOne = newSharedPlatform('custom', []);
+    const sharedTwo = newSharedPlatform('custom', [sharedOne]);
+    const environmentPlatform = newPlatform('custom', []);
+    const model: LzModel = {
+      ...base,
+      environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
+      platforms: [environmentPlatform],
+      sharedPlatforms: [sharedOne, sharedTwo],
+    };
+    const out = await generateOutputs(model);
+    const body = out.files['network.json'];
+
+    expect(body).toContain(generatorNames.environmentPlatformAttachment('fra', 'prod', environmentPlatform.key));
+    expect(body).toContain(generatorNames.sharedPlatformAttachment('fra', sharedOne.key));
+    expect(body).toContain(generatorNames.sharedPlatformAttachment('fra', sharedTwo.key));
   }, 60_000);
 
   it('surfaces a generator assertion as a GeneratorError instead of crashing', async () => {
@@ -120,6 +280,7 @@ describe('generator (go-jsonnet wasm)', () => {
     const model: LzModel = {
       ...base,
       environments: [{
+        id: 'environment-1',
         name: 'prod',
         securityZone: false,
         network: { ...envNetworkDefaults(0), vcnCidr: base.network.hubVcnCidr },

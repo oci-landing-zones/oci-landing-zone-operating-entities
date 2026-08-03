@@ -15,20 +15,34 @@ const css = {
   divider: { width: 1, height: 22, background: 'rgba(255,255,255,0.25)' } as React.CSSProperties,
   sub: { fontSize: 13, color: 'rgba(255,255,255,0.78)' } as React.CSSProperties,
   center: { position: 'absolute', left: '50%', top: 0, bottom: 0, transform: 'translateX(-50%)', display: 'flex', alignItems: 'center' } as React.CSSProperties,
+  // A real, non-overlapping blank strip between the brand and centred controls.
+  // Keeping it out of the flex remainder avoids the centred toggle intercepting
+  // clicks intended for the hidden debug gesture.
+  debugSpace: { flex: '0 1 auto', width: 'clamp(36px, 15vw, 200px)', alignSelf: 'stretch' } as React.CSSProperties,
   right: { marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 } as React.CSSProperties,
 };
 
-export default function TopBar({ center, right }: { center?: React.ReactNode; right?: React.ReactNode }) {
+export default function TopBar({ center, right, onEmptySpaceClick }: {
+  center?: React.ReactNode;
+  right?: React.ReactNode;
+  onEmptySpaceClick?: () => void;
+}) {
   return (
-    <div style={css.bar}>
-      <Link to="/" style={css.link} aria-label="Go to home" title="Home">
+    <div style={css.bar} className="studio-topbar">
+      <Link to="/" style={css.link} className="studio-topbar-brand" aria-label="Go to home" title="Home">
         <span style={css.mark} />
-        <span style={css.word}>Oracle Cloud Infrastructure</span>
+        <span style={css.word}>OCI</span>
       </Link>
       <span style={css.divider} />
-      <span style={css.sub}>Landing Zone Next Gen</span>
-      {center && <div style={css.center}>{center}</div>}
-      {right && <div style={css.right}>{right}</div>}
+      <span style={css.sub}>Landing Zone Studio</span>
+      <span
+        className="studio-topbar-debug-space"
+        style={css.debugSpace}
+        aria-hidden="true"
+        onClick={onEmptySpaceClick}
+      />
+      {center && <div style={css.center} className="studio-topbar-center">{center}</div>}
+      {right && <div style={css.right} className="studio-topbar-right">{right}</div>}
     </div>
   );
 }

@@ -13,9 +13,12 @@
 
 import type { LzModel } from '../model/types';
 import { serializeConfig } from '../services/lzConfig';
-import { evaluate } from './jsonnetVm';
+import { evaluate, jsonnetVm } from './jsonnetVm';
 import { buildVirtualFs } from './virtualFs';
 import { PRIMARY_OUTPUTS } from './outputNames';
+import { validateOkeModel } from '../services/okeValidation';
+import { validateOcvsModel } from '../services/ocvsValidation';
+import { validatePlatformContracts } from '../services/platformValidation';
 
 export interface GeneratedOutputs {
   /** The wizard config that was fed to the generator. */
@@ -34,6 +37,11 @@ export class GeneratorError extends Error {
     super(message);
     this.name = 'GeneratorError';
   }
+}
+
+/** Download and boot the complete generation path before the first config download. */
+export async function warmGenerator(): Promise<void> {
+  await jsonnetVm();
 }
 
 function isFileMap(value: unknown): value is Record<string, unknown> {
@@ -80,6 +88,8 @@ export function generateFromUpstreamDefaults(profile: string): Promise<Record<st
 
 /** Run the generator over a wizard model. */
 export async function generateOutputs(model: LzModel): Promise<GeneratedOutputs> {
+  const issues = [...validatePlatformContracts(model), ...validateOkeModel(model), ...validateOcvsModel(model)];
+  if (issues.length) throw new GeneratorError(issues.join('\n'));
   const config = serializeConfig(model);
   const files = await generateFromConfigCode(config);
   const primary = PRIMARY_OUTPUTS.filter((name) => name in files);

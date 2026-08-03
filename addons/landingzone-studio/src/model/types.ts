@@ -2,7 +2,7 @@
  * Canonical Landing Zone model — the single source of truth.
  *
  * The wizard writes into this object; every downstream view (JSON preview,
- * on-screen diagram, .drawio export, SVG export) is a PURE derivation of it.
+ * on-screen diagram and .drawio export) is a PURE derivation of it.
  * Each new wizard step adds fields here and the diagram grows to match.
  *
  * Milestone 0 is deliberately tiny: a tenancy and a hub VCN. That's enough to
@@ -19,26 +19,11 @@ export interface FoundationConfig {
 export interface EnvNetworkConfig {
   vcnCidr: string;
   subnets: Subnet[];
-  /** Routing names (diagram-only): VCN→DRG attachment + the VCN's Service Gateway. */
-  routing: VcnRouting;
-}
-
-/**
- * Routing labels for one VCN — diagram-only (like presentation, excluded from
- * the generated config). The attachment name resolves <region>/<lze>/<env>
- * tokens; gateway names are free text and default to their OCI type label.
- */
-export interface VcnRouting {
-  /** Name of this VCN's attachment to the DRG, e.g. vcn-prod-attach. */
-  attachmentName: string;
-  /** Service Gateway display name (every VCN has one). */
-  sgwName: string;
-  /** Internet / NAT Gateway names — hub VCN only; undefined on spokes. */
-  igwName?: string;
-  natName?: string;
 }
 
 export interface Environment {
+  /** Stable browser identity; editable names never serve as relationships. */
+  id: string;
   name: string;            // e.g. prod
   securityZone: boolean;   // enrol this environment in an OCI Security Zone
   network: EnvNetworkConfig;
@@ -50,13 +35,18 @@ export interface Environment {
  * dynamically; otherwise it lists the specific environment names.
  */
 export interface ProjectConfig {
+  /** Stable browser identity; never serialized to Jsonnet. */
+  id: string;
   name: string;
+  /** Stable environment IDs, resolved to config names during serialization. */
   environments: 'all' | string[];
 }
 
-export type HubKind = 'hub_a' | 'hub_b' | 'hub_c' | 'hub_d' | 'hub_e';
+/** Hub kinds accepted by the current config-driven Jsonnet schema. */
+export type HubKind = 'hub_a' | 'hub_b' | 'hub_c' | 'hub_e';
 
 export interface Subnet {
+  /** Jsonnet subnet-map key. OCI display names are generator-derived. */
   name: string;
   cidr: string;
   /** Mandatory subnet shipped by a platform type (e.g. OKE's int-lb/workers) —
@@ -64,15 +54,37 @@ export interface Subnet {
   locked?: boolean;
 }
 
-/** Platform engine type. MVP deploys oke_simple + custom; exacc/exacs are roadmap. */
-export type PlatformType = 'oke_simple' | 'exacc' | 'exacs' | 'custom';
+/** Platform types currently exposed by the config-driven Studio. */
+export type PlatformType = 'oke_simple' | 'ocvs' | 'custom';
 
 /** OKE Simple settings — the extension params for an oke_simple platform. */
 export interface OkePlatformParams {
   kubernetesVersion: string;   // e.g. v1.35.2
   servicesCidr: string;        // e.g. 10.96.0.0/16
   apiAllowedCidrs: string[];   // e.g. ['10.0.1.0/24']
-  workerImage: string;         // e.g. 8.10
+  workerImage: string;         // image-name selector, e.g. 9\.[0-9]+
+  workerBootVolumeSize: number;
+  cniType: 'native' | 'overlay';
+  /** Omit for a manual subnet map; profiles own their subnet map. */
+  clusterSize?: 'small' | 'medium' | 'large';
+  /** Required for overlay; optional passthrough for native. */
+  podsCidr?: string;
+  createFss: boolean;
+  publicLoadBalancer: boolean;
+}
+
+/** OCVS's one-SDDC management-cluster input contract. */
+export interface OcvsPlatformParams {
+  sshAuthorizedKeys: string;
+  sddcDisplayName: string;
+  clusterDisplayName: string;
+  vmwareSoftwareVersion: string;
+  computeAvailabilityDomain: string;
+  esxiHostsCount: number;
+  vsphereType: string;
+  initialHostOcpuCount: number;
+  initialHostShapeName: string;
+  workloadNetworkCidr: string;
 }
 
 /** Per-environment override for a platform: a custom VCN and/or subnet set. */
@@ -88,67 +100,55 @@ export interface PlatformEnvOverride {
  * other environment derives its VCN by index shift unless an override pins it.
  */
 export interface PlatformConfig {
-  /** Stable key (also the JSON key + diagram id), e.g. 'oke'. */
+  /** Stable browser identity; never serialized to Jsonnet. */
   id: string;
-  name: string;
+  /** Key in environments.<env>.platforms. */
+  key: string;
   type: PlatformType;
-  /** 'all' applies it to every environment; otherwise the listed env names. */
+  /** 'all' applies it to every environment; otherwise the listed environment IDs. */
   environments: 'all' | string[];
-  /** VCN display name (diagram-only), e.g. vcn-oke. Always vcn-prefixed. */
-  vcnName: string;
-  /** DRG attachment name template (diagram-only), may carry <env>, e.g. vcn-oke-<env>-attach. */
-  attachmentName: string;
   /** Base VCN CIDR (env-0); other envs derive from it. */
   vcnCidr: string;
   /** Default (locked) + custom subnets, relative to the base VCN. */
   subnets: Subnet[];
   /** OKE Simple settings — present only when type === 'oke_simple'. */
   okeParams?: OkePlatformParams;
-  /** Per-env VCN / subnet overrides, keyed by environment name. */
+  /** OCVS settings — present only when type === 'ocvs'. */
+  ocvsParams?: OcvsPlatformParams;
+  /** Per-env VCN / subnet overrides, keyed by stable environment ID. */
   overrides?: Record<string, PlatformEnvOverride>;
 }
 
 /**
- * The always-present shared platform — a compartment + VCN that lives OUTSIDE
- * every environment (directly in the landing zone). MVP models just its VCN.
+ * A shared platform. Its resources live in a child of cmp-lz-platform while
+ * its network lives in cmp-lz-network, matching the generator topology.
  */
 export interface SharedPlatformConfig {
+  /** Stable browser identity; never serialized to Jsonnet. */
+  id: string;
+  /** Key in the top-level shared_platforms map. */
+  key: string;
+  /** Shared OCVS uses the same extension contract as an environment platform. */
+  type?: 'custom' | 'ocvs';
   /**
    * Keys the `shared_platforms` config block and names the generated VCN. The
    * generator folds it into an OCI DNS label (`vcn` + region + `lz` + `sh` + name),
    * which OCI caps at 15 chars — so with a 3-char region this has ~5 to spend.
    */
-  name: string;
   vcnCidr: string;
   /**
    * The generator asserts every platform VCN declares at least one subnet
    * (`lib/subnets.libsonnet`), so the shared platform always carries one.
    */
   subnets: Subnet[];
+  /** Present only when this shared platform is an OCVS management cluster. */
+  ocvsParams?: OcvsPlatformParams;
 }
 
 export interface NetworkConfig {
   hubKind: HubKind;
-  /** May contain <region> / <lze> tokens, resolved from foundation + presentation. */
-  hubVcnName: string;
   hubVcnCidr: string;
   subnets: Subnet[];
-  /** Firewall instance IPs (diagram-only). Empty → derived from the fw subnet range. */
-  fwDmzIp: string;
-  fwIntIp: string;
-  /** Name of the single DRG in the network compartment (diagram-only). */
-  drgName: string;
-  /** Hub VCN routing: attachment + IGW/NAT/SGW names (diagram-only). */
-  routing: VcnRouting;
-}
-
-/**
- * Diagram-only labels. These name containers in the network diagram but are
- * intentionally NOT part of the generated config (serializeConfig ignores them).
- */
-export interface PresentationConfig {
-  customer: string;       // names the OCI Tenancy / Operating Entity container
-  landingZone: string;    // names the landing zone compartment container
 }
 
 export interface LzModel {
@@ -161,9 +161,8 @@ export interface LzModel {
   projects: ProjectConfig[];
   /** Environment platforms — VCN-bearing compartments inside environments (step 4). */
   platforms: PlatformConfig[];
-  /** The single shared platform outside all environments (step 4). */
-  sharedPlatform: SharedPlatformConfig;
-  presentation: PresentationConfig;
+  /** Optional shared platforms outside all environments (step 4). */
+  sharedPlatforms: SharedPlatformConfig[];
 }
 
 /**

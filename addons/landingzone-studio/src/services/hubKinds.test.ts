@@ -1,140 +1,57 @@
 import { describe, expect, it } from 'vitest';
-import { HUB_KINDS, getHubKind, hubKindDefaults, resolveHubName } from './hubKinds';
+import { HUB_KINDS, hubKindDefaults } from './hubKinds';
 import { emptyLzModel, normalizeModel } from '../model/defaults';
 
-describe('hubKinds', () => {
-  it('offers hub_a through hub_e; only hub_a is implemented so far', () => {
-    expect(HUB_KINDS.map((k) => k.id)).toEqual(['hub_a', 'hub_b', 'hub_c', 'hub_d', 'hub_e']);
-    expect(HUB_KINDS.filter((k) => k.implemented).map((k) => k.id)).toEqual(['hub_a']);
+describe('hub generator contracts', () => {
+  it('supports A/B/C/E with config keys rather than display-name templates', () => {
+    expect(HUB_KINDS.map((kind) => kind.id)).toEqual(['hub_a', 'hub_b', 'hub_c', 'hub_e']);
+    expect(hubKindDefaults('hub_a').subnets.map((subnet) => subnet.name)).toEqual(['fw-dmz', 'lb', 'fw-int', 'mgmt', 'mon', 'dns']);
+    expect(hubKindDefaults('hub_b').subnets.map((subnet) => subnet.name)).toEqual(['lb', 'fw', 'mgmt', 'mon', 'dns']);
+    expect(hubKindDefaults('hub_c').subnets.map((subnet) => subnet.name)).toEqual(['untrust', 'trust', 'lb', 'mgmt', 'mon', 'dns']);
+    expect(hubKindDefaults('hub_e').subnets.map((subnet) => subnet.name)).toEqual(['lb', 'mgmt', 'mon', 'dns']);
   });
 
-  it('hub_a has the six default subnets', () => {
-    const a = getHubKind('hub_a');
-    expect(a?.defaultSubnets.map((sn) => sn.name)).toEqual([
-      'sn-<region>-<lze>-hub-fw-dmz',
-      'sn-<region>-<lze>-hub-lb',
-      'sn-<region>-<lze>-hub-fw-int',
-      'sn-<region>-<lze>-hub-mgmt',
-      'sn-<region>-<lze>-hub-mon',
-      'sn-<region>-<lze>-hub-dns',
-    ]);
-  });
-
-  it('hubKindDefaults returns the default VCN name, CIDR + subnets', () => {
-    const { hubVcnName, hubVcnCidr, subnets } = hubKindDefaults('hub_a');
-    expect(hubVcnName).toBe('vcn-<region>-<lze>-hub');
-    expect(hubVcnCidr).toBe('10.0.0.0/21');
-    expect(subnets).toHaveLength(6);
-    expect(subnets[0]).toEqual({ name: 'sn-<region>-<lze>-hub-fw-dmz', cidr: '10.0.0.0/24' });
+  it('starts with no shared platform and no presentation-only state', () => {
+    const model = emptyLzModel();
+    expect(model.sharedPlatforms).toEqual([]);
+    expect(model.version).toBe('0.17.0');
+    expect(model.network).toEqual({ hubKind: 'hub_a', ...hubKindDefaults('hub_a') });
+    expect('presentation' in model).toBe(false);
+    expect('routing' in model.network).toBe(false);
   });
 });
 
-describe('resolveHubName', () => {
-  it('substitutes <region> and <lze> tokens', () => {
-    expect(resolveHubName('vcn-<region>-<lze>-hub', { region: 'fra', lze: 'acme' })).toBe('vcn-fra-acme-hub');
+describe('saved model versioning', () => {
+  it('accepts the current contract unchanged', () => {
+    const current = emptyLzModel();
+    expect(normalizeModel(current)).toBe(current);
   });
 
-  it('leaves a token literal while its value is empty', () => {
-    expect(resolveHubName('sn-<region>-<lze>-hub-dns', { region: 'fra', lze: '' })).toBe('sn-fra-<lze>-hub-dns');
+  it('resets older, partial, or malformed records to the latest model', () => {
+    expect(normalizeModel({ version: '0.14.0' })).toEqual(emptyLzModel());
+    expect(normalizeModel({ version: '0.15.0' })).toEqual(emptyLzModel());
+    expect(normalizeModel({ version: '0.16.0' })).toEqual(emptyLzModel());
+    expect(normalizeModel(null)).toEqual(emptyLzModel());
   });
 
-  it('passes through names without tokens unchanged', () => {
-    expect(resolveHubName('my-custom-subnet', { region: 'fra', lze: 'acme' })).toBe('my-custom-subnet');
-  });
-});
-
-describe('network defaults + migration', () => {
-  it('a new model defaults to hub_a with its subnets', () => {
-    const net = emptyLzModel().network;
-    expect(net.hubKind).toBe('hub_a');
-    expect(net.hubVcnName).toBe('vcn-<region>-<lze>-hub');
-    expect(net.subnets).toHaveLength(6);
-  });
-
-  it('normalizeModel migrates a legacy { hubVcn } network to hub_a defaults', () => {
-    const legacy = { network: { hubVcn: { name: '', cidr: '10.0.0.0/16' } } };
-    const net = normalizeModel(legacy).network;
-    expect(net.hubKind).toBe('hub_a');
-    expect(net.hubVcnName).toBe('vcn-<region>-<lze>-hub');
-    expect(net.subnets).toHaveLength(6);
-    expect('hubVcn' in net).toBe(false);
-  });
-
-  it('normalizeModel upgrades an untouched legacy default subnet set to the current defaults', () => {
-    const stored = {
-      network: {
-        hubKind: 'hub_a',
-        hubVcnCidr: '10.0.0.0/21',
-        subnets: [
-          { name: 'fw-dmz', cidr: '10.0.0.0/24' },
-          { name: 'web', cidr: '10.0.1.0/24' },
-          { name: 'fw-int', cidr: '10.0.2.0/24' },
-          { name: 'mgmt', cidr: '10.0.3.0/24' },
-        ],
-      },
+  it('migrates valid 0.16 name-based relationships to stable environment ids', () => {
+    const current = emptyLzModel();
+    const legacy = {
+      ...current,
+      version: '0.16.0',
+      environments: current.environments.map(({ id: _id, ...environment }) => environment),
+      projects: [{ name: 'app', environments: ['prod'] }],
+      platforms: [{
+        id: 'cust', key: 'cust', type: 'custom', environments: ['prod'],
+        vcnCidr: '10.0.80.0/21', subnets: [{ name: 'core', cidr: '10.0.80.0/24' }],
+        overrides: { prod: { vcnCidr: '10.200.0.0/21' } },
+      }],
     };
-    const net = normalizeModel(stored).network;
-    expect(net.subnets.map((sn) => sn.name)).toEqual(
-      hubKindDefaults('hub_a').subnets.map((sn) => sn.name),
-    );
-  });
-
-  it('normalizeModel keeps user-customized subnets as-is', () => {
-    const stored = {
-      network: {
-        hubKind: 'hub_a',
-        hubVcnName: 'vcn-<region>-<lze>-hub',
-        hubVcnCidr: '10.0.0.0/21',
-        subnets: [{ name: 'my-subnet', cidr: '10.0.7.0/24' }],
-      },
-    };
-    expect(normalizeModel(stored).network.subnets).toEqual([{ name: 'my-subnet', cidr: '10.0.7.0/24' }]);
-  });
-
-  it('normalizeModel seeds environment networks on legacy records (<= 0.6.0)', () => {
-    const stored = {
-      environments: [
-        { name: 'prod', securityZone: true },
-        { name: 'dev', securityZone: false },
-      ],
-    };
-    const envs = normalizeModel(stored).environments;
-    expect(envs[0].network.vcnCidr).toBe('10.0.8.0/21');
-    expect(envs[1].network.vcnCidr).toBe('10.0.16.0/21');
-    expect(envs[0].network.subnets.map((sn) => sn.name)).toEqual([
-      'sn-<region>-<env>-web', 'sn-<region>-<env>-app', 'sn-<region>-<env>-db', 'sn-<region>-<env>-infra',
-    ]);
-    // a stored env network is kept as-is
-    const custom = {
-      environments: [{ name: 'prod', securityZone: true, network: { vcnCidr: '192.168.8.0/21', subnets: [] } }],
-    };
-    expect(normalizeModel(custom).environments[0].network.vcnCidr).toBe('192.168.8.0/21');
-  });
-
-  it('normalizeModel upgrades an untouched 10.100-based hub default to 10.0.0.0/21', () => {
-    const stored = {
-      network: {
-        hubKind: 'hub_a',
-        hubVcnName: 'vcn-<region>-<lze>-hub',
-        hubVcnCidr: '10.100.0.0/21',
-        subnets: hubKindDefaults('hub_a').subnets.map((sn, i) => ({ name: sn.name, cidr: `10.100.${i}.0/24` })),
-      },
-    };
-    const net = normalizeModel(stored).network;
-    expect(net.hubVcnCidr).toBe('10.0.0.0/21');
-    expect(net.subnets[0].cidr).toBe('10.0.0.0/24');
-    // but a customised 10.100 network is left alone
-    const custom = {
-      network: { hubKind: 'hub_a', hubVcnCidr: '10.100.0.0/21', subnets: [{ name: 'mine', cidr: '10.100.0.0/24' }] },
-    };
-    expect(normalizeModel(custom).network.hubVcnCidr).toBe('10.100.0.0/21');
-  });
-
-  it('normalizeModel migrates the old cmp-landingzone default to landingzone', () => {
-    const stored = { presentation: { customer: '', landingZone: 'cmp-landingzone' } };
-    expect(normalizeModel(stored).presentation.landingZone).toBe('landingzone');
-    // a real custom name is untouched
-    const custom = { presentation: { customer: '', landingZone: 'acme' } };
-    expect(normalizeModel(custom).presentation.landingZone).toBe('acme');
+    const migrated = normalizeModel(legacy);
+    const prodId = migrated.environments[0].id;
+    expect(migrated.version).toBe('0.17.0');
+    expect(migrated.projects[0]).toMatchObject({ id: 'project-1', environments: [prodId] });
+    expect(migrated.platforms[0].environments).toEqual([prodId]);
+    expect(migrated.platforms[0].overrides).toEqual({ [prodId]: { vcnCidr: '10.200.0.0/21' } });
   });
 });

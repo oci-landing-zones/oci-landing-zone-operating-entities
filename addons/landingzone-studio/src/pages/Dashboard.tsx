@@ -1,7 +1,7 @@
 /**
  * Dashboard ("/") — the intro band, then the saved Landing Zones with full
- * management (open, rename, duplicate, delete) and a "New Landing Zone" action.
- * The list itself is `SavedLzList`, shared with the wizard's closing step.
+ * management (open, duplicate, delete) and a "New Landing Zone" action.
+ * Naming is edited only as the first field in Foundation.
  */
 
 import React, { useCallback, useState } from 'react';
@@ -25,12 +25,17 @@ export default function Dashboard() {
   // Seeded from the store, then kept in step with the list — deleting the last
   // build has to bring the full-size Hero back.
   const [count, setCount] = useState(() => listLZs().length);
+  const [storageError, setStorageError] = useState<string | null>(null);
   const hasRecords = count > 0;
   const onCountChange = useCallback((n: number) => setCount(n), []);
 
   function handleNew() {
-    const rec = createLZ();
-    navigate(`/lz/${rec.id}`);
+    const created = createLZ();
+    if (!created.ok || !created.record) {
+      setStorageError(created.message ?? 'Could not create the Landing Zone.');
+      return;
+    }
+    navigate(`/lz/${created.record.id}`);
   }
 
   return (
@@ -39,6 +44,8 @@ export default function Dashboard() {
       {/* The intro band always sits at the top; it shrinks to a slim header once
           there are saved builds to list below it. */}
       <Hero onNew={handleNew} compact={hasRecords} />
+
+      {storageError && <div role="alert" style={{ ...s.page, paddingTop: 12, paddingBottom: 0, color: '#9f1d1d' }}>{storageError}</div>}
 
       {hasRecords && (
         <div style={s.page}>

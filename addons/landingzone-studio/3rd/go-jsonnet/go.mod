@@ -1,4 +1,4 @@
-module lzng-jsonnet-wasm
+module landing-zone-studio-jsonnet-wasm
 
 go 1.25.0
 

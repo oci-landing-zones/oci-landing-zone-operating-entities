@@ -1,29 +1,31 @@
 import type { DiagramEdge, DiagramModel, DiagramNode, DiagramOptions, LzModel } from '../model/types';
-import { getHubKind, resolveHubName } from '../services/hubKinds';
-import { envNetworkDefaults, envRoutingDefaults, hubRoutingDefaults } from '../model/defaults';
+import { getHubKind } from '../services/hubKinds';
+import { envNetworkDefaults } from '../model/defaults';
 import { hostIpInSubnet } from '../services/cidr';
 import { buildRouteTables } from '../services/routeTables';
 import { buildFlowTraces } from '../services/flowTrace';
-import { platformInEnv, platformSubnetsForEnv, platformVcnForEnv } from '../services/platforms';
+import { ocvsDefaultSubnets, platformInEnv, platformSubnetsForEnv, platformVcnForEnv } from '../services/platforms';
+import { generatorNames } from '../services/generatorNaming';
 
 /**
  * Pure: canonical LzModel → renderer-agnostic DiagramModel.
  *
  * Containment hierarchy (each nested inside the previous):
  *   OCI Region
- *     └─ OCI Tenancy / Operating Entity      (named by presentation.customer)
- *          └─ landing zone container         (named by presentation.landingZone)
- *               ├─ cmp-<lze>-network  (yellow)
- *               │    ├─ hub VCN                  (step 2: kind, name, CIDR)
+ *     └─ OCI Tenancy
+ *          └─ cmp-landingzone
+ *               ├─ cmp-lz-network  (yellow)
+ *               │    ├─ hub VCN                  (step 2: generator name + CIDR)
  *               │    │    └─ hub subnets         (step 2 subnet table)
  *               │    └─ gateways (IGW / NAT / SGW) on the VCN's left border
- *               ├─ cmp-<lze>-security (yellow)
- *               └─ cmp-<lze>-<env>   (green)     one per environment
- *                    └─ cmp-<lze>-<env>-network  (yellow)
- *                         └─ vcn-<region>-<env>-projects
+ *               ├─ cmp-lz-platform (yellow, always present)
+ *               ├─ cmp-lz-security (yellow)
+ *               └─ cmp-lz-<env>   (green)     one per environment
+ *                    └─ cmp-lz-<env>-network  (yellow)
+ *                         └─ vcn-<region>-lz-<env>-projects
  *                              └─ 4 fixed subnets: web / app / db / infra
  *
- * Hub subnets matching the hub_a roles get an icon + caption: *-fw-dmz and
+ * Hub subnets matching the supported firewall roles get an icon + caption: *-fw-dmz and
  * *-fw-int show the OCI Network Firewall (caption nfw-<region>-hub-dmz/-int,
  * region from the Foundation step), *-lb shows the Load Balancer.
  *
@@ -33,7 +35,7 @@ import { platformInEnv, platformSubnetsForEnv, platformVcnForEnv } from '../serv
  *
  * Child x/y are relative to the immediate parent (parentId). Both the React
  * Flow renderer and the .drawio exporter consume this, so screen and export
- * agree. presentation.customer / presentation.landingZone are diagram-only.
+ * agree. Saved-design metadata is intentionally outside LzModel.
  */
 
 const COMP_W = 200;    // plain (childless) compartment row — step 1 view
@@ -48,19 +50,20 @@ const SUB_H = 50;      // plain subnet row
 const SUB_H_ICON = 124; // subnet with an icon + caption inside
 const SUB_GAP = 12;
 const VCN_PAD = 22;    // breathing room between subnets and the VCN border
-const GW_W = 66;       // gateway icon + two-line label
-const GW_H = 64;
-const GW_STRIP = 76;   // hub VCN x-inset — the strip the gateways live in
+const GW_W = 116;      // gateway icon + readable generated name
+const GW_H = 74;
+const GW_STRIP = 150;  // explicit gateway rail to the left of each VCN
+const GW_X = 12;       // gateways sit in the rail; a short edge shows VCN ownership
 
 const VCN_W = VCN_PAD * 2 + SUB_W;
 const HUB_NET_W = GW_STRIP + VCN_W + PAD; // hub network compartment (gateway strip left)
 const NET_COMP_W = HUB_NET_W;             // env network compartment — same strip, for its Service Gateway
 // Projects: a gray compartment to the right of each env network compartment,
 // holding one block per project that applies to the environment.
-const PROJ_COMP_W = 156;
+const PROJ_COMP_W = 216;
 const PROJ_GAP = 16;       // gap between the network and projects compartments
-const PROJ_W = 116;        // a single project block
-const PROJ_H = 34;
+const PROJ_W = 184;        // a generated project-compartment name without clipping
+const PROJ_H = 42;
 const PROJ_GAP_V = 12;     // vertical gap between stacked project blocks
 const ENV_COMP_W = PAD * 2 + NET_COMP_W + PROJ_GAP + PROJ_COMP_W;
 // Platforms (step 4): a gray compartment to the right of the projects one,
@@ -174,15 +177,24 @@ function pushVcn(
  * firewalls also show an instance IP — the stored value, or one derived from the
  * subnet range when left blank.
  */
-function decorateHubSubnet(name: string, cidr: string, regionTok: string, fwIps: { dmz: string; int: string }): SubnetSpec {
+function decorateHubSubnet(name: string, cidr: string, regionTok: string): SubnetSpec {
   if (name.endsWith('-fw-dmz')) {
-    return { name, cidr, icon: 'firewall', caption: `nfw-${regionTok}-hub-dmz`, captionTone: 'green', ipNote: fwIps.dmz.trim() || hostIpInSubnet(cidr), isPublic: true };
+    return { name, cidr, icon: 'firewall', caption: `nfw-${regionTok}-lz-hub-dmz`, captionTone: 'green', ipNote: hostIpInSubnet(cidr, 10), isPublic: true };
   }
   if (name.endsWith('-lb')) {
     return { name, cidr, icon: 'lb', caption: 'Load Balancer', captionTone: 'green', isPublic: true };
   }
   if (name.endsWith('-fw-int')) {
-    return { name, cidr, icon: 'firewall', caption: `nfw-${regionTok}-hub-int`, captionTone: 'orange', ipNote: fwIps.int.trim() || hostIpInSubnet(cidr) };
+    return { name, cidr, icon: 'firewall', caption: `nfw-${regionTok}-lz-hub-int`, captionTone: 'orange', ipNote: hostIpInSubnet(cidr, 10) };
+  }
+  if (name.endsWith('-fw')) {
+    return { name, cidr, icon: 'firewall', caption: `nfw-${regionTok}-lz-hub`, captionTone: 'orange', ipNote: hostIpInSubnet(cidr, 10) };
+  }
+  if (name.endsWith('-untrust')) {
+    return { name, cidr, icon: 'firewall', caption: 'Untrust NLB + firewall backends', captionTone: 'green', isPublic: true };
+  }
+  if (name.endsWith('-trust')) {
+    return { name, cidr, icon: 'firewall', caption: 'Trust NLB + firewall backends', captionTone: 'orange' };
   }
   return { name, cidr };
 }
@@ -192,7 +204,7 @@ function decorateHubSubnet(name: string, cidr: string, regionTok: string, fwIps:
  * compartments render as plain rows; the network nesting appears from step 2.
  */
 export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOptions = {}): DiagramModel {
-  // Placeholder hub kinds (b/c/d/e) aren't specified yet — the network layer
+  // Placeholder hub kinds (b/c) aren't specified yet — the network layer
   // stays hidden until an implemented hub kind is selected.
   const hubImplemented = getHubKind(model.network.hubKind)?.implemented ?? false;
   // Step 2 draws the hub only: hub VCN + subnets + gateways + DRG + the hub's own
@@ -206,18 +218,32 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   // the environments, and a platforms compartment inside each environment.
   const showPlatforms = upToStep >= 4 && hubImplemented;
   const platforms = model.platforms ?? [];
-  const sharedPlatform = model.sharedPlatform ?? { name: 'core', vcnCidr: '', subnets: [] };
-  const sharedPlatSubnets: SubnetSpec[] = (sharedPlatform.subnets ?? []).map((sn) => ({ name: sn.name, cidr: sn.cidr }));
-  // Title strip + the VCN (with its own subnets) + bottom padding.
-  const sharedPlatH = TITLE + PAD + vcnHeight(sharedPlatSubnets) + PAD;
+  const sharedPlatforms = model.sharedPlatforms ?? [];
+  const sharedInstances = showPlatforms ? sharedPlatforms.map((platform, index) => {
+    const subnets: SubnetSpec[] = (platform.type === 'ocvs'
+      ? ocvsDefaultSubnets(platform.vcnCidr)
+      : platform.subnets).map((sn) => ({
+        name: generatorNames.environmentSubnet(model.foundation.regionShortName, 'shared', `${platform.key}-${sn.name}`),
+        cidr: sn.cidr,
+      }));
+    return {
+      index,
+      platform,
+      subnets,
+      vcnH: vcnHeight(subnets),
+      vcnId: `shared-plat-vcn-${index}`,
+    };
+  }) : [];
   // The "Show endpoints" button shows/hides the dots; clicking a dot opens its
   // table. The route-table layer is a step-3 (spoke) concern.
-  const allRouteTables = showSpokes ? buildRouteTables(model) : [];
+  // Every selectable hub has its own derived route-table adapter.
+  const supportsFlowTracing = model.network.hubKind === 'hub_a' || model.network.hubKind === 'hub_b' || model.network.hubKind === 'hub_c' || model.network.hubKind === 'hub_e';
+  const allRouteTables = showSpokes && supportsFlowTracing ? buildRouteTables(model) : [];
   // Active flow traces (step 3, diagram-only). A flow walks the route tables, so
   // selecting one implies the endpoints + route-table layer: it auto-opens every
   // table the packet consults, highlights the matched rows, and draws an animated
   // coloured path along the hop sequence.
-  const activeFlows = showSpokes ? (opts.activeFlows ?? []) : [];
+  const activeFlows = showSpokes && supportsFlowTracing ? (opts.activeFlows ?? []) : [];
   const flowTraces = activeFlows.length > 0 ? buildFlowTraces(model, activeFlows) : [];
   const flowActive = flowTraces.length > 0;
   const rtHighlight = new Map<string, number[]>();
@@ -239,21 +265,14 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   const showRightRT = openTables.some((t) => t.kind === 'spoke');
   const f = model.foundation;
   const region = f.region.trim();
-  const customer = model.presentation.customer.trim();
-  // Field holds the bare LZ name; the compartment label carries the cmp- prefix.
-  const lzRaw = model.presentation.landingZone.trim();
-  const lzName = lzRaw.replace(/^cmp-/, '') || 'landingzone';
-  const landingZone = `cmp-${lzName}`;
-  const tokens = { region: f.regionShortName.trim(), lze: lzRaw };
   const regionTok = f.regionShortName.trim() || '<region>';
 
   // ---- hub network (left column), driven by the step 2 fields
-  const fwIps = { dmz: model.network.fwDmzIp ?? '', int: model.network.fwIntIp ?? '' };
   const hubSubnets = model.network.subnets.map((sn) => {
-    const spec = decorateHubSubnet(resolveHubName(sn.name, tokens), sn.cidr, regionTok, fwIps);
+    const spec = decorateHubSubnet(generatorNames.hubSubnet(regionTok, sn.name), sn.cidr, regionTok);
     return showEndpoints ? withEndpoint(spec) : spec;
   });
-  const hubVcnLabel = `${resolveHubName(model.network.hubVcnName, tokens)}\n${model.network.hubVcnCidr}`;
+  const hubVcnLabel = `${generatorNames.hubVcn(regionTok)}\n${model.network.hubVcnCidr}`;
   const hubVcnH = vcnHeight(hubSubnets);
   // cmp-network keeps its natural width whether or not a hub table is open — an
   // open hub table sits in a reserved lane OUTSIDE it (see midMargin below), the
@@ -263,38 +282,40 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   // step 2 only the hub's own attachment is shown; the spoke attachments (one per
   // environment) join in step 3, and one per platform VCN in step 4.
   const platformVcnCount = showPlatforms
-    ? model.environments.reduce((sum, e) => sum + platforms.filter((p) => platformInEnv(p, e.name.trim())).length, 0)
+    ? model.environments.reduce((sum, e) => sum + platforms.filter((p) => platformInEnv(p, e.id)).length, 0)
     : 0;
-  const numAttach = 1 + (showSpokes ? model.environments.length : 0) + platformVcnCount;
+  const numAttach = 1 + (showSpokes ? model.environments.length : 0) + platformVcnCount + sharedInstances.length;
   const stackH = numAttach * ATTACH_H + (numAttach - 1) * ATTACH_GAP_V;
   // The DRG icon is centred in the cluster; padding both sides by its caption
   // height keeps the "DRG" label clear of the compartment border (it otherwise
   // overflows when the cluster is short — e.g. step 2's single hub attachment).
   const clusterH = Math.max(DRG_H + 2 * DRG_LABEL_H, stackH);
+  const sharedNetworkH = sharedInstances.length
+    ? sharedInstances.reduce((height, instance) => height + instance.vcnH, 0) + sharedInstances.length * PLAT_VCN_GAP
+    : 0;
   const netCompH = showHub
-    ? TITLE + PAD + hubVcnH + HUB_ATTACH_GAP + clusterH + PAD
+    ? TITLE + PAD + hubVcnH + sharedNetworkH + HUB_ATTACH_GAP + clusterH + PAD
     : COMP_H;
-  // network compartment + security row (+ the shared-platform row at step 4)
-  const sharedPlatRow = showPlatforms ? COMP_GAP + sharedPlatH : 0;
-  const leftH = netCompH + COMP_GAP + COMP_H + sharedPlatRow;
+  const sharedChildrenH = sharedInstances.length
+    ? TITLE + PAD + sharedInstances.length * PROJ_H + (sharedInstances.length - 1) * PROJ_GAP_V + PAD
+    : COMP_H;
+  // The shared platform compartment exists from Foundation onward.
+  const leftH = netCompH + COMP_GAP + COMP_H + COMP_GAP + sharedChildrenH;
 
   // ---- environments (right column), stored per-environment spoke networks
   const envs = model.environments.map((e, i) => {
     const name = e.name.trim() || `env${i + 1}`;
-    const envTokens = { ...tokens, env: name };
     // Stale in-memory records may predate Environment.network — fall back to defaults.
     const net = e.network ?? envNetworkDefaults(i);
     const subnets: SubnetSpec[] = net.subnets.map((sn) => {
-      const spec: SubnetSpec = { name: resolveHubName(sn.name, envTokens), cidr: sn.cidr };
+      const spec: SubnetSpec = { name: generatorNames.environmentSubnet(regionTok, name, sn.name), cidr: sn.cidr };
       return showEndpoints ? withEndpoint(spec, name) : spec;
     });
     const vcnH = vcnHeight(subnets);
-    const netH = wrapHeight(vcnH);
-    const routing = net.routing ?? envRoutingDefaults();
     // Projects that land in this environment ('all' or an explicit list).
     const projectNames = showSpokes
       ? model.projects
-          .filter((p) => p.environments === 'all' || (Array.isArray(p.environments) && p.environments.includes(e.name.trim())))
+          .filter((p) => p.environments === 'all' || (Array.isArray(p.environments) && p.environments.includes(e.id)))
           .map((p) => p.name.trim())
           .filter(Boolean)
       : [];
@@ -306,16 +327,20 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     // derived (or overridden) for this environment.
     const platformInstances = showPlatforms
       ? platforms
-          .filter((p) => platformInEnv(p, e.name.trim()))
+          .filter((p) => platformInEnv(p, e.id))
           .map((p) => {
-            const vcnCidr = platformVcnForEnv(p, e.name.trim(), i);
-            const subnetSpecs: SubnetSpec[] = platformSubnetsForEnv(p, e.name.trim(), i)
-              .map((sn) => ({ name: sn.name, cidr: sn.cidr }));
-            const vcnName = p.vcnName?.trim() || `vcn-${p.id}`;
+            const vcnCidr = platformVcnForEnv(p, e.id, i);
+            const key = p.key.trim() || p.id;
+            const subnetSpecs: SubnetSpec[] = platformSubnetsForEnv(p, e.id, i)
+              .map((sn) => ({
+                name: generatorNames.environmentPlatformSubnet(regionTok, name, key, sn.name, p.type),
+                cidr: sn.cidr,
+              }));
+            const vcnName = generatorNames.environmentPlatformVcn(regionTok, name, key);
             return {
-              id: p.id, name: p.name.trim() || p.id, vcnName,
+              id: p.id, name: key, type: p.type, vcnName,
               vcnLabel: `${vcnName}\n${vcnCidr}`,
-              attachLabel: resolveHubName(p.attachmentName || `vcn-${p.id}-<env>-attach`, envTokens),
+              attachLabel: generatorNames.environmentPlatformAttachment(regionTok, name, key),
               subnetSpecs, vcnH: vcnHeight(subnetSpecs),
             };
           })
@@ -323,23 +348,24 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     const platStackH = platformInstances.length > 0
       ? platformInstances.reduce((h, pl) => h + pl.vcnH, 0) + (platformInstances.length - 1) * PLAT_VCN_GAP
       : 0;
-    const platCompH = TITLE + PAD + platStackH + PAD;
-    // Platforms stack BELOW the network compartment in the left column, so their
-    // VCNs sit on the routing gutter (like the spoke VCN) and attach cleanly.
+    const netH = TITLE + PAD + vcnH + (platformInstances.length ? PLAT_VCN_GAP + platStackH : 0) + PAD;
+    const platCompH = platformInstances.length > 0
+      ? TITLE + PAD + platformInstances.length * PROJ_H + (platformInstances.length - 1) * PROJ_GAP_V + PAD
+      : COMP_H;
     const hasPlatforms = platformInstances.length > 0;
-    const leftColH = netH + (hasPlatforms ? COMP_GAP + platCompH : 0);
+    const leftColH = netH + COMP_GAP + platCompH;
     return {
       id: `cmp-env-${i}`,
       name,
-      label: `cmp-${lzName}-${name}`,
+      label: generatorNames.environmentCompartment(name),
       secure: e.securityZone,
-      netLabel: `cmp-${lzName}-${name}-network`,
-      vcnLabel: `vcn-${regionTok}-${name}-projects\n${net.vcnCidr}`,
+      netLabel: generatorNames.environmentChildCompartment(name, 'network'),
+      vcnLabel: `${generatorNames.environmentVcn(regionTok, name)}\n${net.vcnCidr}`,
       subnets,
       vcnH,
       netH,
-      sgwName: routing.sgwName || 'Service Gateway',
-      attachName: resolveHubName(routing.attachmentName, envTokens),
+      sgwName: generatorNames.environmentGateway(regionTok, name, 'sgw'),
+      attachName: generatorNames.environmentAttachment(regionTok, name),
       projectNames,
       projCompH,
       platformInstances,
@@ -387,16 +413,16 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
 
   const nodes: DiagramNode[] = [
     { id: 'region', kind: 'region', label: region ? `OCI Region · ${region}` : 'OCI Region', x: 0, y: 0, width: regWidth, height: regHeight },
-    { id: 'tenancy', kind: 'tenancy', label: `OCI Tenancy - ${customer || 'Operating Entity'}`, parentId: 'region', x: PAD, y: innerTop, width: tenWidth, height: tenHeight },
-    { id: 'landingzone', kind: 'landingzone', label: landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
+    { id: 'tenancy', kind: 'tenancy', label: 'OCI Tenancy', parentId: 'region', x: PAD, y: innerTop, width: tenWidth, height: tenHeight },
+    { id: 'landingzone', kind: 'landingzone', label: generatorNames.landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
   ];
   const edges: DiagramEdge[] = [];
 
   // network compartment › hub VCN › hub subnets, gateways on the VCN border (step 2+, implemented hub kinds only)
-  nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', container: showHub || undefined, label: `cmp-${lzName}-network`, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
+  nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
   if (showHub) {
     const placed = pushVcn(nodes, 'hub-vcn', 'cmp-network', hubVcnLabel, hubSubnets, GW_STRIP);
-    // Gateways straddle the hub VCN's left border: IGW by the first subnet,
+    // Gateways use the rail left of the hub VCN: IGW by the first subnet,
     // NAT by the internal firewall subnet, SGW by the last subnet.
     const vcnY = TITLE + PAD;
     const centerOf = (i: number) => vcnY + placed[i].y + placed[i].height / 2;
@@ -404,26 +430,47 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     const anchors = placed.length > 0
       ? [centerOf(0), centerOf(natIndex >= 0 ? natIndex : Math.floor(placed.length / 2)), centerOf(placed.length - 1)]
       : [vcnY + hubVcnH * 0.2, vcnY + hubVcnH * 0.5, vcnY + hubVcnH * 0.8];
-    const r = model.network.routing ?? hubRoutingDefaults();
     const gateways = [
-      { id: 'gw-igw', icon: 'igw' as const, label: r.igwName || 'Internet Gateway' },
-      { id: 'gw-natgw', icon: 'natgw' as const, label: r.natName || 'NAT Gateway' },
-      { id: 'gw-sgw', icon: 'sgw' as const, label: r.sgwName || 'Service Gateway' },
+      { id: 'gw-igw', icon: 'igw' as const, label: generatorNames.hubGateway(regionTok, 'igw') },
+      { id: 'gw-natgw', icon: 'natgw' as const, label: generatorNames.hubGateway(regionTok, 'ngw') },
+      { id: 'gw-sgw', icon: 'sgw' as const, label: generatorNames.hubGateway(regionTok, 'sgw') },
     ];
     gateways.forEach((gw, i) => {
       const y = Math.max(TITLE + 2, Math.min(anchors[i] - GW_H / 2, netCompH - GW_H - 2));
-      nodes.push({ id: gw.id, kind: 'gateway', icon: gw.icon, label: gw.label, parentId: 'cmp-network', x: GW_STRIP - GW_W / 2, y, width: GW_W, height: GW_H });
+      nodes.push({ id: gw.id, kind: 'gateway', icon: gw.icon, label: gw.label, parentId: 'cmp-network', x: GW_X, y, width: GW_W, height: GW_H });
+      edges.push({ id: `e-${gw.id}-hub-vcn`, source: gw.id, target: 'hub-vcn', sourceSide: 'right', targetSide: 'left' });
     });
 
     // DRG + attachment cluster, centred horizontally in cmp-network below the hub
     // VCN: DRG on the left, the pills stacked to its right (hub first, then envs).
-    const clusterTop = TITLE + PAD + hubVcnH + HUB_ATTACH_GAP;
+    let sharedY = TITLE + PAD + hubVcnH + PLAT_VCN_GAP;
+    sharedInstances.forEach((instance) => {
+      const label = `${generatorNames.sharedPlatformVcn(regionTok, instance.platform.key)}\n${instance.platform.vcnCidr}`;
+      const placed = pushVcn(nodes, instance.vcnId, 'cmp-network', label, instance.subnets, GW_STRIP, sharedY);
+      const anchor = placed[0] ? sharedY + placed[0].y + placed[0].height / 2 : sharedY + VCN_TITLE + PAD;
+      nodes.push({
+        id: `shared-plat-sgw-${instance.index}`, kind: 'gateway', icon: 'sgw',
+        label: generatorNames.sharedPlatformGateway(regionTok, instance.platform.key, 'sgw'), parentId: 'cmp-network',
+        x: GW_X, y: anchor - GW_H / 2, width: GW_W, height: GW_H,
+      });
+      edges.push({ id: `e-shared-plat-sgw-${instance.index}`, source: `shared-plat-sgw-${instance.index}`, target: instance.vcnId, sourceSide: 'right', targetSide: 'left' });
+      if (model.network.hubKind === 'hub_e' && instance.platform.type !== 'ocvs') {
+        nodes.push({
+          id: `shared-plat-natgw-${instance.index}`, kind: 'gateway', icon: 'natgw',
+          label: generatorNames.sharedPlatformGateway(regionTok, instance.platform.key, 'ngw'), parentId: 'cmp-network',
+          x: GW_X, y: anchor - GW_H * 1.5 - 8, width: GW_W, height: GW_H,
+        });
+        edges.push({ id: `e-shared-plat-natgw-${instance.index}`, source: `shared-plat-natgw-${instance.index}`, target: instance.vcnId, sourceSide: 'right', targetSide: 'left' });
+      }
+      sharedY += instance.vcnH + PLAT_VCN_GAP;
+    });
+    const clusterTop = TITLE + PAD + hubVcnH + sharedNetworkH + HUB_ATTACH_GAP;
     const groupW = DRG_W + ATTACH_DRG_GAP + ATTACH_W;
     const groupLeft = GW_STRIP + (VCN_W - groupW) / 2; // centred under the hub VCN
     const drgX = groupLeft;
     const stackX = groupLeft + DRG_W + ATTACH_DRG_GAP;
     const stackTop = clusterTop + (clusterH - stackH) / 2;
-    nodes.push({ id: 'drg', kind: 'drg', label: (model.network.drgName ?? '').trim() || 'DRG', parentId: 'cmp-network', x: drgX, y: clusterTop + (clusterH - DRG_H) / 2, width: DRG_W, height: DRG_H });
+    nodes.push({ id: 'drg', kind: 'drg', label: generatorNames.hubDrg(regionTok), parentId: 'cmp-network', x: drgX, y: clusterTop + (clusterH - DRG_H) / 2, width: DRG_W, height: DRG_H });
 
     // Gutter-routed attachments: one per spoke VCN (step 3) and one per platform
     // VCN (step 4). Grouped by environment (a spoke then its platforms) so the
@@ -437,8 +484,15 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
         });
       }
     }
+    sharedInstances.forEach((instance) => {
+      gutterItems.push({
+        id: `attach-shared-${instance.index}`,
+        label: generatorNames.sharedPlatformAttachment(regionTok, instance.platform.key),
+        vcn: instance.vcnId,
+      });
+    });
     const attachList = [
-      { id: 'attach-hub', label: resolveHubName(r.attachmentName, tokens), vcn: 'hub-vcn' },
+      { id: 'attach-hub', label: generatorNames.hubAttachment(regionTok), vcn: 'hub-vcn' },
       ...gutterItems,
     ];
     // Absolute x of the gutter between cmp-network and the env column. The spoke
@@ -467,20 +521,24 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   }
 
   // security compartment (plain row under the network compartment)
-  nodes.push({ id: 'cmp-security', kind: 'compartment', tone: 'yellow', label: `cmp-${lzName}-security`, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset + netCompH + COMP_GAP, width: netCompW, height: COMP_H });
+  nodes.push({ id: 'cmp-security', kind: 'compartment', tone: 'yellow', label: generatorNames.securityCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset + netCompH + COMP_GAP, width: netCompW, height: COMP_H });
 
-  // shared platform row (step 4): a gray compartment + VCN that lives OUTSIDE every
-  // environment, directly in the landing zone, below the security compartment.
-  if (showPlatforms) {
-    const sharedVcnName = sharedPlatform.name?.trim() || 'core';
+  // The shared platform root is generator-owned and always present. Optional
+  // shared platform child compartments appear here; their VCNs live above in
+  // cmp-lz-network.
+  nodes.push({
+    id: 'cmp-platform', kind: 'compartment', tone: 'yellow', container: sharedInstances.length > 0 || undefined,
+    label: generatorNames.platformCompartment, parentId: 'landingzone',
+    x: leftX, y: innerTop + leftOffset + netCompH + COMP_GAP + COMP_H + COMP_GAP,
+    width: netCompW, height: sharedChildrenH,
+  });
+  sharedInstances.forEach((instance, index) => {
     nodes.push({
-      id: 'cmp-shared-platform', kind: 'compartment', tone: 'gray', container: true,
-      label: `cmp-${lzName}-platform-shared`, parentId: 'landingzone',
-      x: leftX, y: innerTop + leftOffset + netCompH + COMP_GAP + COMP_H + COMP_GAP, width: netCompW, height: sharedPlatH,
+      id: `cmp-shared-platform-${index}`, kind: 'compartment', tone: 'gray',
+      label: generatorNames.sharedPlatformCompartment(instance.platform.key), parentId: 'cmp-platform',
+      x: PAD, y: TITLE + PAD + index * (PROJ_H + PROJ_GAP_V), width: netCompW - 2 * PAD, height: PROJ_H,
     });
-    // Inset by the gateway strip so it lines up with the hub VCN above it.
-    pushVcn(nodes, 'shared-plat-vcn', 'cmp-shared-platform', `vcn-${sharedVcnName}\n${sharedPlatform.vcnCidr}`, sharedPlatSubnets, GW_STRIP);
-  }
+  });
 
   // environment compartments › env network compartment › env VCN › its subnets (step 2+)
   let envY = innerTop + rightOffset;
@@ -491,43 +549,75 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     if (!showSpokes) return;
     nodes.push({ id: `${env.id}-network`, kind: 'compartment', tone: 'yellow', container: true, label: env.netLabel, parentId: env.id, x: PAD, y: TITLE + PAD, width: NET_COMP_W, height: env.netH });
     const placed = pushVcn(nodes, `${env.id}-vcn`, `${env.id}-network`, env.vcnLabel, env.subnets, GW_STRIP);
-    // Service Gateway straddling the env VCN's left border, level with the last subnet.
+    let platformY = TITLE + PAD + env.vcnH + PLAT_VCN_GAP;
+    env.platformInstances.forEach((pl, k) => {
+      const platformVcnId = `${env.id}-plat-${k}`;
+      const platformPlaced = pushVcn(nodes, platformVcnId, `${env.id}-network`, pl.vcnLabel, pl.subnetSpecs, GW_STRIP, platformY);
+      const platformAnchor = platformPlaced[0]
+        ? platformY + platformPlaced[0].y + platformPlaced[0].height / 2
+        : platformY + VCN_TITLE + PAD;
+      nodes.push({
+        id: `${platformVcnId}-sgw`, kind: 'gateway', icon: 'sgw',
+        label: generatorNames.environmentPlatformGateway(regionTok, env.name, pl.name, 'sgw'),
+        parentId: `${env.id}-network`, x: GW_X,
+        y: platformAnchor - GW_H / 2, width: GW_W, height: GW_H,
+      });
+      edges.push({ id: `e-${platformVcnId}-sgw`, source: `${platformVcnId}-sgw`, target: platformVcnId, sourceSide: 'right', targetSide: 'left' });
+      if (model.network.hubKind === 'hub_e' && pl.type !== 'ocvs') {
+        nodes.push({
+          id: `${platformVcnId}-natgw`, kind: 'gateway', icon: 'natgw',
+          label: generatorNames.environmentPlatformGateway(regionTok, env.name, pl.name, 'ngw'),
+          parentId: `${env.id}-network`, x: GW_X,
+          y: platformAnchor - GW_H * 1.5 - 8, width: GW_W, height: GW_H,
+        });
+        edges.push({ id: `e-${platformVcnId}-natgw`, source: `${platformVcnId}-natgw`, target: platformVcnId, sourceSide: 'right', targetSide: 'left' });
+      }
+      platformY += pl.vcnH + PLAT_VCN_GAP;
+    });
+    // Service Gateway sits in the VCN's gateway rail, level with the last subnet.
     const vcnTop = TITLE + PAD;
     const anchor = placed.length > 0
       ? vcnTop + placed[placed.length - 1].y + placed[placed.length - 1].height / 2
       : vcnTop + env.vcnH * 0.7;
     const sgwY = Math.max(TITLE + 2, Math.min(anchor - GW_H / 2, env.netH - GW_H - 2));
-    nodes.push({ id: `${env.id}-sgw`, kind: 'gateway', icon: 'sgw', label: env.sgwName, parentId: `${env.id}-network`, x: GW_STRIP - GW_W / 2, y: sgwY, width: GW_W, height: GW_H });
+    nodes.push({ id: `${env.id}-sgw`, kind: 'gateway', icon: 'sgw', label: env.sgwName, parentId: `${env.id}-network`, x: GW_X, y: sgwY, width: GW_W, height: GW_H });
+    edges.push({ id: `e-${env.id}-sgw`, source: `${env.id}-sgw`, target: `${env.id}-vcn`, sourceSide: 'right', targetSide: 'left' });
+    // Hub E gives every spoke its own NAT gateway, so internet egress stays
+    // local rather than being hair-pinned through a hub firewall.
+    if (model.network.hubKind === 'hub_e') {
+      nodes.push({
+        id: `${env.id}-natgw`, kind: 'gateway', icon: 'natgw', label: generatorNames.environmentGateway(regionTok, env.name, 'ngw'), parentId: `${env.id}-network`,
+        x: GW_X, y: Math.max(TITLE + 2, sgwY - GW_H - 8), width: GW_W, height: GW_H,
+      });
+      edges.push({ id: `e-${env.id}-natgw`, source: `${env.id}-natgw`, target: `${env.id}-vcn`, sourceSide: 'right', targetSide: 'left' });
+    }
 
     // projects compartment (gray) to the right of the network compartment, with
     // one block per project that applies to this environment.
     nodes.push({
       id: `${env.id}-projects`, kind: 'compartment', tone: 'gray', container: true,
-      label: `cmp-${lzName}-${env.name}-projects`, parentId: env.id,
+      label: generatorNames.environmentChildCompartment(env.name, 'projects'), parentId: env.id,
       x: PAD + NET_COMP_W + PROJ_GAP, y: TITLE + PAD, width: PROJ_COMP_W, height: env.projCompH,
     });
     env.projectNames.forEach((pname, k) => {
       nodes.push({
-        id: `${env.id}-proj-${k}`, kind: 'project', label: pname, parentId: `${env.id}-projects`,
+        id: `${env.id}-proj-${k}`, kind: 'project', label: generatorNames.environmentProjectCompartment(env.name, pname), parentId: `${env.id}-projects`,
         x: (PROJ_COMP_W - PROJ_W) / 2, y: TITLE + PAD + k * (PROJ_H + PROJ_GAP_V), width: PROJ_W, height: PROJ_H,
       });
     });
 
-    // platforms compartment (gray) stacked BELOW the network compartment in the
-    // left column, holding one VCN (with its subnets) per platform in this env —
-    // so the platform VCNs sit on the routing gutter and attach cleanly (below).
-    if (env.hasPlatforms) {
+    nodes.push({
+      id: `${env.id}-platforms`, kind: 'compartment', tone: 'gray', container: env.hasPlatforms || undefined,
+      label: generatorNames.environmentChildCompartment(env.name, 'platform'), parentId: env.id,
+      x: PAD, y: TITLE + PAD + env.netH + COMP_GAP, width: PLAT_COMP_W, height: env.platCompH,
+    });
+    env.platformInstances.forEach((pl, k) => {
       nodes.push({
-        id: `${env.id}-platforms`, kind: 'compartment', tone: 'gray', container: true,
-        label: `cmp-${lzName}-${env.name}-platforms`, parentId: env.id,
-        x: PAD, y: TITLE + PAD + env.netH + COMP_GAP, width: PLAT_COMP_W, height: env.platCompH,
+        id: `${env.id}-platform-comp-${k}`, kind: 'compartment', tone: 'gray',
+        label: generatorNames.environmentPlatformCompartment(env.name, pl.name), parentId: `${env.id}-platforms`,
+        x: PAD, y: TITLE + PAD + k * (PROJ_H + PROJ_GAP_V), width: PLAT_COMP_W - 2 * PAD, height: PROJ_H,
       });
-      let py = TITLE + PAD;
-      env.platformInstances.forEach((pl, k) => {
-        pushVcn(nodes, `${env.id}-plat-${k}`, `${env.id}-platforms`, pl.vcnLabel, pl.subnetSpecs, GW_STRIP, py);
-        py += pl.vcnH + PLAT_VCN_GAP;
-      });
-    }
+    });
   });
 
   // Route-table dots + opened tables. Every table gets a small clickable dot on

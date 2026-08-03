@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// LZNG Vite config.
+// Landing Zone Studio Vite config.
 //   - dev server binds 0.0.0.0 so LAN hosts can hit it
 //   - vitest scans src for *.test.{ts,tsx}
 export default defineConfig({

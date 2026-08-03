@@ -47,7 +47,7 @@ import { oracle } from '../theme';
 
 function nodeStyle(node: DiagramNode): React.CSSProperties {
   // OCI architecture conventions:
-  //   Region      — light, solid rounded container
+  //   Region      — light, solid container
   //   Tenancy     — bold black dashed container
   //   Landing zone— red dotted container
   //   compartment — yellow (shared) or green (environment) block
@@ -60,8 +60,8 @@ function nodeStyle(node: DiagramNode): React.CSSProperties {
       return { background: '#ffffff', border: `2px dotted ${oracle.red}`, borderRadius: 0, color: oracle.ink, fontWeight: 700 };
     case 'compartment':
       if (node.tone === 'gray')
-        // Projects compartment: solid rounded gray box (distinct from the dotted network/env ones).
-        return { background: oracle.compGrayFill, border: `1.5px solid ${oracle.compGrayBorder}`, borderRadius: 8, color: '#3f4750', fontWeight: 600 };
+        // Gray compartments are solid; compartment boundaries are always square.
+        return { background: oracle.compGrayFill, border: `1.5px solid ${oracle.compGrayBorder}`, borderRadius: 0, color: '#3f4750', fontWeight: 600 };
       return node.tone === 'green'
         ? { background: oracle.compGreenFill, border: `1.5px dotted ${oracle.compGreenBorder}`, borderRadius: 0, color: '#3f4750', fontWeight: 600 }
         : { background: oracle.compYellowFill, border: `1.5px dotted ${oracle.compYellowBorder}`, borderRadius: 0, color: '#3f4750', fontWeight: 600 };
@@ -75,7 +75,8 @@ function nodeStyle(node: DiagramNode): React.CSSProperties {
     case 'attachment':
       return { background: '#ffffff', border: '1.5px solid #6b7a99', borderRadius: 5, color: '#1f3a63', fontWeight: 800 };
     case 'project':
-      return { background: '#ffffff', border: `1.5px solid ${oracle.compGrayBorder}`, borderRadius: 6, color: oracle.ink, fontWeight: 700 };
+      // Project nodes represent generated project compartments.
+      return { background: '#ffffff', border: `1.5px solid ${oracle.compGrayBorder}`, borderRadius: 0, color: oracle.ink, fontWeight: 700 };
     case 'routetable':
     case 'rtdot':
       return { background: 'transparent', border: 'none', borderRadius: 0 };
@@ -116,7 +117,7 @@ function SubnetNode({ data }: NodeProps) {
           PUBLIC
         </span>
       )}
-      <span style={{ color: oracle.subnetName, fontWeight: 700 }}>{name}</span>
+      <span style={{ color: d.publicSubnet ? CAPTION_COLORS.green : oracle.subnetName, fontWeight: 700 }}>{name}</span>
       <span style={{ color: oracle.cidrBlue, fontWeight: 600 }}>{cidr}</span>
       {iconSvg && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, marginTop: 2 }}>
@@ -154,7 +155,7 @@ function GatewayNode({ data }: NodeProps) {
       )}
       {/* Narrow enough that two-word names (incl. "NAT Gateway") wrap to two lines
           instead of bleeding past the gateway into the neighbouring subnet. */}
-      <span style={{ width: 50, fontSize: 9.5, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'break-word', lineHeight: 1.2 }}>{d.label}</span>
+      <span style={{ width: 112, fontSize: 9.5, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.25 }}>{d.label}</span>
     </div>
   );
 }
@@ -208,11 +209,11 @@ function AttachmentNode({ data }: NodeProps) {
   );
 }
 
-/** Project block: a white rounded box with a centred bold name, inside the gray projects compartment. */
+/** Project compartment: a square white box with its full generated name. */
 function ProjectNode({ data }: NodeProps) {
   const d = data as { label?: string };
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 8px', boxSizing: 'border-box', fontSize: 12.5, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px 8px', boxSizing: 'border-box', fontSize: 12, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.2 }}>
       {d.label}
     </div>
   );
@@ -630,12 +631,14 @@ function ZoomBar() {
   );
 }
 
-export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps }: {
+export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps, showFlowControl = true }: {
   diagram: DiagramModel;
   options?: DiagramOptions;
   onOptionsChange?: (next: DiagramOptions) => void;
   /** Per-flow packet step: null/absent = auto-play, a number = that 0-based hop. */
   flowSteps?: Record<string, number | null>;
+  /** Whether the selected hub topology has a packet-flow adapter. */
+  showFlowControl?: boolean;
 }) {
   const { nodes, edges } = useMemo(() => toReactFlow(diagram), [diagram]);
   const { fitView } = useReactFlow();
@@ -729,7 +732,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       {onOptionsChange && (
         <Panel position="top-right">
           <div style={{ display: 'flex', gap: 8 }}>
-            <button
+            {showFlowControl && <button
               type="button"
               style={{ ...layerBtn, ...(options?.showEndpoints ? layerBtnActive : null) }}
               aria-pressed={options?.showEndpoints ?? false}
@@ -740,7 +743,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
               }}
             >
               {options?.showEndpoints ? 'Hide endpoints' : 'Show endpoints'}
-            </button>
+            </button>}
             <button
               type="button"
               style={{ ...layerBtn, ...(options?.showFlows ? layerBtnActive : null) }}
