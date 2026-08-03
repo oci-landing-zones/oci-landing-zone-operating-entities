@@ -2,7 +2,7 @@
  * PlatformTemplatesStep — step 4 ("Platforms"). Two parts:
  *   1. Optional shared platforms — repeatable, removable Custom or OCVS entries.
  *   2. Environment platforms — VCN-bearing compartments dropped into one/all/a
- *      subset of the environments. Pick a supported type (OKE Simple, OCVS, or
+ *      subset of the environments. Pick a supported type (OKE, OCVS, or
  *      Custom), name it, choose placement. OKE defaults to the generator-owned
  *      small profile and exposes its cluster settings; Custom starts empty. Each
  *      platform shows a generated per-environment table (its VCN per env) with a
@@ -35,12 +35,17 @@ const local: Record<string, CSSProperties> = {
   cardName:   { fontSize: 15, fontWeight: 800, color: oracle.ink },
   cardBody:   { padding: '4px 16px 18px' },
   note:       { fontSize: 12.5, color: oracle.textMuted, marginBottom: 14, lineHeight: 1.5 },
-  okeGrid:    { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 16, marginTop: 8, alignItems: 'start' },
-  okeColumn:  { display: 'grid', gap: 16, alignContent: 'start', minWidth: 0 },
+  okeGrid:    { display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginTop: 8, alignItems: 'start' },
+  settingsFields: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px 24px' },
   group:      { border: `1px solid ${oracle.border}`, borderRadius: 6, padding: 16, background: oracle.surface, minWidth: 0 },
   groupTitle: { fontSize: 12, fontWeight: 800, color: oracle.ink, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 0.5 },
   switchRow:  { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, padding: '14px 0', borderTop: `1px solid ${oracle.border}` },
   switchCopy: { minWidth: 0, fontSize: 14, lineHeight: 1.35 },
+  featureGrid:{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', columnGap: 24 },
+  subnetGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8, marginTop: 12 },
+  subnetCell: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, padding: '9px 11px', border: `1px solid ${oracle.border}`, borderRadius: 4, background: oracle.surface },
+  subnetName: { fontSize: 11.5, fontWeight: 800, color: oracle.text, textTransform: 'uppercase', letterSpacing: 0.25 },
+  subnetCidr: { fontSize: 12.5, color: oracle.cidrBlue, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', whiteSpace: 'nowrap' },
   genTable:   { width: '100%', borderCollapse: 'collapse', marginTop: 6 },
   genTh:      { textAlign: 'left', fontSize: 11, fontWeight: 700, color: oracle.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, padding: '6px 8px', borderBottom: `1px solid ${oracle.border}` },
   genTd:      { fontSize: 12.5, padding: '7px 8px', borderBottom: `1px solid ${oracle.border}`, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', color: oracle.text },
@@ -61,7 +66,7 @@ function OcvsSettingsFields({ id, value, onChange }: {
   return (
     <div style={s.subCard}>
       <div style={s.subHead}>OCVS management cluster</div>
-      <div style={local.note}>One platform is one SDDC management cluster. The SSH public key is required; HCX remains unavailable because its NAT pattern is not yet supported by Jsonnet.</div>
+      <div style={local.note}>One platform is one SDDC management cluster. The SSH public key is required; HCX remains unavailable because its NAT pattern is not yet supported by Blueprint Factory.</div>
       <div style={local.okeGrid}>
         <div><label style={s.addLabel} htmlFor={`${id}-ssh`}>SSH public key</label><input id={`${id}-ssh`} style={s.rowInput} value={value.sshAuthorizedKeys} onChange={(e) => onChange({ sshAuthorizedKeys: e.target.value })} /></div>
         <div><label style={s.addLabel} htmlFor={`${id}-sddc`}>SDDC name</label><input id={`${id}-sddc`} style={s.rowInput} value={value.sddcDisplayName} onChange={(e) => onChange({ sddcDisplayName: e.target.value })} /></div>
@@ -134,7 +139,7 @@ function SharedPlatformPanel({ platform, open, onToggle, onChange, onDelete }: {
             <div style={{ ...s.subCard, marginTop: 12 }}>
               <div style={s.subHead}>OCVS platform VCN</div>
               <input id={`shared-ocvs-${platform.id}-vcn`} aria-label={`VCN CIDR for shared platform ${key}`} style={s.rowInput} value={vcnCidr} onChange={(e) => onChange({ vcnCidr: e.target.value, subnets: [] })} />
-              <div style={local.fieldHint}>Only /21, /22, /23, or /24 is supported. Jsonnet derives the provisioning subnet: {ocvsDefaultSubnets(vcnCidr)[0]?.cidr ?? 'choose a supported VCN prefix'}.</div>
+              <div style={local.fieldHint}>Only /21, /22, /23, or /24 is supported. Blueprint Factory derives the provisioning subnet: {ocvsDefaultSubnets(vcnCidr)[0]?.cidr ?? 'choose a supported VCN prefix'}.</div>
             </div>
           </>
         ) : (
@@ -300,45 +305,30 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
           <div style={{ marginBottom: 16 }}>
             <label style={s.label} htmlFor={`${platform.id}-key`}>Config key</label>
             <input id={`${platform.id}-key`} style={s.rowInput} value={platform.key} onChange={(e) => onPlatform({ key: e.target.value })} />
-            <div style={local.fieldHint}>Jsonnet derives the compartment, VCN, gateway, and DRG attachment names from this key.</div>
+            <div style={local.fieldHint}>Blueprint Factory derives the compartment, VCN, gateway, and DRG attachment names from this key.</div>
           </div>
 
           {isOke && (
             <div style={s.subCard}>
               <div style={s.subHead}>OKE settings</div>
               <div className="oke-settings-grid" style={local.okeGrid}>
-                <div style={local.okeColumn}>
-                  <div style={local.group}>
-                    <div style={local.groupTitle}>Cluster</div>
-                    <label style={s.addLabel} htmlFor={`${platform.id}-k8s`}>Kubernetes version</label>
-                    <input id={`${platform.id}-k8s`} style={s.rowInput} value={oke.kubernetesVersion} onChange={(e) => setOke({ kubernetesVersion: e.target.value })} />
-                    <label style={{ ...s.addLabel, marginTop: 14 }} htmlFor={`${platform.id}-api`}>API endpoint allowed CIDRs</label>
-                    <input id={`${platform.id}-api`} style={s.rowInput} value={oke.apiAllowedCidrs.join(', ')} onChange={(e) => setOke({ apiAllowedCidrs: e.target.value.split(',').map((x) => x.trim()).filter(Boolean) })} />
-                  </div>
-                  <div style={local.group}>
-                    <div style={local.groupTitle}>Workers</div>
-                    <label style={s.addLabel} htmlFor={`${platform.id}-img`}>Worker image selector</label>
-                    <input id={`${platform.id}-img`} style={s.rowInput} value={oke.workerImage} onChange={(e) => setOke({ workerImage: e.target.value })} />
-                    <label style={{ ...s.addLabel, marginTop: 14 }} htmlFor={`${platform.id}-boot`}>Worker boot volume (GB)</label>
-                    <input id={`${platform.id}-boot`} type="number" min="50" max="32768" style={s.rowInput} value={oke.workerBootVolumeSize} onChange={(e) => setOke({ workerBootVolumeSize: Number(e.target.value) })} />
+                <div style={local.group}>
+                  <div style={local.groupTitle}>Cluster</div>
+                  <div className="oke-fields-grid" style={local.settingsFields}>
+                    <div><label style={s.addLabel} htmlFor={`${platform.id}-k8s`}>Kubernetes version</label><input id={`${platform.id}-k8s`} style={s.rowInput} value={oke.kubernetesVersion} onChange={(e) => setOke({ kubernetesVersion: e.target.value })} /></div>
+                    <div><label style={s.addLabel} htmlFor={`${platform.id}-api`}>API endpoint allowed CIDRs</label><input id={`${platform.id}-api`} style={s.rowInput} value={oke.apiAllowedCidrs.join(', ')} onChange={(e) => setOke({ apiAllowedCidrs: e.target.value.split(',').map((x) => x.trim()).filter(Boolean) })} /></div>
                   </div>
                 </div>
-                <div style={local.okeColumn}>
-                  <div style={local.group}>
-                    <div style={local.groupTitle}>Networking</div>
-                    <label style={s.addLabel} htmlFor={`${platform.id}-svc`}>Services CIDR</label>
-                    <input id={`${platform.id}-svc`} style={s.rowInput} value={oke.servicesCidr} onChange={(e) => setOke({ servicesCidr: e.target.value })} />
-                    <label style={{ ...s.addLabel, marginTop: 14 }} htmlFor={`${platform.id}-cni`}>Pod networking</label>
-                    <select id={`${platform.id}-cni`} style={s.select} value={oke.cniType} onChange={(e) => {
+                <div style={local.group}>
+                  <div style={local.groupTitle}>Networking</div>
+                  <div className="oke-fields-grid" style={local.settingsFields}>
+                    <div><label style={s.addLabel} htmlFor={`${platform.id}-svc`}>Services CIDR</label><input id={`${platform.id}-svc`} style={s.rowInput} value={oke.servicesCidr} onChange={(e) => setOke({ servicesCidr: e.target.value })} /></div>
+                    <div><label style={s.addLabel} htmlFor={`${platform.id}-cni`}>Pod networking</label><select id={`${platform.id}-cni`} style={s.select} value={oke.cniType} onChange={(e) => {
                       const cniType = e.target.value as 'native' | 'overlay';
                       if (cniType === 'overlay') onPlatform({ subnets: platform.subnets.filter((sn) => sn.name !== 'pods') });
                       setOke({ cniType, ...(cniType === 'overlay' && !oke.podsCidr ? { podsCidr: '10.244.0.0/16' } : {}) });
-                    }}>
-                      <option value="native">Native VCN</option>
-                      <option value="overlay">Overlay (Flannel)</option>
-                    </select>
-                    <label style={{ ...s.addLabel, marginTop: 14 }} htmlFor={`${platform.id}-size`}>Network profile</label>
-                    <select id={`${platform.id}-size`} style={s.select} value={oke.clusterSize ?? 'manual'} onChange={(e) => {
+                    }}><option value="native">Native VCN</option><option value="overlay">Overlay (Flannel)</option></select></div>
+                    <div><label style={s.addLabel} htmlFor={`${platform.id}-size`}>Network profile</label><select id={`${platform.id}-size`} style={s.select} value={oke.clusterSize ?? 'manual'} onChange={(e) => {
                       const size = e.target.value === 'manual' ? undefined : e.target.value as 'small' | 'medium' | 'large';
                       if (!size) {
                         onPlatform({ subnets: okeDefaultSubnets(platform.vcnCidr).filter((sn) => oke.cniType === 'native' || sn.name !== 'pods') });
@@ -348,29 +338,32 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
                       const prefix = size === 'small' ? 20 : size === 'medium' ? 18 : 16;
                       onPlatform({ subnets: [], vcnCidr: `${platform.vcnCidr.split('/')[0]}/${prefix}` });
                       setOke({ clusterSize: size });
-                    }}>
-                      <option value="manual">Manual subnets</option>
-                      <option value="small">Small (/20)</option>
-                      <option value="medium">Medium (/18)</option>
-                      <option value="large">Large (/16)</option>
-                    </select>
-                    <label style={{ ...s.addLabel, marginTop: 14 }} htmlFor={`${platform.id}-pods`}>Pod CIDR</label>
-                    <input id={`${platform.id}-pods`} style={s.rowInput} placeholder={oke.cniType === 'overlay' ? '10.244.0.0/16' : 'Optional for native'} value={oke.podsCidr ?? ''} onChange={(e) => setOke({ podsCidr: e.target.value || undefined })} />
+                    }}><option value="manual">Manual subnets</option><option value="small">Small (/20)</option><option value="medium">Medium (/18)</option><option value="large">Large (/16)</option></select></div>
+                    <div><label style={s.addLabel} htmlFor={`${platform.id}-pods`}>Pod CIDR</label><input id={`${platform.id}-pods`} style={s.rowInput} placeholder={oke.cniType === 'overlay' ? '10.244.0.0/16' : 'Optional for native'} value={oke.podsCidr ?? ''} onChange={(e) => setOke({ podsCidr: e.target.value || undefined })} /></div>
                   </div>
-                  <div style={local.group}>
-                    <div style={local.groupTitle}>Optional features</div>
+                </div>
+                <div style={local.group}>
+                  <div style={local.groupTitle}>Workers</div>
+                  <div className="oke-fields-grid" style={local.settingsFields}>
+                    <div><label style={s.addLabel} htmlFor={`${platform.id}-img`}>Worker image selector</label><input id={`${platform.id}-img`} style={s.rowInput} value={oke.workerImage} onChange={(e) => setOke({ workerImage: e.target.value })} /></div>
+                    <div><label style={s.addLabel} htmlFor={`${platform.id}-boot`}>Worker boot volume (GB)</label><input id={`${platform.id}-boot`} type="number" min="50" max="32768" style={s.rowInput} value={oke.workerBootVolumeSize} onChange={(e) => setOke({ workerBootVolumeSize: Number(e.target.value) })} /></div>
+                  </div>
+                </div>
+                <div className="oke-features-group" style={{ ...local.group, gridColumn: '1 / -1' }}>
+                  <div style={local.groupTitle}>Optional features</div>
+                  <div className="oke-feature-grid" style={local.featureGrid}>
                     <div style={{ ...local.switchRow, borderTop: 'none', paddingTop: 0 }}>
                       <div style={local.switchCopy}><strong>Allow public load balancers</strong><div style={{ ...local.fieldHint, lineHeight: 1.5, marginTop: 5 }}>Creates the Hub frontend networking and IAM prerequisites. OCI creates a load balancer only when a Kubernetes Service requests one.</div></div>
                       <Switch checked={oke.publicLoadBalancer} onChange={(checked) => setOke({ publicLoadBalancer: checked })} ariaLabel="Allow public load balancers" />
                     </div>
-                    <div style={local.switchRow}>
+                    <div style={{ ...local.switchRow, borderTop: 'none', paddingTop: 0 }}>
                       <div style={local.switchCopy}><strong>Enable File Storage support</strong><div style={{ ...local.fieldHint, lineHeight: 1.5, marginTop: 5 }}>Creates FSS networking and IAM prerequisites—not file systems, mount targets, or Kubernetes storage objects.</div></div>
                       <Switch checked={oke.createFss} onChange={(checked) => setOke({ createFss: checked })} ariaLabel="Enable File Storage support" />
                     </div>
                   </div>
                 </div>
               </div>
-              {oke.clusterSize && <div style={local.fieldHint}>The selected generator-owned profile replaces the manual subnet map. To return to manual networking, select Manual subnets and define the required roles.</div>}
+              {oke.clusterSize && <div style={local.fieldHint}>The selected Blueprint Factory profile replaces the manual subnet map. To return to manual networking, select Manual subnets and define the required roles.</div>}
             </div>
           )}
 
@@ -380,17 +373,22 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
             <label style={s.label}>Platform VCN &amp; subnets</label>
             {isOke && oke.clusterSize ? (
               <div style={{ ...s.subCard, marginTop: 0 }}>
-                <div style={s.subHead}>Generator-owned {oke.clusterSize} profile · {platform.vcnCidr}</div>
-                <div style={local.fieldHint}>Jsonnet owns these subnets. Switch to Manual subnets only when this layout does not fit the address plan.</div>
-                <div style={{ ...local.fieldHint, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', marginTop: 8 }}>
-                  {okeProfileSubnets(platform.vcnCidr, oke.clusterSize, oke.cniType, oke.createFss).map((sn) => `${sn.name}: ${sn.cidr}`).join(' · ')}
+                <div style={s.subHead}>Blueprint Factory {oke.clusterSize} profile · {platform.vcnCidr}</div>
+                <div style={local.fieldHint}>Blueprint Factory manages these subnets. Switch to Manual subnets only when this layout does not fit the address plan.</div>
+                <div style={local.subnetGrid} role="list" aria-label="Blueprint Factory subnet allocation">
+                  {okeProfileSubnets(platform.vcnCidr, oke.clusterSize, oke.cniType, oke.createFss).map((sn) => (
+                    <div key={sn.name} style={local.subnetCell} role="listitem">
+                      <span style={local.subnetName}>{sn.name.replace('-', ' ')}</span>
+                      <code style={local.subnetCidr}>{sn.cidr}</code>
+                    </div>
+                  ))}
                 </div>
               </div>
             ) : isOcvs ? (
               <div style={{ ...s.subCard, marginTop: 0 }}>
-                <div style={s.subHead}>Generator-owned OCVS provisioning network</div>
+                <div style={s.subHead}>Blueprint Factory OCVS provisioning network</div>
                 <input id={`${platform.id}-ocvs-vcn`} style={s.rowInput} value={platform.vcnCidr} onChange={(e) => onPlatform({ vcnCidr: e.target.value, subnets: [] })} />
-                <div style={local.fieldHint}>Only /21, /22, /23, or /24 is supported. Jsonnet derives the provisioning subnet: {ocvsDefaultSubnets(platform.vcnCidr)[0]?.cidr ?? 'choose a supported VCN prefix'}.</div>
+                <div style={local.fieldHint}>Only /21, /22, /23, or /24 is supported. Blueprint Factory derives the provisioning subnet: {ocvsDefaultSubnets(platform.vcnCidr)[0]?.cidr ?? 'choose a supported VCN prefix'}.</div>
               </div>
             ) : (
               <VcnEditor

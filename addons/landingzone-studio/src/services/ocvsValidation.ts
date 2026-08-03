@@ -35,7 +35,7 @@ function validateNetwork(vcnCidr: string, subnets: { name: string }[], errors: s
   if (!cidr || !OCVS_PREFIXES.has(cidr.prefix)) {
     errors.push('OCVS platform VCN must use one of: /21, /22, /23, /24.');
   }
-  if (subnets.length > 0) errors.push('OCVS provisioning subnet is generator-owned; remove manual OCVS subnets.');
+  if (subnets.length > 0) errors.push('The OCVS provisioning subnet is managed by Blueprint Factory; remove manual OCVS subnets.');
 }
 
 /** Validates one environment-scoped OCVS platform. */

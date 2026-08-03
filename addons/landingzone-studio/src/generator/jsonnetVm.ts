@@ -45,7 +45,7 @@ export interface JsonnetAssets {
 async function browserAssets(): Promise<JsonnetAssets> {
   const wasmRes = await fetch(wasmUrl);
   if (!wasmRes.ok) {
-    throw new Error(`Could not load the jsonnet engine from ${wasmUrl} (${wasmRes.status})`);
+    throw new Error(`Could not load the Blueprint Factory engine (${wasmRes.status}).`);
   }
   return { wasmBinary: await wasmRes.arrayBuffer() };
 }
@@ -63,7 +63,7 @@ let booted: Promise<EvaluateSnippet> | undefined;
 async function boot(): Promise<EvaluateSnippet> {
   const { wasmBinary } = await loadAssets();
   const GoCtor = globalThis.Go;
-  if (!GoCtor) throw new Error('wasm_exec.js did not install globalThis.Go');
+  if (!GoCtor) throw new Error('The Blueprint Factory runtime failed to start.');
 
   const go = new GoCtor();
   const { instance } = await WebAssembly.instantiate(wasmBinary, go.importObject);
@@ -72,7 +72,7 @@ async function boot(): Promise<EvaluateSnippet> {
   void go.run(instance);
 
   const evaluate = globalThis.jsonnet_evaluate_snippet;
-  if (!evaluate) throw new Error('libjsonnet.wasm did not register jsonnet_evaluate_snippet');
+  if (!evaluate) throw new Error('The Blueprint Factory engine failed to initialize.');
   return evaluate;
 }
 

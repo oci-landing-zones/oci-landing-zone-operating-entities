@@ -35,7 +35,7 @@ describe('generator-aligned graph', () => {
     const model: LzModel = { ...base, network: { hubKind: kind, ...hubKindDefaults(kind) } };
     const graph = buildGraph(model, 2);
     expect(graph.nodes.find((node) => node.id === 'hub-vcn')?.label).toBe('vcn-fra-lz-hub\n10.0.0.0/21');
-    const subnets = graph.nodes.filter((node) => node.parentId === 'hub-vcn');
+    const subnets = graph.nodes.filter((node) => node.parentId === 'hub-vcn' && node.kind === 'subnet');
     expect(subnets.map((node) => node.label.split('\n')[0])).toEqual(hubKindDefaults(kind).subnets.map((subnet) => `sn-fra-lz-hub-${subnet.name}`));
     expect(subnets.filter((node) => node.publicSubnet).map((node) => node.label.split('\n')[0])).toEqual(publicKeys.map((key) => `sn-fra-lz-hub-${key}`));
     expect(graph.nodes.find((node) => node.id === 'drg')?.label).toBe('drg-fra-lz-hub');
@@ -43,7 +43,7 @@ describe('generator-aligned graph', () => {
   });
 
   it('uses the generator Network Firewall host offset', () => {
-    const subnets = buildGraph(emptyLzModel(), 2).nodes.filter((node) => node.parentId === 'hub-vcn');
+    const subnets = buildGraph(emptyLzModel(), 2).nodes.filter((node) => node.parentId === 'hub-vcn' && node.kind === 'subnet');
     expect(subnets[0].ipNote).toBe('10.0.0.10');
     expect(subnets[2].ipNote).toBe('10.0.2.10');
   });
@@ -61,7 +61,7 @@ describe('generator-aligned graph', () => {
       label: 'vcn-fra-lz-prod-oke\n10.0.80.0/20', parentId: 'cmp-env-0-network',
     });
     expect(graph.nodes.find((node) => node.id === 'attach-cmp-env-0-plat-0')?.label).toBe('drgatt-fra-lz-prod-oke');
-    expect(graph.nodes.filter((node) => node.parentId === 'cmp-env-0-plat-0').map((node) => node.label.split('\n')[0])).toEqual([
+    expect(graph.nodes.filter((node) => node.parentId === 'cmp-env-0-plat-0' && node.kind === 'subnet').map((node) => node.label.split('\n')[0])).toEqual([
       'sn-fra-lz-prod-oke-pods', 'sn-fra-lz-prod-oke-workers', 'sn-fra-lz-prod-oke-lb', 'sn-fra-lz-prod-oke-cp',
     ]);
     expect(graph.nodes.find((node) => node.id === 'cmp-env-0-plat-0-sgw')?.label).toBe('sgw-fra-lz-prod-oke');
@@ -109,8 +109,8 @@ describe('generator-aligned graph', () => {
       sharedPlatforms: [custom, ocvs],
     }, 4);
     expect(graph.nodes.find((node) => node.id === 'shared-plat-natgw-0')?.label).toBe('ngw-fra-lz-shared-core');
+    expect(graph.nodes.find((node) => node.id === 'shared-plat-natgw-0')?.parentId).toBe('shared-plat-vcn-0');
     expect(graph.nodes.some((node) => node.id === 'shared-plat-natgw-1')).toBe(false);
-    expect(graph.edges).toContainEqual(expect.objectContaining({ source: 'shared-plat-natgw-0', target: 'shared-plat-vcn-0' }));
   });
 
   it('keeps all structural nodes inside their parents', () => {
@@ -123,6 +123,22 @@ describe('generator-aligned graph', () => {
       const parent = nodes.get(node.parentId)!;
       expect(node.x + node.width, `${node.id} right`).toBeLessThanOrEqual(parent.width);
       expect(node.y + node.height, `${node.id} bottom`).toBeLessThanOrEqual(parent.height);
+    }
+  });
+
+  it('nests every gateway inside its VCN', () => {
+    const base = emptyLzModel();
+    const graph = buildGraph({
+      ...base,
+      network: { hubKind: 'hub_e', ...hubKindDefaults('hub_e') },
+      platforms: [newPlatform('custom', [])],
+      sharedPlatforms: [newSharedPlatform('custom', [])],
+    }, 4);
+    const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+    const gateways = graph.nodes.filter((node) => node.kind === 'gateway');
+    expect(gateways.length).toBeGreaterThan(0);
+    for (const gateway of gateways) {
+      expect(nodes.get(gateway.parentId ?? '')?.kind, gateway.id).toBe('vcn');
     }
   });
 

@@ -57,7 +57,7 @@ export interface Subnet {
 /** Platform types currently exposed by the config-driven Studio. */
 export type PlatformType = 'oke_simple' | 'ocvs' | 'custom';
 
-/** OKE Simple settings — the extension params for an oke_simple platform. */
+/** OKE settings — the extension params for an oke_simple platform. */
 export interface OkePlatformParams {
   kubernetesVersion: string;   // e.g. v1.35.2
   servicesCidr: string;        // e.g. 10.96.0.0/16
@@ -111,7 +111,7 @@ export interface PlatformConfig {
   vcnCidr: string;
   /** Default (locked) + custom subnets, relative to the base VCN. */
   subnets: Subnet[];
-  /** OKE Simple settings — present only when type === 'oke_simple'. */
+  /** OKE settings — present only when type === 'oke_simple'. */
   okeParams?: OkePlatformParams;
   /** OCVS settings — present only when type === 'ocvs'. */
   ocvsParams?: OcvsPlatformParams;

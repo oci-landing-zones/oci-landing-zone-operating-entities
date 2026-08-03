@@ -20,7 +20,7 @@ describe('OCVS validation', () => {
     });
     expect(issues).toEqual(expect.arrayContaining([
       'OCVS platform VCN must use one of: /21, /22, /23, /24.',
-      'OCVS provisioning subnet is generator-owned; remove manual OCVS subnets.',
+      'The OCVS provisioning subnet is managed by Blueprint Factory; remove manual OCVS subnets.',
       'OCVS requires a non-empty SSH public key.',
       'OCVS SDDC name must start with a letter and use only letters, numbers, and single hyphens.',
       'OCVS cluster name must start with a letter and use only letters, numbers, and single hyphens.',

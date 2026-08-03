@@ -15,7 +15,7 @@ const base: React.CSSProperties = {
   cursor: 'pointer',
 };
 
-const activeStyle: React.CSSProperties = { ...base, borderColor: '#C74634', color: '#C74634', background: '#FBE9E7' };
+const activeStyle: React.CSSProperties = { ...base, border: '1px solid #C74634', color: '#C74634', background: '#FBE9E7' };
 
 export default function EditButton({ label, onClick, active }: { label: string; onClick: () => void; active?: boolean }) {
   return (

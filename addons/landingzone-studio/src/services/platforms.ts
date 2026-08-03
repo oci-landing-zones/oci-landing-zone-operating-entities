@@ -27,7 +27,7 @@ export interface PlatformTypeMeta {
 
 /** The selectable platform engines, in picker order. */
 export const PLATFORM_TYPES: PlatformTypeMeta[] = [
-  { type: 'oke_simple', label: 'OKE Simple', deployable: true },
+  { type: 'oke_simple', label: 'OKE', deployable: true },
   { type: 'ocvs', label: 'OCVS', deployable: true },
   { type: 'custom', label: 'Custom', deployable: true },
 ];
@@ -111,7 +111,7 @@ export function okeProfileSubnets(
   return allocated;
 }
 
-/** Default OKE Simple settings. */
+/** Default OKE settings. */
 export function okeDefaultParams(): OkePlatformParams {
   return {
     kubernetesVersion: 'v1.35.2',

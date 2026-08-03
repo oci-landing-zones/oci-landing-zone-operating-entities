@@ -54,7 +54,7 @@ describe('toDrawioXml', () => {
 
   it('renders the three gateways and the firewall/LB subnet icons + captions', () => {
     const xml = toDrawioXml(buildGraph(emptyLzModel(), 2));
-    expect(xml).toMatch(/id="gw-igw"[^>]*parent="cmp-network"/);
+    expect(xml).toMatch(/id="gw-igw"[^>]*parent="hub-vcn"/);
     expect(xml).toMatch(/id="gw-natgw"/);
     expect(xml).toMatch(/id="gw-sgw"/);
     expect(xml).toContain('igw-fra-lz-hub');
@@ -85,7 +85,7 @@ describe('toDrawioXml', () => {
     expect(xml).toContain('source="attach-hub" target="drg"');
     expect(xml).toContain('endArrow=none;');
     // every environment VCN gets its own Service Gateway
-    expect(xml).toMatch(/id="cmp-env-0-sgw"[^>]*parent="cmp-env-0-network"/);
+    expect(xml).toMatch(/id="cmp-env-0-sgw"[^>]*parent="cmp-env-0-vcn"/);
   });
 
   it('exports VM endpoint cells only when the endpoints layer is on, icon-less subnets only', () => {

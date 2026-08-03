@@ -14,7 +14,7 @@ export function validateOkePlatform(platform: PlatformConfig): string[] {
   if (!p.apiAllowedCidrs.length || p.apiAllowedCidrs.some((cidr) => !parseCidr(cidr))) errors.push('OKE API allowed CIDRs must contain one or more valid IPv4 CIDRs.');
   const prefix = parseCidr(platform.vcnCidr)?.prefix;
   if (p.clusterSize) {
-    if (platform.subnets.length > 0) errors.push('A generator-owned cluster-size profile cannot be combined with manual OKE subnets.');
+    if (platform.subnets.length > 0) errors.push('A Blueprint Factory cluster-size profile cannot be combined with manual OKE subnets.');
     if (prefix !== SIZE_PREFIX[p.clusterSize]) errors.push(`OKE ${p.clusterSize} profile requires a /${SIZE_PREFIX[p.clusterSize]} platform VCN.`);
   } else {
     const expected = new Set(['control-plane', 'int-lb', 'workers', ...(p.cniType === 'native' ? ['pods'] : []), ...(p.createFss ? ['fss'] : [])]);
