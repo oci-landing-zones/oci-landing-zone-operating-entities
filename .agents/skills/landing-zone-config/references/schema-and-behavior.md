@@ -132,7 +132,8 @@ RPC is a top-level network integration rather than an environment extension:
 - `remote_cidrs` is required and must not overlap local hub, environment, or platform VCNs.
 - Omit `peer_id` for the acceptor. Set it to the acceptor RPC OCID or dependency key for the requestor.
 - Omit both `peer_tenancy_ocid` and `requestor_group_ocid` for same-tenancy peering.
-- Provide both fields for cross-tenancy peering. The group OCID always belongs to the requestor side.
+- For a cross-tenancy acceptor, set `peer_tenancy_ocid` to the requestor tenancy and `requestor_group_ocid` to the foreign requestor group; omit `peer_id`.
+- For a cross-tenancy requestor, set `peer_tenancy_ocid` to the acceptor tenancy and set `peer_id`; omit `requestor_group_ocid` because requester IAM references the local identity-domain group by name.
 - The map may contain multiple named connections. For an N-tenancy design, create one source config per Landing Zone and one entry for every RPC edge attached to that Landing Zone.
 - Environment names and platform counts are dynamic. RPC routing consumes all network-producing local environments and platforms, including OKE VCNs.
 - Config mode still emits the normal complete One-OE output set. The add-on publication adapter separately projects compact RPC-only network and IAM fragments and never emits RPC governance.

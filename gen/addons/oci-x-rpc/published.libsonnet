@@ -4,16 +4,6 @@ local render_context = import '../../render_context.libsonnet';
 {
   non_empty(obj):: std.length(std.objectFields(obj)) > 0,
 
-  without_fields(obj, fields):: {
-    [key]: obj[key]
-    for key in std.objectFields(obj)
-    if !std.member(fields, key)
-  },
-
-  legacy_env_title(name)::
-    std.asciiUpper(std.substr(name, 0, 1))
-    + std.substr(name, 1, std.length(name) - 1),
-
   connection_names(config)::
     std.objectFields(config.remote_peering_connections),
 
@@ -171,9 +161,6 @@ local render_context = import '../../render_context.libsonnet';
        )
   },
 
-  complete(config)::
-    landing_zone(config),
-
   rpc_policy_keys(ctx):: [
     ctx.n.key('PCY', ['HUB', 'RPC', segment])
     for segment in $.connection_segments(ctx.config)
@@ -188,118 +175,6 @@ local render_context = import '../../render_context.libsonnet';
     )
   },
 
-  // Preserve the established public IAM reference boundary while deriving every
-  // retained object and RPC policy from the shared config-driven generator.
-  manual_iam_reference(config, options={})::
-    local ctx = render_context.from_raw_config(config);
-    local iam = landing_zone(config).iam;
-    local root_key = 'CMP-LANDINGZONE-KEY';
-    local root =
-      iam.compartments_configuration.compartments[root_key];
-    local shared_network_key = ctx.n.key_global('CMP', ['NETWORK']);
-    local shared_network =
-      $.without_fields(root.children[shared_network_key], ['defined_tags']);
-    local networked_envs = ctx.topo.ordered_spoke_env_entries();
-    local environment_compartments = {
-      [ctx.topo.env_compartment_key(entry)]:
-        local environment_key = ctx.topo.env_compartment_key(entry);
-        local network_key =
-          ctx.topo.env_child_compartment_key(entry, 'NETWORK');
-        local environment = root.children[environment_key];
-        $.without_fields(environment, ['children']) + {
-          description:
-            '%s Environment Compartment' %
-            $.legacy_env_title(entry.env_name),
-          children: {
-            [network_key]:
-              $.without_fields(
-                environment.children[network_key],
-                ['defined_tags']
-              ) + {
-                description:
-                  '%s Workload Environment, Common Network Compartment' %
-                  $.legacy_env_title(entry.env_name),
-              },
-          },
-        }
-      for entry in networked_envs
-    };
-    local network_group_key =
-      ctx.n.key_global('GRP', ['NETWORK', 'ADMIN']);
-    {
-      compartments_configuration:
-        iam.compartments_configuration {
-          [if std.objectHas(options, 'enable_delete') then 'enable_delete']:
-            options.enable_delete,
-          compartments: {
-            [root_key]:
-              $.without_fields(root, ['children']) + {
-                description:
-                  if std.objectHas(options, 'root_description') then
-                    options.root_description
-                  else root.description,
-                children: {
-                  [shared_network_key]: shared_network,
-                } + environment_compartments,
-              },
-          },
-        },
-      identity_domain_groups_configuration:
-        iam.identity_domain_groups_configuration {
-          groups: {
-            [network_group_key]:
-              iam.identity_domain_groups_configuration.groups[
-                network_group_key
-              ] {
-                description:
-                  'One-OE Landing Zone, Shared network administration group, including common OE network elements.',
-              },
-          },
-        },
-      identity_domains_configuration:
-        iam.identity_domains_configuration,
-      policies_configuration:
-        iam.policies_configuration {
-          [if std.objectHas(
-            options,
-            'enable_cis_benchmark_checks'
-          ) then 'enable_cis_benchmark_checks']:
-            options.enable_cis_benchmark_checks,
-          supplied_policies: $.rpc_policies(iam, ctx),
-        },
-    },
-
-  // Preserve the established public network reference boundary while deriving
-  // the standard topology and every RPC change from the shared generator.
-  // Load balancers and Network Firewall resources are existing-LZ concerns,
-  // not changes introduced by this add-on.
-  manual_network_reference(config)::
-    local network = landing_zone(config).network;
-    local categories =
-      network.network_configuration.network_configuration_categories;
-    network {
-      network_configuration:
-        network.network_configuration {
-          network_configuration_categories: {
-            [category_key]:
-              local category = categories[category_key];
-              category {
-                [if std.objectHas(
-                  category,
-                  'non_vcn_specific_gateways'
-                ) then 'non_vcn_specific_gateways']:
-                  $.without_fields(
-                    category.non_vcn_specific_gateways,
-                    [
-                      'l7_load_balancers',
-                      'network_firewalls_configuration',
-                    ]
-                  ),
-              }
-            for category_key in std.objectFields(categories)
-          },
-        },
-    },
 
   network_fragment(config)::
     local ctx = render_context.from_raw_config(config);

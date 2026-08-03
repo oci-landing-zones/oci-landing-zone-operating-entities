@@ -1,247 +1,111 @@
-# Cross-Tenancy RPC Execution Guide
+# X-RPC Execution Guide
 
-## Overview
+This guide describes how to generate and deploy an RPC extension from the current One-OE generator. It does not deploy the compact files under `runtime/` as standalone Landing Zones.
 
-This guide explains how to configure and establish a **Cross-Tenancy Remote Peering Connection (RPC)** using the **OCI Landing Zone Operating Entities (One-OE)** framework.
+## Before You Start
 
-The setup enables secure connectivity between **Tenancy1** and **Tenancy2** through OCI DRG Remote Peering Connections (RPCs).
+Prepare one source config per Landing Zone and confirm:
 
----
+- Acceptor and requestor roles for every RPC edge
+- Local and peer regions
+- Reviewed, non-overlapping remote VCN CIDRs
+- Same-tenancy or cross-tenancy scope
+- Acceptor RPC OCID or orchestrator dependency key for each requestor
+- For cross tenancy, both tenancy OCIDs and the requestor network-administrator group OCID
+- Existing firewall policy permits the approved traffic when a firewall hub is used
 
-# Execution Flow
+Environment names and counts are customer-defined. The generator derives every local network-producing environment and platform VCN from its source config.
 
-```mermaid
-flowchart TD
+## Same-Tenancy Sequence
 
-    A["Update Tenancy2 IAM<br/>Add Tenancy1 OCID"]
+1. Add an acceptor entry without `peer_id` and without cross-tenancy IAM fields.
+2. Generate and deploy the complete acceptor One-OE outputs.
+3. Collect the acceptor RPC OCID.
+4. Add a requestor entry with that RPC OCID, or a valid orchestrator dependency key.
+5. Generate and deploy the complete requestor One-OE outputs.
+6. Validate the RPC state and routes on both DRGs.
 
-    B["Deploy Tenancy2<br/>IAM + Governance"]
+Same-tenancy RPC changes only the generated network configuration. It does not add IAM or governance fragments.
 
-    C["Collect<br/>Network Group OCID"]
+## Cross-Tenancy Sequence
 
-    D["Update Tenancy1 IAM<br/>Add Group + Tenancy2 OCID"]
+### 1. Establish The Requestor Identity
 
-    E["Deploy Tenancy1<br/>IAM + Network + Governance"]
+Deploy the standard One-OE requestor IAM baseline if it is not already present. Collect the OCID of the requestor tenancy's `grp-lz-network-admin` group.
 
-    F["Collect<br/>Tenancy1 RPC OCID"]
+The requestor RPC policy references this local identity-domain group by name:
 
-    G["Update Tenancy2 Network<br/>Add peer_id"]
-
-    H["Deploy Tenancy2<br/>Network Stack"]
-
-    I["Validate RPC Status<br/>PEERED"]
-
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    G --> H
-    H --> I
+```text
+'id_lz_common'/'grp-lz-network-admin'
 ```
 
----
+Do not define that local group by OCID in the requestor policy.
 
-# Step 1 — Deploy Tenancy2 IAM Configuration
+### 2. Generate And Deploy The Acceptor
 
-The IAM configuration for **Tenancy2** must be deployed first.
+Configure the acceptor with:
 
-This initial deployment creates the networking administrator group whose OCID is required in the **Tenancy1** IAM policy configuration.
+- Reviewed requestor VCN CIDRs in `remote_cidrs`
+- Requestor region in `peer_region_name`
+- Requestor tenancy OCID in `peer_tenancy_ocid`
+- Foreign requestor group OCID in `requestor_group_ocid`
+- No `peer_id`
 
-Launch the ORM stack and execute the following configuration files:
+Generate the complete acceptor output set:
 
-- [runtime/tenancy2_iam.json](./runtime/tenancy2_iam.json)
-
-- [runtime/tenancy2_governance.json](./runtime/tenancy2_governance.json)
-
-Ensure the RPC requester policy includes the correct **Acceptor Tenancy OCID (Tenancy1 OCID)** before deployment.
-
-After successful execution:
-
-- The group `grp-lz-network-admin` will be created.
-
-- Obtain the generated Group OCID.
-
-- This Group OCID will be required while configuring the Tenancy1 IAM policy.
-
----
-
-## Example — Tenancy2 RPC IAM Policy
-
-```json
-
-"policies_configuration": {
-
-    "enable_cis_benchmark_checks": "false",
-
-    "supplied_policies": {
-
-        "PCY-RPC-REQUESTOR": {
-
-            "name": "pcy-rpc-requester",
-
-            "description": "Open LZ policy for requesting RPC connections in the tenancy.",
-
-            "compartment_id": "TENANCY-ROOT",
-
-            "statements": [
-
-                "Define tenancy Acceptor as <Tenancy1 OCID>",
-
-                "Allow group 'id_lz_common'/'grp-lz-network-admin' to manage remote-peering-from in compartment cmp-landingzone:cmp-lz-network",
-
-                "Endorse group 'id_lz_common'/'grp-lz-network-admin' to manage remote-peering-to in tenancy Acceptor"
-
-            ]
-
-        }
-
-    }
-
-}
-
+```bash
+bash gen/generate.sh \
+  --config addons/oci-lz-blueprint-factory/examples/05-xrpc-cross-tenancy-acceptor.json \
+  /tmp/xrpc-acceptor
 ```
 
----
+Review and deploy the generated acceptor IAM and network changes, then collect the created RPC OCID.
 
-# Step 2 — Deploy Tenancy1 IAM, Network, and Governance Configuration
+### 3. Generate And Deploy The Requestor
 
-Once the Tenancy2 IAM deployment is completed:
+Configure the requestor with:
 
-- Obtain the `grp-lz-network-admin` Group OCID.
+- Reviewed acceptor VCN CIDRs in `remote_cidrs`
+- Acceptor RPC OCID or dependency key in `peer_id`
+- Acceptor region in `peer_region_name`
+- Acceptor tenancy OCID in `peer_tenancy_ocid`
+- No `requestor_group_ocid`
 
-- Obtain the Tenancy2 OCID.
+Generate the complete requestor output set:
 
-Update the Tenancy1 IAM configuration with:
-
-- Requestor Group OCID
-
-- Requestor Tenancy OCID
-
-Launch the ORM stack in **Tenancy1** using the following configuration files:
-
-- [runtime/tenancy1_iam.json](./runtime/tenancy1_iam.json)
-
-- [runtime/tenancy1_network.json](./runtime/tenancy1_network.json)
-
-- [runtime/tenancy1_governance.json](./runtime/tenancy1_governance.json)
-
----
-
-## Example — Tenancy1 RPC IAM Policy
-
-```json
-
-"policies_configuration": {
-
-    "enable_cis_benchmark_checks": "false",
-
-    "supplied_policies": {
-
-        "PCY-RPC-ACCEPTOR": {
-
-            "name": "pcy-rpc-acceptor",
-
-            "description": "Open LZ policy for accepting RPC connections in the tenancy.",
-
-            "compartment_id": "TENANCY-ROOT",
-
-            "statements": [
-
-                "Define group requestorGroup as <Network Group OCID from Tenancy2>",
-
-                "Define tenancy Requestor as <Tenancy2 OCID>",
-
-                "Admit group requestorGroup of tenancy Requestor to manage remote-peering-to in compartment cmp-landingzone:cmp-lz-network"
-
-            ]
-
-        }
-
-    }
-
-}
-
+```bash
+bash gen/generate.sh \
+  --config addons/oci-lz-blueprint-factory/examples/06-xrpc-cross-tenancy-requester.json \
+  /tmp/xrpc-requestor
 ```
 
----
+Review and deploy the generated requestor IAM and network changes.
 
-# Step 3 — Complete Tenancy2 Network Deployment
+When the orchestrator resolves a dependency key, ensure its network dependency maps the key to the acceptor RPC `id` and `region_name`.
 
-After successful deployment of the Tenancy1 stack:
+## Validate
 
-- Obtain the generated RPC OCID from Tenancy1.
+Confirm all of the following before declaring the connection ready:
 
-- Update the Tenancy2 network configuration with the RPC peer OCID.
+1. The requestor RPC points to the expected acceptor RPC and peer region.
+2. Both RPC resources reach the `PEERED` lifecycle state.
+3. Each RPC has a `REMOTE_PEERING_CONNECTION` DRG attachment.
+4. RPC route tables and import distributions contain the expected attachment references.
+5. Every reviewed remote CIDR has the required DRG, VCN, and NSG route surface.
+6. No local or remote VCN CIDRs overlap.
+7. Cross-tenancy policy statements use the foreign group OCID only on the acceptor and the local identity-domain group name on the requestor.
+8. Firewall policy permits the approved flows when a firewall hub is present.
+9. End-to-end traffic succeeds in both directions for the approved ports and protocols.
 
-Example:
+## Runtime References
 
-```json
+The [`runtime/`](./runtime/) directory contains six generated RPC-only reference fragments:
 
-"peer_id": "ocid1.remotepeeringconnection.oc1..."
+- [`same_tenancy_acceptor_network.json`](./runtime/same_tenancy_acceptor_network.json)
+- [`same_tenancy_requester_network.json`](./runtime/same_tenancy_requester_network.json)
+- [`cross_tenancy_acceptor_network.json`](./runtime/cross_tenancy_acceptor_network.json)
+- [`cross_tenancy_acceptor_iam.json`](./runtime/cross_tenancy_acceptor_iam.json)
+- [`cross_tenancy_requester_network.json`](./runtime/cross_tenancy_requester_network.json)
+- [`cross_tenancy_requester_iam.json`](./runtime/cross_tenancy_requester_iam.json)
 
-```
-
-Launch or update the ORM stack using the following configuration file:
-
-- [runtime/tenancy2_network.json](./runtime/tenancy2_network.json)
-
-Re-run the ORM stack deployment after updating the `peer_id`.
-
----
-
-# Step 4 — Validate RPC Connectivity
-
-After successful deployment:
-
-- Verify the RPC status is `PEERED`
-
-- Verify DRG Remote Peering Attachments are connected
-
-- Verify route rules are configured properly
-
-- Validate cross-tenancy network communication
-
-The RPC status can be verified from:
-
-- OCI Console
-
-- DRG Remote Peering Attachments
-
-- Terraform/ORM outputs
-
----
-
-# Reference Configuration Files
-
-## Tenancy1
-
-- [runtime/tenancy1_iam.json](./runtime/tenancy1_iam.json)
-
-- [runtime/tenancy1_network.json](./runtime/tenancy1_network.json)
-
-- [runtime/tenancy1_governance.json](./runtime/tenancy1_governance.json)
-
-## Tenancy2
-
-- [runtime/tenancy2_iam.json](./runtime/tenancy2_iam.json)
-
-- [runtime/tenancy2_network.json](./runtime/tenancy2_network.json)
-
-- [runtime/tenancy2_governance.json](./runtime/tenancy2_governance.json)
-
----
-
-> [!IMPORTANT]
-> The user executing Terraform/ORM automation must belong to:
-> - `grp-lz-network-admin`
-> Otherwise:
-> - The ORM stack deployment may fail.
-> - The OCI Console RPC status may display a `REVOKED` state.
-> - Cross-tenancy RPC peering will not be established successfully.
----
-
-# Summary
-
-This implementation enables automated and scalable Cross-Tenancy RPC deployment using the One-OE framework and OCI ORM/Terraform automation.
+These files are working reference samples for establishing RPC and reviewing the generated delta. They intentionally omit complete One-OE and governance configuration.

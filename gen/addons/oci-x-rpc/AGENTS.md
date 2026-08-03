@@ -44,7 +44,7 @@ After normal One-OE discovery is complete, collect these RPC decisions one at a 
 6. Whether each connection provides only peer access or approved transit to another connected Landing Zone
 7. Remote routable CIDRs each side must reach
 8. Acceptor RPC OCID or orchestrator dependency key for each requestor edge
-9. For each cross-tenancy edge, requestor tenancy OCID, acceptor tenancy OCID, and requestor network-administrator group OCID
+9. For each cross-tenancy edge, requestor tenancy OCID, acceptor tenancy OCID, and the requestor network-administrator group OCID needed by the acceptor
 
 Do not guess role, peer OCID, tenancy OCID, group OCID, region, or remote CIDRs.
 
@@ -59,7 +59,6 @@ remote_peering_connections: {
     peer_id: 'ocid1.remotepeeringconnection.oc1.eu-frankfurt-1.example',
     peer_region_name: 'eu-frankfurt-1',
     peer_tenancy_ocid: 'ocid1.tenancy.oc1..acceptor',
-    requestor_group_ocid: 'ocid1.group.oc1..requestor-network-admin',
   },
 },
 ```
@@ -67,8 +66,9 @@ remote_peering_connections: {
 - `remote_cidrs` is required and non-empty.
 - `peer_id` is omitted on the acceptor and required on the requestor. It accepts an RPC OCID or orchestrator dependency key; non-OCID values render as `peer_key`.
 - `peer_region_name` identifies the peer RPC region.
-- `peer_tenancy_ocid` and `requestor_group_ocid` are omitted together for same-tenancy RPC and provided together for cross-tenancy RPC.
-- `requestor_group_ocid` always identifies the requestor-side group, including in the acceptor config.
+- Same-tenancy RPC omits both `peer_tenancy_ocid` and `requestor_group_ocid`.
+- A cross-tenancy acceptor sets `peer_tenancy_ocid` to the requestor tenancy and sets `requestor_group_ocid` to the foreign requestor group. It omits `peer_id`.
+- A cross-tenancy requestor sets `peer_tenancy_ocid` to the acceptor tenancy and sets `peer_id` to the acceptor RPC OCID or dependency key. It omits `requestor_group_ocid` because its policy references the local `'id_lz_common'/'grp-lz-network-admin'` group.
 - Multiple entries generate independent RPC objects, attachments, routing surfaces, and cross-tenancy policies. Connection names must be unique within the Landing Zone config.
 
 ## CIDR Guardrails
@@ -94,8 +94,8 @@ The user or automation principal that establishes the peering must be represente
 - The base hub DRG import distribution receives an RPC import statement.
 - Hub E creates an RPC import distribution containing the hub VCN attachment and every dynamically discovered local environment/platform VCN attachment.
 - Hub E spoke and platform route tables receive explicit routes for every remote CIDR.
-- Firewall hubs route RPC traffic through the existing hub/firewall path and add the required remote CIDRs to the relevant firewall address-list and route surfaces.
-- Published fragments retain only RPC-related route rules, attachments, distributions, route tables, RPC objects, firewall address lists, and cross-tenancy policies.
+- Firewall hubs route RPC traffic through the existing hub/firewall path. The RPC builder does not invent or modify customer-specific Network Firewall security policy; the deployed policy must separately permit the approved traffic.
+- Published fragments retain only RPC-related route rules, attachments, distributions, route tables, RPC objects, and cross-tenancy policies.
 
 ## Deployment Sequence
 
@@ -109,7 +109,7 @@ The user or automation principal that establishes the peering must be represente
 ## Publication And Verification
 
 - `profiles.libsonnet` owns representative complete One-OE configs.
-- `published.libsonnet` renders complete One-OE and projects only the RPC delta.
+- `published.libsonnet` renders the current One-OE generator and projects only the RPC delta.
 - Runtime entrypoints must remain thin and select one network or IAM fragment.
 - Generate repository snapshots with `bash gen/generate.sh`.
 - Generate an end-user landing zone with `bash gen/generate.sh --config <config_file> <output_dir>`.

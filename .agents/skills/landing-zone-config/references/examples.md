@@ -209,10 +209,11 @@ remote_peering_connections: {
     peer_id: 'ocid1.remotepeeringconnection.oc1.eu-frankfurt-1.example',
     peer_region_name: 'eu-frankfurt-1',
     peer_tenancy_ocid: 'ocid1.tenancy.oc1..acceptor',
-    requestor_group_ocid: 'ocid1.group.oc1..requestor-network-admin',
   },
 },
 ```
+
+The requester policy uses its local `'id_lz_common'/'grp-lz-network-admin'` group. Only the acceptor config needs the requestor group's OCID because that group is foreign to the acceptor tenancy.
 
 The surrounding `environments` map remains customer-defined. See the paired JSON examples under `addons/oci-lz-blueprint-factory/examples/` and `gen/addons/oci-x-rpc/AGENTS.md`.
 
