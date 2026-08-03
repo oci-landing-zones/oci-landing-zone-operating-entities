@@ -87,7 +87,7 @@ The requestor group OCID is needed only by the acceptor because the group is for
 
 The builder discovers all local network-producing environments and platforms dynamically. It adds the RPC attachment and the additional route/import rules required for the configured remote CIDRs while preserving the existing One-OE DRG design.
 
-For firewall hub patterns, RPC traffic follows the existing hub/firewall route path. The add-on does not invent or modify customer-specific Network Firewall security policy; verify that the deployed policy permits the approved traffic.
+Hub A, Hub B, and Hub C use the common firewall-hub RPC routing model, where RPC traffic follows the existing hub/firewall route path. Hub E uses its direct DRG import-distribution routing model. The add-on does not invent or modify customer-specific Network Firewall security policy; verify that the deployed policy permits the approved traffic.
 
 ![Reference DRG routing](./images/drg-routing.png)
 

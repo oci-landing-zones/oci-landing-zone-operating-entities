@@ -94,7 +94,8 @@ The user or automation principal that establishes the peering must be represente
 - The base hub DRG import distribution receives an RPC import statement.
 - Hub E creates an RPC import distribution containing the hub VCN attachment and every dynamically discovered local environment/platform VCN attachment.
 - Hub E spoke and platform route tables receive explicit routes for every remote CIDR.
-- Firewall hubs route RPC traffic through the existing hub/firewall path. The RPC builder does not invent or modify customer-specific Network Firewall security policy; the deployed policy must separately permit the approved traffic.
+- Hub A, Hub B, and Hub C route RPC traffic through the common existing hub/firewall path. Hub E uses the direct DRG import-distribution path described above.
+- The RPC builder does not invent or modify customer-specific Network Firewall security policy; the deployed policy must separately permit the approved traffic.
 - Published fragments retain only RPC-related route rules, attachments, distributions, route tables, RPC objects, and cross-tenancy policies.
 
 ## Deployment Sequence
