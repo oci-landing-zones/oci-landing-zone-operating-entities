@@ -49,6 +49,7 @@ A typical configuration describes the target Landing Zone in a few top-level blo
 - **Hub**: the selected hub model and hub network range.
 - **Environments**: environment-specific networks, projects, platforms, and workload extensions.
 - **Extension parameters**: workload-specific settings, such as OKE or Exadata options, when an extension is part of the design.
+- **Remote peering connections**: peer role, region, remote routable CIDRs, and optional cross-tenancy identifiers for RPC designs.
 
 Example shape:
 
@@ -104,6 +105,8 @@ The [examples](./examples) folder contains small and medium-size config files th
 | [Prod and preprod projects](./examples/02-prod-preprod-projects.json) | Two environments, project networks, and multiple projects. |
 | [Prod with OKE](./examples/03-prod-oke.json) | Environment-scoped OKE platform using the `oke_simple` extension. |
 | [Shared ExaCS with Autonomous DB tiers](./examples/04-shared-exacs-autonomous.json) | Shared ExaCS platform and project DB tiers across environments. |
+| [Cross-tenancy RPC acceptor](./examples/05-xrpc-cross-tenancy-acceptor.json) | Tenancy 1 acceptor with dynamic environment routing and cross-tenancy Admit policy. |
+| [Cross-tenancy RPC requester](./examples/06-xrpc-cross-tenancy-requester.json) | Tenancy 2 requester with peer RPC reference and cross-tenancy Allow/Endorse policy. |
 
 Generate any example from the repository root:
 
@@ -112,6 +115,8 @@ bash gen/generate.sh --config addons/oci-lz-blueprint-factory/examples/01-single
 ```
 
 Use the examples as readable patterns. Replace region, hub model, environment names, CIDRs, project names, extension parameters, and notification emails with values reviewed for the target deployment.
+
+The RPC examples form a pair. Generate and review both sides separately. Deploy the acceptor side first, collect its RPC OCID, replace the requester's `peer_id` placeholder, and then generate or deploy the requester side. Environment names and counts are examples only; the factory derives routing from whatever network-producing environments and platforms each customer config defines.
 
 &nbsp;
 

@@ -1,0 +1,174 @@
+{
+    "network_configuration": {
+        "network_configuration_categories": {
+            "0-shared": {
+                "vcns": {
+                    "VCN-FRA-LZ-HUB-KEY": {
+                        "route_tables": {
+                            "RT-FRA-LZ-HUB-INGRESS-KEY": {
+                                "display_name"                                   : "rt-fra-lz-hub-ingress",
+
+                                "route_rules": {
+                                    "rr-fra-rpc-requestor-1": {
+                                        "description"                            : "Route to RPC requestor CIDR 10.1.0.0/16 through Internal OCI Network Firewall",
+                                        "destination"                            : "10.1.0.0/16",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_id"                      : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    }
+                                }
+                            },
+
+                            "RT-FRA-LZ-HUB-LB-KEY": {
+                                "display_name"                                   : "rt-fra-lz-hub-lb",
+
+                                "route_rules": {
+                                    "rr-fra-rpc-requestor-1": {
+                                        "description"                            : "Route to RPC requestor CIDR 10.1.0.0/16 through DRG",
+                                        "destination"                            : "10.1.0.0/16",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_key"                     : "DRG-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
+                            "RT-FRA-LZ-HUB-FW-INT-KEY": {
+                                "display_name"                                   : "rt-fra-lz-hub-fw-int",
+
+                                "route_rules": {
+                                    "rr-fra-rpc-requestor-1": {
+                                        "description"                            : "Route to RPC requestor CIDR 10.1.0.0/16 through DRG",
+                                        "destination"                            : "10.1.0.0/16",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_key"                     : "DRG-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
+                            "RT-FRA-LZ-HUB-NATGW-KEY": {
+                                "display_name"                                   : "rt-fra-lz-hub-natgw",
+
+                                "route_rules": {
+                                    "rr-fra-rpc-requestor-1": {
+                                        "description"                            : "Route to RPC requestor CIDR 10.1.0.0/16 through Internal OCI Network Firewall",
+                                        "destination"                            : "10.1.0.0/16",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_id"                      : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    }
+                                }
+                            },
+
+                            "RT-FRA-LZ-HUB-MGMT-KEY": {
+                                "display_name"                                   : "rt-fra-lz-hub-mgmt",
+
+                                "route_rules": {
+                                    "rr-fra-rpc-requestor-1": {
+                                        "description"                            : "Route to RPC requestor CIDR 10.1.0.0/16 through DRG",
+                                        "destination"                            : "10.1.0.0/16",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_key"                     : "DRG-FRA-LZ-HUB-KEY"
+                                    }
+                                }
+                            }
+                        },
+
+                        "network_security_groups": {
+                            "NSG-FRA-LZ-HUB-FW-INT-KEY": {
+                                "ingress_rules": {
+                                    "from_requestor-1_http": {
+                                        "description"                            : "Allow inbound traffic from RPC requestor VCN over HTTP",
+                                        "src"                                    : "10.1.0.0/16",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 80,
+                                        "dst_port_max"                           : 80,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
+                                    },
+
+                                    "from_requestor-1_https": {
+                                        "description"                            : "Allow inbound traffic from RPC requestor VCN over HTTPS",
+                                        "src"                                    : "10.1.0.0/16",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 443,
+                                        "dst_port_max"                           : 443,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
+                                    },
+
+                                    "from_requestor-1_icmp": {
+                                        "description"                            : "Allow ICMP type 8 (Echo) from RPC requestor VCN",
+                                        "src"                                    : "10.1.0.0/16",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 8,
+                                        "icmp_code"                              : 0,
+                                        "stateless"                              : false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "non_vcn_specific_gateways": {
+                    "dynamic_routing_gateways": {
+                        "DRG-FRA-LZ-HUB-KEY": {
+                            "drg_attachments": {
+                                "DRGATT-FRA-LZ-HUB-RPC-REQUESTOR-KEY": {
+                                    "display_name"                               : "drgatt-fra-lz-hub-rpc-requestor",
+                                    "drg_route_table_key"                        : "DRGRT-FRA-LZ-RPC-REQUESTOR-KEY",
+
+                                    "network_details": {
+                                        "type"                                   : "REMOTE_PEERING_CONNECTION",
+                                        "attached_resource_key"                  : "RPC-FRA-LZ-HUB-REQUESTOR-KEY"
+                                    }
+                                }
+                            },
+
+                            "drg_route_distributions": {
+                                "DRGRD-FRA-LZ-HUB-KEY": {
+                                    "display_name"                               : "drgrd-fra-lz-hub",
+                                    "distribution_type"                          : "IMPORT",
+
+                                    "statements": {
+                                        "ROUTE-TO-RPC-LZ-REQUESTOR-KEY": {
+                                            "action"                             : "ACCEPT",
+                                            "priority"                           : 20,
+
+                                            "match_criteria": {
+                                                "match_type"                     : "DRG_ATTACHMENT_TYPE",
+                                                "attachment_type"                : "REMOTE_PEERING_CONNECTION",
+                                                "drg_attachment_key"             : "DRGATT-FRA-LZ-HUB-RPC-REQUESTOR-KEY"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+
+                            "drg_route_tables": {
+                                "DRGRT-FRA-LZ-RPC-REQUESTOR-KEY": {
+                                    "display_name"                               : "drgrt-fra-lz-rpc-requestor",
+                                    "is_ecmp_enabled"                            : false,
+
+                                    "route_rules": {
+                                        "DRGRT-FRA-LZ-RPC-REQUESTOR-STATIC-ROUTE": {
+                                            "destination"                        : "0.0.0.0/0",
+                                            "destination_type"                   : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key"        : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                        }
+                                    }
+                                }
+                            },
+
+                            "remote_peering_connections": {
+                                "RPC-FRA-LZ-HUB-REQUESTOR-KEY": {
+                                    "display_name"                               : "rpc-fra-lz-hub-requestor",
+                                    "peer_region_name"                           : "eu-amsterdam-1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

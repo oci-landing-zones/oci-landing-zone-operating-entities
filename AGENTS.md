@@ -19,6 +19,7 @@ Use this file as the canonical policy source for request classification, the cus
 - `.agents/skills/landing-zone-config/SKILL.md`: config-mode authoring and verification workflow.
 - `gen/AGENTS.md`: generator architecture, publication boundaries, schema behavior, extension contracts, and code style.
 - `gen/workload-extensions/*/AGENTS.md`: extension-specific contracts, source files, discovery addenda, and tests.
+- `gen/addons/*/AGENTS.md`: add-on-specific contracts, discovery addenda, publication rules, and tests.
 
 ## Request Classification
 
@@ -293,6 +294,7 @@ When helping customers, make no assumptions and do not hallucinate data, file pa
 - `gen/` is the source of truth for generator behavior and customization logic.
 - `terraform-oci-modules-orchestrator` is the source of truth for how generated configuration files are interpreted at deployment time. When a generated field seems unused, transformed, or contradictory, inspect the orchestrator and the downstream modules it invokes before changing this repo's contract. For published OKE behavior, inspect the exact orchestrator tag referenced by the published OKE docs.
 - `gen/workload-extensions/oke/AGENTS.md` plus `gen/workload-extensions/oke/simple/*` are the source of truth for config-driven `oke_simple` behavior and OKE-native networking semantics in this repo.
+- `gen/addons/oci-x-rpc/AGENTS.md` plus `gen/builders/remote_peering.libsonnet` are the source of truth for config-driven RPC behavior, routing overlays, cross-tenancy IAM, and RPC publication semantics.
 - `gen/workload-extensions/ocvs/AGENTS.md` plus `gen/workload-extensions/ocvs/*` are the source of truth for config-driven `ocvs` behavior, OCVS network prerequisites, and generated `ocvs_configuration` semantics in this repo.
 - `gen/workload-extensions/exacs/AGENTS.md` plus `gen/workload-extensions/exacs/*` are the source of truth for config-driven ExaDB-D / ExaCS placement, component, network, and project DB tier semantics in this repo.
 - The ExaDB-C@C generator guide under `gen/workload-extensions/exacc/` plus the source files in that directory are the source of truth for config-driven ExaDB-C@C IAM, observability, notification email, and publication semantics in this repo.

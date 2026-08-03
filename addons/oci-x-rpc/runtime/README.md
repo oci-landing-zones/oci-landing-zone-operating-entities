@@ -1,38 +1,28 @@
-# **[OCI Remote Peering Connections](#)**
-## **An OCI Open LZ [Addon](#) for Remote Peering Across Regions and Tenancies using IaC**
-&nbsp;
-## **DRG Route Table Design and Sample json's**
+# X-RPC Runtime References
 
-### 1. DRG Routing Design
+This directory contains generated RPC-only reference fragments. The generator renders the current One-OE implementation and the X-RPC publication adapter projects only the relevant network and IAM delta.
 
-The diagram below illustrates a sample routing setup for a multi-tenancy/multi-region RPC configuration. The left side represents the Connectivity Hub tenancy with a firewall setup (HUB Model A), while the right side depicts the OE1/DR region setup without a firewall (HUB Model E).
+These are not standalone or complete One-OE configurations. Governance remains part of the standard One-OE deployment and is not duplicated by this add-on.
 
+## Files
 
-<img src="../images/drg-routing.png" width="100%">
+| Scenario | Network | IAM |
+|---|---|---|
+| Same-tenancy acceptor | [`same_tenancy_acceptor_network.json`](./same_tenancy_acceptor_network.json) | Not required |
+| Same-tenancy requestor | [`same_tenancy_requester_network.json`](./same_tenancy_requester_network.json) | Not required |
+| Cross-tenancy acceptor | [`cross_tenancy_acceptor_network.json`](./cross_tenancy_acceptor_network.json) | [`cross_tenancy_acceptor_iam.json`](./cross_tenancy_acceptor_iam.json) |
+| Cross-tenancy requestor | [`cross_tenancy_requester_network.json`](./cross_tenancy_requester_network.json) | [`cross_tenancy_requester_iam.json`](./cross_tenancy_requester_iam.json) |
 
-> [!NOTE]  
-> The above diagram serves as a reference for designing DRG routing based on specific architecture requirements. The Connectivity Hub and OE1 may follow different DRG routing styles, such as having firewalls on both sides, only on the Connectivity Hub, or a mix of various configurations.
+The cross-tenancy acceptor IAM fragment identifies the foreign requestor group by OCID. The requestor IAM fragment references its local `'id_lz_common'/'grp-lz-network-admin'` group by name.
 
-&nbsp;
-### 2. Sample JSON Configuration for RPC  
+Regenerate these files from the repository root:
 
-#### Configuration Details:  
+```bash
+bash gen/generate.sh
+```
 
-- **Connectivity Hub (CH) Configuration**  
-  - `connectivity-hub_iam.auto.tfvars.json` defines the compartment groups and policies required for RPC setup in the Connectivity Hub tenancy.  
-  - `connectivity-hub_network.auto.tfvars.json` defines the Hub and Spoke network setup, including the Remote Peering Connection and associated route tables. The Connectivity Hub JSON configuration follows **OCI Open LZ - Hub A**.  
-    - To learn more about **HUB Model A**, refer to the [OCI Open LZ - Hub A Documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_a).  
+Generate complete deployment files from a customer source config instead:
 
-- **Operating Entity 1 (OE1) Configuration**  
-  - `oe1_iam.auto.tfvars.json` defines the compartment groups and policies required for RPC setup in the OE1 tenancy.  
-  - `oe1_network.auto.tfvars.json` defines the Hub and Spoke network setup, including the Remote Peering Connection and associated route tables. The OE1 JSON configuration follows **OCI Open LZ - Hub E**.  
-    - To learn more about **HUB Model E**, refer to the [OCI Open LZ - Hub E Documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_e).  
-
-
-
-#### License
-Copyright (c) 2026 Oracle and/or its affiliates.
-
-Licensed under the Universal Permissive License (UPL), Version 1.0.
-
-See [LICENSE](/LICENSE.txt) for more details.
+```bash
+bash gen/generate.sh --config <config-file> <output-directory>
+```

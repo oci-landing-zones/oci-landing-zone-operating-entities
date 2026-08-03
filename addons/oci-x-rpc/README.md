@@ -1,166 +1,133 @@
+# OCI Remote Peering Connection Add-on
 
-# **[OCI Remote Peering Connections](#)**
-## **An OCI Open LZ [Addon](#) for Remote Peering Across Regions and Tenancies using IaC**
-&nbsp;
-## **Overview**
-The IaC-driven configuration enables connectivity between two regions in same tenancy and across multiple tenancies. It includes all necessary RPC configurations, such as IAM policies, RPC setup, and connection establishment. This approach ensures consistency, simplifying administration and reducing complexity in managing RPC across OCI regions and tenancies.
+The OCI Remote Peering Connection (X-RPC) add-on extends a current One-OE Landing Zone with the network and, when required, IAM configuration needed to connect VCNs in different OCI regions.
 
-This document provides configuration views for the following use cases:
-- Multi-Tenancy-RPC: Establishes a remote peering connection between the same or different regions across multiple tenancies.
-- Single-Tenancy-RPC: Establishes a remote peering connection between two regions within a single tenancy.
+This add-on supports:
 
+- Same-tenancy, cross-region RPC
+- Cross-tenancy, cross-region RPC
+- Multiple named RPC connections per Landing Zone
+- Dynamic environment and platform VCNs, including OKE VCNs produced by registered extensions
 
-&nbsp;
+![Cross-tenancy RPC topology](./images/x-tenancy.png)
 
-### OCI multi tenancy RPC resources
+## Design Boundary
 
-| Resource | Description |
-| - | - |
-| [IAM Policies](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-iam.htm#scenario_m__IAM_cross-tenancy) | A set of policies is required to establish connectivity between two tenancies. These policies authorize and admit connectivity from different tenancies, ensuring secure and controlled access to networking resources. |
-| [Remote Peering Connection (RPC)](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-rpc-create.htm#drg-rpc-create) | A Remote Peering Connection (RPC) must be created in both tenancies to establish connectivity between them. This involves configuring a dynamic routing gateway (DRG) in each tenancy and setting up the necessary peerings. |
+One-OE remains responsible for the complete Landing Zone, including governance, compartments, identity domains, groups, baseline policies, hub and spoke VCNs, the base DRG, security, and observability.
 
+X-RPC adds only:
 
-### OCI X Tenancy RPC Setup
-This guide details steps to set up a Remote Peering Connection (RPC) in OCI, ensuring secure, seamless network connectivity across tenancies and multi-region setups for distributed workloads.
+- RPC objects and DRG attachments
+- RPC-specific DRG route tables, route distributions, import statements, and route rules
+- VCN and NSG route surfaces required for reviewed remote CIDRs
+- Minimal cross-tenancy IAM policies when the peer is in another tenancy
 
+There is no RPC governance fragment. Same-tenancy RPC requires no additional IAM fragment.
 
-## 1. Single Tenancy Multi-Region
-Configuration details:
-  - The Region A & Region B comprises the following resources.
-    - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
+The source of truth is the current generator under [`gen/`](../../gen/). Files under [`runtime/`](./runtime/) are generated, working reference fragments. They are not complete One-OE configurations and must not be used as the implementation source.
 
-<img src="images/s-tenancy.png" width="900" height="value">
+## Configuration Model
 
-### Steps to Set Up Multi-Region RPC
-Any of the Landing Zone [Blueprints](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints) can be deployed across both tenancies Connectivity Hub and Child/OE to establish a structured and automated framework for configuring cross-tenancy networking.
+Define each connection under top-level `remote_peering_connections` in the source configuration used by Blueprint Factory or the LZ Agent.
 
-#### Configuration Update & Execution in Region A
-***Step 1: Add the Remote Peering Connection (RPC) Block*** <br>
-Modify the network JSON config of Region A by adding the RPC block under the DRG section.
+### Acceptor
 
-***Step 2: Execute the Terraform Deployment*** <br>
-`Plan` and `Apply` the newly added RPC configuration.Collect the RPC OCID upon successful deployment.
+The acceptor creates the RPC and omits `peer_id`:
 
-#### Configuration Update & Execution in Region B
-***Step 1: Add the Remote Peering Connection (RPC) Block***<br>
-Modify the network JSON config of Region B by adding the RPC block under the **DRG** section. Set the `peer_id` parameter to the RPC OCID collected from the Region A.
+```jsonnet
+remote_peering_connections: {
+  production: {
+    remote_cidrs: ['10.1.0.0/21', '10.1.64.0/21'],
+    peer_region_name: 'eu-amsterdam-1',
+  },
+},
+```
 
-***Step 2: Execute the Terraform Deployment***<br>
-`Plan` and `Apply` the newly added RPC configuration. Verify the deployment is successful and that the RPC is established.
+### Requestor
+
+The requestor points to the acceptor RPC by OCID or an orchestrator dependency key:
+
+```jsonnet
+remote_peering_connections: {
+  connectivity_hub: {
+    remote_cidrs: ['10.0.0.0/21', '10.0.64.0/21'],
+    peer_id: 'ocid1.remotepeeringconnection.oc1.eu-frankfurt-1.example',
+    peer_region_name: 'eu-frankfurt-1',
+  },
+},
+```
+
+`remote_cidrs` must contain the reviewed, routable VCN CIDRs on the peer side. Environment names and counts are not fixed; the generator derives local routed VCNs from the customer configuration.
+
+## Cross-Tenancy IAM
+
+For a cross-tenancy acceptor, add the requestor tenancy and foreign requestor group:
+
+```jsonnet
+peer_tenancy_ocid: 'ocid1.tenancy.oc1..requestor',
+requestor_group_ocid: 'ocid1.group.oc1..requestor-network-admin',
+```
+
+For a cross-tenancy requestor, add the acceptor tenancy but do not provide `requestor_group_ocid`:
+
+```jsonnet
+peer_tenancy_ocid: 'ocid1.tenancy.oc1..acceptor',
+```
+
+The generated IAM policies use these identities:
+
+| Side | Identity reference | Permission direction |
+|---|---|---|
+| Acceptor | Foreign requestor group OCID | Admit `remote-peering-to` |
+| Requestor | Local `'id_lz_common'/'grp-lz-network-admin'` | Allow `remote-peering-from` and endorse `remote-peering-to` |
+
+The requestor group OCID is needed only by the acceptor because the group is foreign there.
+
+## Routing
+
+The builder discovers all local network-producing environments and platforms dynamically. It adds the RPC attachment and the additional route/import rules required for the configured remote CIDRs while preserving the existing One-OE DRG design.
+
+Hub A, Hub B, and Hub C use the common firewall-hub RPC routing model, where RPC traffic follows the existing hub/firewall route path. Hub E uses its direct DRG import-distribution routing model. The add-on does not invent or modify customer-specific Network Firewall security policy; verify that the deployed policy permits the approved traffic.
+
+![Reference DRG routing](./images/drg-routing.png)
 
 > [!NOTE]
-> Since this is within the same tenancy across multiple regions, no additional RPC IAM policy is required to administer and establish the connection.
+> The diagram is a working reference for establishing cross-tenancy RPC and designing DRG routing for a specific architecture. Tenancy 1 and Tenancy 2 may use different supported hub and firewall patterns, including firewalls on both sides, on one side, or neither side.
 
-&nbsp;
+## Generate
 
+The paired Blueprint Factory examples demonstrate a Frankfurt acceptor and Amsterdam requestor:
 
-## 2. Multi-Tenancy-RPC
-&nbsp;
-Configuration details:
-  - The Connectivity Hub tenancy comprises the following resources and components:
-    - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
-    - IAM policy (Acceptor) statements to accept the remote peering connection from other/spoke tenancy. 
-  - The Child/OE Tenancy comprises the following resources and components
-    - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
-    - IAM policy (Requestor) statements to request the remote peering connection to the Connectivity Hub tenancy. 
+- [Cross-tenancy acceptor config](../oci-lz-blueprint-factory/examples/05-xrpc-cross-tenancy-acceptor.json)
+- [Cross-tenancy requestor config](../oci-lz-blueprint-factory/examples/06-xrpc-cross-tenancy-requester.json)
 
-<img src="images/x-tenancy.png" width="900" height="value">
+Generate a complete current One-OE output set from either source config:
 
-
-
-#### IAM Policy Syntax for Connectivity Hub Tenancy
-
-```
-"policies_configuration": {
-        "enable_cis_benchmark_checks": "false",
-        "supplied_policies": {
-            "PCY-RPC-ACCEPTOR": {
-                "name": "pcy-rpc-acceptor",
-                "description": "Open LZ policy for aaccepting RPC connections in the tenancy.",
-                "compartment_id": "TENANCY-ROOT",
-                "statements": [
-                    "Define group requestorGroup as ocid1.group.oc1..aaaaa...u5scwsqczu7xf67jozkkbl3hj...kjzqq5gxll4ppiwgtq",
-                    "Define tenancy Requestor as ocid1.tenancy.oc1..aaaaaaaatvskd4rq2srf5santd4....kskkoueyqx....shsxart4535oeq",
-                    "Define compartment acceptorCompartment as ocid1.compartment.oc1..aaaampuojexo4zj....a4u2idgqbyd3ndzyp....3mtxz2z2uq",
-                    "Admit group requestorGroup of tenancy Requestor to manage remote-peering-to in compartment cmp-landingzone-rpc:cmp-lzp-network"
-                ]
-            }
-        }
-    }
+```bash
+bash gen/generate.sh --config <config-file> <output-directory>
 ```
 
-#### IAM Policy Syntax for Child/OE Tenancy
-```
-"policies_configuration": {
-        "enable_cis_benchmark_checks": "false",
-        "supplied_policies": {
-            "PCY-RPC-REQUESTOR": {
-                "name": "pcy-rpc-requester",
-                "description": "Open LZ policy for aaccepting RPC connections in the tenancy.",
-                "compartment_id": "TENANCY-ROOT",
-                "statements": [
-                    "Define group requestorGroup as ocid1.group.oc1..aaaaaaaaw...zkkbl3hjsnq...xll4ppiwgtq",
-                    "Define compartment requestorCompartment as ocid1.compartment.oc1..aaaaaaaack6q...7jmuupbtq23zwx...djhlffoya3ypsphprk5q",
-                    "Define tenancy Acceptor as ocid1.tenancy.oc1..aaaaaaaaval...gouqsvea6opiyo...g5c7sggk2pcvbxq",
-                    "Allow group requestorGroup to manage remote-peering-from in compartment cmp-landingzone-rpc:cmp-lzp-network",
-                    "Endorse group requestorGroup to manage remote-peering-to in tenancy Acceptor"
-                ]
-            }
-        }
-    }
-```
+For the cross-tenancy deployment order, dependency handoff, and validation steps, see the [execution guide](./execution.md).
 
+## Reference Fragments
 
-> [!NOTE]
-> Collect the following required OCIDs from both tenancies to configure the necessary policies in each tenancy. The Child/OE tenancy acts as the requester, while the Hub tenancy serves as the acceptor, approving RPC requests from the Child/OE tenancies.
->- `requestorGroup` (Child/OE Tenancy) → OCID of the network administrator group.
->- `Requestor` Tenancy → OCID of the Child/OE tenancy.
->- `acceptorCompartment` (Hub Tenancy) → OCID of the compartment where the RPC is established.
->- `Acceptor` Tenancy → OCID of the Shared/Hub tenancy.
-> 
-> Refer to the hub_iam.auto.tfvars.json and oe1_iam.auto.tfvars.json files for the complete IAM (Compartments, Groups & Policies) configuration sample template based on One-OE.
->
-> For more details, refer to the [OCI Cross Tenancy RPC Policy Documentation](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-iam.htm#scenario_m__IAM_cross-tenancy). 
+The generated files under [`runtime/`](./runtime/) show the RPC-only delta for four roles:
 
+- Same-tenancy acceptor network
+- Same-tenancy requestor network
+- Cross-tenancy acceptor network and IAM
+- Cross-tenancy requestor network and IAM
 
+Use the complete files generated from the customer source config for deployment. Use the compact runtime files for review, testing, and semantic comparison.
 
-### Steps to Set Up Cross-Tenancy RPC
-Any of the Landing Zone [Blueprints](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints) can be deployed across both tenancies Connectivity Hub and Child/OE to establish a structured and automated framework for configuring cross-tenancy networking.
+## References
 
-#### Configuration Update & Execution in Connectivity Hub Tenancy
-***Step 1: Add the RPC IAM Policy (Acceptor)***<br>
-Update the IAM JSON config with the Acceptor policy in the Connectivity Hub tenancy.
+- [OCI Remote Peering through an upgraded DRG](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/scenario_e.htm)
+- [OCI IAM policies for routing between VCNs](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-iam.htm)
+- [OCI Landing Zones](https://www.oracle.com/cloud/architecture-and-regions/landing-zones/)
 
-***Step 2: Add the Remote Peering Connection (RPC) Block***<br>
-Modify the network JSON config of the Connectivity Hub tenancy by adding the RPC block under the DRG section.
+## License
 
-***Step 3: Execute the Terraform Deployment***<br>
-`Plan` and `Apply` the newly added IAM policy & RPC configuration.Collect the RPC OCID upon successful deployment.
-
-#### Configuration Update & Execution in Child/OE Tenancy
-***Step 1: Add the RPC IAM Policy (Requestor)***<br>
-Update the IAM JSON config with the Requestor policy in the Child/OE tenancy.
-
-***Step 2: Add the Remote Peering Connection (RPC) Block***<br>
-Modify the network JSON config of the Child/OE tenancy by adding the RPC block under the **DRG** section. Set the `peer_id` parameter to the RPC OCID collected from the Connectivity Hub tenancy.
-
-***Step 3: Execute the Terraform Deployment***<br>
-`Plan` and `Apply` the newly added IAM policy & RPC configuration. Verify the deployment is successful and that the RPC is established.
-
-> [!IMPORTANT]
->Ensure that the user performing Terraform automation belongs to the group specified in the RPC policy. Otherwise, the connection will not establish. From a One-OE standpoint, this group should be `grp-lzp-network-admins`.
->
-> Refer to the runtime directory files hub_network.auto.tfvars.json and oe1_iam.network.tfvars.json files for the complete networking configuration sample template based on One-OE.
-
-&nbsp;
-
-#### Summary
-This addon enhances the OCI [One-OE Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack) with IaC-driven Remote Peering Connections (RPC) for two use cases. Multi-Tenancy-RPC links tenancies across regions, and Single-Tenancy-RPC connects regions within a tenancy. It automates IAM policies, DRGs, and RPC setup for secure, scalable, and centralized network management in OCI.
-
-&nbsp;
-#### License
-Copyright (c) 2026 Oracle and/or its affiliates.
+Copyright (c) 2024 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
-
-See [LICENSE](/LICENSE.txt) for more details.

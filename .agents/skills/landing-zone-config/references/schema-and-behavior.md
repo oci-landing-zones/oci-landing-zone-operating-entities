@@ -113,6 +113,33 @@ It also contributes default platform subnets when the platform omits explicit `n
 - Shared infrastructure plus environment AVMC/VMC uses `shared_platforms.exacs` without `network` and networked `environments.<env>.platforms.exacs`
 - Dedicated infrastructure plus dedicated AVMC/VMC uses only networked `environments.<env>.platforms.exacs`
 
+## Remote Peering Connections
+
+RPC is a top-level network integration rather than an environment extension:
+
+```jsonnet
+{
+  remote_peering_connections: {
+    region_b: {
+      remote_cidrs: ['10.1.0.0/21', '10.1.64.0/21'],
+      peer_id: 'ocid1.remotepeeringconnection.oc1.eu-amsterdam-1.example',
+      peer_region_name: 'eu-amsterdam-1',
+    },
+  },
+}
+```
+
+- `remote_cidrs` is required and must not overlap local hub, environment, or platform VCNs.
+- Omit `peer_id` for the acceptor. Set it to the acceptor RPC OCID or dependency key for the requestor.
+- Omit both `peer_tenancy_ocid` and `requestor_group_ocid` for same-tenancy peering.
+- For a cross-tenancy acceptor, set `peer_tenancy_ocid` to the requestor tenancy and `requestor_group_ocid` to the foreign requestor group; omit `peer_id`.
+- For a cross-tenancy requestor, set `peer_tenancy_ocid` to the acceptor tenancy and set `peer_id`; omit `requestor_group_ocid` because requester IAM references the local identity-domain group by name.
+- The map may contain multiple named connections. For an N-tenancy design, create one source config per Landing Zone and one entry for every RPC edge attached to that Landing Zone.
+- Environment names and platform counts are dynamic. RPC routing consumes all network-producing local environments and platforms, including OKE VCNs.
+- Config mode still emits the normal complete One-OE output set. The add-on publication adapter separately projects compact RPC-only network and IAM fragments and never emits RPC governance.
+
+See `gen/addons/oci-x-rpc/AGENTS.md` for role mapping, routing behavior, and deployment sequencing.
+
 ## Output Model
 
 `gen/landing_zone_multi.jsonnet` always emits:

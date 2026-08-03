@@ -10,6 +10,10 @@ function(params)
   local n = params.naming;
   local hub = params.hub;
   local all_vcn_entries = params.all_vcn_entries;
+  local remote_peering =
+    if std.objectHas(params, 'remote_peering') then params.remote_peering
+    else { route_entries: [], network_overlay: {} };
+  local all_routed_cidr_entries = all_vcn_entries + remote_peering.route_entries;
 
   local drg_key = n.key('DRG', ['HUB']);
 
@@ -51,10 +55,10 @@ function(params)
   local drg_spoke_distribution_statements = drg_distribution_statements(10, '-S');
 
   // --- 3. Hub Route Table Injection ---
-  // Route rules for each VCN CIDR through DRG
+  // Route rules for each local VCN and remote RPC CIDR through DRG.
   local hub_spoke_routes_via_drg = {
     [e.route_key]: common._route_via_key('%s through DRG' % e.route_desc, e.vcn, drg_key)
-    for e in all_vcn_entries
+    for e in all_routed_cidr_entries
   };
   local route_tables_with_routes(route_tables, routes) = std.foldl(
     function(acc, rt) acc {
@@ -89,12 +93,12 @@ function(params)
         stateless: false,
       },
     },
-    all_vcn_entries,
+    all_routed_cidr_entries,
     {}
   );
 
   // --- 5. Post-Deploy Routes ---
-  // Route rules through firewall IP for each VCN CIDR
+  // Route rules through firewall IP for each local VCN and remote RPC CIDR.
   local post_route_tables =
     if std.objectHas(hub, 'post_route_tables') then hub.post_route_tables else [];
   local post_route_entity_desc =
@@ -109,7 +113,7 @@ function(params)
       e.vcn,
       hub.post_route_entity_id
     )
-    for e in all_vcn_entries
+    for e in all_routed_cidr_entries
   } else {};
 
   local pre = {
@@ -151,12 +155,12 @@ function(params)
         },
       },
     },
-  };
+  } + remote_peering.network_overlay;
 
   local post =
     if has_post_route_entity
        && std.length(post_route_tables) > 0
-       && std.length(all_vcn_entries) > 0 then {
+       && std.length(all_routed_cidr_entries) > 0 then {
       network_configuration+: {
         network_configuration_categories+: {
           '0-shared'+: {

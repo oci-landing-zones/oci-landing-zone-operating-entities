@@ -13,6 +13,7 @@ local hub_integration_builder = import 'builders/hub_integration.libsonnet';
 local iam_builder = import 'builders/iam.libsonnet';
 local network_spokes_builder = import 'builders/network_spokes.libsonnet';
 local observability_builder = import 'builders/observability.libsonnet';
+local remote_peering_builder = import 'builders/remote_peering.libsonnet';
 local security_builder = import 'builders/security.libsonnet';
 local extensions = import 'extensions.libsonnet';
 local policy_limits = import 'lib/policy_limits.libsonnet';
@@ -54,10 +55,21 @@ function(raw_config)
 
   // Hub CIDRs needed for spoke NSG/security list rules
   local hub_vcn_cidr = config.hub.network.vcn;
+  local remote_peering_connections =
+    if std.objectHas(config, 'remote_peering_connections') then
+      config.remote_peering_connections
+    else {};
+  local remote_peering = remote_peering_builder({
+    naming: n,
+    connections: remote_peering_connections,
+    local_vcn_entries: all_vcn_entries,
+    hub_has_spoke_natgw: config.hub.kind == 'hub_e',
+  });
+  local all_routed_cidr_entries = all_vcn_entries + remote_peering.route_entries;
 
   // Number categories starting from 1 using the spoke-environment semantic order.
   local spoke_env_indexed = std.mapWithIndex(
-    function(i, s) s { index: i + 1 },
+    function(i, s) s + { index: i + 1 },
     spoke_envs
   );
   // Build hub with semantic VCN list for NFW policies and example LB backends.
@@ -77,6 +89,7 @@ function(raw_config)
     naming: n,
     hub: hub,
     all_vcn_entries: all_vcn_entries,
+    remote_peering: remote_peering,
   });
   local hub_integration_pre = hub_integration.pre;
   local hub_integration_post = hub_integration.post;
@@ -86,7 +99,7 @@ function(raw_config)
     topology: topo,
     hub_network: config.hub.network,
     spoke_env_indexed: spoke_env_indexed,
-    all_peer_vcn_entries: all_vcn_entries,
+    all_peer_vcn_entries: all_routed_cidr_entries,
     hub_has_spoke_natgw: hub.has_spoke_natgw,
   });
 
@@ -100,7 +113,7 @@ function(raw_config)
         platform_entry: network_only_platforms[i],
         naming: n,
         hub_vcn_cidr: hub_vcn_cidr,
-        routed_vcn_entries: all_vcn_entries,
+        routed_vcn_entries: all_routed_cidr_entries,
         hub_has_spoke_natgw: hub.has_spoke_natgw,
       })
     for i in std.range(0, std.length(network_only_platforms) - 1)
@@ -113,7 +126,7 @@ function(raw_config)
     naming: n,
     hub_vcn_cidr: hub_vcn_cidr,
     hub_lb_cidr: config.hub.network.subnets.lb,
-    routed_vcn_entries: all_vcn_entries,
+    routed_vcn_entries: all_routed_cidr_entries,
     hub_has_spoke_natgw: hub.has_spoke_natgw,
   });
   local extension_network_pre = extension_state.network_pre;
@@ -130,7 +143,7 @@ function(raw_config)
   // --- Build security, observability, governance ---
   local security = security_builder(config, n, realm, topo);
   local observability = observability_builder(config, n, realm, topo);
-  local assembled_network_pre = hub.pre + hub_integration_pre + extension_network_pre {
+  local assembled_network_pre = hub.pre + hub_integration_pre + extension_network_pre + {
     network_configuration+: {
       network_configuration_categories+: spoke_network.categories + network_only_categories,
     },
