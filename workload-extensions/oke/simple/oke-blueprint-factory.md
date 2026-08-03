@@ -49,7 +49,6 @@ This is different from the committed quickstart folders:
 | `oke_simple` | The OKE extension type. | Use this when generating a landing zone whose requirements are outside the committed quickstart configurations. |
 | `simple/single-stack` | A committed OKE JSON package that deploys the landing zone and OKE together. | Use this for the standard Hub E single-stack deployment. |
 | `simple/multi-stack` | A committed OKE JSON package that adds OKE to an existing landing zone. | Use this for the standard multi-stack deployment path. |
-| `advanced` | A separate guided deployment path with more manual steps. | Use this only when following the advanced OKE extension documentation. |
 
 In either add-on path, use `oke_simple` for OKE platforms.
 
