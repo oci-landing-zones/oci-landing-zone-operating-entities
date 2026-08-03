@@ -27,7 +27,7 @@ const styles: Record<string, React.CSSProperties> = {
 const FEATURES = [
   { title: 'Guided wizard', body: 'Step through Foundation, Hub Network, Projects, Platforms and Review.' },
   { title: 'Live diagram', body: 'A network diagram builds up as you go; export its complete structural view from Review.' },
-  { title: 'Canonical config', body: 'Every input feeds one generator-aligned Landing Zone config.' },
+  { title: 'Canonical config', body: 'Every input feeds one Blueprint Factory-aligned Landing Zone config.' },
 ];
 
 export default function Hero({ onNew, compact = false }: { onNew: () => void; compact?: boolean }) {
@@ -37,7 +37,7 @@ export default function Hero({ onNew, compact = false }: { onNew: () => void; co
       <div style={compact ? styles.titleCompact : styles.title}>Landing Zone Studio</div>
       {!compact && (
         <div style={styles.sub}>
-          Build an OCI Landing Zone step by step. Each input updates a canonical generator config and a
+          Build an OCI Landing Zone step by step. Each input updates a canonical Blueprint Factory config and a
           live, exportable network diagram. Review the generated artifacts before deployment.
         </div>
       )}

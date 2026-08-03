@@ -15,9 +15,9 @@ import { generatorNames } from '../services/generatorNaming';
  *     └─ OCI Tenancy
  *          └─ cmp-landingzone
  *               ├─ cmp-lz-network  (yellow)
- *               │    ├─ hub VCN                  (step 2: generator name + CIDR)
- *               │    │    └─ hub subnets         (step 2 subnet table)
- *               │    └─ gateways (IGW / NAT / SGW) on the VCN's left border
+ *               │    └─ hub VCN                  (step 2: generator name + CIDR)
+ *               │         ├─ gateways (IGW / NAT / SGW)
+ *               │         └─ hub subnets         (step 2 subnet table)
  *               ├─ cmp-lz-platform (yellow, always present)
  *               ├─ cmp-lz-security (yellow)
  *               └─ cmp-lz-<env>   (green)     one per environment
@@ -52,12 +52,13 @@ const SUB_GAP = 12;
 const VCN_PAD = 22;    // breathing room between subnets and the VCN border
 const GW_W = 116;      // gateway icon + readable generated name
 const GW_H = 74;
-const GW_STRIP = 150;  // explicit gateway rail to the left of each VCN
-const GW_X = 12;       // gateways sit in the rail; a short edge shows VCN ownership
+const GW_STRIP = 150;  // gateway rail inside the left side of each VCN
+const GW_X = 12;
 
-const VCN_W = VCN_PAD * 2 + SUB_W;
-const HUB_NET_W = GW_STRIP + VCN_W + PAD; // hub network compartment (gateway strip left)
-const NET_COMP_W = HUB_NET_W;             // env network compartment — same strip, for its Service Gateway
+const VCN_CONTENT_W = VCN_PAD * 2 + SUB_W;
+const VCN_W = GW_STRIP + VCN_CONTENT_W;
+const HUB_NET_W = PAD * 2 + VCN_W;
+const NET_COMP_W = HUB_NET_W;
 // Projects: a gray compartment to the right of each env network compartment,
 // holding one block per project that applies to the environment.
 const PROJ_COMP_W = 216;
@@ -71,9 +72,7 @@ const ENV_COMP_W = PAD * 2 + NET_COMP_W + PROJ_GAP + PROJ_COMP_W;
 // is network-bearing (a VCN with its own subnets), unlike the network-less
 // project blocks. A shared-platform row sits in the left column (outside envs).
 // Platform compartments sit directly under the network compartment in the same
-// column, so they take its exact width and inset their VCN by the same gateway
-// strip — the two VCNs then line up edge to edge. The strip is empty here: a
-// platform VCN has no Service Gateway.
+// column, so they take its exact width and the VCNs line up edge to edge.
 const PLAT_COMP_W = NET_COMP_W;
 const PLAT_VCN_GAP = 16;   // vertical gap between stacked platform VCNs
 
@@ -164,7 +163,7 @@ function pushVcn(
       id: `${id}-sn-${i}`, kind: 'subnet', label: `${sn.name}\n${sn.cidr}`, parentId: id,
       icon: sn.icon, caption: sn.caption, captionTone: sn.captionTone, ipNote: sn.ipNote,
       endpointName: sn.endpoint?.name, endpointIp: sn.endpoint?.ip, publicSubnet: sn.isPublic,
-      x: VCN_PAD, y: sy, width: SUB_W, height,
+      x: GW_STRIP + VCN_PAD, y: sy, width: SUB_W, height,
     });
     placed.push({ y: sy, height });
     sy += height + SUB_GAP;
@@ -418,27 +417,25 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   ];
   const edges: DiagramEdge[] = [];
 
-  // network compartment › hub VCN › hub subnets, gateways on the VCN border (step 2+, implemented hub kinds only)
+  // network compartment › hub VCN › gateways + hub subnets (step 2+, implemented hub kinds only)
   nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
   if (showHub) {
-    const placed = pushVcn(nodes, 'hub-vcn', 'cmp-network', hubVcnLabel, hubSubnets, GW_STRIP);
-    // Gateways use the rail left of the hub VCN: IGW by the first subnet,
+    const placed = pushVcn(nodes, 'hub-vcn', 'cmp-network', hubVcnLabel, hubSubnets);
+    // Gateways use the rail inside the hub VCN: IGW by the first subnet,
     // NAT by the internal firewall subnet, SGW by the last subnet.
-    const vcnY = TITLE + PAD;
-    const centerOf = (i: number) => vcnY + placed[i].y + placed[i].height / 2;
+    const centerOf = (i: number) => placed[i].y + placed[i].height / 2;
     const natIndex = hubSubnets.findIndex((sn) => sn.name.endsWith('-fw-int'));
     const anchors = placed.length > 0
       ? [centerOf(0), centerOf(natIndex >= 0 ? natIndex : Math.floor(placed.length / 2)), centerOf(placed.length - 1)]
-      : [vcnY + hubVcnH * 0.2, vcnY + hubVcnH * 0.5, vcnY + hubVcnH * 0.8];
+      : [hubVcnH * 0.2, hubVcnH * 0.5, hubVcnH * 0.8];
     const gateways = [
       { id: 'gw-igw', icon: 'igw' as const, label: generatorNames.hubGateway(regionTok, 'igw') },
       { id: 'gw-natgw', icon: 'natgw' as const, label: generatorNames.hubGateway(regionTok, 'ngw') },
       { id: 'gw-sgw', icon: 'sgw' as const, label: generatorNames.hubGateway(regionTok, 'sgw') },
     ];
     gateways.forEach((gw, i) => {
-      const y = Math.max(TITLE + 2, Math.min(anchors[i] - GW_H / 2, netCompH - GW_H - 2));
-      nodes.push({ id: gw.id, kind: 'gateway', icon: gw.icon, label: gw.label, parentId: 'cmp-network', x: GW_X, y, width: GW_W, height: GW_H });
-      edges.push({ id: `e-${gw.id}-hub-vcn`, source: gw.id, target: 'hub-vcn', sourceSide: 'right', targetSide: 'left' });
+      const y = Math.max(VCN_TITLE + 2, Math.min(anchors[i] - GW_H / 2, hubVcnH - GW_H - 2));
+      nodes.push({ id: gw.id, kind: 'gateway', icon: gw.icon, label: gw.label, parentId: 'hub-vcn', x: GW_X, y, width: GW_W, height: GW_H });
     });
 
     // DRG + attachment cluster, centred horizontally in cmp-network below the hub
@@ -446,27 +443,27 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     let sharedY = TITLE + PAD + hubVcnH + PLAT_VCN_GAP;
     sharedInstances.forEach((instance) => {
       const label = `${generatorNames.sharedPlatformVcn(regionTok, instance.platform.key)}\n${instance.platform.vcnCidr}`;
-      const placed = pushVcn(nodes, instance.vcnId, 'cmp-network', label, instance.subnets, GW_STRIP, sharedY);
-      const anchor = placed[0] ? sharedY + placed[0].y + placed[0].height / 2 : sharedY + VCN_TITLE + PAD;
+      const placed = pushVcn(nodes, instance.vcnId, 'cmp-network', label, instance.subnets, PAD, sharedY);
+      const firstAnchor = placed[0] ? placed[0].y + placed[0].height / 2 : VCN_TITLE + PAD;
+      const last = placed[placed.length - 1];
+      const lastAnchor = last ? last.y + last.height / 2 : firstAnchor;
       nodes.push({
         id: `shared-plat-sgw-${instance.index}`, kind: 'gateway', icon: 'sgw',
-        label: generatorNames.sharedPlatformGateway(regionTok, instance.platform.key, 'sgw'), parentId: 'cmp-network',
-        x: GW_X, y: anchor - GW_H / 2, width: GW_W, height: GW_H,
+        label: generatorNames.sharedPlatformGateway(regionTok, instance.platform.key, 'sgw'), parentId: instance.vcnId,
+        x: GW_X, y: Math.min(lastAnchor - GW_H / 2, instance.vcnH - GW_H - 2), width: GW_W, height: GW_H,
       });
-      edges.push({ id: `e-shared-plat-sgw-${instance.index}`, source: `shared-plat-sgw-${instance.index}`, target: instance.vcnId, sourceSide: 'right', targetSide: 'left' });
       if (model.network.hubKind === 'hub_e' && instance.platform.type !== 'ocvs') {
         nodes.push({
           id: `shared-plat-natgw-${instance.index}`, kind: 'gateway', icon: 'natgw',
-          label: generatorNames.sharedPlatformGateway(regionTok, instance.platform.key, 'ngw'), parentId: 'cmp-network',
-          x: GW_X, y: anchor - GW_H * 1.5 - 8, width: GW_W, height: GW_H,
+          label: generatorNames.sharedPlatformGateway(regionTok, instance.platform.key, 'ngw'), parentId: instance.vcnId,
+          x: GW_X, y: Math.max(VCN_TITLE + 2, firstAnchor - GW_H / 2), width: GW_W, height: GW_H,
         });
-        edges.push({ id: `e-shared-plat-natgw-${instance.index}`, source: `shared-plat-natgw-${instance.index}`, target: instance.vcnId, sourceSide: 'right', targetSide: 'left' });
       }
       sharedY += instance.vcnH + PLAT_VCN_GAP;
     });
     const clusterTop = TITLE + PAD + hubVcnH + sharedNetworkH + HUB_ATTACH_GAP;
     const groupW = DRG_W + ATTACH_DRG_GAP + ATTACH_W;
-    const groupLeft = GW_STRIP + (VCN_W - groupW) / 2; // centred under the hub VCN
+    const groupLeft = PAD + (VCN_W - groupW) / 2; // centred under the hub VCN
     const drgX = groupLeft;
     const stackX = groupLeft + DRG_W + ATTACH_DRG_GAP;
     const stackTop = clusterTop + (clusterH - stackH) / 2;
@@ -548,48 +545,47 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     envY = compTop + env.compH + COMP_GAP;
     if (!showSpokes) return;
     nodes.push({ id: `${env.id}-network`, kind: 'compartment', tone: 'yellow', container: true, label: env.netLabel, parentId: env.id, x: PAD, y: TITLE + PAD, width: NET_COMP_W, height: env.netH });
-    const placed = pushVcn(nodes, `${env.id}-vcn`, `${env.id}-network`, env.vcnLabel, env.subnets, GW_STRIP);
+    const placed = pushVcn(nodes, `${env.id}-vcn`, `${env.id}-network`, env.vcnLabel, env.subnets);
     let platformY = TITLE + PAD + env.vcnH + PLAT_VCN_GAP;
     env.platformInstances.forEach((pl, k) => {
       const platformVcnId = `${env.id}-plat-${k}`;
-      const platformPlaced = pushVcn(nodes, platformVcnId, `${env.id}-network`, pl.vcnLabel, pl.subnetSpecs, GW_STRIP, platformY);
-      const platformAnchor = platformPlaced[0]
-        ? platformY + platformPlaced[0].y + platformPlaced[0].height / 2
-        : platformY + VCN_TITLE + PAD;
+      const platformPlaced = pushVcn(nodes, platformVcnId, `${env.id}-network`, pl.vcnLabel, pl.subnetSpecs, PAD, platformY);
+      const platformFirstAnchor = platformPlaced[0]
+        ? platformPlaced[0].y + platformPlaced[0].height / 2
+        : VCN_TITLE + PAD;
+      const platformLast = platformPlaced[platformPlaced.length - 1];
+      const platformLastAnchor = platformLast
+        ? platformLast.y + platformLast.height / 2
+        : platformFirstAnchor;
       nodes.push({
         id: `${platformVcnId}-sgw`, kind: 'gateway', icon: 'sgw',
         label: generatorNames.environmentPlatformGateway(regionTok, env.name, pl.name, 'sgw'),
-        parentId: `${env.id}-network`, x: GW_X,
-        y: platformAnchor - GW_H / 2, width: GW_W, height: GW_H,
+        parentId: platformVcnId, x: GW_X,
+        y: Math.min(platformLastAnchor - GW_H / 2, pl.vcnH - GW_H - 2), width: GW_W, height: GW_H,
       });
-      edges.push({ id: `e-${platformVcnId}-sgw`, source: `${platformVcnId}-sgw`, target: platformVcnId, sourceSide: 'right', targetSide: 'left' });
       if (model.network.hubKind === 'hub_e' && pl.type !== 'ocvs') {
         nodes.push({
           id: `${platformVcnId}-natgw`, kind: 'gateway', icon: 'natgw',
           label: generatorNames.environmentPlatformGateway(regionTok, env.name, pl.name, 'ngw'),
-          parentId: `${env.id}-network`, x: GW_X,
-          y: platformAnchor - GW_H * 1.5 - 8, width: GW_W, height: GW_H,
+          parentId: platformVcnId, x: GW_X,
+          y: Math.max(VCN_TITLE + 2, platformFirstAnchor - GW_H / 2), width: GW_W, height: GW_H,
         });
-        edges.push({ id: `e-${platformVcnId}-natgw`, source: `${platformVcnId}-natgw`, target: platformVcnId, sourceSide: 'right', targetSide: 'left' });
       }
       platformY += pl.vcnH + PLAT_VCN_GAP;
     });
     // Service Gateway sits in the VCN's gateway rail, level with the last subnet.
-    const vcnTop = TITLE + PAD;
     const anchor = placed.length > 0
-      ? vcnTop + placed[placed.length - 1].y + placed[placed.length - 1].height / 2
-      : vcnTop + env.vcnH * 0.7;
-    const sgwY = Math.max(TITLE + 2, Math.min(anchor - GW_H / 2, env.netH - GW_H - 2));
-    nodes.push({ id: `${env.id}-sgw`, kind: 'gateway', icon: 'sgw', label: env.sgwName, parentId: `${env.id}-network`, x: GW_X, y: sgwY, width: GW_W, height: GW_H });
-    edges.push({ id: `e-${env.id}-sgw`, source: `${env.id}-sgw`, target: `${env.id}-vcn`, sourceSide: 'right', targetSide: 'left' });
+      ? placed[placed.length - 1].y + placed[placed.length - 1].height / 2
+      : env.vcnH * 0.7;
+    const sgwY = Math.max(VCN_TITLE + 2, Math.min(anchor - GW_H / 2, env.vcnH - GW_H - 2));
+    nodes.push({ id: `${env.id}-sgw`, kind: 'gateway', icon: 'sgw', label: env.sgwName, parentId: `${env.id}-vcn`, x: GW_X, y: sgwY, width: GW_W, height: GW_H });
     // Hub E gives every spoke its own NAT gateway, so internet egress stays
     // local rather than being hair-pinned through a hub firewall.
     if (model.network.hubKind === 'hub_e') {
       nodes.push({
-        id: `${env.id}-natgw`, kind: 'gateway', icon: 'natgw', label: generatorNames.environmentGateway(regionTok, env.name, 'ngw'), parentId: `${env.id}-network`,
-        x: GW_X, y: Math.max(TITLE + 2, sgwY - GW_H - 8), width: GW_W, height: GW_H,
+        id: `${env.id}-natgw`, kind: 'gateway', icon: 'natgw', label: generatorNames.environmentGateway(regionTok, env.name, 'ngw'), parentId: `${env.id}-vcn`,
+        x: GW_X, y: Math.max(VCN_TITLE + 2, (placed[0]?.y ?? VCN_TITLE) - 12), width: GW_W, height: GW_H,
       });
-      edges.push({ id: `e-${env.id}-natgw`, source: `${env.id}-natgw`, target: `${env.id}-vcn`, sourceSide: 'right', targetSide: 'left' });
     }
 
     // projects compartment (gray) to the right of the network compartment, with

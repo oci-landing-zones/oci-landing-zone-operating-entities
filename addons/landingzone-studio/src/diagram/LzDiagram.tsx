@@ -606,7 +606,7 @@ const layerBtn: React.CSSProperties = {
   background: oracle.surface, border: `1px solid ${oracle.border}`, borderRadius: 7,
   boxShadow: '0 1px 4px rgba(32,31,28,0.12)', cursor: 'pointer',
 };
-const layerBtnActive: React.CSSProperties = { background: oracle.red, borderColor: oracle.redDark, color: '#fff' };
+const layerBtnActive: React.CSSProperties = { background: oracle.red, border: `1px solid ${oracle.redDark}`, color: '#fff' };
 
 /** Unified zoom/navigation bar: +  −  [live %] | presets | fit  reset. */
 function ZoomBar() {

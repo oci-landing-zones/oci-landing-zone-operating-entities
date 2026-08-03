@@ -62,7 +62,7 @@ const styles = {
   hopWarn: { padding: '3px 0 3px 8px', fontSize: 10.5, fontWeight: 700, color: oracle.red } as React.CSSProperties,
   stepBar: { display: 'flex', alignItems: 'center', gap: 4, margin: '4px 0 2px 26px' } as React.CSSProperties,
   stepBtn: { minWidth: 26, padding: '3px 6px', fontSize: 11, fontWeight: 800, color: oracle.text, background: oracle.surface, border: `1px solid ${oracle.border}`, borderRadius: 5, cursor: 'pointer', lineHeight: 1 } as React.CSSProperties,
-  stepBtnOn: { background: oracle.red, borderColor: oracle.redDark, color: '#fff' } as React.CSSProperties,
+  stepBtnOn: { background: oracle.red, border: `1px solid ${oracle.redDark}`, color: '#fff' } as React.CSSProperties,
   stepInfo: { fontSize: 10.5, fontWeight: 700, color: oracle.textMuted, marginLeft: 4 } as React.CSSProperties,
   chipsRow: { display: 'flex', flexWrap: 'wrap', gap: 5, margin: '1px 0 7px 30px' } as React.CSSProperties,
   chip: { padding: '2px 9px', fontSize: 10.5, fontWeight: 700, borderRadius: 11, cursor: 'pointer', border: `1px solid ${oracle.border}`, lineHeight: 1.35, userSelect: 'none' } as React.CSSProperties,
@@ -194,7 +194,7 @@ export default function FlowSidebar({
                                 role="button"
                                 title={on ? `Deselect ${r}` : `Trace ${r}`}
                                 onClick={() => toggleRole(allId, rid, roleIds)}
-                                style={{ ...styles.chip, ...(on ? { background: color, color: '#fff', borderColor: color } : styles.chipOff) }}
+                                style={{ ...styles.chip, ...(on ? { background: color, color: '#fff', border: `1px solid ${color}` } : styles.chipOff) }}
                               >
                                 {r}
                               </span>

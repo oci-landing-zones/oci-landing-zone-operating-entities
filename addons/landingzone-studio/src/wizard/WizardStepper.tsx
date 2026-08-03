@@ -39,7 +39,7 @@ const css = {
 
 function stepStyle(active: boolean): React.CSSProperties {
   if (active) {
-    return { ...css.step, background: oracle.red, borderColor: oracle.redDark, color: '#fff' };
+    return { ...css.step, background: oracle.red, border: `1px solid ${oracle.redDark}`, color: '#fff' };
   }
   return css.step;
 }

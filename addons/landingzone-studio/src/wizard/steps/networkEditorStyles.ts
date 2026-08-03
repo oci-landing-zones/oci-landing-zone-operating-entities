@@ -46,10 +46,10 @@ export const s: Record<string, CSSProperties> = {
   addGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 12, alignItems: 'start' },
   addLabel:{ display: 'block', fontSize: 12, color: oracle.textMuted, fontWeight: 700, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.3 },
   addBtn:  { padding: '9px 18px', fontSize: 14, border: `1px solid ${oracle.redDark}`, borderRadius: 4, background: oracle.red, color: '#fff', cursor: 'pointer', fontWeight: 700, marginTop: 24 },
-  addBtnDisabled: { background: oracle.borderStrong, borderColor: oracle.borderStrong, cursor: 'not-allowed' },
+  addBtnDisabled: { background: oracle.borderStrong, border: `1px solid ${oracle.borderStrong}`, cursor: 'not-allowed' },
   select:  { width: '100%', boxSizing: 'border-box', padding: '8px 10px', border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, fontSize: 14, background: oracle.surface, color: oracle.text, fontFamily: FONT },
 
-  errInput: { borderColor: '#b3261e', background: '#fff8f7' },
+  errInput: { border: '1px solid #b3261e', background: '#fff8f7' },
   errText:  { marginTop: 4, fontSize: 11.5, color: '#b3261e', fontWeight: 600 },
 
   envHead:  { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, width: '100%', padding: '14px 20px', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: FONT, textAlign: 'left' },

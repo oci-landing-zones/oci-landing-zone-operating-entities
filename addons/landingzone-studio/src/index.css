@@ -313,6 +313,8 @@ a:focus:not(:focus-visible) {
 
   .network-vcn-settings,
   .oke-settings-grid,
+  .oke-fields-grid,
+  .oke-feature-grid,
   .deployment-links {
     grid-template-columns: 1fr !important;
   }
