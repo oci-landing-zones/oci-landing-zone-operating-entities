@@ -153,7 +153,10 @@ function(ctx) {
         name: n.display_global('pcy', ctx.display_segments + ['service', 'storage']),
         description: desc.policy.grants(
           'OKE clusters',
-          'persistent volume, backup, and file storage permissions',
+          if ctx.create_fss then
+            'persistent volume, backup, and file storage permissions'
+          else
+            'persistent volume and backup permissions',
           'the %s environment OKE platform compartment' % ctx.env_long_title
         ),
         compartment_id: ctx.cmp_key,
@@ -167,11 +170,12 @@ function(ctx) {
             cmp_name,
             std.join(', ', cluster_compartment_source_conditions),
           ],
+        ] + (if ctx.create_fss then [
           "allow any-user to manage file-family in compartment %s where all { %s }" % [
             cmp_name,
             std.join(', ', cluster_compartment_source_conditions),
           ],
-        ],
+        ] else []),
       },
 
     },
