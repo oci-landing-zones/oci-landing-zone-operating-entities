@@ -9,7 +9,7 @@
  * OCI routing semantics encoded in the walk:
  *   - A spoke subnet's table (rt-ssn-*) routes egress; default → DRG, OSN → SGW.
  *   - Leaving a VCN toward the DRG, the packet enters via that VCN's attachment
- *     and the DRG attachment table (rt-drg-<env>/rt-drg-hub) decides the next hop.
+ *     and the shared DRG table (rt-drg-spokes/rt-drg-hub) decides the next hop.
  *   - Entering the hub VCN FROM the DRG, the hub attachment's ingress table
  *     (rt-hub-ingress) decides the next hop — typically the internal firewall.
  *     This table is consulted ONLY on ingress-to-VCN, never on the way back out.
@@ -64,7 +64,7 @@ export interface FlowTrace {
 /** Distinct per-flow colours, assigned in activation order. */
 export const FLOW_COLORS = ['#2196F3', '#FF9800', '#4CAF50', '#E91E63', '#9C27B0', '#00BCD4', '#8BC34A', '#FF5722'] as const;
 
-const fwIp = (stored: string | undefined, cidr: string) => (stored || '').trim() || hostIpInSubnet(cidr);
+const fwIp = (cidr: string) => hostIpInSubnet(cidr, 10);
 const host32 = (cidr: string) => `${hostIpInSubnet(cidr, 10)}/32`;
 
 /** Topology index derived from the model + generated route tables. */
@@ -73,20 +73,24 @@ function buildTopo(model: LzModel) {
   const tableById = new Map(tables.map((t) => [t.id, t]));
 
   const hubSub = (suffix: string) => {
-    const i = model.network.subnets.findIndex((sn) => sn.name.endsWith(suffix));
+    const key = suffix.replace(/^-/, '');
+    const i = model.network.subnets.findIndex((sn) => sn.name === key || sn.name.endsWith(suffix));
     return i >= 0 ? { node: `hub-vcn-sn-${i}`, cidr: model.network.subnets[i].cidr } : null;
   };
   const fwInt = hubSub('-fw-int');
   const fwDmz = hubSub('-fw-dmz');
+  const fwHub = hubSub('-fw');
+  const trust = hubSub('-trust');
+  const untrust = hubSub('-untrust');
   const lb = hubSub('-lb');
-  const intIp = fwInt ? fwIp(model.network.fwIntIp, fwInt.cidr) : '';
-  const dmzIp = fwDmz ? fwIp(model.network.fwDmzIp, fwDmz.cidr) : '';
+  const intIp = fwInt ? fwIp(fwInt.cidr) : '';
+  const dmzIp = fwDmz ? fwIp(fwDmz.cidr) : '';
 
   const envs = model.environments.map((e, i) => ({
     idx: i,
     name: e.name.trim() || `env${i + 1}`,
     attach: `attach-cmp-env-${i}`,
-    drgTable: `rt-drg-${e.name.trim() || `env${i + 1}`}`,
+    drgTable: 'rt-drg-spokes',
     subnets: e.network.subnets.map((sn, j) => ({ cidr: sn.cidr, node: `cmp-env-${i}-vcn-sn-${j}`, role: sn.name.split('-').pop() || `sn${j}` })),
     sgw: `cmp-env-${i}-sgw`,
   }));
@@ -95,6 +99,7 @@ function buildTopo(model: LzModel) {
   const fwByIp = (ip: string): { node: string; table: string } | null => {
     if (fwInt && ip === intIp) return { node: fwInt.node, table: 'rt-hub-internal' };
     if (fwDmz && ip === dmzIp) return { node: fwDmz.node, table: 'rt-hub-dmz' };
+    if (fwHub && ip === hostIpInSubnet(fwHub.cidr, 10)) return { node: fwHub.node, table: 'rt-hub-fw' };
     return null;
   };
 
@@ -107,11 +112,16 @@ function buildTopo(model: LzModel) {
     if (id === 'attach-hub') return 'Hub attach';
     if (fwInt && id === fwInt.node) return 'INT FW';
     if (fwDmz && id === fwDmz.node) return 'DMZ FW';
+    if (fwHub && id === fwHub.node) return 'NFW';
+    if (trust && id === trust.node) return 'Trust NLB + firewall';
+    if (untrust && id === untrust.node) return 'Untrust NLB + firewall';
     if (lb && id === lb.node) return 'LB';
     const at = id.match(/^attach-cmp-env-(\d+)$/);
     if (at) return `${envs[+at[1]]?.name ?? at[1]} attach`;
     const sg = id.match(/^cmp-env-(\d+)-sgw$/);
     if (sg) return `${envs[+sg[1]]?.name ?? sg[1]} SGW`;
+    const ng = id.match(/^cmp-env-(\d+)-natgw$/);
+    if (ng) return `${envs[+ng[1]]?.name ?? ng[1]} NAT GW`;
     const sub = id.match(/^cmp-env-(\d+)-vcn-sn-(\d+)$/);
     if (sub) return `VM ${envs[+sub[1]]?.subnets[+sub[2]]?.role ?? ''}`.trim();
     const hub = id.match(/^hub-vcn-sn-(\d+)$/);
@@ -119,7 +129,7 @@ function buildTopo(model: LzModel) {
     return id;
   };
 
-  return { tableById, fwInt, fwDmz, lb, intIp, dmzIp, envs, fwByIp, human };
+  return { tableById, fwInt, fwDmz, fwHub, trust, untrust, lb, intIp, dmzIp, envs, fwByIp, human };
 }
 type Topo = ReturnType<typeof buildTopo>;
 
@@ -164,7 +174,7 @@ function highlight(acc: Acc, tableId: string, row: number) {
 function walk(
   topo: Topo,
   acc: Acc,
-  start: { table: string; dest: string; zone: number | 'hub' },
+  start: { table: string; dest: string; zone: number | 'hub'; node?: string },
   dstNode: string | null,
 ) {
   let tableId = start.table;
@@ -177,10 +187,11 @@ function walk(
     const m = matchRule(table.rules, dest);
     if (!m) { acc.ok = false; return; }
     highlight(acc, tableId, m.i);
-    const inspected = tableId === 'rt-hub-internal' || tableId === 'rt-hub-dmz';
+    const inspected = tableId === 'rt-hub-internal' || tableId === 'rt-hub-dmz' || tableId === 'rt-hub-fw';
+    const governingNode = guard === 0 && start.node ? start.node : table.attachTo;
     acc.hops.push({
-      seq: acc.hops.length + 1, node: table.attachTo, tableId, rowIndex: m.i, inspected,
-      label: `${topo.human(table.attachTo)}: ${m.rule.destination} → ${m.rule.target}${inspected ? ' (inspect)' : ''}`,
+      seq: acc.hops.length + 1, node: governingNode, tableId, rowIndex: m.i, inspected,
+      label: `${topo.human(governingNode)}: ${m.rule.destination} → ${m.rule.target}${inspected ? ' (inspect)' : ''}`,
     });
 
     const rule = m.rule;
@@ -201,7 +212,6 @@ function walk(
         } else {
           // Delivered into a spoke VCN → local delivery to the destination VM.
           const e = target.match(/^attach-cmp-env-(\d+)$/);
-          zone = e ? +e[1] : zone;
           const deliver = dstNode ?? (e ? `cmp-env-${e[1]}-vcn-sn-0` : '');
           if (deliver) {
             pushVisual(acc, deliver);
@@ -218,6 +228,32 @@ function walk(
         tableId = fw.table;
         zone = 'hub';
         break;
+      }
+      case 'nlb': {
+        const target = rule.flowTarget ?? '';
+        if (!target) { acc.ok = false; return; }
+        pushVisual(acc, target);
+        // A Trust NLB routes a firewall-returned spoke destination via the DRG.
+        // Internet egress crosses the Untrust NLB before the IGW. The third-party
+        // backend OCIDs themselves stay in generator-owned network_backends.json.
+        if (target === topo.trust?.node) {
+          if (dest === '0.0.0.0/0') {
+            if (!topo.untrust) { acc.ok = false; return; }
+            pushVisual(acc, topo.untrust.node);
+            tableId = 'rt-hub-untrust';
+          } else {
+            tableId = 'rt-hub-trust';
+          }
+          zone = 'hub';
+          break;
+        }
+        if (target === topo.untrust?.node) {
+          tableId = 'rt-hub-untrust';
+          zone = 'hub';
+          break;
+        }
+        acc.ok = false;
+        return;
       }
       case 'natgw':
       case 'igw': {
@@ -259,6 +295,56 @@ export function traceFlow(model: LzModel, spec: FlowSpec): FlowTrace {
     : `${srcTag} → ${dstTag}`;
 
   if (spec.kind === 'ingress') {
+    if (model.network.hubKind === 'hub_c') {
+      // Hub C receives public traffic through the Untrust NLB/firewall pair,
+      // then locally delivers it to the public L7 load balancer.
+      const backend = dstSub ?? srcSub;
+      const dstNode = backend?.node ?? null;
+      if (topo.lb && topo.untrust && backend) {
+        pushVisual(acc, 'gw-igw');
+        const igw = topo.tableById.get('rt-hub-igw');
+        const match = igw ? matchRule(igw.rules, host32(topo.lb.cidr)) : null;
+        if (!match) { acc.ok = false; return finish(spec, acc, label); }
+        highlight(acc, 'rt-hub-igw', match.i);
+        acc.hops.push({ seq: 1, node: 'gw-igw', tableId: 'rt-hub-igw', rowIndex: match.i, label: `IGW: ${match.rule.destination} → ${match.rule.target}` });
+        pushVisual(acc, topo.untrust.node);
+        acc.hops.push({ seq: 2, node: topo.untrust.node, inspected: true, label: 'Untrust NLB + firewall: inspect ingress → LB (local)' });
+        pushVisual(acc, topo.lb.node);
+        walk(topo, acc, { table: 'rt-hub-lb', dest: host32(backend.cidr), zone: 'hub' }, dstNode);
+      } else {
+        acc.ok = false;
+      }
+      return finish(spec, acc, label);
+    }
+    if (model.network.hubKind === 'hub_b') {
+      // Hub B's public LB is directly IGW-routed; the final LB route table then
+      // steers the backend path through its single OCI Network Firewall.
+      const backend = dstSub ?? srcSub;
+      const dstNode = backend?.node ?? null;
+      if (topo.lb && backend) {
+        pushVisual(acc, 'gw-igw');
+        acc.hops.push({ seq: 1, node: 'gw-igw', label: 'IGW → public LB' });
+        pushVisual(acc, topo.lb.node);
+        walk(topo, acc, { table: 'rt-hub-lb', dest: host32(backend.cidr), zone: 'hub' }, dstNode);
+      } else {
+        acc.ok = false;
+      }
+      return finish(spec, acc, label);
+    }
+    if (model.network.hubKind === 'hub_e') {
+      // Hub E has no DMZ firewall: the public LB forwards directly to the DRG.
+      const backend = dstSub ?? srcSub;
+      const dstNode = backend?.node ?? null;
+      if (topo.lb && backend) {
+        pushVisual(acc, 'gw-igw');
+        acc.hops.push({ seq: 1, node: 'gw-igw', label: 'IGW → public LB' });
+        pushVisual(acc, topo.lb.node);
+        walk(topo, acc, { table: 'rt-hub-lb', dest: host32(backend.cidr), zone: 'hub' }, dstNode);
+      } else {
+        acc.ok = false;
+      }
+      return finish(spec, acc, label);
+    }
     // Internet → IGW → DMZ FW → LB → (DNAT) → INT FW → DRG → spoke VM.
     const backend = dstSub ?? srcSub;
     const dstNode = backend?.node ?? null;
@@ -289,13 +375,13 @@ export function traceFlow(model: LzModel, spec: FlowSpec): FlowTrace {
   pushVisual(acc, srcSub.node);
 
   if (spec.kind === 'services') {
-    walk(topo, acc, { table: `rt-ssn-${spec.srcEnv}-${spec.srcSubnet ?? 0}`, dest: 'OSN', zone: spec.srcEnv }, null);
+    walk(topo, acc, { table: `rt-ssn-${spec.srcEnv}`, dest: 'OSN', zone: spec.srcEnv, node: srcSub.node }, null);
   } else if (spec.kind === 'egress') {
-    walk(topo, acc, { table: `rt-ssn-${spec.srcEnv}-${spec.srcSubnet ?? 0}`, dest: '0.0.0.0/0', zone: spec.srcEnv }, null);
+    walk(topo, acc, { table: `rt-ssn-${spec.srcEnv}`, dest: '0.0.0.0/0', zone: spec.srcEnv, node: srcSub.node }, null);
   } else {
     // east-west: destination is a host in the dest spoke subnet.
     if (!dstSub) return finish(spec, { ...acc, ok: false }, label);
-    walk(topo, acc, { table: `rt-ssn-${spec.srcEnv}-${spec.srcSubnet ?? 0}`, dest: host32(dstSub.cidr), zone: spec.srcEnv }, dstSub.node);
+    walk(topo, acc, { table: `rt-ssn-${spec.srcEnv}`, dest: host32(dstSub.cidr), zone: spec.srcEnv, node: srcSub.node }, dstSub.node);
   }
   return finish(spec, acc, label);
 }

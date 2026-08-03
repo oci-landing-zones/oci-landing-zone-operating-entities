@@ -128,3 +128,245 @@ button:focus:not(:focus-visible),
 a:focus:not(:focus-visible) {
   outline: none;
 }
+
+/* Landing Zone Studio responsive layout */
+.studio-stepper {
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.studio-workspace > * {
+  min-width: 0;
+}
+
+.platform-placement-table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.environment-network-list {
+  overflow: hidden;
+  border: 1px solid var(--oracle-border);
+  border-radius: 8px;
+}
+
+.environment-network-heading {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.environment-network-kicker {
+  color: var(--oracle-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.environment-network-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.environment-network-chevron {
+  flex: 0 0 auto;
+  color: var(--oracle-text);
+  font-size: 13px;
+}
+
+.environment-network-body {
+  padding: 0 18px 18px;
+}
+
+.environment-network-generated {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 14px;
+  padding: 12px 14px;
+  color: var(--oracle-text-muted);
+  background: var(--oracle-bg);
+  border: 1px solid var(--oracle-border);
+  font-size: 11px;
+}
+
+.environment-network-generated code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--oracle-text);
+  font-size: 11px;
+}
+
+.network-vcn-settings {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 1fr);
+  gap: 16px;
+  align-items: end;
+}
+
+.deployment-links-heading {
+  margin-top: 20px;
+  color: var(--oracle-text);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+}
+
+.deployment-links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 10px 12px;
+  color: #235a8c;
+  background: #fff;
+  border: 1px solid #b8c9d8;
+  border-radius: 4px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.deployment-links a:hover {
+  color: #163f66;
+  background: #f3f7fa;
+  border-color: #7d9bb3;
+}
+
+.wizard-footer-nav button {
+  min-width: 150px;
+}
+
+@media (min-width: 1101px) {
+  .studio-workspace--split {
+    grid-template-columns: minmax(380px, 0.82fr) minmax(620px, 1.18fr) !important;
+  }
+
+  .studio-workspace--split .studio-diagram-canvas {
+    height: 600px !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .studio-workspace--split {
+    grid-template-columns: 1fr !important;
+  }
+
+  .studio-diagram-canvas {
+    height: 560px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .studio-page {
+    padding: 14px 12px 40px !important;
+  }
+
+  .studio-topbar {
+    height: auto !important;
+    min-height: 52px;
+    padding: 8px 14px !important;
+    flex-wrap: wrap;
+  }
+
+  .studio-topbar-brand + span,
+  .studio-topbar-brand + span + span {
+    display: none !important;
+  }
+
+  .studio-topbar-center {
+    position: static !important;
+    order: 3;
+    width: 100%;
+    transform: none !important;
+    justify-content: center;
+  }
+
+  .studio-topbar-right {
+    margin-left: auto !important;
+  }
+
+  .studio-stepper > button {
+    min-width: 132px;
+  }
+
+  .foundation-two-col,
+  .foundation-add-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .foundation-environment-grid {
+    grid-template-columns: minmax(110px, 1fr) 82px 40px !important;
+    gap: 8px !important;
+  }
+
+  .network-subnet-grid {
+    grid-template-columns: minmax(92px, 1fr) minmax(110px, 1fr) 40px !important;
+    gap: 8px !important;
+  }
+
+  .network-add-subnet-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .network-vcn-settings,
+  .oke-settings-grid,
+  .deployment-links {
+    grid-template-columns: 1fr !important;
+  }
+
+  .environment-network-header {
+    align-items: flex-start !important;
+    padding: 12px 14px !important;
+  }
+
+  .environment-network-summary {
+    gap: 8px;
+  }
+
+  .environment-network-body {
+    padding: 0 12px 14px;
+  }
+
+  .environment-network-generated {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .wizard-footer-nav {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .wizard-footer-nav > span {
+    display: none;
+  }
+
+  .wizard-footer-nav button {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .wizard-footer-nav .wizard-prev-button {
+    grid-column: 1 !important;
+  }
+
+  .wizard-footer-nav .wizard-next-button {
+    grid-column: 2 !important;
+  }
+
+  .studio-diagram-canvas {
+    height: 500px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .studio-topbar-brand span:last-child {
+    display: none;
+  }
+
+  .studio-workspace {
+    gap: 14px !important;
+  }
+}

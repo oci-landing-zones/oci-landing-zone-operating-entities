@@ -4,8 +4,8 @@
  * Sources (verified 2026-06):
  *   - https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm
  *   - https://docs.oracle.com/en-us/iaas/Content/General/Concepts/identifiers.htm
- * Government/sovereign realms (oc2/oc3/oc4) carry their publicly documented
- * regions; commercial (oc1) and EU Sovereign (oc19) are the common cases.
+ * Keep this list aligned with gen/constants.libsonnet. The generator currently
+ * supports commercial (oc1) and EU Sovereign (oc19) only.
  */
 
 export interface Region {
@@ -20,11 +20,14 @@ export interface Realm {
 
 export const REALM_OPTIONS: Realm[] = [
   { id: 'oc1', label: 'OC1 — Commercial' },
-  { id: 'oc2', label: 'OC2 — US Government' },
-  { id: 'oc3', label: 'OC3 — US Federal (DoD)' },
-  { id: 'oc4', label: 'OC4 — UK Government' },
   { id: 'oc19', label: 'OC19 — EU Sovereign' },
 ];
+
+const SUPPORTED_REALMS = new Set(REALM_OPTIONS.map(({ id }) => id));
+
+export function isSupportedRealm(realm: string): boolean {
+  return SUPPORTED_REALMS.has(realm);
+}
 
 export const REGIONS_BY_REALM: Record<string, Region[]> = {
   oc1: [
@@ -74,19 +77,6 @@ export const REGIONS_BY_REALM: Record<string, Region[]> = {
     { id: 'us-phoenix-1', shortName: 'phx' },
     { id: 'us-saltlake-2', shortName: 'aga' },
     { id: 'us-sanjose-1', shortName: 'sjc' },
-  ],
-  oc2: [
-    { id: 'us-langley-1', shortName: 'lfi' },
-    { id: 'us-luke-1', shortName: 'luf' },
-  ],
-  oc3: [
-    { id: 'us-gov-ashburn-1', shortName: 'ric' },
-    { id: 'us-gov-chicago-1', shortName: 'pia' },
-    { id: 'us-gov-phoenix-1', shortName: 'tus' },
-  ],
-  oc4: [
-    { id: 'uk-gov-london-1', shortName: 'ltn' },
-    { id: 'uk-gov-cardiff-1', shortName: 'brs' },
   ],
   oc19: [
     { id: 'eu-frankfurt-2', shortName: 'str' },

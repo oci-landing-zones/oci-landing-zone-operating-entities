@@ -4,7 +4,7 @@
  *      environments. Add via a name + "Apply to" dropdown; Edit opens inline
  *      environment checkboxes so a project can target any subset.
  *   2. The spoke (project) network inside each environment compartment — one
- *      collapsible panel per environment, reusing the hub's VCN + routing editors.
+ *      collapsible panel per environment, reusing the hub's VCN editor.
  *
  * Everything writes into the canonical model (model.projects + each
  * Environment.network); the diagram and JSON derive from it.
@@ -12,11 +12,12 @@
 
 import { useState, type CSSProperties } from 'react';
 import { useWizard } from '../wizardContext';
-import { envNetworkDefaults, envRoutingDefaults } from '../../model/defaults';
+import { createModelId, envNetworkDefaults } from '../../model/defaults';
 import { oracle } from '../../theme';
-import { getHubKind, resolveHubName } from '../../services/hubKinds';
-import type { EnvNetworkConfig, ProjectConfig, VcnRouting } from '../../model/types';
-import { VcnEditor, RoutingEditor } from './HubNetworkStep';
+import { getHubKind } from '../../services/hubKinds';
+import type { Environment, EnvNetworkConfig, ProjectConfig } from '../../model/types';
+import { VcnEditor } from './HubNetworkStep';
+import { generatorNames } from '../../services/generatorNaming';
 import { s } from './networkEditorStyles';
 import DeleteButton from '../../components/DeleteButton';
 import EditButton from '../../components/EditButton';
@@ -39,7 +40,7 @@ const local: Record<string, CSSProperties> = {
 };
 
 /** Environments badge for a project: a yellow "All", a "none", or one pill per env. */
-function EnvBadge({ environments }: { environments: 'all' | string[] }) {
+function EnvBadge({ environments, envs }: { environments: 'all' | string[]; envs: Pick<Environment, 'id' | 'name'>[] }) {
   // The outer span is the grid cell (it may stretch); the pills inside size to content.
   return (
     <span style={local.pillWrap}>
@@ -47,25 +48,25 @@ function EnvBadge({ environments }: { environments: 'all' | string[] }) {
         ? <span style={local.allBadge}>All</span>
         : environments.length === 0
           ? <span style={{ ...local.envPill, color: '#b3261e' }}>none</span>
-          : environments.map((e) => <span key={e} style={local.envPill}>{e}</span>)}
+          : environments.map((id) => <span key={id} style={local.envPill}>{envs.find((env) => env.id === id)?.name || 'removed'}</span>)}
     </span>
   );
 }
 
-/** Next free "project-N" name — counts past the highest existing project number. */
+/** Next free "projN" key — mirrors the generator default and stays DNS-safe. */
 function nextProjectName(projects: ProjectConfig[]): string {
   let max = 0;
   for (const p of projects) {
-    const m = p.name.trim().match(/^project-?(\d+)$/i);
+    const m = p.name.trim().match(/^proj(?:ect-?)?(\d+)$/i);
     if (m) max = Math.max(max, parseInt(m[1], 10));
   }
-  return `project-${max + 1}`;
+  return `proj${max + 1}`;
 }
 
 /** Projects table + add form + inline subset editor. */
-function ProjectsPanel({ projects, envNames, onChange }: {
+function ProjectsPanel({ projects, envs, onChange }: {
   projects: ProjectConfig[];
-  envNames: string[];
+  envs: Pick<Environment, 'id' | 'name'>[];
   onChange: (next: ProjectConfig[]) => void;
 }) {
   const [newName, setNewName] = useState('');
@@ -76,7 +77,7 @@ function ProjectsPanel({ projects, envNames, onChange }: {
 
   const nameTaken = (name: string, ignore = -1) =>
     projects.some((p, i) => i !== ignore && p.name.trim().toLowerCase() === name.toLowerCase());
-  // Blank field → use the next free "project-N" suggestion (also the placeholder).
+  // Blank field → use the next free generator-aligned key (also the placeholder).
   const suggestedName = nextProjectName(projects);
   const effectiveName = newName.trim() || suggestedName;
   const addError = nameTaken(effectiveName)
@@ -86,7 +87,7 @@ function ProjectsPanel({ projects, envNames, onChange }: {
 
   function add() {
     if (addError) return;
-    onChange([...projects, { name: effectiveName, environments: newEnvs }]);
+    onChange([...projects, { id: createModelId('project'), name: effectiveName, environments: newEnvs }]);
     setNewName('');
     setNewEnvs('all');
   }
@@ -101,7 +102,7 @@ function ProjectsPanel({ projects, envNames, onChange }: {
   }
   function saveEdit() {
     if (editIdx === null) return;
-    onChange(projects.map((p, idx) => idx === editIdx ? { name: editName.trim() || 'project', environments: editEnvs } : p));
+    onChange(projects.map((p, idx) => idx === editIdx ? { ...p, name: editName.trim() || 'project', environments: editEnvs } : p));
     setEditIdx(null);
   }
   function toggleEnv(env: string) {
@@ -121,16 +122,16 @@ function ProjectsPanel({ projects, envNames, onChange }: {
         </div>
         {projects.length === 0 && <div style={s.empty}>No projects yet — add one below.</div>}
         {projects.map((p, i) => (
-          <div key={i} style={{ ...s.row, ...local.projGrid }}>
+          <div key={p.id} style={{ ...s.row, ...local.projGrid }}>
             {editIdx === i ? (
               <>
                 <input aria-label="Project name" style={s.rowInput} value={editName} onChange={(e) => setEditName(e.target.value)} />
                 <div style={local.pillWrap}>
                   <button type="button" style={editEnvs === 'all' ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => setEditEnvs('all')}>All</button>
-                  {envNames.map((n) => {
-                    const active = editEnvs !== 'all' && editEnvs.includes(n);
+                  {envs.map((env) => {
+                    const active = editEnvs !== 'all' && editEnvs.includes(env.id);
                     return (
-                      <button key={n} type="button" style={active ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => toggleEnv(n)}>{n}</button>
+                      <button key={env.id} type="button" style={active ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => toggleEnv(env.id)}>{env.name}</button>
                     );
                   })}
                 </div>
@@ -142,7 +143,7 @@ function ProjectsPanel({ projects, envNames, onChange }: {
             ) : (
               <>
                 <span style={local.projName}>{p.name}</span>
-                <EnvBadge environments={p.environments} />
+                <EnvBadge environments={p.environments} envs={envs} />
                 <div style={local.rowActions}>
                   <EditButton label={`Edit project ${p.name}`} onClick={() => startEdit(i)} />
                   <DeleteButton label={`Delete project ${p.name}`} onClick={() => del(i)} />
@@ -181,10 +182,10 @@ function ProjectsPanel({ projects, envNames, onChange }: {
               <label style={s.addLabel}>Apply to</label>
               <div style={{ ...local.pillWrap, marginTop: 2 }} role="group" aria-label="Apply project to environments">
                 <button type="button" style={newEnvs === 'all' ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => setNewEnvs('all')}>All</button>
-                {envNames.map((n) => {
-                  const active = newEnvs !== 'all' && newEnvs.includes(n);
+                {envs.map((env) => {
+                  const active = newEnvs !== 'all' && newEnvs.includes(env.id);
                   return (
-                    <button key={n} type="button" style={active ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => toggleNewEnv(n)}>{n}</button>
+                    <button key={env.id} type="button" style={active ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => toggleNewEnv(env.id)}>{env.name}</button>
                   );
                 })}
               </div>
@@ -200,16 +201,13 @@ function ProjectsPanel({ projects, envNames, onChange }: {
 export default function EnvNetworkStep() {
   const { model, setField } = useWizard();
   const kind = getHubKind(model.network.hubKind);
-  // <region> / <lze> tokens resolve live from Step 1 / Step 2.
-  const tokens = { region: model.foundation.regionShortName, lze: model.presentation.landingZone };
-  const lzName = model.presentation.landingZone.trim().replace(/^cmp-/, '') || 'landingzone';
-  const envNames = model.environments.map((e) => e.name.trim()).filter(Boolean);
+  const region = model.foundation.regionShortName;
+  const envs = model.environments.map((env, index) => ({ id: env.id, name: env.name.trim() || `env${index + 1}` }));
   const [envOpen, setEnvOpen] = useState<Record<number, boolean>>({}); // collapsed by default
 
-  /** Stale in-memory records may predate Environment.network / .routing — always fall back to defaults. */
+  /** Stale in-memory records may predate Environment.network — always fall back to defaults. */
   function envNetwork(i: number): EnvNetworkConfig {
-    const net = model.environments[i].network ?? envNetworkDefaults(i);
-    return { ...net, routing: net.routing ?? envRoutingDefaults() };
+    return model.environments[i].network ?? envNetworkDefaults(i);
   }
   function patchEnvNetwork(i: number, patch: Partial<EnvNetworkConfig>) {
     const current = envNetwork(i);
@@ -217,10 +215,6 @@ export default function EnvNetworkStep() {
       ? { ...env, network: { ...current, ...patch } }
       : env));
   }
-  function patchEnvRouting(i: number, patch: Partial<VcnRouting>) {
-    patchEnvNetwork(i, { routing: { ...envNetwork(i).routing, ...patch } });
-  }
-
   // Spoke networks only make sense once an implemented hub kind is chosen in step 2.
   if (!kind?.implemented) {
     return (
@@ -238,7 +232,7 @@ export default function EnvNetworkStep() {
 
   return (
     <div style={s.col}>
-      <ProjectsPanel projects={model.projects} envNames={envNames} onChange={(next) => setField('projects', next)} />
+      <ProjectsPanel projects={model.projects} envs={envs} onChange={(next) => setField('projects', next)} />
 
       <section style={s.panel}>
         <div style={s.accent} />
@@ -249,46 +243,43 @@ export default function EnvNetworkStep() {
               No environments yet — add them in step 1, then their spoke networks appear here.
             </div>
           ) : (
-            <div style={{ border: `1px solid ${oracle.border}`, borderRadius: 8, overflow: 'hidden' }}>
+            <div className="environment-network-list">
               {model.environments.map((env, i) => {
                 const envName = env.name.trim() || `env${i + 1}`;
-                const envTokens = { ...tokens, env: envName };
                 const net = envNetwork(i);
                 const open = envOpen[i] ?? false;
                 return (
                   <div key={i} style={{ borderTop: i > 0 ? `1px solid ${oracle.border}` : undefined }}>
                     <button
                       type="button"
+                      className="environment-network-header"
                       style={s.envHead}
                       aria-expanded={open}
                       onClick={() => setEnvOpen((prev) => ({ ...prev, [i]: !open }))}
                     >
-                      <span style={s.envHeadTitle}>Environment network — {envName}</span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <span style={s.envHeadSub}>{resolveHubName('vcn-<region>-<env>-projects', envTokens)} · {net.vcnCidr}</span>
-                        <span style={{ fontSize: 13, color: oracle.ink }}>{open ? '▾' : '▸'}</span>
+                      <span className="environment-network-heading">
+                        <span style={s.envHeadTitle}>{envName}</span>
+                        <span className="environment-network-kicker">Environment network</span>
+                      </span>
+                      <span className="environment-network-summary">
+                        <span style={s.envHeadSub}>{net.vcnCidr}</span>
+                        <span className="environment-network-chevron" aria-hidden="true">{open ? '▾' : '▸'}</span>
                       </span>
                     </button>
                     {open && (
-                      <div style={{ padding: '0 20px 20px' }}>
-                        <div style={s.derivedNote}>
-                          {resolveHubName('vcn-<region>-<env>-projects', envTokens)} · inside cmp-{lzName}-{envName}-network
+                      <div className="environment-network-body">
+                        <div className="environment-network-generated">
+                          <span>Generated VCN</span>
+                          <code>{generatorNames.environmentVcn(region, envName)}</code>
+                          <span>Compartment</span>
+                          <code>{generatorNames.environmentChildCompartment(envName, 'network')}</code>
                         </div>
                         <VcnEditor
                           idPrefix={`env-${i}`}
-                          tokens={envTokens}
                           vcnCidr={net.vcnCidr}
                           subnets={net.subnets}
                           emptyNote="No subnets in this environment — add one below."
                           onApply={(patch) => patchEnvNetwork(i, patch)}
-                        />
-
-                        <RoutingEditor
-                          idPrefix={`env-${i}`}
-                          isHub={false}
-                          routing={net.routing}
-                          tokens={envTokens}
-                          onRouting={(patch) => patchEnvRouting(i, patch)}
                         />
                       </div>
                     )}

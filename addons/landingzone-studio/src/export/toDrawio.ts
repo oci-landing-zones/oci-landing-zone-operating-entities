@@ -61,14 +61,14 @@ function subnetIconCells(node: DiagramNode): string[] {
     const color = CAPTION_COLORS[node.captionTone ?? 'orange'];
     const captionY = node.ipNote ? node.height - 44 : node.height - 26;
     cells.push(
-      `        <mxCell id="${node.id}-caption" value="${escapeXml(node.caption)}" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;fontColor=${color};" vertex="1" parent="${node.id}">\n` +
+      `        <mxCell id="${node.id}-caption" value="${htmlTextAttribute(node.caption)}" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=12;fontColor=${color};" vertex="1" parent="${node.id}">\n` +
       `          <mxGeometry x="0" y="${captionY}" width="${node.width}" height="20" as="geometry" />\n` +
       `        </mxCell>`,
     );
   }
   if (node.ipNote) {
     cells.push(
-      `        <mxCell id="${node.id}-ip" value="${escapeXml(node.ipNote)}" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=11;fontColor=${oracle.cidrBlue};" vertex="1" parent="${node.id}">\n` +
+      `        <mxCell id="${node.id}-ip" value="${htmlTextAttribute(node.ipNote)}" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=11;fontColor=${oracle.cidrBlue};" vertex="1" parent="${node.id}">\n` +
       `          <mxGeometry x="0" y="${node.height - 24}" width="${node.width}" height="18" as="geometry" />\n` +
       `        </mxCell>`,
     );
@@ -81,7 +81,7 @@ function subnetEndpointCells(node: DiagramNode): string[] {
   if (!node.endpointName) return [];
   const iconX = Math.round((node.width - 30) / 2);
   const cells = [
-    `        <mxCell id="${node.id}-ep-name" value="${escapeXml(node.endpointName)}" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=11;fontColor=${oracle.ink};" vertex="1" parent="${node.id}">\n` +
+    `        <mxCell id="${node.id}-ep-name" value="${htmlTextAttribute(node.endpointName)}" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=11;fontColor=${oracle.ink};" vertex="1" parent="${node.id}">\n` +
     `          <mxGeometry x="0" y="38" width="${node.width}" height="16" as="geometry" />\n` +
     `        </mxCell>`,
     `        <mxCell id="${node.id}-ep-icon" value="" style="shape=image;imageAspect=0;aspect=fixed;noLabel=1;image=${VM_URI};" vertex="1" parent="${node.id}">\n` +
@@ -90,7 +90,7 @@ function subnetEndpointCells(node: DiagramNode): string[] {
   ];
   if (node.endpointIp) {
     cells.push(
-      `        <mxCell id="${node.id}-ep-ip" value="${escapeXml(node.endpointIp)}" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=10;fontColor=${oracle.cidrBlue};" vertex="1" parent="${node.id}">\n` +
+      `        <mxCell id="${node.id}-ep-ip" value="${htmlTextAttribute(node.endpointIp)}" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=10;fontColor=${oracle.cidrBlue};" vertex="1" parent="${node.id}">\n` +
       `          <mxGeometry x="0" y="${node.height - 22}" width="${node.width}" height="16" as="geometry" />\n` +
       `        </mxCell>`,
     );
@@ -122,6 +122,21 @@ function escapeXml(value: string): string {
     .replace(/'/g, '&apos;');
 }
 
+/** Escape untrusted text before it is embedded in a draw.io HTML label. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Plain text consumed by draw.io's html=1 renderer, then stored in XML. */
+function htmlTextAttribute(value: string): string {
+  return escapeXml(escapeHtml(value));
+}
+
 function nodeStyle(node: DiagramNode): string {
   // Matches the on-screen canvas (labels top-left): Region = light container,
   // Tenancy = black dashed, Landing zone = red dotted, compartments = yellow
@@ -138,9 +153,9 @@ function nodeStyle(node: DiagramNode): string {
     case 'compartment': {
       // Compartments that hold nested children render as top-aligned containers.
       const base = node.container ? containerTop : compTop;
-      // Projects compartment: solid rounded gray box (distinct from the dotted ones).
+      // Gray compartments are solid; compartment boundaries are always square.
       if (node.tone === 'gray')
-        return `rounded=1;arcSize=4;${base}fillColor=${oracle.compGrayFill};strokeColor=${oracle.compGrayBorder};fontColor=#3f4750;`;
+        return `rounded=0;${base}fillColor=${oracle.compGrayFill};strokeColor=${oracle.compGrayBorder};fontColor=#3f4750;`;
       return node.tone === 'green'
         ? `rounded=0;${base}dashed=1;dashPattern=1 3;fillColor=${oracle.compGreenFill};strokeColor=${oracle.compGreenBorder};fontColor=#3f4750;`
         : `rounded=0;${base}dashed=1;dashPattern=1 3;fillColor=${oracle.compYellowFill};strokeColor=${oracle.compYellowBorder};fontColor=#3f4750;`;
@@ -160,7 +175,7 @@ function nodeStyle(node: DiagramNode): string {
     case 'attachment':
       return `rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#6b7a99;fontColor=#1f3a63;fontStyle=1;fontSize=10;`;
     case 'project':
-      return `rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=${oracle.compGrayBorder};fontColor=${oracle.ink};fontStyle=1;fontSize=11;`;
+      return `rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=${oracle.compGrayBorder};fontColor=${oracle.ink};fontStyle=1;fontSize=11;`;
     case 'routetable':
       return `rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacing=0;spacingLeft=0;spacingTop=0;fillColor=#ffffff;strokeColor=${RT_TONE_COLORS[node.rtTone ?? 'hub']};`;
     case 'rtdot':
@@ -176,26 +191,26 @@ function routeTableValue(node: DiagramNode): string {
   const headers = node.rtColumns === 'drg' ? ['Dest CIDR', 'Next Hop Type', 'Next Hop Name'] : ['Destination', 'Target Type', 'Target', 'Route Type'];
   const cellsOf = (r: NonNullable<DiagramNode['rtRows']>[number]) =>
     node.rtColumns === 'drg' ? [r.destination, r.targetType, r.target] : [r.destination, r.targetType, r.target, r.routeType];
-  const th = headers.map((h) => `<td style=&quot;color:#999;padding:0 5px;&quot;>${escapeXml(h)}</td>`).join('');
+  const th = headers.map((h) => `<td style="color:#999;padding:0 5px;">${escapeHtml(h)}</td>`).join('');
   const rows = (node.rtRows ?? []).map((r) =>
-    `<tr>${cellsOf(r).map((c, j) => `<td style=&quot;padding:0 5px;${j === 0 ? 'font-family:monospace;color:#3f4750;' : j === 2 ? `color:${color};font-weight:bold;` : 'color:#6b6660;'}&quot;>${escapeXml(c)}</td>`).join('')}</tr>`,
+    `<tr>${cellsOf(r).map((c, j) => `<td style="padding:0 5px;${j === 0 ? 'font-family:monospace;color:#3f4750;' : j === 2 ? `color:${color};font-weight:bold;` : 'color:#6b6660;'}">${escapeHtml(c)}</td>`).join('')}</tr>`,
   ).join('');
   const note = node.rtNote
-    ? `<div style=&quot;font-size:8px;color:#B23A48;font-weight:bold;padding:2px 5px;background:#fdecea;&quot;>${escapeXml(node.rtNote)}</div>`
+    ? `<div style="font-size:8px;color:#B23A48;font-weight:bold;padding:2px 5px;background:#fdecea;">${escapeHtml(node.rtNote)}</div>`
     : '';
-  return `<div style=&quot;background:${color};color:#fff;font-weight:bold;padding:3px 6px;&quot;>${escapeXml(node.label)}</div>${note}` +
-    `<table style=&quot;width:100%;border-collapse:collapse;font-size:8.5px;&quot;><tr>${th}</tr>${rows}</table>`;
+  return `<div style="background:${color};color:#fff;font-weight:bold;padding:3px 6px;">${escapeHtml(node.label)}</div>${note}` +
+    `<table style="width:100%;border-collapse:collapse;font-size:8.5px;"><tr>${th}</tr>${rows}</table>`;
 }
 
 const PAGE_W = 850;
 const PAGE_H = 1100;
 
-/** Two-line subnet label: name in OCI orange-red, CIDR in blue. */
-function subnetHtmlLabel(label: string): string {
-  const [name, cidr] = label.split('\n');
-  return `<font color="${oracle.subnetName}"><b>${name}</b></font><br><font color="${oracle.cidrBlue}">${cidr}</font>`;
+/** Two-line subnet label: public names green, private names orange-red. */
+function subnetHtmlLabel(node: DiagramNode): string {
+  const [name, cidr] = node.label.split('\n');
+  const nameColor = node.publicSubnet ? CAPTION_COLORS.green : oracle.subnetName;
+  return `<font color="${nameColor}"><b>${escapeHtml(name ?? '')}</b></font><br><font color="${oracle.cidrBlue}">${escapeHtml(cidr ?? '')}</font>`;
 }
-
 
 function nodeCell(node: DiagramNode, dx = 0, dy = 0): string {
   // draw.io renders \n in a value as a line break when html=1 via &#10;.
@@ -203,10 +218,10 @@ function nodeCell(node: DiagramNode, dx = 0, dy = 0): string {
   // root node (no parent) is offset by (dx, dy) to centre it on the page.
   // Subnet labels colour the two lines (name / CIDR) via an HTML value.
   const value = node.kind === 'routetable'
-    ? routeTableValue(node)
+    ? escapeXml(routeTableValue(node))
     : node.kind === 'subnet' && node.label.includes('\n')
-    ? escapeXml(subnetHtmlLabel(node.label))
-    : escapeXml(node.label).replace(/\n/g, '&#10;');
+    ? escapeXml(subnetHtmlLabel(node))
+    : htmlTextAttribute(node.label).replace(/\n/g, '&#10;');
   const style = nodeStyle(node);
   const parent = escapeXml(node.parentId ?? '1');
   // Gateways/DRG render as a centred icon with the label below; everything else fills its box.
@@ -265,7 +280,7 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
     if (edge.sourceSide) { const [x, y] = sideXY[edge.sourceSide]; base += `exitX=${x};exitY=${y};exitDx=0;exitDy=0;`; }
     if (edge.targetSide) { const [x, y] = sideXY[edge.targetSide]; base += `entryX=${x};entryY=${y};entryDx=0;entryDy=0;`; }
     const style = edge.animated ? `${base}flowAnimation=1;` : base;
-    const value = edge.label ? escapeXml(edge.label) : '';
+    const value = edge.label ? htmlTextAttribute(edge.label) : '';
     return [
       `        <mxCell id="${escapeXml(edge.id)}" value="${value}" style="${style}" edge="1" parent="1" ` +
       `source="${escapeXml(edge.source)}" target="${escapeXml(edge.target)}">\n` +
@@ -275,7 +290,7 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
   });
 
   return (
-    `<mxfile host="lzng" type="device">\n` +
+    `<mxfile host="landing-zone-studio" type="device">\n` +
     `  <diagram id="lz" name="${escapeXml(diagramName)}">\n` +
     `    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" ` +
     `arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">\n` +

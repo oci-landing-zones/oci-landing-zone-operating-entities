@@ -1,37 +1,34 @@
 /**
- * App.tsx — LZNG router for the statically hosted browser application.
+ * App.tsx — Landing Zone Studio router for the statically hosted browser application.
  */
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import WizardShell from './pages/WizardShell';
 import Disclaimer, { DISCLAIMER_KEY, DISCLAIMER_VERSION } from './components/Disclaimer';
 import { getRouterBasename } from './services/pagesBase';
 import './index.css';
 
-// Start fetching and instantiating Jsonnet as soon as the app module loads. This
-// promise is deliberately not awaited, so rendering is never blocked. The
-// generator reuses the same boot promise when the user reaches Review.
-void import('./generator/jsonnetVm')
-  .then(({ jsonnetVm }) => jsonnetVm())
-  .catch((error: unknown) => {
-    console.warn('Jsonnet preload failed; generation will retry on demand.', error);
-  });
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const WizardShell = React.lazy(() => import('./pages/WizardShell'));
+
+const routeFallback = (
+  <div role="status" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', fontFamily: 'system-ui, sans-serif' }}>
+    Loading…
+  </div>
+);
 
 interface ErrorBoundaryState {
   hasError: boolean;
-  error: Error | null;
 }
 
 class AppErrorBoundary extends React.Component<React.PropsWithChildren, ErrorBoundaryState> {
   constructor(props: React.PropsWithChildren) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
+  static getDerivedStateFromError(): ErrorBoundaryState {
+    return { hasError: true };
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
@@ -41,10 +38,9 @@ class AppErrorBoundary extends React.Component<React.PropsWithChildren, ErrorBou
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: 40, fontFamily: 'monospace', color: '#c0392b', background: '#fdf0ef', minHeight: '100vh' }}>
+        <div role="alert" style={{ padding: 40, fontFamily: 'system-ui, sans-serif', color: '#7b1e17', background: '#fdf0ef', minHeight: '100vh' }}>
           <h2>Something went wrong</h2>
-          <pre style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{this.state.error?.message}</pre>
-          <pre style={{ whiteSpace: 'pre-wrap', fontSize: 11, color: '#888', marginTop: 8 }}>{this.state.error?.stack}</pre>
+          <p>Reload the page and try again. Your work remains in this browser when storage is available.</p>
           <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '8px 16px', cursor: 'pointer' }}>
             Reload Page
           </button>
@@ -69,11 +65,13 @@ export default function App() {
     <AppErrorBoundary>
       {accepted ? (
         <Router basename={getRouterBasename(import.meta.env.BASE_URL)}>
-          <Routes>
-            <Route path="/"       element={<Dashboard />} />
-            <Route path="/lz/:id" element={<WizardShell />} />
-            <Route path="*"       element={<Navigate to="/" replace />} />
-          </Routes>
+          <React.Suspense fallback={routeFallback}>
+            <Routes>
+              <Route path="/"       element={<Dashboard />} />
+              <Route path="/lz/:id" element={<WizardShell />} />
+              <Route path="*"       element={<Navigate to="/" replace />} />
+            </Routes>
+          </React.Suspense>
         </Router>
       ) : (
         <Disclaimer onAccept={acceptDisclaimer} />

@@ -27,14 +27,13 @@
  */
 
 import type { HubKind, LzModel, PlatformConfig } from '../model/types';
-import { resolveHubName } from './hubKinds';
 import { envNetworkDefaults } from '../model/defaults';
 import { platformSubnetsForEnv, platformVcnForEnv } from './platforms';
 
-/** One platform in the config — its per-env network plus its engine extension. */
+/** One platform in the config — a network and, where supported, an extension. */
 export interface PlatformConfigEntry {
-  network: { vcn: string; subnets: Record<string, string> };
-  extension: { type: string; params?: Record<string, unknown> };
+  network: { vcn: string; subnets?: Record<string, string> };
+  extension?: { type: string; params?: Record<string, unknown> };
 }
 
 /** One environment in the config — its spoke network, projects, and platforms. */
@@ -56,39 +55,53 @@ export interface LzConfig {
     };
   };
   environments: Record<string, EnvConfigEntry>;
-  /**
-   * Shared platforms that live outside every environment (step 4). A platform with
-   * no extension must declare its subnets explicitly, so the empty VCN carries an
-   * empty `subnets` map rather than omitting the field.
-   */
-  shared_platforms: Record<string, { network: { vcn: string; subnets: Record<string, string> } }>;
+  /** Shared platforms use the same network/extension shape as environment platforms. */
+  shared_platforms: Record<string, PlatformConfigEntry>;
   security_targets: string[];
 }
 
-/** Short subnet key for the config: the hub name prefix is stripped off. */
-function subnetKey(name: string, tokens: { region: string; lze: string }): string {
-  const resolved = resolveHubName(name, tokens).trim();
-  const prefix = resolveHubName('sn-<region>-<lze>-hub-', tokens);
-  return resolved.startsWith(prefix) ? resolved.slice(prefix.length) : resolved;
-}
-
 /** Projects (by name) that apply to a given environment — 'all' or an explicit list. */
-function projectsForEnv(model: LzModel, envName: string): string[] {
+function projectsForEnv(model: LzModel, envId: string): string[] {
   return model.projects
-    .filter((p) => p.environments === 'all' || (Array.isArray(p.environments) && p.environments.includes(envName)))
+    .filter((p) => p.environments === 'all' || (Array.isArray(p.environments) && p.environments.includes(envId)))
     .map((p) => p.name.trim())
     .filter(Boolean);
 }
 
+function ocvsExtension(p: NonNullable<PlatformConfig['ocvsParams']>): NonNullable<PlatformConfigEntry['extension']> {
+  return {
+    type: 'ocvs',
+    params: {
+      ssh_authorized_keys: p.sshAuthorizedKeys,
+      cluster: {
+        sddc_display_name: p.sddcDisplayName,
+        cluster_display_name: p.clusterDisplayName,
+        vmware_software_version: p.vmwareSoftwareVersion,
+        is_hcx_enabled: false,
+        compute_availability_domain: p.computeAvailabilityDomain,
+        esxi_hosts_count: p.esxiHostsCount,
+        vsphere_type: p.vsphereType,
+        initial_host_ocpu_count: p.initialHostOcpuCount,
+        initial_host_shape_name: p.initialHostShapeName,
+        workload_network_cidr: p.workloadNetworkCidr,
+      },
+    },
+  };
+}
+
 /** A platform's config entry for one environment: its per-env network + extension. */
-function platformEntryFor(platform: PlatformConfig, envName: string, index: number): PlatformConfigEntry {
+function platformEntryFor(platform: PlatformConfig, envId: string, index: number): PlatformConfigEntry {
   const subnets: Record<string, string> = {};
-  for (const sn of platformSubnetsForEnv(platform, envName, index)) {
+  for (const sn of platformSubnetsForEnv(platform, envId, index)) {
     const k = sn.name.trim();
     if (!k) continue;
     subnets[k] = sn.cidr.trim();
   }
-  const network = { vcn: platformVcnForEnv(platform, envName, index).trim(), subnets };
+  const profileOwnedSubnets = (platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize) || platform.type === 'ocvs';
+  const network = {
+    vcn: platformVcnForEnv(platform, envId, index).trim(),
+    ...(profileOwnedSubnets ? {} : { subnets }),
+  };
   if (platform.type === 'oke_simple' && platform.okeParams) {
     const p = platform.okeParams;
     return {
@@ -100,16 +113,30 @@ function platformEntryFor(platform: PlatformConfig, envName: string, index: numb
           services_cidr: p.servicesCidr,
           api_endpoint_allowed_cidrs: p.apiAllowedCidrs,
           worker_image: p.workerImage,
+          worker_boot_volume_size: p.workerBootVolumeSize,
+          cni_type: p.cniType,
+          ...(p.clusterSize ? { cluster_size: p.clusterSize } : {}),
+          ...(p.podsCidr ? { pods_cidr: p.podsCidr } : {}),
+          create_fss: p.createFss,
+          public_load_balancer: p.publicLoadBalancer,
         },
       },
     };
   }
+  if (platform.type === 'ocvs' && platform.ocvsParams) {
+    return {
+      network,
+      extension: ocvsExtension(platform.ocvsParams),
+    };
+  }
+  // `custom` is a UI label for a plain platform network, not a registered
+  // workload-extension type in the generator.
+  if (platform.type === 'custom') return { network };
   return { network, extension: { type: platform.type } };
 }
 
 export function buildConfig(model: LzModel): LzConfig {
   const f = model.foundation;
-  const tokens = { region: f.regionShortName, lze: model.presentation.landingZone };
 
   const environments: Record<string, EnvConfigEntry> = {};
   const security_targets: string[] = [];
@@ -121,20 +148,19 @@ export function buildConfig(model: LzModel): LzConfig {
     const net = env.network ?? envNetworkDefaults(i);
     const envSubnets: Record<string, string> = {};
     for (const sn of net.subnets) {
-      // Config keys subnets by role — the last segment of the name (web/app/db/…).
-      const role = (sn.name.split('-').pop() ?? '').trim();
+      const role = sn.name.trim();
       if (!role) continue;
       envSubnets[role] = sn.cidr.trim();
     }
     const projects: Record<string, Record<string, never>> = {};
-    for (const pn of projectsForEnv(model, name)) projects[pn] = {};
+    for (const pn of projectsForEnv(model, env.id)) projects[pn] = {};
 
     const platforms: Record<string, PlatformConfigEntry> = {};
     for (const p of model.platforms) {
-      const inEnv = p.environments === 'all' || (Array.isArray(p.environments) && p.environments.includes(name));
-      const key = p.id.trim() || p.name.trim();
+      const inEnv = p.environments === 'all' || (Array.isArray(p.environments) && p.environments.includes(env.id));
+      const key = p.key.trim();
       if (!inEnv || !key) continue;
-      platforms[key] = platformEntryFor(p, name, i);
+      platforms[key] = platformEntryFor(p, env.id, i);
     }
 
     environments[name] = {
@@ -145,20 +171,25 @@ export function buildConfig(model: LzModel): LzConfig {
   });
 
   const shared_platforms: LzConfig['shared_platforms'] = {};
-  const sharedVcn = model.sharedPlatform?.vcnCidr?.trim();
-  const sharedName = model.sharedPlatform?.name?.trim() || 'core';
-  if (sharedVcn) {
+  for (const platform of model.sharedPlatforms) {
+    const sharedVcn = platform.vcnCidr.trim();
+    const sharedName = platform.key.trim();
+    if (!sharedVcn || !sharedName) continue;
     const sharedSubnets: Record<string, string> = {};
-    for (const sn of model.sharedPlatform?.subnets ?? []) {
+    for (const sn of platform.subnets) {
       const k = sn.name.trim();
       if (k) sharedSubnets[k] = sn.cidr.trim();
     }
-    shared_platforms[sharedName] = { network: { vcn: sharedVcn, subnets: sharedSubnets } };
+    if (platform.type === 'ocvs' && platform.ocvsParams) {
+      shared_platforms[sharedName] = { network: { vcn: sharedVcn }, extension: ocvsExtension(platform.ocvsParams) };
+    } else {
+      shared_platforms[sharedName] = { network: { vcn: sharedVcn, subnets: sharedSubnets } };
+    }
   }
 
   const subnets: Record<string, string> = {};
   for (const sn of model.network.subnets) {
-    const k = subnetKey(sn.name, tokens);
+    const k = sn.name.trim();
     if (!k) continue; // skip half-typed rows
     subnets[k] = sn.cidr.trim();
   }
@@ -198,18 +229,23 @@ function pairLines(entries: string[], indent: string): string[] {
 
 /** Lines for one platform inside an environment's `platforms` block (8-space key indent). */
 function platformEntryLines(name: string, entry: PlatformConfigEntry): string[] {
-  const subEntries = Object.entries(entry.network.subnets).map(([k, v]) => `${key(k)}: ${quote(v)}`);
-  const subnetLines = subEntries.length === 0
-    ? ['            subnets: {},']
-    : ['            subnets: {', ...pairLines(subEntries, '              '), '            },'];
+  const hasSubnets = entry.network.subnets !== undefined;
+  const subEntries = Object.entries(entry.network.subnets ?? {}).map(([k, v]) => `${key(k)}: ${quote(v)}`);
+  const subnetLines = !hasSubnets
+    ? []
+    : subEntries.length === 0
+      ? ['            subnets: {},']
+      : ['            subnets: {', ...pairLines(subEntries, '              '), '            },'];
   const ext = entry.extension;
-  const extLines = ext.params
-    ? [
-        `          extension: { type: ${quote(ext.type)}, params: {`,
-        ...pairLines(Object.entries(ext.params).map(([k, v]) => `${key(k)}: ${jsonnetValue(v)}`), '            '),
-        '          } },',
-      ]
-    : [`          extension: { type: ${quote(ext.type)} },`];
+  const extLines = !ext
+    ? []
+    : ext.params
+      ? [
+          `          extension: { type: ${quote(ext.type)}, params: {`,
+          ...pairLines(Object.entries(ext.params).map(([k, v]) => `${key(k)}: ${jsonnetValue(v)}`), '            '),
+          '          } },',
+        ]
+      : [`          extension: { type: ${quote(ext.type)} },`];
   return [
     `        ${key(name)}: {`,
     '          network: {',
@@ -224,6 +260,9 @@ function platformEntryLines(name: string, entry: PlatformConfigEntry): string[] 
 /** Render a jsonnet value: arrays of strings as ['a', 'b'], strings quoted, else raw. */
 function jsonnetValue(v: unknown): string {
   if (Array.isArray(v)) return `[${v.map((x) => quote(String(x))).join(', ')}]`;
+  if (typeof v === 'object' && v !== null) {
+    return `{ ${Object.entries(v).map(([k, value]) => `${key(k)}: ${jsonnetValue(value)}`).join(', ')} }`;
+  }
   if (typeof v === 'string') return quote(v);
   return String(v);
 }
@@ -287,9 +326,14 @@ export function serializeConfig(model: LzModel, upToStep = Infinity): string {
     : [
         '  shared_platforms: {',
         ...sharedKeys.map((k) => {
-          const sn = Object.entries(c.shared_platforms[k].network.subnets)
+          const entry = c.shared_platforms[k];
+          const sn = Object.entries(entry.network.subnets ?? {})
             .map(([n, cidr]) => `${key(n)}: ${quote(cidr)}`).join(', ');
-          return `    ${key(k)}: { network: { vcn: ${quote(c.shared_platforms[k].network.vcn)}, subnets: { ${sn} } } },`;
+          const subnets = entry.network.subnets ? `, subnets: { ${sn} }` : '';
+          const extension = entry.extension
+            ? `, extension: { type: ${quote(entry.extension.type)}, params: ${jsonnetValue(entry.extension.params ?? {})} }`
+            : '';
+          return `    ${key(k)}: { network: { vcn: ${quote(entry.network.vcn)}${subnets} }${extension} },`;
         }),
         '  },',
       ];

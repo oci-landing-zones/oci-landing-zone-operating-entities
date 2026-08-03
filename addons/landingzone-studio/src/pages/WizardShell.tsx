@@ -2,7 +2,7 @@
  * WizardShell — Milestone 0 vertical slice, styled in the Oracle Redwood / OCI
  * look. Proves the whole pipeline end to end:
  *   form inputs → canonical LzModel → live React Flow diagram
- *              → JSON preview        → Download .drawio (opens in draw.io)
+ *              → JSON preview        → Review downloads
  */
 
 import React, { useMemo } from 'react';
@@ -18,18 +18,16 @@ import HubNetworkStep from '../wizard/steps/HubNetworkStep';
 import EnvNetworkStep from '../wizard/steps/EnvNetworkStep';
 import PlatformTemplatesStep from '../wizard/steps/PlatformTemplatesStep';
 import ReviewStep from '../wizard/steps/ReviewStep';
-import FinishStep from '../wizard/steps/FinishStep';
 import { buildGraph } from '../diagram/buildGraph';
 import { buildFlowTraces } from '../services/flowTrace';
 import LzDiagram from '../diagram/LzDiagram';
-import { toDrawioXml } from '../export/toDrawio';
 import { serializeConfig } from '../services/lzConfig';
-import { downloadTextFile } from '../export/download';
 import JsonViewer from '../components/JsonViewer';
 import ViewModeToggle, { type ViewMode } from '../components/ViewModeToggle';
 import FlowSidebar from '../components/FlowSidebar';
 import TopBar from '../components/TopBar';
 import { oracle } from '../theme';
+import { EMPTY_DEBUG_SEQUENCE, registerDebugClick } from '../services/debugMode';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 
@@ -39,10 +37,10 @@ const layout = {
   page:    { maxWidth: 1440, margin: '0 auto', padding: '20px 24px 56px' } as React.CSSProperties,
   header:  { display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', margin: '8px 0 22px' } as React.CSSProperties,
   title:   { fontSize: 24, fontWeight: 700, marginBottom: 4, color: oracle.ink } as React.CSSProperties,
-  nameInput: { fontSize: 24, fontWeight: 700, color: oracle.ink, fontFamily: FONT, border: '1px solid transparent', background: 'transparent', borderRadius: 4, padding: '2px 6px', margin: '0 0 4px -6px', minWidth: 320, outline: 'none' } as React.CSSProperties,
   sub:     { color: oracle.textMuted, fontSize: 14 } as React.CSSProperties,
   resetBtn:{ padding: '7px 14px', fontSize: 13, border: `1px solid ${oracle.border}`, borderRadius: 4, background: oracle.surface, color: oracle.text, cursor: 'pointer', fontWeight: 600 } as React.CSSProperties,
   navBtn:  { padding: '6px 12px', fontSize: 12.5, fontWeight: 600, color: '#fff', background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 6, cursor: 'pointer' } as React.CSSProperties,
+  saveState: { fontSize: 12.5, fontWeight: 700, color: '#fff' } as React.CSSProperties,
   headerActions: { display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' } as React.CSSProperties,
   placeholder: { padding: '28px 18px', border: `1px dashed ${oracle.borderStrong}`, borderRadius: 6, background: oracle.surfaceAlt, color: oracle.textMuted, fontSize: 13, lineHeight: 1.55 } as React.CSSProperties,
 
@@ -60,49 +58,74 @@ const layout = {
   railLabel: { writingMode: 'vertical-rl', fontSize: 13, fontWeight: 700, color: oracle.ink, letterSpacing: 0.4 } as React.CSSProperties,
 
   actions: { display: 'flex', gap: 10, marginTop: 4, flexWrap: 'wrap' } as React.CSSProperties,
+  stepFooter: { display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 12, marginTop: 20, paddingTop: 16, borderTop: `1px solid ${oracle.border}` } as React.CSSProperties,
+  stepPosition: { color: oracle.textMuted, fontSize: 12.5, fontWeight: 700, textAlign: 'center' } as React.CSSProperties,
   primary: { padding: '9px 16px', fontSize: 13, border: `1px solid ${oracle.redDark}`, borderRadius: 4, background: oracle.red, color: '#fff', cursor: 'pointer', fontWeight: 700 } as React.CSSProperties,
   secondary: { padding: '9px 14px', fontSize: 13, border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, background: oracle.surface, color: oracle.text, cursor: 'pointer', fontWeight: 600 } as React.CSSProperties,
 };
 
-function slugify(name: string): string {
-  return name.trim().replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'landing-zone';
-}
-
-function WizardBody({ name, onRename }: { name: string; onRename: (v: string) => void }) {
+function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
+  name: string;
+  onNameChange: (value: string) => void;
+  onNameBlur: () => void;
+  nameError: string | null;
+  saveState: 'saved' | 'error';
+}) {
   const { model, reset } = useWizard();
   const [activeStep, setActiveStep] = React.useState(1);
   const [diagramCollapsed, setDiagramCollapsed] = React.useState(false);
   const [flowsCollapsed, setFlowsCollapsed] = React.useState(false);
   const [flowSteps, setFlowSteps] = React.useState<Record<string, number | null>>({});
   const [viewMode, setViewMode] = React.useState<ViewMode>('split');
+  const [debugMode, setDebugMode] = React.useState(false);
+  const debugClicks = React.useRef(EMPTY_DEBUG_SEQUENCE);
   const [diagramOpts, setDiagramOpts] = React.useState<DiagramOptions>({});
   const activeStepLabel = WIZARD_STEPS.find((s) => s.id === activeStep)?.label ?? '';
+
+  // Load the complete generation chunk and boot Jsonnet after the first paint.
+  // Generate shares its singleton promise, so an in-flight warm-up also removes
+  // duplicate work without delaying the dashboard or disclaimer.
+  React.useEffect(() => {
+    const warm = () => {
+      void import('../generator/generate')
+        .then(({ warmGenerator }) => warmGenerator())
+        .catch(() => { /* Generate reports the error and can retry. */ });
+    };
+    if (window.requestIdleCallback) {
+      const idleId = window.requestIdleCallback(warm, { timeout: 1_000 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+    const timerId = window.setTimeout(warm, 0);
+    return () => window.clearTimeout(timerId);
+  }, []);
 
   // Changing step should start at the top, not wherever the previous step was scrolled.
   React.useEffect(() => { window.scrollTo({ top: 0 }); }, [activeStep]);
 
   const showForm = viewMode === 'split' || viewMode === 'form';
   const showDiagram = viewMode === 'split' || viewMode === 'diagram';
+  const supportsFlowTracing = model.network.hubKind === 'hub_a' || model.network.hubKind === 'hub_b' || model.network.hubKind === 'hub_c' || model.network.hubKind === 'hub_e';
   const railActive = viewMode === 'split' && diagramCollapsed;
 
   // The endpoints / route-table dots (and, later, flows) are a diagram-only-mode
   // layer — in split / form / json the diagram stays a clean overview. The
-  // .drawio export derives from `diagram`, so it always mirrors what's on screen.
+  // Review builds a separate step-5 structural graph for Draw.io export.
   const diagramOnly = viewMode === 'diagram';
   const effectiveOpts = useMemo<DiagramOptions>(
     () => {
-      if (!diagramOnly) return { ...diagramOpts, showDots: false, showEndpoints: false, showFlows: false };
+      if (!diagramOnly) return { ...diagramOpts, showDots: false, showEndpoints: false, showFlows: false, activeFlows: [] };
       // A selected flow traces between endpoints through the route tables, so it
       // implies the endpoints + route-table layer — force them on while active.
-      const flowsActive = (diagramOpts.activeFlows?.length ?? 0) > 0;
-      return flowsActive ? { ...diagramOpts, showEndpoints: true, showDots: true } : diagramOpts;
+      const flowsActive = supportsFlowTracing && (diagramOpts.activeFlows?.length ?? 0) > 0;
+      const base = supportsFlowTracing ? diagramOpts : { ...diagramOpts, showFlows: false, activeFlows: [] };
+      return flowsActive ? { ...base, showEndpoints: true, showDots: true } : base;
     },
-    [diagramOnly, diagramOpts],
+    [diagramOnly, diagramOpts, supportsFlowTracing],
   );
-  // The docked flow picker rides alongside the diagram in diagram-only mode at
-  // step 3 (same gate as the Show-flows button). `gridCols` widens the diagram
+  // The docked flow picker rides alongside the diagram in diagram-only mode from
+  // Hub Network onward (same gate as the Show-flows button). `gridCols` widens the diagram
   // area into two columns to seat it (a thin rail when collapsed).
-  const flowsOpen = diagramOnly && activeStep >= 3 && !!effectiveOpts.showFlows;
+  const flowsOpen = supportsFlowTracing && diagramOnly && activeStep >= 2 && !!effectiveOpts.showFlows;
   const gridCols = viewMode === 'split'
     ? (diagramCollapsed ? '1fr 48px' : '1fr 1fr')
     : flowsOpen
@@ -127,72 +150,69 @@ function WizardBody({ name, onRename }: { name: string; onRename: (v: string) =>
       return { ...prev, [id]: next };
     });
   }
-  const drawioXml = useMemo(() => toDrawioXml(diagram), [diagram]);
   const configText = useMemo(() => serializeConfig(model, activeStep), [model, activeStep]);
-  const slug = slugify(name);
-
-  // The title follows the Step 1 Customer / Landing-zone-name fields while it
-  // still has the default or previously derived name; a manual rename (here or
-  // on the dashboard) detaches it.
-  const customer = model.presentation.customer.trim();
-  const lzLabel = model.presentation.landingZone.trim();
-  const derivedName = [customer, lzLabel].filter(Boolean).join(' — ') || 'Untitled Landing Zone';
-  const prevDerived = React.useRef(derivedName);
-  React.useEffect(() => {
-    if (derivedName === prevDerived.current) return;
-    if (name === prevDerived.current || name === 'Untitled Landing Zone') onRename(derivedName);
-    prevDerived.current = derivedName;
-  }, [derivedName, name, onRename]);
 
   function resetWizard() {
     if (!window.confirm('Clear all inputs for this Landing Zone?')) return;
     reset();
   }
 
-  // Back / Next, rendered both above and below the step so long steps don't force
-  // a scroll to the bottom just to move on. `spacer` keeps Next right-aligned on
-  // step 1, where there is no Back button to push against.
+  function registerTopBarDebugClick() {
+    const result = registerDebugClick(debugClicks.current, Date.now());
+    debugClicks.current = result.sequence;
+    if (result.activated) setDebugMode(true);
+  }
+
+  // Back / Next live in one full-width footer beneath the workspace so they do
+  // not interrupt either column or change position between steps.
   const prevStep = WIZARD_STEPS.find((s) => s.id === activeStep - 1);
   const nextStep = WIZARD_STEPS.find((s) => s.id === activeStep + 1);
-  const stepNav = (position: 'top' | 'bottom') => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+  const stepNav = (
+    <nav style={layout.stepFooter} className="wizard-footer-nav" aria-label="Step navigation">
       {prevStep ? (
         <button
           type="button"
-          style={layout.secondary}
+          style={{ ...layout.secondary, justifySelf: 'start', gridColumn: 1 }}
+          className="wizard-prev-button"
           aria-label={`Back to step ${prevStep.id}: ${prevStep.label}`}
           onClick={() => setActiveStep(prevStep.id)}
         >
           ← Back: {prevStep.label}
         </button>
       ) : <span />}
+      <span style={layout.stepPosition}>Step {activeStep} of {WIZARD_STEPS.length}</span>
       {nextStep && (
         <button
           type="button"
-          style={position === 'top' ? layout.secondary : layout.primary}
+          style={{ ...layout.primary, justifySelf: 'end', gridColumn: 3 }}
+          className="wizard-next-button"
           aria-label={`Continue to step ${nextStep.id}: ${nextStep.label}`}
           onClick={() => setActiveStep(nextStep.id)}
         >
           Next: {nextStep.label} →
         </button>
       )}
-    </div>
+      {!nextStep && <span />}
+    </nav>
   );
 
   return (
     <div style={layout.app}>
       <TopBar
+        onEmptySpaceClick={registerTopBarDebugClick}
         center={<ViewModeToggle mode={viewMode} onChange={setViewMode} />}
         right={(
           <>
-            <button type="button" style={layout.navBtn} onClick={() => downloadTextFile(`${slug}.drawio`, drawioXml, 'application/xml')}>Download .drawio</button>
-            <button type="button" style={layout.navBtn} onClick={() => downloadTextFile(`${slug}.jsonnet`, configText, 'text/plain')}>Download config</button>
+            <span role="status" style={{ ...layout.saveState, color: saveState === 'error' ? '#ffd1cc' : '#dff4df' }}>
+              {saveState === 'error' ? 'Not saved' : 'Saved locally'}
+            </span>
+            {debugMode && <button type="button" style={layout.navBtn} onClick={() => setDebugMode(false)}>Debug on · Exit</button>}
             <button type="button" style={layout.navBtn} onClick={resetWizard}>Reset</button>
           </>
         )}
       />
 
-      <div style={layout.page}>
+      <div style={layout.page} className="studio-page">
         {/* The page header (title + name) and the step pills only appear in the
             split Form + Diagram view; single-focus modes stay chrome-free so the
             content gets the whole area. Actions live in the TopBar, always reachable. */}
@@ -200,14 +220,7 @@ function WizardBody({ name, onRename }: { name: string; onRename: (v: string) =>
           <>
             <div style={layout.header}>
               <div>
-                <input
-                  aria-label="Landing Zone name"
-                  style={layout.nameInput}
-                  value={name}
-                  onChange={(e) => onRename(e.target.value)}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = oracle.border; e.currentTarget.style.background = oracle.surface; }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent'; }}
-                />
+                <div style={layout.title}>{name}</div>
                 <div style={layout.sub}>Step {activeStep} of {WIZARD_STEPS.length} — {activeStepLabel}. The diagram and JSON build up as you go.</div>
               </div>
             </div>
@@ -219,12 +232,14 @@ function WizardBody({ name, onRename }: { name: string; onRename: (v: string) =>
         {viewMode === 'json' ? (
           <JsonViewer inline title="Landing Zone Config" value={configText} inlineHeight="72vh" />
         ) : (
-          <div style={{ ...layout.grid, gridTemplateColumns: gridCols }}>
+          <div
+            style={{ ...layout.grid, gridTemplateColumns: gridCols }}
+            className={`studio-workspace${viewMode === 'split' ? ' studio-workspace--split' : ''}`}
+          >
             {showForm && (
               <div style={{ display: 'grid', gap: 14, alignContent: 'start' }}>
-                {stepNav('top')}
                 {activeStep === 1 ? (
-                  <FoundationStep />
+                  <FoundationStep name={name} onNameChange={onNameChange} onNameBlur={onNameBlur} nameError={nameError} />
                 ) : activeStep === 2 ? (
                   <HubNetworkStep />
                 ) : activeStep === 3 ? (
@@ -232,11 +247,8 @@ function WizardBody({ name, onRename }: { name: string; onRename: (v: string) =>
                 ) : activeStep === 4 ? (
                   <PlatformTemplatesStep />
                 ) : activeStep === 5 ? (
-                  <ReviewStep />
-                ) : (
-                  <FinishStep />
-                )}
-                {stepNav('bottom')}
+                  <ReviewStep designName={name} />
+                ) : null}
               </div>
             )}
 
@@ -262,9 +274,9 @@ function WizardBody({ name, onRename }: { name: string; onRename: (v: string) =>
                     </button>
                   )}
                 </div>
-                <div style={diagramOnly ? { ...layout.diagramCanvas, height: 'calc(100vh - 185px)' } : layout.diagramCanvas}>
+                <div className="studio-diagram-canvas" style={diagramOnly ? { ...layout.diagramCanvas, height: 'calc(100vh - 185px)' } : layout.diagramCanvas}>
                   <ReactFlowProvider>
-                    <LzDiagram diagram={diagram} options={effectiveOpts} onOptionsChange={diagramOnly && activeStep >= 3 ? setDiagramOpts : undefined} flowSteps={flowSteps} />
+                    <LzDiagram diagram={diagram} options={effectiveOpts} onOptionsChange={diagramOnly && activeStep >= 2 ? setDiagramOpts : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} />
                   </ReactFlowProvider>
                 </div>
               </section>
@@ -290,7 +302,9 @@ function WizardBody({ name, onRename }: { name: string; onRename: (v: string) =>
           </div>
         )}
 
-        {viewMode === 'split' && (
+        {viewMode !== 'json' && stepNav}
+
+        {debugMode && viewMode === 'split' && (
           <JsonViewer title="Landing Zone Config" value={configText} />
         )}
       </div>
@@ -300,15 +314,46 @@ function WizardBody({ name, onRename }: { name: string; onRename: (v: string) =>
 
 function WizardEditor({ id, initialName, initialModel }: { id: string; initialName: string; initialModel: LzModel }) {
   const [name, setName] = React.useState(initialName);
+  const lastSavedName = React.useRef(initialName);
+  const [nameError, setNameError] = React.useState<string | null>(null);
+  const [storageError, setStorageError] = React.useState<string | null>(null);
+  const [saveState, setSaveState] = React.useState<'saved' | 'error'>('saved');
 
-  function onRename(value: string) {
+  function onNameChange(value: string) {
     setName(value);
-    renameLZ(id, value);
+    if (!value.trim()) {
+      setNameError('Name cannot be empty. The last saved name will be restored.');
+      return;
+    }
+    const result = renameLZ(id, value);
+    if (!result.ok) {
+      setStorageError(result.message ?? 'Could not save the new Landing Zone name.');
+      setSaveState('error');
+      return;
+    }
+    lastSavedName.current = value.trim();
+    setNameError(null);
+    setStorageError(null);
+    setSaveState('saved');
+  }
+
+  function onNameBlur() {
+    if (!name.trim()) {
+      setName(lastSavedName.current);
+      setNameError(null);
+      return;
+    }
+    if (name !== name.trim()) onNameChange(name.trim());
   }
 
   return (
-    <WizardProvider initialModel={initialModel} onChange={(model) => saveLZ(id, model)}>
-      <WizardBody name={name} onRename={onRename} />
+    <WizardProvider initialModel={initialModel} onChange={(model) => {
+      const result = saveLZ(id, model);
+      setStorageError(result.ok ? null : result.message ?? 'Could not save changes to this browser.');
+      setSaveState(result.ok ? 'saved' : 'error');
+    }}>
+      {storageError && <div role="alert" style={{ position: 'sticky', top: 0, zIndex: 20, padding: '10px 24px', color: '#7b1e17', background: '#fdf0ef', borderBottom: '1px solid #d0a2a2', fontFamily: FONT }}>{storageError}</div>}
+      <WizardBody name={name} onNameChange={onNameChange} onNameBlur={onNameBlur} nameError={nameError} saveState={saveState} />
     </WizardProvider>
   );
 }

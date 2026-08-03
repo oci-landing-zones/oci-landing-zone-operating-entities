@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * FlowSidebar — docked, collapsible right-side flow picker (diagram-only, step 3).
  *

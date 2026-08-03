@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useWizard } from '../wizardContext';
 import Switch from '../../components/Switch';
 import DeleteButton from '../../components/DeleteButton';
-import { envNetworkDefaults } from '../../model/defaults';
+import { createModelId, envNetworkDefaults } from '../../model/defaults';
 import { oracle } from '../../theme';
 import {
   findRegion, getDefaultRegionForRealm, getRegionsForRealm, REALM_OPTIONS,
@@ -28,7 +28,7 @@ const s: Record<string, React.CSSProperties> = {
   input:   { width: '100%', boxSizing: 'border-box', padding: '9px 11px', border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, fontSize: 14, background: oracle.surface, color: oracle.text, fontFamily: FONT },
   select:  { width: '100%', boxSizing: 'border-box', padding: '9px 11px', border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, fontSize: 14, background: oracle.surface, color: oracle.text, fontFamily: FONT },
   field:   { marginBottom: 14 },
-  diagramLabelsHead: { marginTop: 18, marginBottom: 10, paddingTop: 14, borderTop: `1px solid ${oracle.border}`, fontSize: 11, fontWeight: 800, letterSpacing: 0.4, textTransform: 'uppercase', color: oracle.textMuted },
+  error:   { marginTop: 5, color: '#9f1d1d', fontSize: 12 },
 
   tableHead: { display: 'grid', gridTemplateColumns: '1fr 150px 70px', gap: 12, alignItems: 'center', padding: '10px 12px', background: oracle.surfaceAlt, border: `1px solid ${oracle.border}`, borderRadius: '6px 6px 0 0', fontSize: 12, fontWeight: 700, color: oracle.textMuted, textTransform: 'uppercase', letterSpacing: 0.3 },
   row:     { display: 'grid', gridTemplateColumns: '1fr 150px 70px', gap: 12, alignItems: 'center', padding: '10px 12px', borderLeft: `1px solid ${oracle.border}`, borderRight: `1px solid ${oracle.border}`, borderBottom: `1px solid ${oracle.border}` },
@@ -40,10 +40,14 @@ const s: Record<string, React.CSSProperties> = {
   addLabel:{ display: 'block', fontSize: 12, color: oracle.textMuted, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.3 },
 };
 
-export default function FoundationStep() {
+export default function FoundationStep({ name, onNameChange, onNameBlur, nameError }: {
+  name: string;
+  onNameChange: (name: string) => void;
+  onNameBlur: () => void;
+  nameError?: string | null;
+}) {
   const { model, setField } = useWizard();
   const f = model.foundation;
-  const p = model.presentation;
   const envs = model.environments;
 
   const [newName, setNewName] = useState('');
@@ -67,11 +71,26 @@ export default function FoundationStep() {
   function updateEnv(i: number, patch: Partial<Environment>) {
     setEnvs(envs.map((e, idx) => (idx === i ? { ...e, ...patch } : e)));
   }
-  function deleteEnv(i: number) { setEnvs(envs.filter((_, idx) => idx !== i)); }
+  function deleteEnv(i: number) {
+    const deletedId = envs[i].id;
+    setField('projects', model.projects.map((project) => project.environments === 'all' ? project : {
+      ...project, environments: project.environments.filter((id) => id !== deletedId),
+    }));
+    setField('platforms', model.platforms.map((platform) => {
+      const overrides = { ...platform.overrides };
+      delete overrides[deletedId];
+      return {
+        ...platform,
+        environments: platform.environments === 'all' ? 'all' : platform.environments.filter((id) => id !== deletedId),
+        overrides,
+      };
+    }));
+    setEnvs(envs.filter((_, idx) => idx !== i));
+  }
   function addEnv() {
     const name = newName.trim();
     if (!name) return;
-    setEnvs([...envs, { name, securityZone: newSecure, network: envNetworkDefaults(envs.length) }]);
+    setEnvs([...envs, { id: createModelId('environment'), name, securityZone: newSecure, network: envNetworkDefaults(envs.length) }]);
     setNewName('');
     setNewSecure(false);
   }
@@ -82,7 +101,21 @@ export default function FoundationStep() {
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Foundation</div>
-          <div style={s.twoCol}>
+          <div style={s.field}>
+            <label style={s.label} htmlFor="saved-lz-name">Saved design name</label>
+            <input
+              id="saved-lz-name"
+              style={{ ...s.input, border: `1px solid ${nameError ? '#9f1d1d' : oracle.borderStrong}` }}
+              value={name}
+              onChange={(e) => onNameChange(e.target.value)}
+              onBlur={onNameBlur}
+              aria-invalid={!!nameError}
+              aria-describedby={nameError ? 'saved-lz-name-error' : undefined}
+            />
+            <div style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Stored only in this browser and used for saved records and download filenames. It does not change OCI resource names.</div>
+            {nameError && <div id="saved-lz-name-error" role="alert" style={s.error}>{nameError}</div>}
+          </div>
+          <div style={s.twoCol} className="foundation-two-col">
             <div>
               <label style={s.label} htmlFor="lz-realm">Realm</label>
               <select id="lz-realm" style={s.select} value={f.realm} onChange={(e) => onRealm(e.target.value)}>
@@ -104,32 +137,10 @@ export default function FoundationStep() {
               id="lz-region-short"
               style={s.input}
               value={f.regionShortName}
-              onChange={(e) => setFoundation({ regionShortName: e.target.value })}
+              readOnly
+              aria-describedby="lz-region-short-help"
             />
-          </div>
-
-          <div style={s.diagramLabelsHead}>Diagram labels — not saved to config</div>
-          <div style={s.twoCol}>
-            <div>
-              <label style={s.label} htmlFor="lz-customer">Customer name</label>
-              <input
-                id="lz-customer"
-                style={s.input}
-                placeholder="Operating Entity"
-                value={p.customer}
-                onChange={(e) => setField('presentation.customer', e.target.value)}
-              />
-            </div>
-            <div>
-              <label style={s.label} htmlFor="lz-name">Landing zone name</label>
-              <input
-                id="lz-name"
-                style={s.input}
-                placeholder="landingzone"
-                value={p.landingZone}
-                onChange={(e) => setField('presentation.landingZone', e.target.value)}
-              />
-            </div>
+            <div id="lz-region-short-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Derived from the selected OCI region and used by the generator in resource names.</div>
           </div>
         </div>
       </section>
@@ -138,15 +149,18 @@ export default function FoundationStep() {
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Environments</div>
+          <div style={{ color: oracle.textMuted, fontSize: 12.5, lineHeight: 1.5, margin: '-8px 0 14px' }}>
+            Security Zone applies the generator&apos;s stricter recipe to that environment. Confirm the recipe permits every service the environment needs before deployment.
+          </div>
 
-          <div style={s.tableHead}>
+          <div style={s.tableHead} className="foundation-environment-grid">
             <span>Name</span>
             <span>Security zone</span>
             <span>Actions</span>
           </div>
           {envs.length === 0 && <div style={s.empty}>No environments yet — add one below.</div>}
           {envs.map((env, i) => (
-            <div key={i} style={s.row}>
+            <div key={i} style={s.row} className="foundation-environment-grid">
               <input
                 aria-label={`Environment ${i + 1} name`}
                 style={s.rowInput}
@@ -164,7 +178,7 @@ export default function FoundationStep() {
           ))}
 
           <label style={{ ...s.addLabel, marginTop: 18 }}>Add environment</label>
-          <div style={s.addRow}>
+          <div style={s.addRow} className="foundation-add-grid">
             <input
               aria-label="New environment name"
               style={s.rowInput}

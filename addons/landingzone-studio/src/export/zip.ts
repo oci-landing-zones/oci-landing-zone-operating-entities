@@ -11,6 +11,17 @@ export function zipTextFiles(files: Record<string, string>): Blob {
   return new Blob([zipped as unknown as BlobPart], { type: 'application/zip' });
 }
 
+/** A predictable, filesystem-safe name for a complete Landing Zone bundle. */
+export function bundleFilename(name: string): string {
+  const slug = name.trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase() || 'landing-zone';
+  return `${slug}-lz-outputs.zip`;
+}
+
 /** Trigger a browser download of a Blob under `filename`. */
 export function downloadBlob(filename: string, blob: Blob): void {
   const url = URL.createObjectURL(blob);
@@ -20,5 +31,6 @@ export function downloadBlob(filename: string, blob: Blob): void {
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
-  URL.revokeObjectURL(url);
+  // Revoking immediately can race the browser's download hand-off.
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }

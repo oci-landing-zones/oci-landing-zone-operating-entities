@@ -1,5 +1,5 @@
 /**
- * WizardStepper — the six-step navigation across the top of the wizard.
+ * WizardStepper — the five-step navigation across the top of the wizard.
  * Buttons are clickable to jump between steps; the active step is highlighted
  * in Oracle red. Step content is owned by the shell; this is pure navigation.
  */
@@ -20,7 +20,6 @@ export const WIZARD_STEPS: WizardStep[] = [
   { id: 3, label: 'Projects' },
   { id: 4, label: 'Platforms' },
   { id: 5, label: 'Review' },
-  { id: 6, label: 'Finish' },
 ];
 
 const css = {
@@ -62,7 +61,7 @@ export default function WizardStepper({
   onSelect: (id: number) => void;
 }) {
   return (
-    <nav style={css.row} aria-label="Wizard steps">
+    <nav style={css.row} className="studio-stepper" aria-label="Wizard steps">
       {steps.map((step) => {
         const isActive = step.id === active;
         return (

@@ -2,15 +2,17 @@
  * jsonnetVm — a shared go-jsonnet WebAssembly VM.
  *
  * The engine is the cached-importer go-jsonnet build under `3rd/go-jsonnet`. It is
- * ~8 MB raw / ~2 MB gzipped. App bootstrap starts loading it immediately without
- * awaiting it, and generation reuses the resulting boot promise.
+ * ~8 MB raw / ~2 MB gzipped. The wizard warms it during browser idle time, and
+ * generation reuses the same boot promise (including while warm-up is running).
  *
  * Assets come from an injectable loader: the browser fetches them, and the test
  * suite hands over a Node loader. That keeps `node:fs` out of the browser bundle
  * without any bundler escape hatches.
  */
 
-import wasmExecJs from '../../3rd/go-jsonnet/wasm_exec.js?raw';
+// The matching Go shim installs globalThis.Go. Keeping it in this generator-only
+// chunk avoids runtime evaluation and lets a strict CSP reject arbitrary eval.
+import '../../3rd/go-jsonnet/wasm_exec.js';
 import wasmUrl from '../../3rd/go-jsonnet/libjsonnet.wasm?url';
 
 /** `jsonnet_evaluate_snippet(filename, code, files, extStrs, extCodes, tlaStrs, tlaCodes)` */
@@ -35,8 +37,6 @@ declare global {
 }
 
 export interface JsonnetAssets {
-  /** Source of Go's `wasm_exec.js` shim; evaluated to install `globalThis.Go`. */
-  wasmExecJs: string;
   /** The compiled `libjsonnet.wasm` bytes. */
   wasmBinary: BufferSource;
 }
@@ -47,7 +47,7 @@ async function browserAssets(): Promise<JsonnetAssets> {
   if (!wasmRes.ok) {
     throw new Error(`Could not load the jsonnet engine from ${wasmUrl} (${wasmRes.status})`);
   }
-  return { wasmExecJs, wasmBinary: await wasmRes.arrayBuffer() };
+  return { wasmBinary: await wasmRes.arrayBuffer() };
 }
 
 let loadAssets: () => Promise<JsonnetAssets> = browserAssets;
@@ -61,10 +61,7 @@ export function setAssetLoader(loader: () => Promise<JsonnetAssets>): void {
 let booted: Promise<EvaluateSnippet> | undefined;
 
 async function boot(): Promise<EvaluateSnippet> {
-  const { wasmExecJs, wasmBinary } = await loadAssets();
-  // wasm_exec.js is a classic script that assigns `globalThis.Go`. Indirect eval
-  // runs it in global scope in both the browser and Node.
-  (0, eval)(wasmExecJs);
+  const { wasmBinary } = await loadAssets();
   const GoCtor = globalThis.Go;
   if (!GoCtor) throw new Error('wasm_exec.js did not install globalThis.Go');
 

@@ -26,19 +26,19 @@ const styles: Record<string, React.CSSProperties> = {
 
 const FEATURES = [
   { title: 'Guided wizard', body: 'Step through Foundation, Hub Network, Projects, Platforms and Review.' },
-  { title: 'Live diagram', body: 'A network diagram builds up as you go — export it to draw.io and SVG.' },
-  { title: 'Canonical JSON', body: 'Every input feeds one Landing Zone JSON object you can download and reuse.' },
+  { title: 'Live diagram', body: 'A network diagram builds up as you go; export its complete structural view from Review.' },
+  { title: 'Canonical config', body: 'Every input feeds one generator-aligned Landing Zone config.' },
 ];
 
 export default function Hero({ onNew, compact = false }: { onNew: () => void; compact?: boolean }) {
   return (
     <div style={compact ? styles.heroCompact : styles.hero}>
       <span style={styles.eyebrow}>OCI Landing Zone</span>
-      <div style={compact ? styles.titleCompact : styles.title}>Landing Zone Next Gen</div>
+      <div style={compact ? styles.titleCompact : styles.title}>Landing Zone Studio</div>
       {!compact && (
         <div style={styles.sub}>
-          Build an OCI Landing Zone step by step. Each input updates a canonical JSON object and a
-          live, exportable network diagram — no guesswork, no hand-written config.
+          Build an OCI Landing Zone step by step. Each input updates a canonical generator config and a
+          live, exportable network diagram. Review the generated artifacts before deployment.
         </div>
       )}
       <button type="button" style={styles.cta} onClick={onNew}>New Landing Zone →</button>

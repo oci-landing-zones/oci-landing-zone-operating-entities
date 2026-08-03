@@ -1,4 +1,4 @@
-export const DEFAULT_PAGES_BASE_PATH = '/landing-zone-next-gen/';
+export const DEFAULT_PAGES_BASE_PATH = '/landing-zone-studio/';
 
 export function normalizeBasePath(value: string = DEFAULT_PAGES_BASE_PATH): string {
   const trimmed = String(value || '/').trim();

@@ -1,7 +1,6 @@
 /**
- * SavedLzList — the grid of saved Landing Zones, with open / rename / duplicate /
- * delete. Shared by the dashboard ("/") and the wizard's closing step, so the two
- * can't drift apart.
+ * SavedLzList — the grid of saved Landing Zones, with open / duplicate /
+ * delete. Saved names are intentionally read-only here; Foundation owns naming.
  *
  * When `currentId` is set the matching card is marked as the one being edited and
  * loses its Open button. Deleting that card hands control back to the caller via
@@ -11,11 +10,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oracle } from '../theme';
-import { deleteLZ, duplicateLZ, getLZ, getOutputs, listLZs, renameLZ, type LzMeta } from '../services/lzStore';
+import { deleteLZ, duplicateLZ, getLZ, getOutputs, listLZs, type LzMeta } from '../services/lzStore';
 import { serializeConfig } from '../services/lzConfig';
-import { CONFIG_FILENAME, PRIMARY_OUTPUTS } from '../generator/outputNames';
-import { downloadTextFile } from '../export/download';
-import { downloadBlob, zipTextFiles } from '../export/zip';
+import { CONFIG_FILENAME } from '../generator/outputNames';
+import { bundleFilename, downloadBlob, zipTextFiles } from '../export/zip';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 
@@ -42,14 +40,12 @@ const s: Record<string, React.CSSProperties> = {
   outMeta: { fontSize: 11.5, color: oracle.textMuted },
   staleTag:{ fontSize: 10.5, fontWeight: 800, color: '#8a5a00', background: '#fdf3e0', border: '1px solid #e2bd77', borderRadius: 999, padding: '2px 8px', letterSpacing: 0.2, textTransform: 'uppercase' },
   outRow:  { display: 'flex', gap: 6, flexWrap: 'wrap' },
-  outBtn:  { padding: '5px 10px', fontSize: 11.5, fontWeight: 700, background: oracle.surface, color: oracle.cidrBlue, border: `1px solid ${oracle.border}`, borderRadius: 4, cursor: 'pointer', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
   zipBtn:  { padding: '5px 11px', fontSize: 11.5, fontWeight: 800, background: oracle.surfaceAlt, color: oracle.ink, border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, cursor: 'pointer', fontFamily: FONT },
 
   actions:{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '0 18px 16px' },
   open:   { padding: '7px 14px', fontSize: 13, background: oracle.red, color: '#fff', border: `1px solid ${oracle.redDark}`, borderRadius: 4, cursor: 'pointer', fontWeight: 700, fontFamily: FONT },
   btn:    { padding: '7px 12px', fontSize: 13, background: oracle.surface, color: oracle.text, border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, cursor: 'pointer', fontWeight: 600, fontFamily: FONT },
   danger: { padding: '7px 12px', fontSize: 13, background: '#fffafa', color: '#9f1d1d', border: '1px solid #d0a2a2', borderRadius: 4, cursor: 'pointer', fontWeight: 600, marginLeft: 'auto', fontFamily: FONT },
-  input:  { width: '100%', boxSizing: 'border-box', padding: '8px 10px', border: `1px solid ${oracle.red}`, borderRadius: 4, fontSize: 14, marginBottom: 8, fontFamily: FONT },
 };
 
 function formatTime(iso: string): string {
@@ -73,13 +69,7 @@ function summaryChips(id: string): string[] {
   return chips;
 }
 
-function slugify(name: string): string {
-  return name.trim().replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'landing-zone';
-}
-
 interface CardOutputs {
-  /** Hub A's artifacts, in deployment order. */
-  primary: string[];
   fileCount: number;
   generatedAt: string;
   /** The model has moved on since these were generated. */
@@ -94,7 +84,6 @@ function cardOutputs(id: string): CardOutputs | null {
   if (!saved) return null;
   const rec = getLZ(id);
   return {
-    primary: PRIMARY_OUTPUTS.filter((name) => name in saved.files),
     fileCount: Object.keys(saved.files).length,
     generatedAt: saved.generatedAt,
     stale: rec ? serializeConfig(rec.model) !== saved.config : false,
@@ -114,7 +103,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
 }) {
   const navigate = useNavigate();
   const [records, setRecords] = useState<LzMeta[]>(() => listLZs());
-  const [editing, setEditing] = useState<{ id: string; name: string } | null>(null);
+  const [storageError, setStorageError] = useState<string | null>(null);
 
   const reload = () => setRecords(listLZs());
   useEffect(() => { onCountChange?.(records.length); }, [records.length, onCountChange]);
@@ -132,23 +121,24 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
   }, [records]);
 
   function handleDuplicate(id: string) {
-    duplicateLZ(id);
+    const result = duplicateLZ(id);
+    if (!result.ok) {
+      setStorageError(result.message ?? 'Could not duplicate the Landing Zone.');
+      return;
+    }
+    setStorageError(result.message ?? null);
     reload();
   }
 
   function handleDelete(id: string, name: string) {
     if (!window.confirm(`Delete “${name}”? This cannot be undone.`)) return;
-    deleteLZ(id);
-    if (editing?.id === id) setEditing(null);
+    const result = deleteLZ(id);
+    if (!result.ok) {
+      setStorageError(result.message ?? 'Could not delete the Landing Zone.');
+      return;
+    }
+    setStorageError(null);
     if (id === currentId) { onCurrentDeleted?.(); return; }
-    reload();
-  }
-
-  function saveRename() {
-    if (!editing) return;
-    const name = editing.name.trim();
-    if (name) renameLZ(editing.id, name);
-    setEditing(null);
     reload();
   }
 
@@ -158,10 +148,10 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
         <div style={s.sectionTitle}>{title}</div>
         <span style={s.count}>{records.length} saved</span>
       </div>
+      {storageError && <div role="alert" style={{ color: '#9f1d1d', fontSize: 13, margin: '-6px 0 12px' }}>{storageError}</div>}
 
       <div style={s.grid}>
         {records.map((r) => {
-          const isEditing = editing?.id === r.id;
           const isCurrent = r.id === currentId;
           const chips = summaries[r.id] ?? [];
           const out = outputs[r.id];
@@ -169,79 +159,50 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
             <div key={r.id} style={isCurrent ? { ...s.card, ...s.cardCurrent } : s.card}>
               <div style={s.accent} />
               <div style={s.body}>
-                {isEditing ? (
-                  <input
-                    aria-label="Landing Zone name"
-                    style={s.input}
-                    value={editing.name}
-                    autoFocus
-                    onChange={(e) => setEditing({ id: r.id, name: e.target.value })}
-                    onKeyDown={(e) => { if (e.key === 'Enter') saveRename(); if (e.key === 'Escape') setEditing(null); }}
-                  />
-                ) : (
-                  <div style={s.nameRow}>
-                    <span style={s.name}>{r.name}</span>
-                    {isCurrent && <span style={s.badge}>This one</span>}
-                  </div>
-                )}
-                {!isEditing && chips.length > 0 && (
+                <div style={s.nameRow}>
+                  <span style={s.name}>{r.name}</span>
+                  {isCurrent && <span style={s.badge}>This one</span>}
+                </div>
+                {chips.length > 0 && (
                   <div style={s.summaryRow}>
                     {chips.map((c) => <span key={c} style={s.chip}>{c}</span>)}
                   </div>
                 )}
                 <div style={s.meta}>Edited {formatTime(r.updatedAt)}</div>
 
-                {/* Artifacts from the last step-5 generator run, straight off the card. */}
-                {!isEditing && out && (
+                {/* A saved snapshot is downloadable only as its complete ZIP. */}
+                {out && (
                   <div style={s.outBox}>
                     <div style={s.outHead}>
-                      <span style={s.outTitle}>Generated outputs</span>
+                      <span style={s.outTitle}>LZ config</span>
                       {out.stale
                         ? <span style={s.staleTag} title="The model changed after these were generated — rerun step 5.">Stale</span>
                         : <span style={s.outMeta}>{formatTime(out.generatedAt)}</span>}
                     </div>
-                    <div style={s.outRow}>
-                      {out.primary.map((name) => (
+                    {!out.stale && (
+                      <div style={s.outRow}>
                         <button
-                          key={name}
-                          type="button"
-                          style={s.outBtn}
-                          onClick={() => downloadTextFile(name, out.files[name], 'application/json')}
-                        >
-                          {name}
-                        </button>
-                      ))}
-                      <button
                         type="button"
                         style={s.zipBtn}
                         title={`${out.fileCount} outputs + ${CONFIG_FILENAME}`}
                         onClick={() => downloadBlob(
-                          `${slugify(r.name)}-lz-outputs.zip`,
+                          bundleFilename(r.name),
                           zipTextFiles({ [CONFIG_FILENAME]: out.config, ...out.files }),
                         )}
                       >
-                        Bundle .zip
+                        Download LZ config
                       </button>
-                    </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
               <div style={s.actions}>
-                {isEditing ? (
-                  <>
-                    <button type="button" style={s.open} onClick={saveRename}>Save</button>
-                    <button type="button" style={s.btn} onClick={() => setEditing(null)}>Cancel</button>
-                  </>
-                ) : (
-                  <>
-                    {!isCurrent && (
-                      <button type="button" style={s.open} onClick={() => navigate(`/lz/${r.id}`)}>Open</button>
-                    )}
-                    <button type="button" style={s.btn} onClick={() => setEditing({ id: r.id, name: r.name })}>Rename</button>
-                    <button type="button" style={s.btn} onClick={() => handleDuplicate(r.id)}>Duplicate</button>
-                    <button type="button" style={s.danger} onClick={() => handleDelete(r.id, r.name)}>Delete</button>
-                  </>
+                {!isCurrent && (
+                  <button type="button" style={s.open} onClick={() => navigate(`/lz/${r.id}`)}>Open</button>
                 )}
+                <button type="button" style={s.btn} onClick={() => handleDuplicate(r.id)}>Duplicate</button>
+                <button type="button" style={s.danger} onClick={() => handleDelete(r.id, r.name)}>Delete</button>
               </div>
             </div>
           );

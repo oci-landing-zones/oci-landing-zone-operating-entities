@@ -8,5 +8,6 @@ export function downloadTextFile(filename: string, content: string, mime = 'text
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
-  URL.revokeObjectURL(url);
+  // Let the browser consume the URL before releasing it.
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }

@@ -2,10 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { toDrawioXml } from './toDrawio';
 import { buildGraph } from '../diagram/buildGraph';
 import { emptyLzModel } from '../model/defaults';
-import { newPlatform } from '../services/platforms';
+import { newPlatform, newSharedPlatform } from '../services/platforms';
 import type { DiagramModel, LzModel } from '../model/types';
 
 describe('toDrawioXml', () => {
+  function valueAttributes(xml: string): string[] {
+    const values = [...xml.matchAll(/\bvalue="([^"]*)"/g)].map((match) => match[1]);
+    expect(values).toHaveLength(xml.match(/\bvalue="/g)?.length ?? 0);
+    return values;
+  }
+
   it('wraps the graph in a valid mxfile/diagram/mxGraphModel structure', () => {
     const xml = toDrawioXml(buildGraph(emptyLzModel()));
     expect(xml).toContain('<mxfile');
@@ -28,7 +34,7 @@ describe('toDrawioXml', () => {
   });
 
   it('adds a Security Zone shield image to secure compartments only', () => {
-    // default model: prod is a Security Zone, preprod/dev are not
+    // default model: prod is a Security Zone, preprod is not
     const xml = toDrawioXml(buildGraph(emptyLzModel()));
     expect(xml).toContain('id="cmp-env-0-shield"');   // prod
     expect(xml).toContain('shape=image;');
@@ -40,9 +46,10 @@ describe('toDrawioXml', () => {
     // two-line HTML label: name + CIDR in different colours
     expect(xml).toContain('&lt;font color=&quot;#AA5C32&quot;&gt;');
     expect(xml).toContain('&lt;font color=&quot;#3B5BA9&quot;&gt;');
-    // one route-table image per subnet (6 hub + 4 per environment × 3 envs)
+    expect(xml).toContain('&lt;font color=&quot;#1E7B2F&quot;&gt;&lt;b&gt;sn-fra-lz-hub-fw-dmz&lt;/b&gt;');
+    // one route-table image per subnet (6 hub + 4 per environment × 2 envs)
     const rtCells = xml.match(/id="[^"]*-rt"/g) ?? [];
-    expect(rtCells).toHaveLength(18);
+    expect(rtCells).toHaveLength(14);
   });
 
   it('renders the three gateways and the firewall/LB subnet icons + captions', () => {
@@ -50,13 +57,13 @@ describe('toDrawioXml', () => {
     expect(xml).toMatch(/id="gw-igw"[^>]*parent="cmp-network"/);
     expect(xml).toMatch(/id="gw-natgw"/);
     expect(xml).toMatch(/id="gw-sgw"/);
-    expect(xml).toContain('Internet Gateway');
+    expect(xml).toContain('igw-fra-lz-hub');
     // firewall icons in the two fw subnets + LB icon, with captions
     expect(xml).toContain('id="hub-vcn-sn-0-icon"');
-    expect(xml).toContain('nfw-fra-hub-dmz');
+    expect(xml).toContain('nfw-fra-lz-hub-dmz');
     expect(xml).toContain('id="hub-vcn-sn-1-icon"');
     expect(xml).toContain('Load Balancer');
-    expect(xml).toContain('nfw-fra-hub-int');
+    expect(xml).toContain('nfw-fra-lz-hub-int');
     // plain subnets get no icon cell
     expect(xml).not.toContain('id="hub-vcn-sn-3-icon"');
   });
@@ -65,14 +72,14 @@ describe('toDrawioXml', () => {
     const xml = toDrawioXml(buildGraph(emptyLzModel(), 3)); // spoke VCNs + their attachments appear in step 3
     // single DRG inside the network compartment
     expect(xml).toMatch(/id="drg"[^>]*parent="cmp-network"/);
-    // one OSN glyph per VCN (1 hub + 3 env)
+    // one OSN glyph per VCN (1 hub + 2 env)
     const osnCells = xml.match(/id="[^"]*-osn"/g) ?? [];
-    expect(osnCells).toHaveLength(4);
+    expect(osnCells).toHaveLength(3);
     // every attachment pill clusters with the DRG inside cmp-network
     expect(xml).toMatch(/id="attach-hub"[^>]*parent="cmp-network"/);
     expect(xml).toMatch(/id="attach-cmp-env-0"[^>]*parent="cmp-network"/);
-    expect(xml).toContain('vcn-hub-attach');
-    expect(xml).toContain('vcn-prod-attach');
+    expect(xml).toContain('drgatt-fra-lz-hub');
+    expect(xml).toContain('drgatt-fra-lz-prod-proj');
     // VCN → attach → DRG edges, no arrowheads
     expect(xml).toContain('source="hub-vcn" target="attach-hub"');
     expect(xml).toContain('source="attach-hub" target="drg"');
@@ -105,26 +112,32 @@ describe('toDrawioXml', () => {
     expect(xml).toMatch(/id="cmp-env-0-projects"[^>]*parent="cmp-env-0"/);
     // a project block inside it
     expect(xml).toMatch(/id="cmp-env-0-proj-0"[^>]*parent="cmp-env-0-projects"/);
-    expect(xml).toContain('project-1');
+    expect(xml).toContain('cmp-lz-prod-proj1');
+    const projectContainer = xml.match(/<mxCell id="cmp-env-0-projects"[^>]+>/)?.[0] ?? '';
+    const projectCompartment = xml.match(/<mxCell id="cmp-env-0-proj-0"[^>]+>/)?.[0] ?? '';
+    expect(projectContainer).toContain('rounded=0;');
+    expect(projectCompartment).toContain('rounded=0;');
     // none of this before step 3
     expect(toDrawioXml(buildGraph(emptyLzModel(), 2))).not.toContain('-projects"');
   });
 
   it('renders the shared platform row + env platform VCNs with subnets (step 4)', () => {
     const base = emptyLzModel();
-    const m: LzModel = { ...base, platforms: [{ ...newPlatform('oke_simple', []), id: 'oke', name: 'oke' }] };
-    // none of this before step 4
-    expect(toDrawioXml(buildGraph(m, 3))).not.toContain('-platforms"');
+    const m: LzModel = { ...base, platforms: [{ ...newPlatform('oke_simple', []), id: 'oke', key: 'oke' }], sharedPlatforms: [newSharedPlatform('custom', [])] };
+    // platform roots exist before step 4, but configured child/VCN nodes do not
+    expect(toDrawioXml(buildGraph(m, 3))).not.toContain('cmp-env-0-platform-comp-0');
+    expect(toDrawioXml(buildGraph(m, 3))).not.toContain('shared-plat-vcn-0');
     const xml = toDrawioXml(buildGraph(m, 4));
     // shared platform compartment outside the environments
-    expect(xml).toMatch(/id="cmp-shared-platform"[^>]*parent="landingzone"/);
-    // a platforms compartment nested in each env, holding a platform VCN
+    expect(xml).toMatch(/id="cmp-shared-platform-0"[^>]*parent="cmp-platform"/);
+    expect(xml).toMatch(/id="shared-plat-vcn-0"[^>]*parent="cmp-network"/);
+    // a platforms compartment is nested in each env, while its VCN is in network
     expect(xml).toMatch(/id="cmp-env-0-platforms"[^>]*parent="cmp-env-0"/);
-    expect(xml).toMatch(/id="cmp-env-0-plat-0"[^>]*parent="cmp-env-0-platforms"/);
+    expect(xml).toMatch(/id="cmp-env-0-plat-0"[^>]*parent="cmp-env-0-network"/);
     // the platform VCN's subnets are nested inside it
     expect(xml).toMatch(/id="cmp-env-0-plat-0-sn-0"[^>]*parent="cmp-env-0-plat-0"/);
-    expect(xml).toContain('int-lb');
-    expect(xml).toContain('10.140.0.0/25');
+    expect(xml).toContain('pods');
+    expect(xml).toContain('10.0.80.0/21');
   });
 
   it('maps an animated edge to draw.io flowAnimation', () => {
@@ -145,8 +158,40 @@ describe('toDrawioXml', () => {
       edges: [],
     };
     const xml = toDrawioXml(diagram);
-    expect(xml).toContain('A &amp; B &lt;co&gt;');
+    // The text is escaped once for draw.io's HTML renderer and again for XML.
+    expect(xml).toContain('A &amp;amp; B &amp;lt;co&amp;gt;');
     expect(xml).not.toContain('A & B <co>');
+  });
+
+  it('keeps open route-table HTML inside a well-formed XML attribute', () => {
+    const xml = toDrawioXml(buildGraph(emptyLzModel(), 3, {
+      showDots: true,
+      showEndpoints: true,
+      openTables: ['rt-hub-lb'],
+    }));
+    expect(xml).toContain('id="rt-hub-lb"');
+    expect(xml).toContain('&lt;table');
+    expect(valueAttributes(xml).every((value) => !value.includes('<'))).toBe(true);
+  });
+
+  it('treats user-controlled draw.io label content as text, not HTML', () => {
+    const diagram: DiagramModel = {
+      nodes: [{
+        id: 'rt',
+        kind: 'routetable',
+        label: '<img src=x onerror=alert(1)>',
+        rtRows: [{ destination: '0.0.0.0/0', targetType: 'DRG', target: '<script>alert(1)</script>', routeType: 'Static' }],
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 40,
+      }],
+      edges: [],
+    };
+    const xml = toDrawioXml(diagram);
+    expect(xml).toContain('&amp;lt;img src=x onerror=alert(1)&amp;gt;');
+    expect(xml).toContain('&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt;');
+    expect(valueAttributes(xml).every((value) => !value.includes('<'))).toBe(true);
   });
 
   it('renders multi-line node labels with a line break entity', () => {
