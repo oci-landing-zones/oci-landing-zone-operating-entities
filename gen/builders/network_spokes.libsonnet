@@ -17,20 +17,26 @@ function(inputs)
   local lb_cidr = hub_network.subnets.lb;
 
   // Builds a complete VCN category for one environment's shared project network.
-  local spoke_category(env_name, env_config, direct_spoke_peers=[]) =
-    local dns = topo.env_dns(env_name);
+  local spoke_category(entry, env_config, direct_spoke_peers=[]) =
+    local key_segments = entry.key_segments;
+    local name_segments = entry.name_segments;
+    local dns_segments = entry.dns_segments;
     local has_natgw = hub_has_spoke_natgw;
     local spn = env_config.shared_project_network;
     local vcn_cidr = spn.network.vcn;
     local subnets = spn.network.subnets;
-    local rt_key = n.key('RT', [env_name, 'PROJ', 'GENERIC']);
-    local sl_key = n.key('SL', [env_name, 'PROJ', 'GENERIC']);
+    local rt_key = n.key('RT', key_segments + ['PROJ', 'GENERIC']);
+    local sl_key = n.key('SL', key_segments + ['PROJ', 'GENERIC']);
+    local vcn_key = n.key('VCN', key_segments + ['PROJECTS']);
+    local is_qualified = std.length(dns_segments) > 1;
+    local vcn_dns_suffix = if is_qualified then 'pr' else 'proj';
+    local subnet_dns_suffix(suffix) = if is_qualified then suffix[0:2] else suffix;
 
     local sn(suffix, cidr) = {
-      [n.key('SN', [env_name, suffix])]: {
-        display_name: n.display('sn', [env_name, suffix]),
+      [n.key('SN', key_segments + [suffix])]: {
+        display_name: n.display('sn', name_segments + [suffix]),
         cidr_block: cidr,
-        dns_label: n.dns_label(['sn', n.region, 'lz', dns, suffix]),
+        dns_label: n.dns_label(['sn', n.region, 'lz'] + dns_segments + [subnet_dns_suffix(suffix)]),
         dhcp_options_key: 'default_dhcp_options',
         prohibit_internet_ingress: true,
         prohibit_public_ip_on_vnic: true,
@@ -45,18 +51,18 @@ function(inputs)
     local nsg_tcp_ingress_rule(description, src_nsg_key, port) =
       common._tcp_ingress_rule(description, src_nsg_key, port, src_type='NETWORK_SECURITY_GROUP');
 
-    local project_names = topo.project_names(env_name);
+    local project_names = topo.project_names(entry);
 
     local project_nsgs = std.foldl(
       function(acc, proj_name)
-        local web_nsg_key = n.key('NSG', [env_name, proj_name, 'WEB']);
-        local app_nsg_key = n.key('NSG', [env_name, proj_name, 'APP']);
-        local db_nsg_key = n.key('NSG', [env_name, proj_name, 'DB']);
-        local proj_cmp = n.key_global('CMP', [env_name, proj_name]);
+        local web_nsg_key = n.key('NSG', key_segments + [proj_name, 'WEB']);
+        local app_nsg_key = n.key('NSG', key_segments + [proj_name, 'APP']);
+        local db_nsg_key = n.key('NSG', key_segments + [proj_name, 'DB']);
+        local proj_cmp = topo.env_project_compartment_key(entry, proj_name);
         acc {
         [web_nsg_key]: {
           compartment_id: proj_cmp,
-          display_name: n.display('nsg', [env_name, proj_name, 'web']),
+          display_name: n.display('nsg', name_segments + [proj_name, 'web']),
           egress_rules: common._nsg_egress_tcp_only,
           ingress_rules: {
             http_80: hub_tcp_ingress_rule(
@@ -78,16 +84,16 @@ function(inputs)
         },
         [app_nsg_key]: {
           compartment_id: proj_cmp,
-          display_name: n.display('nsg', [env_name, proj_name, 'app']),
+          display_name: n.display('nsg', name_segments + [proj_name, 'app']),
           egress_rules: common._nsg_egress_tcp_only,
           ingress_rules: {
             http_80: nsg_tcp_ingress_rule(
-              'Allow inbound from NSG %s over HTTP' % n.display('nsg', [env_name, proj_name, 'web']),
+              'Allow inbound from NSG %s over HTTP' % n.display('nsg', name_segments + [proj_name, 'web']),
               web_nsg_key,
               80
             ),
             https_443: nsg_tcp_ingress_rule(
-              'Allow inbound from NSG %s over HTTPS' % n.display('nsg', [env_name, proj_name, 'web']),
+              'Allow inbound from NSG %s over HTTPS' % n.display('nsg', name_segments + [proj_name, 'web']),
               web_nsg_key,
               443
             ),
@@ -100,11 +106,11 @@ function(inputs)
         },
         [db_nsg_key]: {
           compartment_id: proj_cmp,
-          display_name: n.display('nsg', [env_name, proj_name, 'db']),
+          display_name: n.display('nsg', name_segments + [proj_name, 'db']),
           egress_rules: common._nsg_egress_tcp_only,
           ingress_rules: {
             db_1521: nsg_tcp_ingress_rule(
-              'Allow inbound from NSG %s over TCP 1521' % n.display('nsg', [env_name, proj_name, 'app']),
+              'Allow inbound from NSG %s over TCP 1521' % n.display('nsg', name_segments + [proj_name, 'app']),
               app_nsg_key,
               1521
             ),
@@ -121,7 +127,7 @@ function(inputs)
           description: 'Route to Oracle Services Network through Service GW',
           destination: 'all-services',
           destination_type: 'SERVICE_CIDR_BLOCK',
-          network_entity_key: n.key('SGW', [env_name, 'PROJ']),
+          network_entity_key: n.key('SGW', key_segments + ['PROJ']),
         },
       } + if has_natgw then
         {
@@ -135,7 +141,7 @@ function(inputs)
             description: 'Route to the Internet through NAT GW',
             destination: '0.0.0.0/0',
             destination_type: 'CIDR_BLOCK',
-            network_entity_key: n.key('NGW', [env_name, 'PROJ']),
+            network_entity_key: n.key('NGW', key_segments + ['PROJ']),
           },
         } + (if std.length(direct_spoke_peers) > 0 then {
                [p.route_key]: {
@@ -160,12 +166,12 @@ function(inputs)
       };
 
     {
-      category_compartment_id: n.key_global('CMP', [env_name, 'NETWORK']),
+      category_compartment_id: topo.env_child_compartment_key(entry, 'NETWORK'),
       vcns: {
-        [n.key('VCN', [env_name, 'PROJECTS'])]: {
-          display_name: n.display('vcn', [env_name, 'projects']),
+        [vcn_key]: {
+          display_name: n.display('vcn', name_segments + ['projects']),
           cidr_blocks: [vcn_cidr],
-          dns_label: n.dns_label(['vcn', n.region, 'lz', dns, 'proj']),
+          dns_label: n.dns_label(['vcn', n.region, 'lz'] + dns_segments + [vcn_dns_suffix]),
           block_nat_traffic: false,
           is_attach_drg: false,
           is_create_igw: false,
@@ -178,13 +184,13 @@ function(inputs)
           network_security_groups: project_nsgs,
           route_tables: {
             [rt_key]: {
-              display_name: n.display('rt', [env_name, 'proj', 'generic']),
+              display_name: n.display('rt', name_segments + ['proj', 'generic']),
               route_rules: route_rules,
             },
           },
           security_lists: {
             [sl_key]: {
-              display_name: n.display('sl', [env_name, 'proj', 'generic']),
+              display_name: n.display('sl', name_segments + ['proj', 'generic']),
               egress_rules: [
                 {
                   description: 'Allow all outbound traffic to 0.0.0.0/0 over ALL protocols',
@@ -211,15 +217,15 @@ function(inputs)
             + sn('infra', subnets.infra),
           vcn_specific_gateways: {
             service_gateways: {
-              [n.key('SGW', [env_name, 'PROJ'])]: {
-                display_name: n.display('sgw', [env_name, 'proj']),
+              [n.key('SGW', key_segments + ['PROJ'])]: {
+                display_name: n.display('sgw', name_segments + ['proj']),
                 services: 'all-services',
               },
             },
           } + if has_natgw then {
             nat_gateways: {
-              [n.key('NGW', [env_name, 'PROJ'])]: {
-                display_name: n.display('ngw', [env_name, 'proj']),
+              [n.key('NGW', key_segments + ['PROJ'])]: {
+                display_name: n.display('ngw', name_segments + ['proj']),
               },
             },
           } else {},
@@ -228,10 +234,10 @@ function(inputs)
     };
 
   local categories = {
-    ['%d-%s' % [s.index, s.name]]: spoke_category(
-      s.name,
+    ['%d-%s' % [s.index, s.entry.qualified_name]]: spoke_category(
+      s.entry,
       s.env,
-      local current_spoke_vcn_key = n.key('VCN', [s.name, 'PROJECTS']);
+      local current_spoke_vcn_key = n.key('VCN', s.entry.key_segments + ['PROJECTS']);
       if hub_has_spoke_natgw then [
         p
         for p in all_peer_vcn_entries

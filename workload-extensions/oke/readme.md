@@ -8,10 +8,7 @@ Welcome to the **OKE Landing Zone Extension**.
 
 The OKE Landing Zone Extension is a secure cloud environment, designed with the best practices to simplify the on-boarding of OKE workloads and enable the continuous operations of their cloud resources. This reference architecture provides an automated landing zone configuration.
 
-Currently two options are available
-
-- [**Simple OKE deployment**](./simple) - 1 OKE Cluster in production environment using a simple published configuration. Config-driven generation can customize the simple pattern, including native or overlay OKE networking.
-- [**Advanced OKE deployment**](./advanced) - 3 OKE Clusters in prod, pre-prod and management environments using an advanced configuration. 
+Use the [**Simple OKE deployment**](./simple) to deploy one OKE cluster in a production environment from the published configuration, or use config-driven generation to add the environments and OKE platforms required by your design.
 
 &nbsp;
 

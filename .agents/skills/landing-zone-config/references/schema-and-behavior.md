@@ -4,7 +4,7 @@
 
 - `gen/config.libsonnet` validates the required config shape and normalizes omitted values.
 - `gen/landing_zone.libsonnet` turns normalized config into hub, spoke, platform, IAM, governance, security, observability, and extension outputs.
-- `gen/landing_zone_multi.jsonnet` decides which output files appear in config mode.
+- `gen/landing_zone_multi.jsonnet` decides which output files appear in Blueprint Factory config mode.
 - `gen/AGENTS.md` explains the intended architecture, naming conventions, and publication guardrails.
 
 ## Minimal Config Shape
@@ -36,7 +36,8 @@ Optional but important:
 
 - `region`, defaulting to `eu-frankfurt-1`
 - `region_short_name`, defaulting to `fra`
-- `realm`, defaulting to `oc1` (including when explicitly `null`)
+- `realm`, defaulting to `oc1` (including when explicitly `null`); supported values are `oc1` and `oc19`
+- `cis_level`, defaulting to `2`; Blueprint Factory config mode emits only the selected CIS level's security and observability files
 - `hub.network.subnets`
 - `shared_platforms`
 - `environments.<env>.platforms`
@@ -46,6 +47,9 @@ Optional but important:
 `gen/config.libsonnet` applies these defaults and assertions:
 
 - `hub.kind` must be one of `hub_a`, `hub_b`, `hub_c`, `hub_e`
+- `region` and `region_short_name` must be provided together or omitted together
+- `realm` must be one of the realms defined in `gen/constants.libsonnet`
+- `cis_level` must be `1` or `2`; strings `'1'` and `'2'` are also normalized
 - If `hub.network.subnets` is omitted, hub subnets are auto-generated from the hub VCN using the canonical order for that hub kind
 - If `shared_project_network.network.subnets` is omitted, spoke subnets auto-generate as `web`, `app`, `db`, `infra`
 - If a platform omits `network.subnets` and has an `extension`, subnet generation is delegated to that extension
@@ -116,14 +120,19 @@ It also contributes default platform subnets when the platform omits explicit `n
 - `network.json`
 - `iam.json`
 - `governance.json`
-- `security_cis1_pre.json`
-- `security_cis1.json`
-- `security_cis2_pre.json`
-- `security_cis2.json`
-- `observability_cis1_pre.json`
-- `observability_cis1.json`
-- `observability_cis2_pre.json`
-- `observability_cis2.json`
+
+For the selected `cis_level`, it also emits one security and one observability pair. Omitted `cis_level` defaults to level 2:
+
+- `cis_level: 1`
+  - `security_cis1_pre.json`
+  - `security_cis1.json`
+  - `observability_cis1_pre.json`
+  - `observability_cis1.json`
+- `cis_level: 2` or omitted
+  - `security_cis2_pre.json`
+  - `security_cis2.json`
+  - `observability_cis2_pre.json`
+  - `observability_cis2.json`
 
 Conditional outputs:
 
@@ -137,4 +146,4 @@ Conditional outputs:
 2. Add one environment or platform at a time.
 3. Run `bash gen/generate.sh --config <config_file> [output_dir]`.
 4. Validate `network.json` as the canonical final network artifact; expect `network_pre.json` only for staged hubs.
-5. When changing schema or extension assumptions, update tests or regression fixtures that cover config mode.
+5. When changing schema or extension assumptions, update tests or regression fixtures that cover Blueprint Factory config mode.

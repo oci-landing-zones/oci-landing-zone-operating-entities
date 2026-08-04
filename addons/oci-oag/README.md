@@ -16,7 +16,7 @@ OCI Operating Entities LZ may optionally deploy OCI IAM Groups and Policies for 
 The policies granted to the Access Governance Group which are used for the OAG Instance to query OCI services in the tenancy are read only.  This allows for OAG to review access in the OCI tenancy and align to the CIS OCI Foundations Benchmark.  The policy statements are below:
 
 > [!NOTE]
-> Step 1 : The One-OE Landing Zone serves as the foundational setup for all workloads. It covers essential IAM. The OAG add-on will create an additional group "GRP-OE-OAG-ADMINS" and below set of policies . Ensure the below group and polcies to be added to the configuration [oci_open_lz_one-oe_iam.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json).
+> Step 1 : The One-OE Landing Zone serves as the foundational setup for all workloads. It covers essential IAM. The OAG add-on will create an additional group "GRP-OE-OAG-ADMINS" and below set of policies . Ensure the below group and polcies to be added to the configuration [oneoe_iam.json](../../blueprints/one-oe/runtime/one-stack/oneoe_iam.json).
 
 ```
 allow group GRP-OE-OAG-ADMINS to inspect all-resources in tenancy

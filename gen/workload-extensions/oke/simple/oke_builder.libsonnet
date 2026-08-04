@@ -6,7 +6,7 @@
 //     metadata(params):: { default_subnets, subnet_order },
 //     render(params):: { metadata, contributions },
 //   }
-//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, pods_cidr?, cni_type?, cni?, cluster_size?}
+//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, worker_boot_volume_size?, pods_cidr?, cni_type?, cni?, cluster_size?, public_load_balancer?, create_fss?}
 //   params.network       — {vcn: 'cidr', subnets: {name: cidr}}
 //   params.naming        — naming object
 //   params.topology      — platform scope semantics from topology.libsonnet
@@ -16,10 +16,16 @@ local oke_workers = import './oke_workers.libsonnet';
 local oke_clusters = import './oke_clusters.libsonnet';
 local oke_network = import './oke_network.libsonnet';
 local oke_iam = import './oke_iam.libsonnet';
+local oke_iam_shared = import './oke_iam_shared.libsonnet';
+local oke_compartments = import './oke_compartments.libsonnet';
+local oke_governance = import './oke_governance.libsonnet';
+local oke_security = import './oke_security.libsonnet';
 local oke_context = import './oke_context.libsonnet';
 
 {
   metadata(params):: {
+    assert params.topology.scope_type == 'environment' :
+      'oke_simple is supported only under environments.<environment>.platforms',
     local raw_cni_type =
       if std.objectHas(params.config_params, 'cni_type') && params.config_params.cni_type != null then
         params.config_params.cni_type
@@ -32,6 +38,13 @@ local oke_context = import './oke_context.libsonnet';
         'config_params.cni_type must be one of: native, overlay';
       raw_cni_type,
     local is_overlay_network = cni_type == 'overlay',
+    local create_fss =
+      if std.objectHas(params.config_params, 'create_fss') && params.config_params.create_fss != null then
+        assert std.type(params.config_params.create_fss) == 'boolean' :
+          'config_params.create_fss must be a boolean';
+        params.config_params.create_fss
+      else
+        false,
     local raw_cluster_size =
       if std.objectHas(params.config_params, 'cluster_size') && params.config_params.cluster_size != null then
         params.config_params.cluster_size
@@ -79,30 +92,45 @@ local oke_context = import './oke_context.libsonnet';
           'control-plane': '/29',
           'int-lb': '/26',
           workers: '/23',
-        } + (if is_overlay_network then {} else {
+        } + (if create_fss then {
+          fss: '/26',
+        } else {}) + (if is_overlay_network then {} else {
           pods: '/21',
         }),
-        order: if is_overlay_network then ['workers', 'int-lb', 'control-plane'] else ['pods', 'workers', 'int-lb', 'control-plane'],
+        order:
+          (if is_overlay_network then ['workers', 'int-lb'] else ['pods', 'workers', 'int-lb']) +
+          (if create_fss then ['fss'] else []) +
+          ['control-plane'],
       },
       medium: {
         subnets: {
           'control-plane': '/29',
           'int-lb': '/25',
           workers: '/22',
-        } + (if is_overlay_network then {} else {
+        } + (if create_fss then {
+          fss: '/25',
+        } else {}) + (if is_overlay_network then {} else {
           pods: '/19',
         }),
-        order: if is_overlay_network then ['workers', 'int-lb', 'control-plane'] else ['pods', 'workers', 'int-lb', 'control-plane'],
+        order:
+          (if is_overlay_network then ['workers', 'int-lb'] else ['pods', 'workers', 'int-lb']) +
+          (if create_fss then ['fss'] else []) +
+          ['control-plane'],
       },
       large: {
         subnets: {
           'control-plane': '/29',
           'int-lb': '/24',
           workers: '/19',
-        } + (if is_overlay_network then {} else {
+        } + (if create_fss then {
+          fss: '/24',
+        } else {}) + (if is_overlay_network then {} else {
           pods: '/17',
         }),
-        order: if is_overlay_network then ['workers', 'int-lb', 'control-plane'] else ['pods', 'workers', 'int-lb', 'control-plane'],
+        order:
+          (if is_overlay_network then ['workers', 'int-lb'] else ['pods', 'workers', 'int-lb']) +
+          (if create_fss then ['fss'] else []) +
+          ['control-plane'],
       },
     },
     local subnet_profile =
@@ -116,18 +144,6 @@ local oke_context = import './oke_context.libsonnet';
   render(params)::
     local metadata = self.metadata(params);
     local ctx = oke_context.build(params, metadata);
-    local security_zone_contribution =
-      if ctx.scope.allow_security_target then {
-        security_zones_configuration+: {
-          security_zones+: {
-            [ctx.n.key_global('SZ-TGT', [ctx.env, 'PLATFORM', ctx.plat])]: {
-              name: ctx.n.display_global('sz-tgt', ctx.display_segments),
-              compartment_id: ctx.cmp_key,
-              recipe_key: 'SZ-RCP-LZ-05-WORKLOAD-KEY',
-            },
-          },
-        },
-      } else {};
     {
       metadata: metadata,
 
@@ -136,10 +152,16 @@ local oke_context = import './oke_context.libsonnet';
         oke_clusters: oke_clusters(ctx),
         network_pre: oke_network(ctx),
         iam: oke_iam(ctx),
-
-        // security_cis1/security_cis2 share the same security-zone target.
-        security_cis1: security_zone_contribution,
-        security_cis2: security_zone_contribution,
+        security_cis2: if ctx.cis_level == 2 then oke_security(ctx) else {},
       },
+    },
+  aggregate(results)::
+    local contexts = [
+      oke_context.build(result.render_params, result.metadata)
+      for result in results
+    ];
+    {
+      iam: oke_compartments(contexts) + oke_iam_shared(contexts),
+      governance: oke_governance,
     },
 }

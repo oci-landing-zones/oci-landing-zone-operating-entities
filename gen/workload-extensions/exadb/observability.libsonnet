@@ -15,9 +15,13 @@ local exadb_events = import './events.libsonnet';
     local topic_emails(key) = notification.topic_emails(key);
     local subscriptions(email_key) = [{ protocol: 'EMAIL', values: topic_emails(email_key) }];
 
+    local env_scope(env_name) = model.environment_scope(env_name);
     local shared_infra_topic_key = n.key_global('NOTT', [product_upper, 'SHARED', 'INFRA', 'WORKLOADS']);
     local db_topic_key = n.key_global('NOTT', [product_upper, 'DB', 'WORKLOADS']);
-    local env_topic_key(env_name) = n.key_global('NOTT', [env_name, product_upper, 'PROJECTS']);
+    local env_topic_key(env_name) = n.key_global(
+      'NOTT',
+      env_scope(env_name).key_segments + [product_upper, 'PROJECTS']
+    );
     local project_environment_names = [
       env_name
       for env_name in std.objectFields(model.by_environment)
@@ -25,9 +29,9 @@ local exadb_events = import './events.libsonnet';
     ];
     local project_topics = {
       [env_topic_key(env_name)]: {
-        name: n.display_global('nott', [env_name, product.code]),
-        description: descriptions.project_topic(model.environment_scope(env_name)),
-        compartment_id: n.key_global('CMP', [env_name, 'SECURITY']),
+        name: n.display_global('nott', env_scope(env_name).name_segments + [product.code]),
+        description: descriptions.project_topic(env_scope(env_name)),
+        compartment_id: n.key_global('CMP', env_scope(env_name).key_segments + ['SECURITY']),
         subscriptions: subscriptions('projects'),
       }
       for env_name in project_environment_names
@@ -58,20 +62,23 @@ local exadb_events = import './events.libsonnet';
       if product.code == 'exacc' then ['NOTIFICATION', 'OPERATOR', 'ACCESS', 'CONTROL']
       else ['NOTIFICATION', product_upper, 'OPERATOR', 'ACCESS', 'CONTROL'];
     local project_rule_segments(env_name, project_name, project_count) =
+      local scope = env_scope(env_name);
       local base =
-        if product.code == 'exacc' then [env_name, 'NOTIFICATION', 'PROJECTS']
-        else [env_name, product_upper, 'NOTIFICATION', 'PROJECTS'];
+        if product.code == 'exacc' then scope.key_segments + ['NOTIFICATION', 'PROJECTS']
+        else scope.key_segments + [product_upper, 'NOTIFICATION', 'PROJECTS'];
       if project_count == 1 then base else base + [project_name];
     local project_display_segments(env_name, project_name, project_count) =
+      local scope = env_scope(env_name);
       if project_count == 1 then
-        [env_name, 'notify-on-notifications']
+        scope.name_segments + ['notify-on-notifications']
       else
-        [env_name, 'notify-on-notifications', project_name];
+        scope.name_segments + ['notify-on-notifications', project_name];
     local project_event_rules_for_env(env_name) =
       local project_names = model.by_environment[env_name];
+      local scope = env_scope(env_name);
       {
         [n.key_global('RUL', project_rule_segments(env_name, project_name, std.length(project_names)))]: {
-          compartment_id: inputs.project_db_key(env_name, project_name),
+          compartment_id: inputs.project_db_key(scope, project_name),
           destination_topic_ids: [env_topic_key(env_name)],
           event_display_name:
             n.display_global('rul', project_display_segments(env_name, project_name, std.length(project_names))),
@@ -116,8 +123,8 @@ local exadb_events = import './events.libsonnet';
         },
         } else {}) + all_project_event_rules
       else
-        if std.objectHas(model.by_environment, scope.scope_name) then
-          project_event_rules_for_env(scope.scope_name)
+        if std.objectHas(model.by_environment, model.scope_key) then
+          project_event_rules_for_env(model.scope_key)
         else {};
 
     local alarm(key_segments, display_segments, topic_key, namespace, query, severity='CRITICAL') = {

@@ -2,6 +2,7 @@
 // Config normalization and subnet policy selection for OCI Landing Zone.
 local cidrs = import 'lib/cidrs.libsonnet';
 local collections = import 'lib/collections.libsonnet';
+local constants = import 'constants.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
 local validation = import 'lib/validation.libsonnet';
 
@@ -13,6 +14,7 @@ local validation = import 'lib/validation.libsonnet';
     hub_c: ['untrust', 'trust', 'lb', 'mgmt', 'mon', 'dns'],
   },
   local supported_hub_kinds = std.objectFields(hub_subnet_order),
+  local supported_realms = std.objectFields(constants),
 
   local spoke_subnet_names = ['web', 'app', 'db', 'infra'],
 
@@ -71,6 +73,18 @@ local validation = import 'lib/validation.libsonnet';
     local realm =
       if std.objectHas(config, 'realm') && config.realm != null then config.realm
       else 'oc1';
+    assert std.member(supported_realms, realm) :
+      'config.realm must be one of: %s' % std.join(', ', supported_realms);
+
+    local raw_cis_level =
+      if std.objectHas(config, 'cis_level') && config.cis_level != null then config.cis_level
+      else 2;
+    assert raw_cis_level == 1 || raw_cis_level == 2 ||
+           raw_cis_level == '1' || raw_cis_level == '2' :
+      'config.cis_level must be 1 or 2';
+    local cis_level =
+      if raw_cis_level == 1 || raw_cis_level == '1' then 1
+      else 2;
 
     local hub_subnet_keys = hub_subnet_order[hub_kind];
     local hub_subnet_label = 'config.hub.network.subnets for %s' % hub_kind;
@@ -193,6 +207,7 @@ local validation = import 'lib/validation.libsonnet';
       region: region,
       region_short_name: region_short_name,
       realm: realm,
+      cis_level: cis_level,
       hub+: { network+: { subnets: hub_subnets } },
       environments: norm_envs,
       [if security_target_names != null then 'security_targets']: security_target_names,

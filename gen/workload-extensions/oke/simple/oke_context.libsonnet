@@ -1,6 +1,7 @@
 // OKE render context and customer-authored parameter validation.
 
 local cidrs = import '../../../lib/cidrs.libsonnet';
+local public_lb = import './oke_public_load_balancer.libsonnet';
 
 {
   build(params, metadata)::
@@ -9,24 +10,37 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
   assert std.objectHas(params.config_params, 'api_endpoint_allowed_cidrs') :
     'oke_simple requires config_params.api_endpoint_allowed_cidrs';
 
-  local n = params.naming;
-  local scope = params.topology;
-  local env = scope.scope_name;
-  local env_long_title = scope.scope_long_title;
-  local plat = scope.platform_name;
-  local display_segments = [env, plat];
-  local cmp_key = scope.compartment_key;
+	  local n = params.naming;
+	  local scope = params.topology;
+	  local env = scope.qualified_name;
+	  local env_long_title = scope.scope_long_title;
+	  local plat = scope.platform_name;
+	  local key_segments = scope.key_segments + ['PLATFORM', plat];
+	  local display_segments = scope.name_segments + [plat];
+	  local cmp_key = scope.compartment_key;
   local routing = if std.objectHas(params, 'routing') then params.routing else null;
   local has_hub = routing != null && routing.hub != null;
   local hub_lb_cidr =
     if routing != null && std.objectHas(routing, 'hub_lb_cidr') then routing.hub_lb_cidr
     else null;
+  local public_load_balancer = public_lb.public_load_balancer_enabled(params.platform_config);
+  local create_fss =
+    if std.objectHas(params.config_params, 'create_fss') && params.config_params.create_fss != null then
+      assert std.type(params.config_params.create_fss) == 'boolean' :
+        'config_params.create_fss must be a boolean';
+      params.config_params.create_fss
+    else
+      false;
+  assert !public_load_balancer || has_hub :
+    'oke_simple config_params.public_load_balancer requires a hub-backed platform network';
+  assert !public_load_balancer || hub_lb_cidr != null :
+    'oke_simple config_params.public_load_balancer requires the Hub load balancer subnet';
   local internet_default_target =
     if routing != null && std.objectHas(routing, 'internet_default_target')
     then routing.internet_default_target
     else 'local_natgw';
   local use_local_natgw = internet_default_target == 'local_natgw';
-  local category_key = '%s-platform-%s' % [std.asciiLower(env), std.asciiLower(plat)];
+	  local category_key = '%s-platform-%s' % [std.asciiLower(scope.qualified_name), std.asciiLower(plat)];
   local services_cidr =
     local validated = cidrs.validate('config_params.services_cidr', params.config_params.services_cidr);
     assert !cidrs.overlaps(validated, params.network.vcn) :
@@ -123,11 +137,25 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
         'config_params.worker_image must be a string';
       params.config_params.worker_image
     else
-      '8.10';
+      '9\\.[0-9]+';
+  local worker_boot_volume_size =
+    if std.objectHas(params.config_params, 'worker_boot_volume_size') &&
+       params.config_params.worker_boot_volume_size != null then
+      assert std.type(params.config_params.worker_boot_volume_size) == 'number' :
+        'config_params.worker_boot_volume_size must be a number';
+      assert std.floor(params.config_params.worker_boot_volume_size) ==
+             params.config_params.worker_boot_volume_size :
+        'config_params.worker_boot_volume_size must be an integer';
+      assert params.config_params.worker_boot_volume_size >= 50 &&
+             params.config_params.worker_boot_volume_size <= 32768 :
+        'config_params.worker_boot_volume_size must be between 50 and 32768 GB';
+      params.config_params.worker_boot_volume_size
+    else
+      60;
   local sn_key(suffix) =
-    n.key('SN', [env, 'PLATFORM', plat, suffix]);
+    n.key('SN', key_segments + [suffix]);
   local rt_key(suffix) =
-    n.key('RT', [env, 'PLATFORM', plat, suffix]);
+    n.key('RT', key_segments + [suffix]);
   local checked_oke_name(label, value, max_len) =
     assert std.length(value) <= max_len :
       '%s must be %d characters or less: %s (%d)' % [label, max_len, value, std.length(value)];
@@ -140,19 +168,27 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     n.key('NDP', display_segments);
   local node_pool_name =
     checked_oke_name('OKE node pool name', n.display('ndp', display_segments), 32);
+  local vault_key =
+    n.key_global('VLT', ['SHARED', 'SECURITY']);
+  local kube_secret_key =
+    n.key('KEY', display_segments + ['KUBE', 'SECRETS']);
   {
     params: params,
     metadata: metadata,
     n: n,
-    scope: scope,
-    env: env,
+	    scope: scope,
+	    env: env,
     env_long_title: env_long_title,
-    plat: plat,
-    display_segments: display_segments,
+	    plat: plat,
+	    key_segments: key_segments,
+	    display_segments: display_segments,
     cmp_key: cmp_key,
     routing: routing,
     has_hub: has_hub,
     hub_lb_cidr: hub_lb_cidr,
+    public_load_balancer: public_load_balancer,
+    create_fss: create_fss,
+    platform_tag_value: public_lb.platform_tag_value(scope.qualified_name, plat),
     internet_default_target: internet_default_target,
     use_local_natgw: use_local_natgw,
     category_key: category_key,
@@ -166,31 +202,43 @@ local cidrs = import '../../../lib/cidrs.libsonnet';
     is_overlay_network: is_overlay_network,
     optional_cluster_kubernetes_network_config: optional_cluster_kubernetes_network_config,
     worker_image: worker_image,
+    worker_boot_volume_size: worker_boot_volume_size,
+    cis_level: params.cis_level,
     cluster_key: cluster_key,
     cluster_name: cluster_name,
     node_pool_key: node_pool_key,
     node_pool_name: node_pool_name,
+    vault_key: vault_key,
+    vault_name: n.display_global('vlt', ['shared', 'security']),
+    kube_secret_key: kube_secret_key,
+    kube_secret_key_name: n.display('key', display_segments + ['kube', 'secrets']),
     subnets: params.network.subnets,
-    vcn_key: n.key('VCN', [env, 'PLATFORM', plat]),
-    sgw_key: n.key('SGW', [env, 'PLATFORM', plat]),
-    ngw_key: n.key('NGW', [env, 'PLATFORM', plat]),
+	    vcn_key: n.key('VCN', key_segments),
+	    hub_vcn_key: n.key('VCN', ['HUB']),
+	    sgw_key: n.key('SGW', key_segments),
+	    ngw_key: n.key('NGW', key_segments),
     drg_key: n.key('DRG', ['HUB']),
     sn_cp_key: sn_key('CP'),
+    sn_fss_key: sn_key('FSS'),
     sn_lb_key: sn_key('INT-LB'),
     sn_pods_key: sn_key('PODS'),
     sn_workers_key: sn_key('WORKERS'),
     rt_cp_key: rt_key('CP'),
+    rt_fss_key: rt_key('FSS'),
     rt_lb_key: rt_key('INT-LB'),
     rt_pods_key: rt_key('PODS'),
     rt_workers_key: rt_key('WORKERS'),
-    sl_cp_key: n.key('SL', [env, 'PLATFORM', plat, 'CP']),
-    sl_lb_key: n.key('SL', [env, 'PLATFORM', plat, 'INT-LB']),
-    sl_pods_key: n.key('SL', [env, 'PLATFORM', plat, 'PODS']),
-    sl_workers_key: n.key('SL', [env, 'PLATFORM', plat, 'WORKERS']),
-    nsg_cp_key: n.key('NSG', [env, 'PLATFORM', plat, 'CP']),
-    nsg_lb_key: n.key('NSG', [env, 'PLATFORM', plat, 'INT-LB']),
-    nsg_pods_key: n.key('NSG', [env, 'PLATFORM', plat, 'PODS']),
-    nsg_workers_key: n.key('NSG', [env, 'PLATFORM', plat, 'WORKERS']),
+	    sl_cp_key: n.key('SL', key_segments + ['CP']),
+	    sl_fss_key: n.key('SL', key_segments + ['FSS']),
+	    sl_lb_key: n.key('SL', key_segments + ['INT-LB']),
+	    sl_pods_key: n.key('SL', key_segments + ['PODS']),
+	    sl_workers_key: n.key('SL', key_segments + ['WORKERS']),
+	    nsg_cp_key: n.key('NSG', key_segments + ['CP']),
+	    nsg_fss_key: n.key('NSG', key_segments + ['FSS']),
+	    nsg_lb_key: n.key('NSG', key_segments + ['INT-LB']),
+	    nsg_pods_key: n.key('NSG', key_segments + ['PODS']),
+	    nsg_workers_key: n.key('NSG', key_segments + ['WORKERS']),
+    hub_frontend_nsg_key: n.key('NSG', ['HUB'] + key_segments + ['PUBLIC-LB']),
     dns: scope.dns,
   },
 }

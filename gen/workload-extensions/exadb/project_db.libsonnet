@@ -24,11 +24,20 @@ local validation = import '../../lib/validation.libsonnet';
            '%s placement must include infrastructure or database' % product.code;
     components,
 
+  scope_key_segments(scope)::
+    if std.objectHas(scope, 'key_segments') then scope.key_segments else [scope.scope_name],
+
+  scope_name_segments(scope)::
+    if std.objectHas(scope, 'name_segments') then scope.name_segments else [scope.scope_name],
+
+  scope_qualified_name(scope)::
+    if std.objectHas(scope, 'qualified_name') then scope.qualified_name else scope.scope_name,
+
   platform_db_key(product, n, scope)::
-    n.key_global('CMP', [scope.scope_name, scope.platform_name, 'DB']),
+    n.key_global('CMP', $.scope_key_segments(scope) + [scope.platform_name, 'DB']),
 
   platform_infra_key(product, n, scope)::
-    n.key_global('CMP', [scope.scope_name, scope.platform_name, 'INFRA']),
+    n.key_global('CMP', $.scope_key_segments(scope) + [scope.platform_name, 'INFRA']),
 
   platform_children(inputs)::
     local product = inputs.product;
@@ -64,6 +73,20 @@ local validation = import '../../lib/validation.libsonnet';
       product.code,
     ],
 
+  project_db_key_for_scope(product, n, scope, project_name)::
+    n.key_global('CMP', $.scope_key_segments(scope) + [
+      project_name,
+      std.asciiUpper(product.code),
+      'DB',
+    ]),
+
+  project_db_name_for_scope(product, scope, project_name)::
+    'cmp-lz-%s-%s-%s-db' % [
+      std.join('-', [std.asciiLower(s) for s in $.scope_name_segments(scope)]),
+      std.asciiLower(project_name),
+      product.code,
+    ],
+
   platform_compartment_overlay(inputs)::
     local product = inputs.product;
     local n = inputs.naming;
@@ -89,9 +112,9 @@ local validation = import '../../lib/validation.libsonnet';
     } else {
       'CMP-LANDINGZONE-KEY'+: {
         children+: {
-          [n.key_global('CMP', [scope.scope_name])]+: {
+          [n.key_global('CMP', $.scope_key_segments(scope))]+: {
             children+: {
-              [n.key_global('CMP', [scope.scope_name, 'PLATFORM'])]+: {
+              [n.key_global('CMP', $.scope_key_segments(scope) + ['PLATFORM'])]+: {
                 children+: {
                   [platform_key]+: {
                     description: descriptions.platform_compartment(scope),
@@ -112,14 +135,17 @@ local validation = import '../../lib/validation.libsonnet';
     local descriptions = inputs.descriptions;
     local model = inputs.model;
     local tag_key = inputs.tag_key;
-    local project_children(env_name) = std.foldl(
+    local project_children(env_key) =
+      local env_scope = model.environment_scope(env_key);
+      local env_segments = $.scope_key_segments(env_scope);
+      std.foldl(
       function(acc, project_name) acc {
-        [n.key_global('CMP', [env_name, project_name])]+: {
+        [n.key_global('CMP', env_segments + [project_name])]+: {
           children+: {
-            [$.project_db_key(product, n, env_name, project_name)]: {
-              name: $.project_db_name(product, env_name, project_name),
+            [$.project_db_key_for_scope(product, n, env_scope, project_name)]: {
+              name: $.project_db_name_for_scope(product, env_scope, project_name),
               description: descriptions.project_db_compartment(
-                model.environment_scope(env_name),
+                env_scope,
                 project_name
               ),
               defined_tags: { [tag_key]: product.tags.db },
@@ -127,15 +153,18 @@ local validation = import '../../lib/validation.libsonnet';
           },
         },
       },
-      model.by_environment[env_name],
+      model.by_environment[env_key],
       {}
     );
     local environment_children = std.foldl(
-      function(acc, env_name) acc {
-        [n.key_global('CMP', [env_name])]+: {
+      function(acc, env_key)
+        local env_scope = model.environment_scope(env_key);
+        local env_segments = $.scope_key_segments(env_scope);
+        acc {
+        [n.key_global('CMP', env_segments)]+: {
           children+: {
-            [n.key_global('CMP', [env_name, 'PROJECTS'])]+: {
-              children+: project_children(env_name),
+            [n.key_global('CMP', env_segments + ['PROJECTS'])]+: {
+              children+: project_children(env_key),
             },
           },
         },
@@ -174,14 +203,36 @@ local validation = import '../../lib/validation.libsonnet';
     local entries = inputs.entries;
     local tag_key = inputs.tag_key;
     local topo = if std.objectHas(inputs, 'topology') then inputs.topology else null;
+    local scope_config =
+      if std.length(entries) > 0 && std.objectHas(entries[0], 'scope_config') then
+        entries[0].scope_config
+      else {};
+    local environment_entries =
+      if std.objectHas(scope_config, 'environment_entries') then scope_config.environment_entries
+      else {};
+    local environment_entries_by_env_name =
+      if std.objectHas(scope_config, 'environment_entries_by_env_name') then
+        scope_config.environment_entries_by_env_name
+      else {};
+    local env_entry_for_key(env_key) =
+      if std.objectHas(environment_entries, env_key) then environment_entries[env_key]
+      else if std.objectHas(environment_entries_by_env_name, env_key) then
+        environment_entries_by_env_name[env_key]
+      else null;
+    local normalize_env_key(env_key) =
+      local entry = env_entry_for_key(env_key);
+      if entry == null then env_key else entry.qualified_name;
     local entry_project_db_map(entry) =
       local params = entry.platform_config.extension.params;
       if std.objectHas(params, 'project_db_compartments')
          && params.project_db_compartments != null then
         if product.code == 'exacs' && entry.scope.scope_type == 'shared' then
-          params.project_db_compartments
+          {
+            [normalize_env_key(env_key)]: params.project_db_compartments[env_key]
+            for env_key in std.objectFields(params.project_db_compartments)
+          }
         else
-          { [entry.scope.scope_name]: params.project_db_compartments }
+          { [$.scope_qualified_name(entry.scope)]: params.project_db_compartments }
       else {};
     local merged_project_db_map = std.foldl(
       function(acc, entry)
@@ -199,19 +250,23 @@ local validation = import '../../lib/validation.libsonnet';
       [env_name]: collections.unique(merged_project_db_map[env_name])
       for env_name in std.objectFields(merged_project_db_map)
     };
-    local scope_for(env_name) =
-      local env_entries = [
+    local scope_for(env_key) =
+      local platform_scopes = [
         entry.scope
         for entry in entries
-        if entry.scope.scope_type == 'environment' && entry.scope.scope_name == env_name
+        if entry.scope.scope_type == 'environment' && $.scope_qualified_name(entry.scope) == env_key
       ];
-      if std.length(env_entries) > 0 then env_entries[0]
-      else topo.env_platform(env_name, product.code);
+      local env_entry = env_entry_for_key(env_key);
+      if std.length(platform_scopes) > 0 then platform_scopes[0]
+      else if env_entry != null && topo != null then topo.env_platform(env_entry, product.code)
+      else if topo != null then topo.env_platform(env_key, product.code)
+      else error 'cannot resolve project DB environment scope %s' % env_key;
     {
-      [$.project_db_key(product, n, env_name, project_name)]: {
-        name: $.project_db_name(product, env_name, project_name),
-        description: descriptions.project_db_compartment(scope_for(env_name), project_name),
-        parent_id: n.key_global('CMP', [env_name, project_name]),
+      [$.project_db_key_for_scope(product, n, scope_for(env_name), project_name)]: {
+        local project_scope = scope_for(env_name),
+        name: $.project_db_name_for_scope(product, project_scope, project_name),
+        description: descriptions.project_db_compartment(project_scope, project_name),
+        parent_id: n.key_global('CMP', $.scope_key_segments(project_scope) + [project_name]),
         defined_tags: { [tag_key]: product.tags.db },
       }
       for env_name in std.objectFields(project_db_compartments)
@@ -227,7 +282,7 @@ local validation = import '../../lib/validation.libsonnet';
              'exacc project_db_compartments can only be set on environment platforms';
       assert std.type(cfg.project_db_compartments) == 'array' :
              'exacc project_db_compartments must be an array';
-      { [scope.scope_name]: cfg.project_db_compartments }
+      { [$.scope_qualified_name(scope)]: cfg.project_db_compartments }
     else if product.code == 'exacs' then
       if scope.scope_type == 'shared' then
         assert std.type(cfg.project_db_compartments) == 'object' :
@@ -236,7 +291,7 @@ local validation = import '../../lib/validation.libsonnet';
       else
         assert std.type(cfg.project_db_compartments) == 'array' :
                'exacs project_db_compartments must be an array when set on environment platforms';
-        { [scope.scope_name]: cfg.project_db_compartments }
+        { [$.scope_qualified_name(scope)]: cfg.project_db_compartments }
     else error 'Unsupported ExaDB product: %s' % product.code,
 
   validate_project_db_map(product, raw_project_db_compartments)::
@@ -251,10 +306,29 @@ local validation = import '../../lib/validation.libsonnet';
     local scope_config =
       if std.objectHas(inputs, 'scope_config') then inputs.scope_config
       else {};
-    local raw_project_db_compartments = self.validate_project_db_map(
+    local raw_project_db_compartments_unqualified = self.validate_project_db_map(
       product,
       self.raw_project_db_map(product, scope, inputs.cfg)
     );
+    local environment_entries =
+      if std.objectHas(scope_config, 'environment_entries') then scope_config.environment_entries
+      else {};
+    local environment_entries_by_env_name =
+      if std.objectHas(scope_config, 'environment_entries_by_env_name') then
+        scope_config.environment_entries_by_env_name
+      else {};
+    local env_entry_for_key(env_key) =
+      if std.objectHas(environment_entries, env_key) then environment_entries[env_key]
+      else if std.objectHas(environment_entries_by_env_name, env_key) then
+        environment_entries_by_env_name[env_key]
+      else null;
+    local normalize_env_key(env_key) =
+      local entry = env_entry_for_key(env_key);
+      if entry == null then env_key else entry.qualified_name;
+    local raw_project_db_compartments = {
+      [normalize_env_key(env_name)]: raw_project_db_compartments_unqualified[env_name]
+      for env_name in std.objectFields(raw_project_db_compartments_unqualified)
+    };
     local components =
       if std.objectHas(inputs, 'components') then inputs.components
       else self.normalize_components(product, inputs.cfg);
@@ -277,7 +351,7 @@ local validation = import '../../lib/validation.libsonnet';
     local environment_projects =
       if std.objectHas(scope_config, 'environment_projects') then scope_config.environment_projects
       else if std.objectHas(scope_config, 'projects') && scope.scope_type == 'environment' then
-        { [scope.scope_name]: scope_config.projects }
+        { [$.scope_qualified_name(scope)]: scope_config.projects }
       else {};
     local environment_labels =
       if std.objectHas(scope_config, 'environment_labels') then scope_config.environment_labels
@@ -305,21 +379,41 @@ local validation = import '../../lib/validation.libsonnet';
       std.join(', ', unknown_projects),
     ];
     local environment_scope(env_name) =
+      local env_entry = env_entry_for_key(env_name);
       local env_label =
         if std.objectHas(environment_labels, env_name) then environment_labels[env_name]
         else { scope_title: labels.title_case(env_name), scope_long_title: labels.title_case(env_name) };
-      if scope.scope_type == 'environment' && scope.scope_name == env_name then scope
+      if scope.scope_type == 'environment' && $.scope_qualified_name(scope) == env_name then scope
+      else if env_entry != null then scope {
+        scope_type: 'environment',
+        scope_name: env_entry.env_name,
+        qualified_name: env_entry.qualified_name,
+        key_segments: env_entry.key_segments,
+        display_segments: env_entry.display_segments,
+        name_segments: env_entry.name_segments,
+        compartment_segments: env_entry.compartment_segments,
+        dns_segments: env_entry.dns_segments,
+        scope_title: env_label.scope_title,
+        scope_long_title: env_label.scope_long_title,
+      }
       else scope {
         scope_type: 'environment',
         scope_name: env_name,
+        qualified_name: env_name,
+        key_segments: [env_name],
+        display_segments: [env_label.scope_title],
+        name_segments: [env_name],
+        compartment_segments: [env_name],
         scope_title: env_label.scope_title,
         scope_long_title: env_label.scope_long_title,
       };
 
     {
       by_environment: by_environment,
+      scope_key: $.scope_qualified_name(scope),
       scope_project_names:
-        if std.objectHas(by_environment, scope.scope_name) then by_environment[scope.scope_name]
+        if std.objectHas(by_environment, $.scope_qualified_name(scope)) then
+          by_environment[$.scope_qualified_name(scope)]
         else [],
 
       environment_scope(env_name):: environment_scope(env_name),
@@ -327,7 +421,9 @@ local validation = import '../../lib/validation.libsonnet';
       specs: std.flattenArrays([
         [
           {
-            env_name: env_name,
+            env_key: env_name,
+            env_name: environment_scope(env_name).scope_name,
+            qualified_name: env_name,
             project_name: project_name,
             scope: environment_scope(env_name),
           }

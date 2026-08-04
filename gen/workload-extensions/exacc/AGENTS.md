@@ -86,7 +86,9 @@ Environment platform example with project DB compartments:
 - Single-stack entrypoints emit full One-OE + ExaDB-C@C outputs:
   - `exacc_identity_uc1.json`
   - `exacc_governance_uc1.json`
+  - `exacc_security_cis1_uc1_pre.json`
   - `exacc_security_cis1_uc1.json`
+  - `exacc_security_cis2_uc1_pre.json`
   - `exacc_security_cis2_uc1.json`
   - `exacc_observability_cis1_uc1.json`
   - `exacc_observability_cis2_uc1.json`

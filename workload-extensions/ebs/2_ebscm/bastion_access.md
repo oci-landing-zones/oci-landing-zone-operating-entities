@@ -118,7 +118,7 @@ https://example.com/
 
 ## **3. EBS Environment Access**
 
-In this example we are using https and port 443 connecting to the domain https://prodapp.ebs with an IP of 10.0.73.89
+In this example we are using https and port 443 connecting to the domain `https://prodapp.ebs` with an IP of 10.0.73.89
 
 Add your EBS domain entry to your hosts file, eg:
 ```
@@ -158,7 +158,7 @@ sudo ssh -i <private_Key> -N -L 443:<ip_ebs_lb>:443 -p 22 <bastion_session_ocid>
 | <ip_ebscm_lb> | The IP address of the EBSCM Load Balancer |
 | <bastion_session_ocid> | The OCID of the Bastion session |
 
-Finally, point your browser to: https://prodapp.ebs
+Finally, point your browser to: `https://prodapp.ebs`
 
 &nbsp;
 

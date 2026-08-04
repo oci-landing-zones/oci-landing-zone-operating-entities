@@ -15,6 +15,7 @@ local network_spokes_builder = import 'builders/network_spokes.libsonnet';
 local observability_builder = import 'builders/observability.libsonnet';
 local security_builder = import 'builders/security.libsonnet';
 local extensions = import 'extensions.libsonnet';
+local policy_limits = import 'lib/policy_limits.libsonnet';
 local platforms = import 'platforms.libsonnet';
 local render_context = import 'render_context.libsonnet';
 local hub_builders = {
@@ -29,6 +30,7 @@ local extension_registry = {
   oke_simple: import 'workload-extensions/oke/simple/oke_simple.libsonnet',
   exacc: import 'workload-extensions/exacc/exacc.libsonnet',
   exacs: import 'workload-extensions/exacs/exacs.libsonnet',
+  ocvs: import 'workload-extensions/ocvs/ocvs.libsonnet',
 };
 
 function(raw_config)
@@ -43,6 +45,12 @@ function(raw_config)
   local all_vcn_entries = ctx.all_vcn_entries;
   local lb_env_name = ctx.lb_env_name;
   local lb_backends = ctx.lb_backends;
+  local create_hub_l7_load_balancer =
+    std.length([
+      entry
+      for entry in extension_entries
+      if entry.platform_config.extension.type == 'oke_simple'
+    ]) == 0;
 
   // Hub CIDRs needed for spoke NSG/security list rules
   local hub_vcn_cidr = config.hub.network.vcn;
@@ -60,6 +68,7 @@ function(raw_config)
       { name: entry.name, cidr: entry.vcn }
       for entry in all_vcn_entries
     ],
+    create_l7_load_balancer: create_hub_l7_load_balancer,
     lb_backends: lb_backends,
     lb_env_name: lb_env_name,
   });
@@ -100,6 +109,7 @@ function(raw_config)
   local extension_state = extensions.resolve({
     extension_registry: extension_registry,
     extension_entries: extension_entries,
+    cis_level: config.cis_level,
     naming: n,
     hub_vcn_cidr: hub_vcn_cidr,
     hub_lb_cidr: config.hub.network.subnets.lb,
@@ -108,11 +118,14 @@ function(raw_config)
   });
   local extension_network_pre = extension_state.network_pre;
   local extension_iam = extension_state.iam;
+  local extension_governance = extension_state.governance;
   local extension_security_cis1 = extension_state.security_cis1;
   local extension_security_cis2 = extension_state.security_cis2;
   local extension_observability_cis1 = extension_state.observability_cis1;
   local extension_observability_cis2 = extension_state.observability_cis2;
   local extension_extra = extension_state.extra;
+  local assembled_iam = iam_builder(config, n, realm, topo) + extension_iam;
+  local checked_iam = policy_limits.validate(assembled_iam, 400);
 
   // --- Build security, observability, governance ---
   local security = security_builder(config, n, realm, topo);
@@ -128,6 +141,9 @@ function(raw_config)
 
   // --- Compose output ---
   {
+    // Normalized config-mode selector used by landing_zone_multi.jsonnet.
+    cis_level: config.cis_level,
+
     // Canonical network output: final deployable artifact for all hub types.
     network: assembled_network,
 
@@ -141,15 +157,17 @@ function(raw_config)
       else null,
 
     // IAM output: compartments, groups, identity domains, policies
-    iam: iam_builder(config, n, realm, topo) + extension_iam,
+    iam: checked_iam,
 
     // Governance output: tag namespaces and definitions
-    governance: governance_builder(config, n),
+    governance: governance_builder(config, n) + extension_governance,
 
-    // Security outputs: 4 CIS variants (merged with extension contributions)
-    security_cis1_pre: security.cis1_pre,
+    // Security outputs: extension-owned prerequisites must be available in the
+    // pre phase as well as the final phase. Consumers deploy the pre artifact
+    // before extension resources such as OKE clusters and node pools.
+    security_cis1_pre: security.cis1_pre + extension_security_cis1,
     security_cis1: security.cis1 + extension_security_cis1,
-    security_cis2_pre: security.cis2_pre,
+    security_cis2_pre: security.cis2_pre + extension_security_cis2,
     security_cis2: security.cis2 + extension_security_cis2,
 
     // Observability outputs: 4 CIS variants. Extension observability is

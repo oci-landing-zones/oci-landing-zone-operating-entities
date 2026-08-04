@@ -2,11 +2,13 @@ local subnet_utils = import 'lib/subnets.libsonnet';
 local validation = import 'lib/validation.libsonnet';
 local platforms = import 'platforms.libsonnet';
 local collections = import 'lib/collections.libsonnet';
+local extension_components = import 'lib/extension_components.libsonnet';
 
 {
   local standard_contribution_keys = [
     'network_pre',
     'iam',
+    'governance',
     'security_cis1',
     'security_cis2',
     'observability_cis1',
@@ -39,6 +41,20 @@ local collections = import 'lib/collections.libsonnet';
       results,
       {}
     ),
+
+  local aggregate_results(results) = [
+    {
+      type: extension_type,
+      contributions: validation.returned_object(
+        definition.aggregate(type_results),
+        'Extension "%s" aggregate(results)' % extension_type
+      ),
+    }
+    for extension_type in std.uniq(std.sort([result.type for result in results]))
+    for type_results in [[result for result in results if result.type == extension_type]]
+    for definition in [type_results[0].definition]
+    if std.objectHasAll(definition, 'aggregate')
+  ],
 
   select_entries_by_type(extension_entries, extension_type)::
     [
@@ -230,6 +246,8 @@ local collections = import 'lib/collections.libsonnet';
   _render_params(inputs, pe, resolved_subnets, routing, ext_meta)::
     {
       config_params: pe.platform_config.extension.params,
+      platform_config: pe.platform_config,
+      cis_level: inputs.cis_level,
       network:
         if ext_meta.has_network then
           { vcn: pe.platform_config.network.vcn, subnets: resolved_subnets }
@@ -245,66 +263,14 @@ local collections = import 'lib/collections.libsonnet';
   resolve(inputs)::
     local extension_registry = inputs.extension_registry;
     local extension_entries = inputs.extension_entries;
-    local component_defaults = { infrastructure: true, database: true };
-    local has_network(entry) =
-      std.objectHas(entry.platform_config, 'network') && entry.platform_config.network != null;
-    local has_project_db(entry) =
-      local cfg = entry.platform_config.extension.params;
-      std.objectHas(cfg, 'project_db_compartments') && cfg.project_db_compartments != null;
-    local has_shared_extension_type(ext_type) =
-      std.length([
-        entry
-        for entry in extension_entries
-        if entry.platform_config.extension.type == ext_type && entry.scope.scope_type == 'shared'
-      ]) > 0;
-    local entry_components(entry) =
-      local ext_type = entry.platform_config.extension.type;
-      local project_db_only =
-        ext_type == 'exacs' && has_project_db(entry) && !has_network(entry);
-      local inferred =
-        if ext_type != 'exacs' then component_defaults
-        else {
-          infrastructure:
-            entry.scope.scope_type == 'shared' ||
-            !has_shared_extension_type(ext_type) ||
-            project_db_only,
-          database: has_network(entry) || project_db_only,
-        };
-      inferred;
-    local extension_types = collections.unique([
-      entry.platform_config.extension.type
-      for entry in extension_entries
-    ]);
-    local extension_has_networks = {
-      [ext_type]: std.length([
-        entry
-        for entry in extension_entries
-        if entry.platform_config.extension.type == ext_type && has_network(entry)
-      ]) > 0
-      for ext_type in extension_types
-    };
-    local extension_components = {
-      [ext_type]: {
-        infrastructure: std.length([
-          entry
-          for entry in extension_entries
-          if entry.platform_config.extension.type == ext_type && entry_components(entry).infrastructure
-        ]) > 0,
-        database: std.length([
-          entry
-          for entry in extension_entries
-          if entry.platform_config.extension.type == ext_type && entry_components(entry).database
-        ]) > 0,
-      }
-      for ext_type in extension_types
-    };
+    local component_summary = extension_components.summarize(extension_entries);
     local results = std.map(
       function(entry)
         local entry_with_summary = entry {
           scope_config+: {
-            extension_components: extension_components,
-            extension_entry_components: entry_components(entry),
-            extension_has_networks: extension_has_networks,
+            extension_components: component_summary.extension_components,
+            extension_entry_components: component_summary.entry_components(entry),
+            extension_has_networks: component_summary.extension_has_networks,
           },
         };
         local resolved = self.resolve_entry(inputs { platform_entry: entry_with_summary });
@@ -316,19 +282,22 @@ local collections = import 'lib/collections.libsonnet';
                'Extension "%s" is missing required contribution "network_pre"' % resolved.type;
         {
           type: resolved.type,
+          definition: resolved.definition,
           metadata: resolved.metadata,
+          render_params: resolved.render_params,
           contributions: ext_contributions,
         },
       extension_entries
     );
+    local contribution_results = results + aggregate_results(results);
     {
       results: results,
     }
     + {
-      [key]: merge_contribution(results, key)
+      [key]: merge_contribution(contribution_results, key)
       for key in standard_contribution_keys
     }
     + {
-      extra: merge_extra_contributions(results),
+      extra: merge_extra_contributions(contribution_results),
     },
 }

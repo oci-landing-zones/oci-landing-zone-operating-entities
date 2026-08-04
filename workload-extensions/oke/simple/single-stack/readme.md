@@ -32,14 +32,13 @@
 | **TARGET RESOURCES** | Complete LZ Foundation, IAM, Hub Network, DRG, OKE VCN, OKE Cluster with all components integrated |
 | **DEPLOYMENT**          | Use the JSON files in this folder with Terraform CLI, or stage them in a customer-controlled private source for OCI Resource Manager as described in [Deployment Steps](#5-deployment-steps). [Terraform CLI](/commons/content/terraform.md) can also be used. |
 
-For customized OKE landing zones generated from a configuration file, see [OKE Config-Driven Generation](../config-driven.md).
-
-
 &nbsp;
 
 ## **2. Architecture Overview**
 
 This deployment combines **OneOE Blueprint**, **Hub Model E networking**, and **OKE cluster** into a **single comprehensive Terraform deployment**. Unlike the multi-stack approach where OKE is added to an existing Landing Zone, this single-stack deployment creates everything together from scratch.
+
+The quickstart creates one production OKE platform.
 
 <img src="../single-stack/content/oke_oneclick.png" width="800">
 
@@ -51,11 +50,16 @@ This deployment combines **OneOE Blueprint**, **Hub Model E networking**, and **
 
 **Key Features:**
 - **Complete Landing Zone Foundation**: OneOE compartment structure, IAM groups, policies
-- **Hub-and-Spoke Networking**: Hub VCN (Model E) with firewall capabilities + OKE Spoke VCN
+- **Hub-and-Spoke Networking**: Hub VCN (Model E, no firewall) + OKE Spoke VCN
 - **Automated Routing**: Hub route tables pre-configured  with OKE CIDR (10.0.80.0/20)
 - **DRG Integration**: Dynamic Routing Gateway with route distributions configured for Hub-Spoke communication
 - **CIS-Compliant OKE**: Uses the CIS-compliant OKE module from [terraform-oci-modules-workloads](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
-- **OKE Network Modes**: Published JSON is VCN-native by default; config-driven generation can also emit an overlay network shape for Flannel-compatible clusters
+- **Encryption**: The included OKE cluster and worker files use CIS1 with OCI-managed encryption. Worker boot-volume encryption in transit is enabled only for CIS2 generation.
+- **IAM profile**: `oke_identity.json` is rendered from CIS2 and includes compartment-scoped KMS authority. It is dormant for this quickstart because the CIS1 cluster and worker files contain no KMS key reference; keep unrelated keys out of the OKE platform compartment.
+- **OKE Network Mode**: The committed JSON uses VCN-native networking
+- **Public workload ingress**: OKE has narrowly scoped permissions to create public OCI Load Balancers in the prepared Hub subnet.
+
+See the shared [private and public LB/NLB Service examples](../readme.md#deploying-workload-load-balancers) before deploying workload ingress.
 
 &nbsp;
 
@@ -80,7 +84,7 @@ The deployment includes the complete OneOE blueprint with:
 
 ### **3.3 OKE Spoke Network** <!-- omit from toc -->
 
-**OKE VCN (`10.0.80.0/20`)** with dedicated subnets. The published single-stack JSON uses native networking and includes four subnets:
+**OKE VCN (`10.0.80.0/20`)** with dedicated subnets. The committed single-stack JSON uses native networking and includes four subnets:
 
 | Subnet | CIDR | Purpose | Size |
 |--------|------|---------|------|
@@ -95,7 +99,9 @@ The deployment includes the complete OneOE blueprint with:
 - NSG for Pods (pod-to-pod, pod-to-services)
 - NSG for Internal Load Balancers (NodePort range)
 
-For config-driven overlay generation, the OKE VCN uses only the Control Plane, Internal LB, and Worker Nodes subnets. The pod subnet, pod route table, pod security list, pod NSG, and worker pod networking fields are omitted because pod addressing comes from the Kubernetes overlay pod CIDR instead of an OCI pod subnet.
+The OKE quickstart does not create a hub-level OCI L7 Load Balancer. The Hub LB subnet is used for OKE-created public OCI Load Balancers when Kubernetes workloads define `Service` resources of type `LoadBalancer`.
+
+Before granting Kubernetes Service permissions, review the shared [operational and security notes](../readme.md#operational-and-security-notes).
 
 **Gateways:**
 - NAT Gateway for outbound internet access (all subnets)
@@ -116,41 +122,29 @@ For config-driven overlay generation, the OKE VCN uses only the Control Plane, I
 - **Kubernetes Version**: v1.35.2
 - **Cluster Type**: Enhanced cluster
 - **Control Plane**: Private endpoint in dedicated subnet
-- **Worker Pool**: 1x VM.Standard.E5.Flex (1 OCPU, 8GB RAM, Oracle Linux 8.10) - easily scalable
-- **CNI**: VCN-native pod networking in the published JSON; config-driven overlay generation requests Flannel
+- **Worker Pool**: 1x VM.Standard.E5.Flex (1 OCPU, 8GB RAM, latest matching Oracle Linux 9 OKE image) - easily scalable
+- **CNI**: VCN-native pod networking
+- **Kubernetes Secrets and Worker Boot Volume Encryption**: OCI-managed encryption; worker boot-volume encryption in transit is disabled for the included CIS1 configuration
 
 &nbsp;
 
-### **3.6 Native and Overlay Network Modes** <!-- omit from toc -->
-
-`oke_simple` separates the network shape emitted by the workload extension from the cluster CNI requested from the downstream OKE module.
-
-| Config parameter | Purpose | Supported values | Default |
-| --- | --- | --- | --- |
-| `cni_type` | Network shape emitted by this workload extension | `native`, `overlay` | `native` |
-| `cni` | OKE cluster CNI requested from the downstream OKE module | `vcn_native`, `flannel` | `vcn_native` for native, `flannel` for overlay |
-
-Native mode uses workload-extension `cni_type: native` and `cni: vcn_native`. It creates a pod subnet in the OKE VCN, creates the pod security list and pod NSG, and wires the worker node pool with `pods_subnet_id` and `pods_nsg_ids`.
-
-Overlay mode uses workload-extension `cni_type: overlay` and `cni: flannel`. It creates no OCI pod subnet and wires the worker node pool only with the worker subnet and worker NSG. Overlay mode defaults `pods_cidr` to `10.244.0.0/16`. Keep `services_cidr` and overlay `pods_cidr` non-overlapping with each other, the OKE VCN, and any routed on-premises, cloud, or peered ranges. Do not set workload-extension `cni_type` to `flannel`; `flannel` is the OKE CNI value, while `overlay` is the workload-extension network shape.
-
-For config-driven subnetting, prefer auto-subnet profiles. If `cluster_size` is omitted and no manual OKE subnet map is provided, the generator uses `small`. `small` requires an OKE VCN `/20`, `medium` requires `/18`, and `large` requires `/16`. Manual OKE subnet CIDRs are still supported by omitting `cluster_size` and defining `network.subnets` with the required native or overlay subnet keys.
-
 ## **4. Configuration Files**
 
-The deployment uses five JSON configuration files:
+The initial deployment uses the five core JSON files plus the `_pre` security and observability files for the selected CIS profile. After the initial apply creates the Landing Zone compartments and dependencies, replace both `_pre` inputs with their full versions and apply the stack again.
 
 | File | Purpose  |
 | --- | --- |
-| `oke_identity.json` | OneOE IAM + OKE-specific groups/policies |
+| `oke_identity.json` | OneOE IAM + OKE-specific groups/policies, rendered from CIS2 |
 | `oke_network.json` | OneOE + Hub E + OKE network |
 | `oke_governance.json` | Tag namespaces and governance definitions |
 | `oke_clusters.json` | OKE cluster configuration |
 | `oke_workers.json` | OKE Node pool configuration |
+| `oke_security_cis1_pre.json` or `oke_security_cis2_pre.json` | Initial CIS-aligned security configuration |
+| `oke_observability_cis1_pre.json` or `oke_observability_cis2_pre.json` | Initial CIS-aligned observability configuration |
 
-### Additional Published Security & Observability Outputs <!-- omit from toc -->
+### Staged Security and Observability Files <!-- omit from toc -->
 
-The published package also includes companion JSONs that capture CIS-aligned security and observability settings for reference or downstream consumption. The one-click ORM link above wires only the core deployment inputs; it does **not** consume these companion files. If you want to apply them, fetch and handle them separately in your own workflow.
+The security and observability files are paired. Use the `_pre` files for the first apply, then replace them with the corresponding full files of the same CIS level and apply again.
 
 | File | Purpose |
 | --- | --- |
@@ -183,15 +177,14 @@ The published package also includes companion JSONs that capture CIS-aligned sec
 
 1. **Create ORM Stack**
 
-   Create the stack from the pinned orchestrator release and set the working directory to `rms-facade`.
+   Use the Orchestrator tag selected by the deployment workflow and set the working directory to `rms-facade`.
 
 2. **Stage Configuration Files in a Private Source**
-   - Upload `oke_governance.json`, `oke_identity.json`, `oke_network.json`, `oke_clusters.json`, and `oke_workers.json` to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
-   - The previous public repo-hosted one-click example is not the recommended customer deployment path.
+   - Upload `oke_governance.json`, `oke_identity.json`, `oke_network.json`, `oke_clusters.json`, `oke_workers.json`, and the `_pre` security and observability files matching your CIS profile to a customer-controlled private OCI Object Storage bucket, or make them available from an approved private GitHub source.
 
 3. **Review Configuration** (Optional Customization)
 
-   Before deployment, you may want to review the JSON configuration files and customize them as needed:
+   Before deployment, review these fixed configuration values and confirm that the quickstart fits the target tenancy:
 
    **Key Configuration Values:**
    - **Regions**: Default region code is `FRA` (Frankfurt) - update all keys and display names if deploying to a different region
@@ -210,6 +203,11 @@ The published package also includes companion JSONs that capture CIS-aligned sec
    - Click **Apply**
    - Deployment takes approximately **20-30 minutes**
    - Monitor progress in the logs
+
+6. **Apply Full Security and Observability Configuration**
+   - Replace the `_pre` security input with `oke_security_cis1.json` or `oke_security_cis2.json`, preserving the selected CIS level.
+   - Replace the `_pre` observability input with `oke_observability_cis1.json` or `oke_observability_cis2.json`.
+   - Run **Plan**, review the replacement, and run **Apply** again.
 
 #### Step 3: Verify Deployment <!-- omit from toc -->
 
@@ -239,6 +237,7 @@ After successful apply:
 ```bash
 git clone https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator.git
 cd terraform-oci-modules-orchestrator
+git checkout tags/v2.1.1
 ```
 
 #### Step 2: Copy Configuration Files <!-- omit from toc -->
@@ -248,6 +247,8 @@ cd terraform-oci-modules-orchestrator
 cp /path/to/workload-extensions/oke/simple/single-stack/*.json \
    /path/to/terraform-oci-modules-orchestrator/
 ```
+
+For the first plan, configure Orchestrator to load the five core files and only the `_pre` security and observability files for the selected CIS level. Do not load a `_pre` file and its full replacement in the same plan.
 
 #### Step 3: Configure Provider <!-- omit from toc -->
 
@@ -265,6 +266,8 @@ terraform init
 terraform plan -out=tfplan
 terraform apply tfplan
 ```
+
+After the initial apply, replace the two `_pre` input references with the corresponding full security and observability files, then run and review a second plan and apply.
 
 &nbsp;
 
@@ -305,11 +308,13 @@ kubectl cluster-info
 
 The orchestrator module doesn't deploy add-ons automatically. Install required add-ons:
 
-#### CertManager (for TLS certificate management) <!-- omit from toc -->
+#### cert-manager (for TLS certificate management) <!-- omit from toc -->
 
 ```bash
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.0/cert-manager.yaml
 ```
+
+This pinned release supports the included Kubernetes `v1.35.2` baseline. Let’s Encrypt can terminate in Kubernetes with cert-manager and an ingress controller, or at OCI LB using an imported certificate maintained by a security-owned external pipeline. OKE and Kubernetes do not renew OCI certificates. Review the shared [operational and security notes](../readme.md#operational-and-security-notes) before choosing a model.
 
 #### Metrics Server (for resource monitoring) <!-- omit from toc -->
 
@@ -379,7 +384,7 @@ Edit the JSON file to modify CIDR blocks:
     "node_pools": {
       "NDP-FRA-LZ-PROD-OKE-KEY": {
         "node_config_details": {
-          "image": "8.10",
+          "image": "9\\.[0-9]+",
           "node_shape": "VM.Standard.E5.Flex",
           "flex_shape_settings": {
             "ocpus": 2,        // Changed from 1 to 2
@@ -414,9 +419,7 @@ Edit the JSON file to modify CIDR blocks:
 }
 ```
 
-**Note**: Keep `options.kubernetes_network_config.services_cidr` aligned with your Kubernetes service network plan. It remains required for the published native OKE payload even though `pods_cidr` is no longer part of the standard single-stack example.
-
-For config-driven overlay clusters, `options.kubernetes_network_config` includes both `services_cidr` and `pods_cidr`. If `pods_cidr` is not provided, the generator defaults it to `10.244.0.0/16`.
+**Note**: Keep `options.kubernetes_network_config.services_cidr` aligned with your Kubernetes service network plan. It remains required for the committed native OKE payload even though `pods_cidr` is no longer part of the standard single-stack example.
 
 **Important**: [Check Supported Images, Shapes for Worker Nodes](https://docs.oracle.com/en-us/iaas/Content/ContEng/Reference/contengimagesshapes.htm) and [OKE supported versions](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengaboutk8sversions.htm) before upgrading.
 
@@ -430,9 +433,9 @@ To add custom NSG rules, locate the NSG configuration in the JSON file and add n
 {
   "network_configuration": {
     "network_configuration_categories": {
-      "prod": {
+      "prod-platform-oke": {
         "network_security_groups": {
-          "NSG-PROD-WORKERS": {
+          "NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
             "ingress_rules": {
               "ssh_from_bastion": {
                 "description": "Allow SSH from bastion",
@@ -459,12 +462,12 @@ Understanding the routing is critical for troubleshooting connectivity. This dep
 
 ### 8.1 OKE Subnet Route Tables <!-- omit from toc -->
 
-The published native OKE subnets (Control Plane, Internal LB, Workers, Pods) use the same routing pattern. Config-driven overlay clusters use the same pattern for the remaining Control Plane, Internal LB, and Workers subnets, with no pod subnet route table.
+The OKE subnets (Control Plane, Internal LB, Workers, Pods) use the same routing pattern.
 
 ```
 Default Route:
   Destination: 0.0.0.0/0
-  Target: NAT Gateway (NGW-PROD-OKE-KEY)
+  Target: NAT Gateway (NGW-FRA-LZ-PROD-PLATFORM-OKE-KEY)
   Purpose: Outbound internet access from spoke
 
 Hub and Other Networks Route:
@@ -474,7 +477,7 @@ Hub and Other Networks Route:
 
 Service Gateway Route:
   Destination: all-services
-  Target: Service Gateway (SGW-PROD-OKE-KEY)
+  Target: Service Gateway (SGW-FRA-LZ-PROD-PLATFORM-OKE-KEY)
   Purpose: Direct access to OCI services (bypasses NAT)
 ```
 

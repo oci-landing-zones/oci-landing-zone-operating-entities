@@ -34,12 +34,15 @@ local products = import '../exadb/products.libsonnet';
     } else {}),
 
   render(params)::
-    local n = params.naming;
-    local scope = params.topology;
-    local env = scope.scope_name;
-    local plat = scope.platform_name;
-    local display_segments = [env, plat];
-    local dns = scope.dns;
+	    local n = params.naming;
+	    local scope = params.topology;
+	    local env = scope.qualified_name;
+	    local plat = scope.platform_name;
+	    local key_segments = scope.key_segments + ['PLATFORM', plat];
+	    local display_segments = scope.name_segments + [plat];
+	    local dns_segments = scope.dns_segments;
+	    local dns_platform_suffix =
+	      if std.length(dns_segments) > 1 then 'xc' else plat;
     local routing =
       if std.objectHas(params, 'routing') then params.routing
       else null;
@@ -52,13 +55,13 @@ local products = import '../exadb/products.libsonnet';
     local peer_routes =
       if routing != null && std.objectHas(routing, 'peers') then routing.peers
       else {};
-    local category_key = '%s-platform-%s' % [std.asciiLower(env), std.asciiLower(plat)];
-    local vcn_key = n.key('VCN', [env, 'PLATFORM', plat]);
-    local ngw_key = n.key('NGW', [env, 'PLATFORM', plat]);
-    local sgw_key = n.key('SGW', [env, 'PLATFORM', plat]);
-    local drg_key = n.key('DRG', ['HUB']);
-    local rt_key = n.key('RT', [env, 'PLATFORM', plat, 'GENERIC']);
-    local sl_key = n.key('SL', [env, 'PLATFORM', plat, 'GENERIC']);
+	    local category_key = '%s-platform-%s' % [std.asciiLower(scope.qualified_name), std.asciiLower(plat)];
+	    local vcn_key = n.key('VCN', key_segments);
+	    local ngw_key = n.key('NGW', key_segments);
+	    local sgw_key = n.key('SGW', key_segments);
+	    local drg_key = n.key('DRG', ['HUB']);
+	    local rt_key = n.key('RT', key_segments + ['GENERIC']);
+	    local sl_key = n.key('SL', key_segments + ['GENERIC']);
     local route_rules =
       {
         [n.route_rule([n.region, 'sgw'])]: {
@@ -101,9 +104,9 @@ local products = import '../exadb/products.libsonnet';
       category_compartment_id: scope.network_compartment_key,
       vcns: {
         [vcn_key]: {
-          display_name: n.display('vcn', display_segments),
-          cidr_blocks: [params.network.vcn],
-          dns_label: n.dns_label(['vcn', n.region, 'lz', dns, plat]),
+	          display_name: n.display('vcn', display_segments),
+	          cidr_blocks: [params.network.vcn],
+	          dns_label: n.dns_label(['vcn', n.region, 'lz'] + dns_segments + [dns_platform_suffix]),
           block_nat_traffic: false,
           is_attach_drg: false,
           is_create_igw: false,
@@ -143,20 +146,20 @@ local products = import '../exadb/products.libsonnet';
             },
           },
           subnets: {
-            [n.key('SN', [env, 'PLATFORM', plat, 'DB'])]: {
-              display_name: n.display('sn', display_segments + ['db']),
-              cidr_block: params.network.subnets.db,
-              dns_label: n.dns_label(['sn', n.region, dns, plat, 'db']),
+	            [n.key('SN', key_segments + ['DB'])]: {
+	              display_name: n.display('sn', display_segments + ['db']),
+	              cidr_block: params.network.subnets.db,
+	              dns_label: n.dns_label(['sn', n.region] + dns_segments + [dns_platform_suffix, 'db']),
               dhcp_options_key: 'default_dhcp_options',
               prohibit_internet_ingress: true,
               prohibit_public_ip_on_vnic: true,
               route_table_key: rt_key,
               security_list_keys: [sl_key],
             },
-            [n.key('SN', [env, 'PLATFORM', plat, 'BACKUP'])]: {
-              display_name: n.display('sn', display_segments + ['backup']),
-              cidr_block: params.network.subnets.backup,
-              dns_label: n.dns_label(['sn', n.region, dns, plat, 'bck']),
+	            [n.key('SN', key_segments + ['BACKUP'])]: {
+	              display_name: n.display('sn', display_segments + ['backup']),
+	              cidr_block: params.network.subnets.backup,
+	              dns_label: n.dns_label(['sn', n.region] + dns_segments + [dns_platform_suffix, 'bck']),
               dhcp_options_key: 'default_dhcp_options',
               prohibit_internet_ingress: true,
               prohibit_public_ip_on_vnic: true,

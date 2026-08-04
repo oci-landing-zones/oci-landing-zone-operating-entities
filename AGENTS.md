@@ -7,7 +7,7 @@ Repo-cloning customers are the primary audience for this repository guidance.
 Most customers want one of two things:
 
 1. deploy a standard published landing zone from the repo's existing blueprint JSON files
-2. create a customized landing zone from config used to handle specific requirements that are not part of standard json blueprints.
+2. use the Blueprint Factory to create a customized landing zone for requirements that are not part of standard JSON blueprints.
 
 Default to the standard published path for ordinary customer deployments. The most common case is `blueprints/one-oe/runtime/one-stack/`.
 
@@ -16,9 +16,17 @@ Default to the standard published path for ordinary customer deployments. The mo
 Use this file as the canonical policy source for request classification, the customer warning, discovery order, unsupported requirements, artifact placement, deployment defaults, and repository source-of-truth rules. Nested `AGENTS.md` files and repo-local skills should add local workflow or contract detail, not replace these rules.
 
 - `.agents/skills/landing-zone-customer-guidance/SKILL.md`: customer conversation workflow and short activation reminders.
-- `.agents/skills/landing-zone-config/SKILL.md`: config-mode authoring and verification workflow.
+- `.agents/skills/landing-zone-config/SKILL.md`: Blueprint Factory authoring and verification workflow.
 - `gen/AGENTS.md`: generator architecture, publication boundaries, schema behavior, extension contracts, and code style.
 - `gen/workload-extensions/*/AGENTS.md`: extension-specific contracts, source files, discovery addenda, and tests.
+
+## Product Naming Boundary
+
+Use the product names **OCI LZ AI Agent** for AI-assisted Landing Zone guidance and **Blueprint Factory** for customized blueprint generation.
+
+- In customer-facing guidance, introduce the full product name and link to its add-on documentation. Shorten later references to `LZ AI Agent` or `Blueprint Factory`.
+- Use implementation terms such as `generator`, `config mode`, and `Jsonnet` only when commands, source code, or contributor contracts require technical precision.
+- Do not present implementation terminology or generic AI assistance as separate customer offerings.
 
 ## Request Classification
 
@@ -49,7 +57,7 @@ Examples of `ambiguous-or-mixed` requests:
 
 - change the repo and also tell me what customers should deploy
 - update this OKE extension and tell me whether `0.0.0.0/0` is acceptable in my landing zone
-- request cannot be fulfilled by current generator and requires both changes to jsonnet files and generated LZ files from config
+- request cannot be fulfilled by the current Blueprint Factory and requires both repository development and customer artifact generation
 
 ## Mandatory AI Safety Gate For Customer-Use Requests
 
@@ -65,12 +73,12 @@ For `customer-use` and `ambiguous-or-mixed` requests, assume the customer may ha
 
 - Explain what you are recommending, why it is recommended, and the main security implications in plain language.
 - Ask discovery questions one at a time. Do not present the full required discovery list as a single customer questionnaire unless the customer explicitly asks for a checklist.
-- Before asking the customer to choose between repo or generator terms, explain those terms in customer language first and say why the choice matters.
+- Before asking the customer to choose between repository or Blueprint Factory terms, explain those terms in customer language first and say why the choice matters.
 - Do not ask customers to choose between labels such as `One-OE`, `Hub A`, `Hub B`, `Hub C`, `Hub E`, `platform`, `project`, `environment`, or `shared_project_network` without first explaining them in plain language and confirming they are relevant.
 - Start each discovery step with a short explanation of what decision is being made, then ask only the next missing question.
 - After each customer answer, briefly summarize what is now known before moving to the next discovery item.
 - Prefer text explanations and simple diagrams over raw config snippets.
-- Treat raw config, Jsonnet, and internal generator structures as working material, not the primary customer deliverable.
+- Treat raw config, Jsonnet, and internal Blueprint Factory structures as working material, not the primary customer deliverable.
 - Show intermediate config only if the customer asks for it directly or if it is necessary to unblock the discussion or verify a design.
 
 ## Mandatory Deployment Delivery Defaults
@@ -92,12 +100,12 @@ For `customer-use` and `ambiguous-or-mixed` requests, if the customer asks for a
 - Provide manual configuration steps for the unsupported requirement after the landing zone is created. Keep these steps separate from generated-config steps and explain that the customer owns lifecycle, drift management, and compliance review for the manual resources.
 - Where possible, configure supported landing zone prerequisites to reduce manual work. Examples include CIDR allocation, compartments, VCNs, subnets, DRG attachments, route tables, security rules, DNS, logging, or IAM policies when those items are already supported by the selected path.
 - Do not promise that the framework fully configures the unsupported resource just because it can prepare adjacent resources such as routing or compartments.
-- If the unsupported requirement is network connectivity such as Site-to-Site VPN, FastConnect, or another external connectivity pattern, first verify what the selected published path or config-driven generator can emit. If the connectivity resource itself is unsupported, make that explicit, then configure only supported prerequisites such as non-overlapping CIDRs, DRG-ready topology, DRG attachments, and route-table entries where the framework supports them. The customer must manually create and validate the unsupported connectivity resource, such as CPE objects, IPSec tunnels, BGP/static routing settings, provider cross-connects, or service-specific attachments.
+- If the unsupported requirement is network connectivity such as Site-to-Site VPN, FastConnect, or another external connectivity pattern, first verify what the selected published path or Blueprint Factory can emit. If the connectivity resource itself is unsupported, make that explicit, then configure only supported prerequisites such as non-overlapping CIDRs, DRG-ready topology, DRG attachments, and route-table entries where the framework supports them. The customer must manually create and validate the unsupported connectivity resource, such as CPE objects, IPSec tunnels, BGP/static routing settings, provider cross-connects, or service-specific attachments.
 - When giving manual steps, consult the relevant repository guide first and use official OCI documentation when the steps depend on OCI service behavior that is not defined in this repo.
 
 ## Mandatory Customer Artifact Placement
 
-For `customer-use` and `ambiguous-or-mixed` requests, before creating config-mode source files or generated landing zone outputs:
+For `customer-use` and `ambiguous-or-mixed` requests, before creating Blueprint Factory source files or generated landing zone outputs:
 
 - Ask where the customer wants the source config files to live.
 - Ask where the generated landing zone file set should be written.
@@ -108,22 +116,30 @@ For `customer-use` and `ambiguous-or-mixed` requests, before creating config-mod
 
 For `customer-use` and `ambiguous-or-mixed` requests, do not jump directly to workload-extension, deployment, or configuration options after the warning is accepted. First establish the customer's landing zone design inputs, extension and network scope, and CIDR inputs in the following order.
 
-If any item below is still unknown, ask for it before continuing. Do not skip ahead and do not recommend OKE deployment paths, published JSON artifacts, or config-mode files until this sequence is complete.
+If any item below is still unknown, ask for it before continuing. Do not skip ahead and do not recommend OKE deployment paths, published JSON artifacts, or Blueprint Factory files until this sequence is complete.
 The list below defines the decision order. It is not a customer-facing bulk questionnaire. If multiple items are unknown, handle them across separate turns.
 
 1. **Landing zone baseline**
    - Always use `One-OE` as the landing zone family for customer-use guidance in this repository.
    - Do not ask who will operate the landing zone or whether the customer has one or several operating entities.
    - Do not ask the customer to choose a landing zone family before continuing discovery.
-   - Explain briefly that this guidance uses the current One-OE baseline, then move to the environment question.
+   - Explain briefly that this guidance uses the current One-OE baseline, then move to the region question.
    - Do not assume the customer should start from a workload extension before the One-OE baseline is established.
 
-2. **Environment count and names**
+2. **Region and realm**
+   - Determine the OCI region where the landing zone will be deployed.
+   - Explain that the region is the deployment location, such as `eu-frankfurt-1`, while the realm is the isolated OCI cloud boundary, such as `oc1` for public cloud or `oc19` for EU Sovereign Cloud.
+   - Default the realm to `oc1` if the customer does not provide one.
+   - Ask for the realm explicitly only when the customer mentions sovereign, government, dedicated, isolated, Alloy, or another non-public OCI deployment, or when the selected region maps to a non-`oc1` realm.
+   - If the customer does not know the realm, help infer it from the selected region only after checking repository or official OCI region/realm data.
+   - For Blueprint Factory config mode, keep `region` and `region_short_name` paired; omit `realm` or set it to `oc1` for public-cloud deployments, and set it explicitly for non-`oc1` deployments.
+
+3. **Environment count and names**
    - Determine how many environments the landing zone needs and what they are called.
    - Ask which environments are needed, using examples such as development, test, preproduction, and production when helpful.
    - Keep the environment names explicit. Do not assume only `prod` and `preprod` unless the customer confirms the standard One-OE shape fits.
 
-3. **Application and workload structure**
+4. **Application and workload structure**
    - Determine which applications or workloads are going to run in the landing zone.
    - OKE can itself be the workload or platform the customer is asking for.
    - Ask what will run on top of OKE and whether any other non-OKE workloads must also be part of the landing zone.
@@ -133,7 +149,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Do not treat an application as a single OCI service such as one VM or one Oracle Function.
    - Treat an application as a business workload that is commonly composed of multiple services that together solve a business need.
 
-4. **Firewall requirement**
+5. **Firewall requirement**
    - Determine whether the landing zone must include a firewall.
    - Ask this in customer language: whether the deployment is production and whether inspected or tightly controlled traffic flow is required.
    - Explain that a firewall-based design is recommended for both production and non-production, but it is mandatory for production.
@@ -141,17 +157,17 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Any production deployment must be treated as firewall-required.
    - Do not recommend a no-firewall hub for production use.
 
-5. **Hub model selection**
+6. **Hub model selection**
    - Choose the hub model only after the firewall requirement is known.
    - Do not ask the customer to pick `Hub A`, `Hub B`, `Hub C`, or `Hub E` by label alone.
    - After the firewall need is known, explain the relevant hub options in plain language, recommend the best fit, and only then confirm the hub family.
    - For firewalled designs, guide the customer to the appropriate hub family before discussing workload details.
-   - Before recommending public ingress, load balancer changes, or OKE exposure patterns for the chosen hub family, inspect the relevant hub guide, published runtime artifacts, or config-driven hub builder first. Do not assume the selected hub lacks a public load balancer pattern or needs a new public edge design without checking what the repo already provides.
+   - Before recommending public ingress, load balancer changes, or OKE exposure patterns for the chosen hub family, inspect the relevant hub guide, published runtime artifacts, or Blueprint Factory hub builder first. Do not assume the selected hub lacks a public load balancer pattern or needs a new public edge design without checking what the repo already provides.
    - Do not present `Hub E` or any other no-firewall hub as the default simply because the deployment is non-production.
    - Recommend a no-firewall hub only when the customer explicitly accepts the tradeoff, or when the request is clearly PoC, lab, or cost/simplicity driven.
    - Reserve `Hub E` for PoC, lab, or explicitly non-production cases where a no-firewall design is acceptable.
 
-6. **Extension and network scope sizing**
+7. **Extension and network scope sizing**
    - Determine which applications, platforms, and workload extensions will need network resources or other CIDR-bearing ranges before proposing concrete CIDRs or asking the customer for final CIDR values.
    - For network-producing workload extensions, identify every VCN/subnet-producing or CIDR-bearing scope the selected path will actually emit, including hub VCNs, spoke VCNs, platform VCNs, extension VCNs, Kubernetes service CIDRs, Kubernetes pod ranges, or any other routed or internal ranges defined by the selected extension contract.
    - Use the selected workload extension's local guide under `gen/workload-extensions/*/AGENTS.md` to decide which placement, component, and sizing questions must be answered before CIDR allocation.
@@ -159,7 +175,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Do not reserve CIDRs for unchosen extension placement branches. Allocate only for the network scopes the selected design will emit, plus deliberate future reserves that are explained to the customer.
    - If a selected extension or placement scope is networkless, infrastructure-only, or otherwise forbidden from emitting network resources, do not assign it a VCN or subnet CIDR.
 
-7. **CIDR allocation**
+8. **CIDR allocation**
    - Determine the concrete OCI CIDR plan for the hub, spoke, platform, and selected workload-extension networks before giving deployment or config guidance.
    - Explain CIDRs as the network ranges reserved for OCI VCNs and subnets before asking the customer for numbers.
    - CIDR allocations are difficult to change later. Before recommending a split, explain the reasoning behind each block size, which network scope it serves, which sizing input drove it, and where intentional reserve space is left.
@@ -173,15 +189,15 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - If the customer has not defined CIDRs yet, help them decide the allocation first.
    - If repository behavior and official OCI documentation appear inconsistent for OKE networking, say so and verify with official OCI docs before advising.
 
-Only after these seven decisions are known may the agent continue with:
+Only after these eight decisions are known may the agent continue with:
 
-- recommending the standard published path versus the config-driven path
-- explaining OKE deployment options such as single-stack, multi-stack, or config-driven `oke_simple`
+- recommending the standard published path versus the Blueprint Factory
+- explaining OKE deployment options such as single-stack, multi-stack, or Blueprint Factory `oke_simple`
 - generating or modifying landing zone guidance, configs, or deployment steps
 
 ## Mandatory ExaDB-D / ExaCS Discovery Addendum
 
-For `customer-use` and `ambiguous-or-mixed` requests that include ExaDB-D, Exadata Database Service on Dedicated Infrastructure, Autonomous Database Dedicated, ExaCS, VMCs, or AVMCs, complete these extra discovery decisions before CIDR allocation and before creating or modifying config-mode artifacts. Ask them one at a time in customer language after the base landing-zone decisions above are known.
+For `customer-use` and `ambiguous-or-mixed` requests that include ExaDB-D, Exadata Database Service on Dedicated Infrastructure, Autonomous Database Dedicated, ExaCS, VMCs, or AVMCs, complete these extra discovery decisions before CIDR allocation and before creating or modifying Blueprint Factory artifacts. Ask them one at a time in customer language after the base landing-zone decisions above are known.
 
 1. **Exadata infrastructure placement**
    - Determine whether the Exadata infrastructure is shared across environments or dedicated per environment.
@@ -236,9 +252,9 @@ When helping customers deploy those published artifacts, keep the secure deliver
 
 If the customer is clearly using another blueprint family, use that family's repository documentation and runtime material if it exists. Do not invent missing deployment steps, runtime folders, or artifact combinations.
 
-## Customized Customer Path: Config-Driven Generation
+## Customized Customer Path: Blueprint Factory
 
-Move the customer to the config-driven path for anything non-standard or customized, especially when the request includes:
+Move the customer to the Blueprint Factory for anything non-standard or customized, especially when the request includes:
 
 - adding projects
 - adding platforms
@@ -247,7 +263,7 @@ Move the customer to the config-driven path for anything non-standard or customi
 - using multiple workload extensions at the same time
 - defining custom CIDR ranges
 
-Do not move the customer to config mode merely to represent a resource that the config schema and generator do not support. For unsupported requirements, use config mode only for the supported landing zone prerequisites and document the unsupported resource as manual post-deployment configuration.
+Do not move the customer to the Blueprint Factory merely to represent a resource that its config schema and implementation do not support. For unsupported requirements, use Blueprint Factory config mode only for the supported landing zone prerequisites and document the unsupported resource as manual post-deployment configuration.
 
 Start from:
 
@@ -255,7 +271,7 @@ Start from:
 2. `gen/AGENTS.md`
 3. `gen/JSONNET_COMPOSITION.md`
 
-When a customer uses config mode, the deployable working set becomes the files produced by that customer's own config generation.
+When a customer uses the Blueprint Factory, the deployable working set becomes the files produced by that customer's own factory run.
 
 - Use only those generated files.
 - Do not mix those generated files with the repo's published JSON snapshots under `blueprints/` or `workload-extensions/`.
@@ -266,29 +282,30 @@ When a customer uses config mode, the deployable working set becomes the files p
 - Remember that those generated configs are deployed through `terraform-oci-modules-orchestrator`. When deep-dive debugging or deployment-behavior investigation is needed, inspect the orchestrator contract and its downstream module wiring in addition to this repo. For published OKE flows, follow the exact orchestrator tag referenced by the published OKE docs instead of inspecting `HEAD`.
 - Do not assume OKE requires `projects`.
 - Do not assume an environment requires `shared_project_network`; use it only when the desired topology needs a spoke/projects VCN.
-- Verify generator behavior before telling customers that a config must include `projects` or `shared_project_network`.
+- Verify Blueprint Factory behavior before telling customers that a config must include `projects` or `shared_project_network`.
 
 ## No-Assumptions Rule
 
 When helping customers, make no assumptions and do not hallucinate data, file paths, schema details, deployment steps, or recommendations.
 
 - Check the repository first before giving commands, file names, workflow advice, or configuration guidance.
-- When the question is about public exposure, ingress, or load balancing, inspect the selected hub guide, published runtime artifact, or config-driven hub builder before advising. Never assume a hub model lacks a public load balancer pattern or needs an extra public edge layer without checking the repo first.
+- When the question is about public exposure, ingress, or load balancing, inspect the selected hub guide, published runtime artifact, or Blueprint Factory hub builder before advising. Never assume a hub model lacks a public load balancer pattern or needs an extra public edge layer without checking the repo first.
 - If the repository is not sufficient and the answer depends on external OCI behavior or current product guidance, verify with official OCI documentation or other reputable sources before advising.
 - If online search or external documentation conflicts with this repository, give the repository's recommendations and source-of-truth files slightly higher priority for what this landing zone framework supports. State the conflict clearly instead of silently replacing repo guidance with external guidance.
 - Do not infer OKE pod or service CIDR behavior from examples that predate the current OKE networking contract or generic defaults. Verify the selected OKE networking mode with current official OCI documentation before making CIDR recommendations.
-- For OKE-specific generator semantics and CIDR planning in config mode, consult `gen/workload-extensions/oke/AGENTS.md` before recommending a deployable config or exact CIDR split.
+- For OKE-specific Blueprint Factory semantics and CIDR planning, consult `gen/workload-extensions/oke/AGENTS.md` before recommending a deployable config or exact CIDR split.
 - Never present a guess, memory, or inferred recommendation as a confirmed fact.
 
 ## Source Of Truth
 
 - `gen/` is the source of truth for generator behavior and customization logic.
 - `terraform-oci-modules-orchestrator` is the source of truth for how generated configuration files are interpreted at deployment time. When a generated field seems unused, transformed, or contradictory, inspect the orchestrator and the downstream modules it invokes before changing this repo's contract. For published OKE behavior, inspect the exact orchestrator tag referenced by the published OKE docs.
-- `gen/workload-extensions/oke/AGENTS.md` plus `gen/workload-extensions/oke/simple/*` are the source of truth for config-driven `oke_simple` behavior and OKE-native networking semantics in this repo.
-- `gen/workload-extensions/exacs/AGENTS.md` plus `gen/workload-extensions/exacs/*` are the source of truth for config-driven ExaDB-D / ExaCS placement, component, network, and project DB tier semantics in this repo.
-- The ExaDB-C@C generator guide under `gen/workload-extensions/exacc/` plus the source files in that directory are the source of truth for config-driven ExaDB-C@C IAM, observability, notification email, and publication semantics in this repo.
+- `gen/workload-extensions/oke/AGENTS.md` plus `gen/workload-extensions/oke/simple/*` are the source of truth for Blueprint Factory `oke_simple` behavior and OKE-native networking semantics in this repo.
+- `gen/workload-extensions/ocvs/AGENTS.md` plus `gen/workload-extensions/ocvs/*` are the source of truth for Blueprint Factory `ocvs` behavior, OCVS network prerequisites, and generated `ocvs_configuration` semantics in this repo.
+- `gen/workload-extensions/exacs/AGENTS.md` plus `gen/workload-extensions/exacs/*` are the source of truth for Blueprint Factory ExaDB-D / ExaCS placement, component, network, and project DB tier semantics in this repo.
+- The ExaDB-C@C generator guide under `gen/workload-extensions/exacc/` plus the source files in that directory are the source of truth for Blueprint Factory ExaDB-C@C IAM, observability, notification email, and publication semantics in this repo.
 - Published JSON files under `blueprints/` and `workload-extensions/` are deployable artifacts for the standard published path, but they are not the source of truth for generator logic.
-- For config-driven changes, start from `gen/config.libsonnet`, `gen/landing_zone.libsonnet`, `gen/topology.libsonnet`, or `gen/workload-extensions/*` before touching generated outputs.
+- For Blueprint Factory changes, start from `gen/config.libsonnet`, `gen/landing_zone.libsonnet`, `gen/topology.libsonnet`, or `gen/workload-extensions/*` before touching generated outputs.
 
 ## Core Commands
 

@@ -1,0 +1,40 @@
+{
+    "realm"                         : "oc1",
+    "region"                        : "eu-frankfurt-1",
+    "region_short_name"             : "fra",
+
+    "environments": {
+        "preprod": {
+            "projects": {
+                "proj1"             : {}
+            },
+
+            "shared_project_network": {
+                "network": {
+                    "vcn"           : "10.0.128.0/21"
+                }
+            }
+        },
+
+        "prod": {
+            "projects": {
+                "data"              : {},
+                "proj1"             : {}
+            },
+
+            "shared_project_network": {
+                "network": {
+                    "vcn"           : "10.0.64.0/21"
+                }
+            }
+        }
+    },
+
+    "hub": {
+        "kind"                      : "hub_b",
+
+        "network": {
+            "vcn"                   : "10.0.0.0/21"
+        }
+    }
+}

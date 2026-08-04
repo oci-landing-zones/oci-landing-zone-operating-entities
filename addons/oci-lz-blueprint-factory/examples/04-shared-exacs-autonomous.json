@@ -1,0 +1,65 @@
+{
+    "realm"                                  : "oc1",
+    "region"                                 : "eu-frankfurt-1",
+    "region_short_name"                      : "fra",
+
+    "environments": {
+        "preprod": {
+            "projects": {
+                "proj1"                      : {}
+            },
+
+            "shared_project_network": {
+                "network": {
+                    "vcn"                    : "10.0.128.0/21"
+                }
+            }
+        },
+
+        "prod": {
+            "projects": {
+                "proj1"                      : {}
+            },
+
+            "shared_project_network": {
+                "network": {
+                    "vcn"                    : "10.0.64.0/21"
+                }
+            }
+        }
+    },
+
+    "hub": {
+        "kind"                               : "hub_e",
+
+        "network": {
+            "vcn"                            : "10.0.0.0/21"
+        }
+    },
+
+    "shared_platforms": {
+        "exacs": {
+            "extension": {
+                "type"                       : "exacs",
+
+                "params": {
+                    "notification_emails": {
+                        "db_workloads"       : ["exacs-db@example.com"],
+                        "default"            : ["exacs-platform@example.com"],
+                        "infra_workloads"    : ["exacs-infra@example.com"],
+                        "projects"           : ["exacs-projects@example.com"]
+                    },
+
+                    "project_db_compartments": {
+                        "preprod"            : ["proj1"],
+                        "prod"               : ["proj1"]
+                    }
+                }
+            },
+
+            "network": {
+                "vcn"                        : "10.0.24.0/21"
+            }
+        }
+    }
+}
