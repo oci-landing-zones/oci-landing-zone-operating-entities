@@ -45,7 +45,7 @@ In this model, the Landing Zone Foundations, the One-OE foundation, and the requ
 
 The published single-stack UC1 example uses one shared EXACS platform VCN with database and backup subnets. It also creates environment EXACS platform compartments and project-level EXACS database compartments for `prod` and `preprod` so the published artifacts continue to cover multiple ExaDB-D placement use cases.
 
-Published generated artifacts in this folder currently cover UC1. UC2 and UC3 are retained as design guidance and require config-driven generation before use.
+Published generated artifacts in this folder currently cover UC1. UC2 and UC3 are retained as design guidance and require the [Blueprint Factory](../../../addons/oci-lz-blueprint-factory/README.md) before use.
 
 &nbsp;
 

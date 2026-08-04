@@ -2,7 +2,7 @@
 
 ## Minimal Single-Spoke Example
 
-Use this when you need the smallest config that still exercises the new config-driven path.
+Use this when you need the smallest config that still exercises the Blueprint Factory path.
 
 ```jsonnet
 {
@@ -204,5 +204,5 @@ jsonnet --multi output/ --tla-code-file config=path/to/config.jsonnet gen/landin
 - Prefer omitted hub and spoke subnet maps when canonical auto-subnet allocation is acceptable.
 - Prefer explicit platform subnet maps only when you need non-default layout or the platform is not extension-backed.
 - Prefer environment platforms over `shared_platforms` when the platform belongs operationally to one environment.
-- Ask for and record the target `region` and `region_short_name`; omit `realm` when the customer does not provide one because config mode defaults it to `oc1`.
+- Ask for and record the target `region` and `region_short_name`; omit `realm` when the customer does not provide one because Blueprint Factory config mode defaults it to `oc1`.
 - Set `cis_level: 1` only when the requested output set should use CIS level 1; omitted `cis_level` emits CIS level 2 files.

@@ -15,7 +15,7 @@
 
 Use one of the supported Landing Zone add-on entry paths when the committed OKE JSON files do not match the required landing zone:
 
-- [OCI LZ Blueprint Factory](../../../addons/oci-lz-blueprint-factory/README.md) for a directly authored and reviewed source configuration.
+- [Blueprint Factory](../../../addons/oci-lz-blueprint-factory/README.md) for a directly authored and reviewed source configuration.
 - [OCI LZ AI Agent](../../../addons/oci-lz-ai-agent/README.md) for AI-assisted discovery, source-configuration drafting, and review.
 
 Both paths produce a reviewed source input and generated deployment package. They support custom CIDR ranges, multiple environments, multiple OKE platforms with one cluster per platform, and overlay networking.
@@ -194,7 +194,7 @@ Overlay mode omits the OCI pod subnet, pod route table, pod security list, pod N
 
 ## **6. OKE VCN Sizing**
 
-Auto-subnet profiles are the default way to define OKE subnetting. The user provides the OKE VCN CIDR, and may optionally provide `cluster_size`; when `cluster_size` is omitted, the generator uses the `small` profile. The generator then creates the required OKE subnets.
+Auto-subnet profiles are the default way to define OKE subnetting. The user provides the OKE VCN CIDR, and may optionally provide `cluster_size`; when `cluster_size` is omitted, the Blueprint Factory uses the `small` profile. The factory then creates the required OKE subnets.
 
 The OKE VCN CIDR prefix must match the selected or defaulted size exactly:
 
@@ -204,7 +204,7 @@ The OKE VCN CIDR prefix must match the selected or defaulted size exactly:
 | `medium` | `/18` |
 | `large` | `/16` |
 
-With native networking, the generator creates these subnet sizes:
+With native networking, the Blueprint Factory creates these subnet sizes:
 
 | `cluster_size` | Pod subnet | Worker subnet | Internal LB subnet | Optional FSS subnet | Control plane subnet |
 | --- | --- | --- | --- | --- | --- |
@@ -212,7 +212,7 @@ With native networking, the generator creates these subnet sizes:
 | `medium` | `/19` | `/22` | `/25` | `/25` | `/29` |
 | `large` | `/17` | `/19` | `/24` | `/24` | `/29` |
 
-With overlay networking, the generator creates these subnet sizes:
+With overlay networking, the Blueprint Factory creates these subnet sizes:
 
 | `cluster_size` | Worker subnet | Internal LB subnet | Optional FSS subnet | Control plane subnet |
 | --- | --- | --- | --- | --- |
@@ -309,7 +309,7 @@ See [Provisioning PVCs on the File Storage Service](https://docs.oracle.com/en-u
 
 ## **9. Generate the JSON Files**
 
-Run the generator from the repository root:
+Run the Blueprint Factory from the repository root:
 
 ```bash
 bash gen/generate.sh --config /path/to/oke-config.jsonnet /path/to/generated-oke

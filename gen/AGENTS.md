@@ -1,5 +1,7 @@
 # OCI Landing Zone Jsonnet -- Architecture & Conventions
 
+The `gen/` Jsonnet implementation powers the [Blueprint Factory](../addons/oci-lz-blueprint-factory/README.md). This contributor guide uses implementation terms such as generator, config mode, and Jsonnet where technical precision is required.
+
 ## 1. File Organization
 
 ```
@@ -410,7 +412,7 @@ Config mode validates required fields during normalization. `config.environments
 - Shared platform compartments live under `CMP-LZ-PLATFORM-KEY`, but their child keys omit the redundant parent segment: `CMP-LZ-SHARED-<NAME>-KEY`.
 - Shared platform OCI compartment names include the shared scope without repeating the parent platform segment. Example: a shared ExaCS platform uses `cmp-lz-shared-exacs` and `cmp-landingzone:cmp-lz-platform:cmp-lz-shared-exacs`. Individual workload extensions may reject shared placement; `oke_simple` is environment-only.
 - Platform identity/resources use platform compartments, while platform network categories use the scope's network compartment references.
-- Integrated IAM owns platform child compartments for config-driven outputs.
+- Integrated IAM owns platform child compartments for Blueprint Factory outputs.
 - Standalone multi-stack OKE may overlay the same platform child compartment only to stay self-contained.
 - Extensions receive scope semantics via `params.topology`; naming remains formatting-only.
 - Security-target environment selection is centralized in `topology.libsonnet`. Current behavior targets all defined environments when `security_targets` is omitted; set `security_targets` explicitly when a published profile needs narrower targeting.
