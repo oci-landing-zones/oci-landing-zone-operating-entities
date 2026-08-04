@@ -18,7 +18,7 @@ jobs:
           while IFS= read -r -d '' file; do
             size=$(wc -c < "$file")
             if (( size > MAX_BYTES )); then
-              echo "::error file=$file::File is $size bytes; maximum is $MAX_BYTES bytes."
+              echo "::error file=$file::File too large: $file is $size bytes; maximum is $MAX_BYTES bytes."
               failed=1
             fi
           done < <(git diff --name-only -z --diff-filter=AM "$BASE_SHA" "$HEAD_SHA")
