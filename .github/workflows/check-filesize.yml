@@ -4,19 +4,22 @@ jobs:
   File-Size:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
-      - name: check size
+          fetch-depth: 0
+      - name: Check changed-file sizes
         shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          MAX_BYTES: "1048576"
         run: |
-          CHANGED=`git diff --name-only -r HEAD^1 HEAD`
-          FAIL=0
-          while IFS= read -r line; do
-              SIZE=`find -maxdepth 1 -name "$line" -size +2M`
-              if [ "$SIZE" ]; then
-                echo -n "File too large: " `du -h $line`
-                FAIL=1
-              fi
-          done <<< "$CHANGED"
-          exit $FAIL
+          failed=0
+          while IFS= read -r -d '' file; do
+            size=$(wc -c < "$file")
+            if (( size > MAX_BYTES )); then
+              echo "::error file=$file::File is $size bytes; maximum is $MAX_BYTES bytes."
+              failed=1
+            fi
+          done < <(git diff --name-only -z --diff-filter=AM "$BASE_SHA" "$HEAD_SHA")
+          exit "$failed"
