@@ -6,7 +6,7 @@
 //     metadata(params):: { default_subnets, subnet_order },
 //     render(params):: { metadata, contributions },
 //   }
-//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, pods_cidr?, cni_type?, cni?, cluster_size?, public_load_balancer?}
+//   params.config_params — {kubernetes_version, services_cidr, api_endpoint_allowed_cidrs, worker_image?, worker_boot_volume_size?, pods_cidr?, cni_type?, cni?, cluster_size?, public_load_balancer?, create_fss?}
 //   params.network       — {vcn: 'cidr', subnets: {name: cidr}}
 //   params.naming        — naming object
 //   params.topology      — platform scope semantics from topology.libsonnet
@@ -38,6 +38,13 @@ local oke_context = import './oke_context.libsonnet';
         'config_params.cni_type must be one of: native, overlay';
       raw_cni_type,
     local is_overlay_network = cni_type == 'overlay',
+    local create_fss =
+      if std.objectHas(params.config_params, 'create_fss') && params.config_params.create_fss != null then
+        assert std.type(params.config_params.create_fss) == 'boolean' :
+          'config_params.create_fss must be a boolean';
+        params.config_params.create_fss
+      else
+        false,
     local raw_cluster_size =
       if std.objectHas(params.config_params, 'cluster_size') && params.config_params.cluster_size != null then
         params.config_params.cluster_size
@@ -85,30 +92,45 @@ local oke_context = import './oke_context.libsonnet';
           'control-plane': '/29',
           'int-lb': '/26',
           workers: '/23',
-        } + (if is_overlay_network then {} else {
+        } + (if create_fss then {
+          fss: '/26',
+        } else {}) + (if is_overlay_network then {} else {
           pods: '/21',
         }),
-        order: if is_overlay_network then ['workers', 'int-lb', 'control-plane'] else ['pods', 'workers', 'int-lb', 'control-plane'],
+        order:
+          (if is_overlay_network then ['workers', 'int-lb'] else ['pods', 'workers', 'int-lb']) +
+          (if create_fss then ['fss'] else []) +
+          ['control-plane'],
       },
       medium: {
         subnets: {
           'control-plane': '/29',
           'int-lb': '/25',
           workers: '/22',
-        } + (if is_overlay_network then {} else {
+        } + (if create_fss then {
+          fss: '/25',
+        } else {}) + (if is_overlay_network then {} else {
           pods: '/19',
         }),
-        order: if is_overlay_network then ['workers', 'int-lb', 'control-plane'] else ['pods', 'workers', 'int-lb', 'control-plane'],
+        order:
+          (if is_overlay_network then ['workers', 'int-lb'] else ['pods', 'workers', 'int-lb']) +
+          (if create_fss then ['fss'] else []) +
+          ['control-plane'],
       },
       large: {
         subnets: {
           'control-plane': '/29',
           'int-lb': '/24',
           workers: '/19',
-        } + (if is_overlay_network then {} else {
+        } + (if create_fss then {
+          fss: '/24',
+        } else {}) + (if is_overlay_network then {} else {
           pods: '/17',
         }),
-        order: if is_overlay_network then ['workers', 'int-lb', 'control-plane'] else ['pods', 'workers', 'int-lb', 'control-plane'],
+        order:
+          (if is_overlay_network then ['workers', 'int-lb'] else ['pods', 'workers', 'int-lb']) +
+          (if create_fss then ['fss'] else []) +
+          ['control-plane'],
       },
     },
     local subnet_profile =

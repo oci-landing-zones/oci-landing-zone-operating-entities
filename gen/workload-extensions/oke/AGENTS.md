@@ -33,6 +33,9 @@ For published OKE deployment investigations, inspect the exact orchestrator tag 
 - For native, the generator creates and wires a dedicated pod subnet in the OKE VCN through `pods_subnet_id`.
 - For overlay, the generator does not emit pod subnet, pod route table, pod security list, pod NSG, worker `pods_subnet_id`, or worker `pods_nsg_ids`.
 - `oke_simple` defaults `worker_image` to the OL9 family selector `'9\\.[0-9]+'`, which the generator emits as `node_config_details.image`. The downstream OKE module inserts this value into its Oracle Linux image-name regular expression, so newer OL9 minor releases can be selected without matching OL8 images.
+- `config_params.worker_boot_volume_size` defaults to `60` GB and accepts integer values from `50` through `32768`. The generator emits it as `node_config_details.boot_volume_size`.
+- Every generated worker node uses `node_config_details.cloud_init.heredoc_script` to run `/usr/libexec/oci-growfs -y`, then fetch and execute the OKE-provided `oke_init_script` from instance metadata. Supplying custom worker `user_data` replaces OKE's default bootstrap path, so the generated script must retain this explicit bootstrap.
+- CIS2 worker cloud-init also installs `oci-fss-utils` from the runtime Oracle Linux major-version developer repository. The script detects OL8 or OL9 from `/etc/os-release` and enables the matching repository only for the package transaction. CIS1 does not install the package.
 - CIS1 sample node pools omit `node_config_details.encryption`, leaving boot-volume encryption on OCI-managed keys with in-transit encryption disabled. CIS2 node pools enable boot-volume encryption in transit and use their cluster-specific generated key as `node_config_details.encryption.kms_key_id`.
 - `services_cidr` remains the explicit Kubernetes service CIDR in the repo's standard native examples and is emitted under `options.kubernetes_network_config` in the cluster payload consumed by `cis-oke`.
 - `pods_cidr` is not required for the standard native `oke_simple` path, but if a config explicitly sets it the generator preserves it under `options.kubernetes_network_config` as a passthrough to the downstream `cis-oke` module.
@@ -43,7 +46,9 @@ For published OKE deployment investigations, inspect the exact orchestrator tag 
 - The OKE platform VCN prefix must exactly match the selected or defaulted size: `small` requires `/20`, `medium` requires `/18`, and `large` requires `/16`.
 - `cluster_size` cannot be used together with `platform.network.subnets`. With `cluster_size`, the extension owns the fixed subnet layout for the OKE platform VCN.
 - For new customer-facing config examples, prefer the auto-subnet profiles as the normal subnetting path. Use manual `platform.network.subnets` only when the profile layouts do not fit the required address plan.
-- Manual native subnet maps must include exactly `control-plane`, `int-lb`, `workers`, and `pods`. Manual overlay subnet maps must include exactly `control-plane`, `int-lb`, and `workers`.
+- `config_params.create_fss` is a boolean and defaults to `false`. When enabled, the extension adds a private FSS subnet, service-gateway-only route table, ICMP security list, FSS NSG, paired stateless NFS rules between the FSS and worker NSGs, and the cluster-principal `manage file-family` statement.
+- FSS support prepares network and IAM prerequisites for OCI File Storage CSI provisioning. It does not create a file system, mount target, export, StorageClass, or PVC.
+- Manual native subnet maps must include exactly `control-plane`, `int-lb`, `workers`, and `pods`, plus `fss` when `create_fss` is enabled. Manual overlay subnet maps must include exactly `control-plane`, `int-lb`, and `workers`, plus `fss` when enabled.
 - `oke_simple` is supported only under `environments.<environment>.platforms`. Placement under `shared_platforms` is rejected.
 - `oke_simple` uses the normalized top-level `cis_level`; it does not expose a separate OKE CIS or KMS-key option.
 - CIS2 clusters use a customer-managed key for Kubernetes secrets encryption. CIS1 clusters omit the CMEK reference.
@@ -76,6 +81,8 @@ Native profiles:
 | `medium` | `/18` | pods `/19`, workers `/22`, int-lb `/25`, control-plane `/29` |
 | `large` | `/16` | pods `/17`, workers `/19`, int-lb `/24`, control-plane `/29` |
 
+When `create_fss` is enabled, FSS is allocated immediately before the control-plane subnet: `/26` for `small`, `/25` for `medium`, and `/24` for `large`.
+
 Overlay profiles:
 
 | Size | VCN prefix | Allocation order and subnet prefixes |
@@ -83,6 +90,8 @@ Overlay profiles:
 | `small` | `/20` | workers `/23`, int-lb `/26`, control-plane `/29` |
 | `medium` | `/18` | workers `/22`, int-lb `/25`, control-plane `/29` |
 | `large` | `/16` | workers `/19`, int-lb `/24`, control-plane `/29` |
+
+The same optional FSS subnet sizes and placement apply to overlay profiles.
 
 ## CIDR Planning Rules
 
