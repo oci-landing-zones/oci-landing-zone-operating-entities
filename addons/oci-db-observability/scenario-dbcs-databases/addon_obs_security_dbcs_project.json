@@ -1,35 +1,38 @@
 {
-
     "vaults_configuration": {
-        "default_compartment_id": "CMP-LZ-PROD-SECURITY-KEY",
-        "vaults": {
-            "VLT-LZ-PROD-MON-KEY": {
-                "name": "vlt-lz-prod-mon-security",
-                "compartment_id": "CMP-LZ-PROD-SECURITY-KEY"
+        "default_compartment_id"    : "CMP-LZ-PROD-SECURITY-KEY",
+
+        "keys": {
+            "KEY-LZ-PREPROD-MON-KEY": {
+                "name"              : "key-lz-preprod-mon-bkt",
+                "compartment_id"    : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "group_grantees"    : ["grp-lz-preprod-proj1-admin"],
+                "protection_mode"   : "SOFTWARE",
+                "service_grantees"  : ["objectstorage-eu-frankfurt-1"],
+                "vault_key"         : "VLT-LZ-PREPROD-MON-KEY",
+                "versions"          : ["1", "2"]
             },
-            "VLT-LZ-PREPROD-MON-KEY": {
-                "name": "vlt-lz-preprod-mon-security",
-                "compartment_id": "CMP-LZ-PREPROD-SECURITY-KEY"
+
+            "KEY-LZ-PROD-MON-KEY": {
+                "name"              : "key-lz-prod-mon-bkt",
+                "compartment_id"    : "CMP-LZ-PROD-SECURITY-KEY",
+                "group_grantees"    : ["grp-lz-prod-proj1-admin"],
+                "protection_mode"   : "SOFTWARE",
+                "service_grantees"  : ["objectstorage-eu-frankfurt-1"],
+                "vault_key"         : "VLT-LZ-PROD-MON-KEY",
+                "versions"          : ["1", "2"]
             }
         },
-        "keys": {
-            "KEY-LZ-PROD-MON-KEY": {
-                "name": "key-lz-prod-mon-bkt",
-                "compartment_id": "CMP-LZ-PROD-SECURITY-KEY",
-                "protection_mode": "SOFTWARE",
-                "vault_key": "VLT-LZ-PROD-MON-KEY",
-                "service_grantees": ["objectstorage-eu-frankfurt-1"],
-                "group_grantees": ["grp-lz-prod-proj1-admin"],
-                "versions": ["1","2"]
+
+        "vaults": {
+            "VLT-LZ-PREPROD-MON-KEY": {
+                "name"              : "vlt-lz-preprod-mon-security",
+                "compartment_id"    : "CMP-LZ-PREPROD-SECURITY-KEY"
             },
-            "KEY-LZ-PREPROD-MON-KEY": {
-                "name": "key-lz-preprod-mon-bkt",
-                "compartment_id": "CMP-LZ-PREPROD-SECURITY-KEY",
-                "protection_mode": "SOFTWARE",
-                "vault_key": "VLT-LZ-PREPROD-MON-KEY",
-                "service_grantees": ["objectstorage-eu-frankfurt-1"],
-                "group_grantees": ["grp-lz-preprod-proj1-admin"],
-                "versions": ["1","2"]
+
+            "VLT-LZ-PROD-MON-KEY": {
+                "name"              : "vlt-lz-prod-mon-security",
+                "compartment_id"    : "CMP-LZ-PROD-SECURITY-KEY"
             }
         }
     }

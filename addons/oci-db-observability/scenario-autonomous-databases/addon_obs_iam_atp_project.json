@@ -1,25 +1,38 @@
 {
-
     "identity_domain_dynamic_groups_configuration": {
-        "default_identity_domain_id": "COMMON-DOMAIN",
-        "default_defined_tags": null,
-        "default_freeform_tags": null,
+        "default_defined_tags"                    : null,
+        "default_freeform_tags"                   : null,
+        "default_identity_domain_id"              : "COMMON-DOMAIN",
+
         "dynamic_groups": {
-          "DG-LZ-MON": {
-            "name": "dg-lz-mon-dynamic-group",
-            "description": "dynamic group for security functions execution, required for Logging Analytics",
-            "matching_rule": "ALL {resource.type='managementagent'}"
-          }
+            "DG-LZ-MON": {
+                "name"                            : "dg-lz-mon-dynamic-group",
+                "description"                     : "dynamic group for security functions execution, required for Logging Analytics",
+                "matching_rule"                   : "ALL {resource.type='managementagent'}"
+            }
         }
     },
 
     "policies_configuration": {
-        "enable_cis_benchmark_checks": "false",
+        "enable_cis_benchmark_checks"             : "false",
+
         "supplied_policies": {
+            "PCY-MON-DYNAMIC-GROUP": {
+                "name"                            : "pcy-mon-dynamic-group",
+                "description"                     : "Policy to allow the Observability management agent dynamic group to upload metrics and logs.",
+                "compartment_id"                  : "TENANCY-ROOT",
+
+                "statements": [
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to use metrics in tenancy",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy"
+                ]
+            },
+
             "PCY-MON-SERVICES": {
-                "name": "pcy-mon-services",
-                "description": "Policy to allow usage of Observability services in tenancy.",
-                "compartment_id": "TENANCY-ROOT",
+                "name"                            : "pcy-mon-services",
+                "description"                     : "Policy to allow usage of Observability services in tenancy.",
+                "compartment_id"                  : "TENANCY-ROOT",
+
                 "statements": [
                     "Allow service operations-insights to use ons-topics in tenancy",
                     "Allow service operations-insights to read secret-family in tenancy",
@@ -27,43 +40,14 @@
                     "Allow service loganalytics to use metrics in tenancy",
                     "Allow service loganalytics to read loganalytics-features-family in tenancy",
                     "Allow service dpd to read secret-family in tenancy"
+                ]
+            },
 
-                ]
-            },
-            "PCY-MON-DYNAMIC-GROUP": {
-                "name": "pcy-mon-dynamic-group",
-                "description": "Policy to allow the Observability management agent dynamic group to upload metrics and logs.",
-                "compartment_id": "TENANCY-ROOT",
-                "statements": [
-                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to use metrics in tenancy",
-                    "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy"
-                ]
-            },
-            "PCY-PROD-PROJ1-MON-ADMINISTRATION": {
-                "name": "pcy-prod-proj1-mon-admin",
-                "description": "Policy to allow monitoring groups to manage Autonomous Database observability resources in the Prod proj1 compartment.",
-                "compartment_id": "CMP-LZ-PROD-PROJ1-KEY",
-                "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage compartments in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage dbmgmt-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage ons-topics in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage opsi-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-dashboard-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-agents in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-agent-install-keys in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage loganalytics-features-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage loganalytics-ingesttime-rule in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage loganalytics-resources-family in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-dashboard in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-saved-search in compartment cmp-lz-prod-proj1"
-
-                ]
-            },
             "PCY-PREPROD-PROJ1-MON-ADMINISTRATION": {
-                "name": "pcy-preprod-proj1-mon-admin",
-                "description": "Policy to allow monitoring groups to manage Autonomous Database observability resources in the Preprod proj1 compartment.",
-                "compartment_id": "CMP-LZ-PREPROD-PROJ1-KEY",
+                "name"                            : "pcy-preprod-proj1-mon-admin",
+                "description"                     : "Policy to allow monitoring groups to manage Autonomous Database observability resources in the Preprod proj1 compartment.",
+                "compartment_id"                  : "CMP-LZ-PREPROD-PROJ1-KEY",
+
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage compartments in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-preprod-proj1",
@@ -79,8 +63,29 @@
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage management-dashboard in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage management-saved-search in compartment cmp-lz-preprod-proj1"
                 ]
-            }
+            },
 
+            "PCY-PROD-PROJ1-MON-ADMINISTRATION": {
+                "name"                            : "pcy-prod-proj1-mon-admin",
+                "description"                     : "Policy to allow monitoring groups to manage Autonomous Database observability resources in the Prod proj1 compartment.",
+                "compartment_id"                  : "CMP-LZ-PROD-PROJ1-KEY",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage compartments in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage dbmgmt-private-endpoints in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage dbmgmt-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage ons-topics in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage opsi-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-dashboard-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-agents in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-agent-install-keys in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage loganalytics-features-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage loganalytics-ingesttime-rule in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage loganalytics-resources-family in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-dashboard in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-saved-search in compartment cmp-lz-prod-proj1"
+                ]
+            }
         }
     }
 }

@@ -1,60 +1,69 @@
 {
     "instances_configuration": {
-        "default_compartment_id": "CMP-LZ-MONITORING-KEY",
-        "default_ssh_public_key_path": null,
+        "default_compartment_id"                           : "CMP-LZ-MONITORING-KEY",
+        "default_ssh_public_key_path"                      : null,
+
         "instances": {
             "VM-FRA-LZ-SHARED-MON-AGENT-KEY": {
-                "name": "vm-fra-lz-shared-mon-agent",
-                "shape": "VM.Standard.E5.Flex",
+                "name"                                     : "vm-fra-lz-shared-mon-agent",
+                "shape"                                    : "VM.Standard.E5.Flex",
+
                 "boot_volume": {
-                    "preserve_on_instance_deletion": false,
-                    "size": 60
+                    "preserve_on_instance_deletion"        : false,
+                    "size"                                 : 60
                 },
+
                 "cloud_agent": {
-                    "disable_management": false,
-                    "disable_monitoring": false,
+                    "disable_management"                   : false,
+                    "disable_monitoring"                   : false,
+
                     "plugins": [
                         {
-                            "name": "Management Agent",
-                            "enabled": true
+                            "name"                         : "Management Agent",
+                            "enabled"                      : true
                         },
                         {
-                            "name": "Custom Logs Monitoring",
-                            "enabled": true
+                            "name"                         : "Custom Logs Monitoring",
+                            "enabled"                      : true
                         },
                         {
-                            "name": "Compute Instance Monitoring",
-                            "enabled": true
+                            "name"                         : "Compute Instance Monitoring",
+                            "enabled"                      : true
                         },
                         {
-                            "name": "Vulnerability Scanning",
-                            "enabled": true
+                            "name"                         : "Vulnerability Scanning",
+                            "enabled"                      : true
                         },
                         {
-                            "name": "OS Management Service Agent",
-                            "enabled": true
+                            "name"                         : "OS Management Service Agent",
+                            "enabled"                      : true
                         }
                     ]
                 },
+
                 "encryption": {
                     "encrypt_in_transit_on_instance_create": null,
                     "encrypt_in_transit_on_instance_update": null
                 },
+
                 "flex_shape_settings": {
-                    "memory": 8,
-                    "ocpus": 2
+                    "memory"                               : 8,
+                    "ocpus"                                : 2
                 },
+
                 "networking": {
-                    "assign_public_ip": false,
-                    "hostname": "vm-fra-lz-shared-mon-agent",
-                    "subnet_id": "SN-FRA-LZ-HUB-MON-KEY"
+                    "assign_public_ip"                     : false,
+                    "hostname"                             : "vm-fra-lz-shared-mon-agent",
+                    "subnet_id"                            : "SN-FRA-LZ-HUB-MON-KEY"
                 },
+
                 "placement": {
-                    "availability_domain": 1,
-                    "fault_domain": 1
+                    "availability_domain"                  : 1,
+                    "fault_domain"                         : 1
                 },
+
                 "platform_image": {
-                    "ocid": "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaadv452wgzvy52n3pbqf2yc3h6mrdqb4qsryta75qsbntn6q7lo7ea"
+                    "ocid"                                 : "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaadv452wgzvy52n3pbqf2yc3h6mrdqb4qsryta75qsbntn6q7lo7ea"
                 }
             }
         }
