@@ -53,7 +53,9 @@ const VCN_PAD = 22;    // breathing room between subnets and the VCN border
 const GW_W = 116;      // gateway icon + readable generated name
 const GW_H = 74;
 const GW_STRIP = 150;  // gateway rail inside the left side of each VCN
-const GW_X = 12;
+// The gateway node centres its icon, so half its width outside the VCN makes the
+// icon centre sit exactly on the VCN's left boundary line.
+const GW_X = -GW_W / 2;
 
 const VCN_CONTENT_W = VCN_PAD * 2 + SUB_W;
 const VCN_W = GW_STRIP + VCN_CONTENT_W;
@@ -413,12 +415,12 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   const nodes: DiagramNode[] = [
     { id: 'region', kind: 'region', label: region ? `OCI Region · ${region}` : 'OCI Region', x: 0, y: 0, width: regWidth, height: regHeight },
     { id: 'tenancy', kind: 'tenancy', label: 'OCI Tenancy', parentId: 'region', x: PAD, y: innerTop, width: tenWidth, height: tenHeight },
-    { id: 'landingzone', kind: 'landingzone', label: generatorNames.landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
+    { id: 'landingzone', kind: 'landingzone', secure: true, container: true, label: generatorNames.landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
   ];
   const edges: DiagramEdge[] = [];
 
   // network compartment › hub VCN › gateways + hub subnets (step 2+, implemented hub kinds only)
-  nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
+  nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', secure: true, container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
   if (showHub) {
     const placed = pushVcn(nodes, 'hub-vcn', 'cmp-network', hubVcnLabel, hubSubnets);
     // Gateways use the rail inside the hub VCN: IGW by the first subnet,
@@ -512,7 +514,12 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       const hub = i === 0;
       const channel = hub ? undefined : (i - 1 - gutterMid) * gutterStep;
       edges.push({ id: `e-${a.vcn}-${a.id}`, source: a.vcn, target: a.id, sourceSide: hub ? 'bottom' : 'left', targetSide: hub ? 'top' : 'right', channel, centerX: hub ? undefined : gutterCenterX });
-      edges.push({ id: `e-${a.id}-drg`, source: a.id, target: 'drg', sourceSide: 'left', targetSide: 'right' });
+      // Each DRG attachment is a separate OCI connection. Give every line its
+      // own port on the DRG border so the graph never collapses them into one.
+      edges.push({
+        id: `e-${a.id}-drg`, source: a.id, target: 'drg',
+        sourceSide: 'left', targetSide: 'right', targetPort: (i + 1) / (attachList.length + 1),
+      });
     });
 
   }
@@ -639,16 +646,21 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
 
     // A dot per table, on the edge of its element facing the table; stacked when
     // several tables share an element (e.g. the DRG's two tables).
-    const byEl = new Map<string, typeof allRouteTables>();
-    for (const rt of allRouteTables) byEl.set(rt.attachTo, [...(byEl.get(rt.attachTo) ?? []), rt]);
-    for (const [elId, rts] of byEl) {
+    const byEl = new Map<string, { rt: typeof allRouteTables[number]; dotId: string }[]>();
+    for (const rt of allRouteTables) {
+      [rt.attachTo, ...(rt.attachExtra ?? [])].forEach((elementId, index) => {
+        const dotId = index === 0 ? `dot-${rt.id}` : `dot-${rt.id}-${index}`;
+        byEl.set(elementId, [...(byEl.get(elementId) ?? []), { rt, dotId }]);
+      });
+    }
+    for (const [elId, entries] of byEl) {
       const a = abs(elId);
       if (!a) continue;
-      rts.forEach((rt, k) => {
+      entries.forEach(({ rt, dotId }, k) => {
         const cx = onLeft(rt) ? a.x : a.x + a.w;
-        const cy = a.y + a.h / 2 + (k - (rts.length - 1) / 2) * (DOT + 4);
+        const cy = a.y + a.h / 2 + (k - (entries.length - 1) / 2) * (DOT + 4);
         nodes.push({
-          id: `dot-${rt.id}`, kind: 'rtdot', label: '', parentId: 'landingzone',
+          id: dotId, kind: 'rtdot', label: '', parentId: 'landingzone',
           rtDotTableId: rt.id, rtDotOpen: openSet.has(rt.id), rtDotConfigured: rt.rules.length > 0, rtDotTone: rt.kind,
           x: cx - DOT / 2, y: cy - DOT / 2, width: DOT, height: DOT,
         });

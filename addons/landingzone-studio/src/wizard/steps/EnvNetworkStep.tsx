@@ -269,7 +269,7 @@ export default function EnvNetworkStep() {
                     {open && (
                       <div className="environment-network-body">
                         <div className="environment-network-generated">
-                          <span>Generated VCN</span>
+                          <span>VCN name</span>
                           <code>{generatorNames.environmentVcn(region, envName)}</code>
                           <span>Compartment</span>
                           <code>{generatorNames.environmentChildCompartment(envName, 'network')}</code>

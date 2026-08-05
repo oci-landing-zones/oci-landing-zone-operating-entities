@@ -141,7 +141,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
                 readOnly
                 aria-describedby="lz-region-short-help"
               />
-              <div id="lz-region-short-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Derived from the selected OCI region and used by the generator in resource names.</div>
+              <div id="lz-region-short-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Derived from the selected OCI region and included in OCI resource names.</div>
             </div>
             <div>
               <label style={s.label} htmlFor="lz-cis-level">CIS benchmark level</label>
@@ -152,10 +152,10 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
                 onChange={(e) => setFoundation({ cisLevel: Number(e.target.value) as 1 | 2 })}
                 aria-describedby="lz-cis-level-help"
               >
-                <option value={2}>Level 2 — enhanced security</option>
+                <option value={2}>Level 2 — CMEK required</option>
                 <option value={1}>Level 1 — foundational security</option>
               </select>
-              <div id="lz-cis-level-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Selects the generator&apos;s CIS security and observability artifact set. Level 2 is the generator default.</div>
+              <div id="lz-cis-level-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Level 2 requires customer-managed encryption keys (CMEK) for resources protected by Security Zones. Level 1 provides the foundational controls.</div>
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.body}>
           <div style={s.title}>Environments</div>
           <div style={{ color: oracle.textMuted, fontSize: 12.5, lineHeight: 1.5, margin: '-8px 0 14px' }}>
-            Security Zone applies the generator&apos;s stricter recipe to that environment. Confirm the recipe permits every service the environment needs before deployment.
+            Security Zone applies a stricter security recipe to that environment. Confirm the recipe permits every service the environment needs before deployment.
           </div>
 
           <div style={s.tableHead} className="foundation-environment-grid">

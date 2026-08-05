@@ -173,7 +173,7 @@ export function duplicateLZ(id: string): CreateLzResult {
   // The copy has an identical model, so the source's artifacts still describe it.
   const outputs = getOutputs(id);
   if (outputs && !saveOutputs(created.record.id, { config: outputs.config, files: outputs.files }).ok) {
-    return { ...created, message: 'The Landing Zone copy was created, but its generated ZIP could not be saved.' };
+    return { ...created, message: 'The Landing Zone copy was created, but its output ZIP could not be saved.' };
   }
   return created;
 }

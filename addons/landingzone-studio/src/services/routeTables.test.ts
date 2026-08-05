@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildRouteTables } from './routeTables';
 import { emptyLzModel } from '../model/defaults';
 import { hubKindDefaults } from './hubKinds';
-import { newPlatform } from './platforms';
+import { newPlatform, newSharedPlatform } from './platforms';
 
 describe('buildRouteTables', () => {
   it('builds generator-owned hub, shared DRG, and one-per-VCN spoke tables', () => {
@@ -42,19 +42,40 @@ describe('buildRouteTables', () => {
     const t = buildRouteTables(emptyLzModel());
     const natgw = t.find((r) => r.id === 'rt-hub-natgw')!;
     expect(natgw.rules.every((r) => r.nextHopKind === 'firewall' && r.flowTarget === '10.0.2.10')).toBe(true);
+    expect(t.find((r) => r.id === 'rt-hub-ingress')).toMatchObject({ kind: 'hub', attachTo: 'attach-hub' });
     expect(t.find((r) => r.id === 'rt-hub-ingress')!.rules[0]).toMatchObject({ destination: '0.0.0.0/0', nextHopKind: 'firewall', flowTarget: '10.0.2.10' });
   });
 
-  it('builds a DRG hub table (dynamic, import note) mapping each spoke /24 to its attachment', () => {
+  it('attaches the hub and shared spoke DRG tables at the attachments they govern', () => {
     const t = buildRouteTables(emptyLzModel());
     const drg = t.find((r) => r.id === 'rt-drg-hub')!;
-    expect(drg).toMatchObject({ attachTo: 'drg', name: 'drgrt-fra-lz-hub' });
+    expect(drg).toMatchObject({ attachTo: 'attach-hub', name: 'drgrt-fra-lz-hub' });
     expect(drg.note).toMatch(/Import route distribution/);
-    expect(drg.rules[0]).toMatchObject({ destination: '10.0.64.0/24', targetType: 'VCN Attachment', target: 'drgatt-fra-lz-prod-proj', routeType: 'Dynamic', flowTarget: 'attach-cmp-env-0' });
-    expect(drg.rules).toHaveLength(8);
+    expect(drg.rules[0]).toMatchObject({ destination: '10.0.64.0/21', targetType: 'VCN Attachment', target: 'drgatt-fra-lz-prod-proj', routeType: 'Dynamic', flowTarget: 'attach-cmp-env-0' });
+    expect(drg.rules).toHaveLength(2);
     const spokes = t.find((r) => r.id === 'rt-drg-spokes')!;
-    expect(spokes).toMatchObject({ attachTo: 'drg', name: 'drgrt-fra-lz-spokes' });
+    expect(spokes).toMatchObject({
+      attachTo: 'attach-cmp-env-0',
+      attachExtra: ['attach-cmp-env-1'],
+      name: 'drgrt-fra-lz-spokes',
+    });
     expect(spokes.rules[0]).toMatchObject({ destination: '0.0.0.0/0', target: 'drgatt-fra-lz-hub', flowTarget: 'attach-hub' });
+  });
+
+  it('shares DRGRT-SPOKES across environment and shared platform attachments', () => {
+    const base = emptyLzModel();
+    const platform = newPlatform('custom', []);
+    const shared = newSharedPlatform('custom', []);
+    const spokes = buildRouteTables({ ...base, platforms: [platform], sharedPlatforms: [shared] })
+      .find((table) => table.id === 'rt-drg-spokes')!;
+    expect([spokes.attachTo, ...(spokes.attachExtra ?? [])]).toEqual([
+      'attach-cmp-env-0',
+      'attach-cmp-env-0-plat-0',
+      'attach-cmp-env-1',
+      'attach-cmp-env-1-plat-0',
+      'attach-shared-0',
+    ]);
+    expect([spokes.attachTo, ...(spokes.attachExtra ?? [])]).not.toContain('drg');
   });
 
   it('gives each spoke subnet a default-to-DRG + OSN-to-SGW table', () => {
@@ -76,7 +97,7 @@ describe('buildRouteTables', () => {
     expect(t.find((r) => r.id === 'rt-hub-lb')!.rules.map((r) => r.nextHopKind)).toEqual(['igw', 'drg', 'drg']);
     expect(t.find((r) => r.id === 'rt-hub-mgmt')!.rules[0]).toMatchObject({ nextHopKind: 'natgw', flowTarget: 'gw-natgw' });
     expect(t.find((r) => r.id === 'rt-ssn-0')!.rules[0]).toMatchObject({ nextHopKind: 'natgw', flowTarget: 'cmp-env-0-natgw' });
-    expect(t.find((r) => r.id === 'rt-drg-spokes')!.rules).toContainEqual(expect.objectContaining({ destination: '10.0.128.0/24', flowTarget: 'attach-cmp-env-1' }));
+    expect(t.find((r) => r.id === 'rt-drg-spokes')!.rules).toContainEqual(expect.objectContaining({ destination: '10.0.128.0/21', flowTarget: 'attach-cmp-env-1' }));
   });
 
   it('models Hub B final routes through its one OCI Network Firewall', () => {

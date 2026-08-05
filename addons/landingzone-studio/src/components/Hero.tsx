@@ -38,7 +38,7 @@ export default function Hero({ onNew, compact = false }: { onNew: () => void; co
       {!compact && (
         <div style={styles.sub}>
           Build an OCI Landing Zone step by step. Each input updates a canonical Blueprint Factory config and a
-          live, exportable network diagram. Review the generated artifacts before deployment.
+          live, exportable network diagram. Review all output files before deployment.
         </div>
       )}
       <button type="button" style={styles.cta} onClick={onNew}>New Landing Zone →</button>

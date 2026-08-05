@@ -83,6 +83,9 @@ describe('toDrawioXml', () => {
     // VCN → attach → DRG edges, no arrowheads
     expect(xml).toContain('source="hub-vcn" target="attach-hub"');
     expect(xml).toContain('source="attach-hub" target="drg"');
+    expect(xml.match(/id="e-attach-hub-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.25;');
+    expect(xml.match(/id="e-attach-cmp-env-0-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.5;');
+    expect(xml.match(/id="e-attach-cmp-env-1-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.75;');
     expect(xml).toContain('endArrow=none;');
     // every environment VCN gets its own Service Gateway
     expect(xml).toMatch(/id="cmp-env-0-sgw"[^>]*parent="cmp-env-0-vcn"/);

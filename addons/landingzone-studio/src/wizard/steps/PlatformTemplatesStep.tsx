@@ -226,7 +226,7 @@ function PerEnvTable({ platform, environments, onPlatform }: {
                   {profileOwned ? (
                     inst.overridden
                       ? <button type="button" style={{ ...local.linkBtn, color: oracle.red }} onClick={() => resetOverride(inst.id)}>Reset stale override</button>
-                      : <span style={local.fieldHint}>Profile-owned</span>
+                      : <span style={local.fieldHint}>Automatic</span>
                   ) : (
                     <>
                       <button type="button" style={local.linkBtn} onClick={() => setEditEnv(editEnv === inst.id ? null : inst.id)}>
@@ -402,7 +402,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
           </div>
 
           <div style={{ marginTop: 18 }}>
-            <label style={s.label}>Generated per-environment settings</label>
+            <label style={s.label}>Per-environment settings</label>
             <PerEnvTable platform={platform} environments={environments} onPlatform={onPlatform} />
           </div>
         </div>

@@ -277,8 +277,18 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
     }
     // Routing connectors: thin muted right-angle lines, no arrowheads (VCN ─ attach ─ DRG).
     let base = `edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=none;startArrow=none;strokeColor=#6b6660;strokeWidth=1.4;jettySize=auto;`;
-    if (edge.sourceSide) { const [x, y] = sideXY[edge.sourceSide]; base += `exitX=${x};exitY=${y};exitDx=0;exitDy=0;`; }
-    if (edge.targetSide) { const [x, y] = sideXY[edge.targetSide]; base += `entryX=${x};entryY=${y};entryDx=0;entryDy=0;`; }
+    if (edge.sourceSide) {
+      const [defaultX, defaultY] = sideXY[edge.sourceSide];
+      const x = edge.sourceSide === 'top' || edge.sourceSide === 'bottom' ? (edge.sourcePort ?? defaultX) : defaultX;
+      const y = edge.sourceSide === 'left' || edge.sourceSide === 'right' ? (edge.sourcePort ?? defaultY) : defaultY;
+      base += `exitX=${x};exitY=${y};exitDx=0;exitDy=0;`;
+    }
+    if (edge.targetSide) {
+      const [defaultX, defaultY] = sideXY[edge.targetSide];
+      const x = edge.targetSide === 'top' || edge.targetSide === 'bottom' ? (edge.targetPort ?? defaultX) : defaultX;
+      const y = edge.targetSide === 'left' || edge.targetSide === 'right' ? (edge.targetPort ?? defaultY) : defaultY;
+      base += `entryX=${x};entryY=${y};entryDx=0;entryDy=0;`;
+    }
     const style = edge.animated ? `${base}flowAnimation=1;` : base;
     const value = edge.label ? htmlTextAttribute(edge.label) : '';
     return [
