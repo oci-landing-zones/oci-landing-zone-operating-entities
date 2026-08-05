@@ -16,7 +16,7 @@ describe('flowTrace — walks the route tables per the validated OCI spec', () =
     expect(t.ok).toBe(true);
     expect(seq(t.hops)).toEqual([
       ['cmp-env-0-vcn-sn-0', 'rt-ssn-0', 0],
-      ['drg', 'rt-drg-spokes', 0],
+      ['attach-cmp-env-0', 'rt-drg-spokes', 0],
       ['attach-hub', 'rt-hub-ingress', 0],
       ['hub-vcn-sn-2', 'rt-hub-internal', 0],
       ['gw-natgw', undefined, undefined],
@@ -53,10 +53,10 @@ describe('flowTrace — walks the route tables per the validated OCI spec', () =
     expect(t.ok).toBe(true);
     expect(seq(t.hops)).toEqual([
       ['cmp-env-0-vcn-sn-0', 'rt-ssn-0', 0],
-      ['drg', 'rt-drg-spokes', 0],
+      ['attach-cmp-env-0', 'rt-drg-spokes', 0],
       ['attach-hub', 'rt-hub-ingress', 2],
       ['hub-vcn-sn-2', 'rt-hub-internal', 2],
-      ['drg', 'rt-drg-hub', 4],
+      ['attach-hub', 'rt-drg-hub', 1],
       ['cmp-env-1-vcn-sn-0', undefined, undefined],
     ]);
     // The hairpin retraces the hub attachment + DRG.
@@ -70,7 +70,7 @@ describe('flowTrace — walks the route tables per the validated OCI spec', () =
       'drg->attach-cmp-env-1',
       'attach-cmp-env-1->cmp-env-1-vcn-sn-0',
     ]);
-    expect(t.highlights).toContainEqual({ tableId: 'rt-drg-hub', rows: [4] });
+    expect(t.highlights).toContainEqual({ tableId: 'rt-drg-hub', rows: [1] });
   });
 
   it('INGRESS: INET → IGW → DMZ FW → LB → INT FW → DRG → spoke VM (LB→backend inspected, post-fix)', () => {
@@ -81,7 +81,7 @@ describe('flowTrace — walks the route tables per the validated OCI spec', () =
       ['hub-vcn-sn-0', 'rt-hub-dmz', undefined],   // DMZ FW local-delivers to the LB
       ['hub-vcn-sn-1', 'rt-hub-lb', 1],            // LB → INT FW (the bug-fix: not straight to DRG)
       ['hub-vcn-sn-2', 'rt-hub-internal', 1],      // INT FW → DRG
-      ['drg', 'rt-drg-hub', 0],                    // prod web /24 → prod attach
+      ['attach-hub', 'rt-drg-hub', 0],             // prod VCN → prod attach
       ['cmp-env-0-vcn-sn-0', undefined, undefined],
     ]);
     // The LB→backend leg is inspected by the internal firewall (regression guard for the rt-hub-lb fix).

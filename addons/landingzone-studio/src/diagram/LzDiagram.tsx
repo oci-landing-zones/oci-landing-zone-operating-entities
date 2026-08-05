@@ -272,7 +272,7 @@ function RtDotNode({ data }: NodeProps) {
   );
 }
 
-const nodeTypes: NodeTypes = { compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, project: ProjectNode, routetable: RouteTableNode, rtdot: RtDotNode };
+const nodeTypes: NodeTypes = { landingzone: CompartmentNode, compartment: CompartmentNode, subnet: SubnetNode, gateway: GatewayNode, vcn: VcnNode, drg: DrgNode, attachment: AttachmentNode, project: ProjectNode, routetable: RouteTableNode, rtdot: RtDotNode };
 
 /** Border-intersection point of `node` on the line toward `other` (floating-edge geometry). */
 function intersect(node: InternalNode, other: InternalNode): { x: number; y: number } {
@@ -302,16 +302,16 @@ function sideOf(node: InternalNode, p: { x: number; y: number }): Position {
 }
 
 /** Centre of a named border of `node` — used when an edge pins a fixed connection side. */
-function sidePoint(node: InternalNode, side: string): { x: number; y: number; pos: Position } {
+function sidePoint(node: InternalNode, side: string, port = 0.5): { x: number; y: number; pos: Position } {
   const nx = node.internals.positionAbsolute.x;
   const ny = node.internals.positionAbsolute.y;
   const w = node.measured.width ?? 0;
   const h = node.measured.height ?? 0;
   switch (side) {
-    case 'left': return { x: nx, y: ny + h / 2, pos: Position.Left };
-    case 'right': return { x: nx + w, y: ny + h / 2, pos: Position.Right };
-    case 'top': return { x: nx + w / 2, y: ny, pos: Position.Top };
-    default: return { x: nx + w / 2, y: ny + h, pos: Position.Bottom };
+    case 'left': return { x: nx, y: ny + h * port, pos: Position.Left };
+    case 'right': return { x: nx + w, y: ny + h * port, pos: Position.Right };
+    case 'top': return { x: nx + w * port, y: ny, pos: Position.Top };
+    default: return { x: nx + w * port, y: ny + h, pos: Position.Bottom };
   }
 }
 
@@ -324,9 +324,9 @@ function FloatingEdge({ id, source, target, markerEnd, style, data }: EdgeProps)
   const s = useInternalNode(source);
   const t = useInternalNode(target);
   if (!s || !t) return null;
-  const d = data as { sourceSide?: string; targetSide?: string; channel?: number; centerX?: number } | undefined;
-  const sp = d?.sourceSide ? sidePoint(s, d.sourceSide) : { ...intersect(s, t), pos: undefined as Position | undefined };
-  const tp = d?.targetSide ? sidePoint(t, d.targetSide) : { ...intersect(t, s), pos: undefined as Position | undefined };
+  const d = data as { sourceSide?: string; targetSide?: string; sourcePort?: number; targetPort?: number; channel?: number; centerX?: number } | undefined;
+  const sp = d?.sourceSide ? sidePoint(s, d.sourceSide, d.sourcePort) : { ...intersect(s, t), pos: undefined as Position | undefined };
+  const tp = d?.targetSide ? sidePoint(t, d.targetSide, d.targetPort) : { ...intersect(t, s), pos: undefined as Position | undefined };
   // A pinned centerX holds the vertical bend in a fixed channel; otherwise it
   // floats at the endpoints' midpoint. `channel` staggers parallel links either way.
   const centerX = d?.centerX != null
@@ -510,7 +510,7 @@ function FlowOverlay({ flowEdges, steps, width, height }: {
 function toReactFlow(diagram: DiagramModel): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = diagram.nodes.map((n) => {
     // Kinds with a custom node component draw their own label; the style is box-only.
-    const customType = n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'project' || n.kind === 'routetable' || n.kind === 'rtdot';
+    const customType = n.kind === 'landingzone' || n.kind === 'compartment' || n.kind === 'subnet' || n.kind === 'gateway' || n.kind === 'vcn' || n.kind === 'drg' || n.kind === 'attachment' || n.kind === 'project' || n.kind === 'routetable' || n.kind === 'rtdot';
     return {
     id: n.id,
     position: { x: n.x, y: n.y },
@@ -549,7 +549,7 @@ function toReactFlow(diagram: DiagramModel): { nodes: Node[]; edges: Edge[] } {
     target: e.target,
     type: 'floating',
     label: e.label,
-    data: { sourceSide: e.sourceSide, targetSide: e.targetSide, channel: e.channel, centerX: e.centerX },
+    data: { sourceSide: e.sourceSide, targetSide: e.targetSide, sourcePort: e.sourcePort, targetPort: e.targetPort, channel: e.channel, centerX: e.centerX },
     // Lift links above the opaque compartment fills. Dot→table connectors ride
     // just under the table (above the dots) so the whole line stays visible.
     zIndex: e.target.startsWith('rt-') ? 1900 : 1000,

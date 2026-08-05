@@ -12,7 +12,7 @@ export const CONFIG_FILENAME = 'config.jsonnet';
 
 /** What each surfaced artifact is for, so a reviewer knows which to deploy first. */
 export const OUTPUT_BLURB: Record<string, string> = {
-  'network_pre.json': 'Initial phase — creates the network before generated final-route dependencies exist.',
+  'network_pre.json': 'Initial phase — creates the network before final-route dependencies are available.',
   'network.json': 'Completion phase — replaces network_pre.json after required private IP OCIDs are available.',
 };
 
@@ -49,8 +49,8 @@ export function deploymentStages(availableFiles: string[]): DeploymentStage[] {
     {
       title: '1. Create the landing zone',
       description: available.has('network_pre.json')
-        ? 'Use the pre-phase network, security, and observability files. Plan and apply this set before completing generated routes.'
-        : 'Use the generated network with the pre-phase security and observability files. Plan and apply this set first.',
+        ? 'Use the pre-phase network, security, and observability files. Plan and apply this set before completing final routes.'
+        : 'Use the final network with the pre-phase security and observability files. Plan and apply this set first.',
       files: keep([...persistent, available.has('network_pre.json') ? 'network_pre.json' : 'network.json', ...pre]),
     },
     {

@@ -83,6 +83,7 @@ export function buildRouteTables(model: LzModel): RouteTable[] {
 function canonicalizeCoreRouteTables(model: LzModel, raw: RouteTable[]): RouteTable[] {
   const region = model.foundation.regionShortName.trim() || '<region>';
   const normalized: RouteTable[] = [];
+  const spokeAttachments = coreSpokeAttachments(model, region);
 
   for (const table of raw) {
     if (table.id.startsWith('rt-drg-') || table.id.startsWith('rt-ssn-')) continue;
@@ -103,16 +104,29 @@ function canonicalizeCoreRouteTables(model: LzModel, raw: RouteTable[]): RouteTa
   }
 
   const hubDrg = raw.find((table) => table.id === 'rt-drg-hub');
-  if (hubDrg) normalized.push({ ...hubDrg, name: `drgrt-${region}-lz-hub`, attachTo: 'drg' });
+  if (hubDrg) normalized.push({
+    ...hubDrg,
+    name: `drgrt-${region}-lz-hub`,
+    attachTo: 'attach-hub',
+    rules: spokeAttachments.map((entry) => attach(entry.cidr, entry.name, entry.id)),
+  });
 
   const spokeDrg = raw.filter((table) => table.id.startsWith('rt-drg-') && table.id !== 'rt-drg-hub');
-  if (spokeDrg.length > 0) normalized.push({
+  if (spokeAttachments.length > 0 && spokeDrg.length > 0) normalized.push({
     ...spokeDrg[0],
     id: 'rt-drg-spokes',
     name: `drgrt-${region}-lz-spokes`,
-    attachTo: 'drg',
-    attachExtra: spokeDrg.map((table) => table.attachTo),
-    rules: model.network.hubKind === 'hub_e' ? deduplicateRules(spokeDrg.flatMap((table) => table.rules)) : spokeDrg[0].rules,
+    attachTo: spokeAttachments[0].id,
+    ...(spokeAttachments.length > 1 ? { attachExtra: spokeAttachments.slice(1).map((entry) => entry.id) } : {}),
+    rules: model.network.hubKind === 'hub_e'
+      ? [
+          attach(model.network.hubVcnCidr, generatorNames.hubAttachment(region), 'attach-hub'),
+          ...spokeAttachments.map((entry) => attach(entry.cidr, entry.name, entry.id)),
+        ]
+      : spokeDrg[0].rules,
+    note: model.network.hubKind === 'hub_e'
+      ? 'Dynamic routes imported from the hub and spoke/platform VCN attachments'
+      : spokeDrg[0].note,
   });
 
   model.environments.forEach((env, envIndex) => {
@@ -130,14 +144,37 @@ function canonicalizeCoreRouteTables(model: LzModel, raw: RouteTable[]): RouteTa
   return normalized;
 }
 
-function deduplicateRules(rules: RouteRule[]): RouteRule[] {
-  const seen = new Set<string>();
-  return rules.filter((rule) => {
-    const key = `${rule.destination}|${rule.nextHopKind}|${rule.flowTarget ?? ''}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
+/** Every non-hub VCN attachment receives the single shared DRGRT-SPOKES table. */
+function coreSpokeAttachments(model: LzModel, region: string): { id: string; name: string; cidr: string }[] {
+  const entries: { id: string; name: string; cidr: string }[] = [];
+  model.environments.forEach((env, envIndex) => {
+    const envName = env.name.trim() || `env${envIndex + 1}`;
+    entries.push({
+      id: `attach-cmp-env-${envIndex}`,
+      name: generatorNames.environmentAttachment(region, envName),
+      cidr: env.network.vcnCidr,
+    });
+    let platformSlot = 0;
+    model.platforms.forEach((platform) => {
+      if (!platformInEnv(platform, env.id)) return;
+      const platformName = platform.key.trim() || platform.type;
+      entries.push({
+        id: `attach-cmp-env-${envIndex}-plat-${platformSlot}`,
+        name: generatorNames.environmentPlatformAttachment(region, envName, platformName),
+        cidr: platformVcnForEnv(platform, env.id, envIndex),
+      });
+      platformSlot += 1;
+    });
   });
+  model.sharedPlatforms.forEach((platform, sharedIndex) => {
+    const platformName = platform.key.trim() || platform.type || 'platform';
+    entries.push({
+      id: `attach-shared-${sharedIndex}`,
+      name: generatorNames.sharedPlatformAttachment(region, platformName),
+      cidr: platform.vcnCidr,
+    });
+  });
+  return entries;
 }
 
 /** Hub A's dual-firewall route set. */
@@ -192,7 +229,7 @@ function buildHubARouteTables(model: LzModel): RouteTable[] {
     rules: [...internalSubnets.map((s) => fw(s.cidr, intIp, intName)), ...envVcnsToFw()],
   });
   tables.push({
-    id: 'rt-hub-ingress', name: `rt-${region}-hub-ingress`, kind: 'gateway', columns: 'vcn', attachTo: 'attach-hub',
+    id: 'rt-hub-ingress', name: `rt-${region}-hub-ingress`, kind: 'hub', columns: 'vcn', attachTo: 'attach-hub',
     rules: [fw('0.0.0.0/0', intIp, intName), ...envVcnsToFw()],
   });
 
@@ -310,7 +347,7 @@ function buildHubBRouteTables(model: LzModel): RouteTable[] {
     note: finalNote, rules: [fw('0.0.0.0/0', firewallIp, firewallName), ...toDrg(), sgw('gw-sgw')],
   });
   tables.push({
-    id: 'rt-hub-ingress', name: `rt-${region}-hub-ingress`, kind: 'gateway', columns: 'vcn', attachTo: 'attach-hub',
+    id: 'rt-hub-ingress', name: `rt-${region}-hub-ingress`, kind: 'hub', columns: 'vcn', attachTo: 'attach-hub',
     note: finalNote,
     rules: [fw('0.0.0.0/0', firewallIp, firewallName), ...(lb ? [fw(lb.cidr, firewallIp, firewallName)] : []), ...toFirewall()],
   });
@@ -387,7 +424,7 @@ function buildHubCRouteTables(model: LzModel): RouteTable[] {
     note: finalNote, rules: [untrustNlb(lb.cidr)],
   });
   tables.push({
-    id: 'rt-hub-ingress', name: `rt-${region}-hub-ingress`, kind: 'gateway', columns: 'vcn', attachTo: 'attach-hub',
+    id: 'rt-hub-ingress', name: `rt-${region}-hub-ingress`, kind: 'hub', columns: 'vcn', attachTo: 'attach-hub',
     note: finalNote, rules: [trustNlb('0.0.0.0/0'), ...envs.map((env) => trustNlb(env.vcnCidr))],
   });
 

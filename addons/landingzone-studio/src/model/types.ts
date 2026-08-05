@@ -180,7 +180,7 @@ export interface DiagramNode {
   label: string;
   /** Compartment fill: yellow (shared), green (environment) or gray (projects). */
   tone?: 'yellow' | 'green' | 'gray';
-  /** Environment compartment enrolled in an OCI Security Zone (shows a shield). */
+  /** Compartment explicitly targeted by an OCI Security Zone (shows a shield). */
   secure?: boolean;
   /** Compartment that holds nested children — label renders top-left. */
   container?: boolean;
@@ -239,6 +239,9 @@ export interface DiagramEdge {
   /** Fixed connection sides — pins endpoints to a specific border for clean routing. */
   sourceSide?: EdgeSide;
   targetSide?: EdgeSide;
+  /** Normalized position along the selected source/target border (0..1). */
+  sourcePort?: number;
+  targetPort?: number;
   /** Horizontal nudge (px) for the orthogonal mid-bend, so parallel links don't overlap. */
   channel?: number;
   /**

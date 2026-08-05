@@ -232,12 +232,12 @@ export default function ReviewStep({ designName }: { designName: string }) {
         <div style={s.body}>
           <div style={s.title}>Deploy with OCI Resource Manager</div>
           <div style={local.note}>
-            Use the generated files only. Do not mix this ZIP with published blueprint JSON files.
+            Use only the files in this ZIP. Do not mix them with published blueprint JSON files.
             Store the selected files in a customer-controlled private Object Storage bucket or an
             approved private Git repository, then use the orchestrator&apos;s <code>rms-facade</code> working directory.
           </div>
           <ol style={local.ordered}>
-            <li>Download the ZIP, review the config and generated JSON, and resolve every placeholder.</li>
+            <li>Download the ZIP, review the config and JSON output, and resolve every placeholder.</li>
             <li>Create or edit an ORM stack from a pinned orchestrator release. Set the working directory to <code>rms-facade</code>.</li>
             <li>Choose <code>ocibucket</code> or approved private Git as the configuration source and select only the files listed for the current phase.</li>
             <li>Run a plan, review changes and policy impact, then apply. Wait for it to finish before moving to the next phase.</li>

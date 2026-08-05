@@ -25,6 +25,22 @@ describe('generator-aligned graph', () => {
     expect(graph.nodes.some((node) => node.id.startsWith('cmp-shared-platform-'))).toBe(false);
   });
 
+  it('marks every explicit Security Zone target and no unrelated compartment', () => {
+    const model: LzModel = {
+      ...emptyLzModel(),
+      environments: [env('prod', true, 0), env('preprod', false, 1)],
+    };
+    const graph = buildGraph(model, 4);
+
+    expect(graph.nodes.find((node) => node.id === 'landingzone')?.secure).toBe(true);
+    expect(graph.nodes.find((node) => node.id === 'cmp-network')?.secure).toBe(true);
+    expect(graph.nodes.find((node) => node.id === 'cmp-env-0')?.secure).toBe(true);
+    expect(graph.nodes.find((node) => node.id === 'cmp-env-1')?.secure).toBe(false);
+    expect(graph.nodes.find((node) => node.id === 'cmp-security')?.secure).toBeUndefined();
+    expect(graph.nodes.find((node) => node.id === 'cmp-platform')?.secure).toBeUndefined();
+    expect(graph.nodes.find((node) => node.id === 'cmp-env-0-network')?.secure).toBeUndefined();
+  });
+
   it.each([
     ['hub_a', ['fw-dmz', 'lb']],
     ['hub_b', ['lb']],
@@ -139,6 +155,7 @@ describe('generator-aligned graph', () => {
     expect(gateways.length).toBeGreaterThan(0);
     for (const gateway of gateways) {
       expect(nodes.get(gateway.parentId ?? '')?.kind, gateway.id).toBe('vcn');
+      expect(gateway.x + gateway.width / 2, `${gateway.id} icon centre`).toBe(0);
     }
   });
 
@@ -150,5 +167,20 @@ describe('generator-aligned graph', () => {
       activeFlows: ['prod:egress'],
     });
     expect(traced.edges.some((edge) => edge.animated)).toBe(true);
+  });
+
+  it('shows shared DRG route tables on each attachment and keeps attachment lines distinct', () => {
+    const model: LzModel = {
+      ...emptyLzModel(),
+      platforms: [newPlatform('custom', [])],
+      sharedPlatforms: [newSharedPlatform('custom', [])],
+    };
+    const graph = buildGraph(model, 4, { showDots: true });
+    const spokeDots = graph.nodes.filter((node) => node.kind === 'rtdot' && node.rtDotTableId === 'rt-drg-spokes');
+    expect(spokeDots).toHaveLength(5);
+
+    const drgEdges = graph.edges.filter((edge) => edge.target === 'drg' && edge.source.startsWith('attach-'));
+    expect(drgEdges).toHaveLength(6);
+    expect(new Set(drgEdges.map((edge) => edge.targetPort)).size).toBe(drgEdges.length);
   });
 });
