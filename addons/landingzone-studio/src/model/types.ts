@@ -13,6 +13,8 @@ export interface FoundationConfig {
   realm: string;           // e.g. oc1
   region: string;          // region identifier, e.g. eu-frankfurt-1
   regionShortName: string; // three-letter region key, e.g. fra
+  /** Generator security and observability baseline. */
+  cisLevel: 1 | 2;
 }
 
 /** Per-environment spoke network — seeded with defaults, user-adjustable in step 2. */

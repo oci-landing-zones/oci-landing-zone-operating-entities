@@ -33,7 +33,10 @@ toolchain; a shim from another Go version is not supported.
 
 `libjsonnet.wasm` is generated and ignored by Git; it must never be committed or
 stored with Git LFS. `wasm_exec.js` remains committed because it is the matching
-JavaScript compatibility shim rather than a compiled binary.
+JavaScript compatibility shim rather than a compiled binary. The Studio's dev,
+test, and production-build scripts verify these runtime assets and rebuild them
+when they are missing or do not match `SHA256SUMS`, so a fresh clone cannot start
+with a broken generator import.
 
 ## Deliberate rebuild procedure
 

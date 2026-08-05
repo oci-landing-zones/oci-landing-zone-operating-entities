@@ -63,11 +63,13 @@ const local: Record<string, CSSProperties> = {
   links: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, marginTop: 8, fontSize: 12.5 },
 };
 
-const EXPECTED_CORE_FILES = [
-  'iam.json', 'governance.json', 'network_pre.json', 'network.json',
-  'security_cis2_pre.json', 'security_cis2.json',
-  'observability_cis2_pre.json', 'observability_cis2.json',
-];
+function expectedCoreFiles(cisLevel: 1 | 2): string[] {
+  return [
+    'iam.json', 'governance.json', 'network_pre.json', 'network.json',
+    `security_cis${cisLevel}_pre.json`, `security_cis${cisLevel}.json`,
+    `observability_cis${cisLevel}_pre.json`, `observability_cis${cisLevel}.json`,
+  ];
+}
 
 export default function ReviewStep({ designName }: { designName: string }) {
   const { model } = useWizard();
@@ -86,7 +88,9 @@ export default function ReviewStep({ designName }: { designName: string }) {
   useEffect(() => { currentConfig.current = configText; }, [configText]);
   const hub = getHubKind(model.network.hubKind);
   const contractErrors = useMemo(() => validatePlatformContracts(model), [model]);
-  const deployFiles = result ? Object.keys(result.files) : EXPECTED_CORE_FILES.filter((file) => model.network.hubKind !== 'hub_e' || file !== 'network_pre.json');
+  const deployFiles = result
+    ? Object.keys(result.files)
+    : expectedCoreFiles(model.foundation.cisLevel).filter((file) => model.network.hubKind !== 'hub_e' || file !== 'network_pre.json');
   const deployStages = deploymentStages(deployFiles);
 
   // Outputs are a snapshot. A model change forces a transparent rebuild before
@@ -165,6 +169,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
             {[
               ['Region', model.foundation.region],
               ['Realm', model.foundation.realm],
+              ['CIS benchmark', `Level ${model.foundation.cisLevel}`],
               ['Hub', hub?.label ?? model.network.hubKind],
               ['Environments', String(envCount)],
               ['Projects', String(model.projects.length)],

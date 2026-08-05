@@ -28,7 +28,18 @@ export default function TopBar({ center, right, onEmptySpaceClick }: {
   onEmptySpaceClick?: () => void;
 }) {
   return (
-    <div style={css.bar} className="studio-topbar">
+    <div
+      style={css.bar}
+      className="studio-topbar"
+      onClick={(event) => {
+        const target = event.target as HTMLElement;
+        // Flex gaps and the dedicated spacer are the only debug gesture targets.
+        // Interactive controls bubble through this bar too, so explicitly ignore them.
+        if (event.target === event.currentTarget || target.classList.contains('studio-topbar-debug-space')) {
+          onEmptySpaceClick?.();
+        }
+      }}
+    >
       <Link to="/" style={css.link} className="studio-topbar-brand" aria-label="Go to home" title="Home">
         <span style={css.mark} />
         <span style={css.word}>OCI</span>
@@ -39,7 +50,6 @@ export default function TopBar({ center, right, onEmptySpaceClick }: {
         className="studio-topbar-debug-space"
         style={css.debugSpace}
         aria-hidden="true"
-        onClick={onEmptySpaceClick}
       />
       {center && <div style={css.center} className="studio-topbar-center">{center}</div>}
       {right && <div style={css.right} className="studio-topbar-right">{right}</div>}

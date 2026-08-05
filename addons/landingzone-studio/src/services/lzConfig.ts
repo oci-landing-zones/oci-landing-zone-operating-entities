@@ -47,6 +47,7 @@ export interface LzConfig {
   realm: string;
   region: string;
   region_short_name: string;
+  cis_level: 1 | 2;
   hub: {
     kind: HubKind;
     network: {
@@ -198,6 +199,7 @@ export function buildConfig(model: LzModel): LzConfig {
     realm: f.realm,
     region: f.region,
     region_short_name: f.regionShortName,
+    cis_level: f.cisLevel,
     hub: {
       kind: model.network.hubKind,
       network: {
@@ -366,6 +368,7 @@ export function serializeConfig(model: LzModel, upToStep = Infinity): string {
     `  realm: ${quote(c.realm)},`,
     `  region: ${quote(c.region)},`,
     `  region_short_name: ${quote(c.region_short_name)},`,
+    `  cis_level: ${c.cis_level},`,
     ...hubBlock,
     ...environmentsBlock,
     ...sharedPlatformsBlock,
