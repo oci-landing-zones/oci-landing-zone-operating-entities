@@ -14,7 +14,7 @@ describe('generator-supported realms', () => {
   it('does not rewrite a current-version record', () => {
     const stored = {
       ...emptyLzModel(),
-      foundation: { realm: 'oc19', region: 'eu-frankfurt-2', regionShortName: 'fr2' },
+      foundation: { realm: 'oc19', region: 'eu-frankfurt-2', regionShortName: 'fr2', cisLevel: 2 },
     };
     expect(normalizeModel(stored).foundation).toEqual(stored.foundation);
   });

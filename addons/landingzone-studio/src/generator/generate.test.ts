@@ -131,6 +131,20 @@ describe('generator (go-jsonnet wasm)', () => {
     expectHubGeneratorContract(out.files, 'hub_a');
   }, 60_000);
 
+  it('emits the selected CIS level 1 artifact family', async () => {
+    const base = emptyLzModel();
+    const out = await generateOutputs({
+      ...base,
+      foundation: { ...base.foundation, cisLevel: 1 },
+    });
+
+    expect(out.config).toContain('cis_level: 1');
+    expect(out.secondary).toContain('security_cis1.json');
+    expect(out.secondary).toContain('observability_cis1.json');
+    expect(out.secondary).not.toContain('security_cis2.json');
+    expect(out.secondary).not.toContain('observability_cis2.json');
+  }, 60_000);
+
   it('generates Hub E as a final-only no-firewall bundle', async () => {
     const base = emptyLzModel();
     const model: LzModel = {

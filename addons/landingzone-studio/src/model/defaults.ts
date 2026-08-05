@@ -2,7 +2,7 @@ import type { EnvNetworkConfig, LzModel, ProjectConfig } from './types';
 import { getDefaultRegionForRealm } from '../services/regions';
 import { hubKindDefaults } from '../services/hubKinds';
 
-export const LZ_MODEL_VERSION = '0.17.0';
+export const LZ_MODEL_VERSION = '0.18.0';
 
 export function defaultProjects(): ProjectConfig[] {
   return [{ id: 'project-1', name: 'proj1', environments: 'all' }];
@@ -34,6 +34,7 @@ export function emptyLzModel(): LzModel {
       realm: 'oc1',
       region: region?.id ?? 'eu-frankfurt-1',
       regionShortName: region?.shortName ?? 'fra',
+      cisLevel: 2,
     },
     environments: [
       { id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) },
@@ -107,6 +108,7 @@ export function normalizeModel(stored: unknown): LzModel {
   if (
     candidate.version !== LZ_MODEL_VERSION
     || !candidate.foundation
+    || (candidate.foundation.cisLevel !== 1 && candidate.foundation.cisLevel !== 2)
     || !candidate.network
     || !Array.isArray(candidate.environments)
     || !Array.isArray(candidate.projects)

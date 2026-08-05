@@ -131,16 +131,32 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
               </select>
             </div>
           </div>
-          <div style={{ marginTop: 14 }}>
-            <label style={s.label} htmlFor="lz-region-short">Region short name</label>
-            <input
-              id="lz-region-short"
-              style={s.input}
-              value={f.regionShortName}
-              readOnly
-              aria-describedby="lz-region-short-help"
-            />
-            <div id="lz-region-short-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Derived from the selected OCI region and used by the generator in resource names.</div>
+          <div style={{ ...s.twoCol, marginTop: 14 }} className="foundation-two-col">
+            <div>
+              <label style={s.label} htmlFor="lz-region-short">Region short name</label>
+              <input
+                id="lz-region-short"
+                style={s.input}
+                value={f.regionShortName}
+                readOnly
+                aria-describedby="lz-region-short-help"
+              />
+              <div id="lz-region-short-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Derived from the selected OCI region and used by the generator in resource names.</div>
+            </div>
+            <div>
+              <label style={s.label} htmlFor="lz-cis-level">CIS benchmark level</label>
+              <select
+                id="lz-cis-level"
+                style={s.select}
+                value={f.cisLevel}
+                onChange={(e) => setFoundation({ cisLevel: Number(e.target.value) as 1 | 2 })}
+                aria-describedby="lz-cis-level-help"
+              >
+                <option value={2}>Level 2 — enhanced security</option>
+                <option value={1}>Level 1 — foundational security</option>
+              </select>
+              <div id="lz-cis-level-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Selects the generator&apos;s CIS security and observability artifact set. Level 2 is the generator default.</div>
+            </div>
           </div>
         </div>
       </section>

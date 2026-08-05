@@ -95,7 +95,7 @@ describe('lzStore', () => {
 
   it('duplicateLZ clones the model under a new id with a "Copy of" name', () => {
     const rec = createSaved('Base');
-    saveLZ(rec.id, { ...emptyLzModel(), foundation: { realm: 'oc1', region: 'us-ashburn-1', regionShortName: 'iad' } });
+    saveLZ(rec.id, { ...emptyLzModel(), foundation: { realm: 'oc1', region: 'us-ashburn-1', regionShortName: 'iad', cisLevel: 2 } });
     const copy = duplicateLZ(rec.id);
     expect(copy.ok).toBe(true);
     expect(copy.record!.id).not.toBe(rec.id);

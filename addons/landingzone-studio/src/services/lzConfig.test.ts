@@ -15,7 +15,7 @@ function env(name: string, securityZone: boolean, index: number): Environment {
 describe('buildConfig', () => {
   it('maps foundation fields and keys environments by name', () => {
     const c = buildConfig(model({
-      foundation: { realm: 'oc1', region: 'eu-frankfurt-1', regionShortName: 'fra' },
+      foundation: { realm: 'oc1', region: 'eu-frankfurt-1', regionShortName: 'fra', cisLevel: 2 },
       environments: [
         env('prod', true, 0),
         env('preprod', false, 1),
@@ -25,6 +25,7 @@ describe('buildConfig', () => {
     expect(c.realm).toBe('oc1');
     expect(c.region).toBe('eu-frankfurt-1');
     expect(c.region_short_name).toBe('fra');
+    expect(c.cis_level).toBe(2);
     expect(Object.keys(c.environments)).toEqual(['prod', 'preprod', 'dev']);
     // each env now carries its spoke network + the projects dropped in it (+ platforms, empty by default)
     expect(c.environments.prod).toEqual({
@@ -80,14 +81,14 @@ describe('buildConfig', () => {
 describe('serializeConfig', () => {
   it('serialises the default model in the expected jsonnet shape', () => {
     const out = serializeConfig(model({
-      foundation: { realm: 'oc1', region: 'eu-frankfurt-1', regionShortName: 'fra' },
+      foundation: { realm: 'oc1', region: 'eu-frankfurt-1', regionShortName: 'fra', cisLevel: 2 },
       environments: [
         env('prod', true, 0),
         env('preprod', false, 1),
         env('dev', false, 2),
       ],
     }));
-    expect(out).toContain("realm: 'oc1',\n  region: 'eu-frankfurt-1',\n  region_short_name: 'fra',");
+    expect(out).toContain("realm: 'oc1',\n  region: 'eu-frankfurt-1',\n  region_short_name: 'fra',\n  cis_level: 2,");
     expect(out).not.toContain('shared_platforms:');
     expect(out).not.toContain('// changed');
     expect(out).toContain("kind: 'hub_a',");
@@ -121,7 +122,7 @@ describe('serializeConfig', () => {
     expect(prodBlock).toContain('projects: { alpha: {}, beta: {} },');
     const preprodBlock = out.slice(out.indexOf('preprod: {'));
     expect(preprodBlock).toContain('projects: { alpha: {} },');
-    expect(base.version).toBe('0.17.0');
+    expect(base.version).toBe('0.18.0');
   });
 
   it('renders the step 1 view in the one-field-per-line shape without the hub block', () => {
@@ -131,6 +132,7 @@ describe('serializeConfig', () => {
       "  realm: 'oc1',",
       "  region: 'eu-frankfurt-1',",
       "  region_short_name: 'fra',",
+      '  cis_level: 2,',
       '  environments: { prod: {}, preprod: {} },',
       "  security_targets: ['prod'],",
       '}',
@@ -138,6 +140,14 @@ describe('serializeConfig', () => {
     ].join('\n'));
     // from step 2 onward the hub block appears
     expect(serializeConfig(model(), 2)).toContain('hub:');
+  });
+
+  it('serialises CIS level 1 for the generator', () => {
+    const base = emptyLzModel();
+    const out = serializeConfig(model({
+      foundation: { ...base.foundation, cisLevel: 1 },
+    }), 1);
+    expect(out).toContain('  cis_level: 1,');
   });
 
   it('emits an OKE platform per environment it targets, with a per-env VCN + extension', () => {
