@@ -109,6 +109,19 @@ bash gen/generate.sh --config <config-file> <output-directory>
 
 For the cross-tenancy deployment order, dependency handoff, and validation steps, see the [execution guide](./execution.md).
 
+## Complete Generated Examples
+
+The [`examples/complete-one-oe/`](./examples/complete-one-oe/) directory publishes complete acceptor and requester One-OE output sets from the paired Blueprint Factory source configurations. These examples provide a manual review and deployment starting point without making generated JSON the implementation source.
+
+Regenerate or verify the examples after any generator, source configuration, formatter, or publication change:
+
+```bash
+bash addons/oci-x-rpc/examples/complete-one-oe/regenerate.sh
+bash addons/oci-x-rpc/examples/complete-one-oe/verify.sh
+```
+
+Edit the source configuration and regenerate rather than editing generated JSON directly.
+
 ## Reference Fragments
 
 The generated files under [`runtime/`](./runtime/) show the RPC-only delta for four roles:
