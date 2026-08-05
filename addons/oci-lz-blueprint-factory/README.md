@@ -41,7 +41,7 @@ Paths 1 and 2 produce customer-specific generated files. Path 3 does not require
 
 ## 3. Configuration Syntax and Examples
 
-The source configuration for the Blueprint Factory is a JSON document. JSON keeps the input easy to review, store, and compare in normal code review workflows. The generator also accepts Jsonnet for advanced composition, but the examples in this add-on use JSON.
+The source configuration for the Blueprint Factory is a JSON document. JSON keeps the input easy to review, store, and compare in normal code review workflows. The generator also accepts Jsonnet for advanced composition; see the [Blueprint Factory Configuration Reference](./blueprint-factory-configuration-reference.md) for the supported configuration shape. The examples in this add-on use JSON.
 
 A typical configuration describes the target Landing Zone in a few top-level blocks:
 
@@ -188,6 +188,7 @@ Deployment follows the standard [Terraform deployment guide](/commons/content/te
 | Resource | Purpose |
 |---|---|
 | [OCI LZ AI Agent](/addons/oci-lz-ai-agent/README.md) | AI-assisted discovery and config drafting guidance. |
+| [Blueprint Factory Configuration Reference](./blueprint-factory-configuration-reference.md) | Blueprint Factory configuration elements and supported shapes. |
 | [Generator README](/gen/README.md) | Local setup and generator commands. |
 | [Generator Architecture](/gen/AGENTS.md) | Advanced generator reference for repository contributors. |
 | [Jsonnet Composition Guide](/gen/JSONNET_COMPOSITION.md) | Advanced composition reference for repository contributors. |
