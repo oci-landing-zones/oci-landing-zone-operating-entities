@@ -25,6 +25,9 @@ The **OCI LZ BCDR** addon provides the core landing zone resources required to s
 - **Identity and security**: IAM resources, including compartments, users, groups, and policies, are managed from the home region and available across subscribed regions. Regional security resources, such as vaults, keys, secrets, and workload-specific security controls, must be deployed or replicated in the DR region as part of the workload recovery plan.
 - **Networking** requirements vary depending on the DR scenario: inter-AD designs use regional subnets and resources, while cross-region designs require inter-region peering. Resources are provisioned in their respective regions.
 - **Observability** resources, including events, alarms, and logs, are managed on a per-region basis.
+  
+<img src="images/layers.png" width="900">
+
 - For **operations**, the platform must be resilient enough to support provisioning and day-to-day operation of the solution, including CI/CD, monitoring, and third-party integrations.
 - In **multi-region** landing zones, global IAM resources such as compartments, groups, and policies should be reused consistently, while regional resources such as VCNs, vaults, events, topics, and subscriptions must be explicitly provisioned in each target region.
 - Multi-region deployment state should be managed separately per region, for example with distinct OCI Resource Manager stacks or Terraform workspaces, so each regional deployment can be planned, applied, and operated independently.
