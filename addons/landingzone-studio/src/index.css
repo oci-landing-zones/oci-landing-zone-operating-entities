@@ -250,8 +250,13 @@ a:focus:not(:focus-visible) {
 }
 
 @media (max-width: 1100px) {
-  .studio-workspace--split {
+  .studio-workspace--split,
+  .studio-workspace--flows {
     grid-template-columns: 1fr !important;
+  }
+
+  .studio-flow-sidebar {
+    height: min(520px, 60vh) !important;
   }
 
   .studio-diagram-canvas {

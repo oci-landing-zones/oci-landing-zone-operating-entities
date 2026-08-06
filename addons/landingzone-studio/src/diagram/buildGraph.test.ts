@@ -9,6 +9,21 @@ function env(name: string, securityZone: boolean, index: number): Environment {
   return { id: `environment-${index + 1}`, name, securityZone, network: envNetworkDefaults(index) };
 }
 
+function absoluteCenter(graph: ReturnType<typeof buildGraph>, id: string): { x: number; y: number } {
+  const byId = new Map(graph.nodes.map((node) => [node.id, node]));
+  const node = byId.get(id)!;
+  let x = node.x;
+  let y = node.y;
+  let parentId = node.parentId;
+  while (parentId) {
+    const parent = byId.get(parentId)!;
+    x += parent.x;
+    y += parent.y;
+    parentId = parent.parentId;
+  }
+  return { x: x + node.width / 2, y: y + node.height / 2 };
+}
+
 describe('generator-aligned graph', () => {
   it('uses the fixed landing-zone and top-level compartment names', () => {
     const graph = buildGraph(emptyLzModel(), 1);
@@ -167,6 +182,37 @@ describe('generator-aligned graph', () => {
       activeFlows: ['prod:egress'],
     });
     expect(traced.edges.some((edge) => edge.animated)).toBe(true);
+  });
+
+  it('keeps an active flow focused on its endpoints and consulted table attachment points', () => {
+    const graph = buildGraph(emptyLzModel(), 3, { activeFlows: ['prod:egress:web'] });
+    expect(graph.nodes.filter((node) => node.endpointName).map((node) => node.id)).toEqual(['cmp-env-0-vcn-sn-0']);
+    expect(graph.nodes.filter((node) => node.kind === 'routetable')).toHaveLength(0);
+    expect(graph.nodes.filter((node) => node.kind === 'rtdot').map((node) => node.rtDotTableId).sort()).toEqual([
+      'rt-drg-spokes', 'rt-hub-ingress', 'rt-hub-internal', 'rt-ssn-0',
+    ]);
+
+    const flow = graph.edges.find((edge) => edge.id === 'flow-prod:egress:web#0')!;
+    expect(flow.points?.[0]).toEqual(absoluteCenter(graph, 'cmp-env-0-vcn-sn-0'));
+    expect(flow.points?.at(-1)).toEqual(absoluteCenter(graph, 'gw-natgw'));
+  });
+
+  it('opens a consulted route table only on request and keeps all of its real attachment points', () => {
+    const graph = buildGraph(emptyLzModel(), 3, {
+      activeFlows: ['prod:egress:web'],
+      openTables: ['rt-drg-spokes'],
+    });
+    expect(graph.nodes.find((node) => node.id === 'rt-drg-spokes')).toBeDefined();
+    expect(graph.nodes.filter((node) => node.kind === 'rtdot' && node.rtDotTableId === 'rt-drg-spokes')).toHaveLength(2);
+  });
+
+  it('keeps all-endpoint flow branches anchored to their actual subnet centres', () => {
+    const graph = buildGraph(emptyLzModel(), 3, { activeFlows: ['prod:egress'] });
+    const flows = graph.edges.filter((edge) => edge.id.startsWith('flow-prod:egress#'));
+    expect(flows).toHaveLength(4);
+    flows.forEach((flow, index) => {
+      expect(flow.points?.[0]).toEqual(absoluteCenter(graph, `cmp-env-0-vcn-sn-${index}`));
+    });
   });
 
   it('shows shared DRG route tables on each attachment and keeps attachment lines distinct', () => {

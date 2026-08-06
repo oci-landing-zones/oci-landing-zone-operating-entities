@@ -16,12 +16,35 @@ import type { FlowTrace } from '../services/flowTrace';
 export const FLOW_KINDS = [
   { id: 'egress',    label: 'Spoke → Internet',     sub: 'egress' },
   { id: 'ingress',   label: 'Internet → Spoke',     sub: 'ingress' },
-  { id: 'east-west', label: 'Spoke ↔ Spoke',        sub: 'east-west' },
   { id: 'services',  label: 'Spoke → OCI Services',  sub: 'SGW' },
 ] as const;
 
 /** Composite id for one flow in one environment. */
 export const flowId = (env: string, kind: string) => `${env}:${kind}`;
+
+export interface FlowChoice {
+  id: string;
+  label: string;
+  sub: string;
+}
+
+/** Concrete choices for one source environment, including every east-west destination. */
+export function flowChoices(environments: { name: string }[], sourceIndex: number): FlowChoice[] {
+  const source = environments[sourceIndex];
+  if (!source) return [];
+  return [
+    { id: flowId(source.name, 'egress'), label: 'Spoke → Internet', sub: 'egress' },
+    { id: flowId(source.name, 'ingress'), label: 'Internet → Spoke', sub: 'ingress' },
+    ...environments
+      .filter((_, index) => index !== sourceIndex)
+      .map((destination) => ({
+        id: `${source.name}>${destination.name}:east-west`,
+        label: `Spoke → ${destination.name}`,
+        sub: 'east-west',
+      })),
+    { id: flowId(source.name, 'services'), label: 'Spoke → OCI Services', sub: 'SGW' },
+  ];
+}
 
 const styles = {
   panel: {
@@ -53,6 +76,7 @@ const styles = {
   flowLabel: { fontSize: 12.5, fontWeight: 600, color: oracle.ink, lineHeight: 1.2 } as React.CSSProperties,
   flowSub: { fontSize: 10.5, fontWeight: 600, color: oracle.textMuted } as React.CSSProperties,
   empty: { fontSize: 12, color: oracle.textMuted, lineHeight: 1.5, padding: '8px 4px' } as React.CSSProperties,
+  guidance: { fontSize: 11.5, color: oracle.textMuted, lineHeight: 1.45, margin: '0 2px 12px' } as React.CSSProperties,
   swatch: { width: 10, height: 10, borderRadius: 2, flexShrink: 0, border: '1px solid rgba(0,0,0,0.15)' } as React.CSSProperties,
   // Step-by-step hop list shown under a selected flow.
   hops: { listStyle: 'none', margin: '2px 0 8px 26px', padding: 0, borderLeft: `2px solid ${oracle.border}` } as React.CSSProperties,
@@ -63,6 +87,7 @@ const styles = {
   stepBar: { display: 'flex', alignItems: 'center', gap: 4, margin: '4px 0 2px 26px' } as React.CSSProperties,
   stepBtn: { minWidth: 26, padding: '3px 6px', fontSize: 11, fontWeight: 800, color: oracle.text, background: oracle.surface, border: `1px solid ${oracle.border}`, borderRadius: 5, cursor: 'pointer', lineHeight: 1 } as React.CSSProperties,
   stepBtnOn: { background: oracle.red, border: `1px solid ${oracle.redDark}`, color: '#fff' } as React.CSSProperties,
+  stepBtnDisabled: { opacity: 0.4, cursor: 'not-allowed' } as React.CSSProperties,
   stepInfo: { fontSize: 10.5, fontWeight: 700, color: oracle.textMuted, marginLeft: 4 } as React.CSSProperties,
   chipsRow: { display: 'flex', flexWrap: 'wrap', gap: 5, margin: '1px 0 7px 30px' } as React.CSSProperties,
   chip: { padding: '2px 9px', fontSize: 10.5, fontWeight: 700, borderRadius: 11, cursor: 'pointer', border: `1px solid ${oracle.border}`, lineHeight: 1.35, userSelect: 'none' } as React.CSSProperties,
@@ -129,13 +154,11 @@ export default function FlowSidebar({
     onChange([...next]);
   };
 
-  const setEnvAll = (env: { name: string; roles: string[] }, on: boolean) => {
+  const clearEnvironment = (env: { name: string; roles: string[] }, choices: FlowChoice[]) => {
     const next = new Set(set);
-    FLOW_KINDS.forEach((f) => {
-      const allId = flowId(env.name, f.id);
-      next.delete(allId);
-      env.roles.forEach((r) => next.delete(`${allId}:${r}`));
-      if (on) next.add(allId);
+    choices.forEach((choice) => {
+      next.delete(choice.id);
+      env.roles.forEach((role) => next.delete(`${choice.id}:${role}`));
     });
     onChange([...next]);
   };
@@ -149,39 +172,43 @@ export default function FlowSidebar({
         </button>
       </div>
       <div style={styles.body}>
+        <p style={styles.guidance}>Choose one endpoint for a clear path, or all endpoints to compare branches. Select another flow only when you need a side-by-side comparison.</p>
         {environments.length === 0 ? (
           <div style={styles.empty}>No environments yet — add one in the form to pick flows.</div>
         ) : (
-          environments.map((env) => {
-            const envHasAny = FLOW_KINDS.some((f) => {
-              const allId = flowId(env.name, f.id);
-              return set.has(allId) || env.roles.some((r) => set.has(`${allId}:${r}`));
+          environments.map((env, envIndex) => {
+            const choices = flowChoices(environments, envIndex);
+            const envHasAny = choices.some((choice) => {
+              return set.has(choice.id) || env.roles.some((role) => set.has(`${choice.id}:${role}`));
             });
             return (
               <div key={env.name} style={styles.envGroup}>
                 <div style={styles.envHead}>
                   <span>{env.name}</span>
-                  <button type="button" style={styles.envLink} onClick={() => setEnvAll(env, !envHasAny)}>
-                    {envHasAny ? 'Clear' : 'All'}
-                  </button>
+                  {envHasAny && <button type="button" style={styles.envLink} onClick={() => clearEnvironment(env, choices)}>Clear</button>}
                 </div>
-                {FLOW_KINDS.map((f) => {
-                  const allId = flowId(env.name, f.id);
+                {choices.map((choice) => {
+                  const allId = choice.id;
                   const roleIds = env.roles.map((r) => `${allId}:${r}`);
                   const allOn = set.has(allId);
                   const active = allOn || roleIds.some((rid) => set.has(rid));
                   const trace = active ? traceByGroup.get(allId) : undefined;
                   const color = trace?.color ?? oracle.red;
                   return (
-                    <div key={f.id}>
-                      <div style={{ ...styles.row, ...(active ? styles.rowOn : null) }}>
-                        <input type="checkbox" checked={allOn} title="Toggle all endpoints" onChange={() => toggleAll(allId, roleIds)} />
+                    <div key={choice.id}>
+                      <label style={{ ...styles.row, ...(active ? styles.rowOn : null) }}>
+                        <input
+                          type="checkbox"
+                          checked={allOn}
+                          aria-label={`Trace all ${choice.label} endpoints for ${env.name}`}
+                          onChange={() => toggleAll(allId, roleIds)}
+                        />
                         {active && <span style={{ ...styles.swatch, background: color }} />}
                         <span>
-                          <span style={styles.flowLabel}>{f.label}</span>{' '}
-                          <span style={styles.flowSub}>· {f.sub}</span>
+                          <span style={styles.flowLabel}>{choice.label}</span>{' '}
+                          <span style={styles.flowSub}>· {choice.sub}</span>
                         </span>
-                      </div>
+                      </label>
                       {/* per-endpoint chips: click one to trace just that endpoint */}
                       {env.roles.length > 0 && (
                         <div style={styles.chipsRow}>
@@ -189,15 +216,16 @@ export default function FlowSidebar({
                             const rid = `${allId}:${r}`;
                             const on = allOn || set.has(rid);
                             return (
-                              <span
+                              <button
+                                type="button"
                                 key={r}
-                                role="button"
+                                aria-pressed={on}
                                 title={on ? `Deselect ${r}` : `Trace ${r}`}
                                 onClick={() => toggleRole(allId, rid, roleIds)}
                                 style={{ ...styles.chip, ...(on ? { background: color, color: '#fff', border: `1px solid ${color}` } : styles.chipOff) }}
                               >
                                 {r}
-                              </span>
+                              </button>
                             );
                           })}
                         </div>
@@ -205,12 +233,14 @@ export default function FlowSidebar({
                       {trace && (() => {
                         const step = steps[allId];
                         const total = trace.hops.length;
+                        const atStart = step === 0;
+                        const atEnd = step != null && step >= total - 1;
                         return (
                           <>
                             <div style={styles.stepBar}>
-                              <button type="button" style={styles.stepBtn} title="Previous hop" onClick={() => onStep(allId, 'prev')}>◀</button>
+                              <button type="button" disabled={atStart} style={{ ...styles.stepBtn, ...(atStart ? styles.stepBtnDisabled : null) }} title="Previous hop" onClick={() => onStep(allId, 'prev')}>◀</button>
                               <button type="button" style={{ ...styles.stepBtn, ...(step == null ? styles.stepBtnOn : null) }} title="Auto-play" onClick={() => onStep(allId, 'play')}>▶ Auto</button>
-                              <button type="button" style={styles.stepBtn} title="Next hop" onClick={() => onStep(allId, 'next')}>▶</button>
+                              <button type="button" disabled={atEnd} style={{ ...styles.stepBtn, ...(atEnd ? styles.stepBtnDisabled : null) }} title="Next hop" onClick={() => onStep(allId, 'next')}>▶</button>
                               <span style={styles.stepInfo}>{step == null ? 'auto' : `${step + 1}/${total}`}</span>
                             </div>
                             <ol style={styles.hops}>

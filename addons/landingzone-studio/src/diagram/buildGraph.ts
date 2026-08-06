@@ -248,18 +248,33 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   const flowTraces = activeFlows.length > 0 ? buildFlowTraces(model, activeFlows) : [];
   const flowActive = flowTraces.length > 0;
   const rtHighlight = new Map<string, number[]>();
-  const flowOpenIds = new Set<string>();
+  const flowTableIds = new Set<string>();
+  const flowTableNodes = new Map<string, Set<string>>();
+  const flowEndpointIds = new Set<string>();
   for (const t of flowTraces) {
     for (const h of t.highlights) {
-      flowOpenIds.add(h.tableId);
+      flowTableIds.add(h.tableId);
       rtHighlight.set(h.tableId, [...(rtHighlight.get(h.tableId) ?? []), ...h.rows]);
+    }
+    for (const hop of t.hops) {
+      if (!hop.tableId) continue;
+      const governed = flowTableNodes.get(hop.tableId) ?? new Set<string>();
+      governed.add(hop.node);
+      flowTableNodes.set(hop.tableId, governed);
+    }
+    for (const segment of t.segments) {
+      if (/^cmp-env-\d+-vcn-sn-\d+$/.test(segment.from)) flowEndpointIds.add(segment.from);
+      if (/^cmp-env-\d+-vcn-sn-\d+$/.test(segment.to)) flowEndpointIds.add(segment.to);
     }
   }
   const showDots = showSpokes && ((opts.showDots ?? false) || flowActive);
-  // The endpoints layer draws a VM inside every icon-less subnet (hub mgmt/mon/
-  // dns + all spoke subnets); the firewall/LB subnets stay endpoint-free.
-  const showEndpoints = showSpokes && ((opts.showEndpoints ?? false) || flowActive);
-  const openSet = new Set<string>([...(opts.openTables ?? []), ...flowOpenIds]);
+  // Manual endpoint mode shows all eligible endpoints. A flow adds only its
+  // actual source/destination VMs so unrelated subnets do not become clutter.
+  const showAllEndpoints = showSpokes && (opts.showEndpoints ?? false);
+  // Flow selection identifies the relevant tables but does not force every one
+  // open. The sidebar already explains the route; dots stay available for
+  // on-demand inspection without shrinking the topology around many tables.
+  const openSet = new Set<string>(opts.openTables ?? []);
   const openTables = showDots ? allRouteTables.filter((t) => openSet.has(t.id)) : [];
   const showMidRT = openTables.some((t) => t.kind === 'hub');
   const showLeftRT = openTables.some((t) => t.kind === 'gateway' || t.kind === 'drg');
@@ -271,7 +286,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   // ---- hub network (left column), driven by the step 2 fields
   const hubSubnets = model.network.subnets.map((sn) => {
     const spec = decorateHubSubnet(generatorNames.hubSubnet(regionTok, sn.name), sn.cidr, regionTok);
-    return showEndpoints ? withEndpoint(spec) : spec;
+    return showAllEndpoints ? withEndpoint(spec) : spec;
   });
   const hubVcnLabel = `${generatorNames.hubVcn(regionTok)}\n${model.network.hubVcnCidr}`;
   const hubVcnH = vcnHeight(hubSubnets);
@@ -308,9 +323,10 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     const name = e.name.trim() || `env${i + 1}`;
     // Stale in-memory records may predate Environment.network — fall back to defaults.
     const net = e.network ?? envNetworkDefaults(i);
-    const subnets: SubnetSpec[] = net.subnets.map((sn) => {
+    const subnets: SubnetSpec[] = net.subnets.map((sn, subnetIndex) => {
       const spec: SubnetSpec = { name: generatorNames.environmentSubnet(regionTok, name, sn.name), cidr: sn.cidr };
-      return showEndpoints ? withEndpoint(spec, name) : spec;
+      const nodeId = `cmp-env-${i}-vcn-sn-${subnetIndex}`;
+      return showAllEndpoints || flowEndpointIds.has(nodeId) ? withEndpoint(spec, name) : spec;
     });
     const vcnH = vcnHeight(subnets);
     // Projects that land in this environment ('all' or an explicit list).
@@ -646,9 +662,16 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
 
     // A dot per table, on the edge of its element facing the table; stacked when
     // several tables share an element (e.g. the DRG's two tables).
+    const dotTables = flowActive
+      ? allRouteTables.filter((table) => flowTableIds.has(table.id) || openSet.has(table.id))
+      : allRouteTables;
     const byEl = new Map<string, { rt: typeof allRouteTables[number]; dotId: string }[]>();
-    for (const rt of allRouteTables) {
-      [rt.attachTo, ...(rt.attachExtra ?? [])].forEach((elementId, index) => {
+    for (const rt of dotTables) {
+      const attachmentPoints = [rt.attachTo, ...(rt.attachExtra ?? [])];
+      const visiblePoints = flowActive && flowTableIds.has(rt.id) && !openSet.has(rt.id)
+        ? attachmentPoints.filter((elementId) => flowTableNodes.get(rt.id)?.has(elementId))
+        : attachmentPoints;
+      visiblePoints.forEach((elementId, index) => {
         const dotId = index === 0 ? `dot-${rt.id}` : `dot-${rt.id}-${index}`;
         byEl.set(elementId, [...(byEl.get(elementId) ?? []), { rt, dotId }]);
       });
@@ -680,7 +703,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
         // table (no flow on it) still shows the full rule set.
         const used = rtHighlight.get(rt.id);
         // Dedupe: many endpoints/flows can hit the SAME row — show it once.
-        const disp = flowActive && flowOpenIds.has(rt.id) && used && used.length
+        const disp = flowActive && flowTableIds.has(rt.id) && used && used.length
           ? [...new Set(used)].sort((x, y2) => x - y2).map((i) => rt.rules[i])
           : rt.rules;
         const h = rtHeight(disp.length, !!rt.note);
@@ -772,24 +795,16 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     return verts;
   };
   const nodeIds = new Set(nodes.map((n) => n.id));
-  // Count endpoint sub-traces per base flow so each gets its own parallel lane
-  // (a small diagonal offset) instead of all overlapping into one thick line.
-  const flowCount = new Map<string, number>();
-  for (const t of flowTraces) {
-    const base = t.id.split('#')[0];
-    flowCount.set(base, (flowCount.get(base) ?? 0) + 1);
-  }
   const seenGroup = new Set<string>();
   for (const t of flowTraces) {
     const segs = t.segments.filter((s) => nodeIds.has(s.from) && nodeIds.has(s.to));
     if (segs.length === 0) continue;
     const base = t.id.split('#')[0];
-    const k = parseInt(t.id.split('#')[1] ?? '0', 10) || 0;
-    const cnt = flowCount.get(base) ?? 1;
-    const off = (k - (cnt - 1) / 2) * 9; // centred lane offset
-    const shift = (p: { x: number; y: number }) => ({ x: p.x + off, y: p.y + off });
     const waypoints = [segs[0].from, ...segs.map((s) => s.to)];
-    const points = routeFlow(waypoints).map(shift);
+    // Keep endpoints and shared legs on their real resources. Artificially
+    // shifting complete traces made packets float beside the subnet/DRG icons;
+    // same-colour endpoint traces can safely merge on their common route.
+    const points = routeFlow(waypoints);
     if (points.length < 2) continue;
     // Numbered hop badges render once per flow group (the first endpoint) so they
     // don't stack at the shared hub nodes.
@@ -799,7 +814,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       ? t.hops
           .map((h) => ({ h, c: absCenter(h.node) }))
           .filter((b): b is { h: typeof t.hops[number]; c: { x: number; y: number } } => b.c !== null)
-          .map(({ h, c }) => ({ node: h.node, seq: h.seq, ...shift(c) }))
+          .map(({ h, c }) => ({ node: h.node, seq: h.seq, ...c }))
       : [];
     edges.push({
       id: `flow-${t.id}`, source: waypoints[0], target: waypoints[waypoints.length - 1],
