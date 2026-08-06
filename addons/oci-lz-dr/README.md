@@ -34,7 +34,7 @@ To review best practices about BCDR, go [here](BCDR-best-practices.md).
 ### 2. Deployment Guide
 
 > [!NOTE]
-> This add-on covers the DR Landing Zone scope and the listed Workload Extension scenarios. It does not deploy the workloads themselves; select and implement a dedicated [DR strategy](BCDR-best-practices.md#5-dr-strategy-trade-offs) in a separate phase.
+> This add-on covers the DR Landing Zone scope and the listed Workload Extension scenarios. It does not deploy the workloads themselves; select and implement a dedicated [DR strategy]([BCDR-best-practices.md#5-dr-strategy-trade-offs](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/dr/addons/oci-lz-dr/BCDR-best-practices.md#6-dr-strategies)) in a separate phase.
 
 #### Workload replication considerations
 
