@@ -18,6 +18,7 @@ import {
   BaseEdge,
   ViewportPortal,
   getSmoothStepPath,
+  getViewportForBounds,
   useReactFlow,
   useStore,
   useInternalNode,
@@ -473,20 +474,8 @@ function FlowOverlay({ flowEdges, steps, width, height }: {
                 <path d="M0,0 L9,4.5 L0,9 Z" fill={color} />
               </marker>
             </defs>
-            <path d={path} fill="none" stroke={color} strokeOpacity={0.2} strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" />
-            <path d={path} fill="none" stroke={color} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" markerEnd={`url(#${mId})`} />
-            {/* directional arrow on each segment (primary endpoint only, to avoid clutter) */}
-            {badges.length > 0 && pts.slice(1).map((b, i) => {
-              const a = pts[i];
-              const len = Math.hypot(b.x - a.x, b.y - a.y);
-              if (len < 38) return null;
-              const ang = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
-              return (
-                <g key={`arr-${i}`} transform={`translate(${(a.x + b.x) / 2},${(a.y + b.y) / 2}) rotate(${ang})`}>
-                  <path d="M-5,-4.5 L6,0 L-5,4.5 Z" fill={color} stroke="#fff" strokeWidth={0.8} />
-                </g>
-              );
-            })}
+            <path d={path} fill="none" stroke={color} strokeOpacity={0.14} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={path} fill="none" stroke={color} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" markerEnd={`url(#${mId})`} />
             {/* every endpoint carries its own labelled source→dest pill */}
             <FlowPacket path={path} color={color} label={e.label ?? ''} step={step} frac={frac} dur={dur} />
             {badges.length > 0 && badges.map((b, i) => {
@@ -494,7 +483,7 @@ function FlowOverlay({ flowEdges, steps, width, height }: {
               seen.set(b.node, k + 1);
               const active = step === i;
               return (
-                <g key={`${b.node}-${i}`} transform={`translate(${b.x},${b.y - 6 - k * 22})`}>
+                <g key={`${b.node}-${i}`} transform={`translate(${b.x},${b.y - 18 - k * 24})`}>
                   <circle r={active ? 11 : 9} fill={active ? '#fff' : color} stroke={color} strokeWidth={active ? 3 : 1.6} />
                   <text textAnchor="middle" dominantBaseline="central" fontSize={active ? 11.5 : 10.5} fontWeight={800} fill={active ? color : '#fff'}>{b.seq}</text>
                 </g>
@@ -641,13 +630,14 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   showFlowControl?: boolean;
 }) {
   const { nodes, edges } = useMemo(() => toReactFlow(diagram), [diagram]);
-  const { fitBounds, fitView } = useReactFlow();
+  const { fitView, setViewport } = useReactFlow();
   // Flow overlay inputs: the waypoint edges + the diagram's outer bounds.
   const flowEdges = useMemo(() => diagram.edges.filter((e) => !!e.waypoints), [diagram]);
   const region = diagram.nodes.find((n) => n.kind === 'region');
   // Pane width — so switching view modes (or resizing the window) re-centres the
   // diagram instead of leaving it pinned to its previous-layout position.
   const paneWidth = useStore((s) => s.width);
+  const paneHeight = useStore((s) => s.height);
 
   const toggleTables = useCallback((ids: string[]) => {
     if (!onOptionsChange || ids.length === 0) return;
@@ -661,9 +651,8 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
     if (d.kind === 'rtdot' && d.rtDotTableId) toggleTables([d.rtDotTableId]);
   }, [toggleTables]);
 
-  // When a flow is active, the view should frame the FLOW, not the whole diagram:
-  // the path nodes (edges carrying a colour) plus the route-table boxes the flow
-  // opened. That's what makes the packet path read end-to-end like ONTV.
+  // When a flow is active, frame the path rather than the whole diagram. Include
+  // any consulted route table the user opened from an attachment dot.
   const flowNodeIds = useMemo(() => {
     const ids = new Set<string>();
     diagram.edges.forEach((e) => {
@@ -680,6 +669,26 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   const flowKey = flowNodeIds.join(',');
   const flowBounds = useMemo(() => {
     const points = flowEdges.flatMap((edge) => edge.points ?? []);
+    const byId = new Map(diagram.nodes.map((node) => [node.id, node]));
+    const absolutePosition = (node: DiagramNode) => {
+      let x = node.x;
+      let y = node.y;
+      let parentId = node.parentId;
+      while (parentId) {
+        const parent = byId.get(parentId);
+        if (!parent) break;
+        x += parent.x;
+        y += parent.y;
+        parentId = parent.parentId;
+      }
+      return { x, y };
+    };
+    diagram.nodes
+      .filter((node) => node.kind === 'routetable' && node.rtHighlight?.length)
+      .forEach((node) => {
+        const position = absolutePosition(node);
+        points.push(position, { x: position.x + node.width, y: position.y + node.height });
+      });
     if (points.length < 2) return null;
     const xs = points.map((point) => point.x);
     const ys = points.map((point) => point.y);
@@ -689,7 +698,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
     const maxX = Math.max(...xs) + margin;
     const maxY = Math.max(...ys) + margin;
     return { x: minX, y: minY, width: Math.max(1, maxX - minX), height: Math.max(1, maxY - minY) };
-  }, [flowEdges]);
+  }, [diagram.nodes, flowEdges]);
   const flowBoundsKey = flowBounds
     ? [flowBounds.x, flowBounds.y, flowBounds.width, flowBounds.height].map(Math.round).join(':')
     : '';
@@ -708,15 +717,22 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   // an unchanged key is a no-op and the user keeps their zoom/pan.
   const lastFitKey = useRef('');
   useEffect(() => {
+    if (paneWidth <= 0 || paneHeight <= 0) return;
     const key = `${layoutKey}|${flowKey}|${flowBoundsKey}`;
     if (key === lastFitKey.current) return;
     lastFitKey.current = key;
-    const raf = requestAnimationFrame(() => {
-      if (flowBounds) fitBounds(flowBounds, { padding: 0.16, duration: 350 });
+    // Controlled React Flow nodes are measured just after they enter the store.
+    // A short deferred fit avoids racing that measurement when the flow sidebar
+    // opens and changes the pane width in the same render.
+    const timer = window.setTimeout(() => {
+      if (flowBounds) {
+        const viewport = getViewportForBounds(flowBounds, paneWidth, paneHeight, 0.2, 1, 0.16);
+        setViewport(viewport, { duration: 350 });
+      }
       else fitView({ padding: 0.28, duration: 250 });
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, fitBounds, fitView]);
+    }, 60);
+    return () => window.clearTimeout(timer);
+  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, paneWidth, paneHeight, setViewport, fitView]);
 
   return (
     <RtContext.Provider value={toggleTables}>
@@ -728,8 +744,6 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       onNodeClick={onNodeClick}
       nodesDraggable={false}
       nodesConnectable={false}
-      fitView
-      fitViewOptions={{ padding: 0.28 }}
       minZoom={0.2}
       maxZoom={4}
       proOptions={{ hideAttribution: true }}

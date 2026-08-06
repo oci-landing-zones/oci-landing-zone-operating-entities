@@ -114,11 +114,8 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
   const effectiveOpts = useMemo<DiagramOptions>(
     () => {
       if (!diagramOnly) return { ...diagramOpts, showDots: false, showEndpoints: false, showFlows: false, activeFlows: [] };
-      // A selected flow traces between endpoints through the route tables, so it
-      // implies the endpoints + route-table layer — force them on while active.
-      const flowsActive = supportsFlowTracing && (diagramOpts.activeFlows?.length ?? 0) > 0;
       const base = supportsFlowTracing ? diagramOpts : { ...diagramOpts, showFlows: false, activeFlows: [] };
-      return flowsActive ? { ...base, showEndpoints: true, showDots: true } : base;
+      return base;
     },
     [diagramOnly, diagramOpts, supportsFlowTracing],
   );
@@ -234,7 +231,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
         ) : (
           <div
             style={{ ...layout.grid, gridTemplateColumns: gridCols }}
-            className={`studio-workspace${viewMode === 'split' ? ' studio-workspace--split' : ''}`}
+            className={`studio-workspace${viewMode === 'split' ? ' studio-workspace--split' : ''}${flowsOpen ? ' studio-workspace--flows' : ''}`}
           >
             {showForm && (
               <div style={{ display: 'grid', gap: 14, alignContent: 'start' }}>
@@ -283,7 +280,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
             ))}
 
             {flowsOpen && (
-              <div style={{ height: 'calc(100vh - 185px)' }}>
+              <div className="studio-flow-sidebar" style={{ height: 'calc(100vh - 185px)' }}>
                 <FlowSidebar
                   environments={model.environments.map((e, i) => ({
                     name: e.name.trim() || `env${i + 1}`,
