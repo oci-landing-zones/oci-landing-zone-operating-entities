@@ -70,6 +70,22 @@ Reference: [Oracle Business Continuity and Disaster Recovery](https://www.oracle
 
 &nbsp;
 
+#### Workload replication considerations
+
+The landing zone extension prepares the DR foundation. Configure and validate workload replication separately, based on the OCI service used and the selected recovery objectives.
+
+| Service layer | Native replication examples | Post-deployment consideration |
+|---|---|---|
+| Compute | Boot volume replication | Define the instance recovery procedure and test it in the DR region. |
+| Containers | OKE with Full Stack Disaster Recovery (FSDR) | For stateful workloads, configure replication through the underlying storage service. |
+| Data | Oracle Data Guard, Autonomous Data Guard, database replicas, or backups | Select the mechanism that meets the workload's RTO and RPO. |
+| Storage | Object Storage, Block Volume, and File Storage replication | Validate replication scope, retention, and recovery testing. |
+| Security | Vault, key, and secret replication | Ensure the DR workload can access the replicated cryptographic material and secrets. |
+
+See [Native Cross-Region Replication Capabilities by OCI Service Layer](https://confluence.oraclecorp.com/confluence/display/EMEACSS/Native+Cross-Region+Replication+Capabilities+by+OCI+Service+Layer) for service-specific capabilities.
+
+&nbsp;
+
 
 
 ### 7. Related documentation
