@@ -16,7 +16,7 @@
 
 ### 1. Overview
 
-This folder contains the One-OE specific BCDR extension files for the published One-OE one-stack baseline.
+This folder contains the One-OE specific DR extension files for the published One-OE one-stack baseline.
 
 The extension is intended to add regional resources required for Business Continuity and Disaster Recovery while reusing the global baseline resources already managed from the tenancy home region.
 
@@ -40,7 +40,7 @@ Key design rules:
 
 ### 3. Scope
 
-For a One-OE BCDR extension, the required deployable files are limited to:
+For a One-OE DR extension, the required deployable files are limited to:
 
 - **Network**: regional VCN, DRG, routing, peering, gateways, subnets, and other connectivity resources required by the selected DR pattern.
 - **Observability**: regional events, alarms, logs, topics, subscriptions, and monitoring resources required to operate and validate the DR environment.
@@ -58,6 +58,9 @@ Select the deployment option that matches the hub model and CIS level already de
 | [**One-OE + Hub A BCDR**](#step-1-deploy-the-one-oe-bcdr-addon) | [**One-OE + Hub B BCDR**](#step-1-deploy-the-one-oe-bcdr-addon) | [**One-OE + Hub C BCDR**](#step-1-deploy-the-one-oe-bcdr-addon) | [**One-OE + Hub E BCDR**](#step-1-deploy-the-one-oe-bcdr-addon) |
 |:-|:-|:-|:-|
 | **Step 0: Deploy baseline**</br>[One-OE + Hub A](/blueprints/one-oe/runtime/one-stack/one_oe_hub_a.md)</br></br>**Step 1: Extend for DR**</br></br>**CIS Level 1**: [<img src="../../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_a.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1.json"})</br>`oneoe_bcdr_network_hub_a.json`</br>`oneoe_bcdr_observability_cis1.json`</br></br>**CIS Level 2**: [<img src="../../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_a.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2.json"})</br>`oneoe_bcdr_network_hub_a.json`</br>`oneoe_bcdr_observability_cis2.json` | **Step 0: Deploy baseline**</br>[One-OE + Hub B](/blueprints/one-oe/runtime/one-stack/one_oe_hub_b.md)</br></br>**Step 1: Extend for DR**</br></br>**CIS Level 1**: [<img src="../../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_b.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1.json"})</br>`oneoe_bcdr_network_hub_b.json`</br>`oneoe_bcdr_observability_cis1.json`</br></br>**CIS Level 2**: [<img src="../../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_b.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2.json"})</br>`oneoe_bcdr_network_hub_b.json`</br>`oneoe_bcdr_observability_cis2.json` | **Step 0: Deploy baseline**</br>[One-OE + Hub C](/blueprints/one-oe/runtime/one-stack/one_oe_hub_c.md)</br></br>**Step 1: Extend for DR**</br></br>**CIS Level 1**: [<img src="../../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_c.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1.json"})</br>`oneoe_bcdr_network_hub_c.json`</br>`oneoe_bcdr_observability_cis1.json`</br></br>**CIS Level 2**: [<img src="../../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_c.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2.json"})</br>`oneoe_bcdr_network_hub_c.json`</br>`oneoe_bcdr_observability_cis2.json` | **Step 0: Deploy baseline**</br>[One-OE + Hub E](/blueprints/one-oe/runtime/one-stack/one_oe_hub_e.md)</br></br>**Step 1: Extend for DR**</br></br>**CIS Level 1**: [<img src="../../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_e.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1.json"})</br>`oneoe_bcdr_network_hub_e.json`</br>`oneoe_bcdr_observability_cis1.json`</br></br>**CIS Level 2**: [<img src="../../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_e.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2.json"})</br>`oneoe_bcdr_network_hub_e.json`</br>`oneoe_bcdr_observability_cis2.json` |
+
+> [!NOTE]
+> **CIS Level 2:** This add-on does not create a new vault in the DR region. If DR workloads require customer-managed encryption keys or secrets, consider replicating the existing vault from the home region and validate that it supports replication. See [Replicating Vaults and Keys](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/replicatingvaults.htm).
 
 Then follow these steps:
 
@@ -95,16 +98,6 @@ Do not redeploy or duplicate IAM and security baseline files in the secondary re
 
 &nbsp;
 
-### 5. Source baseline
-
-The extension targets the published One-OE one-stack runtime baseline:
-
-- [`blueprints/one-oe/runtime/one-stack/readme.md`](/blueprints/one-oe/runtime/one-stack/readme.md)
-- [`blueprints/one-oe/runtime/one-stack`](/blueprints/one-oe/runtime/one-stack)
-
-Use the selected One-OE hub model as the source reference for network shape, naming, DRG usage, route-table behavior, and any required staged `*_pre.json` deployment.
-
-&nbsp;
 
 ### 6. License
 
