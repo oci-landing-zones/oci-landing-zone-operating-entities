@@ -641,7 +641,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   showFlowControl?: boolean;
 }) {
   const { nodes, edges } = useMemo(() => toReactFlow(diagram), [diagram]);
-  const { fitView } = useReactFlow();
+  const { fitBounds, fitView } = useReactFlow();
   // Flow overlay inputs: the waypoint edges + the diagram's outer bounds.
   const flowEdges = useMemo(() => diagram.edges.filter((e) => !!e.waypoints), [diagram]);
   const region = diagram.nodes.find((n) => n.kind === 'region');
@@ -666,11 +666,33 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   // opened. That's what makes the packet path read end-to-end like ONTV.
   const flowNodeIds = useMemo(() => {
     const ids = new Set<string>();
-    diagram.edges.forEach((e) => { if (e.color) { ids.add(e.source); ids.add(e.target); } });
+    diagram.edges.forEach((e) => {
+      if (!e.color) return;
+      // Animated flows are stored as one edge whose waypoint chain contains the
+      // real path through attachments, the DRG, firewalls, and gateways. Framing
+      // only source + target crops those intermediate hops and makes the packet
+      // appear to jump across an unrelated part of the graph.
+      (e.waypoints ?? [e.source, e.target]).forEach((id) => ids.add(id));
+    });
     diagram.nodes.forEach((n) => { if (n.kind === 'routetable' && n.rtHighlight?.length) ids.add(n.id); });
     return [...ids];
   }, [diagram]);
   const flowKey = flowNodeIds.join(',');
+  const flowBounds = useMemo(() => {
+    const points = flowEdges.flatMap((edge) => edge.points ?? []);
+    if (points.length < 2) return null;
+    const xs = points.map((point) => point.x);
+    const ys = points.map((point) => point.y);
+    const margin = 56;
+    const minX = Math.min(...xs) - margin;
+    const minY = Math.min(...ys) - margin;
+    const maxX = Math.max(...xs) + margin;
+    const maxY = Math.max(...ys) + margin;
+    return { x: minX, y: minY, width: Math.max(1, maxX - minX), height: Math.max(1, maxY - minY) };
+  }, [flowEdges]);
+  const flowBoundsKey = flowBounds
+    ? [flowBounds.x, flowBounds.y, flowBounds.width, flowBounds.height].map(Math.round).join(':')
+    : '';
 
   // Re-fit on STRUCTURAL change (environments/subnets/hubs) or a pane resize —
   // but NOT on adding/removing projects or route tables, so the user keeps their
@@ -686,15 +708,15 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   // an unchanged key is a no-op and the user keeps their zoom/pan.
   const lastFitKey = useRef('');
   useEffect(() => {
-    const key = `${layoutKey}|${flowKey}`;
+    const key = `${layoutKey}|${flowKey}|${flowBoundsKey}`;
     if (key === lastFitKey.current) return;
     lastFitKey.current = key;
     const raf = requestAnimationFrame(() => {
-      if (flowNodeIds.length > 1) fitView({ nodes: flowNodeIds.map((id) => ({ id })), padding: 0.22, duration: 350 });
+      if (flowBounds) fitBounds(flowBounds, { padding: 0.16, duration: 350 });
       else fitView({ padding: 0.28, duration: 250 });
     });
     return () => cancelAnimationFrame(raf);
-  }, [layoutKey, flowKey, flowNodeIds, fitView]);
+  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, fitBounds, fitView]);
 
   return (
     <RtContext.Provider value={toggleTables}>
