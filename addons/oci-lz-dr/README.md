@@ -12,7 +12,7 @@
 
 ### 1. Overview
 
-The **OCI LZ BCDR** addon provides the required core resources to allow Business Continuity and Disaster Recovery solutions for OCI Landing Zones blueprints. It is intended to complement a landing zone with the network, identity, observability, and operational components required to support recovery scenarios across ADs, regions or tenancies.
+The **OCI LZ BCDR** addon provides the core landing zone resources required to support Business Continuity and Disaster Recovery scenarios for OCI Landing Zone blueprints. It complements a landing zone with the network, identity, observability, and operational components required to support recovery scenarios across availability domains, regions, or tenancies.
 
 #### Landing Zone DR design considerations
 
@@ -22,7 +22,7 @@ The **OCI LZ BCDR** addon provides the required core resources to allow Business
 
 <img src="images/optionsDR.png" width="900">
 
-- **Security (IAM)** is always provisioned in the home region and automatically replicated across subscribed regions.
+- **Identity and security**: IAM resources, including compartments, users, groups, and policies, are managed from the home region and available across subscribed regions. Regional security resources, such as vaults, keys, secrets, and workload-specific security controls, must be deployed or replicated in the DR region as part of the workload recovery plan.
 - **Networking** requirements vary depending on the DR scenario: inter-AD designs use regional subnets and resources, while cross-region designs require inter-region peering. Resources are provisioned in their respective regions.
 - **Observability** resources, including events, alarms, and logs, are managed on a per-region basis.
 - For **operations**, the platform must be resilient enough to support provisioning and day-to-day operation of the solution, including CI/CD, monitoring, and third-party integrations.
@@ -34,19 +34,19 @@ To review best practices about BCDR, go [here](BCDR-best-practices.md).
 ### 2. Deployment Guide
 
 > [!NOTE]
-> This add-on covers the DR Landing Zone scope and the listed Workload Extension scenarios. It does not deploy the workloads themselves; select and implement a dedicated [DR strategy](./BCDR-best-practices.md#6-dr-strategies) in a separate phase.
+> This add-on covers the DR Landing Zone scope. It does not deploy the workloads themselves; select and implement a dedicated [DR strategy](./BCDR-best-practices.md#6-dr-strategies) in a separate phase.
 
-1. Deploy the [One-OE baseline](../../blueprints/one-oe/runtime/one-stack/readme.md).
-2. Confirm the DR scenario, workloads and regions.
-3. This add-on includes the default scenarios listed below. If your scenario is not listed, use the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md) to create custom JSON configuration files:
+1. Confirm the DR scenario, workloads, regions, tenancy boundaries, connectivity model, and recovery objectives.
+2. Deploy or confirm the [One-OE baseline](../../blueprints/one-oe/runtime/one-stack/readme.md) in the home region.
+3. Use the same hub model and CIS level as the home-region baseline. This add-on includes the published scenario below. If your scenario is not listed, use the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md) to create your custom JSON configuration files.
 
    | Deployment | Use when | Deployment guide |
    |---|---|---|
    | One-OE | The DR environment requires the One-OE landing zone baseline without any Workload extension. | [One-OE BCDR](one-oe/README.md) |
 
 4. Run Terraform plan and apply for the DR LZ extension.
-5. Configure inter-region connectivity with the [OCI Remote Peering Connections addon](../oci-x-rpc/README.md).
-6. Validate connectivity, failover behavior, monitoring, and operational runbooks.
+5. Configure inter-region connectivity with the [OCI Remote Peering Connections addon](../oci-x-rpc/README.md), using its same-tenancy or cross-tenancy procedure for the selected DR scenario.
+6. Validate connectivity, failover behavior, workload replication health, access to keys and secrets in the DR region, monitoring, and operational runbooks.
 
 &nbsp;
 

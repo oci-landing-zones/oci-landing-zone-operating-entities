@@ -1,3 +1,25 @@
+# OCI LZ BCDR Best Practices
+## Guidance for planning and operating Business Continuity and Disaster Recovery
+
+**Table of Contents**
+
+[1. Overview](#1-overview)<br>
+[2. Business Continuity and Disaster Recovery concepts](#2-business-continuity-and-disaster-recovery-concepts)<br>
+[3. Resource scope: global and regional](#3-resource-scope-global-and-regional)<br>
+[4. Recovery Objectives](#4-recovery-objectives)<br>
+[5. DR Strategies](#5-dr-strategies)<br>
+[6. Workload replication considerations](#6-workload-replication-considerations)<br>
+[7. Related documentation](#7-related-documentation)<br>
+[8. License](#8-license)<br>
+
+### 1. Overview
+
+This guide helps teams plan and operate Business Continuity and Disaster Recovery for OCI Landing Zones. It explains recovery objectives, global versus regional resource scope, DR strategies, and workload replication considerations.
+
+It complements the OCI LZ BCDR addon documentation. The addon deploys the landing zone DR foundation; workload replication, failover procedures, and service-specific recovery configuration must be implemented separately according to the selected DR strategy.
+
+&nbsp;
+
 ### 2. Business Continuity and Disaster Recovery concepts
 
 **Business Continuity (BC)** defines how the organization keeps operating during a disruption. It covers people, processes, communication, operational procedures, and the technology capabilities needed to continue delivering critical services.
@@ -12,7 +34,7 @@ Reference: [What is the Difference Between Business Continuity and Disaster Reco
 
 &nbsp;
 
-### 4. Resource scope: global and regional
+### 3. Resource scope: global and regional
 
 BCDR planning must distinguish global resources from regional resources. Global resources are created once and reused across subscribed regions, while regional resources must be deployed, monitored, and maintained in each region that participates in the DR design.
 
@@ -38,7 +60,7 @@ The **home region** is especially important because IAM and tenancy-wide governa
 
 &nbsp;
 
-### 5. Recovery Objetives.
+### 4. Recovery Objectives
 
 
 
@@ -48,7 +70,7 @@ DR design must balance recovery time, acceptable data loss, cost, and operationa
 - **Recovery Point Objective (RPO)**: the maximum amount of data the business can accept losing during a disruption.
 
 
-### 6. DR Strategies
+### 5. DR Strategies
 
 Common DR approaches include:
 
@@ -70,7 +92,7 @@ Reference: [Oracle Business Continuity and Disaster Recovery](https://www.oracle
 
 &nbsp;
 
-#### Workload replication considerations
+### 6. Workload replication considerations
 
 The landing zone extension prepares the DR foundation. Configure and validate workload replication separately, based on the OCI service used and the selected recovery objectives.
 
