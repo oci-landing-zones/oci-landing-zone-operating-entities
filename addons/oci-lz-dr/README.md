@@ -1,6 +1,5 @@
-# OCI LZ BCDR
-
-*An OCI Open LZ Addon for Business Continuity and Disaster Recovery landing zone blueprints*
+# **[OCI LZ BCDR](#)**
+## **An OCI Open LZ [Addon](#) for Business Continuity and Disaster Recovery landing zone blueprints**
 
 &nbsp;
 
@@ -13,11 +12,11 @@
 
 ## 1. Overview
 
-The **OCI LZ BCDR** addon provides the core landing zone resources required to support **Business Continuity** and **Disaster Recovery** scenarios for OCI Landing Zone blueprints. It complements a landing zone with the network, identity, observability, and operational components required to support recovery scenarios across availability domains, regions, or tenancies.
+The **OCI LZ BCDR** addon provides the core landing zone resources required to support **Business Continuity** and **Disaster Recovery** scenarios for OCI Landing Zone blueprints. It complements a landing zone with the network, security and observability components required to support recovery scenarios across regions. 
 
 ### Landing Zone DR design considerations
 
-- The landing zone design is built around the next main pillars: **identity**, **security**, **networking**, **observability**, and **operations**. For Business Continuity and Disaster Recovery, it is essential to avoid any **single point of failure** across all pillars.
+- The Landing Zone design is built around key pillars, including **identity**, **security**, **networking**, **observability**, and **operations**. From a Business Continuity and Disaster Recovery (BC/DR) perspective, the architecture should minimize single points of failure across these pillars and ensure that critical capabilities remain available or can be recovered in the event of a failure or disaster.
 - In **multi-region** landing zones, global IAM resources such as compartments, groups, and policies should be reused consistently, while regional resources such as VCNs, vaults, events, topics, and subscriptions must be explicitly provisioned in each target region.
 - **Identity and security**: IAM resources, including compartments, users, groups, and policies, are managed from the home region and available across subscribed regions. Regional security resources, such as vaults, keys, secrets, and workload-specific security controls, must be deployed or replicated in the DR region as part of the workload recovery plan.
 - **Networking** requirements vary depending on the DR scenario: inter-AD designs use regional subnets and resources, while cross-region designs require inter-region peering. Resources are provisioned in their respective regions.
