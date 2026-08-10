@@ -47,9 +47,11 @@ For a One-OE DR cross-region extension, the required deployable files are limite
 
 This is a multi-stack deployment: Step 0 deploys the One-OE baseline and Step 1 deploys the regional BCDR addon. Before deploying Step 1, configure the addon stack to consume the required outputs from the baseline stack by using the orchestrator's outputs and dependencies features described in the [OCI Resource Manager multi-stack deployment guide](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/dr/commons/content/orm_bp.md).
 
-<img src="../images/orm_deployment_home_region.png" width="700">
+<img src="../images/orm_deployment_home_region.png" width="700" alt="OCI Resource Manager stack configured to use an Object Storage bucket for dependency files">
 
-**Step 1. Extend One-OE for DR**
+*OCI Resource Manager configuration that uses an Object Storage bucket as the dependency source. Select the bucket and its dependency JSON file or files containing the baseline stack outputs consumed by the BCDR addon.*
+
+**Step 1. Deploy the One-OE DR Extension**
 
 > [!NOTE]
 > Our One-OE blueprint uses `eu-frankfurt-1` as the home region. For the DR extension, we use `eu-amsterdam-1` as the DR region.
@@ -58,14 +60,24 @@ The DR environment may follow the same hub model and CIS security level as the p
 
 For a different region pair or DR topology, use the [OCI LZ Blueprint Factory](../../oci-lz-blueprint-factory/README.md) to create and review custom JSON configuration files.
 
-> [!IMPORTANT]
-> Create the BCDR stack in `eu-amsterdam-1` (Amsterdam). The deployment region is a Terraform or Resource Manager stack setting, not a field in the JSON configuration files. The regional resource keys and names in these files use the `AMS` prefix; the One-OE baseline uses `FRA` for Frankfurt.
-
-
 | BCDR extension | Hub A | Hub B | Hub C | Hub E |
 |---|---|---|---|---|
 | CIS Level 1 | [<img src="../../../commons/images/DeployToOCI.svg" height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_a_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_security.json"})<br>`oneoe_bcdr_network_hub_a_pre.json`<br>`oneoe_bcdr_observability_cis1_pre.json`<br>`oneoe_bcdr_security.json` | [<img src="../../../commons/images/DeployToOCI.svg" height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_b_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_security.json"})<br>`oneoe_bcdr_network_hub_b_pre.json`<br>`oneoe_bcdr_observability_cis1_pre.json`<br>`oneoe_bcdr_security.json` | [<img src="../../../commons/images/DeployToOCI.svg" height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_c_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_security.json"})<br>`oneoe_bcdr_network_hub_c_pre.json`<br>`oneoe_bcdr_observability_cis1_pre.json`<br>`oneoe_bcdr_security.json` | [<img src="../../../commons/images/DeployToOCI.svg" height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_e.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_security.json"})<br>`oneoe_bcdr_network_hub_e.json`<br>`oneoe_bcdr_observability_cis1_pre.json`<br>`oneoe_bcdr_security.json` |
 | CIS Level 2 | [<img src="../../../commons/images/DeployToOCI.svg" height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_a_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_security.json"})<br>`oneoe_bcdr_network_hub_a_pre.json`<br>`oneoe_bcdr_observability_cis2_pre.json`<br>`oneoe_bcdr_security.json` | [<img src="../../../commons/images/DeployToOCI.svg" height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_b_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_security.json"})<br>`oneoe_bcdr_network_hub_b_pre.json`<br>`oneoe_bcdr_observability_cis2_pre.json`<br>`oneoe_bcdr_security.json` | [<img src="../../../commons/images/DeployToOCI.svg" height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_c_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_security.json"})<br>`oneoe_bcdr_network_hub_c_pre.json`<br>`oneoe_bcdr_observability_cis2_pre.json`<br>`oneoe_bcdr_security.json` | [<img src="../../../commons/images/DeployToOCI.svg" height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_e.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/dr/addons/oci-lz-dr/one-oe/oneoe_bcdr_security.json"})<br>`oneoe_bcdr_network_hub_e.json`<br>`oneoe_bcdr_observability_cis2_pre.json`<br>`oneoe_bcdr_security.json` |
+
+> [!NOTE]
+> **CIS Level 2:** before deploying the AMS BCDR stack, replicate the Vault and the `KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY` key to Amsterdam. Provide the OCID of the AMS key replica through `kms_dependency.keys.KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY` so `bkt-ams-lz-service-connector` uses customer-managed encryption. See [Replicating Vaults and Keys](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/replicatingvaults.htm).
+
+When deploying with ORM, follow these steps:
+
+1. Select `eu-amsterdam-1` (Netherlands Northwest, Amsterdam) in the OCI Console, then accept terms and wait for the configuration to load.
+2. Set the working directory to `rms-facade`.
+3. Set the stack name you prefer.
+4. Set the terraform version to 1.5.x. Click Next.
+5. Accept the default files. Click Next. Optionally, replace with your reviewed JSON configuration files.
+6. Configure the stack dependencies so the BCDR addon consumes the required outputs from the baseline One-OE stack.
+7. Un-check run apply. Click Create.
+8. Run Plan and review the proposed regional network and observability changes before applying.
 
 **Step 1.1. Complete staged hub networking**
 
@@ -91,20 +103,6 @@ The BCDR observability files contain only regional AMS resources. The home-regio
 > **Manual post-deployment configuration required:** the BCDR observability files create `bkt-ams-lz-service-connector` as the destination bucket. After both stacks are deployed, configure an Object Storage replication policy from the Frankfurt source bucket `bkt-fra-lz-service-connector` to that AMS destination. See [Object Storage replication](https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/usingreplication.htm).
 
 The AMS configuration intentionally creates no Service Connector. The replication destination becomes read-only while replication is active, so it cannot also be the local target of a Service Connector.
-
-> [!NOTE]
-> **CIS Level 2:** before deploying the AMS BCDR stack, replicate the Vault and the `KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY` key to Amsterdam. Provide the OCID of the AMS key replica through `kms_dependency.keys.KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY` so `bkt-ams-lz-service-connector` uses customer-managed encryption. See [Replicating Vaults and Keys](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/replicatingvaults.htm).
-
-When deploying with ORM, follow these steps:
-
-1. Select `eu-amsterdam-1` (Netherlands Northwest, Amsterdam) in the OCI Console, then accept terms and wait for the configuration to load.
-2. Set the working directory to `rms-facade`.
-3. Set the stack name you prefer.
-4. Set the terraform version to 1.5.x. Click Next.
-5. Accept the default files. Click Next. Optionally, replace with your reviewed JSON configuration files.
-6. Configure the stack dependencies so the BCDR addon consumes the required outputs from the baseline One-OE stack.
-7. Un-check run apply. Click Create.
-8. Run Plan and review the proposed regional network and observability changes before applying.
 
 **Step 2. Deploy inter-region RPC within the same tenancy**
 
