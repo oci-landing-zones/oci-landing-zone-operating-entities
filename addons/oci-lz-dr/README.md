@@ -39,7 +39,8 @@ To review best practices about BCDR, go [here](BCDR-best-practices.md).
 ## 2. Deployment Guide
 
 > [!NOTE]
-> This add-on covers the DR Landing Zone scope. It does not deploy the workloads themselves; select and implement a dedicated [DR strategy](./BCDR-best-practices.md#5-dr-strategies) in a separate phase.
+>This add-on covers the DR Landing Zone scope, including core infrastructure resources such as VCNs, route tables, security resources, events, notifications, and other foundational Landing Zone components. It does not deploy workload-specific resources, such as databases, OKE clusters, Exadata Cloud Service (ExaCS), Compute instances, or other application-specific resources.
+> The appropriate [DR strategy](./BCDR-best-practices.md#5-dr-strategies) for each workload should be selected and implemented separately, based on its specific availability, RTO, and RPO requirements.
 
 1. Confirm the DR scenario, workloads, regions, tenancy boundaries, connectivity model, and recovery objectives.
 2. Deploy or confirm the [One-OE baseline](../../blueprints/one-oe/runtime/one-stack/readme.md) in the home region.
