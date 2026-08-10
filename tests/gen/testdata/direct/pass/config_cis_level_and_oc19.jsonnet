@@ -21,7 +21,7 @@ local cost_policy =
 local security_recipes =
   outputs['security_cis1.json'].security_zones_configuration.recipes;
 local observability_bucket =
-  outputs['observability_cis1.json'].service_connectors_configuration.buckets['BKT-LZ-SERVICE-CONNECTOR-KEY'];
+  outputs['observability_cis1.json'].service_connectors_configuration.buckets['BKT-STR-LZ-SERVICE-CONNECTOR-KEY'];
 local cis2_vault_key =
   default_cis_outputs['security_cis2.json'].vaults_configuration.keys['KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY'];
 {

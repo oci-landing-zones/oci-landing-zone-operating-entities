@@ -73,6 +73,8 @@ The AI Agent works within the [Blueprint Factory](../oci-lz-blueprint-factory/RE
 
 This approach keeps AI assistance anchored in the repository landing zone patterns and best practices while enabling customization.
 
+For One-OE designs, the Factory asks: **Do you want to deploy a Disaster Recovery (DR) region?** When selected, the current preset uses `eu-frankfurt-1` as the home region and `eu-amsterdam-1` as the DR region, with `10.0.192.0/21` for the DR hub VCN and `10.0.200.0/21` for the PROD VCN. It does not include preproduction or Multi-OE DR; see the [One-OE Disaster Recovery preset](../oci-lz-blueprint-factory/README.md#one-oe-disaster-recovery-preset) for the supported scope.
+
 ### Example of complete OKE one-shot prompt to Generate Landing Zone
 
 ```text

@@ -47,7 +47,8 @@ If the selected published path, config generator, or workload extension does not
 ## Discovery Reminders
 
 - Always default to `One-OE`; do not ask who operates the landing zone or ask the customer to choose a landing zone family.
-- Ask in root `AGENTS.md` order: One-OE baseline, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, then CIDRs.
+- After establishing the One-OE baseline, ask: **Do you want to deploy a Disaster Recovery (DR) region?** If the customer answers yes, the current published Factory preset supports only `eu-frankfurt-1` as the home region and `eu-amsterdam-1` as the DR region. It deploys only the DR hub and `prod` VCN, using `10.0.192.0/21` and `10.0.200.0/21`, respectively. Do not apply this fixed preset to another region pair or to Multi-OE; route those requirements to a reviewed custom design.
+- Ask in root `AGENTS.md` order: One-OE baseline, DR decision, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, then CIDRs.
 - Ask for the target OCI region early. Explain that realm defaults to `oc1` public cloud when omitted, and ask for realm only when a non-public or sovereign deployment may apply, such as `oc19` EU Sovereign Cloud.
 - Explain each decision in customer language before using repo terms such as `One-OE`, `Hub A`, `platform`, `project`, or `shared_project_network`.
 - Do not propose concrete CIDRs until the root `AGENTS.md` network-scope gate is complete; use extension guides such as OKE or ExaCS only for extension-specific sizing inputs.

@@ -37,6 +37,12 @@ The Blueprint Factory can be used in three ways:
 
 Paths 1 and 2 produce customer-specific generated files. Path 3 does not require a custom factory run.
 
+### One-OE Disaster Recovery preset
+
+When the AI-assisted Factory path establishes the One-OE baseline, it asks: **Do you want to deploy a Disaster Recovery (DR) region?**
+
+If the answer is yes, the currently supported preset uses `eu-frankfurt-1` as the home region and `eu-amsterdam-1` as the DR region. It deploys a DR hub VCN using `10.0.192.0/21` and a PROD VCN using `10.0.200.0/21`. This preset does not include preproduction and does not support Multi-OE DR. Use a reviewed custom Factory design for another regional topology or CIDR allocation.
+
 &nbsp;
 
 ## 3. Configuration Syntax and Examples

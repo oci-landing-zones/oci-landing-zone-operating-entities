@@ -16,12 +16,12 @@ local rules = obs.events_configuration.event_rules;
 local flow_logs = obs.logging_configuration.flow_logs;
 local log_groups = obs.logging_configuration.log_groups;
 {
-  has_env_flow_log_group: std.objectHas(log_groups, 'LGRP-LZ-PROD-VCN-FLOW-KEY'),
-  has_env_network_rule: std.objectHas(rules, 'RUL-LZ-PROD-NOTIFY-NETWORK-KEY'),
+  has_env_flow_log_group: std.objectHas(log_groups, 'LGRP-FRA-LZ-PROD-VCN-FLOW-KEY'),
+  has_env_network_rule: std.objectHas(rules, 'RUL-FRA-LZ-PROD-NOTIFY-NETWORK-KEY'),
   has_env_network_target: std.objectHas(zones, 'SZ-TGT-LZ-PROD-ENVIRONMENT-NETWORK-KEY'),
-  has_env_security_rule: std.objectHas(rules, 'RUL-LZ-PROD-NOTIFY-SECURITY-KEY'),
+  has_env_security_rule: std.objectHas(rules, 'RUL-FRA-LZ-PROD-NOTIFY-SECURITY-KEY'),
   has_env_target: std.objectHas(zones, 'SZ-TGT-LZ-PROD-ENVIRONMENT-KEY'),
-  has_env_subnet_flow_log: std.objectHas(flow_logs, 'LOG-LZ-PROD-SUBNET-FLOW-KEY'),
-  has_env_vcn_flow_log: std.objectHas(flow_logs, 'LOG-LZ-PROD-VCN-FLOW-KEY'),
+  has_env_subnet_flow_log: std.objectHas(flow_logs, 'LOG-FRA-LZ-PROD-SUBNET-FLOW-KEY'),
+  has_env_vcn_flow_log: std.objectHas(flow_logs, 'LOG-FRA-LZ-PROD-VCN-FLOW-KEY'),
   has_project_target: std.objectHas(zones, 'SZ-TGT-LZ-PROD-PROJ1-KEY'),
 }

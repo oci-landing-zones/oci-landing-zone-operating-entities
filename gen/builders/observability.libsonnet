@@ -105,7 +105,7 @@ function(config, n, realm_constants, topo)
 
   local placeholder_email = 'email.address@example.com';
   local notification_topic(name_segments, description) = {
-    name: n.display_global('nott', name_segments),
+    name: n.display('nott', name_segments),
     description: description,
     compartment_id: security_cmp_key,
     subscriptions: [{ protocol: 'EMAIL', values: [placeholder_email] }],
@@ -117,10 +117,10 @@ function(config, n, realm_constants, topo)
   local env_security_event_rules = std.foldl(
     function(acc, env_name)
       acc + {
-        [n.key_global('RUL', [env_name, 'NOTIFY', 'SECURITY'])]: {
+        [n.key('RUL', [env_name, 'NOTIFY', 'SECURITY'])]: {
           compartment_id: n.key_global('CMP', [env_name, 'SECURITY']),
-          destination_topic_ids: [n.key_global('NOTT', ['SECURITY'])],
-          event_display_name: n.display_global('rul', [env_name, 'notify', 'security']),
+          destination_topic_ids: [n.key('NOTT', ['SECURITY'])],
+          event_display_name: n.display('rul', [env_name, 'notify', 'security']),
           supplied_events: security_events,
         },
       },
@@ -130,10 +130,10 @@ function(config, n, realm_constants, topo)
   local env_network_event_rules = std.foldl(
     function(acc, env_name)
       acc + {
-        [n.key_global('RUL', [env_name, 'NOTIFY', 'NETWORK'])]: {
+        [n.key('RUL', [env_name, 'NOTIFY', 'NETWORK'])]: {
           compartment_id: n.key_global('CMP', [env_name, 'NETWORK']),
-          destination_topic_ids: [n.key_global('NOTT', ['NETWORK'])],
-          event_display_name: n.display_global('rul', [env_name, 'notify', 'network']),
+          destination_topic_ids: [n.key('NOTT', ['NETWORK'])],
+          event_display_name: n.display('rul', [env_name, 'notify', 'network']),
           supplied_events: network_events,
         },
       },
@@ -147,9 +147,9 @@ function(config, n, realm_constants, topo)
       default_compartment_id: n.key_global('CMP', ['NETWORK']),
 
       alarms: {
-        [n.key_global('AL', ['NETWORK', 'LB'])]: {
-          display_name: n.display_global('al', ['network', 'lb']),
-          destination_topic_ids: [n.key_global('NOTT', ['NETWORK'])],
+        [n.key('AL', ['NETWORK', 'LB'])]: {
+          display_name: n.display('al', ['network', 'lb']),
+          destination_topic_ids: [n.key('NOTT', ['NETWORK'])],
           is_enabled: 'false',
 
           supplied_alarm: {
@@ -166,17 +166,17 @@ function(config, n, realm_constants, topo)
       default_compartment_id: 'CMP-LANDINGZONE-KEY',
 
       event_rules: {
-        [n.key_global('RUL', ['NOTIFY', 'NETWORK'])]: {
+        [n.key('RUL', ['NOTIFY', 'NETWORK'])]: {
           compartment_id: n.key_global('CMP', ['NETWORK']),
-          destination_topic_ids: [n.key_global('NOTT', ['NETWORK'])],
-          event_display_name: n.display_global('rul', ['notify', 'network']),
+          destination_topic_ids: [n.key('NOTT', ['NETWORK'])],
+          event_display_name: n.display('rul', ['notify', 'network']),
           supplied_events: network_events,
         },
 
-        [n.key_global('RUL', ['NOTIFY', 'SECURITY'])]: {
+        [n.key('RUL', ['NOTIFY', 'SECURITY'])]: {
           compartment_id: n.key_global('CMP', ['SECURITY']),
-          destination_topic_ids: [n.key_global('NOTT', ['SECURITY'])],
-          event_display_name: n.display_global('rul', ['notify', 'security']),
+          destination_topic_ids: [n.key('NOTT', ['SECURITY'])],
+          event_display_name: n.display('rul', ['notify', 'security']),
           supplied_events: security_events,
         },
       } + env_security_event_rules + env_network_event_rules,
@@ -186,15 +186,15 @@ function(config, n, realm_constants, topo)
       default_compartment_id: 'TENANCY-ROOT',
 
       event_rules: {
-        [n.key_global('RUL', ['CLOUDGUARD'])]: {
-          destination_topic_ids: [n.key_global('NOTT', ['CLOUDGUARD'])],
-          event_display_name: n.display_global('rul', ['notify-on-cloudguard-changes']),
+        [n.key('RUL', ['CLOUDGUARD'])]: {
+          destination_topic_ids: [n.key('NOTT', ['CLOUDGUARD'])],
+          event_display_name: n.display('rul', ['notify-on-cloudguard-changes']),
           supplied_events: cloudguard_events,
         },
 
-        [n.key_global('RUL', ['IAM'])]: {
-          destination_topic_ids: [n.key_global('NOTT', ['IAM'])],
-          event_display_name: n.display_global('rul', ['notify-on-iam-changes']),
+        [n.key('RUL', ['IAM'])]: {
+          destination_topic_ids: [n.key('NOTT', ['IAM'])],
+          event_display_name: n.display('rul', ['notify-on-iam-changes']),
           supplied_events: iam_events,
         },
       },
@@ -204,10 +204,10 @@ function(config, n, realm_constants, topo)
       default_compartment_id: security_cmp_key,
 
       topics: {
-        [n.key_global('NOTT', ['CLOUDGUARD'])]: notification_topic(['cloudguard'], 'Topic for Cloud Guard related notifications.'),
-        [n.key_global('NOTT', ['IAM'])]: notification_topic(['iam'], 'Topic for IAM related notifications.'),
-        [n.key_global('NOTT', ['NETWORK'])]: notification_topic(['network'], 'Topic for network related notifications.'),
-        [n.key_global('NOTT', ['SECURITY'])]: notification_topic(['security'], 'Topic for notifications.'),
+        [n.key('NOTT', ['CLOUDGUARD'])]: notification_topic(['cloudguard'], 'Topic for Cloud Guard related notifications.'),
+        [n.key('NOTT', ['IAM'])]: notification_topic(['iam'], 'Topic for IAM related notifications.'),
+        [n.key('NOTT', ['NETWORK'])]: notification_topic(['network'], 'Topic for network related notifications.'),
+        [n.key('NOTT', ['SECURITY'])]: notification_topic(['security'], 'Topic for notifications.'),
       },
     },
 
@@ -215,16 +215,16 @@ function(config, n, realm_constants, topo)
       default_compartment_id: n.key_global('CMP', ['SECURITY']),
 
       buckets: {
-        [n.key_global('BKT', ['SERVICE', 'CONNECTOR'])]: {
-          name: n.display_global('bkt', ['service', 'connector']),
+        [n.key('BKT', ['SERVICE', 'CONNECTOR'])]: {
+          name: n.display('bkt', ['service', 'connector']),
           compartment_id: n.key_global('CMP', ['SECURITY']),
           cis_level: '1',
         },
       },
 
       service_connectors: {
-        [n.key_global('SCH', ['MONITOR'])]: {
-          display_name: n.display_global('sch', ['monitor']),
+        [n.key('SCH', ['MONITOR'])]: {
+          display_name: n.display('sch', ['monitor']),
 
           policy: {
             name: 'service-connector-audit-policy',
@@ -238,7 +238,7 @@ function(config, n, realm_constants, topo)
           },
 
           target: {
-            bucket_name: n.display_global('bkt', ['service', 'connector']),
+            bucket_name: n.display('bkt', ['service', 'connector']),
             bucket_object_name_prefix: 'sch',
             kind: 'objectstorage',
           },
@@ -251,13 +251,13 @@ function(config, n, realm_constants, topo)
   local env_flow_logs = std.foldl(
     function(acc, env_name)
       acc + {
-        [n.key_global('LOG', [env_name, 'SUBNET', 'FLOW'])]: {
-          log_group_id: n.key_global('LGRP', [env_name, 'VCN', 'FLOW']),
+        [n.key('LOG', [env_name, 'SUBNET', 'FLOW'])]: {
+          log_group_id: n.key('LGRP', [env_name, 'VCN', 'FLOW']),
           target_compartment_ids: [n.key_global('CMP', [env_name, 'NETWORK'])],
           target_resource_type: 'subnet',
         },
-        [n.key_global('LOG', [env_name, 'VCN', 'FLOW'])]: {
-          log_group_id: n.key_global('LGRP', [env_name, 'VCN', 'FLOW']),
+        [n.key('LOG', [env_name, 'VCN', 'FLOW'])]: {
+          log_group_id: n.key('LGRP', [env_name, 'VCN', 'FLOW']),
           target_compartment_ids: [n.key_global('CMP', [env_name, 'NETWORK'])],
           target_resource_type: 'vcn',
         },
@@ -269,8 +269,8 @@ function(config, n, realm_constants, topo)
   local env_log_groups = std.foldl(
     function(acc, env_name)
       acc + {
-        [n.key_global('LGRP', [env_name, 'VCN', 'FLOW'])]: {
-          name: n.display_global('lgrp', [env_name, 'vcn', 'flow']),
+        [n.key('LGRP', [env_name, 'VCN', 'FLOW'])]: {
+          name: n.display('lgrp', [env_name, 'vcn', 'flow']),
           compartment_id: n.key_global('CMP', [env_name, 'SECURITY']),
         },
       },
@@ -283,21 +283,21 @@ function(config, n, realm_constants, topo)
       default_compartment_id: n.key_global('CMP', ['SECURITY']),
 
       flow_logs: env_flow_logs + {
-        [n.key_global('LOG', ['SUBNET', 'FLOW'])]: {
-          log_group_id: n.key_global('LGRP', ['VCN', 'FLOW']),
+        [n.key('LOG', ['SUBNET', 'FLOW'])]: {
+          log_group_id: n.key('LGRP', ['VCN', 'FLOW']),
           target_compartment_ids: [n.key_global('CMP', ['NETWORK'])],
           target_resource_type: 'subnet',
         },
-        [n.key_global('LOG', ['VCN', 'FLOW'])]: {
-          log_group_id: n.key_global('LGRP', ['VCN', 'FLOW']),
+        [n.key('LOG', ['VCN', 'FLOW'])]: {
+          log_group_id: n.key('LGRP', ['VCN', 'FLOW']),
           target_compartment_ids: [n.key_global('CMP', ['NETWORK'])],
           target_resource_type: 'vcn',
         },
       },
 
       log_groups: env_log_groups + {
-        [n.key_global('LGRP', ['VCN', 'FLOW'])]: {
-          name: n.display_global('lgrp', ['vcn', 'flow']),
+        [n.key('LGRP', ['VCN', 'FLOW'])]: {
+          name: n.display('lgrp', ['vcn', 'flow']),
           compartment_id: n.key_global('CMP', ['SECURITY']),
         },
       },
@@ -308,7 +308,7 @@ function(config, n, realm_constants, topo)
   local cis2_bucket_override = {
     service_connectors_configuration+: {
       buckets+: {
-        [n.key_global('BKT', ['SERVICE', 'CONNECTOR'])]+: {
+        [n.key('BKT', ['SERVICE', 'CONNECTOR'])]+: {
           cis_level: '2',
           kms_key_id: n.key_global('KEY', ['SHARED', 'OSS', 'AUDIT', 'BKT']),
         },

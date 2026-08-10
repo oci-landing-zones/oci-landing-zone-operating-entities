@@ -3,6 +3,19 @@
         "default_compartment_id"                                   : "CMP-LZ-NETWORK-KEY",
 
         "alarms": {
+            "AL-FRA-LZ-NETWORK-LB-KEY": {
+                "display_name"                                     : "al-fra-lz-network-lb",
+                "destination_topic_ids"                            : ["NOTT-FRA-LZ-NETWORK-KEY"],
+                "is_enabled"                                       : "false",
+
+                "supplied_alarm": {
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_lbaas",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "UnHealthyBackendServers[1m].mean() >= 0"
+                }
+            },
+
             "AL-LZ-EXACS-CPUUTIL-KEY": {
                 "display_name"                                     : "al-lz-db-cpuutil",
                 "compartment_id"                                   : "CMP-LZ-SHARED-EXACS-DB-KEY",
@@ -106,19 +119,6 @@
                     "query"                                        : "StorageUtilization[1m].mean() >= 90",
                     "severity"                                     : "CRITICAL"
                 }
-            },
-
-            "AL-LZ-NETWORK-LB-KEY": {
-                "display_name"                                     : "al-lz-network-lb",
-                "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
-                "is_enabled"                                       : "false",
-
-                "supplied_alarm": {
-                    "message_format"                               : "PRETTY_JSON",
-                    "namespace"                                    : "oci_lbaas",
-                    "pending_duration"                             : "PT5M",
-                    "query"                                        : "UnHealthyBackendServers[1m].mean() >= 0"
-                }
             }
         }
     },
@@ -127,6 +127,207 @@
         "default_compartment_id"                                   : "CMP-LANDINGZONE-KEY",
 
         "event_rules": {
+            "RUL-FRA-LZ-NOTIFY-NETWORK-KEY": {
+                "compartment_id"                                   : "CMP-LZ-NETWORK-KEY",
+                "destination_topic_ids"                            : ["NOTT-FRA-LZ-NETWORK-KEY"],
+                "event_display_name"                               : "rul-fra-lz-notify-network",
+
+                "supplied_events": [
+                    "com.oraclecloud.virtualnetwork.createvcn",
+                    "com.oraclecloud.virtualnetwork.deletevcn",
+                    "com.oraclecloud.virtualnetwork.updatevcn",
+                    "com.oraclecloud.virtualnetwork.createroutetable",
+                    "com.oraclecloud.virtualnetwork.deleteroutetable",
+                    "com.oraclecloud.virtualnetwork.updateroutetable",
+                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
+                    "com.oraclecloud.virtualnetwork.createsecuritylist",
+                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
+                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
+                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
+                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
+                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
+                    "com.oraclecloud.virtualnetwork.createdrg",
+                    "com.oraclecloud.virtualnetwork.deletedrg",
+                    "com.oraclecloud.virtualnetwork.updatedrg",
+                    "com.oraclecloud.virtualnetwork.createdrgattachment",
+                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
+                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
+                    "com.oraclecloud.virtualnetwork.createinternetgateway",
+                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
+                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
+                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
+                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
+                    "com.oraclecloud.natgateway.createnatgateway",
+                    "com.oraclecloud.natgateway.deletenatgateway",
+                    "com.oraclecloud.natgateway.updatenatgateway",
+                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
+                    "com.oraclecloud.servicegateway.createservicegateway",
+                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
+                    "com.oraclecloud.servicegateway.attachserviceid",
+                    "com.oraclecloud.servicegateway.detachserviceid",
+                    "com.oraclecloud.servicegateway.updateservicegateway",
+                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
+                    "com.oraclecloud.virtualnetwork.createpublicip",
+                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
+                ]
+            },
+
+            "RUL-FRA-LZ-NOTIFY-SECURITY-KEY": {
+                "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                            : ["NOTT-FRA-LZ-SECURITY-KEY"],
+                "event_display_name"                               : "rul-fra-lz-notify-security",
+
+                "supplied_events": [
+                    "com.oraclecloud.notification.createsubscription",
+                    "com.oraclecloud.notification.deletesubscription",
+                    "com.oraclecloud.notification.getunsubscription",
+                    "com.oraclecloud.notification.movesubscription",
+                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
+                    "com.oraclecloud.notification.updatesubscription"
+                ]
+            },
+
+            "RUL-FRA-LZ-PREPROD-NOTIFY-NETWORK-KEY": {
+                "compartment_id"                                   : "CMP-LZ-PREPROD-NETWORK-KEY",
+                "destination_topic_ids"                            : ["NOTT-FRA-LZ-NETWORK-KEY"],
+                "event_display_name"                               : "rul-fra-lz-preprod-notify-network",
+
+                "supplied_events": [
+                    "com.oraclecloud.virtualnetwork.createvcn",
+                    "com.oraclecloud.virtualnetwork.deletevcn",
+                    "com.oraclecloud.virtualnetwork.updatevcn",
+                    "com.oraclecloud.virtualnetwork.createroutetable",
+                    "com.oraclecloud.virtualnetwork.deleteroutetable",
+                    "com.oraclecloud.virtualnetwork.updateroutetable",
+                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
+                    "com.oraclecloud.virtualnetwork.createsecuritylist",
+                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
+                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
+                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
+                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
+                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
+                    "com.oraclecloud.virtualnetwork.createdrg",
+                    "com.oraclecloud.virtualnetwork.deletedrg",
+                    "com.oraclecloud.virtualnetwork.updatedrg",
+                    "com.oraclecloud.virtualnetwork.createdrgattachment",
+                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
+                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
+                    "com.oraclecloud.virtualnetwork.createinternetgateway",
+                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
+                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
+                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
+                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
+                    "com.oraclecloud.natgateway.createnatgateway",
+                    "com.oraclecloud.natgateway.deletenatgateway",
+                    "com.oraclecloud.natgateway.updatenatgateway",
+                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
+                    "com.oraclecloud.servicegateway.createservicegateway",
+                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
+                    "com.oraclecloud.servicegateway.attachserviceid",
+                    "com.oraclecloud.servicegateway.detachserviceid",
+                    "com.oraclecloud.servicegateway.updateservicegateway",
+                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
+                    "com.oraclecloud.virtualnetwork.createpublicip",
+                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
+                ]
+            },
+
+            "RUL-FRA-LZ-PREPROD-NOTIFY-SECURITY-KEY": {
+                "compartment_id"                                   : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "destination_topic_ids"                            : ["NOTT-FRA-LZ-SECURITY-KEY"],
+                "event_display_name"                               : "rul-fra-lz-preprod-notify-security",
+
+                "supplied_events": [
+                    "com.oraclecloud.notification.createsubscription",
+                    "com.oraclecloud.notification.deletesubscription",
+                    "com.oraclecloud.notification.getunsubscription",
+                    "com.oraclecloud.notification.movesubscription",
+                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
+                    "com.oraclecloud.notification.updatesubscription"
+                ]
+            },
+
+            "RUL-FRA-LZ-PROD-NOTIFY-NETWORK-KEY": {
+                "compartment_id"                                   : "CMP-LZ-PROD-NETWORK-KEY",
+                "destination_topic_ids"                            : ["NOTT-FRA-LZ-NETWORK-KEY"],
+                "event_display_name"                               : "rul-fra-lz-prod-notify-network",
+
+                "supplied_events": [
+                    "com.oraclecloud.virtualnetwork.createvcn",
+                    "com.oraclecloud.virtualnetwork.deletevcn",
+                    "com.oraclecloud.virtualnetwork.updatevcn",
+                    "com.oraclecloud.virtualnetwork.createroutetable",
+                    "com.oraclecloud.virtualnetwork.deleteroutetable",
+                    "com.oraclecloud.virtualnetwork.updateroutetable",
+                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
+                    "com.oraclecloud.virtualnetwork.createsecuritylist",
+                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
+                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
+                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
+                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
+                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
+                    "com.oraclecloud.virtualnetwork.createdrg",
+                    "com.oraclecloud.virtualnetwork.deletedrg",
+                    "com.oraclecloud.virtualnetwork.updatedrg",
+                    "com.oraclecloud.virtualnetwork.createdrgattachment",
+                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
+                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
+                    "com.oraclecloud.virtualnetwork.createinternetgateway",
+                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
+                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
+                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
+                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
+                    "com.oraclecloud.natgateway.createnatgateway",
+                    "com.oraclecloud.natgateway.deletenatgateway",
+                    "com.oraclecloud.natgateway.updatenatgateway",
+                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
+                    "com.oraclecloud.servicegateway.createservicegateway",
+                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
+                    "com.oraclecloud.servicegateway.attachserviceid",
+                    "com.oraclecloud.servicegateway.detachserviceid",
+                    "com.oraclecloud.servicegateway.updateservicegateway",
+                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
+                    "com.oraclecloud.virtualnetwork.createpublicip",
+                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
+                ]
+            },
+
+            "RUL-FRA-LZ-PROD-NOTIFY-SECURITY-KEY": {
+                "compartment_id"                                   : "CMP-LZ-PROD-SECURITY-KEY",
+                "destination_topic_ids"                            : ["NOTT-FRA-LZ-SECURITY-KEY"],
+                "event_display_name"                               : "rul-fra-lz-prod-notify-security",
+
+                "supplied_events": [
+                    "com.oraclecloud.notification.createsubscription",
+                    "com.oraclecloud.notification.deletesubscription",
+                    "com.oraclecloud.notification.getunsubscription",
+                    "com.oraclecloud.notification.movesubscription",
+                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
+                    "com.oraclecloud.notification.updatesubscription"
+                ]
+            },
+
             "RUL-LZ-NOTIFICATION-EXACS-OPERATOR-ACCESS-CONTROL-KEY": {
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-EXACS-SHARED-INFRA-WORKLOADS-KEY"],
@@ -266,73 +467,6 @@
                 ]
             },
 
-            "RUL-LZ-NOTIFY-NETWORK-KEY": {
-                "compartment_id"                                   : "CMP-LZ-NETWORK-KEY",
-                "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
-                "event_display_name"                               : "rul-lz-notify-network",
-
-                "supplied_events": [
-                    "com.oraclecloud.virtualnetwork.createvcn",
-                    "com.oraclecloud.virtualnetwork.deletevcn",
-                    "com.oraclecloud.virtualnetwork.updatevcn",
-                    "com.oraclecloud.virtualnetwork.createroutetable",
-                    "com.oraclecloud.virtualnetwork.deleteroutetable",
-                    "com.oraclecloud.virtualnetwork.updateroutetable",
-                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
-                    "com.oraclecloud.virtualnetwork.createsecuritylist",
-                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
-                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
-                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
-                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
-                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
-                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
-                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
-                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
-                    "com.oraclecloud.virtualnetwork.createdrg",
-                    "com.oraclecloud.virtualnetwork.deletedrg",
-                    "com.oraclecloud.virtualnetwork.updatedrg",
-                    "com.oraclecloud.virtualnetwork.createdrgattachment",
-                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
-                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
-                    "com.oraclecloud.virtualnetwork.createinternetgateway",
-                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
-                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
-                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
-                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
-                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
-                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
-                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
-                    "com.oraclecloud.natgateway.createnatgateway",
-                    "com.oraclecloud.natgateway.deletenatgateway",
-                    "com.oraclecloud.natgateway.updatenatgateway",
-                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
-                    "com.oraclecloud.servicegateway.createservicegateway",
-                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
-                    "com.oraclecloud.servicegateway.attachserviceid",
-                    "com.oraclecloud.servicegateway.detachserviceid",
-                    "com.oraclecloud.servicegateway.updateservicegateway",
-                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
-                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
-                    "com.oraclecloud.virtualnetwork.createpublicip",
-                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
-                ]
-            },
-
-            "RUL-LZ-NOTIFY-SECURITY-KEY": {
-                "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
-                "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"                               : "rul-lz-notify-security",
-
-                "supplied_events": [
-                    "com.oraclecloud.notification.createsubscription",
-                    "com.oraclecloud.notification.deletesubscription",
-                    "com.oraclecloud.notification.getunsubscription",
-                    "com.oraclecloud.notification.movesubscription",
-                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
-                    "com.oraclecloud.notification.updatesubscription"
-                ]
-            },
-
             "RUL-LZ-PREPROD-EXACS-NOTIFICATION-PROJECTS-KEY": {
                 "compartment_id"                                   : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
@@ -396,73 +530,6 @@
                     "com.oraclecloud.databaseservice.database.information",
                     "com.oraclecloud.databaseservice.dbsystem.critical",
                     "com.oraclecloud.databaseservice.dbsystem.information"
-                ]
-            },
-
-            "RUL-LZ-PREPROD-NOTIFY-NETWORK-KEY": {
-                "compartment_id"                                   : "CMP-LZ-PREPROD-NETWORK-KEY",
-                "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
-                "event_display_name"                               : "rul-lz-preprod-notify-network",
-
-                "supplied_events": [
-                    "com.oraclecloud.virtualnetwork.createvcn",
-                    "com.oraclecloud.virtualnetwork.deletevcn",
-                    "com.oraclecloud.virtualnetwork.updatevcn",
-                    "com.oraclecloud.virtualnetwork.createroutetable",
-                    "com.oraclecloud.virtualnetwork.deleteroutetable",
-                    "com.oraclecloud.virtualnetwork.updateroutetable",
-                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
-                    "com.oraclecloud.virtualnetwork.createsecuritylist",
-                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
-                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
-                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
-                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
-                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
-                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
-                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
-                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
-                    "com.oraclecloud.virtualnetwork.createdrg",
-                    "com.oraclecloud.virtualnetwork.deletedrg",
-                    "com.oraclecloud.virtualnetwork.updatedrg",
-                    "com.oraclecloud.virtualnetwork.createdrgattachment",
-                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
-                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
-                    "com.oraclecloud.virtualnetwork.createinternetgateway",
-                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
-                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
-                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
-                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
-                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
-                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
-                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
-                    "com.oraclecloud.natgateway.createnatgateway",
-                    "com.oraclecloud.natgateway.deletenatgateway",
-                    "com.oraclecloud.natgateway.updatenatgateway",
-                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
-                    "com.oraclecloud.servicegateway.createservicegateway",
-                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
-                    "com.oraclecloud.servicegateway.attachserviceid",
-                    "com.oraclecloud.servicegateway.detachserviceid",
-                    "com.oraclecloud.servicegateway.updateservicegateway",
-                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
-                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
-                    "com.oraclecloud.virtualnetwork.createpublicip",
-                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
-                ]
-            },
-
-            "RUL-LZ-PREPROD-NOTIFY-SECURITY-KEY": {
-                "compartment_id"                                   : "CMP-LZ-PREPROD-SECURITY-KEY",
-                "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"                               : "rul-lz-preprod-notify-security",
-
-                "supplied_events": [
-                    "com.oraclecloud.notification.createsubscription",
-                    "com.oraclecloud.notification.deletesubscription",
-                    "com.oraclecloud.notification.getunsubscription",
-                    "com.oraclecloud.notification.movesubscription",
-                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
-                    "com.oraclecloud.notification.updatesubscription"
                 ]
             },
 
@@ -530,73 +597,6 @@
                     "com.oraclecloud.databaseservice.dbsystem.critical",
                     "com.oraclecloud.databaseservice.dbsystem.information"
                 ]
-            },
-
-            "RUL-LZ-PROD-NOTIFY-NETWORK-KEY": {
-                "compartment_id"                                   : "CMP-LZ-PROD-NETWORK-KEY",
-                "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
-                "event_display_name"                               : "rul-lz-prod-notify-network",
-
-                "supplied_events": [
-                    "com.oraclecloud.virtualnetwork.createvcn",
-                    "com.oraclecloud.virtualnetwork.deletevcn",
-                    "com.oraclecloud.virtualnetwork.updatevcn",
-                    "com.oraclecloud.virtualnetwork.createroutetable",
-                    "com.oraclecloud.virtualnetwork.deleteroutetable",
-                    "com.oraclecloud.virtualnetwork.updateroutetable",
-                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
-                    "com.oraclecloud.virtualnetwork.createsecuritylist",
-                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
-                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
-                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
-                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
-                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
-                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
-                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
-                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
-                    "com.oraclecloud.virtualnetwork.createdrg",
-                    "com.oraclecloud.virtualnetwork.deletedrg",
-                    "com.oraclecloud.virtualnetwork.updatedrg",
-                    "com.oraclecloud.virtualnetwork.createdrgattachment",
-                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
-                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
-                    "com.oraclecloud.virtualnetwork.createinternetgateway",
-                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
-                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
-                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
-                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
-                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
-                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
-                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
-                    "com.oraclecloud.natgateway.createnatgateway",
-                    "com.oraclecloud.natgateway.deletenatgateway",
-                    "com.oraclecloud.natgateway.updatenatgateway",
-                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
-                    "com.oraclecloud.servicegateway.createservicegateway",
-                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
-                    "com.oraclecloud.servicegateway.attachserviceid",
-                    "com.oraclecloud.servicegateway.detachserviceid",
-                    "com.oraclecloud.servicegateway.updateservicegateway",
-                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
-                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
-                    "com.oraclecloud.virtualnetwork.createpublicip",
-                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
-                ]
-            },
-
-            "RUL-LZ-PROD-NOTIFY-SECURITY-KEY": {
-                "compartment_id"                                   : "CMP-LZ-PROD-SECURITY-KEY",
-                "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"                               : "rul-lz-prod-notify-security",
-
-                "supplied_events": [
-                    "com.oraclecloud.notification.createsubscription",
-                    "com.oraclecloud.notification.deletesubscription",
-                    "com.oraclecloud.notification.getunsubscription",
-                    "com.oraclecloud.notification.movesubscription",
-                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
-                    "com.oraclecloud.notification.updatesubscription"
-                ]
             }
         }
     },
@@ -605,9 +605,9 @@
         "default_compartment_id"                                   : "TENANCY-ROOT",
 
         "event_rules": {
-            "RUL-LZ-CLOUDGUARD-KEY": {
-                "destination_topic_ids"                            : ["NOTT-LZ-CLOUDGUARD-KEY"],
-                "event_display_name"                               : "rul-lz-notify-on-cloudguard-changes",
+            "RUL-FRA-LZ-CLOUDGUARD-KEY": {
+                "destination_topic_ids"                            : ["NOTT-FRA-LZ-CLOUDGUARD-KEY"],
+                "event_display_name"                               : "rul-fra-lz-notify-on-cloudguard-changes",
 
                 "supplied_events": [
                     "com.oraclecloud.cloudguard.problemdetected",
@@ -619,9 +619,9 @@
                 ]
             },
 
-            "RUL-LZ-IAM-KEY": {
-                "destination_topic_ids"                            : ["NOTT-LZ-IAM-KEY"],
-                "event_display_name"                               : "rul-lz-notify-on-iam-changes",
+            "RUL-FRA-LZ-IAM-KEY": {
+                "destination_topic_ids"                            : ["NOTT-FRA-LZ-IAM-KEY"],
+                "event_display_name"                               : "rul-fra-lz-notify-on-iam-changes",
 
                 "supplied_events": [
                     "com.oraclecloud.identitycontrolplane.createidentityprovider",
@@ -654,56 +654,56 @@
         "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
 
         "flow_logs": {
-            "LOG-LZ-PREPROD-SUBNET-FLOW-KEY": {
-                "log_group_id"                                     : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
+            "LOG-FRA-LZ-PREPROD-SUBNET-FLOW-KEY": {
+                "log_group_id"                                     : "LGRP-FRA-LZ-PREPROD-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-PREPROD-NETWORK-KEY"],
                 "target_resource_type"                             : "subnet"
             },
 
-            "LOG-LZ-PREPROD-VCN-FLOW-KEY": {
-                "log_group_id"                                     : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
+            "LOG-FRA-LZ-PREPROD-VCN-FLOW-KEY": {
+                "log_group_id"                                     : "LGRP-FRA-LZ-PREPROD-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-PREPROD-NETWORK-KEY"],
                 "target_resource_type"                             : "vcn"
             },
 
-            "LOG-LZ-PROD-SUBNET-FLOW-KEY": {
-                "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+            "LOG-FRA-LZ-PROD-SUBNET-FLOW-KEY": {
+                "log_group_id"                                     : "LGRP-FRA-LZ-PROD-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-PROD-NETWORK-KEY"],
                 "target_resource_type"                             : "subnet"
             },
 
-            "LOG-LZ-PROD-VCN-FLOW-KEY": {
-                "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+            "LOG-FRA-LZ-PROD-VCN-FLOW-KEY": {
+                "log_group_id"                                     : "LGRP-FRA-LZ-PROD-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-PROD-NETWORK-KEY"],
                 "target_resource_type"                             : "vcn"
             },
 
-            "LOG-LZ-SUBNET-FLOW-KEY": {
-                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
+            "LOG-FRA-LZ-SUBNET-FLOW-KEY": {
+                "log_group_id"                                     : "LGRP-FRA-LZ-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-NETWORK-KEY"],
                 "target_resource_type"                             : "subnet"
             },
 
-            "LOG-LZ-VCN-FLOW-KEY": {
-                "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
+            "LOG-FRA-LZ-VCN-FLOW-KEY": {
+                "log_group_id"                                     : "LGRP-FRA-LZ-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-NETWORK-KEY"],
                 "target_resource_type"                             : "vcn"
             }
         },
 
         "log_groups": {
-            "LGRP-LZ-PREPROD-VCN-FLOW-KEY": {
-                "name"                                             : "lgrp-lz-preprod-vcn-flow",
+            "LGRP-FRA-LZ-PREPROD-VCN-FLOW-KEY": {
+                "name"                                             : "lgrp-fra-lz-preprod-vcn-flow",
                 "compartment_id"                                   : "CMP-LZ-PREPROD-SECURITY-KEY"
             },
 
-            "LGRP-LZ-PROD-VCN-FLOW-KEY": {
-                "name"                                             : "lgrp-lz-prod-vcn-flow",
+            "LGRP-FRA-LZ-PROD-VCN-FLOW-KEY": {
+                "name"                                             : "lgrp-fra-lz-prod-vcn-flow",
                 "compartment_id"                                   : "CMP-LZ-PROD-SECURITY-KEY"
             },
 
-            "LGRP-LZ-VCN-FLOW-KEY": {
-                "name"                                             : "lgrp-lz-vcn-flow",
+            "LGRP-FRA-LZ-VCN-FLOW-KEY": {
+                "name"                                             : "lgrp-fra-lz-vcn-flow",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY"
             }
         }
@@ -713,9 +713,48 @@
         "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
 
         "topics": {
-            "NOTT-LZ-CLOUDGUARD-KEY": {
-                "name"                                             : "nott-lz-cloudguard",
+            "NOTT-FRA-LZ-CLOUDGUARD-KEY": {
+                "name"                                             : "nott-fra-lz-cloudguard",
                 "description"                                      : "Topic for Cloud Guard related notifications.",
+                "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                                 : "EMAIL",
+                        "values"                                   : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-FRA-LZ-IAM-KEY": {
+                "name"                                             : "nott-fra-lz-iam",
+                "description"                                      : "Topic for IAM related notifications.",
+                "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                                 : "EMAIL",
+                        "values"                                   : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-FRA-LZ-NETWORK-KEY": {
+                "name"                                             : "nott-fra-lz-network",
+                "description"                                      : "Topic for network related notifications.",
+                "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                                 : "EMAIL",
+                        "values"                                   : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-FRA-LZ-SECURITY-KEY": {
+                "name"                                             : "nott-fra-lz-security",
+                "description"                                      : "Topic for notifications.",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
@@ -752,32 +791,6 @@
                 ]
             },
 
-            "NOTT-LZ-IAM-KEY": {
-                "name"                                             : "nott-lz-iam",
-                "description"                                      : "Topic for IAM related notifications.",
-                "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
-
-                "subscriptions": [
-                    {
-                        "protocol"                                 : "EMAIL",
-                        "values"                                   : ["email.address@example.com"]
-                    }
-                ]
-            },
-
-            "NOTT-LZ-NETWORK-KEY": {
-                "name"                                             : "nott-lz-network",
-                "description"                                      : "Topic for network related notifications.",
-                "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
-
-                "subscriptions": [
-                    {
-                        "protocol"                                 : "EMAIL",
-                        "values"                                   : ["email.address@example.com"]
-                    }
-                ]
-            },
-
             "NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY": {
                 "name"                                             : "nott-lz-preprod-exacs",
                 "description"                                      : "Topic for Pre-Production ExaDB-D project notifications.",
@@ -802,19 +815,6 @@
                         "values"                                   : ["exacs-project-team@example.com"]
                     }
                 ]
-            },
-
-            "NOTT-LZ-SECURITY-KEY": {
-                "name"                                             : "nott-lz-security",
-                "description"                                      : "Topic for notifications.",
-                "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
-
-                "subscriptions": [
-                    {
-                        "protocol"                                 : "EMAIL",
-                        "values"                                   : ["email.address@example.com"]
-                    }
-                ]
             }
         }
     },
@@ -823,16 +823,16 @@
         "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
 
         "buckets": {
-            "BKT-LZ-SERVICE-CONNECTOR-KEY": {
-                "name"                                             : "bkt-lz-service-connector",
+            "BKT-FRA-LZ-SERVICE-CONNECTOR-KEY": {
+                "name"                                             : "bkt-fra-lz-service-connector",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "cis_level"                                        : "1"
             }
         },
 
         "service_connectors": {
-            "SCH-LZ-MONITOR-KEY": {
-                "display_name"                                     : "sch-lz-monitor",
+            "SCH-FRA-LZ-MONITOR-KEY": {
+                "display_name"                                     : "sch-fra-lz-monitor",
 
                 "policy": {
                     "name"                                         : "service-connector-audit-policy",
@@ -851,7 +851,7 @@
                 },
 
                 "target": {
-                    "bucket_name"                                  : "bkt-lz-service-connector",
+                    "bucket_name"                                  : "bkt-fra-lz-service-connector",
                     "bucket_object_name_prefix"                    : "sch",
                     "kind"                                         : "objectstorage"
                 }
