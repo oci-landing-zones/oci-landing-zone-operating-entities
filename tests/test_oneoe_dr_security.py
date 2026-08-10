@@ -60,15 +60,9 @@ class OneOeDrSecurityTests(unittest.TestCase):
             self.assertIn(text, content)
 
     def test_orm_buttons_include_vss_in_the_configuration_file_list(self) -> None:
-        rows = [
-            line
-            for line in (ADDON_DIR / "README.md").read_text(encoding="utf-8").splitlines()
-            if line.startswith("| CIS Level")
-        ]
-        self.assertEqual(2, len(rows))
-        for row in rows:
-            with self.subTest(row=row[:16]):
-                self.assertEqual(4, row.count('oneoe_bcdr_security.json"})'))
+        content = (ADDON_DIR / "README.md").read_text(encoding="utf-8")
+        self.assertIn("| CIS Level 1 | CIS Level 2 |", content)
+        self.assertEqual(8, content.count('oneoe_bcdr_security.json"})'))
 
 
 if __name__ == "__main__":
