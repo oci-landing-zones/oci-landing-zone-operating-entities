@@ -15,9 +15,9 @@
 
 ### 1. Overview
 
-This folder contains the One-OE-specific Disaster Recovery (DR) extension files for the published One-OE One-Stack Baseline.
+This folder contains the Disaster Recovery (DR) extension for the published One-OE One-Stack Baseline.
 
-The extension provisions the regional resources required to support cross-region Business Continuity and Disaster Recovery (BC/DR), while reusing the existing baseline resources that are managed from the tenancy’s home region and available across regions.
+The extension deploys the regional resources required in the DR Region to support cross-region Business Continuity and Disaster Recovery (BC/DR). It complements the existing One-OE baseline by reusing resources that are centrally managed from the tenancy’s Home Region and available across regions.
 
 &nbsp;
 
@@ -45,11 +45,11 @@ For a One-OE DR cross-region extension, the required deployable files are limite
 |:-|:-|:-|:-|
 | <img src="../../../blueprints/one-oe/design/images/oneoe_hub_a.png" width="300"> | <img src="../../../blueprints/one-oe/design/images/oneoe_hub_b.png" width="300"> | <img src="../../../blueprints/one-oe/design/images/oneoe_hub_c.png" width="300"> | <img src="../../../blueprints/one-oe/design/images/oneoe_hub_e.png" width="340"> |
 
-This is a multi-stack deployment: Step 0 deploys the One-OE baseline and Step 1 deploys the regional BCDR addon. Before deploying Step 1, configure the addon stack to consume the required outputs from the baseline stack by using the orchestrator's outputs and dependencies features described in the [OCI Resource Manager multi-stack deployment guide](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/dr/commons/content/orm_bp.md).
+This is a multi-stack deployment. Step 0 deploys the One-OE baseline stack in the Home Region. Step 1 deploys the regional BCDR add-on stack in the DR Region, using a separate stack hosted in the DR Region and a replicated Object Storage bucket. Before deploying Step 1, configure the addon stack to consume the required outputs from the baseline stack by using the orchestrator's outputs and dependencies features described in the [OCI Resource Manager multi-stack deployment guide](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/dr/commons/content/orm_bp.md).
 
-<img src="../images/orm_deployment_home_region.png" width="700" alt="OCI Resource Manager stack configured to use an Object Storage bucket for dependency files">
+<img src="../images/orm_deployment_home_region.png" width="700" alt=" Frankfurt OCI Resource Manager stack configured to use an Object Storage bucket to generate outtput dependencies files">
 
-*OCI Resource Manager configuration that uses an Object Storage bucket as the dependency source. Select the bucket and its dependency JSON file or files containing the baseline stack outputs consumed by the BCDR addon.*
+*In the above example OCI Resource Manager configuration uses an Object Storage bucket as the dependency source. Select the bucket and its dependency JSON file or files containing the baseline stack outputs consumed by the BCDR addon.*
 
 **Step 1. Deploy the One-OE DR Extension**
 
@@ -68,16 +68,19 @@ For a different region pair or DR topology, use the [OCI LZ Blueprint Factory](.
 > [!NOTE]
 > **CIS Level 2:** before deploying the AMS BCDR stack, replicate the Vault and the `KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY` key to Amsterdam. Provide the OCID of the AMS key replica through `kms_dependency.keys.KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY` so `bkt-ams-lz-service-connector` uses customer-managed encryption. See [Replicating Vaults and Keys](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/replicatingvaults.htm).
 
+<img src="../images/orm-deplymnet-dr_region.png" width="700" alt=" Amsterdam OCI Resource Manager stack configured to use an replicated Object Storage bucket for dependency files">
+
 When deploying with ORM, follow these steps:
 
-1. Select `eu-amsterdam-1` (Netherlands Northwest, Amsterdam) in the OCI Console, then accept terms and wait for the configuration to load.
-2. Set the working directory to `rms-facade`.
-3. Set the stack name you prefer.
-4. Set the terraform version to 1.5.x. Click Next.
-5. Accept the default files. Click Next. Optionally, replace with your reviewed JSON configuration files.
-6. Configure the stack dependencies so the BCDR addon consumes the required outputs from the baseline One-OE stack.
-7. Un-check run apply. Click Create.
-8. Run Plan and review the proposed regional network and observability changes before applying.
+1. Create the ORM DR stack in the DR Region and replicate the bucket containing the One-OE output files from the Home Region to the DR Region.
+2. Select `eu-amsterdam-1` (Netherlands Northwest, Amsterdam) in the OCI Console, then accept terms and wait for the configuration to load.
+3. Set the working directory to `rms-facade`.
+4. Set the stack name you prefer.
+5. Set the terraform version to 1.5.x. Click Next.
+6. Accept the default files. Click Next. Optionally, replace with your reviewed JSON configuration files.
+7. Configure the stack dependencies so the BCDR addon consumes the required outputs from the baseline One-OE 8tack.
+8. Un-check run apply. Click Create.
+9.  Run Plan and review the proposed regional network and observability changes before applying.
 
 **Step 1.1. Complete staged hub networking**
 
