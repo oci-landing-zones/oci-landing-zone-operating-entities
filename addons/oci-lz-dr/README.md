@@ -7,7 +7,7 @@
 
 [1. Overview](#1-overview)<br>
 [2. Deployment Guide](#2-deployment-guide)<br>
-[3. License](#3-license)<br>
+
 
 
 ## 1. Overview
@@ -56,7 +56,7 @@ To review best practices about BCDR, go [here](BCDR-best-practices.md).
 
 &nbsp;
 
-## 3. License
+# License
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 
