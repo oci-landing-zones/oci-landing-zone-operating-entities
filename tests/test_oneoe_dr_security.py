@@ -63,6 +63,7 @@ class OneOeDrSecurityTests(unittest.TestCase):
         content = (ADDON_DIR / "README.md").read_text(encoding="utf-8")
         self.assertIn("| CIS Level 1 | CIS Level 2 |", content)
         self.assertEqual(8, content.count('oneoe_bcdr_security.json"})'))
+        self.assertIn("\n| | **Note — CIS Level 2:**", content)
 
 
 if __name__ == "__main__":
