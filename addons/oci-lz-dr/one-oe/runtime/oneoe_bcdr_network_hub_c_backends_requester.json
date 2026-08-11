@@ -1,362 +1,362 @@
 {
     "network_configuration": {
-        "default_compartment_id"                                                     : "CMP-LZ-NETWORK-KEY",
-        "default_enable_cis_checks"                                                  : false,
+        "default_compartment_id"                                                 : "CMP-LZ-NETWORK-KEY",
+        "default_enable_cis_checks"                                              : false,
 
         "network_configuration_categories": {
             "0-shared": {
-                "category_compartment_id"                                            : "CMP-LZ-NETWORK-KEY",
+                "category_compartment_id"                                        : "CMP-LZ-NETWORK-KEY",
 
                 "vcns": {
                     "VCN-AMS-LZ-HUB-KEY": {
-                        "display_name"                                               : "vcn-ams-lz-hub",
-                        "cidr_blocks"                                                : ["10.0.192.0/21"],
-                        "dns_label"                                                  : "vcnamslzhub",
-                        "block_nat_traffic"                                          : false,
-                        "is_attach_drg"                                              : false,
-                        "is_create_igw"                                              : false,
-                        "is_ipv6enabled"                                             : false,
-                        "is_oracle_gua_allocation_enabled"                           : false,
+                        "display_name"                                           : "vcn-ams-lz-hub",
+                        "cidr_blocks"                                            : ["10.0.192.0/21"],
+                        "dns_label"                                              : "vcnamslzhub",
+                        "block_nat_traffic"                                      : false,
+                        "is_attach_drg"                                          : false,
+                        "is_create_igw"                                          : false,
+                        "is_ipv6enabled"                                         : false,
+                        "is_oracle_gua_allocation_enabled"                       : false,
 
                         "subnets": {
                             "SN-AMS-LZ-HUB-UNTRUST-KEY": {
-                                "display_name"                                       : "sn-ams-lz-hub-untrust",
-                                "cidr_block"                                         : "10.0.192.0/24",
-                                "dns_label"                                          : "snamshubuntrust",
-                                "dhcp_options_key"                                   : "default_dhcp_options",
-                                "prohibit_internet_ingress"                          : false,
-                                "prohibit_public_ip_on_vnic"                         : false,
-                                "route_table_key"                                    : "RT-AMS-LZ-HUB-UNTRUST-KEY",
-                                "security_list_keys"                                 : ["SL-AMS-LZ-HUB-UNTRUST-KEY"]
+                                "display_name"                                   : "sn-ams-lz-hub-untrust",
+                                "cidr_block"                                     : "10.0.192.0/24",
+                                "dns_label"                                      : "snamshubuntrust",
+                                "dhcp_options_key"                               : "default_dhcp_options",
+                                "prohibit_internet_ingress"                      : false,
+                                "prohibit_public_ip_on_vnic"                     : false,
+                                "route_table_key"                                : "RT-AMS-LZ-HUB-UNTRUST-KEY",
+                                "security_list_keys"                             : ["SL-AMS-LZ-HUB-UNTRUST-KEY"]
                             },
 
                             "SN-AMS-LZ-HUB-TRUST-KEY": {
-                                "display_name"                                       : "sn-ams-lz-hub-trust",
-                                "cidr_block"                                         : "10.0.193.0/24",
-                                "dns_label"                                          : "snamshubtrust",
-                                "dhcp_options_key"                                   : "default_dhcp_options",
-                                "prohibit_internet_ingress"                          : true,
-                                "prohibit_public_ip_on_vnic"                         : true,
-                                "route_table_key"                                    : "RT-AMS-LZ-HUB-TRUST-KEY",
-                                "security_list_keys"                                 : ["SL-AMS-LZ-HUB-TRUST-KEY"]
+                                "display_name"                                   : "sn-ams-lz-hub-trust",
+                                "cidr_block"                                     : "10.0.193.0/24",
+                                "dns_label"                                      : "snamshubtrust",
+                                "dhcp_options_key"                               : "default_dhcp_options",
+                                "prohibit_internet_ingress"                      : true,
+                                "prohibit_public_ip_on_vnic"                     : true,
+                                "route_table_key"                                : "RT-AMS-LZ-HUB-TRUST-KEY",
+                                "security_list_keys"                             : ["SL-AMS-LZ-HUB-TRUST-KEY"]
                             },
 
                             "SN-AMS-LZ-HUB-LB-KEY": {
-                                "display_name"                                       : "sn-ams-lz-hub-lb",
-                                "cidr_block"                                         : "10.0.194.0/24",
-                                "dns_label"                                          : "snamshublb",
-                                "dhcp_options_key"                                   : "default_dhcp_options",
-                                "prohibit_internet_ingress"                          : false,
-                                "prohibit_public_ip_on_vnic"                         : false,
-                                "route_table_key"                                    : "RT-AMS-LZ-HUB-LB-KEY",
-                                "security_list_keys"                                 : ["SL-AMS-LZ-HUB-LB-KEY"]
+                                "display_name"                                   : "sn-ams-lz-hub-lb",
+                                "cidr_block"                                     : "10.0.194.0/24",
+                                "dns_label"                                      : "snamshublb",
+                                "dhcp_options_key"                               : "default_dhcp_options",
+                                "prohibit_internet_ingress"                      : false,
+                                "prohibit_public_ip_on_vnic"                     : false,
+                                "route_table_key"                                : "RT-AMS-LZ-HUB-LB-KEY",
+                                "security_list_keys"                             : ["SL-AMS-LZ-HUB-LB-KEY"]
                             },
 
                             "SN-AMS-LZ-HUB-MGMT-KEY": {
-                                "display_name"                                       : "sn-ams-lz-hub-mgmt",
-                                "cidr_block"                                         : "10.0.195.0/24",
-                                "dns_label"                                          : "snamshubmgmt",
-                                "dhcp_options_key"                                   : "default_dhcp_options",
-                                "prohibit_internet_ingress"                          : true,
-                                "prohibit_public_ip_on_vnic"                         : true,
-                                "route_table_key"                                    : "RT-AMS-LZ-HUB-MGMT-KEY",
-                                "security_list_keys"                                 : ["SL-AMS-LZ-HUB-MGMT-KEY"]
+                                "display_name"                                   : "sn-ams-lz-hub-mgmt",
+                                "cidr_block"                                     : "10.0.195.0/24",
+                                "dns_label"                                      : "snamshubmgmt",
+                                "dhcp_options_key"                               : "default_dhcp_options",
+                                "prohibit_internet_ingress"                      : true,
+                                "prohibit_public_ip_on_vnic"                     : true,
+                                "route_table_key"                                : "RT-AMS-LZ-HUB-MGMT-KEY",
+                                "security_list_keys"                             : ["SL-AMS-LZ-HUB-MGMT-KEY"]
                             },
 
                             "SN-AMS-LZ-HUB-MON-KEY": {
-                                "display_name"                                       : "sn-ams-lz-hub-mon",
-                                "cidr_block"                                         : "10.0.196.0/24",
-                                "dns_label"                                          : "snamshubmon",
-                                "dhcp_options_key"                                   : "default_dhcp_options",
-                                "prohibit_internet_ingress"                          : true,
-                                "prohibit_public_ip_on_vnic"                         : true,
-                                "route_table_key"                                    : "RT-AMS-LZ-HUB-MGMT-KEY",
-                                "security_list_keys"                                 : ["SL-AMS-LZ-HUB-MGMT-KEY"]
+                                "display_name"                                   : "sn-ams-lz-hub-mon",
+                                "cidr_block"                                     : "10.0.196.0/24",
+                                "dns_label"                                      : "snamshubmon",
+                                "dhcp_options_key"                               : "default_dhcp_options",
+                                "prohibit_internet_ingress"                      : true,
+                                "prohibit_public_ip_on_vnic"                     : true,
+                                "route_table_key"                                : "RT-AMS-LZ-HUB-MGMT-KEY",
+                                "security_list_keys"                             : ["SL-AMS-LZ-HUB-MGMT-KEY"]
                             },
 
                             "SN-AMS-LZ-HUB-DNS-KEY": {
-                                "display_name"                                       : "sn-ams-lz-hub-dns",
-                                "cidr_block"                                         : "10.0.197.0/24",
-                                "dns_label"                                          : "snamshubdns",
-                                "dhcp_options_key"                                   : "default_dhcp_options",
-                                "prohibit_internet_ingress"                          : true,
-                                "prohibit_public_ip_on_vnic"                         : true,
-                                "route_table_key"                                    : "RT-AMS-LZ-HUB-MGMT-KEY",
-                                "security_list_keys"                                 : ["SL-AMS-LZ-HUB-MGMT-KEY"]
+                                "display_name"                                   : "sn-ams-lz-hub-dns",
+                                "cidr_block"                                     : "10.0.197.0/24",
+                                "dns_label"                                      : "snamshubdns",
+                                "dhcp_options_key"                               : "default_dhcp_options",
+                                "prohibit_internet_ingress"                      : true,
+                                "prohibit_public_ip_on_vnic"                     : true,
+                                "route_table_key"                                : "RT-AMS-LZ-HUB-MGMT-KEY",
+                                "security_list_keys"                             : ["SL-AMS-LZ-HUB-MGMT-KEY"]
                             }
                         },
 
                         "route_tables": {
                             "RT-AMS-LZ-HUB-IGW-KEY": {
-                                "display_name"                                       : "rt-ams-lz-hub-igw",
+                                "display_name"                                   : "rt-ams-lz-hub-igw",
 
                                 "route_rules": {
                                     "rr-ams-igw-ingress": {
-                                        "description"                                : "Route to Public LoadBalancer's subnet through Untrust NLB and Firewalls",
-                                        "destination"                                : "10.0.194.0/24",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_id"                          : "UNTRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljtgvl..."
+                                        "description"                            : "Route to Public LoadBalancer's subnet through Untrust NLB and Firewalls",
+                                        "destination"                            : "10.0.194.0/24",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_id"                      : "UNTRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljtgvl..."
                                     }
                                 }
                             },
 
                             "RT-AMS-LZ-HUB-INGRESS-KEY": {
-                                "display_name"                                       : "rt-ams-lz-hub-ingress",
+                                "display_name"                                   : "rt-ams-lz-hub-ingress",
 
                                 "route_rules": {
                                     "rr-ams-internet": {
-                                        "description"                                : "Route to the Internet through Trust NLB and Firewalls",
-                                        "destination"                                : "0.0.0.0/0",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_id"                          : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
+                                        "description"                            : "Route to the Internet through Trust NLB and Firewalls",
+                                        "destination"                            : "0.0.0.0/0",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_id"                      : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
                                     },
 
                                     "rr-ams-prod-projects": {
-                                        "description"                                : "Route to VCN Prod Projects through Trust NLB and Firewalls",
-                                        "destination"                                : "10.0.200.0/21",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_id"                          : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
+                                        "description"                            : "Route to VCN Prod Projects through Trust NLB and Firewalls",
+                                        "destination"                            : "10.0.200.0/21",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_id"                      : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
                                     }
                                 }
                             },
 
                             "RT-AMS-LZ-HUB-LB-KEY": {
-                                "display_name"                                       : "rt-ams-lz-hub-lb",
+                                "display_name"                                   : "rt-ams-lz-hub-lb",
 
                                 "route_rules": {
                                     "rr-ams-internet": {
-                                        "description"                                : "Route to the Internet through Untrust NLB and Firewalls",
-                                        "destination"                                : "0.0.0.0/0",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_id"                          : "UNTRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljtgvl..."
+                                        "description"                            : "Route to the Internet through Untrust NLB and Firewalls",
+                                        "destination"                            : "0.0.0.0/0",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_id"                      : "UNTRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljtgvl..."
                                     },
 
                                     "rr-ams-prod-projects": {
-                                        "description"                                : "Route to VCN Prod Projects through DRG",
-                                        "destination"                                : "10.0.200.0/21",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_key"                         : "DRG-AMS-LZ-HUB-KEY"
+                                        "description"                            : "Route to VCN Prod Projects through DRG",
+                                        "destination"                            : "10.0.200.0/21",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_key"                     : "DRG-AMS-LZ-HUB-KEY"
                                     }
                                 }
                             },
 
                             "RT-AMS-LZ-HUB-MGMT-KEY": {
-                                "display_name"                                       : "rt-ams-lz-hub-mgmt",
+                                "display_name"                                   : "rt-ams-lz-hub-mgmt",
 
                                 "route_rules": {
                                     "rr-ams-internet": {
-                                        "description"                                : "Route to the Internet through Trust NLB and Firewalls",
-                                        "destination"                                : "0.0.0.0/0",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_id"                          : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
+                                        "description"                            : "Route to the Internet through Trust NLB and Firewalls",
+                                        "destination"                            : "0.0.0.0/0",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_id"                      : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
                                     },
 
                                     "rr-ams-prod-projects": {
-                                        "description"                                : "Route to VCN Prod Projects through DRG",
-                                        "destination"                                : "10.0.200.0/21",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_key"                         : "DRG-AMS-LZ-HUB-KEY"
+                                        "description"                            : "Route to VCN Prod Projects through DRG",
+                                        "destination"                            : "10.0.200.0/21",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_key"                     : "DRG-AMS-LZ-HUB-KEY"
                                     },
 
                                     "rr-ams-sgw": {
-                                        "description"                                : "Route to Oracle Services Network through Service GW",
-                                        "destination"                                : "all-services",
-                                        "destination_type"                           : "SERVICE_CIDR_BLOCK",
-                                        "network_entity_key"                         : "SGW-AMS-LZ-HUB-KEY"
+                                        "description"                            : "Route to Oracle Services Network through Service GW",
+                                        "destination"                            : "all-services",
+                                        "destination_type"                       : "SERVICE_CIDR_BLOCK",
+                                        "network_entity_key"                     : "SGW-AMS-LZ-HUB-KEY"
                                     }
                                 }
                             },
 
                             "RT-AMS-LZ-HUB-TRUST-KEY": {
-                                "display_name"                                       : "rt-ams-lz-hub-trust",
+                                "display_name"                                   : "rt-ams-lz-hub-trust",
 
                                 "route_rules": {
                                     "rr-ams-prod-projects": {
-                                        "description"                                : "Route to VCN Prod Projects through DRG",
-                                        "destination"                                : "10.0.200.0/21",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_key"                         : "DRG-AMS-LZ-HUB-KEY"
+                                        "description"                            : "Route to VCN Prod Projects through DRG",
+                                        "destination"                            : "10.0.200.0/21",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_key"                     : "DRG-AMS-LZ-HUB-KEY"
                                     },
 
-                                    "rr-ams-rpc-region-a-1": {
-                                        "description"                                : "Route to Frankfurt CIDR 10.0.0.0/16 through DRG",
-                                        "destination"                                : "10.0.0.0/16",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_key"                         : "DRG-AMS-LZ-HUB-KEY"
+                                    "rr-ams-rpc-home-1": {
+                                        "description"                            : "Route to Frankfurt CIDR 10.0.0.0/16 through DRG",
+                                        "destination"                            : "10.0.0.0/16",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_key"                     : "DRG-AMS-LZ-HUB-KEY"
                                     }
                                 }
                             },
 
                             "RT-AMS-LZ-HUB-UNTRUST-KEY": {
-                                "display_name"                                       : "rt-ams-lz-hub-untrust",
+                                "display_name"                                   : "rt-ams-lz-hub-untrust",
 
                                 "route_rules": {
                                     "rr-ams-igw": {
-                                        "description"                                : "Route to the Internet through Internet GW",
-                                        "destination"                                : "0.0.0.0/0",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_key"                         : "IGW-AMS-LZ-HUB-KEY"
+                                        "description"                            : "Route to the Internet through Internet GW",
+                                        "destination"                            : "0.0.0.0/0",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_key"                     : "IGW-AMS-LZ-HUB-KEY"
                                     }
                                 }
                             }
                         },
 
                         "default_security_list": {
-                            "ingress_rules"                                          : [],
-                            "egress_rules"                                           : []
+                            "ingress_rules"                                      : [],
+                            "egress_rules"                                       : []
                         },
 
                         "security_lists": {
                             "SL-AMS-LZ-HUB-LB-KEY": {
-                                "display_name"                                       : "sl-ams-lz-hub-lb",
-                                "egress_rules"                                       : [],
+                                "display_name"                                   : "sl-ams-lz-hub-lb",
+                                "egress_rules"                                   : [],
 
                                 "ingress_rules": [
                                     {
-                                        "description"                                : "ICMP type 3 code 4",
-                                        "src"                                        : "0.0.0.0/0",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 3,
-                                        "icmp_code"                                  : 4,
-                                        "stateless"                                  : false
+                                        "description"                            : "ICMP type 3 code 4",
+                                        "src"                                    : "0.0.0.0/0",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 3,
+                                        "icmp_code"                              : 4,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "ICMP type 3",
-                                        "src"                                        : "10.0.192.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 3,
-                                        "stateless"                                  : false
+                                        "description"                            : "ICMP type 3",
+                                        "src"                                    : "10.0.192.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 3,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "Allow inbound ICMP type 8 (Echo)",
-                                        "src"                                        : "10.0.192.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 8,
-                                        "icmp_code"                                  : 0,
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound ICMP type 8 (Echo)",
+                                        "src"                                    : "10.0.192.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 8,
+                                        "icmp_code"                              : 0,
+                                        "stateless"                              : false
                                     }
                                 ]
                             },
 
                             "SL-AMS-LZ-HUB-MGMT-KEY": {
-                                "display_name"                                       : "sl-ams-lz-hub-mgmt",
+                                "display_name"                                   : "sl-ams-lz-hub-mgmt",
 
                                 "ingress_rules": [
                                     {
-                                        "description"                                : "ICMP type 3 code 4",
-                                        "src"                                        : "0.0.0.0/0",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 3,
-                                        "icmp_code"                                  : 4,
-                                        "stateless"                                  : false
+                                        "description"                            : "ICMP type 3 code 4",
+                                        "src"                                    : "0.0.0.0/0",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 3,
+                                        "icmp_code"                              : 4,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "ICMP type 3",
-                                        "src"                                        : "10.0.192.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 3,
-                                        "stateless"                                  : false
+                                        "description"                            : "ICMP type 3",
+                                        "src"                                    : "10.0.192.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 3,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "Allow inbound ICMP type 8 (Echo)",
-                                        "src"                                        : "10.0.192.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 8,
-                                        "icmp_code"                                  : 0,
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound ICMP type 8 (Echo)",
+                                        "src"                                    : "10.0.192.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 8,
+                                        "icmp_code"                              : 0,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "EXAMPLE: Allow inbound traffic from the Bastion Service private endpoint IP address",
-                                        "src"                                        : "10.0.195.123/32",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 22,
-                                        "dst_port_max"                               : 22,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "EXAMPLE: Allow inbound traffic from the Bastion Service private endpoint IP address",
+                                        "src"                                    : "10.0.195.123/32",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 22,
+                                        "dst_port_max"                           : 22,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 ],
 
                                 "egress_rules": [
                                     {
-                                        "description"                                : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
-                                        "dst"                                        : "0.0.0.0/0",
-                                        "dst_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ALL",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                                    : "0.0.0.0/0",
+                                        "dst_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ALL",
+                                        "stateless"                              : false
                                     }
                                 ]
                             },
 
                             "SL-AMS-LZ-HUB-TRUST-KEY": {
-                                "display_name"                                       : "sl-ams-lz-hub-trust",
-                                "egress_rules"                                       : [],
+                                "display_name"                                   : "sl-ams-lz-hub-trust",
+                                "egress_rules"                                   : [],
 
                                 "ingress_rules": [
                                     {
-                                        "description"                                : "ICMP type 3 code 4",
-                                        "src"                                        : "0.0.0.0/0",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 3,
-                                        "icmp_code"                                  : 4,
-                                        "stateless"                                  : false
+                                        "description"                            : "ICMP type 3 code 4",
+                                        "src"                                    : "0.0.0.0/0",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 3,
+                                        "icmp_code"                              : 4,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "ICMP type 3",
-                                        "src"                                        : "10.0.192.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 3,
-                                        "stateless"                                  : false
+                                        "description"                            : "ICMP type 3",
+                                        "src"                                    : "10.0.192.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 3,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "Allow inbound ICMP type 8 (Echo)",
-                                        "src"                                        : "10.0.192.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 8,
-                                        "icmp_code"                                  : 0,
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound ICMP type 8 (Echo)",
+                                        "src"                                    : "10.0.192.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 8,
+                                        "icmp_code"                              : 0,
+                                        "stateless"                              : false
                                     }
                                 ]
                             },
 
                             "SL-AMS-LZ-HUB-UNTRUST-KEY": {
-                                "display_name"                                       : "sl-ams-lz-hub-untrust",
-                                "egress_rules"                                       : [],
+                                "display_name"                                   : "sl-ams-lz-hub-untrust",
+                                "egress_rules"                                   : [],
 
                                 "ingress_rules": [
                                     {
-                                        "description"                                : "ICMP type 3 code 4",
-                                        "src"                                        : "0.0.0.0/0",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 3,
-                                        "icmp_code"                                  : 4,
-                                        "stateless"                                  : false
+                                        "description"                            : "ICMP type 3 code 4",
+                                        "src"                                    : "0.0.0.0/0",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 3,
+                                        "icmp_code"                              : 4,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "ICMP type 3",
-                                        "src"                                        : "10.0.192.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 3,
-                                        "stateless"                                  : false
+                                        "description"                            : "ICMP type 3",
+                                        "src"                                    : "10.0.192.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 3,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "Allow inbound ICMP type 8 (Echo)",
-                                        "src"                                        : "10.0.192.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 8,
-                                        "icmp_code"                                  : 0,
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound ICMP type 8 (Echo)",
+                                        "src"                                    : "10.0.192.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 8,
+                                        "icmp_code"                              : 0,
+                                        "stateless"                              : false
                                     }
                                 ]
                             }
@@ -364,199 +364,199 @@
 
                         "network_security_groups": {
                             "NSG-AMS-LZ-HUB-LB-KEY": {
-                                "display_name"                                       : "nsg-ams-lz-hub-lb",
+                                "display_name"                                   : "nsg-ams-lz-hub-lb",
 
                                 "ingress_rules": {
                                     "http_80": {
-                                        "description"                                : "Allow inbound traffic from Hub Untrust subnet over HTTP",
-                                        "src"                                        : "10.0.192.0/24",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 80,
-                                        "dst_port_max"                               : 80,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound traffic from Hub Untrust subnet over HTTP",
+                                        "src"                                    : "10.0.192.0/24",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 80,
+                                        "dst_port_max"                           : 80,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     },
 
                                     "https_443": {
-                                        "description"                                : "Allow inbound traffic from Hub Untrust subnet over HTTPS",
-                                        "src"                                        : "10.0.192.0/24",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 443,
-                                        "dst_port_max"                               : 443,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound traffic from Hub Untrust subnet over HTTPS",
+                                        "src"                                    : "10.0.192.0/24",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 443,
+                                        "dst_port_max"                           : 443,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                                : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
-                                        "dst"                                        : "0.0.0.0/0",
-                                        "dst_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "dst"                                    : "0.0.0.0/0",
+                                        "dst_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 }
                             },
 
                             "NSG-AMS-LZ-HUB-TRUST-FW-KEY": {
-                                "display_name"                                       : "nsg-ams-lz-hub-trust-fw",
+                                "display_name"                                   : "nsg-ams-lz-hub-trust-fw",
 
                                 "ingress_rules": {
                                     "from_trust_nlb_http": {
-                                        "description"                                : "Allow inbound from NSG nsg-ams-lz-hub-trust-nlb over HTTP",
-                                        "src"                                        : "NSG-AMS-LZ-HUB-TRUST-NLB-KEY",
-                                        "src_type"                                   : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                               : 80,
-                                        "dst_port_max"                               : 80,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound from NSG nsg-ams-lz-hub-trust-nlb over HTTP",
+                                        "src"                                    : "NSG-AMS-LZ-HUB-TRUST-NLB-KEY",
+                                        "src_type"                               : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_min"                           : 80,
+                                        "dst_port_max"                           : 80,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     },
 
                                     "from_trust_nlb_https": {
-                                        "description"                                : "Allow inbound from NSG nsg-ams-lz-hub-trust-nlb over HTTPS",
-                                        "src"                                        : "NSG-AMS-LZ-HUB-TRUST-NLB-KEY",
-                                        "src_type"                                   : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                               : 443,
-                                        "dst_port_max"                               : 443,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound from NSG nsg-ams-lz-hub-trust-nlb over HTTPS",
+                                        "src"                                    : "NSG-AMS-LZ-HUB-TRUST-NLB-KEY",
+                                        "src_type"                               : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_min"                           : 443,
+                                        "dst_port_max"                           : 443,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     },
 
                                     "from_trust_nlb_icmp": {
-                                        "description"                                : "Allow ICMP type 8 (Echo) from NSG nsg-ams-lz-hub-trust-nlb",
-                                        "src"                                        : "NSG-AMS-LZ-HUB-TRUST-NLB-KEY",
-                                        "src_type"                                   : "NETWORK_SECURITY_GROUP",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 8,
-                                        "icmp_code"                                  : 0,
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow ICMP type 8 (Echo) from NSG nsg-ams-lz-hub-trust-nlb",
+                                        "src"                                    : "NSG-AMS-LZ-HUB-TRUST-NLB-KEY",
+                                        "src_type"                               : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 8,
+                                        "icmp_code"                              : 0,
+                                        "stateless"                              : false
                                     },
 
                                     "from_trust_nlb_ssh": {
-                                        "description"                                : "Allow inbound from NSG nsg-ams-lz-hub-trust-nlb over SSH",
-                                        "src"                                        : "NSG-AMS-LZ-HUB-TRUST-NLB-KEY",
-                                        "src_type"                                   : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                               : 22,
-                                        "dst_port_max"                               : 22,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound from NSG nsg-ams-lz-hub-trust-nlb over SSH",
+                                        "src"                                    : "NSG-AMS-LZ-HUB-TRUST-NLB-KEY",
+                                        "src_type"                               : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_min"                           : 22,
+                                        "dst_port_max"                           : 22,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                                : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
-                                        "dst"                                        : "0.0.0.0/0",
-                                        "dst_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ALL",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                                    : "0.0.0.0/0",
+                                        "dst_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ALL",
+                                        "stateless"                              : false
                                     }
                                 }
                             },
 
                             "NSG-AMS-LZ-HUB-TRUST-NLB-KEY": {
-                                "display_name"                                       : "nsg-ams-lz-hub-trust-nlb",
+                                "display_name"                                   : "nsg-ams-lz-hub-trust-nlb",
 
                                 "ingress_rules": {
                                     "from_prod_http": {
-                                        "description"                                : "Allow inbound traffic from Prod VCN over HTTP",
-                                        "src"                                        : "10.0.200.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 80,
-                                        "dst_port_max"                               : 80,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound traffic from Prod VCN over HTTP",
+                                        "src"                                    : "10.0.200.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 80,
+                                        "dst_port_max"                           : 80,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     },
 
                                     "from_prod_https": {
-                                        "description"                                : "Allow inbound traffic from Prod VCN over HTTPS",
-                                        "src"                                        : "10.0.200.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 443,
-                                        "dst_port_max"                               : 443,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound traffic from Prod VCN over HTTPS",
+                                        "src"                                    : "10.0.200.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 443,
+                                        "dst_port_max"                           : 443,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     },
 
                                     "from_prod_icmp": {
-                                        "description"                                : "Allow ICMP type 8 (Echo) from Prod VCN",
-                                        "src"                                        : "10.0.200.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 8,
-                                        "icmp_code"                                  : 0,
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow ICMP type 8 (Echo) from Prod VCN",
+                                        "src"                                    : "10.0.200.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 8,
+                                        "icmp_code"                              : 0,
+                                        "stateless"                              : false
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                                : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
-                                        "dst"                                        : "0.0.0.0/0",
-                                        "dst_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ALL",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                                    : "0.0.0.0/0",
+                                        "dst_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ALL",
+                                        "stateless"                              : false
                                     }
                                 }
                             },
 
                             "NSG-AMS-LZ-HUB-UNTRUST-FW-KEY": {
-                                "display_name"                                       : "nsg-ams-lz-hub-untrust-fw",
+                                "display_name"                                   : "nsg-ams-lz-hub-untrust-fw",
 
                                 "ingress_rules": {
                                     "from_untrust_nlb": {
-                                        "description"                                : "Allow inbound from NSG nsg-ams-lz-hub-untrust-nlb over TCP ALL",
-                                        "src"                                        : "NSG-AMS-LZ-HUB-UNTRUST-NLB-KEY",
-                                        "src_type"                                   : "NETWORK_SECURITY_GROUP",
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound from NSG nsg-ams-lz-hub-untrust-nlb over TCP ALL",
+                                        "src"                                    : "NSG-AMS-LZ-HUB-UNTRUST-NLB-KEY",
+                                        "src_type"                               : "NETWORK_SECURITY_GROUP",
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                                : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
-                                        "dst"                                        : "0.0.0.0/0",
-                                        "dst_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ALL",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                                    : "0.0.0.0/0",
+                                        "dst_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ALL",
+                                        "stateless"                              : false
                                     }
                                 }
                             },
 
                             "NSG-AMS-LZ-HUB-UNTRUST-NLB-KEY": {
-                                "display_name"                                       : "nsg-ams-lz-hub-untrust-nlb",
+                                "display_name"                                   : "nsg-ams-lz-hub-untrust-nlb",
 
                                 "ingress_rules": {
                                     "http_80": {
-                                        "description"                                : "Allow inbound traffic from 0.0.0.0/0 over HTTP",
-                                        "src"                                        : "0.0.0.0/0",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 80,
-                                        "dst_port_max"                               : 80,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound traffic from 0.0.0.0/0 over HTTP",
+                                        "src"                                    : "0.0.0.0/0",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 80,
+                                        "dst_port_max"                           : 80,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     },
 
                                     "https_443": {
-                                        "description"                                : "Allow inbound traffic from 0.0.0.0/0 over HTTPS",
-                                        "src"                                        : "0.0.0.0/0",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 443,
-                                        "dst_port_max"                               : 443,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound traffic from 0.0.0.0/0 over HTTPS",
+                                        "src"                                    : "0.0.0.0/0",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 443,
+                                        "dst_port_max"                           : 443,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                                : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
-                                        "dst"                                        : "0.0.0.0/0",
-                                        "dst_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ALL",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "dst"                                    : "0.0.0.0/0",
+                                        "dst_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ALL",
+                                        "stateless"                              : false
                                     }
                                 }
                             }
@@ -565,15 +565,15 @@
                         "vcn_specific_gateways": {
                             "internet_gateways": {
                                 "IGW-AMS-LZ-HUB-KEY": {
-                                    "display_name"                                   : "igw-ams-lz-hub",
-                                    "route_table_key"                                : "RT-AMS-LZ-HUB-IGW-KEY"
+                                    "display_name"                               : "igw-ams-lz-hub",
+                                    "route_table_key"                            : "RT-AMS-LZ-HUB-IGW-KEY"
                                 }
                             },
 
                             "service_gateways": {
                                 "SGW-AMS-LZ-HUB-KEY": {
-                                    "display_name"                                   : "sgw-ams-lz-hub",
-                                    "services"                                       : "all-services"
+                                    "display_name"                               : "sgw-ams-lz-hub",
+                                    "services"                                   : "all-services"
                                 }
                             }
                         }
@@ -583,119 +583,119 @@
                 "non_vcn_specific_gateways": {
                     "dynamic_routing_gateways": {
                         "DRG-AMS-LZ-HUB-KEY": {
-                            "display_name"                                           : "drg-ams-lz-hub",
+                            "display_name"                                       : "drg-ams-lz-hub",
 
                             "drg_attachments": {
-                                "DRGATT-AMS-LZ-HUB-RPC-REGION-A-KEY": {
-                                    "display_name"                                   : "drgatt-ams-lz-hub-rpc-region-a",
-                                    "drg_route_table_key"                            : "DRGRT-AMS-LZ-RPC-REGION-A-KEY",
+                                "DRGATT-AMS-LZ-HUB-RPC-HOME-KEY": {
+                                    "display_name"                               : "drgatt-ams-lz-hub-rpc-home",
+                                    "drg_route_table_key"                        : "DRGRT-AMS-LZ-RPC-HOME-KEY",
 
                                     "network_details": {
-                                        "type"                                       : "REMOTE_PEERING_CONNECTION",
-                                        "attached_resource_key"                      : "RPC-AMS-LZ-HUB-REGION-A-KEY"
+                                        "type"                                   : "REMOTE_PEERING_CONNECTION",
+                                        "attached_resource_key"                  : "RPC-AMS-LZ-HUB-HOME-KEY"
                                     }
                                 },
 
                                 "DRGATT-AMS-LZ-HUB-VCN-KEY": {
-                                    "display_name"                                   : "drgatt-ams-lz-hub",
-                                    "drg_route_table_key"                            : "DRGRT-AMS-LZ-HUB-KEY",
+                                    "display_name"                               : "drgatt-ams-lz-hub",
+                                    "drg_route_table_key"                        : "DRGRT-AMS-LZ-HUB-KEY",
 
                                     "network_details": {
-                                        "type"                                       : "VCN",
-                                        "attached_resource_key"                      : "VCN-AMS-LZ-HUB-KEY",
-                                        "route_table_key"                            : "RT-AMS-LZ-HUB-INGRESS-KEY"
+                                        "type"                                   : "VCN",
+                                        "attached_resource_key"                  : "VCN-AMS-LZ-HUB-KEY",
+                                        "route_table_key"                        : "RT-AMS-LZ-HUB-INGRESS-KEY"
                                     }
                                 },
 
                                 "DRGATT-AMS-LZ-PROD-PROJ-KEY": {
-                                    "display_name"                                   : "drgatt-ams-lz-prod-proj",
-                                    "drg_route_table_key"                            : "DRGRT-AMS-LZ-SPOKES-KEY",
+                                    "display_name"                               : "drgatt-ams-lz-prod-proj",
+                                    "drg_route_table_key"                        : "DRGRT-AMS-LZ-SPOKES-KEY",
 
                                     "network_details": {
-                                        "type"                                       : "VCN",
-                                        "attached_resource_key"                      : "VCN-AMS-LZ-PROD-PROJECTS-KEY"
+                                        "type"                                   : "VCN",
+                                        "attached_resource_key"                  : "VCN-AMS-LZ-PROD-PROJECTS-KEY"
                                     }
                                 }
                             },
 
                             "drg_route_distributions": {
                                 "DRGRD-AMS-LZ-HUB-KEY": {
-                                    "display_name"                                   : "drgrd-ams-lz-hub",
-                                    "distribution_type"                              : "IMPORT",
+                                    "display_name"                               : "drgrd-ams-lz-hub",
+                                    "distribution_type"                          : "IMPORT",
 
                                     "statements": {
                                         "ROUTE-TO-VCN-PROD-KEY": {
-                                            "action"                                 : "ACCEPT",
-                                            "priority"                               : 10,
+                                            "action"                             : "ACCEPT",
+                                            "priority"                           : 10,
 
                                             "match_criteria": {
-                                                "match_type"                         : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"                    : "VCN",
-                                                "drg_attachment_key"                 : "DRGATT-AMS-LZ-PROD-PROJ-KEY"
+                                                "match_type"                     : "DRG_ATTACHMENT_ID",
+                                                "attachment_type"                : "VCN",
+                                                "drg_attachment_key"             : "DRGATT-AMS-LZ-PROD-PROJ-KEY"
                                             }
                                         },
 
-                                        "ROUTE-TO-RPC-LZ-REGION-A-KEY": {
-                                            "action"                                 : "ACCEPT",
-                                            "priority"                               : 20,
+                                        "ROUTE-TO-RPC-LZ-HOME-KEY": {
+                                            "action"                             : "ACCEPT",
+                                            "priority"                           : 20,
 
                                             "match_criteria": {
-                                                "match_type"                         : "DRG_ATTACHMENT_TYPE",
-                                                "attachment_type"                    : "REMOTE_PEERING_CONNECTION",
-                                                "drg_attachment_key"                 : "DRGATT-AMS-LZ-HUB-RPC-REGION-A-KEY"
+                                                "match_type"                     : "DRG_ATTACHMENT_TYPE",
+                                                "attachment_type"                : "REMOTE_PEERING_CONNECTION",
+                                                "drg_attachment_key"             : "DRGATT-AMS-LZ-HUB-RPC-HOME-KEY"
                                             }
                                         }
                                     }
                                 },
 
-                                "DRGRD-AMS-LZ-RPC-REGION-A-KEY": {
-                                    "display_name"                                   : "drgrd-ams-lz-rpc-region-a",
-                                    "distribution_type"                              : "IMPORT",
-                                    "statements"                                     : {}
+                                "DRGRD-AMS-LZ-RPC-HOME-KEY": {
+                                    "display_name"                               : "drgrd-ams-lz-rpc-home",
+                                    "distribution_type"                          : "IMPORT",
+                                    "statements"                                 : {}
                                 }
                             },
 
                             "drg_route_tables": {
                                 "DRGRT-AMS-LZ-HUB-KEY": {
-                                    "display_name"                                   : "drgrt-ams-lz-hub",
-                                    "import_drg_route_distribution_key"              : "DRGRD-AMS-LZ-HUB-KEY",
-                                    "is_ecmp_enabled"                                : false,
-                                    "route_rules"                                    : {}
+                                    "display_name"                               : "drgrt-ams-lz-hub",
+                                    "import_drg_route_distribution_key"          : "DRGRD-AMS-LZ-HUB-KEY",
+                                    "is_ecmp_enabled"                            : false,
+                                    "route_rules"                                : {}
                                 },
 
-                                "DRGRT-AMS-LZ-RPC-REGION-A-KEY": {
-                                    "display_name"                                   : "drgrt-ams-lz-rpc-region-a",
-                                    "import_drg_route_distribution_key"              : "DRGRD-AMS-LZ-RPC-REGION-A-KEY",
-                                    "is_ecmp_enabled"                                : false,
+                                "DRGRT-AMS-LZ-RPC-HOME-KEY": {
+                                    "display_name"                               : "drgrt-ams-lz-rpc-home",
+                                    "import_drg_route_distribution_key"          : "DRGRD-AMS-LZ-RPC-HOME-KEY",
+                                    "is_ecmp_enabled"                            : false,
 
                                     "route_rules": {
-                                        "DRGRT-AMS-LZ-RPC-REGION-A-PROD-STATIC-ROUTE": {
-                                            "destination"                            : "10.0.200.0/21",
-                                            "destination_type"                       : "CIDR_BLOCK",
-                                            "next_hop_drg_attachment_key"            : "DRGATT-AMS-LZ-HUB-VCN-KEY"
+                                        "DRGRT-AMS-LZ-RPC-HOME-PROD-STATIC-ROUTE": {
+                                            "destination"                        : "10.0.200.0/21",
+                                            "destination_type"                   : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key"        : "DRGATT-AMS-LZ-HUB-VCN-KEY"
                                         }
                                     }
                                 },
 
                                 "DRGRT-AMS-LZ-SPOKES-KEY": {
-                                    "display_name"                                   : "drgrt-ams-lz-spokes",
-                                    "is_ecmp_enabled"                                : false,
+                                    "display_name"                               : "drgrt-ams-lz-spokes",
+                                    "is_ecmp_enabled"                            : false,
 
                                     "route_rules": {
                                         "DRGRT-AMS-LZ-SPOKES-STATIC-ROUTE": {
-                                            "destination"                            : "0.0.0.0/0",
-                                            "destination_type"                       : "CIDR_BLOCK",
-                                            "next_hop_drg_attachment_key"            : "DRGATT-AMS-LZ-HUB-VCN-KEY"
+                                            "destination"                        : "0.0.0.0/0",
+                                            "destination_type"                   : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key"        : "DRGATT-AMS-LZ-HUB-VCN-KEY"
                                         }
                                     }
                                 }
                             },
 
                             "remote_peering_connections": {
-                                "RPC-AMS-LZ-HUB-REGION-A-KEY": {
-                                    "display_name"                                   : "rpc-ams-lz-hub-region-a",
-                                    "peer_key"                                       : "RPC-FRA-LZ-HUB-DR-KEY",
-                                    "peer_region_name"                               : "eu-frankfurt-1"
+                                "RPC-AMS-LZ-HUB-HOME-KEY": {
+                                    "display_name"                               : "rpc-ams-lz-hub-home",
+                                    "peer_key"                                   : "RPC-FRA-LZ-HUB-DR-KEY",
+                                    "peer_region_name"                           : "eu-frankfurt-1"
                                 }
                             }
                         }
@@ -703,107 +703,107 @@
 
                     "l7_load_balancers": {
                         "LB-AMS-LZ-PROD-01-KEY": {
-                            "display_name"                                           : "lb-ams-lz-prod-01",
-                            "ip_mode"                                                : "IPV4",
-                            "is_private"                                             : false,
-                            "network_security_group_keys"                            : ["NSG-AMS-LZ-HUB-LB-KEY"],
-                            "shape"                                                  : "flexible",
-                            "subnet_ids"                                             : [],
-                            "subnet_keys"                                            : ["SN-AMS-LZ-HUB-LB-KEY"],
+                            "display_name"                                       : "lb-ams-lz-prod-01",
+                            "ip_mode"                                            : "IPV4",
+                            "is_private"                                         : false,
+                            "network_security_group_keys"                        : ["NSG-AMS-LZ-HUB-LB-KEY"],
+                            "shape"                                              : "flexible",
+                            "subnet_ids"                                         : [],
+                            "subnet_keys"                                        : ["SN-AMS-LZ-HUB-LB-KEY"],
 
                             "shape_details": {
-                                "maximum_bandwidth_in_mbps"                          : 10,
-                                "minimum_bandwidth_in_mbps"                          : 10
+                                "maximum_bandwidth_in_mbps"                      : 10,
+                                "minimum_bandwidth_in_mbps"                      : 10
                             },
 
                             "listeners": {
                                 "LBLSNR-AMS-LZ-PROD-01-KEY": {
-                                    "name"                                           : "lblsnr-ams-lz-prod-01",
-                                    "port"                                           : "80",
-                                    "protocol"                                       : "HTTP",
-                                    "default_backend_set_key"                        : "LBBKST-AMS-LZ-PROD-01-KEY",
-                                    "routing_policy_key"                             : "LBRT-AMS-LZ-PROD-01-KEY",
+                                    "name"                                       : "lblsnr-ams-lz-prod-01",
+                                    "port"                                       : "80",
+                                    "protocol"                                   : "HTTP",
+                                    "default_backend_set_key"                    : "LBBKST-AMS-LZ-PROD-01-KEY",
+                                    "routing_policy_key"                         : "LBRT-AMS-LZ-PROD-01-KEY",
 
                                     "connection_configuration": {
-                                        "idle_timeout_in_seconds"                    : 1200
+                                        "idle_timeout_in_seconds"                : 1200
                                     }
                                 }
                             },
 
                             "backend_sets": {
                                 "LBBKST-AMS-LZ-PROD-01-KEY": {
-                                    "name"                                           : "lbbkst-ams-lz-prod-01",
-                                    "policy"                                         : "ROUND_ROBIN",
+                                    "name"                                       : "lbbkst-ams-lz-prod-01",
+                                    "policy"                                     : "ROUND_ROBIN",
 
                                     "backends": {
                                         "LBBE-AMS-LZ-PROD-01-KEY": {
-                                            "ip_address"                             : "10.0.200.10",
-                                            "port"                                   : 80
+                                            "ip_address"                         : "10.0.200.10",
+                                            "port"                               : 80
                                         }
                                     },
 
                                     "health_checker": {
-                                        "interval_ms"                                : 10000,
-                                        "is_force_plain_text"                        : true,
-                                        "port"                                       : 80,
-                                        "protocol"                                   : "HTTP",
-                                        "retries"                                    : 3,
-                                        "return_code"                                : 200,
-                                        "timeout_in_millis"                          : 3000,
-                                        "url_path"                                   : "/testapp1/"
+                                        "interval_ms"                            : 10000,
+                                        "is_force_plain_text"                    : true,
+                                        "port"                                   : 80,
+                                        "protocol"                               : "HTTP",
+                                        "retries"                                : 3,
+                                        "return_code"                            : 200,
+                                        "timeout_in_millis"                      : 3000,
+                                        "url_path"                               : "/testapp1/"
                                     }
                                 },
 
                                 "LBBKST-AMS-LZ-PROD-02-KEY": {
-                                    "name"                                           : "lbbkst-ams-lz-prod-02",
-                                    "policy"                                         : "ROUND_ROBIN",
+                                    "name"                                       : "lbbkst-ams-lz-prod-02",
+                                    "policy"                                     : "ROUND_ROBIN",
 
                                     "backends": {
                                         "LBBE-AMS-LZ-PROD-02-KEY": {
-                                            "ip_address"                             : "10.0.200.20",
-                                            "port"                                   : 80
+                                            "ip_address"                         : "10.0.200.20",
+                                            "port"                               : 80
                                         }
                                     },
 
                                     "health_checker": {
-                                        "interval_ms"                                : 10000,
-                                        "is_force_plain_text"                        : true,
-                                        "port"                                       : 80,
-                                        "protocol"                                   : "HTTP",
-                                        "retries"                                    : 3,
-                                        "return_code"                                : 200,
-                                        "timeout_in_millis"                          : 3000,
-                                        "url_path"                                   : "/testapp2/"
+                                        "interval_ms"                            : 10000,
+                                        "is_force_plain_text"                    : true,
+                                        "port"                                   : 80,
+                                        "protocol"                               : "HTTP",
+                                        "retries"                                : 3,
+                                        "return_code"                            : 200,
+                                        "timeout_in_millis"                      : 3000,
+                                        "url_path"                               : "/testapp2/"
                                     }
                                 }
                             },
 
                             "routing_policies": {
                                 "LBRT-AMS-LZ-PROD-01-KEY": {
-                                    "name"                                           : "lbrt_ams_lz_prod_01",
-                                    "condition_language_version"                     : "V1",
+                                    "name"                                       : "lbrt_ams_lz_prod_01",
+                                    "condition_language_version"                 : "V1",
 
                                     "rules": {
                                         "lbrouterule_testapp1": {
-                                            "name"                                   : "testapp1",
-                                            "condition"                              : "all(http.request.url.path sw (i '/testapp1/'))",
+                                            "name"                               : "testapp1",
+                                            "condition"                          : "all(http.request.url.path sw (i '/testapp1/'))",
 
                                             "actions": {
                                                 "action-1": {
-                                                    "name"                           : "FORWARD_TO_BACKENDSET",
-                                                    "backend_set_key"                : "LBBKST-AMS-LZ-PROD-01-KEY"
+                                                    "name"                       : "FORWARD_TO_BACKENDSET",
+                                                    "backend_set_key"            : "LBBKST-AMS-LZ-PROD-01-KEY"
                                                 }
                                             }
                                         },
 
                                         "lbrouterule_testapp2": {
-                                            "name"                                   : "testapp2",
-                                            "condition"                              : "all(http.request.url.path sw (i '/testapp2/'))",
+                                            "name"                               : "testapp2",
+                                            "condition"                          : "all(http.request.url.path sw (i '/testapp2/'))",
 
                                             "actions": {
                                                 "action-2": {
-                                                    "name"                           : "FORWARD_TO_BACKENDSET",
-                                                    "backend_set_key"                : "LBBKST-AMS-LZ-PROD-02-KEY"
+                                                    "name"                       : "FORWARD_TO_BACKENDSET",
+                                                    "backend_set_key"            : "LBBKST-AMS-LZ-PROD-02-KEY"
                                                 }
                                             }
                                         }
@@ -816,139 +816,139 @@
             },
 
             "1-prod": {
-                "category_compartment_id"                                            : "CMP-LZ-PROD-NETWORK-KEY",
+                "category_compartment_id"                                        : "CMP-LZ-PROD-NETWORK-KEY",
 
                 "vcns": {
                     "VCN-AMS-LZ-PROD-PROJECTS-KEY": {
-                        "display_name"                                               : "vcn-ams-lz-prod-projects",
-                        "cidr_blocks"                                                : ["10.0.200.0/21"],
-                        "dns_label"                                                  : "vcnamslzpproj",
-                        "block_nat_traffic"                                          : false,
-                        "is_attach_drg"                                              : false,
-                        "is_create_igw"                                              : false,
-                        "is_ipv6enabled"                                             : false,
-                        "is_oracle_gua_allocation_enabled"                           : false,
+                        "display_name"                                           : "vcn-ams-lz-prod-projects",
+                        "cidr_blocks"                                            : ["10.0.200.0/21"],
+                        "dns_label"                                              : "vcnamslzpproj",
+                        "block_nat_traffic"                                      : false,
+                        "is_attach_drg"                                          : false,
+                        "is_create_igw"                                          : false,
+                        "is_ipv6enabled"                                         : false,
+                        "is_oracle_gua_allocation_enabled"                       : false,
 
                         "subnets": {
                             "SN-AMS-LZ-PROD-WEB-KEY": {
-                                "display_name"                                       : "sn-ams-lz-prod-web",
-                                "cidr_block"                                         : "10.0.200.0/24",
-                                "dns_label"                                          : "snamslzpweb",
-                                "dhcp_options_key"                                   : "default_dhcp_options",
-                                "prohibit_internet_ingress"                          : true,
-                                "prohibit_public_ip_on_vnic"                         : true,
-                                "route_table_key"                                    : "RT-AMS-LZ-PROD-PROJ-GENERIC-KEY",
-                                "security_list_keys"                                 : ["SL-AMS-LZ-PROD-PROJ-GENERIC-KEY"]
+                                "display_name"                                   : "sn-ams-lz-prod-web",
+                                "cidr_block"                                     : "10.0.200.0/24",
+                                "dns_label"                                      : "snamslzpweb",
+                                "dhcp_options_key"                               : "default_dhcp_options",
+                                "prohibit_internet_ingress"                      : true,
+                                "prohibit_public_ip_on_vnic"                     : true,
+                                "route_table_key"                                : "RT-AMS-LZ-PROD-PROJ-GENERIC-KEY",
+                                "security_list_keys"                             : ["SL-AMS-LZ-PROD-PROJ-GENERIC-KEY"]
                             },
 
                             "SN-AMS-LZ-PROD-APP-KEY": {
-                                "display_name"                                       : "sn-ams-lz-prod-app",
-                                "cidr_block"                                         : "10.0.201.0/24",
-                                "dns_label"                                          : "snamslzpapp",
-                                "dhcp_options_key"                                   : "default_dhcp_options",
-                                "prohibit_internet_ingress"                          : true,
-                                "prohibit_public_ip_on_vnic"                         : true,
-                                "route_table_key"                                    : "RT-AMS-LZ-PROD-PROJ-GENERIC-KEY",
-                                "security_list_keys"                                 : ["SL-AMS-LZ-PROD-PROJ-GENERIC-KEY"]
+                                "display_name"                                   : "sn-ams-lz-prod-app",
+                                "cidr_block"                                     : "10.0.201.0/24",
+                                "dns_label"                                      : "snamslzpapp",
+                                "dhcp_options_key"                               : "default_dhcp_options",
+                                "prohibit_internet_ingress"                      : true,
+                                "prohibit_public_ip_on_vnic"                     : true,
+                                "route_table_key"                                : "RT-AMS-LZ-PROD-PROJ-GENERIC-KEY",
+                                "security_list_keys"                             : ["SL-AMS-LZ-PROD-PROJ-GENERIC-KEY"]
                             },
 
                             "SN-AMS-LZ-PROD-DB-KEY": {
-                                "display_name"                                       : "sn-ams-lz-prod-db",
-                                "cidr_block"                                         : "10.0.202.0/24",
-                                "dns_label"                                          : "snamslzpdb",
-                                "dhcp_options_key"                                   : "default_dhcp_options",
-                                "prohibit_internet_ingress"                          : true,
-                                "prohibit_public_ip_on_vnic"                         : true,
-                                "route_table_key"                                    : "RT-AMS-LZ-PROD-PROJ-GENERIC-KEY",
-                                "security_list_keys"                                 : ["SL-AMS-LZ-PROD-PROJ-GENERIC-KEY"]
+                                "display_name"                                   : "sn-ams-lz-prod-db",
+                                "cidr_block"                                     : "10.0.202.0/24",
+                                "dns_label"                                      : "snamslzpdb",
+                                "dhcp_options_key"                               : "default_dhcp_options",
+                                "prohibit_internet_ingress"                      : true,
+                                "prohibit_public_ip_on_vnic"                     : true,
+                                "route_table_key"                                : "RT-AMS-LZ-PROD-PROJ-GENERIC-KEY",
+                                "security_list_keys"                             : ["SL-AMS-LZ-PROD-PROJ-GENERIC-KEY"]
                             },
 
                             "SN-AMS-LZ-PROD-INFRA-KEY": {
-                                "display_name"                                       : "sn-ams-lz-prod-infra",
-                                "cidr_block"                                         : "10.0.203.0/24",
-                                "dns_label"                                          : "snamslzpinfra",
-                                "dhcp_options_key"                                   : "default_dhcp_options",
-                                "prohibit_internet_ingress"                          : true,
-                                "prohibit_public_ip_on_vnic"                         : true,
-                                "route_table_key"                                    : "RT-AMS-LZ-PROD-PROJ-GENERIC-KEY",
-                                "security_list_keys"                                 : ["SL-AMS-LZ-PROD-PROJ-GENERIC-KEY"]
+                                "display_name"                                   : "sn-ams-lz-prod-infra",
+                                "cidr_block"                                     : "10.0.203.0/24",
+                                "dns_label"                                      : "snamslzpinfra",
+                                "dhcp_options_key"                               : "default_dhcp_options",
+                                "prohibit_internet_ingress"                      : true,
+                                "prohibit_public_ip_on_vnic"                     : true,
+                                "route_table_key"                                : "RT-AMS-LZ-PROD-PROJ-GENERIC-KEY",
+                                "security_list_keys"                             : ["SL-AMS-LZ-PROD-PROJ-GENERIC-KEY"]
                             }
                         },
 
                         "route_tables": {
                             "RT-AMS-LZ-PROD-PROJ-GENERIC-KEY": {
-                                "display_name"                                       : "rt-ams-lz-prod-proj-generic",
+                                "display_name"                                   : "rt-ams-lz-prod-proj-generic",
 
                                 "route_rules": {
                                     "rr-ams-drg": {
-                                        "description"                                : "Route to the 0.0.0.0/0 through DRG",
-                                        "destination"                                : "0.0.0.0/0",
-                                        "destination_type"                           : "CIDR_BLOCK",
-                                        "network_entity_key"                         : "DRG-AMS-LZ-HUB-KEY"
+                                        "description"                            : "Route to the 0.0.0.0/0 through DRG",
+                                        "destination"                            : "0.0.0.0/0",
+                                        "destination_type"                       : "CIDR_BLOCK",
+                                        "network_entity_key"                     : "DRG-AMS-LZ-HUB-KEY"
                                     },
 
                                     "rr-ams-sgw": {
-                                        "description"                                : "Route to Oracle Services Network through Service GW",
-                                        "destination"                                : "all-services",
-                                        "destination_type"                           : "SERVICE_CIDR_BLOCK",
-                                        "network_entity_key"                         : "SGW-AMS-LZ-PROD-PROJ-KEY"
+                                        "description"                            : "Route to Oracle Services Network through Service GW",
+                                        "destination"                            : "all-services",
+                                        "destination_type"                       : "SERVICE_CIDR_BLOCK",
+                                        "network_entity_key"                     : "SGW-AMS-LZ-PROD-PROJ-KEY"
                                     }
                                 }
                             }
                         },
 
                         "default_security_list": {
-                            "ingress_rules"                                          : [],
-                            "egress_rules"                                           : []
+                            "ingress_rules"                                      : [],
+                            "egress_rules"                                       : []
                         },
 
                         "security_lists": {
                             "SL-AMS-LZ-PROD-PROJ-GENERIC-KEY": {
-                                "display_name"                                       : "sl-ams-lz-prod-proj-generic",
+                                "display_name"                                   : "sl-ams-lz-prod-proj-generic",
 
                                 "ingress_rules": [
                                     {
-                                        "description"                                : "ICMP type 3 code 4",
-                                        "src"                                        : "0.0.0.0/0",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 3,
-                                        "icmp_code"                                  : 4,
-                                        "stateless"                                  : false
+                                        "description"                            : "ICMP type 3 code 4",
+                                        "src"                                    : "0.0.0.0/0",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 3,
+                                        "icmp_code"                              : 4,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "ICMP type 3",
-                                        "src"                                        : "10.0.200.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 3,
-                                        "stateless"                                  : false
+                                        "description"                            : "ICMP type 3",
+                                        "src"                                    : "10.0.200.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 3,
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "Allow inbound ICMP type 8 (Echo) from Hub VCN",
-                                        "src"                                        : "10.0.192.0/21",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ICMP",
-                                        "icmp_type"                                  : 8,
-                                        "icmp_code"                                  : 0,
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound ICMP type 8 (Echo) from Hub VCN",
+                                        "src"                                    : "10.0.192.0/21",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ICMP",
+                                        "icmp_type"                              : 8,
+                                        "icmp_code"                              : 0,
+                                        "stateless"                              : false
                                     }
                                 ],
 
                                 "egress_rules": [
                                     {
-                                        "description"                                : "Allow all outbound traffic to 0.0.0.0/0 over ALL protocols",
-                                        "dst"                                        : "0.0.0.0/0",
-                                        "dst_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "ALL",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow all outbound traffic to 0.0.0.0/0 over ALL protocols",
+                                        "dst"                                    : "0.0.0.0/0",
+                                        "dst_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "ALL",
+                                        "stateless"                              : false
                                     },
                                     {
-                                        "description"                                : "Allow outbound traffic to Oracle Services Network over ALL protocols",
-                                        "dst"                                        : "all-services",
-                                        "dst_type"                                   : "SERVICE_CIDR_BLOCK",
-                                        "protocol"                                   : "ALL",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow outbound traffic to Oracle Services Network over ALL protocols",
+                                        "dst"                                    : "all-services",
+                                        "dst_type"                               : "SERVICE_CIDR_BLOCK",
+                                        "protocol"                               : "ALL",
+                                        "stateless"                              : false
                                     }
                                 ]
                             }
@@ -956,122 +956,122 @@
 
                         "network_security_groups": {
                             "NSG-AMS-LZ-PROD-PROJ1-APP-KEY": {
-                                "display_name"                                       : "nsg-ams-lz-prod-proj1-app",
-                                "compartment_id"                                     : "CMP-LZ-PROD-PROJ1-KEY",
+                                "display_name"                                   : "nsg-ams-lz-prod-proj1-app",
+                                "compartment_id"                                 : "CMP-LZ-PROD-PROJ1-KEY",
 
                                 "ingress_rules": {
                                     "http_80": {
-                                        "description"                                : "Allow inbound from NSG nsg-ams-lz-prod-proj1-web over HTTP",
-                                        "src"                                        : "NSG-AMS-LZ-PROD-PROJ1-WEB-KEY",
-                                        "src_type"                                   : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                               : 80,
-                                        "dst_port_max"                               : 80,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound from NSG nsg-ams-lz-prod-proj1-web over HTTP",
+                                        "src"                                    : "NSG-AMS-LZ-PROD-PROJ1-WEB-KEY",
+                                        "src_type"                               : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_min"                           : 80,
+                                        "dst_port_max"                           : 80,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     },
 
                                     "https_443": {
-                                        "description"                                : "Allow inbound from NSG nsg-ams-lz-prod-proj1-web over HTTPS",
-                                        "src"                                        : "NSG-AMS-LZ-PROD-PROJ1-WEB-KEY",
-                                        "src_type"                                   : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                               : 443,
-                                        "dst_port_max"                               : 443,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound from NSG nsg-ams-lz-prod-proj1-web over HTTPS",
+                                        "src"                                    : "NSG-AMS-LZ-PROD-PROJ1-WEB-KEY",
+                                        "src_type"                               : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_min"                           : 443,
+                                        "dst_port_max"                           : 443,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     },
 
                                     "ssh_22": {
-                                        "description"                                : "Allow inbound traffic from Hub management subnet over SSH",
-                                        "src"                                        : "10.0.195.0/24",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 22,
-                                        "dst_port_max"                               : 22,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound traffic from Hub management subnet over SSH",
+                                        "src"                                    : "10.0.195.0/24",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 22,
+                                        "dst_port_max"                           : 22,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                                : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
-                                        "dst"                                        : "0.0.0.0/0",
-                                        "dst_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "dst"                                    : "0.0.0.0/0",
+                                        "dst_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 }
                             },
 
                             "NSG-AMS-LZ-PROD-PROJ1-DB-KEY": {
-                                "display_name"                                       : "nsg-ams-lz-prod-proj1-db",
-                                "compartment_id"                                     : "CMP-LZ-PROD-PROJ1-KEY",
+                                "display_name"                                   : "nsg-ams-lz-prod-proj1-db",
+                                "compartment_id"                                 : "CMP-LZ-PROD-PROJ1-KEY",
 
                                 "ingress_rules": {
                                     "db_1521": {
-                                        "description"                                : "Allow inbound from NSG nsg-ams-lz-prod-proj1-app over TCP 1521",
-                                        "src"                                        : "NSG-AMS-LZ-PROD-PROJ1-APP-KEY",
-                                        "src_type"                                   : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                               : 1521,
-                                        "dst_port_max"                               : 1521,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound from NSG nsg-ams-lz-prod-proj1-app over TCP 1521",
+                                        "src"                                    : "NSG-AMS-LZ-PROD-PROJ1-APP-KEY",
+                                        "src_type"                               : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_min"                           : 1521,
+                                        "dst_port_max"                           : 1521,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                                : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
-                                        "dst"                                        : "0.0.0.0/0",
-                                        "dst_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "dst"                                    : "0.0.0.0/0",
+                                        "dst_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 }
                             },
 
                             "NSG-AMS-LZ-PROD-PROJ1-WEB-KEY": {
-                                "display_name"                                       : "nsg-ams-lz-prod-proj1-web",
-                                "compartment_id"                                     : "CMP-LZ-PROD-PROJ1-KEY",
+                                "display_name"                                   : "nsg-ams-lz-prod-proj1-web",
+                                "compartment_id"                                 : "CMP-LZ-PROD-PROJ1-KEY",
 
                                 "ingress_rules": {
                                     "http_80": {
-                                        "description"                                : "Allow inbound traffic from Hub LB subnet over HTTP",
-                                        "src"                                        : "10.0.194.0/24",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 80,
-                                        "dst_port_max"                               : 80,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound traffic from Hub LB subnet over HTTP",
+                                        "src"                                    : "10.0.194.0/24",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 80,
+                                        "dst_port_max"                           : 80,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     },
 
                                     "https_443": {
-                                        "description"                                : "Allow inbound traffic from Hub LB subnet over HTTPS",
-                                        "src"                                        : "10.0.194.0/24",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 443,
-                                        "dst_port_max"                               : 443,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound traffic from Hub LB subnet over HTTPS",
+                                        "src"                                    : "10.0.194.0/24",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 443,
+                                        "dst_port_max"                           : 443,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     },
 
                                     "ssh_22": {
-                                        "description"                                : "Allow inbound traffic from Hub management subnet over SSH",
-                                        "src"                                        : "10.0.195.0/24",
-                                        "src_type"                                   : "CIDR_BLOCK",
-                                        "dst_port_min"                               : 22,
-                                        "dst_port_max"                               : 22,
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow inbound traffic from Hub management subnet over SSH",
+                                        "src"                                    : "10.0.195.0/24",
+                                        "src_type"                               : "CIDR_BLOCK",
+                                        "dst_port_min"                           : 22,
+                                        "dst_port_max"                           : 22,
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                                : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
-                                        "dst"                                        : "0.0.0.0/0",
-                                        "dst_type"                                   : "CIDR_BLOCK",
-                                        "protocol"                                   : "TCP",
-                                        "stateless"                                  : false
+                                        "description"                            : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "dst"                                    : "0.0.0.0/0",
+                                        "dst_type"                               : "CIDR_BLOCK",
+                                        "protocol"                               : "TCP",
+                                        "stateless"                              : false
                                     }
                                 }
                             }
@@ -1080,8 +1080,8 @@
                         "vcn_specific_gateways": {
                             "service_gateways": {
                                 "SGW-AMS-LZ-PROD-PROJ-KEY": {
-                                    "display_name"                                   : "sgw-ams-lz-prod-proj",
-                                    "services"                                       : "all-services"
+                                    "display_name"                               : "sgw-ams-lz-prod-proj",
+                                    "services"                                   : "all-services"
                                 }
                             }
                         }
@@ -1092,54 +1092,54 @@
     },
 
     "nlb_configuration": {
-        "default_compartment_id"                                                     : "CMP-LZ-NETWORK-KEY",
+        "default_compartment_id"                                                 : "CMP-LZ-NETWORK-KEY",
 
         "nlbs": {
             "NLB-AMS-LZ-HUB-TRUST-KEY": {
-                "display_name"                                                       : "nlb-ams-lz-hub-trust",
-                "enable_symmetric_hashing"                                           : true,
-                "is_preserve_source_destination"                                     : true,
-                "is_private"                                                         : true,
-                "network_security_group_ids"                                         : ["NSG-AMS-LZ-HUB-TRUST-NLB-KEY"],
-                "subnet_id"                                                          : "SN-AMS-LZ-HUB-TRUST-KEY",
+                "display_name"                                                   : "nlb-ams-lz-hub-trust",
+                "enable_symmetric_hashing"                                       : true,
+                "is_preserve_source_destination"                                 : true,
+                "is_private"                                                     : true,
+                "network_security_group_ids"                                     : ["NSG-AMS-LZ-HUB-TRUST-NLB-KEY"],
+                "subnet_id"                                                      : "SN-AMS-LZ-HUB-TRUST-KEY",
 
                 "listeners": {
                     "NLBLSNR-AMS-LZ-HUB-TRUST-KEY": {
-                        "name"                                                       : "listener-ams-lz-hub-trust",
-                        "port"                                                       : "0",
-                        "protocol"                                                   : "ANY",
+                        "name"                                                   : "listener-ams-lz-hub-trust",
+                        "port"                                                   : "0",
+                        "protocol"                                               : "ANY",
 
                         "backend_set": {
-                            "name"                                                   : "backend-set-ams-lz-hub-trust",
+                            "name"                                               : "backend-set-ams-lz-hub-trust",
 
                             "backends": {
                                 "FW-BACKEND-AMS-LZ-TRUST-01-KEY": {
-                                    "name"                                           : "fw-backend-ams-lz-trust-01",
-                                    "port"                                           : "0",
-                                    "is_backup"                                      : "false",
-                                    "is_drain"                                       : "false",
-                                    "is_offline"                                     : "false",
-                                    "target_id"                                      : "NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrr...",
-                                    "weight"                                         : "1"
+                                    "name"                                       : "fw-backend-ams-lz-trust-01",
+                                    "port"                                       : "0",
+                                    "is_backup"                                  : "false",
+                                    "is_drain"                                   : "false",
+                                    "is_offline"                                 : "false",
+                                    "target_id"                                  : "NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrr...",
+                                    "weight"                                     : "1"
                                 },
 
                                 "FW-BACKEND-AMS-LZ-TRUST-02-KEY": {
-                                    "name"                                           : "fw-backend-ams-lz-trust-02",
-                                    "port"                                           : "0",
-                                    "is_backup"                                      : "false",
-                                    "is_drain"                                       : "false",
-                                    "is_offline"                                     : "false",
-                                    "target_id"                                      : "NETWORK FIREWALL-2 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrt...",
-                                    "weight"                                         : "1"
+                                    "name"                                       : "fw-backend-ams-lz-trust-02",
+                                    "port"                                       : "0",
+                                    "is_backup"                                  : "false",
+                                    "is_drain"                                   : "false",
+                                    "is_offline"                                 : "false",
+                                    "target_id"                                  : "NETWORK FIREWALL-2 PRIVATE IP OCID IN TRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljrt...",
+                                    "weight"                                     : "1"
                                 }
                             },
 
                             "health_checker": {
-                                "port"                                               : "22",
-                                "protocol"                                           : "TCP",
-                                "interval_in_millis"                                 : "10000",
-                                "retries"                                            : "3",
-                                "timeout_in_millis"                                  : "3000"
+                                "port"                                           : "22",
+                                "protocol"                                       : "TCP",
+                                "interval_in_millis"                             : "10000",
+                                "retries"                                        : "3",
+                                "timeout_in_millis"                              : "3000"
                             }
                         }
                     }
@@ -1147,50 +1147,50 @@
             },
 
             "NLB-AMS-LZ-HUB-UNTRUST-KEY": {
-                "display_name"                                                       : "nlb-ams-lz-hub-untrust",
-                "enable_symmetric_hashing"                                           : true,
-                "is_preserve_source_destination"                                     : true,
-                "is_private"                                                         : true,
-                "network_security_group_ids"                                         : ["NSG-AMS-LZ-HUB-UNTRUST-NLB-KEY"],
-                "subnet_id"                                                          : "SN-AMS-LZ-HUB-UNTRUST-KEY",
+                "display_name"                                                   : "nlb-ams-lz-hub-untrust",
+                "enable_symmetric_hashing"                                       : true,
+                "is_preserve_source_destination"                                 : true,
+                "is_private"                                                     : true,
+                "network_security_group_ids"                                     : ["NSG-AMS-LZ-HUB-UNTRUST-NLB-KEY"],
+                "subnet_id"                                                      : "SN-AMS-LZ-HUB-UNTRUST-KEY",
 
                 "listeners": {
                     "NLBLSNR-AMS-LZ-HUB-UNTRUST-KEY": {
-                        "name"                                                       : "listener-ams-lz-hub-untrust",
-                        "port"                                                       : "0",
-                        "protocol"                                                   : "ANY",
+                        "name"                                                   : "listener-ams-lz-hub-untrust",
+                        "port"                                                   : "0",
+                        "protocol"                                               : "ANY",
 
                         "backend_set": {
-                            "name"                                                   : "backend-set-ams-lz-hub-untrust",
+                            "name"                                               : "backend-set-ams-lz-hub-untrust",
 
                             "backends": {
                                 "FW-BACKEND-AMS-LZ-UNTRUST-01-KEY": {
-                                    "name"                                           : "fw-backend-ams-lz-untrust-01",
-                                    "port"                                           : "0",
-                                    "is_backup"                                      : "false",
-                                    "is_drain"                                       : "false",
-                                    "is_offline"                                     : "false",
-                                    "target_id"                                      : "NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsm...",
-                                    "weight"                                         : "1"
+                                    "name"                                       : "fw-backend-ams-lz-untrust-01",
+                                    "port"                                       : "0",
+                                    "is_backup"                                  : "false",
+                                    "is_drain"                                   : "false",
+                                    "is_offline"                                 : "false",
+                                    "target_id"                                  : "NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsm...",
+                                    "weight"                                     : "1"
                                 },
 
                                 "FW-BACKEND-AMS-LZ-UNTRUST-02-KEY": {
-                                    "name"                                           : "fw-backend-ams-lz-untrust-02",
-                                    "port"                                           : "0",
-                                    "is_backup"                                      : "false",
-                                    "is_drain"                                       : "false",
-                                    "is_offline"                                     : "false",
-                                    "target_id"                                      : "NETWORK FIREWALL-2 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsh...",
-                                    "weight"                                         : "1"
+                                    "name"                                       : "fw-backend-ams-lz-untrust-02",
+                                    "port"                                       : "0",
+                                    "is_backup"                                  : "false",
+                                    "is_drain"                                   : "false",
+                                    "is_offline"                                 : "false",
+                                    "target_id"                                  : "NETWORK FIREWALL-2 PRIVATE IP OCID IN UNTRUST SUBNET, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljsh...",
+                                    "weight"                                     : "1"
                                 }
                             },
 
                             "health_checker": {
-                                "port"                                               : "22",
-                                "protocol"                                           : "TCP",
-                                "interval_in_millis"                                 : "10000",
-                                "retries"                                            : "3",
-                                "timeout_in_millis"                                  : "3000"
+                                "port"                                           : "22",
+                                "protocol"                                       : "TCP",
+                                "interval_in_millis"                             : "10000",
+                                "retries"                                        : "3",
+                                "timeout_in_millis"                              : "3000"
                             }
                         }
                     }

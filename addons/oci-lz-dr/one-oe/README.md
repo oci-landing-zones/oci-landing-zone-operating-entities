@@ -150,9 +150,9 @@ After the One-OE BCDR addon is deployed, establish the Remote Peering Connection
 
 #### 4.2.1. Replace the Amsterdam requester and Frankfurt acceptor network files
 
-First, in the home region: replace the matching final Frankfurt One-OE network file in the home-region stack or Terraform state with its complete `*_acceptor.json` variant. Each acceptor file contains the final One-OE network configuration plus the FRA-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file. Applying this variant updates the Frankfurt network dependency output, making the acceptor RPC available to the AMS BCDR stack.
+First, in the home region: replace the matching final Frankfurt One-OE network file in the home-region stack with its complete `*_acceptor.json` variant. Each acceptor file contains the final One-OE network configuration plus the FRA-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file. Applying this variant updates the Frankfurt network dependency output, making the acceptor RPC available to the AMS BCDR stack.
 
-Then, in the DR region: to establish an RPC to Frankfurt, replace the matching final network file in the same stack or Terraform state with its complete `*_requester.json` variant after staged hub networking is complete. Each requester file contains the final network configuration plus the AMS-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file.
+Then, in the DR region: to establish an RPC to Frankfurt, replace the matching final network file in the same stack with its complete `*_requester.json` variant after staged hub networking is complete. Each requester file contains the final network configuration plus the AMS-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file.
 
 All requester and acceptor files are in the [`runtime`](./runtime/) directory.
 
