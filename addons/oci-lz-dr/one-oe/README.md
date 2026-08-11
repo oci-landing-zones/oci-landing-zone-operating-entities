@@ -158,6 +158,10 @@ All requester and acceptor files are in the [`runtime`](./runtime/) directory.
 
 <img src="../images/x-tenancy.png" width="900" alt="cross region rpc">
 
+<p align="center"><em>Figure 4</em></p>
+
+**Figure 4: cross-region RPC. Example: Frankfurt - Amsterdam**
+
 
 Use the [OCI Remote Peering Connections addon](/addons/oci-x-rpc/README.md) to follow the required steps and automate this connectivity layer.
 
