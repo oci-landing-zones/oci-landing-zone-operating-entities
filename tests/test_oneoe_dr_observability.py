@@ -7,13 +7,14 @@ import unittest
 from tests.gen.helpers import REPO_ROOT, render_jsonnet_object
 
 
-ADDON_DIR = REPO_ROOT / "addons/oci-lz-dr/one-oe"
-README = ADDON_DIR / "README.md"
+ADDON_ROOT = REPO_ROOT / "addons/oci-lz-dr/one-oe"
+ADDON_DIR = ADDON_ROOT / "runtime"
+README = ADDON_ROOT / "README.md"
 ENTRYPOINTS = {
-    "oneoe_bcdr_observability_cis1_pre.json": "gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1_pre.jsonnet",
-    "oneoe_bcdr_observability_cis1.json": "gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1.jsonnet",
-    "oneoe_bcdr_observability_cis2_pre.json": "gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2_pre.jsonnet",
-    "oneoe_bcdr_observability_cis2.json": "gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2.jsonnet",
+    "oneoe_bcdr_observability_cis1_pre.json": "gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis1_pre.jsonnet",
+    "oneoe_bcdr_observability_cis1.json": "gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis1.jsonnet",
+    "oneoe_bcdr_observability_cis2_pre.json": "gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis2_pre.jsonnet",
+    "oneoe_bcdr_observability_cis2.json": "gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis2.jsonnet",
 }
 ONEOE_OBSERVABILITY = "gen/blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1.jsonnet"
 BUCKET_KEY = "BKT-AMS-LZ-SERVICE-CONNECTOR-KEY"
@@ -31,6 +32,7 @@ class OneOeDrObservabilityTests(unittest.TestCase):
                 snapshot = ADDON_DIR / snapshot_name
                 self.assertTrue((REPO_ROOT / entrypoint_name).is_file())
                 self.assertTrue(snapshot.is_file())
+                self.assertFalse((ADDON_ROOT / snapshot_name).is_file())
                 self.assertEqual(
                     render_jsonnet_object(Path(entrypoint_name)),
                     json.loads(snapshot.read_text(encoding="utf-8")),

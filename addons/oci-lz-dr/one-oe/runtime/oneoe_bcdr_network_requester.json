@@ -1,0 +1,162 @@
+{
+    "network_configuration": {
+        "network_configuration_categories": {
+            "0-shared": {
+                "vcns": {
+                    "VCN-AMS-LZ-HUB-KEY": {
+                        "route_tables": {
+                            "RT-AMS-LZ-HUB-LB-KEY": {
+                                "display_name"                                 : "rt-ams-lz-hub-lb",
+
+                                "route_rules": {
+                                    "rr-ams-rpc-region-a-1": {
+                                        "description"                          : "Route to RPC region_a CIDR 10.0.0.0/16 through DRG",
+                                        "destination"                          : "10.0.0.0/16",
+                                        "destination_type"                     : "CIDR_BLOCK",
+                                        "network_entity_key"                   : "DRG-AMS-LZ-HUB-KEY"
+                                    }
+                                }
+                            },
+
+                            "RT-AMS-LZ-HUB-MGMT-KEY": {
+                                "display_name"                                 : "rt-ams-lz-hub-mgmt",
+
+                                "route_rules": {
+                                    "rr-ams-rpc-region-a-1": {
+                                        "description"                          : "Route to RPC region_a CIDR 10.0.0.0/16 through DRG",
+                                        "destination"                          : "10.0.0.0/16",
+                                        "destination_type"                     : "CIDR_BLOCK",
+                                        "network_entity_key"                   : "DRG-AMS-LZ-HUB-KEY"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "non_vcn_specific_gateways": {
+                    "dynamic_routing_gateways": {
+                        "DRG-AMS-LZ-HUB-KEY": {
+                            "drg_attachments": {
+                                "DRGATT-AMS-LZ-HUB-RPC-REGION-A-KEY": {
+                                    "display_name"                             : "drgatt-ams-lz-hub-rpc-region-a",
+                                    "drg_route_table_key"                      : "DRGRT-AMS-LZ-RPC-REGION-A-KEY",
+
+                                    "network_details": {
+                                        "type"                                 : "REMOTE_PEERING_CONNECTION",
+                                        "attached_resource_key"                : "RPC-AMS-LZ-HUB-REGION-A-KEY"
+                                    }
+                                }
+                            },
+
+                            "drg_route_distributions": {
+                                "DRGRD-AMS-LZ-HUB-KEY": {
+                                    "display_name"                             : "drgrd-ams-lz-hub",
+                                    "distribution_type"                        : "IMPORT",
+
+                                    "statements": {
+                                        "ROUTE-TO-RPC-LZ-REGION-A-KEY": {
+                                            "action"                           : "ACCEPT",
+                                            "priority"                         : 20,
+
+                                            "match_criteria": {
+                                                "match_type"                   : "DRG_ATTACHMENT_TYPE",
+                                                "attachment_type"              : "REMOTE_PEERING_CONNECTION",
+                                                "drg_attachment_key"           : "DRGATT-AMS-LZ-HUB-RPC-REGION-A-KEY"
+                                            }
+                                        }
+                                    }
+                                },
+
+                                "DRGRD-AMS-LZ-RPC-REGION-A-KEY": {
+                                    "display_name"                             : "drgrd-ams-lz-rpc-region-a",
+                                    "distribution_type"                        : "IMPORT",
+
+                                    "statements": {
+                                        "ROUTE-TO-RPC-LZ-REGION-A-VCN-HUB-KEY": {
+                                            "action"                           : "ACCEPT",
+                                            "priority"                         : 10,
+
+                                            "match_criteria": {
+                                                "match_type"                   : "DRG_ATTACHMENT_ID",
+                                                "attachment_type"              : "VCN",
+                                                "drg_attachment_key"           : "DRGATT-AMS-LZ-HUB-VCN-KEY"
+                                            }
+                                        },
+
+                                        "ROUTE-TO-RPC-LZ-REGION-A-VCN-PROD-KEY": {
+                                            "action"                           : "ACCEPT",
+                                            "priority"                         : 20,
+
+                                            "match_criteria": {
+                                                "match_type"                   : "DRG_ATTACHMENT_ID",
+                                                "attachment_type"              : "VCN",
+                                                "drg_attachment_key"           : "DRGATT-AMS-LZ-PROD-PROJ-KEY"
+                                            }
+                                        }
+                                    }
+                                },
+
+                                "DRGRD-AMS-LZ-SPOKE-KEY": {
+                                    "display_name"                             : "drgrd-ams-lz-spoke",
+                                    "distribution_type"                        : "IMPORT",
+
+                                    "statements": {
+                                        "ROUTE-TO-RPC-LZ-REGION-A-S-KEY": {
+                                            "action"                           : "ACCEPT",
+                                            "priority"                         : 30,
+
+                                            "match_criteria": {
+                                                "match_type"                   : "DRG_ATTACHMENT_TYPE",
+                                                "attachment_type"              : "REMOTE_PEERING_CONNECTION",
+                                                "drg_attachment_key"           : "DRGATT-AMS-LZ-HUB-RPC-REGION-A-KEY"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+
+                            "drg_route_tables": {
+                                "DRGRT-AMS-LZ-RPC-REGION-A-KEY": {
+                                    "display_name"                             : "drgrt-ams-lz-rpc-region-a",
+                                    "import_drg_route_distribution_key"        : "DRGRD-AMS-LZ-RPC-REGION-A-KEY",
+                                    "is_ecmp_enabled"                          : false,
+                                    "route_rules"                              : {}
+                                }
+                            },
+
+                            "remote_peering_connections": {
+                                "RPC-AMS-LZ-HUB-REGION-A-KEY": {
+                                    "display_name"                             : "rpc-ams-lz-hub-region-a",
+                                    "peer_key"                                 : "RPC-FRA-LZ-HUB-REGION-B-KEY",
+                                    "peer_region_name"                         : "eu-frankfurt-1"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "1-prod": {
+                "vcns": {
+                    "VCN-AMS-LZ-PROD-PROJECTS-KEY": {
+                        "route_tables": {
+                            "RT-AMS-LZ-PROD-PROJ-GENERIC-KEY": {
+                                "display_name"                                 : "rt-ams-lz-prod-proj-generic",
+
+                                "route_rules": {
+                                    "rr-ams-rpc-region-a-1": {
+                                        "description"                          : "Route to RPC region_a CIDR 10.0.0.0/16 through DRG",
+                                        "destination"                          : "10.0.0.0/16",
+                                        "destination_type"                     : "CIDR_BLOCK",
+                                        "network_entity_key"                   : "DRG-AMS-LZ-HUB-KEY"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

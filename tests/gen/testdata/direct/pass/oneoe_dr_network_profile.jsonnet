@@ -14,12 +14,12 @@ local summarize(network) =
     has_preprod_category: std.objectHas(categories, '2-preprod'),
   };
 {
-  hub_a_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_a_pre.jsonnet'),
-  hub_a: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_a.jsonnet'),
-  hub_b_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_b_pre.jsonnet'),
-  hub_b: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_b.jsonnet'),
-  hub_c_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_c_pre.jsonnet'),
-  hub_c_backends: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_c_backends.jsonnet'),
-  hub_c: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_c.jsonnet'),
-  hub_e: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_network_hub_e.jsonnet'),
+  hub_a_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_a_pre.jsonnet'),
+  hub_a: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_a.jsonnet'),
+  hub_b_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_b_pre.jsonnet'),
+  hub_b: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_b.jsonnet'),
+  hub_c_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_c_pre.jsonnet'),
+  hub_c_backends: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_c_backends.jsonnet'),
+  hub_c: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_c.jsonnet'),
+  hub_e: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_e.jsonnet'),
 }

@@ -13,8 +13,8 @@ local summarize(observability) = {
   final_has_flow_logs: std.objectHas(observability, 'logging_configuration'),
 };
 {
-  cis1_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1_pre.jsonnet'),
-  cis1: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis1.jsonnet'),
-  cis2_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2_pre.jsonnet'),
-  cis2: summarize(import 'gen/addons/oci-lz-dr/one-oe/oneoe_bcdr_observability_cis2.jsonnet'),
+  cis1_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis1_pre.jsonnet'),
+  cis1: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis1.jsonnet'),
+  cis2_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis2_pre.jsonnet'),
+  cis2: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis2.jsonnet'),
 }
