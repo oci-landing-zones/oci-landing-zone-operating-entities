@@ -105,6 +105,19 @@ class OneOeDrObservabilityTests(unittest.TestCase):
             BUCKET_NAME,
             "bkt-fra-lz-service-connector",
             "replication policy",
+            "output dependency files",
+            "separate from the Service Connector bucket replication",
+            "for Hub E, after its initial network configuration is applied",
+            'alt="Generic two-region One-OE disaster recovery architecture',
+            "*Figure 1: Generic two-region One-OE disaster recovery architecture.*",
+            "*Figure 2: Home-region One-OE stack in Frankfurt.",
+            "*Figure 3: DR-region BCDR stack in Amsterdam.",
+            "orm_deployment_dr_region.png",
+            'alt="OCI Resource Manager BCDR stack in Amsterdam',
+            "Clear the Run apply check box",
+            "## 1. Overview",
+            "## 4. Deployment model",
+            "regional VSS",
             "kms_dependency",
             "Service Connector",
             "eu-amsterdam-1",
@@ -113,6 +126,8 @@ class OneOeDrObservabilityTests(unittest.TestCase):
             "oneoe_bcdr_observability_cis2_pre.json",
         ):
             self.assertIn(required_text, content)
+        for unexpected_text in ("outtput", "8tack", "an replicated"):
+            self.assertNotIn(unexpected_text, content)
 
 
 if __name__ == "__main__":

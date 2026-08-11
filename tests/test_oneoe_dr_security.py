@@ -62,8 +62,16 @@ class OneOeDrSecurityTests(unittest.TestCase):
     def test_orm_buttons_include_vss_in_the_configuration_file_list(self) -> None:
         content = (ADDON_DIR / "README.md").read_text(encoding="utf-8")
         self.assertIn("| CIS Level 1 | CIS Level 2 |", content)
-        self.assertEqual(8, content.count('oneoe_bcdr_security.json"})'))
+        self.assertEqual(8, content.count('oneoe_bcdr_security.json"}'))
         self.assertIn("\n| | **Note — CIS Level 2:**", content)
+
+    def test_readme_includes_hub_picker_and_reference_orm_links(self) -> None:
+        content = (ADDON_DIR / "README.md").read_text(encoding="utf-8")
+        hub_picker = next(
+            line for line in content.splitlines() if line.startswith("| [**One-OE + Hub A**]")
+        )
+        self.assertEqual(5, hub_picker.count("|"))
+        self.assertIn("[orm-cis1-hub-a]:", content)
 
 
 if __name__ == "__main__":
