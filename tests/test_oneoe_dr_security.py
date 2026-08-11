@@ -55,6 +55,9 @@ class OneOeDrSecurityTests(unittest.TestCase):
             "Vulnerability Scanning Service (VSS)",
             "Security Zones",
             "not redeployed",
+            "Cloud Guard remains managed by the Frankfurt baseline",
+            "Vaults are regional",
+            "manually replicate the Vault and its encryption key to Amsterdam",
             "eu-amsterdam-1",
         ):
             self.assertIn(text, content)

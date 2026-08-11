@@ -114,7 +114,7 @@ Hub E deploys its complete network configuration in Step 1 and does not require 
 
 `oneoe_bcdr_security.json` deploys [Vulnerability Scanning Service (VSS)](https://docs.oracle.com/en-us/iaas/Content/scanning/using/overview.htm) recipes and targets in AMS. It is included in the initial BCDR stack and does not need a staged replacement.
 
-Security Zones are not redeployed in Amsterdam. The One-OE baseline already associates the shared tenancy-wide compartment hierarchy with its Security Zones; OCI does not allow a compartment to belong to multiple Security Zones. Cloud Guard and Vaults likewise remain managed by the Frankfurt baseline.
+Security Zones are not redeployed in Amsterdam. The One-OE baseline already associates the shared tenancy-wide compartment hierarchy with its Security Zones; OCI does not allow a compartment to belong to multiple Security Zones. Cloud Guard remains managed by the Frankfurt baseline. Vaults are regional: for CIS Level 2, manually replicate the Vault and its encryption key to Amsterdam before deployment, as noted in the deployment table. This addon does not create that replica.
 
 **Step 1.2. Complete staged observability**
 

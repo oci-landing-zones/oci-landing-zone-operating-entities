@@ -81,13 +81,6 @@ Common DR approaches include:
 | **Warm standby** | Reduced-capacity environment with current data and faster recovery. | Higher cost, lower RTO/RPO. |
 | **Active/active** | Critical systems that need near-continuous service. | Highest cost and operational complexity. |
 
-Common disaster recovery strategies include:
-
-Backup & Restore: Simple, cost-effective, longer recovery time
-Pilot Light: Minimal environment always running
-Warm Standby: Scaled-down fully functional environment
-Active-Active: Fully redundant systems across locations
-
 Reference: [Oracle Business Continuity and Disaster Recovery](https://www.oracle.com/business-continuity/business-continuity-disaster-recovery/).
 
 &nbsp;
@@ -104,11 +97,7 @@ The landing zone extension prepares the DR foundation. Configure and validate wo
 | Storage | Object Storage, Block Volume, and File Storage replication | Validate replication scope, retention, and recovery testing. |
 | Security | Vault, key, and secret replication | Ensure the DR workload can access the replicated cryptographic material and secrets. |
 
-See [Native Cross-Region Replication Capabilities by OCI Service Layer](https://confluence.oraclecorp.com/confluence/display/EMEACSS/Native+Cross-Region+Replication+Capabilities+by+OCI+Service+Layer) for service-specific capabilities.
-
 &nbsp;
-
-
 
 ### 7. Related documentation
 
