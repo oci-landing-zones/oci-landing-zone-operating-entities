@@ -27,7 +27,11 @@ The One-OE BC/DR design extends an existing One-OE baseline into a DR region whi
 
 <img src="../images/one-oe-multi-region.png" width="900" alt="Generic two-region One-OE disaster recovery architecture with shared management groups, regional hub and production networks, and data replication to the DR region">
 
-*Figure 1: Generic two-region One-OE disaster recovery architecture.*
+<p align="center"><em>Figure 1</em></p>
+
+**Figure 1: Generic two-region One-OE disaster recovery architecture**
+
+The architecture shows shared management groups, regional hub and production networks, and data replication to the DR region.
 
 &nbsp;
 
@@ -51,7 +55,11 @@ This is a multi-stack deployment. Step 0 deploys the One-OE baseline stack in th
 
 <img src="../images/orm_deployment_home_region.png" width="700" alt="OCI Resource Manager One-OE stack in Frankfurt saving output dependency files in an Object Storage bucket">
 
-*Figure 2: Home-region One-OE stack in Frankfurt. It saves output dependency files in Object Storage so they can be replicated for the BCDR stack.*
+<p align="center"><em>Figure 2</em></p>
+
+**Figure 2: Home-region One-OE stack in Frankfurt**
+
+It saves output dependency files in Object Storage so they can be replicated for the BCDR stack.
 
 **Step 1. Deploy the One-OE DR Extension**
 
@@ -78,7 +86,11 @@ For a different region pair or DR topology, use the [OCI LZ Blueprint Factory](.
 
 <img src="../images/orm_deployment_dr_region.png" width="700" alt="OCI Resource Manager BCDR stack in Amsterdam using an Object Storage bucket for replicated One-OE dependency files">
 
-*Figure 3: DR-region BCDR stack in Amsterdam. It reads the replicated One-OE output dependency files from Object Storage and does not save a new output file.*
+<p align="center"><em>Figure 3</em></p>
+
+**Figure 3: DR-region BCDR stack in Amsterdam**
+
+It reads the replicated One-OE output dependency files from Object Storage and does not save a new output file.
 
 When deploying with ORM, follow these steps:
 

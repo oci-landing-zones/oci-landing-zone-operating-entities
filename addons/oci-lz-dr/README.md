@@ -25,14 +25,22 @@ The **OCI LZ BCDR** addon provides the core landing zone resources required to s
   
 <img src="images/layers.png" width="900" alt="BCDR architecture showing IAM and governance managed from the home region, tenancy-wide Cloud Guard, and regional security, network, and observability resources in the home and DR regions. Vault replication is not covered by the landing zone.">
 
-*Figure 1. BCDR resource scope: IAM and governance are reused from the home region, Cloud Guard is tenancy-wide, and network and observability are deployed per region. Vault replication is outside the landing zone scope.*
+<p align="center"><em>Figure 1</em></p>
+
+**Figure 1: BCDR resource scope**
+
+IAM and governance are reused from the home region, Cloud Guard is tenancy-wide, and network and observability are deployed per region. Vault replication is outside the landing zone scope.
 
 - For **operations**, the platform must be resilient enough to support provisioning and day-to-day operation of the solution, including CI/CD, monitoring, and third-party integrations. Multi-region deployment state should be managed separately per region, for example with distinct OCI Resource Manager stacks or Terraform workspaces, so each regional deployment can be planned, applied, and operated independently.
 
 
 <img src="images/optionsDR.png" width="900" alt="Four DR deployment variants: a shared or dedicated DR compartment, each deployed across separate Availability Domains or a dedicated secondary region.">
 
-*Figure 2. DR deployment options across Availability Domains or regions. The DR workload can reuse the production compartment or run in a dedicated DR compartment; each option can use a separate Availability Domain or a dedicated region. The selected model has different resource provisioning and maintenance requirements. A dedicated DR compartment is useful when a separate team manages DR resources.*
+<p align="center"><em>Figure 2</em></p>
+
+**Figure 2: DR deployment options across Availability Domains or regions**
+
+The DR workload can reuse the production compartment or run in a dedicated DR compartment; each option can use a separate Availability Domain or a dedicated region. The selected model has different resource provisioning and maintenance requirements. A dedicated DR compartment is useful when a separate team manages DR resources.
 
 To review best practices about BCDR, go [here](BCDR-best-practices.md).
 
