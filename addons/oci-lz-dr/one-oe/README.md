@@ -156,7 +156,7 @@ Then, in the DR region: to establish an RPC to Frankfurt, replace the matching f
 
 All requester and acceptor files are in the [`runtime`](./runtime/) directory.
 
-<img src="../images/x-tenancy.png" width="900" alt="cross region rpc">
+<img src="../images/s-tenancy.png" width="900" alt="cross region rpc">
 
 <p align="center"><em>Figure 4</em></p>
 

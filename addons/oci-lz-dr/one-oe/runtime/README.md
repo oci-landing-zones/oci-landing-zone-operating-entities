@@ -20,7 +20,6 @@ This directory contains the JSON configuration files used by the One-OE BCDR ext
 | `oneoe_bcdr_network_hub_c_backends_requester.json` | Complete Hub C-with-backends network with the FRA RPC requester and routes. | Replaces `oneoe_bcdr_network_hub_c_backends.json` after the Frankfurt acceptor is applied. |
 | `oneoe_bcdr_network_hub_e.json` | Complete AMS Hub E network configuration. | Use during the initial BCDR deployment; Hub E does not require staging. |
 | `oneoe_bcdr_network_hub_e_requester.json` | Complete AMS Hub E network with the FRA RPC requester and routes. | Replaces `oneoe_bcdr_network_hub_e.json` after the Frankfurt acceptor is applied. |
-| `oneoe_bcdr_network_requester.json` | Legacy generic AMS RPC requester configuration. | It is superseded by the hub-specific requester files; do not use it for new deployments. |
 | `oneoe_bcdr_observability_cis1_pre.json` | Initial CIS Level 1 AMS observability configuration. | Use during initial deployment before final hub networking. |
 | `oneoe_bcdr_observability_cis1.json` | Final CIS Level 1 AMS observability configuration, including flow logs. | Replaces `oneoe_bcdr_observability_cis1_pre.json` after final network configuration. |
 | `oneoe_bcdr_observability_cis2_pre.json` | Initial CIS Level 2 AMS observability configuration. | Use during initial deployment before final hub networking. |
