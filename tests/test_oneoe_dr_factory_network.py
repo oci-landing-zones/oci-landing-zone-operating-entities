@@ -136,16 +136,16 @@ class OneOeDrFactoryNetworkTests(unittest.TestCase):
                     for rule_key, rule in route_table["route_rules"].items():
                         self.assertEqual(rule, acceptor_rules[rule_key])
 
-    def test_acceptors_add_the_fra_to_ams_rpc_for_prod_dr(self) -> None:
+    def test_acceptors_add_the_fra_dr_rpc_for_prod_dr(self) -> None:
         for entrypoint_name in ACCEPTOR_ENTRYPOINTS.values():
             with self.subTest(entrypoint=entrypoint_name):
                 acceptor_drg = fra_drg(render_jsonnet_object(Path(entrypoint_name)))
-                rpc = acceptor_drg["remote_peering_connections"]["RPC-FRA-LZ-HUB-REGION-B-KEY"]
+                rpc = acceptor_drg["remote_peering_connections"]["RPC-FRA-LZ-HUB-DR-KEY"]
                 self.assertEqual("eu-amsterdam-1", rpc["peer_region_name"])
                 self.assertNotIn("peer_key", rpc)
-                self.assertIn("DRGATT-FRA-LZ-HUB-RPC-REGION-B-KEY", acceptor_drg["drg_attachments"])
-                self.assertIn("DRGRD-FRA-LZ-RPC-REGION-B-KEY", acceptor_drg["drg_route_distributions"])
-                self.assertIn("DRGRT-FRA-LZ-RPC-REGION-B-KEY", acceptor_drg["drg_route_tables"])
+                self.assertIn("DRGATT-FRA-LZ-HUB-RPC-DR-KEY", acceptor_drg["drg_attachments"])
+                self.assertIn("DRGRD-FRA-LZ-RPC-DR-KEY", acceptor_drg["drg_route_distributions"])
+                self.assertIn("DRGRT-FRA-LZ-RPC-DR-KEY", acceptor_drg["drg_route_tables"])
 
     def test_hub_e_acceptor_routes_ams_prod_directly_to_the_drg(self) -> None:
         network = render_jsonnet_object(
@@ -163,7 +163,7 @@ class OneOeDrFactoryNetworkTests(unittest.TestCase):
                 "RT-FRA-LZ-PROD-PROJ-GENERIC-KEY"
             ],
         ):
-            route = route_table["route_rules"]["rr-fra-rpc-region-b-1"]
+            route = route_table["route_rules"]["rr-fra-rpc-dr-1"]
             self.assertEqual("10.0.200.0/21", route["destination"])
             self.assertEqual("DRG-FRA-LZ-HUB-KEY", route["network_entity_key"])
 
@@ -179,13 +179,13 @@ class OneOeDrFactoryNetworkTests(unittest.TestCase):
                 network = render_jsonnet_object(Path(ACCEPTOR_ENTRYPOINTS[snapshot_name]))
                 acceptor_drg = fra_drg(network)
                 rpc_route_table = acceptor_drg["drg_route_tables"][
-                    "DRGRT-FRA-LZ-RPC-REGION-B-KEY"
+                    "DRGRT-FRA-LZ-RPC-DR-KEY"
                 ]
                 rpc_distribution = acceptor_drg["drg_route_distributions"][
-                    "DRGRD-FRA-LZ-RPC-REGION-B-KEY"
+                    "DRGRD-FRA-LZ-RPC-DR-KEY"
                 ]
                 static_route = rpc_route_table["route_rules"][
-                    "DRGRT-FRA-LZ-RPC-REGION-B-PROD-STATIC-ROUTE"
+                    "DRGRT-FRA-LZ-RPC-DR-PROD-STATIC-ROUTE"
                 ]
                 self.assertEqual("10.0.64.0/21", static_route["destination"])
                 self.assertEqual(
@@ -196,7 +196,7 @@ class OneOeDrFactoryNetworkTests(unittest.TestCase):
                 route = network["network_configuration"]["network_configuration_categories"]["0-shared"][
                     "vcns"
                 ]["VCN-FRA-LZ-HUB-KEY"]["route_tables"][route_table_key]["route_rules"][
-                    "rr-fra-rpc-region-b-1"
+                    "rr-fra-rpc-dr-1"
                 ]
                 self.assertEqual("10.0.200.0/21", route["destination"])
                 self.assertEqual("DRG-FRA-LZ-HUB-KEY", route["network_entity_key"])
@@ -228,7 +228,7 @@ class OneOeDrFactoryNetworkTests(unittest.TestCase):
             with self.subTest(entrypoint=entrypoint_name):
                 requester_drg = drg(render_jsonnet_object(Path(entrypoint_name)))
                 self.assertEqual(
-                    "RPC-FRA-LZ-HUB-REGION-B-KEY",
+                    "RPC-FRA-LZ-HUB-DR-KEY",
                     requester_drg["remote_peering_connections"]["RPC-AMS-LZ-HUB-REGION-A-KEY"][
                         "peer_key"
                     ],

@@ -577,7 +577,7 @@
                             "remote_peering_connections": {
                                 "RPC-AMS-LZ-HUB-REGION-A-KEY": {
                                     "display_name"                                   : "rpc-ams-lz-hub-region-a",
-                                    "peer_key"                                       : "RPC-FRA-LZ-HUB-REGION-B-KEY",
+                                    "peer_key"                                       : "RPC-FRA-LZ-HUB-DR-KEY",
                                     "peer_region_name"                               : "eu-frankfurt-1"
                                 }
                             }

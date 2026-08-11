@@ -1,7 +1,7 @@
 local naming = import '../../../naming.libsonnet';
 
 local frankfurt_cidr = '10.0.0.0/16';
-local frankfurt_peer_key = 'RPC-FRA-LZ-HUB-REGION-B-KEY';
+local frankfurt_peer_key = 'RPC-FRA-LZ-HUB-DR-KEY';
 local frankfurt_region = 'eu-frankfurt-1';
 
 local remote_route(drg_key) = {

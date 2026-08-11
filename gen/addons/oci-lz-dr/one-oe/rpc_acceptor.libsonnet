@@ -29,18 +29,17 @@ function(final_network, firewall_egress_route_table=null)
   local prod_attachment_key = n.key('DRGATT', ['PROD', 'PROJ']);
   local hub_distribution_key = n.key('DRGRD', ['HUB']);
   local spoke_distribution_key = n.key('DRGRD', ['SPOKE']);
-  local rpc_key = n.key('RPC', ['HUB', 'REGION', 'B']);
-  local rpc_attachment_key = n.key('DRGATT', ['HUB', 'RPC', 'REGION', 'B']);
-  local rpc_distribution_key = n.key('DRGRD', ['RPC', 'REGION', 'B']);
-  local rpc_route_table_key = n.key('DRGRT', ['RPC', 'REGION', 'B']);
-  local rpc_route_rule_key = n.route_rule([n.region, 'rpc', 'region', 'b', '1']);
+  local rpc_key = n.key('RPC', ['HUB', 'DR']);
+  local rpc_attachment_key = n.key('DRGATT', ['HUB', 'RPC', 'DR']);
+  local rpc_distribution_key = n.key('DRGRD', ['RPC', 'DR']);
+  local rpc_route_table_key = n.key('DRGRT', ['RPC', 'DR']);
+  local rpc_route_rule_key = n.route_rule([n.region, 'rpc', 'dr', '1']);
   local rpc_prod_static_route_key = std.join('-', [
     'DRGRT',
     std.asciiUpper(n.region),
     'LZ',
     'RPC',
-    'REGION',
-    'B',
+    'DR',
     'PROD',
     'STATIC',
     'ROUTE',
@@ -49,7 +48,7 @@ function(final_network, firewall_egress_route_table=null)
     '1-prod'
   ].vcns[prod_vcn_key].cidr_blocks[0];
   local rpc_attachment = {
-    display_name: n.display('DRGATT', ['HUB', 'RPC', 'REGION', 'B']),
+    display_name: n.display('DRGATT', ['HUB', 'RPC', 'DR']),
     drg_route_table_key: rpc_route_table_key,
     network_details: {
       type: 'REMOTE_PEERING_CONNECTION',
@@ -57,11 +56,11 @@ function(final_network, firewall_egress_route_table=null)
     },
   };
   local rpc = {
-    display_name: n.display('RPC', ['HUB', 'REGION', 'B']),
+    display_name: n.display('RPC', ['HUB', 'DR']),
     peer_region_name: amsterdam_region,
   };
   local rpc_distribution = {
-    display_name: n.display('DRGRD', ['RPC', 'REGION', 'B']),
+    display_name: n.display('DRGRD', ['RPC', 'DR']),
     distribution_type: 'IMPORT',
     statements: {},
   };
@@ -80,19 +79,19 @@ function(final_network, firewall_egress_route_table=null)
     drg_route_distributions+: {
       [hub_distribution_key]+: {
         statements+: {
-          [n.key_global('ROUTE-TO-RPC', ['REGION', 'B'])]:
+          [n.key_global('ROUTE-TO-RPC', ['DR'])]:
             rpc_route_statement(rpc_attachment_key, 30),
         },
       },
       [spoke_distribution_key]+: {
         statements+: {
-          [n.key_global('ROUTE-TO-RPC', ['REGION', 'B', 'S'])]:
+          [n.key_global('ROUTE-TO-RPC', ['DR', 'S'])]:
             rpc_route_statement(rpc_attachment_key, 40),
         },
       },
       [rpc_distribution_key]+: {
         statements+: {
-          [n.key_global('ROUTE-TO-RPC', ['REGION', 'B', 'VCN', 'HUB'])]: {
+          [n.key_global('ROUTE-TO-RPC', ['DR', 'VCN', 'HUB'])]: {
             action: 'ACCEPT',
             priority: 10,
             match_criteria: {
@@ -101,7 +100,7 @@ function(final_network, firewall_egress_route_table=null)
               drg_attachment_key: hub_attachment_key,
             },
           },
-          [n.key_global('ROUTE-TO-RPC', ['REGION', 'B', 'VCN', 'PROD'])]: {
+          [n.key_global('ROUTE-TO-RPC', ['DR', 'VCN', 'PROD'])]: {
             action: 'ACCEPT',
             priority: 20,
             match_criteria: {
@@ -115,7 +114,7 @@ function(final_network, firewall_egress_route_table=null)
     },
     drg_route_tables+: {
       [rpc_route_table_key]: {
-        display_name: n.display('DRGRT', ['RPC', 'REGION', 'B']),
+        display_name: n.display('DRGRT', ['RPC', 'DR']),
         import_drg_route_distribution_key: rpc_distribution_key,
         is_ecmp_enabled: false,
         route_rules: {},
@@ -126,14 +125,14 @@ function(final_network, firewall_egress_route_table=null)
     drg_route_distributions+: {
       [hub_distribution_key]+: {
         statements+: {
-          [n.key_global('ROUTE-TO-RPC', ['REGION', 'B'])]:
+          [n.key_global('ROUTE-TO-RPC', ['DR'])]:
             rpc_route_statement(rpc_attachment_key, 30),
         },
       },
     },
     drg_route_tables+: {
       [rpc_route_table_key]: {
-        display_name: n.display('DRGRT', ['RPC', 'REGION', 'B']),
+        display_name: n.display('DRGRT', ['RPC', 'DR']),
         import_drg_route_distribution_key: rpc_distribution_key,
         is_ecmp_enabled: false,
         route_rules: {
