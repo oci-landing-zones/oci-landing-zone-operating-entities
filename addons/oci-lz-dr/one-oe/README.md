@@ -152,7 +152,45 @@ After the One-OE BCDR addon is deployed, establish the Remote Peering Connection
 
 First, in the home region: replace the matching final Frankfurt One-OE network file in the home-region stack with its complete `*_acceptor.json` variant. Each acceptor file contains the final One-OE network configuration plus the FRA-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file. Applying this variant updates the Frankfurt network dependency output, making the acceptor RPC available to the AMS BCDR stack.
 
+**oneoe_network_hub_N_acceptor.json**
+
+```
+"remote_peering_connections": 
+{
+"RPC-FRA-LZ-HUB-DR-KEY": {
+"display_name"     : "rpc-fra-lz-hub-dr",
+"peer_region_name" : "eu-amsterdam-1"
+}
+}
+```
+
+**network_output.json**
+
+```
+RPC-FRA-LZ-HUB-DR-KEY	
+id	"ocid1.remotepeeringconnection.oc1.eu-frankfurt-1.xxxxxxxxxxxxnnbmuunntekppwfezefy4rms3oq"
+region_name	"eu-frankfurt-1"
+```
+
+
+
 Then, in the DR region: to establish an RPC to Frankfurt, replace the matching final network file in the same stack with its complete `*_requester.json` variant after staged hub networking is complete. Each requester file contains the final network configuration plus the AMS-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file.
+
+<img src="../images/op2_2run.png" width="900" alt="cross region rpc">
+
+
+**oneoe_network_hub_N_requestor.json**
+
+
+```
+"remote_peering_connections": {
+"RPC-AMS-LZ-HUB-HOME-KEY": {
+"display_name"      : "rpc-ams-lz-hub-home",
+"peer_key"          : "RPC-FRA-LZ-HUB-DR-KEY",
+"peer_region_name"  : "eu-frankfurt-1"
+}
+}
+```
 
 All requester and acceptor files are in the [`runtime`](./runtime/) directory.
 
