@@ -41,7 +41,7 @@ In this reference pattern, Region 1 represents the primary region and always act
 Same-tenancy RPC requires no additional cross-tenancy IAM or governance configuration. Only the two network templates are published for this scenario.
 
 > [!NOTE]
-> These files are generated One-OE golden reference templates. Review and replace all placeholder tenancy OCIDs, group OCIDs, RPC references, firewall private IP OCIDs, CIDRs, regions, and other customer-specific values before deployment. Standard One-OE security and observability configurations remain part of the Landing Zone deployment and are not duplicated here.
+> The reference JSON configuration files are based on the current One-OE structure. Review and replace all placeholder tenancy OCIDs, group OCIDs, RPC references, firewall private IP OCIDs, CIDRs, regions, and other customer-specific values before deployment. Standard One-OE security and observability configurations remain part of the Landing Zone deployment and are not duplicated here.
 
 For deployment order and validation, see the [OCI X-RPC execution guide](../execution.md).
 

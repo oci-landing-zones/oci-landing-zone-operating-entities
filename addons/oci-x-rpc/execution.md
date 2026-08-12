@@ -96,7 +96,7 @@ In this reference pattern, Region 1 represents the primary region and always act
 ## Step 2 - Deploy Region 2 As The Requester
 
 1. Review and adapt [`same_tenancy_region2_requester_network.json`](./runtime/same_tenancy_region2_requester_network.json) for Region 2.
-2. The golden template uses `peer_key` for orchestrated dependency resolution. For a manual deployment, replace `peer_key` with `peer_id` and set it to the Region 1 acceptor RPC OCID:
+2. The reference template uses `peer_key` for orchestrated dependency resolution. For a manual deployment, replace `peer_key` with `peer_id` and set it to the Region 1 acceptor RPC OCID:
 
 ```json
 "peer_id": "ocid1.remotepeeringconnection.oc1..."
@@ -204,7 +204,7 @@ After a successful deployment, collect the RPC OCID created in Tenancy 1.
 
 # Step 3 - Complete The Tenancy 2 Network Deployment
 
-The golden requester template uses `peer_key` for orchestrated dependency resolution. For a manual deployment, replace `peer_key` with `peer_id` and set it to the Tenancy 1 acceptor RPC OCID:
+The reference requester template uses `peer_key` for orchestrated dependency resolution. For a manual deployment, replace `peer_key` with `peer_id` and set it to the Tenancy 1 acceptor RPC OCID:
 
 ```json
 "peer_id": "ocid1.remotepeeringconnection.oc1..."

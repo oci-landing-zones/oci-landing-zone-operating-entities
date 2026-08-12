@@ -2,15 +2,13 @@
 
 ## Overview
 
-Use the [OCI LZ Blueprint Factory](../../oci-lz-blueprint-factory/README.md) or [OCI LZ AI Agent](../../oci-lz-ai-agent/README.md) when the runtime golden templates do not match the customer's regions, environments, platforms, CIDRs, hub models, or RPC topology.
+The [OCI LZ Blueprint Factory](../../oci-lz-blueprint-factory/README.md) and [OCI LZ AI Agent](../../oci-lz-ai-agent/README.md) help generate X-RPC configurations for customer-specific requirements, including regions, environments, platforms, CIDRs, hub models, and RPC topology.
 
-Both paths create a reviewed source configuration and generate the complete current One-OE output set. Generated customer outputs are written to separate customer-selected directories and are not committed under `addons/oci-x-rpc/runtime/`.
-
-## Supported RPC Scenarios
+## Scenarios
 
 | Scenario | Acceptor | Requester | Additional RPC IAM |
 |---|---|---|---|
-| Same tenancy, multiple regions | Omits `peer_id` | Sets the acceptor RPC OCID or dependency key in `peer_id` | None |
+| Same tenancy, multiple regions | Omits `peer_id` | Sets the acceptor RPC OCID or dependency key in `peer_id` | Same-tenancy RPC IAM policies are not needed. |
 | Cross tenancy, multiple regions | Adds requester tenancy and foreign requester group OCIDs; omits `peer_id` | Adds acceptor tenancy OCID and sets `peer_id` | Acceptor Admit policy; requester Allow and Endorse policies |
 
 The requester IAM policy references its local group as `'id_lz_common'/'grp-lz-network-admin'`. Only the acceptor identifies the foreign requester group by OCID.
@@ -147,7 +145,9 @@ The generator adds RPC route tables, route distributions, attachments, import st
 
 ## Generated Output
 
-Generation produces the complete One-OE files, including `governance.json`, `iam.json`, `network.json`, security and observability files, and `network_pre.json` for firewall hubs that require two-stage deployment.
+Generation produces the core One-OE configuration files: `governance.json`, `iam.json`, `network.json`, the selected `security_cis1.json` or `security_cis2.json`, and the corresponding `observability_cis1.json` or `observability_cis2.json`.
+
+For staged deployments, generation also produces `network_pre.json`, the selected `security_cis1_pre.json` or `security_cis2_pre.json`, and the corresponding `observability_cis1_pre.json` or `observability_cis2_pre.json`. Hub C deployments can additionally produce `network_backends.json`, and registered extensions can add their own `.json` output files.
 
 Review all generated files before deployment. Keep the source configurations and generated output directories separate.
 
