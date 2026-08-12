@@ -152,6 +152,10 @@ After the One-OE BCDR addon is deployed, establish the Remote Peering Connection
 
 First, in the home region: replace the matching final Frankfurt One-OE network file in the home-region stack with its complete `*_acceptor.json` variant. Each acceptor file contains the final One-OE network configuration plus the FRA-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file. Applying this variant updates the Frankfurt network dependency output, making the acceptor RPC available to the AMS BCDR stack.
 
+
+<img src="../images/op1_2run.png" width="900" alt="cross region rpc">
+
+
 **oneoe_network_hub_N_acceptor.json**
 
 ```
@@ -199,6 +203,11 @@ All requester and acceptor files are in the [`runtime`](./runtime/) directory.
 <p align="center"><em>Figure 4</em></p>
 
 **Figure 4: cross-region RPC. Example: Frankfurt - Amsterdam**
+
+
+| Network visualizer — FRA | Network visualizer — AMS |
+|---|---|
+| <img src="../images/net_view_fra.png" width="600" alt="network visualizer view from FRA"><br><em>Figure 5: Network visualizer view from FRA</em> | <img src="../images/net_view_ams.png" width="600" alt="network visualizer view from AMS"><br><em>Figure 6: Network visualizer view from AMS</em> |
 
 
 Use the [OCI Remote Peering Connections addon](/addons/oci-x-rpc/README.md) to follow the required steps and automate this connectivity layer.
