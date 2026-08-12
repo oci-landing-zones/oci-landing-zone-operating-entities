@@ -17,25 +17,37 @@ flowchart LR
 
         subgraph REQUESTER_IDENTITY["Tenancy 2 | Requester Identity"]
             direction TB
-            A["1. Add Tenancy 1 OCID to requester IAM"]
-            B["2. Deploy requester IAM and governance"]
-            C["3. Collect requester network-admin group OCID"]
+            A["`**1. Update requester IAM**
+            Add Tenancy 1 OCID`"]
+            B["`**2. Deploy requester**
+            IAM and governance`"]
+            C["`**3. Collect requester group**
+            Network-admin group OCID`"]
             A --> B --> C
         end
 
         subgraph ACCEPTOR["Tenancy 1 | Acceptor"]
             direction TB
-            D["4. Add Tenancy 2 and group OCIDs to acceptor IAM"]
-            E["5. Deploy acceptor IAM, network, and governance"]
-            F["6. Collect Tenancy 1 acceptor RPC OCID"]
+            D["`**4. Update acceptor IAM**
+            Add Tenancy 2 OCID
+            Add requester group OCID`"]
+            E["`**5. Deploy acceptor**
+            IAM and governance
+            Network configuration`"]
+            F["`**6. Collect acceptor RPC**
+            Tenancy 1 RPC OCID`"]
             D --> E --> F
         end
 
         subgraph REQUESTER_NETWORK["Tenancy 2 | Complete Requester Network"]
             direction TB
-            G["7. Set requester peer_id to the acceptor RPC OCID"]
-            H["8. Deploy requester network"]
-            I["9. Verify the RPC status is PEERED"]
+            G["`**7. Update requester network**
+            Set peer_id to
+            acceptor RPC OCID`"]
+            H["`**8. Deploy network**
+            Complete requester peering`"]
+            I["`**9. Validate connection**
+            RPC status is PEERED`"]
             G --> H --> I
         end
 
