@@ -60,7 +60,7 @@ And follow these steps:
   2. Set the working directory to “rms-facade”.
   3. Set the stack name you prefer.
   4. Set the terraform version to 1.5.x. Click Next.
-  5. Review the [ORM deployment best practices](../../../../commons/content/orm_bp.md), then accept the default files or replace them with your reviewed json/yaml configuration files. Before continuing, replace `email.address@example.com` in the selected initial observability file with the operational notification email addresses and confirm each email subscription. Repeat this change in the matching final observability file before using it in Step 2; otherwise the final replacement restores the placeholder addresses.
+  5. Review the [ORM deployment best practices](../../../../commons/content/orm_bp.md), then accept the default files or replace them with your reviewed json/yaml configuration files. Before continuing, replace `email.address@example.com` in [oneoe_observability_cis1_pre.json](oneoe_observability_cis1_pre.json) with the operational notification email addresses and confirm each email subscription. Repeat this change in [oneoe_observability_cis1.json](oneoe_observability_cis1.json) before using it in Step 2; otherwise the final replacement restores the placeholder addresses.
   6. Un-check run apply. Click Create.
   
 #### Step 2: 
@@ -118,7 +118,7 @@ And follow these steps:
   2. Set the working directory to “rms-facade”.
   3. Set the stack name you prefer.
   4. Set the terraform version to 1.5.x. Click Next.
-  5. Review the [ORM deployment best practices](../../../../commons/content/orm_bp.md), then accept the default files or replace them with your reviewed json/yaml configuration files. Before continuing, replace `email.address@example.com` in the selected initial observability file with the operational notification email addresses and confirm each email subscription. Repeat this change in the matching final observability file before using it in Step 2; otherwise the final replacement restores the placeholder addresses.
+  5. Review the [ORM deployment best practices](../../../../commons/content/orm_bp.md), then accept the default files or replace them with your reviewed json/yaml configuration files. Before continuing, replace `email.address@example.com` in [oneoe_observability_cis2_pre.json](oneoe_observability_cis2_pre.json) with the operational notification email addresses and confirm each email subscription. Repeat this change in [oneoe_observability_cis2.json](oneoe_observability_cis2.json) before using it in Step 2; otherwise the final replacement restores the placeholder addresses.
   6. Un-check run apply. Click Create.
 
 #### Step 2: 
