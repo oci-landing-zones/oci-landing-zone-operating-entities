@@ -11,37 +11,59 @@ The setup enables secure connectivity between Region 1 and Region 2 in the same 
 # Cross-Tenancy Execution Flow
 
 ```mermaid
-flowchart TD
-    subgraph REQUESTER_IDENTITY["Tenancy 2 - Requester Identity"]
-        A["Update requester IAM<br/>Add Tenancy 1 OCID"]
-        B["Deploy requester<br/>IAM + Governance"]
-        C["Collect requester<br/>network-admin group OCID"]
-        A --> B --> C
+flowchart LR
+    subgraph PROCESS["Cross-Tenancy RPC Deployment"]
+        direction TB
+
+        subgraph REQUESTER_IDENTITY["Tenancy 2 | Requester Identity"]
+            direction TB
+            A["1. Add Tenancy 1 OCID to requester IAM"]
+            B["2. Deploy requester IAM and governance"]
+            C["3. Collect requester network-admin group OCID"]
+            A --> B --> C
+        end
+
+        subgraph ACCEPTOR["Tenancy 1 | Acceptor"]
+            direction TB
+            D["4. Add Tenancy 2 and group OCIDs to acceptor IAM"]
+            E["5. Deploy acceptor IAM, network, and governance"]
+            F["6. Collect Tenancy 1 acceptor RPC OCID"]
+            D --> E --> F
+        end
+
+        subgraph REQUESTER_NETWORK["Tenancy 2 | Complete Requester Network"]
+            direction TB
+            G["7. Set requester peer_id to the acceptor RPC OCID"]
+            H["8. Deploy requester network"]
+            I["9. Verify the RPC status is PEERED"]
+            G --> H --> I
+        end
+
+        C --> D
+        F --> G
     end
 
-    subgraph ACCEPTOR["Tenancy 1 - Acceptor"]
-        D["Update acceptor IAM<br/>Add requester group + Tenancy 2 OCIDs"]
-        E["Deploy acceptor<br/>IAM + Network + Governance"]
-        F["Collect Tenancy 1<br/>acceptor RPC OCID"]
-        D --> E --> F
+    subgraph LEGEND["Role Legend"]
+        direction TB
+        L1(["Tenancy 1 | Acceptor"])
+        L2(["Tenancy 2 | Requester"])
+        L3(["RPC connection verified"])
     end
 
-    subgraph REQUESTER_NETWORK["Tenancy 2 - Complete Requester Network"]
-        G["Update requester network<br/>Set peer_id to acceptor RPC OCID"]
-        H["Deploy requester<br/>Network"]
-        I["Validate RPC status<br/>PEERED"]
-        G --> H --> I
-    end
+    I ~~~ L3
 
-    C --> D
-    F --> G
+    classDef tenancy1 fill:#fff1d6,stroke:#c65d00,color:#572800,stroke-width:2px;
+    classDef tenancy2 fill:#e8f1ff,stroke:#2563eb,color:#102a56,stroke-width:2px;
+    classDef verified fill:#e8f7ed,stroke:#16803c,color:#0e4723,stroke-width:2px;
+    class A,B,C,G,H,L2 tenancy2;
+    class D,E,F,L1 tenancy1;
+    class I,L3 verified;
 
-    classDef requester fill:#eaf2ff,stroke:#2563eb,color:#102a56,stroke-width:1.5px;
-    classDef acceptor fill:#fff4e5,stroke:#d97706,color:#5a2d00,stroke-width:1.5px;
-    classDef validation fill:#eaf8ef,stroke:#16803c,color:#0e4723,stroke-width:1.5px;
-    class A,B,C,G,H requester;
-    class D,E,F acceptor;
-    class I validation;
+    style PROCESS fill:#ffffff,stroke:#64748b,stroke-width:1.5px,color:#172033
+    style REQUESTER_IDENTITY fill:#f6f9ff,stroke:#2563eb,stroke-width:2px,color:#102a56
+    style ACCEPTOR fill:#fffaf0,stroke:#c65d00,stroke-width:2px,color:#572800
+    style REQUESTER_NETWORK fill:#f6f9ff,stroke:#2563eb,stroke-width:2px,color:#102a56
+    style LEGEND fill:#f8fafc,stroke:#64748b,stroke-width:1.5px,color:#172033
 ```
 
 ---
