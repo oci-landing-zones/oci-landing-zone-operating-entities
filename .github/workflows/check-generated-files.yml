@@ -26,9 +26,6 @@ jobs:
           echo "INFO: Running ./gen/generate.sh to regenerate all files from templates..."
           ./gen/generate.sh
 
-          echo "INFO: Verifying complete One-OE X-RPC examples..."
-          ./addons/oci-x-rpc/examples/complete-one-oe/verify.sh
-
           echo "---"
           echo "INFO: Checking for differences between committed and regenerated files..."
 

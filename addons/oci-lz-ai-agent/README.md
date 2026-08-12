@@ -101,7 +101,7 @@ I want a landing zone with OKE.
 ```text
 Create two reviewed One-OE Landing Zone drafts for a cross-tenancy RPC:
 - Tenancy 1 is the acceptor in eu-frankfurt-1 using Hub A and CIDRs under 10.0.0.0/16.
-- Tenancy 2 is the requester in eu-amsterdam-1 using Hub E and CIDRs under 10.1.0.0/16.
+- Tenancy 2 is the requester in eu-amsterdam-1 using Hub B and CIDRs under 10.1.0.0/16.
 - Both sides need prod, preprod, and UAT project networks.
 - Generate all local environment and platform routing dynamically.
 - Add only RPC-specific cross-tenancy IAM policies; governance remains One-OE standard.
@@ -115,6 +115,7 @@ Minimal discovery prompt:
 I need a cross-tenancy Remote Peering Connection between two One-OE landing zones.
 ```
 
+See the [X-RPC Blueprint Factory and LZ Agent guide](../oci-x-rpc/runtime/x-rpc-blueprint-factory.md) for the required role, IAM, routing, and output behavior.
 
 ### Currently supported add-ons and workloads:
 

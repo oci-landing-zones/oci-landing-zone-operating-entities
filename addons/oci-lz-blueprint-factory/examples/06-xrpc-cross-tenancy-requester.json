@@ -30,7 +30,7 @@
     },
 
     "hub": {
-        "kind"                      : "hub_e",
+        "kind"                      : "hub_b",
 
         "network": {
             "vcn"                   : "10.1.0.0/21"

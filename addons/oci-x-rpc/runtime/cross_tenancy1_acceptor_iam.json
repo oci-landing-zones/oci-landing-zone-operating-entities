@@ -101,42 +101,6 @@
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role"        : "lz-security-admin"
                         }
-                    },
-
-                    "CMP-LZ-UAT-KEY": {
-                        "name"                                 : "cmp-lz-uat",
-                        "description"                          : "UAT Environment Compartment",
-
-                        "children": {
-                            "CMP-LZ-UAT-NETWORK-KEY": {
-                                "name"                         : "cmp-lz-uat-network",
-                                "description"                  : "UAT Workload Environment, Common Network Compartment",
-
-                                "defined_tags": {
-                                    "tagns-lz-role.tag-lz-role": "lz-network-admin"
-                                }
-                            },
-
-                            "CMP-LZ-UAT-PLATFORM-KEY": {
-                                "name"                         : "cmp-lz-uat-platform",
-                                "description"                  : "UAT Workload Environment, Common Platform Compartment"
-                            },
-
-                            "CMP-LZ-UAT-PROJECTS-KEY": {
-                                "name"                         : "cmp-lz-uat-projects",
-                                "description"                  : "UAT Workload Environment, Common Projects Compartment",
-                                "children"                     : {}
-                            },
-
-                            "CMP-LZ-UAT-SECURITY-KEY": {
-                                "name"                         : "cmp-lz-uat-security",
-                                "description"                  : "UAT Workload Environment, Common Security Compartment",
-
-                                "defined_tags": {
-                                    "tagns-lz-role.tag-lz-role": "lz-security-admin"
-                                }
-                            }
-                        }
                     }
                 }
             }

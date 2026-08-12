@@ -1,28 +1,52 @@
-# X-RPC Runtime References
+# X-RPC Runtime Golden Templates
 
-This directory contains generated RPC-only reference fragments. The generator renders the current One-OE implementation and the X-RPC publication adapter projects only the relevant network and IAM delta.
+This directory contains generated One-OE golden templates for a production-oriented RPC reference topology. The templates are generated from the current `gen/` source and are suitable for review, testing, and customer-specific adaptation.
 
-These are not standalone or complete One-OE configurations. Governance remains part of the standard One-OE deployment and is not duplicated by this add-on.
+## Reference Topology
+
+| Side | Region | Hub | CIDR family | Environments |
+|---|---|---|---|---|
+| Tenancy 1 acceptor | `eu-frankfurt-1` | Hub A | `10.0.x.x` | `prod`, `preprod` |
+| Tenancy 2 requester | `eu-amsterdam-1` | Hub B | `10.1.x.x` | `prod`, `preprod` |
 
 ## Files
 
-| Scenario | Network | IAM |
-|---|---|---|
-| Same-tenancy acceptor | [`same_tenancy_acceptor_network.json`](./same_tenancy_acceptor_network.json) | Not required |
-| Same-tenancy requestor | [`same_tenancy_requester_network.json`](./same_tenancy_requester_network.json) | Not required |
-| Cross-tenancy acceptor | [`cross_tenancy_acceptor_network.json`](./cross_tenancy_acceptor_network.json) | [`cross_tenancy_acceptor_iam.json`](./cross_tenancy_acceptor_iam.json) |
-| Cross-tenancy requestor | [`cross_tenancy_requester_network.json`](./cross_tenancy_requester_network.json) | [`cross_tenancy_requester_iam.json`](./cross_tenancy_requester_iam.json) |
+### Cross Tenancy
 
-The cross-tenancy acceptor IAM fragment identifies the foreign requestor group by OCID. The requestor IAM fragment references its local `'id_lz_common'/'grp-lz-network-admin'` group by name.
+| Side | Governance | IAM | Network |
+|---|---|---|---|
+| Tenancy 1 acceptor | [`cross_tenancy1_acceptor_governance.json`](./cross_tenancy1_acceptor_governance.json) | [`cross_tenancy1_acceptor_iam.json`](./cross_tenancy1_acceptor_iam.json) | [`cross_tenancy1_acceptor_network.json`](./cross_tenancy1_acceptor_network.json) |
+| Tenancy 2 requester | [`cross_tenancy2_requester_governance.json`](./cross_tenancy2_requester_governance.json) | [`cross_tenancy2_requester_iam.json`](./cross_tenancy2_requester_iam.json) | [`cross_tenancy2_requester_network.json`](./cross_tenancy2_requester_network.json) |
 
-Regenerate these files from the repository root:
+The governance files are the standard One-OE baseline included in the published governance/IAM/network reference set. X-RPC does not introduce additional governance resources. Use the standard One-OE security and observability configurations with these templates; those domains are not duplicated here.
+
+### Same Tenancy, Multiple Regions
+
+| Side | Network |
+|---|---|
+| Tenancy 1 acceptor | [`same_tenancy1_acceptor_network.json`](./same_tenancy1_acceptor_network.json) |
+| Tenancy 2 requester | [`same_tenancy2_requester_network.json`](./same_tenancy2_requester_network.json) |
+
+Same-tenancy RPC does not require cross-tenancy IAM policies or an additional governance configuration, so only network templates are published.
+
+## Before Deployment
+
+These files are reference templates, not customer-specific values. Review and replace all placeholder tenancy OCIDs, group OCIDs, RPC references, firewall private IP OCIDs, CIDRs, regions, names, tags, notification endpoints, and other environment-specific values before deployment.
+
+Hub A and Hub B use the standard two-stage OCI Network Firewall deployment. The committed network templates represent the final RPC-enabled network configuration. For a new Landing Zone, follow the matching Hub A or Hub B pre-stage workflow, or use config-driven generation to produce the matching `network_pre.json` file before applying the final network configuration.
+
+For deployment order and validation, see the [X-RPC execution guide](../execution.md).
+
+## Blueprint Factory And LZ Agent
+
+The generated JSON output for a customer-specific Blueprint Factory or LZ Agent request is intentionally not committed in this directory. Follow [`x-rpc-blueprint-factory.md`](./x-rpc-blueprint-factory.md) to create a reviewed source config and generate a separate output directory.
+
+## Regenerate
+
+Regenerate all committed snapshots from the repository root:
 
 ```bash
 bash gen/generate.sh
 ```
 
-Generate complete deployment files from a customer source config instead:
-
-```bash
-bash gen/generate.sh --config <config-file> <output-directory>
-```
+Do not edit generated runtime JSON directly. Update the corresponding profiles, builders, or Jsonnet entrypoints under [`gen/addons/oci-x-rpc/`](../../../gen/addons/oci-x-rpc/) and regenerate.

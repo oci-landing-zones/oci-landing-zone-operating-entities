@@ -175,6 +175,13 @@ local render_context = import '../../render_context.libsonnet';
     )
   },
 
+  render(config):: landing_zone(config),
+
+  governance(config):: $.render(config).governance,
+
+  iam(config):: $.render(config).iam,
+
+  network(config):: $.render(config).network,
 
   network_fragment(config)::
     local ctx = render_context.from_raw_config(config);

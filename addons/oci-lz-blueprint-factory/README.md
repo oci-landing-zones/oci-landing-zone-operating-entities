@@ -116,7 +116,7 @@ bash gen/generate.sh --config addons/oci-lz-blueprint-factory/examples/01-single
 
 Use the examples as readable patterns. Replace region, hub model, environment names, CIDRs, project names, extension parameters, and notification emails with values reviewed for the target deployment.
 
-The RPC examples form a pair. Generate and review both sides separately. Deploy the acceptor side first, collect its RPC OCID, replace the requester's `peer_id` placeholder, and then generate or deploy the requester side. Environment names and counts are examples only; the factory derives routing from whatever network-producing environments and platforms each customer config defines.
+The RPC examples form a Hub A acceptor and Hub B requester pair. Generate and review both sides separately. Deploy the acceptor side first, collect its RPC OCID, replace the requester's `peer_id` placeholder, and then generate or deploy the requester side. Environment names and counts are examples only; the factory derives routing from whatever network-producing environments and platforms each customer config defines. See the [X-RPC Blueprint Factory guide](../oci-x-rpc/runtime/x-rpc-blueprint-factory.md) for the complete role, IAM, routing, and generation contract.
 
 &nbsp;
 

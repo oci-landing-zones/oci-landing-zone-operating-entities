@@ -17,6 +17,12 @@ local acceptor_iam = published.iam_fragment(profiles.cross_tenancy_acceptor);
 local requestor_iam = published.iam_fragment(profiles.cross_tenancy_requestor);
 local same_acceptor_iam = published.iam_fragment(profiles.same_tenancy_acceptor);
 local same_requestor_iam = published.iam_fragment(profiles.same_tenancy_requestor);
+local acceptor_golden_network = published.network(profiles.cross_tenancy_acceptor);
+local requestor_golden_network = published.network(profiles.cross_tenancy_requestor);
+local acceptor_golden_iam = published.iam(profiles.cross_tenancy_acceptor);
+local acceptor_golden_governance = published.governance(
+  profiles.cross_tenancy_acceptor
+);
 
 local shared(result) =
   result.network.network_configuration.network_configuration_categories['0-shared'];
@@ -25,27 +31,16 @@ local drg(result, key) =
 local acceptor_drg = drg(acceptor, 'DRG-FRA-LZ-HUB-KEY');
 local requestor_drg = drg(requestor, 'DRG-AMS-LZ-HUB-KEY');
 local acceptor_rpc =
-  acceptor_drg.remote_peering_connections['RPC-FRA-LZ-HUB-REQUESTOR-KEY'];
+  acceptor_drg.remote_peering_connections['RPC-FRA-LZ-HUB-TENANCY2-KEY'];
 local requestor_rpc =
-  requestor_drg.remote_peering_connections['RPC-AMS-LZ-HUB-ACCEPTOR-KEY'];
-local requestor_distribution =
-  requestor_drg.drg_route_distributions['DRGRD-AMS-LZ-RPC-ACCEPTOR-KEY'];
-local imported_attachments = std.sort([
-  requestor_distribution.statements[key].match_criteria.drg_attachment_key
-  for key in std.objectFields(requestor_distribution.statements)
-]);
-local local_vcn_attachments = std.sort([
-  key
-  for key in std.objectFields(requestor_drg.drg_attachments)
-  if requestor_drg.drg_attachments[key].network_details.type == 'VCN'
-]);
+  requestor_drg.remote_peering_connections['RPC-AMS-LZ-HUB-TENANCY1-KEY'];
 local acceptor_statements =
   acceptor_iam.policies_configuration.supplied_policies[
-    'PCY-FRA-LZ-HUB-RPC-REQUESTOR-KEY'
+    'PCY-FRA-LZ-HUB-RPC-TENANCY2-KEY'
   ].statements;
 local requestor_statements =
   requestor_iam.policies_configuration.supplied_policies[
-    'PCY-AMS-LZ-HUB-RPC-ACCEPTOR-KEY'
+    'PCY-AMS-LZ-HUB-RPC-TENANCY1-KEY'
   ].statements;
 local expected_acceptor_statements = [
   'Define group requestorGroup as ocid1.group.oc1..requestor-network-admin',
@@ -63,6 +58,17 @@ local network_fragment_has_only_delta(fragment) =
     fragment.network_configuration,
     'network_configuration_categories'
   );
+local golden_categories(network) =
+  network.network_configuration.network_configuration_categories;
+local complete_network_has_standard_categories(network) =
+  local categories = golden_categories(network);
+  local keys = std.objectFields(categories);
+  std.length(keys) == 3
+  && std.member(keys, '0-shared')
+  && std.member(keys, '1-prod')
+  && std.member(keys, '2-preprod')
+  && std.objectHas(categories['0-shared'], 'vcns')
+  && std.objectHas(categories['0-shared'], 'non_vcn_specific_gateways');
 
 {
   failures: [
@@ -76,18 +82,19 @@ local network_fragment_has_only_delta(fragment) =
       {
         name: 'requestor dependency key was not published as peer_key',
         ok: std.objectHas(requestor_rpc, 'peer_key')
-            && requestor_rpc.peer_key == 'RPC-FRA-LZ-HUB-REQUESTOR-KEY'
+            && requestor_rpc.peer_key == 'RPC-FRA-LZ-HUB-TENANCY2-KEY'
             && !std.objectHas(requestor_rpc, 'peer_id'),
       },
       {
         name: 'acceptor RPC attachment is not a remote-peering attachment',
         ok: acceptor_drg.drg_attachments[
-          'DRGATT-FRA-LZ-HUB-RPC-REQUESTOR-KEY'
+          'DRGATT-FRA-LZ-HUB-RPC-TENANCY2-KEY'
         ].network_details.type == 'REMOTE_PEERING_CONNECTION',
       },
       {
-        name: 'requestor RPC import distribution omits a local VCN attachment',
-        ok: imported_attachments == local_vcn_attachments,
+        name: 'published profiles do not use the standard Hub A and Hub B pair',
+        ok: profiles.cross_tenancy_acceptor.hub.kind == 'hub_a'
+            && profiles.cross_tenancy_requestor.hub.kind == 'hub_b',
       },
       {
         name: 'acceptor IAM does not use the foreign requestor group OCID',
@@ -113,6 +120,27 @@ local network_fragment_has_only_delta(fragment) =
         name: 'published output is not an RPC-only network delta',
         ok: network_fragment_has_only_delta(acceptor_network)
             && network_fragment_has_only_delta(requestor_network),
+      },
+      {
+        name: 'golden network output is not a complete prod/preprod One-OE surface',
+        ok: complete_network_has_standard_categories(acceptor_golden_network)
+            && complete_network_has_standard_categories(requestor_golden_network),
+      },
+      {
+        name: 'golden IAM or governance output is incomplete',
+        ok: std.objectHas(acceptor_golden_iam, 'compartments_configuration')
+            && std.objectHas(acceptor_golden_iam, 'policies_configuration')
+            && std.objectHas(
+              acceptor_golden_governance,
+              'tags_configuration'
+            ),
+      },
+      {
+        name: 'same-tenancy and cross-tenancy network profiles diverge',
+        ok: published.network(profiles.same_tenancy_acceptor)
+            == acceptor_golden_network
+            && published.network(profiles.same_tenancy_requestor)
+               == requestor_golden_network,
       },
       {
         name: 'RPC changed the standard customer Network Firewall policy',

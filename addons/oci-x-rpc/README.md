@@ -1,137 +1,65 @@
 # OCI Remote Peering Connection Add-on
 
-The OCI Remote Peering Connection (X-RPC) add-on extends a current One-OE Landing Zone with the network and, when required, IAM configuration needed to connect VCNs in different OCI regions.
+The OCI Remote Peering Connection (X-RPC) add-on connects One-OE Landing Zones across OCI regions in the same tenancy or in different tenancies.
 
-This add-on supports:
+It supports two complementary usage paths:
 
-- Same-tenancy, cross-region RPC
-- Cross-tenancy, cross-region RPC
-- Multiple named RPC connections per Landing Zone
-- Dynamic environment and platform VCNs, including OKE VCNs produced by registered extensions
+| Path | Purpose |
+|---|---|
+| [Runtime golden templates](./runtime/README.md) | Current, generated One-OE reference configurations that can be reviewed and adapted for a manual deployment. |
+| [Blueprint Factory and LZ Agent](./runtime/x-rpc-blueprint-factory.md) | Config-driven generation for customer-specific regions, environments, platforms, CIDRs, hub models, and RPC peers. |
+
+The runtime examples use a production-oriented reference topology:
+
+- Tenancy 1 is the RPC acceptor in `eu-frankfurt-1`, uses Hub A, and uses `10.0.x.x` CIDRs.
+- Tenancy 2 is the RPC requester in `eu-amsterdam-1`, uses Hub B, and uses `10.1.x.x` CIDRs.
+- Both examples contain `prod` and `preprod` project networks.
+- The same-tenancy examples use the same regional network profiles but omit cross-tenancy IAM.
 
 ![Cross-tenancy RPC topology](./images/x-tenancy.png)
 
 ## Design Boundary
 
-One-OE remains responsible for the complete Landing Zone, including governance, compartments, identity domains, groups, baseline policies, hub and spoke VCNs, the base DRG, security, and observability.
+One-OE owns the complete Landing Zone baseline: governance, compartments, identity domains, groups, baseline policies, hub and spoke VCNs, the base DRG, security, and observability.
 
-X-RPC adds only:
+X-RPC extends that baseline with:
 
 - RPC objects and DRG attachments
-- RPC-specific DRG route tables, route distributions, import statements, and route rules
-- VCN and NSG route surfaces required for reviewed remote CIDRs
+- RPC-specific route tables, route distributions, import statements, and route rules
+- VCN and NSG routing for reviewed remote CIDRs
 - Minimal cross-tenancy IAM policies when the peer is in another tenancy
 
-There is no RPC governance fragment. Same-tenancy RPC requires no additional IAM fragment.
+Same-tenancy RPC adds network configuration only. Cross-tenancy RPC adds the required acceptor and requester IAM policy statements. X-RPC itself does not add governance resources; the cross-tenancy governance files in `runtime/` are the unchanged One-OE baseline included in the governance/IAM/network golden reference set. Security and observability remain part of the standard One-OE deployment and are not duplicated by this add-on.
 
-The source of truth is the current generator under [`gen/`](../../gen/). Files under [`runtime/`](./runtime/) are generated, working reference fragments. They are not complete One-OE configurations and must not be used as the implementation source.
+The repository source of truth is the current generator under [`gen/`](../../gen/). Runtime JSON files are generated snapshots and must not be used as the implementation source.
 
-## Configuration Model
+## Roles And IAM
 
-Define each connection under top-level `remote_peering_connections` in the source configuration used by Blueprint Factory or the LZ Agent.
-
-### Acceptor
-
-The acceptor creates the RPC and omits `peer_id`:
-
-```jsonnet
-remote_peering_connections: {
-  production: {
-    remote_cidrs: ['10.1.0.0/21', '10.1.64.0/21'],
-    peer_region_name: 'eu-amsterdam-1',
-  },
-},
-```
-
-### Requestor
-
-The requestor points to the acceptor RPC by OCID or an orchestrator dependency key:
-
-```jsonnet
-remote_peering_connections: {
-  connectivity_hub: {
-    remote_cidrs: ['10.0.0.0/21', '10.0.64.0/21'],
-    peer_id: 'ocid1.remotepeeringconnection.oc1.eu-frankfurt-1.example',
-    peer_region_name: 'eu-frankfurt-1',
-  },
-},
-```
-
-`remote_cidrs` must contain the reviewed, routable VCN CIDRs on the peer side. Environment names and counts are not fixed; the generator derives local routed VCNs from the customer configuration.
-
-## Cross-Tenancy IAM
-
-For a cross-tenancy acceptor, add the requestor tenancy and foreign requestor group:
-
-```jsonnet
-peer_tenancy_ocid: 'ocid1.tenancy.oc1..requestor',
-requestor_group_ocid: 'ocid1.group.oc1..requestor-network-admin',
-```
-
-For a cross-tenancy requestor, add the acceptor tenancy but do not provide `requestor_group_ocid`:
-
-```jsonnet
-peer_tenancy_ocid: 'ocid1.tenancy.oc1..acceptor',
-```
-
-The generated IAM policies use these identities:
-
-| Side | Identity reference | Permission direction |
+| Side | RPC reference | Cross-tenancy IAM identity |
 |---|---|---|
-| Acceptor | Foreign requestor group OCID | Admit `remote-peering-to` |
-| Requestor | Local `'id_lz_common'/'grp-lz-network-admin'` | Allow `remote-peering-from` and endorse `remote-peering-to` |
+| Acceptor | Creates the RPC and omits `peer_id` | Uses the foreign requester group OCID to admit `remote-peering-to` |
+| Requester | Uses the acceptor RPC OCID or an orchestrator dependency key | Uses local `'id_lz_common'/'grp-lz-network-admin'` for Allow and Endorse statements |
 
-The requestor group OCID is needed only by the acceptor because the group is foreign there.
+The requester group OCID is required only on the acceptor side because the group is foreign there. The requester must reference its own identity-domain group by name, not by OCID.
 
 ## Routing
 
-The builder discovers all local network-producing environments and platforms dynamically. It adds the RPC attachment and the additional route/import rules required for the configured remote CIDRs while preserving the existing One-OE DRG design.
+The generator discovers all local network-producing environments and platforms dynamically. It adds RPC routing for the reviewed remote CIDRs without replacing the existing One-OE DRG design.
 
-Hub A, Hub B, and Hub C use the common firewall-hub RPC routing model, where RPC traffic follows the existing hub/firewall route path. Hub E uses its direct DRG import-distribution routing model. The add-on does not invent or modify customer-specific Network Firewall security policy; verify that the deployed policy permits the approved traffic.
+Hub A, Hub B, and Hub C use the common firewall-hub RPC routing path. Hub E uses a direct DRG import-distribution path and is reserved for PoC, lab, or explicitly accepted no-firewall scenarios. The runtime golden templates use Hub A and Hub B.
+
+The add-on does not change customer-specific OCI Network Firewall security policy. The deployed policy must permit the approved cross-region traffic.
 
 ![Reference DRG routing](./images/drg-routing.png)
 
 > [!NOTE]
-> The diagram is a working reference for establishing cross-tenancy RPC and designing DRG routing for a specific architecture. Tenancy 1 and Tenancy 2 may use different supported hub and firewall patterns, including firewalls on both sides, on one side, or neither side.
+> The diagram is a working reference for establishing cross-tenancy RPC and designing DRG routing for a specific architecture. Tenancy 1 and Tenancy 2 may use different supported hub and firewall patterns depending on the approved customer design.
 
-## Generate
+## Next Steps
 
-The paired Blueprint Factory examples demonstrate a Frankfurt acceptor and Amsterdam requestor:
-
-- [Cross-tenancy acceptor config](../oci-lz-blueprint-factory/examples/05-xrpc-cross-tenancy-acceptor.json)
-- [Cross-tenancy requestor config](../oci-lz-blueprint-factory/examples/06-xrpc-cross-tenancy-requester.json)
-
-Generate a complete current One-OE output set from either source config:
-
-```bash
-bash gen/generate.sh --config <config-file> <output-directory>
-```
-
-For the cross-tenancy deployment order, dependency handoff, and validation steps, see the [execution guide](./execution.md).
-
-## Complete Generated Examples
-
-The [`examples/complete-one-oe/`](./examples/complete-one-oe/) directory publishes complete acceptor and requester One-OE output sets from the paired Blueprint Factory source configurations. These examples provide a manual review and deployment starting point without making generated JSON the implementation source.
-
-Regenerate or verify the examples after any generator, source configuration, formatter, or publication change:
-
-```bash
-bash addons/oci-x-rpc/examples/complete-one-oe/regenerate.sh
-bash addons/oci-x-rpc/examples/complete-one-oe/verify.sh
-```
-
-Edit the source configuration and regenerate rather than editing generated JSON directly.
-
-## Reference Fragments
-
-The generated files under [`runtime/`](./runtime/) show the RPC-only delta for four roles:
-
-- Same-tenancy acceptor network
-- Same-tenancy requestor network
-- Cross-tenancy acceptor network and IAM
-- Cross-tenancy requestor network and IAM
-
-Use the complete files generated from the customer source config for deployment. Use the compact runtime files for review, testing, and semantic comparison.
+- Review the [runtime golden templates](./runtime/README.md) for the manual reference path.
+- Follow the [Blueprint Factory and LZ Agent guide](./runtime/x-rpc-blueprint-factory.md) for dynamic generation.
+- Follow the [execution guide](./execution.md) for deployment order and validation.
 
 ## References
 

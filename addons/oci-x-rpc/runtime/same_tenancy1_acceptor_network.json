@@ -89,13 +89,63 @@
                         "route_tables": {
                             "RT-FRA-LZ-HUB-INGRESS-KEY": {
                                 "display_name"                                  : "rt-fra-lz-hub-ingress",
-                                "route_rules"                                   : {}
+
+                                "route_rules": {
+                                    "rr-fra-internet": {
+                                        "description"                           : "Route to the Internet through the Internal OCI Network Firewall",
+                                        "destination"                           : "0.0.0.0/0",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-fra-prod-projects": {
+                                        "description"                           : "Route to VCN Prod Projects through Internal OCI Network Firewall",
+                                        "destination"                           : "10.0.64.0/21",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-fra-preprod-projects": {
+                                        "description"                           : "Route to VCN PreProd Projects through Internal OCI Network Firewall",
+                                        "destination"                           : "10.0.128.0/21",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-fra-rpc-tenancy2-1": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.0.0/21 through Internal OCI Network Firewall",
+                                        "destination"                           : "10.1.0.0/21",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-fra-rpc-tenancy2-2": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.64.0/21 through Internal OCI Network Firewall",
+                                        "destination"                           : "10.1.64.0/21",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-fra-rpc-tenancy2-3": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.128.0/21 through Internal OCI Network Firewall",
+                                        "destination"                           : "10.1.128.0/21",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    }
+                                }
                             },
 
                             "RT-FRA-LZ-HUB-LB-KEY": {
                                 "display_name"                                  : "rt-fra-lz-hub-lb",
 
                                 "route_rules": {
+                                    "rr-fra-internet": {
+                                        "description"                           : "Route to the Internet through the DMZ Firewall",
+                                        "destination"                           : "0.0.0.0/0",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "DMZ OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.vrdnynvr..."
+                                    },
+
                                     "rr-fra-prod-projects": {
                                         "description"                           : "Route to VCN Prod Projects through DRG",
                                         "destination"                           : "10.0.64.0/21",
@@ -127,20 +177,6 @@
                                     "rr-fra-rpc-tenancy2-3": {
                                         "description"                           : "Route to RPC tenancy2 CIDR 10.1.128.0/21 through DRG",
                                         "destination"                           : "10.1.128.0/21",
-                                        "destination_type"                      : "CIDR_BLOCK",
-                                        "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rr-fra-rpc-tenancy2-4": {
-                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.192.0/21 through DRG",
-                                        "destination"                           : "10.1.192.0/21",
-                                        "destination_type"                      : "CIDR_BLOCK",
-                                        "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rr-fra-uat-projects": {
-                                        "description"                           : "Route to VCN UAT Projects through DRG",
-                                        "destination"                           : "10.0.192.0/21",
                                         "destination_type"                      : "CIDR_BLOCK",
                                         "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
                                     }
@@ -204,38 +240,96 @@
                                         "destination"                           : "10.1.128.0/21",
                                         "destination_type"                      : "CIDR_BLOCK",
                                         "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rr-fra-rpc-tenancy2-4": {
-                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.192.0/21 through DRG",
-                                        "destination"                           : "10.1.192.0/21",
-                                        "destination_type"                      : "CIDR_BLOCK",
-                                        "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rr-fra-uat-projects": {
-                                        "description"                           : "Route to VCN UAT Projects through DRG",
-                                        "destination"                           : "10.0.192.0/21",
-                                        "destination_type"                      : "CIDR_BLOCK",
-                                        "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
                                     }
                                 }
                             },
 
                             "RT-FRA-LZ-HUB-NATGW-KEY": {
                                 "display_name"                                  : "rt-fra-lz-hub-natgw",
-                                "route_rules"                                   : {}
+
+                                "route_rules": {
+                                    "rr-vcn-fra-hub-mgmt-sn": {
+                                        "description"                           : "Route to mgmt subnet in Hub VCN through Internal OCI Network Firewall",
+                                        "destination"                           : "10.0.3.0/24",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-vcn-fra-hub-mon-sn": {
+                                        "description"                           : "Route to mon subnet in Hub VCN through Internal OCI Network Firewall",
+                                        "destination"                           : "10.0.4.0/24",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-vcn-fra-hub-dns-sn": {
+                                        "description"                           : "Route to dns subnet in Hub VCN through Internal OCI Network Firewall",
+                                        "destination"                           : "10.0.5.0/24",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-fra-prod-projects": {
+                                        "description"                           : "Route to VCN Prod Projects through Internal OCI Network Firewall",
+                                        "destination"                           : "10.0.64.0/21",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-fra-preprod-projects": {
+                                        "description"                           : "Route to VCN PreProd Projects through Internal OCI Network Firewall",
+                                        "destination"                           : "10.0.128.0/21",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-fra-rpc-tenancy2-1": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.0.0/21 through Internal OCI Network Firewall",
+                                        "destination"                           : "10.1.0.0/21",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-fra-rpc-tenancy2-2": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.64.0/21 through Internal OCI Network Firewall",
+                                        "destination"                           : "10.1.64.0/21",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
+                                    "rr-fra-rpc-tenancy2-3": {
+                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.128.0/21 through Internal OCI Network Firewall",
+                                        "destination"                           : "10.1.128.0/21",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    }
+                                }
                             },
 
                             "RT-FRA-LZ-HUB-IGW-KEY": {
                                 "display_name"                                  : "rt-fra-lz-hub-igw",
-                                "route_rules"                                   : {}
+
+                                "route_rules": {
+                                    "rr-vcn-fra-hub-lb-sn": {
+                                        "description"                           : "Route to lb subnet in Hub VCN through DMZ OCI Network Firewall",
+                                        "destination"                           : "10.0.1.0/24",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "DMZ OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.vrdnynvr..."
+                                    }
+                                }
                             },
 
                             "RT-FRA-LZ-HUB-MGMT-KEY": {
                                 "display_name"                                  : "rt-fra-lz-hub-mgmt",
 
                                 "route_rules": {
+                                    "rr-fra-internet": {
+                                        "description"                           : "Route to the Internet through the Internal OCI Network Firewall",
+                                        "destination"                           : "0.0.0.0/0",
+                                        "destination_type"                      : "CIDR_BLOCK",
+                                        "network_entity_id"                     : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                    },
+
                                     "rr-fra-prod-projects": {
                                         "description"                           : "Route to VCN Prod Projects through DRG",
                                         "destination"                           : "10.0.64.0/21",
@@ -271,25 +365,11 @@
                                         "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
-                                    "rr-fra-rpc-tenancy2-4": {
-                                        "description"                           : "Route to RPC tenancy2 CIDR 10.1.192.0/21 through DRG",
-                                        "destination"                           : "10.1.192.0/21",
-                                        "destination_type"                      : "CIDR_BLOCK",
-                                        "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
                                     "rr-fra-sgw": {
                                         "description"                           : "Route to Oracle Services Network through Service GW",
                                         "destination"                           : "all-services",
                                         "destination_type"                      : "SERVICE_CIDR_BLOCK",
                                         "network_entity_key"                    : "SGW-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rr-fra-uat-projects": {
-                                        "description"                           : "Route to VCN UAT Projects through DRG",
-                                        "destination"                           : "10.0.192.0/21",
-                                        "destination_type"                      : "CIDR_BLOCK",
-                                        "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
                                     }
                                 }
                             }
@@ -697,66 +777,6 @@
                                         "icmp_type"                             : 8,
                                         "icmp_code"                             : 0,
                                         "stateless"                             : false
-                                    },
-
-                                    "from_tenancy2-4_http": {
-                                        "description"                           : "Allow inbound traffic from RPC tenancy2 VCN over HTTP",
-                                        "src"                                   : "10.1.192.0/21",
-                                        "src_type"                              : "CIDR_BLOCK",
-                                        "dst_port_min"                          : 80,
-                                        "dst_port_max"                          : 80,
-                                        "protocol"                              : "TCP",
-                                        "stateless"                             : false
-                                    },
-
-                                    "from_tenancy2-4_https": {
-                                        "description"                           : "Allow inbound traffic from RPC tenancy2 VCN over HTTPS",
-                                        "src"                                   : "10.1.192.0/21",
-                                        "src_type"                              : "CIDR_BLOCK",
-                                        "dst_port_min"                          : 443,
-                                        "dst_port_max"                          : 443,
-                                        "protocol"                              : "TCP",
-                                        "stateless"                             : false
-                                    },
-
-                                    "from_tenancy2-4_icmp": {
-                                        "description"                           : "Allow ICMP type 8 (Echo) from RPC tenancy2 VCN",
-                                        "src"                                   : "10.1.192.0/21",
-                                        "src_type"                              : "CIDR_BLOCK",
-                                        "protocol"                              : "ICMP",
-                                        "icmp_type"                             : 8,
-                                        "icmp_code"                             : 0,
-                                        "stateless"                             : false
-                                    },
-
-                                    "from_uat_http": {
-                                        "description"                           : "Allow inbound traffic from UAT VCN over HTTP",
-                                        "src"                                   : "10.0.192.0/21",
-                                        "src_type"                              : "CIDR_BLOCK",
-                                        "dst_port_min"                          : 80,
-                                        "dst_port_max"                          : 80,
-                                        "protocol"                              : "TCP",
-                                        "stateless"                             : false
-                                    },
-
-                                    "from_uat_https": {
-                                        "description"                           : "Allow inbound traffic from UAT VCN over HTTPS",
-                                        "src"                                   : "10.0.192.0/21",
-                                        "src_type"                              : "CIDR_BLOCK",
-                                        "dst_port_min"                          : 443,
-                                        "dst_port_max"                          : 443,
-                                        "protocol"                              : "TCP",
-                                        "stateless"                             : false
-                                    },
-
-                                    "from_uat_icmp": {
-                                        "description"                           : "Allow ICMP type 8 (Echo) from UAT VCN",
-                                        "src"                                   : "10.0.192.0/21",
-                                        "src_type"                              : "CIDR_BLOCK",
-                                        "protocol"                              : "ICMP",
-                                        "icmp_type"                             : 8,
-                                        "icmp_code"                             : 0,
-                                        "stateless"                             : false
                                     }
                                 },
 
@@ -842,16 +862,6 @@
                                         "type"                                  : "VCN",
                                         "attached_resource_key"                 : "VCN-FRA-LZ-PREPROD-PROJECTS-KEY"
                                     }
-                                },
-
-                                "DRGATT-FRA-LZ-UAT-PROJ-KEY": {
-                                    "display_name"                              : "drgatt-fra-lz-uat-proj",
-                                    "drg_route_table_key"                       : "DRGRT-FRA-LZ-SPOKES-KEY",
-
-                                    "network_details": {
-                                        "type"                                  : "VCN",
-                                        "attached_resource_key"                 : "VCN-FRA-LZ-UAT-PROJECTS-KEY"
-                                    }
                                 }
                             },
 
@@ -883,20 +893,9 @@
                                             }
                                         },
 
-                                        "ROUTE-TO-VCN-UAT-KEY": {
-                                            "action"                            : "ACCEPT",
-                                            "priority"                          : 30,
-
-                                            "match_criteria": {
-                                                "match_type"                    : "DRG_ATTACHMENT_ID",
-                                                "attachment_type"               : "VCN",
-                                                "drg_attachment_key"            : "DRGATT-FRA-LZ-UAT-PROJ-KEY"
-                                            }
-                                        },
-
                                         "ROUTE-TO-RPC-LZ-TENANCY2-KEY": {
                                             "action"                            : "ACCEPT",
-                                            "priority"                          : 40,
+                                            "priority"                          : 30,
 
                                             "match_criteria": {
                                                 "match_type"                    : "DRG_ATTACHMENT_TYPE",
@@ -1196,18 +1195,7 @@
                                     "NFW-FRA-LZ-ADDRLIST-SPOKES-KEY": {
                                         "name"                                  : "nfw-fra-lz-addrlist-spokes",
                                         "type"                                  : "IP",
-
-                                        "addresses": [
-                                            "10.0.64.0/21",
-                                            "10.0.128.0/21",
-                                            "10.0.192.0/21"
-                                        ]
-                                    },
-
-                                    "NFW-FRA-LZ-ADDRLIST-UAT-KEY": {
-                                        "name"                                  : "nfw-fra-lz-addrlist-uat",
-                                        "type"                                  : "IP",
-                                        "addresses"                             : ["10.0.192.0/21"]
+                                        "addresses"                             : ["10.0.64.0/21", "10.0.128.0/21"]
                                     }
                                 },
 
@@ -1238,25 +1226,15 @@
                                         "action"                                : "ALLOW",
                                         "service_lists"                         : ["NFW-FRA-LZ-SERLIST-01-KEY"],
                                         "url_lists"                             : ["NFW-FRA-LZ-URL-LIST-01-KEY", "NFW-FRA-LZ-URL-LIST-02-KEY"],
-
-                                        "source_address_lists": [
-                                            "NFW-FRA-LZ-ADDRLIST-PROD-KEY",
-                                            "NFW-FRA-LZ-ADDRLIST-PREPROD-KEY",
-                                            "NFW-FRA-LZ-ADDRLIST-UAT-KEY"
-                                        ]
+                                        "source_address_lists"                  : ["NFW-FRA-LZ-ADDRLIST-PROD-KEY", "NFW-FRA-LZ-ADDRLIST-PREPROD-KEY"]
                                     },
 
                                     "NFW-FRA-LZ-SEC-RULE-03-KEY": {
                                         "name"                                  : "secrule-allow-spokes2internet-icmp",
                                         "action"                                : "ALLOW",
                                         "application_lists"                     : ["NFW-FRA-LZ-APPLIST-01-KEY"],
-                                        "destination_address_lists"             : ["NFW-FRA-LZ-ADDRLIST-PUB-KEY"],
-
-                                        "source_address_lists": [
-                                            "NFW-FRA-LZ-ADDRLIST-PROD-KEY",
-                                            "NFW-FRA-LZ-ADDRLIST-PREPROD-KEY",
-                                            "NFW-FRA-LZ-ADDRLIST-UAT-KEY"
-                                        ]
+                                        "source_address_lists"                  : ["NFW-FRA-LZ-ADDRLIST-PROD-KEY", "NFW-FRA-LZ-ADDRLIST-PREPROD-KEY"],
+                                        "destination_address_lists"             : ["NFW-FRA-LZ-ADDRLIST-PUB-KEY"]
                                     }
                                 }
                             }
@@ -1579,158 +1557,6 @@
                             "service_gateways": {
                                 "SGW-FRA-LZ-PREPROD-PROJ-KEY": {
                                     "display_name"                              : "sgw-fra-lz-preprod-proj",
-                                    "services"                                  : "all-services"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-
-            "3-uat": {
-                "category_compartment_id"                                       : "CMP-LZ-UAT-NETWORK-KEY",
-
-                "vcns": {
-                    "VCN-FRA-LZ-UAT-PROJECTS-KEY": {
-                        "display_name"                                          : "vcn-fra-lz-uat-projects",
-                        "cidr_blocks"                                           : ["10.0.192.0/21"],
-                        "dns_label"                                             : "vcnfralzuaproj",
-                        "block_nat_traffic"                                     : false,
-                        "is_attach_drg"                                         : false,
-                        "is_create_igw"                                         : false,
-                        "is_ipv6enabled"                                        : false,
-                        "is_oracle_gua_allocation_enabled"                      : false,
-                        "network_security_groups"                               : {},
-
-                        "subnets": {
-                            "SN-FRA-LZ-UAT-WEB-KEY": {
-                                "display_name"                                  : "sn-fra-lz-uat-web",
-                                "cidr_block"                                    : "10.0.192.0/24",
-                                "dns_label"                                     : "snfralzuaweb",
-                                "dhcp_options_key"                              : "default_dhcp_options",
-                                "prohibit_internet_ingress"                     : true,
-                                "prohibit_public_ip_on_vnic"                    : true,
-                                "route_table_key"                               : "RT-FRA-LZ-UAT-PROJ-GENERIC-KEY",
-                                "security_list_keys"                            : ["SL-FRA-LZ-UAT-PROJ-GENERIC-KEY"]
-                            },
-
-                            "SN-FRA-LZ-UAT-APP-KEY": {
-                                "display_name"                                  : "sn-fra-lz-uat-app",
-                                "cidr_block"                                    : "10.0.193.0/24",
-                                "dns_label"                                     : "snfralzuaapp",
-                                "dhcp_options_key"                              : "default_dhcp_options",
-                                "prohibit_internet_ingress"                     : true,
-                                "prohibit_public_ip_on_vnic"                    : true,
-                                "route_table_key"                               : "RT-FRA-LZ-UAT-PROJ-GENERIC-KEY",
-                                "security_list_keys"                            : ["SL-FRA-LZ-UAT-PROJ-GENERIC-KEY"]
-                            },
-
-                            "SN-FRA-LZ-UAT-DB-KEY": {
-                                "display_name"                                  : "sn-fra-lz-uat-db",
-                                "cidr_block"                                    : "10.0.194.0/24",
-                                "dns_label"                                     : "snfralzuadb",
-                                "dhcp_options_key"                              : "default_dhcp_options",
-                                "prohibit_internet_ingress"                     : true,
-                                "prohibit_public_ip_on_vnic"                    : true,
-                                "route_table_key"                               : "RT-FRA-LZ-UAT-PROJ-GENERIC-KEY",
-                                "security_list_keys"                            : ["SL-FRA-LZ-UAT-PROJ-GENERIC-KEY"]
-                            },
-
-                            "SN-FRA-LZ-UAT-INFRA-KEY": {
-                                "display_name"                                  : "sn-fra-lz-uat-infra",
-                                "cidr_block"                                    : "10.0.195.0/24",
-                                "dns_label"                                     : "snfralzuainfra",
-                                "dhcp_options_key"                              : "default_dhcp_options",
-                                "prohibit_internet_ingress"                     : true,
-                                "prohibit_public_ip_on_vnic"                    : true,
-                                "route_table_key"                               : "RT-FRA-LZ-UAT-PROJ-GENERIC-KEY",
-                                "security_list_keys"                            : ["SL-FRA-LZ-UAT-PROJ-GENERIC-KEY"]
-                            }
-                        },
-
-                        "route_tables": {
-                            "RT-FRA-LZ-UAT-PROJ-GENERIC-KEY": {
-                                "display_name"                                  : "rt-fra-lz-uat-proj-generic",
-
-                                "route_rules": {
-                                    "rr-fra-drg": {
-                                        "description"                           : "Route to the 0.0.0.0/0 through DRG",
-                                        "destination"                           : "0.0.0.0/0",
-                                        "destination_type"                      : "CIDR_BLOCK",
-                                        "network_entity_key"                    : "DRG-FRA-LZ-HUB-KEY"
-                                    },
-
-                                    "rr-fra-sgw": {
-                                        "description"                           : "Route to Oracle Services Network through Service GW",
-                                        "destination"                           : "all-services",
-                                        "destination_type"                      : "SERVICE_CIDR_BLOCK",
-                                        "network_entity_key"                    : "SGW-FRA-LZ-UAT-PROJ-KEY"
-                                    }
-                                }
-                            }
-                        },
-
-                        "default_security_list": {
-                            "ingress_rules"                                     : [],
-                            "egress_rules"                                      : []
-                        },
-
-                        "security_lists": {
-                            "SL-FRA-LZ-UAT-PROJ-GENERIC-KEY": {
-                                "display_name"                                  : "sl-fra-lz-uat-proj-generic",
-
-                                "ingress_rules": [
-                                    {
-                                        "description"                           : "ICMP type 3 code 4",
-                                        "src"                                   : "0.0.0.0/0",
-                                        "src_type"                              : "CIDR_BLOCK",
-                                        "protocol"                              : "ICMP",
-                                        "icmp_type"                             : 3,
-                                        "icmp_code"                             : 4,
-                                        "stateless"                             : false
-                                    },
-                                    {
-                                        "description"                           : "ICMP type 3",
-                                        "src"                                   : "10.0.192.0/21",
-                                        "src_type"                              : "CIDR_BLOCK",
-                                        "protocol"                              : "ICMP",
-                                        "icmp_type"                             : 3,
-                                        "stateless"                             : false
-                                    },
-                                    {
-                                        "description"                           : "Allow inbound ICMP type 8 (Echo) from Hub VCN",
-                                        "src"                                   : "10.0.0.0/21",
-                                        "src_type"                              : "CIDR_BLOCK",
-                                        "protocol"                              : "ICMP",
-                                        "icmp_type"                             : 8,
-                                        "icmp_code"                             : 0,
-                                        "stateless"                             : false
-                                    }
-                                ],
-
-                                "egress_rules": [
-                                    {
-                                        "description"                           : "Allow all outbound traffic to 0.0.0.0/0 over ALL protocols",
-                                        "dst"                                   : "0.0.0.0/0",
-                                        "dst_type"                              : "CIDR_BLOCK",
-                                        "protocol"                              : "ALL",
-                                        "stateless"                             : false
-                                    },
-                                    {
-                                        "description"                           : "Allow outbound traffic to Oracle Services Network over ALL protocols",
-                                        "dst"                                   : "all-services",
-                                        "dst_type"                              : "SERVICE_CIDR_BLOCK",
-                                        "protocol"                              : "ALL",
-                                        "stateless"                             : false
-                                    }
-                                ]
-                            }
-                        },
-
-                        "vcn_specific_gateways": {
-                            "service_gateways": {
-                                "SGW-FRA-LZ-UAT-PROJ-KEY": {
-                                    "display_name"                              : "sgw-fra-lz-uat-proj",
                                     "services"                                  : "all-services"
                                 }
                             }

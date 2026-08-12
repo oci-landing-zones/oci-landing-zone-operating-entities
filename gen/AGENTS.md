@@ -187,7 +187,7 @@ Rules:
 Current adapters:
 
 - `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. It reuses `gen/render_context.libsonnet` for normalization/topology-derived inputs while preserving the hub-only network contract and shared-only IAM/governance projections.
-- `gen/addons/oci-x-rpc/published.libsonnet` — owns RPC-only network and cross-tenancy IAM projections derived from complete config-driven One-OE outputs.
+- `gen/addons/oci-x-rpc/published.libsonnet` — owns RPC-only network/IAM projections for config-driven verification and the complete governance, IAM, and network surfaces used by the X-RPC runtime golden templates.
 - `gen/workload-extensions/exacc/{single-stack,multi-stack}/published.libsonnet` — own ExaDB-C@C stack-local publication projections.
 - `gen/workload-extensions/exacs/multi-stack/published.libsonnet` — owns ExaDB-D / ExaCS multi-stack publication projections.
 
