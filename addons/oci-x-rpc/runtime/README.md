@@ -1,52 +1,53 @@
-# X-RPC Runtime Golden Templates
+# **[OCI Remote Peering Connections](#)**
+## **An OCI Open LZ [Addon](#) for Remote Peering Across Regions and Tenancies using IaC**
+&nbsp;
+## **DRG Route Table Design and Sample JSON Files**
 
-This directory contains generated One-OE golden templates for a production-oriented RPC reference topology. The templates are generated from the current `gen/` source and are suitable for review, testing, and customer-specific adaptation.
+### 1. DRG Routing Design
 
-## Reference Topology
+The diagram below illustrates a sample routing setup for a multi-tenancy/multi-region RPC configuration. The left side represents Tenancy 1, the acceptor, using **Hub Model A**, while the right side represents Tenancy 2, the requester, using **Hub Model B**.
 
-| Side | Region | Hub | CIDR family | Environments |
-|---|---|---|---|---|
-| Tenancy 1 acceptor | `eu-frankfurt-1` | Hub A | `10.0.x.x` | `prod`, `preprod` |
-| Tenancy 2 requester | `eu-amsterdam-1` | Hub B | `10.1.x.x` | `prod`, `preprod` |
+<img src="../images/drg-routing.png" width="100%">
 
-## Files
+> [!NOTE]
+> The diagram serves as a reference for designing DRG routing based on specific architecture requirements. Tenancy 1 and Tenancy 2 may use different supported DRG and firewall routing designs. The published sample uses firewalls on both sides with Hub A and Hub B.
 
-### Cross Tenancy
+&nbsp;
+### 2. Sample JSON Configuration for RPC
 
-| Side | Governance | IAM | Network |
-|---|---|---|---|
-| Tenancy 1 acceptor | [`cross_tenancy1_acceptor_governance.json`](./cross_tenancy1_acceptor_governance.json) | [`cross_tenancy1_acceptor_iam.json`](./cross_tenancy1_acceptor_iam.json) | [`cross_tenancy1_acceptor_network.json`](./cross_tenancy1_acceptor_network.json) |
-| Tenancy 2 requester | [`cross_tenancy2_requester_governance.json`](./cross_tenancy2_requester_governance.json) | [`cross_tenancy2_requester_iam.json`](./cross_tenancy2_requester_iam.json) | [`cross_tenancy2_requester_network.json`](./cross_tenancy2_requester_network.json) |
+#### Cross-Tenancy Configuration
 
-The governance files are the standard One-OE baseline included in the published governance/IAM/network reference set. X-RPC does not introduce additional governance resources. Use the standard One-OE security and observability configurations with these templates; those domains are not duplicated here.
+- **Tenancy 1 - Acceptor**
+  - [`cross_tenancy1_acceptor_governance.json`](./cross_tenancy1_acceptor_governance.json) provides the standard One-OE governance baseline.
+  - [`cross_tenancy1_acceptor_iam.json`](./cross_tenancy1_acceptor_iam.json) defines the compartments, groups, baseline policies, and cross-tenancy Admit policy required by the acceptor.
+  - [`cross_tenancy1_acceptor_network.json`](./cross_tenancy1_acceptor_network.json) defines the Hub A and spoke network, acceptor RPC, DRG attachments, route tables, route distributions, and route rules.
+  - For Hub A details, see the [OCI Open LZ Hub A documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_a).
 
-### Same Tenancy, Multiple Regions
+- **Tenancy 2 - Requester**
+  - [`cross_tenancy2_requester_governance.json`](./cross_tenancy2_requester_governance.json) provides the standard One-OE governance baseline.
+  - [`cross_tenancy2_requester_iam.json`](./cross_tenancy2_requester_iam.json) defines the compartments, groups, baseline policies, and cross-tenancy Allow and Endorse policies required by the requester.
+  - [`cross_tenancy2_requester_network.json`](./cross_tenancy2_requester_network.json) defines the Hub B and spoke network, requester RPC, DRG attachments, route tables, route distributions, and route rules.
+  - For Hub B details, see the [OCI Open LZ Hub B documentation](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models/hub_b).
 
-| Side | Network |
-|---|---|
-| Tenancy 1 acceptor | [`same_tenancy1_acceptor_network.json`](./same_tenancy1_acceptor_network.json) |
-| Tenancy 2 requester | [`same_tenancy2_requester_network.json`](./same_tenancy2_requester_network.json) |
+Tenancy 1 remains the acceptor in this reference topology. Each additional requester region or tenancy requires its own acceptor RPC entry in Tenancy 1.
 
-Same-tenancy RPC does not require cross-tenancy IAM policies or an additional governance configuration, so only network templates are published.
+#### Same-Tenancy, Multi-Region Configuration
 
-## Before Deployment
+- [`same_tenancy1_acceptor_network.json`](./same_tenancy1_acceptor_network.json) provides the Region 1 Hub A network with the acceptor RPC. The acceptor omits `peer_id`.
+- [`same_tenancy2_requester_network.json`](./same_tenancy2_requester_network.json) provides the Region 2 Hub B network with the requester RPC. It uses `peer_key` for orchestrated dependency resolution; for a manual deployment, replace `peer_key` with `peer_id` and set it to the RPC OCID collected from Region 1. Never emit both fields.
 
-These files are reference templates, not customer-specific values. Review and replace all placeholder tenancy OCIDs, group OCIDs, RPC references, firewall private IP OCIDs, CIDRs, regions, names, tags, notification endpoints, and other environment-specific values before deployment.
+Same-tenancy RPC requires no additional cross-tenancy IAM or governance configuration. Only the two network templates are published for this scenario.
 
-Hub A and Hub B use the standard two-stage OCI Network Firewall deployment. The committed network templates represent the final RPC-enabled network configuration. For a new Landing Zone, follow the matching Hub A or Hub B pre-stage workflow, or use config-driven generation to produce the matching `network_pre.json` file before applying the final network configuration.
+> [!NOTE]
+> These files are generated One-OE golden reference templates. Review and replace all placeholder tenancy OCIDs, group OCIDs, RPC references, firewall private IP OCIDs, CIDRs, regions, and other customer-specific values before deployment. Standard One-OE security and observability configurations remain part of the Landing Zone deployment and are not duplicated here.
 
-For deployment order and validation, see the [X-RPC execution guide](../execution.md).
+For deployment order and validation, see the [OCI X-RPC execution guide](../execution.md).
 
-## Blueprint Factory And LZ Agent
+For customer-specific dynamic generation, see the [X-RPC Blueprint Factory and LZ Agent guide](./x-rpc-blueprint-factory.md).
 
-The generated JSON output for a customer-specific Blueprint Factory or LZ Agent request is intentionally not committed in this directory. Follow [`x-rpc-blueprint-factory.md`](./x-rpc-blueprint-factory.md) to create a reviewed source config and generate a separate output directory.
+#### License
+Copyright (c) 2026 Oracle and/or its affiliates.
 
-## Regenerate
+Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-Regenerate all committed snapshots from the repository root:
-
-```bash
-bash gen/generate.sh
-```
-
-Do not edit generated runtime JSON directly. Update the corresponding profiles, builders, or Jsonnet entrypoints under [`gen/addons/oci-x-rpc/`](../../../gen/addons/oci-x-rpc/) and regenerate.
+See [LICENSE](/LICENSE.txt) for more details.
