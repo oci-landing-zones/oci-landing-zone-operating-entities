@@ -33,8 +33,10 @@ Tenancy 1 remains the acceptor in this reference topology. Each additional reque
 
 #### Same-Tenancy, Multi-Region Configuration
 
-- [`same_tenancy1_acceptor_network.json`](./same_tenancy1_acceptor_network.json) provides the Region 1 Hub A network with the acceptor RPC. The acceptor omits `peer_id`.
-- [`same_tenancy2_requester_network.json`](./same_tenancy2_requester_network.json) provides the Region 2 Hub B network with the requester RPC. It uses `peer_key` for orchestrated dependency resolution; for a manual deployment, replace `peer_key` with `peer_id` and set it to the RPC OCID collected from Region 1. Never emit both fields.
+In this reference pattern, Region 1 represents the primary region and always acts as the RPC acceptor. Region 2 represents an additional subscribed region, such as a DR region, and acts as the requester. Additional subscribed regions can follow the Region 2 requester pattern.
+
+- [`same_tenancy_region1_acceptor_network.json`](./same_tenancy_region1_acceptor_network.json) provides the Region 1 Hub A network with the acceptor RPC. The acceptor omits `peer_id`.
+- [`same_tenancy_region2_requester_network.json`](./same_tenancy_region2_requester_network.json) provides the Region 2 Hub B network with the requester RPC. It uses `peer_key` for orchestrated dependency resolution; for a manual deployment, replace `peer_key` with `peer_id` and set it to the RPC OCID collected from Region 1. Never emit both fields.
 
 Same-tenancy RPC requires no additional cross-tenancy IAM or governance configuration. Only the two network templates are published for this scenario.
 

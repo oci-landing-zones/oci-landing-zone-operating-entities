@@ -33,6 +33,8 @@ Do not include overlapping ranges or Kubernetes-internal service and overlay pod
 
 Create one source configuration per region.
 
+In this reference pattern, Region 1 represents the primary region and always acts as the RPC acceptor. Region 2 represents an additional subscribed region, such as a DR region, and acts as the requester. Additional subscribed regions can follow the Region 2 requester pattern with one corresponding acceptor RPC entry for each connection.
+
 ### Region 1 - Acceptor
 
 The acceptor creates the RPC and omits `peer_id` and all cross-tenancy IAM fields:

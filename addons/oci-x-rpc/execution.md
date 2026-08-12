@@ -72,16 +72,18 @@ flowchart LR
 
 Same-tenancy RPC requires network configuration only. No additional cross-tenancy IAM or governance configuration is required.
 
+In this reference pattern, Region 1 represents the primary region and always acts as the RPC acceptor. Region 2 represents an additional subscribed region, such as a DR region, and acts as the requester. Additional subscribed regions can follow the Region 2 requester pattern.
+
 ## Step 1 - Deploy Region 1 As The Acceptor
 
-1. Review and adapt [`same_tenancy1_acceptor_network.json`](./runtime/same_tenancy1_acceptor_network.json) for Region 1.
+1. Review and adapt [`same_tenancy_region1_acceptor_network.json`](./runtime/same_tenancy_region1_acceptor_network.json) for Region 1.
 2. Keep the Region 1 RPC as the acceptor by omitting `peer_id`.
 3. `Plan` and `Apply` the Region 1 One-OE network configuration.
 4. Collect the RPC OCID created in Region 1.
 
 ## Step 2 - Deploy Region 2 As The Requester
 
-1. Review and adapt [`same_tenancy2_requester_network.json`](./runtime/same_tenancy2_requester_network.json) for Region 2.
+1. Review and adapt [`same_tenancy_region2_requester_network.json`](./runtime/same_tenancy_region2_requester_network.json) for Region 2.
 2. The golden template uses `peer_key` for orchestrated dependency resolution. For a manual deployment, replace `peer_key` with `peer_id` and set it to the Region 1 acceptor RPC OCID:
 
 ```json
@@ -239,8 +241,8 @@ The RPC status can be verified through:
 
 ## Same-Tenancy, Multi-Region
 
-- [`same_tenancy1_acceptor_network.json`](./runtime/same_tenancy1_acceptor_network.json)
-- [`same_tenancy2_requester_network.json`](./runtime/same_tenancy2_requester_network.json)
+- [`same_tenancy_region1_acceptor_network.json`](./runtime/same_tenancy_region1_acceptor_network.json)
+- [`same_tenancy_region2_requester_network.json`](./runtime/same_tenancy_region2_requester_network.json)
 
 ---
 
