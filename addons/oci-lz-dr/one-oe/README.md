@@ -115,9 +115,10 @@ When deploying with ORM, follow these steps:
 4. Set the stack name you prefer.
 5. Set the Terraform version to 1.5.x. Click Next.
 6. Accept the default files. Click Next. Optionally, replace with your reviewed JSON configuration files.
-7. Configure the stack dependencies so the BCDR add-on consumes the required outputs from the baseline One-OE stack.
-8. Clear the Run apply check box. Click Create.
-9. Run Plan and review the proposed regional network and observability changes before applying.
+7. Before creating the stack, replace `email.address@example.com` in the selected initial observability file with the operational notification email addresses and confirm each email subscription. Repeat this change in the matching final observability file before using it in Section 4.1.2; otherwise the final replacement restores the placeholder addresses.
+8. Configure the stack dependencies so the BCDR add-on consumes the required outputs from the baseline One-OE stack.
+9. Clear the Run apply check box. Click Create.
+10. Run Plan and review the proposed regional network and observability changes before applying.
 
 #### 4.1.1. Complete staged hub networking
 
@@ -183,7 +184,7 @@ Then, in the DR region: to establish an RPC to Frankfurt, replace the matching f
 <img src="../images/op2_2run.png" width="900" alt="cross region rpc">
 
 
-**oneoe_network_hub_N_requestor.json**
+**oneoe_bcdr_network_hub_<hub>_requester.json**
 
 
 ```
