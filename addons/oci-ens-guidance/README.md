@@ -78,7 +78,7 @@ Annex II contains 73 measures. The One-OE/IaC baseline can directly establish th
 **Coverage legend:** <img src="./images/green.png" alt="Fully covered" width="16" height="16"> Fully covered &nbsp;&nbsp; <img src="./images/orange.png" alt="Partially covered" width="16" height="16"> Partially covered &nbsp;&nbsp; <img src="./images/red.png" alt="Not covered by the landing-zone baseline" width="16" height="16"> Not covered by the landing-zone baseline
 
 > [!NOTE]
-> For every measure marked **Partially supported**, review the **Manual customer responsibility and limitation** column to identify the activities that the customer must complete.
+> For every measure marked **Partially or Not supported**, review the **Manual customer responsibility and limitation** column to identify the activities that the customer must complete.
 
 | ENS measure | One-OE coverage | One-OE foundation | One-OE Add-ons | Manual customer responsibility and limitation |
 |---|---|---|---|---|
