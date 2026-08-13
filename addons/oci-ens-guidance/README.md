@@ -6,14 +6,23 @@ Oracle Cloud Infrastructure provides security, governance, identity, network, lo
 
 The ENS, regulated by [Royal Decree 311/2022](https://www.boe.es/buscar/act.php?id=BOE-A-2022-7191), defines three security categories: Basic, Medium, and High. Under applicable law and a contractual relationship, the ENS also applies to private entities that provide services or solutions to public-sector entities in the exercise of their powers and responsibilities.
 
-**OCI Operating Entities Landing Zone**, using the One-OE blueprint, helps customers establish a repeatable, security-oriented OCI foundation for one operating entity, its environments, platforms, and projects within a single tenancy. It provides blueprints and infrastructure-as-code patterns for compartment organisation, IAM, network segmentation, security services, logging, monitoring, governance, and selected optional controls.
+[OCI Operating Entities Landing Zone (OCI Open LZ)](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities) provides One-OE, Multi-OE, and Multi-Tenancy blueprints. This guidance focuses on One-OE, which helps customers establish a repeatable, security-oriented OCI foundation for one operating entity, its environments, platforms, and projects within a single tenancy. It provides blueprints and infrastructure-as-code patterns for compartment organisation, IAM, network segmentation, security services, logging, monitoring, governance, and selected optional controls.
 
 This guidance explains how the One-OE landing zone can support the design of systems categorised as ENS High. It is architectural guidance for defining, deploying, verifying, and operating a customer-specific security baseline. The suitability of OCI services, regions, contractual commitments, and compliance documentation must be assessed by each customer for its system and target ENS category.
 
 This guidance is architectural only and does not itself establish ENS conformity or certification.
 
+## 2. Architecture principles for ENS High
 
-## 2. Compliance boundary
+1. **Treat the landing zone as a common security foundation, not the system boundary.** Each in-scope workload must extend the baseline according to its data, interfaces, threat model, and availability requirement.
+2. **Use least privilege and separation of duties.** Place network, security, IAM, and workload administration in separate roles/compartments and use narrowly scoped policies.
+3. **Prefer prevention and detection together.** Security Zones can deny non-compliant resource operations; Cloud Guard detects configuration and activity concerns. Neither replaces review and response.
+4. **Keep configuration reviewable.** Configuration inputs, plans, approvals, applies, and post-deployment verification are evidence. Changes must follow a controlled change process.
+5. **Design logging as an evidence pipeline.** Capture the defined logs, protect access, set retention/export requirements, integrate alerts, and test retrieval. Logging enabled without review, retention, or response is insufficient.
+6. **Make every exception explicit.** Security-Zone exemptions, broad IAM policies, public endpoints, disabled detector rules, or unencrypted exceptions require documented approval, owner, expiry, and compensating controls.
+7. **Validate in OCI after deployment.** IaC state is evidence of intent. OCI configuration, Cloud Guard status, logs, and access tests are evidence of effectiveness.
+
+## 3. Compliance boundary
 
 The OCI Operating Entities Landing Zone is an **ENS-enabling architecture baseline**. It can help customers establish repeatable OCI foundations for compartment organisation, identity and access control, network segmentation, security monitoring, logging, governance, and selected optional security services.
 
@@ -27,7 +36,7 @@ A control marked **IaC** in this document means that the design can be declared 
 
 Cloud security and compliance follow a shared-responsibility model. OCI provides cloud-service capabilities and related documentation within the applicable service scope; customers remain responsible for assessing their suitability, configuring and operating their environment and workloads, and demonstrating the effectiveness of the required controls, including HA/DR arrangements.
 
-## 3. Customer responsibilities
+## 4. Customer responsibilities
 
 The One-OE Landing Zone provides a security-oriented OCI foundation. The customer remains responsible for defining, securing, operating, and demonstrating the effectiveness of the complete information system within ENS scope.
 
@@ -48,7 +57,7 @@ Customer and workload responsibilities include:
 
 
 
-## 4. What the Operating Entities Landing Zone provides
+## 5. What the Operating Entities Landing Zone provides
 
 The following table distinguishes the One-OE foundation capabilities, optional LZ add-ons, and optional OCI configuration.
 
@@ -60,7 +69,7 @@ The following table distinguishes the One-OE foundation capabilities, optional L
 > The listed capabilities are not necessarily enabled by default; they must be selected, configured, deployed, and verified where applicable. The landing zone does not cover all ENS requirements. This includes system categorisation, risk analysis and residual-risk acceptance, organisational governance and training, workload and application security, data lifecycle and continuity arrangements, operational incident management, and conformity evidence, audit, or certification decisions. See [Customer responsibilities](#customer-responsibilities) for the activities that remain the customer's responsibility.
 
 
-### 4.1 ENS High control-design matrix
+### 5.1 ENS High control-design matrix
 
 The ENS measure IDs below are taken from Annex II of Royal Decree 311/2022. They show areas that the design can support; applicability, required reinforcements, and sufficiency must be determined by the system risk analysis and validated with CCN. For an ENS High system, op.pl.1 + R2 requires a formal risk analysis. The OCI One-OE landing zone provides technical safeguards that can support this analysis, but it does not replace the customer’s responsibility to perform, approve, and maintain it, as well as extensive security-architecture reinforcements for `op.pl.2`, and stronger requirements for access, logging, monitoring, cryptography, communications, continuity, and service protection. [ENS Annex II measure table](https://www.boe.es/buscar/act.php?id=BOE-A-2022-7191)
 
@@ -74,7 +83,7 @@ Annex II contains 73 measures. The One-OE/IaC baseline can directly establish th
 | ENS measure | One-OE coverage | One-OE foundation | One-OE Add-ons | Manual customer responsibility and limitation |
 |---|---|---|---|---|
 | `op.pl.2` Security architecture | <img src="./images/orange.png" alt="Partially covered" width="16" height="16"> | Parent/child compartments; segregated admin groups; VCN topology; shared security services.<br><br>Declares the tenancy foundation, network boundaries, and separation of administration duties. | — | Produce the system architecture, interfaces, asset model, threat model, and formally approve the architecture. |
-| `op.acc.1`–`op.acc.4` Access control | <img src="./images/green.png" alt="Fully covered" width="16" height="16">`op.acc.3`<br><img src="./images/orange.png" alt="Partially covered" width="16" height="16"> | IAM groups, dynamic groups, policies, compartments, federation option.<br><br>Implements RBAC and compartment-scoped policy structure. | — | Define joiner/mover/leaver processes, recertify access, configure identity-provider/MFA requirements, and review policies for each workload. |
+| `op.acc.1`–`op.acc.4` Access control | `op.acc.3` <img src="./images/green.png" alt="Fully covered" width="16" height="16"> &nbsp;<img src="./images/orange.png" alt="Partially covered" width="16" height="16"> | IAM groups, dynamic groups, policies, compartments, federation option.<br><br>Implements RBAC and compartment-scoped policy structure. | — | Define joiner/mover/leaver processes, recertify access, configure identity-provider/MFA requirements, and review policies for each workload. |
 | `op.acc.5`–`op.acc.6` Authentication | <img src="./images/red.png" alt="Not covered by the landing-zone baseline" width="16" height="16"> | Identity-domain/federation integration where selected.<br><br>Provides IAM integration points and policies. | — | Select and enforce the ENS-appropriate authentication mechanisms, MFA, lifecycle, external-user assurance, and privileged access process. |
 | `op.exp.1` Asset inventory | <img src="./images/orange.png" alt="Partially covered" width="16" height="16"> | Compartments, tags, resource search/inventory support.<br><br>Establishes managed structure and, where configured, tag namespaces/keys. | — | Define the authoritative CMDB/asset process; ensure coverage of workload, SaaS, endpoints, and non-OCI assets; reconcile regularly. |
 | `op.exp.2`–`op.exp.5` Secure configuration and change management | <img src="./images/green.png" alt="Fully covered" width="16" height="16"> `op.exp.2`<br><img src="./images/orange.png" alt="Partially covered" width="16" height="16"> | Version-control configuration (GitHub), Resource Manager/Terraform plan and apply.<br><br>Makes desired configuration reproducible and reviewable. | — | Establish approvals, change windows, break-glass procedure, drift review, release management, and security-baseline review. |
@@ -88,7 +97,17 @@ Annex II contains 73 measures. The One-OE/IaC baseline can directly establish th
 | `mp.s.2`–`mp.s.4` Web-service and DDoS protection | <img src="./images/orange.png" alt="Partially covered" width="16" height="16"> | OCI default Layer 3/4 volumetric DDoS protection, Optional WAF, firewall, and edge-service extensions.<br><br>Provides optional architecture integration points. | — | Select, configure, operate, and test workload web protections, DDoS strategy, certificates, and application controls. |
 | `org.*`, `mp.per.*`, `mp.if.*`, `mp.eq.*`, `mp.sw.*`, `mp.info.*` | <img src="./images/red.png" alt="Not covered by the landing-zone baseline" width="16" height="16"> | N/A.<br><br>No landing-zone implementation claim. | — | Implement governance, policies, procedures, personnel controls, physical controls, secure development, data handling, e-signature/time-stamping where applicable, and workload protections. |
 
-#### 4.1.1 Why Cloud Guard is important, but not sufficient
+____
+
+
+
+
+
+
+
+## 6. Key OCI security guardrails
+
+### 6.1 Cloud Guard
 
 Cloud Guard is a central baseline service because it can monitor compartment targets using configuration and activity detectors and can attach responder recipes. Oracle documents that targets set the monitored scope and detector recipes determine the monitoring rules; responder recipes may take corrective action automatically or with administrator intervention. [About OCI targets](https://docs.oracle.com/en-us/iaas/cloud-guard/using/targets-about.htm) · [About detector recipes](https://docs.oracle.com/en-us/iaas/Content/cloud-guard/using/detect-recipes-about.htm)
 
@@ -102,43 +121,11 @@ For ENS High, deployers must still define and evidence:
 
 Cloud Guard findings are evidence inputs, not proof of ENS conformity.
 
-#### 4.1.2 Security Zones
+### 6.2 Security Zones
 
 Security Zones are a recommended optional preventive guardrail for compartments requiring strict resource-creation constraints. Oracle states that operations in a Security Zone are validated against its recipe and that invalid operations are denied; this includes examples such as public accessibility and customer-managed-key requirements.
 
 Before enabling a Security Zone, the customer must define the in-scope compartment boundary, evaluate existing-resource violations, approve exception handling, and test workload compatibility. It complements, but cannot replace, application, data, operational, and governance controls.
-
-
-____
-
-
-
-## 5. Purpose
-
-This document defines the ENS High design elements that an OCI One-OE landing zone can establish, configure, or support through Infrastructure as Code (IaC).
-
-The document has four goals:
-
-1. State which controls are implemented or configurable in landing-zone IaC.
-2. Identify the customer’s manual and operational responsibilities from IaC.
-3. Identify workload, organisational, and service-contract controls that a landing zone cannot satisfy.
-4. Provide a traceable, proposed mapping to ENS measures and OCI One-OE landing-zone design elements.
-
-OCI Operating Entities Landing Zone (OCI Open LZ) is the appropriate technical baseline: it provides One-OE, Multi-OE, and Multi-Tenancy blueprints. Oracle describes the One-OE blueprint as the option for onboarding one operating entity, its environments, platforms, and projects into one tenancy. [OCI Operating Entities Landing Zone repository](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities)
-
-
-
-
-
-## 6. Architecture principles for ENS High
-
-1. **Treat the landing zone as a common security foundation, not the system boundary.** Each in-scope workload must extend the baseline according to its data, interfaces, threat model, and availability requirement.
-2. **Use least privilege and separation of duties.** Place network, security, IAM, and workload administration in separate roles/compartments and use narrowly scoped policies.
-3. **Prefer prevention and detection together.** Security Zones can deny non-compliant resource operations; Cloud Guard detects configuration and activity concerns. Neither replaces review and response.
-4. **Keep configuration reviewable.** Configuration inputs, plans, approvals, applies, and post-deployment verification are evidence. Changes must follow a controlled change process.
-5. **Design logging as an evidence pipeline.** Capture the defined logs, protect access, set retention/export requirements, integrate alerts, and test retrieval. Logging enabled without review, retention, or response is insufficient.
-6. **Make every exception explicit.** Security-Zone exemptions, broad IAM policies, public endpoints, disabled detector rules, or unencrypted exceptions require documented approval, owner, expiry, and compensating controls.
-7. **Validate in OCI after deployment.** IaC state is evidence of intent. OCI configuration, Cloud Guard status, logs, and access tests are evidence of effectiveness.
 
 ## 7. Deployment and verification workflow
 
@@ -168,3 +155,12 @@ This document provides a practical design reference for relating OCI One-OE land
 5. [OCI Cloud Guard targets](https://docs.oracle.com/en-us/iaas/Content/cloud-guard/using/targets-about.htm)
 6. [OCI Cloud Guard detector recipes](https://docs.oracle.com/en-us/iaas/Content/cloud-guard/using/detect-recipes-about.htm)
 7. [OCI Vulnerability Scanning overview](https://docs.oracle.com/en-us/iaas/Content/scanning/using/overview.htm)
+
+
+# License
+
+Copyright (c) 2026 Oracle and/or its affiliates.
+
+Licensed under the Universal Permissive License (UPL), Version 1.0.
+
+See [LICENSE](/LICENSE.txt) for more details.
