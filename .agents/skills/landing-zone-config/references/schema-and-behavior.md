@@ -17,7 +17,7 @@
   },
   environments: {
     prod: {
-      shared_project_network: {
+      project_network: {
         network: { vcn: '10.0.64.0/21' },
       },
       projects: { proj1: {} },
@@ -39,6 +39,8 @@ Optional but important:
 - `realm`, defaulting to `oc1` (including when explicitly `null`); supported values are `oc1` and `oc19`
 - `cis_level`, defaulting to `2`; Blueprint Factory config mode emits only the selected CIS level's security and observability files
 - `hub.network.subnets`
+- `environments.<env>.project_network`
+- `environments.<env>.projects`
 - `shared_platforms`
 - `environments.<env>.platforms`
 
@@ -51,13 +53,18 @@ Optional but important:
 - `realm` must be one of the realms defined in `gen/constants.libsonnet`
 - `cis_level` must be `1` or `2`; strings `'1'` and `'2'` are also normalized
 - If `hub.network.subnets` is omitted, hub subnets are auto-generated from the hub VCN using the canonical order for that hub kind
-- If `shared_project_network.network.subnets` is omitted, spoke subnets auto-generate as `web`, `app`, `db`, `infra`
+- If `project_network.network.subnets` is omitted, shared subnets auto-generate as `web`, `app`, `db`, and `infra`
+- If `project_network.network.subnets` is `{}`, the project VCN has no shared subnets
+- A non-empty shared-subnet map is exact: every supplied named CIDR is emitted and no `web`, `app`, `db`, or `infra` subnet is added implicitly
+- `project_network.subnet_routing` defaults to `vcn`; `hub` is supported for firewalled Hub A, Hub B, and Hub C, while Hub E is rejected
+- `projects.<project>.subnets` requires `project_network` and must contain at least one named CIDR
+- Shared and dedicated subnet CIDRs must be canonical, contained by the project VCN, and mutually non-overlapping
 - If a platform omits `network.subnets` and has an `extension`, subnet generation is delegated to that extension
 - If a platform omits `network.subnets` and has no `extension`, normalization fails
 
 ## Spokes, Platforms, And Shared Platforms
 
-- An environment becomes a spoke only when it defines `shared_project_network`
+- An environment becomes a spoke only when it defines `project_network`
 - `environments.<env>.platforms` creates environment-scoped platform VCNs and IAM hierarchy
 - `shared_platforms` creates shared platform VCNs and shared platform compartments
 - Platform scope semantics, display labels, DNS short codes, and security-target eligibility come from `gen/topology.libsonnet`
@@ -65,8 +72,41 @@ Optional but important:
 Current topology behavior worth remembering:
 
 - Preferred environment ordering is `prod`, `preprod`, `staging`, `uat`, `dev`, `test`, then any remaining names
-- Sample load balancer backends are derived from the first ordered workload spoke's `web` subnet
+- Sample load balancer backends are derived from the first ordered workload spoke whose normalized shared-subnet map contains `web` (including the omitted-map defaults); otherwise the public hub LB example uses non-working `0.0.0.0` backends. No workload is exposed by those placeholders, but the public listener and ingress NSG still require review before production use.
 - Security-target selection is centralized in `gen/topology.libsonnet`; omitted `security_targets` targets all defined environments
+
+## Project Networks And Dedicated Subnets
+
+`project_network` creates one environment project VCN. Shared subnets are
+controlled under `project_network.network.subnets`: omission generates the four
+defaults, `{}` means none, and a non-empty map is exact. A project may
+additionally define dedicated subnets under
+`projects.<project>.subnets`:
+
+```jsonnet
+prod: {
+  project_network: {
+    subnet_routing: 'vcn',
+    network: {
+      vcn: '10.0.64.0/21',
+      subnets: { frontend: '10.0.64.0/24' },
+    },
+  },
+  projects: {
+    api: { subnets: { jobs: '10.0.68.0/26' } },
+    data: {},
+  },
+}
+```
+
+- All shared and dedicated subnets stay in the environment `NETWORK` compartment.
+- Shared subnets are the recommended design default because multiple projects can use the allocated ranges efficiently. Dedicated subnet ranges provide separate project CIDR allocation and lifecycle management, but can leave significant unused address capacity.
+- Subnet access is governed at the environment `NETWORK` compartment. The factory does not generate per-subnet IAM conditions, so dedicated allocation is not an IAM boundary.
+- `subnet_routing: 'vcn'` keeps OCI local routing. `hub` sends traffic between
+  different subnets through the Hub A/B/C firewall path. Same-subnet traffic is
+  always direct. Hub C follows its normal staged deployment and requires real
+  firewall backend targets in place of generated placeholders. Hub E has no
+  firewall and is blocked.
 
 ## Extension Contract
 
@@ -77,6 +117,7 @@ Current registered types:
 - `oke_simple`
 - `exacc`
 - `exacs`
+- `ocvs`
 
 An extension-backed platform config looks like this:
 
@@ -108,7 +149,7 @@ It also contributes default platform subnets when the platform omits explicit `n
 
 - Database placement means AVMC/VMC placement and requires `platform.network`; the extension auto-generates `db` and `backup` subnets when explicit subnets are omitted
 - Infrastructure-only placement is inferred when an ExaCS platform has no `network`
-- `project_db_compartments` is only for Autonomous Database Dedicated project tiers; `shared_project_network` is only needed when that environment also needs project network resources
+- `project_db_compartments` is only for Autonomous Database Dedicated project tiers; `project_network` is only needed when that environment also needs project network resources
 - Shared infrastructure plus shared AVMC/VMC uses `shared_platforms.exacs` with `network`
 - Shared infrastructure plus environment AVMC/VMC uses `shared_platforms.exacs` without `network` and networked `environments.<env>.platforms.exacs`
 - Dedicated infrastructure plus dedicated AVMC/VMC uses only networked `environments.<env>.platforms.exacs`

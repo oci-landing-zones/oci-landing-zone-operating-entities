@@ -49,14 +49,17 @@ If the selected published path, Blueprint Factory, or workload extension does no
 - Always default to `One-OE`; do not ask who operates the landing zone or ask the customer to choose a landing zone family.
 - Ask in root `AGENTS.md` order: One-OE baseline, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, then CIDRs.
 - Ask for the target OCI region early. Explain that realm defaults to `oc1` public cloud when omitted, and ask for realm only when a non-public or sovereign deployment may apply, such as `oc19` EU Sovereign Cloud.
-- Explain each decision in customer language before using repo terms such as `One-OE`, `Hub A`, `platform`, `project`, or `shared_project_network`.
+- Explain each decision in customer language before using repo terms such as `One-OE`, `Hub A`, `platform`, `project`, or `project_network`.
+- During network-scope sizing, ask whether project workloads can use shared subnets or require project-dedicated subnet allocations. Recommend shared subnets unless separate CIDR allocation or lifecycle management is required: shared subnets use address space more efficiently, while dedicated subnets commonly leave capacity stranded in lightly used per-project ranges.
+- Before asking for that choice, explain that dedicated allocation is not an IAM boundary: principals with subnet permissions in the environment network compartment may use any of its subnets. Also explain that same-subnet traffic never traverses the hub firewall and must be controlled with NSGs and security lists.
+- Use a professional, outcome-based question such as: “Shared subnets are the recommended default because they use the allocated address space efficiently. Do any projects need separately allocated subnet CIDRs for operational reasons, or can their workloads use shared subnets with NSGs and security lists for segmentation? Dedicated allocation does not provide IAM isolation.” Ask it as the next single discovery question, not as part of a bulk questionnaire.
 - Do not propose concrete CIDRs until the root `AGENTS.md` network-scope gate is complete; use extension guides such as OKE or ExaCS only for extension-specific sizing inputs.
 
 ## OKE-Specific Guardrails
 
 - If the customer only says they want OKE, do not jump to `oke_simple`, single-stack vs multi-stack, or config snippets.
 - Do not assume OKE means `projects` are required.
-- Do not assume an environment needs `shared_project_network` unless the intended topology requires a spoke VCN.
+- Do not assume an environment needs `project_network` unless the intended topology requires a spoke VCN.
 - Explain OCI CIDRs separately from Kubernetes pod and service CIDRs; use `gen/workload-extensions/oke/AGENTS.md` for repo-specific OKE networking semantics.
 - Do not treat non-production as an automatic reason to recommend a no-firewall hub. Firewall-based designs are still the recommended default unless the customer explicitly accepts the tradeoff for a simpler non-production layout.
 - When the customer asks for public access, do not assume the chosen hub needs a brand-new public load balancer design. Check the selected hub guide or runtime artifacts first; in the One-OE one-stack runtime, each hub family already includes a public load balancer example with placeholder backends.

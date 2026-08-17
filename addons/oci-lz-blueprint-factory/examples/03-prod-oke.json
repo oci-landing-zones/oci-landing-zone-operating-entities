@@ -18,7 +18,7 @@
                     },
 
                     "network": {
-                        "vcn"                           : "10.0.96.0/21"
+                        "vcn"                           : "10.0.96.0/20"
                     }
                 }
             },
@@ -27,7 +27,7 @@
                 "proj1"                                 : {}
             },
 
-            "shared_project_network": {
+            "project_network": {
                 "network": {
                     "vcn"                               : "10.0.64.0/21"
                 }

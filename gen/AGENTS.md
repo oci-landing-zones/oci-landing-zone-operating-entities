@@ -213,11 +213,11 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
   },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
       platforms: {                        // optional
         oke: {
-          network: { vcn: '10.0.96.0/22' },
+          network: { vcn: '10.0.96.0/20' },
           extension: {
             type: 'oke_simple',
             params: {
@@ -234,7 +234,7 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 }
 ```
 
-Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`) and must be one of the realms in `constants.libsonnet`. `cis_level` defaults to `2` and must be `1` or `2`; config mode emits only the selected CIS security and observability file pair. `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Missing subnets are still auto-calculated from VCN CIDRs using `auto_subnets()`.
+Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`) and must be one of the realms in `constants.libsonnet`. `cis_level` defaults to `2` and must be `1` or `2`; config mode emits only the selected CIS security and observability file pair. `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Hub and extension subnet defaults use `auto_subnets()`. For project-network shared subnets, omission auto-generates `web`, `app`, `db`, and `infra`; an explicit empty map emits none; a non-empty map is authoritative.
 
 Plain platforms still require `platform.network`. Extension-backed platforms follow the registered extension's `metadata.network_mode`: `required` means `platform.network` must exist, `forbidden` means it must be omitted, and `optional` means the same extension can emit network when `platform.network` exists or non-network domains when it is absent. Legacy `metadata.requires_network: true|false` remains supported and maps to `required` or `forbidden`.
 
@@ -293,10 +293,10 @@ The orchestrator (`landing_zone.libsonnet`) dispatches to the correct hub builde
 LB example backend term definitions:
 
 - Ordered environment/spoke order: environments are ordered as `prod`, `preprod`, `staging`, `uat`, `dev`, `test`, then any remaining environment names in their existing config order.
-- Workload spoke: an environment entry that has `shared_project_network` and therefore produces a spoke VCN category.
-- First ordered workload spoke: the first environment in that ordered list that qualifies as a workload spoke.
+- Workload spoke: an environment entry that has `project_network` and therefore produces a spoke VCN category.
+- First ordered web spoke: the first workload spoke in that ordered list whose normalized shared-subnet map contains `web`, whether supplied explicitly or generated from an omitted map.
 
-LB example backends are derived centrally from the first ordered workload spoke's `shared_project_network.network.subnets.web` CIDR (`.10` and `.20` host IPs). This keeps generated examples deterministic and aligned with the canonical prod-first topology; if no workload spoke exists, the orchestrator passes explicit `0.0.0.0` placeholders rather than relying on silent defaults inside hub components.
+LB example backends are derived centrally from the first ordered web spoke's `project_network.network.subnets.web` CIDR (`.10` and `.20` host IPs). If no normalized workload spoke contains `web`, the example uses deliberately non-working `0.0.0.0` backend placeholders. This does not expose a workload, but the public listener and ingress NSG still exist and must be replaced or removed before production use. The generator never infers a backend subnet from another shared or dedicated subnet.
 
 ## 6. Extension Contract
 
@@ -412,6 +412,7 @@ Config mode validates required fields during normalization. `config.environments
 - Shared platform compartments live under `CMP-LZ-PLATFORM-KEY`, but their child keys omit the redundant parent segment: `CMP-LZ-SHARED-<NAME>-KEY`.
 - Shared platform OCI compartment names include the shared scope without repeating the parent platform segment. Example: a shared ExaCS platform uses `cmp-lz-shared-exacs` and `cmp-landingzone:cmp-lz-platform:cmp-lz-shared-exacs`. Individual workload extensions may reject shared placement; `oke_simple` is environment-only.
 - Platform identity/resources use platform compartments, while platform network categories use the scope's network compartment references.
+- Project-dedicated subnets are allocation constructs only. They remain in the environment network compartment, and the generator does not add subnet-specific IAM conditions.
 - Integrated IAM owns platform child compartments for Blueprint Factory outputs.
 - Standalone multi-stack OKE may overlay the same platform child compartment only to stay self-contained.
 - Extensions receive scope semantics via `params.topology`; naming remains formatting-only.

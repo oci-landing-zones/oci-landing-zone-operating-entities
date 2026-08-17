@@ -9,7 +9,7 @@
                 "proj1"             : {}
             },
 
-            "shared_project_network": {
+            "project_network": {
                 "network": {
                     "vcn"           : "10.0.64.0/21"
                 }
