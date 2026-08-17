@@ -40,6 +40,14 @@ ENABLE_KEY_SORTING = True  # Set to True to enable key rearranging (sorting by p
 
 # Keys are sorted in this priority order first, then alphabetically
 KEY_PRIORITY_ORDER = [
+    "realm",
+    "region",
+    "region_short_name",
+    "hub",
+    "environments",
+    "prod",
+    "preprod",
+    "dev",
     "name",
     "action",
     "display_name",

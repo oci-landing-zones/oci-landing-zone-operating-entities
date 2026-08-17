@@ -1,27 +1,27 @@
 {
-    "realm"                         : "oc1",
-    "region"                        : "eu-frankfurt-1",
-    "region_short_name"             : "fra",
+    "realm"                  : "oc1",
+    "region"                 : "eu-frankfurt-1",
+    "region_short_name"      : "fra",
 
-    "environments": {
-        "dev": {
-            "projects": {
-                "proj1"             : {}
-            },
+    "hub": {
+        "kind"               : "hub_e",
 
-            "project_network": {
-                "network": {
-                    "vcn"           : "10.0.64.0/21"
-                }
-            }
+        "network": {
+            "vcn"            : "10.0.0.0/21"
         }
     },
 
-    "hub": {
-        "kind"                      : "hub_e",
+    "environments": {
+        "dev": {
+            "project_network": {
+                "network": {
+                    "vcn"    : "10.0.64.0/21"
+                }
+            },
 
-        "network": {
-            "vcn"                   : "10.0.0.0/21"
+            "projects": {
+                "proj1"      : {}
+            }
         }
     }
 }
