@@ -1,0 +1,34 @@
+{
+  "alarm_count": 32,
+  "all_disabled": true,
+  "cpu_warning": {
+    "message_format": "PRETTY_JSON",
+    "namespace": "oci_computeagent",
+    "pending_duration": "PT10M",
+    "query": "CpuUtilization[5m].groupBy(resourceId).mean() >= 75",
+    "severity": "WARNING"
+  },
+  "event_delivery": {
+    "message_format": "PRETTY_JSON",
+    "metric_compartment_id": "CMP-LZ-SECURITY-KEY",
+    "namespace": "oci_cloudevents",
+    "pending_duration": "PT1M",
+    "query": "DeliveryFailedEvents[1m].groupBy(resourceId).sum() > 0",
+    "severity": "CRITICAL"
+  },
+  "notification_delivery": {
+    "message_format": "PRETTY_JSON",
+    "metric_compartment_id": "CMP-LZ-SECURITY-KEY",
+    "namespace": "oci_notification",
+    "pending_duration": "PT1M",
+    "query": "FailedMessagesCount[5m].groupBy(resourceId).sum() > 0",
+    "severity": "CRITICAL"
+  },
+  "vnic_conntrack_critical": {
+    "message_format": "PRETTY_JSON",
+    "namespace": "oci_vcn",
+    "pending_duration": "PT5M",
+    "query": "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 90",
+    "severity": "CRITICAL"
+  }
+}
