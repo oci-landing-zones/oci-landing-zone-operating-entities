@@ -17,10 +17,10 @@ local acceptor_iam = published.iam_fragment(profiles.cross_tenancy_acceptor);
 local requestor_iam = published.iam_fragment(profiles.cross_tenancy_requestor);
 local same_acceptor_iam = published.iam_fragment(profiles.same_tenancy_acceptor);
 local same_requestor_iam = published.iam_fragment(profiles.same_tenancy_requestor);
-local acceptor_golden_network = published.network(profiles.cross_tenancy_acceptor);
-local requestor_golden_network = published.network(profiles.cross_tenancy_requestor);
-local acceptor_golden_iam = published.iam(profiles.cross_tenancy_acceptor);
-local acceptor_golden_governance = published.governance(
+local acceptor_reference_network = published.network(profiles.cross_tenancy_acceptor);
+local requestor_reference_network = published.network(profiles.cross_tenancy_requestor);
+local acceptor_reference_iam = published.iam(profiles.cross_tenancy_acceptor);
+local acceptor_reference_governance = published.governance(
   profiles.cross_tenancy_acceptor
 );
 
@@ -58,10 +58,10 @@ local network_fragment_has_only_delta(fragment) =
     fragment.network_configuration,
     'network_configuration_categories'
   );
-local golden_categories(network) =
+local reference_categories(network) =
   network.network_configuration.network_configuration_categories;
 local complete_network_has_standard_categories(network) =
-  local categories = golden_categories(network);
+  local categories = reference_categories(network);
   local keys = std.objectFields(categories);
   std.length(keys) == 3
   && std.member(keys, '0-shared')
@@ -122,25 +122,25 @@ local complete_network_has_standard_categories(network) =
             && network_fragment_has_only_delta(requestor_network),
       },
       {
-        name: 'golden network output is not a complete prod/preprod One-OE surface',
-        ok: complete_network_has_standard_categories(acceptor_golden_network)
-            && complete_network_has_standard_categories(requestor_golden_network),
+        name: 'reference network output is not a complete prod/preprod One-OE surface',
+        ok: complete_network_has_standard_categories(acceptor_reference_network)
+            && complete_network_has_standard_categories(requestor_reference_network),
       },
       {
-        name: 'golden IAM or governance output is incomplete',
-        ok: std.objectHas(acceptor_golden_iam, 'compartments_configuration')
-            && std.objectHas(acceptor_golden_iam, 'policies_configuration')
+        name: 'reference IAM or governance output is incomplete',
+        ok: std.objectHas(acceptor_reference_iam, 'compartments_configuration')
+            && std.objectHas(acceptor_reference_iam, 'policies_configuration')
             && std.objectHas(
-              acceptor_golden_governance,
+              acceptor_reference_governance,
               'tags_configuration'
             ),
       },
       {
         name: 'same-tenancy and cross-tenancy network profiles diverge',
         ok: published.network(profiles.same_tenancy_acceptor)
-            == acceptor_golden_network
+            == acceptor_reference_network
             && published.network(profiles.same_tenancy_requestor)
-               == requestor_golden_network,
+               == requestor_reference_network,
       },
       {
         name: 'RPC changed the standard customer Network Firewall policy',
