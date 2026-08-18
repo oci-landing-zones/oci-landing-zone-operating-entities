@@ -17,10 +17,10 @@ In the published reference topology, Tenancy 1 remains the acceptor. Add a separ
 
 ## Configuration Contract
 
-Define each RPC under the top-level `remote_peering_connections` object. Every entry requires:
+Define each RPC under the top-level `remote_peering_connections` object. Each entry uses the following required and role-specific fields:
 
-- `remote_cidrs`: reviewed routable VCN CIDRs on the peer side
-- `peer_region_name`: OCI region containing the peer RPC
+- `remote_cidrs`: required, reviewed routable VCN CIDRs on the peer side
+- `peer_region_name`: OCI region containing the peer RPC; specify it for inter-region connections
 - `peer_id`: acceptor RPC OCID or orchestrator dependency key, requester only
 - `peer_tenancy_ocid`: peer tenancy OCID, cross tenancy only
 - `requestor_group_ocid`: foreign requester network-administrator group OCID, cross-tenancy acceptor only
@@ -139,9 +139,11 @@ Deploy the requester IAM baseline first when its network-administrator group mus
 
 Environment names and counts are customer-defined. The generator derives local routing from every network-producing environment and platform in the source configuration, including registered extensions such as OKE. It does not hardcode `prod`, `preprod`, `uat`, or a fixed number of environments.
 
-Hub A, Hub B, and Hub C use the common firewall-hub RPC routing path. Hub E uses a direct DRG path and should be selected only for PoC, lab, or explicitly accepted no-firewall scenarios. The standard X-RPC examples use Hub A for the acceptor and Hub B for the requester.
+Hub selection follows the customer's One-OE design and is configured independently for each Landing Zone. Hub A and Hub B use OCI Network Firewall, Hub C supports third-party network firewalls through trust and untrust Network Load Balancers, and Hub E provides direct DRG routing without a firewall. Hub E should be selected only for PoC, lab, or explicitly accepted no-firewall scenarios. The X-RPC generator applies the appropriate routing for the selected hub model.
 
-The generator adds RPC route tables, route distributions, attachments, import statements, and route rules. It does not modify the customer's OCI Network Firewall security policy; that policy must separately permit the approved traffic.
+For Hub C, the Blueprint Factory generates the hub network, required subnets, Network Load Balancers, DRG integration, X-RPC routing, and `network_backends.json`. The customer deploys and configures the third-party firewall appliances, such as Fortinet or Palo Alto, and supplies their private IP OCIDs to complete the Network Load Balancer backend configuration.
+
+The generator adds RPC route tables, route distributions, attachments, import statements, and route rules. Firewall policies must separately permit the approved X-RPC traffic.
 
 ## Generated Output
 
