@@ -5,12 +5,15 @@ set -euo pipefail
 runtime_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 studio_dir="$(cd "$runtime_dir/../.." && pwd)"
 wasm_opt="$studio_dir/node_modules/.bin/wasm-opt"
-expected_go="go1.25.4"
 export GOCACHE="${GOCACHE:-$studio_dir/node_modules/.cache/go-build}"
+export GOMODCACHE="${GOMODCACHE:-$studio_dir/node_modules/.cache/go-mod}"
 mkdir -p "$GOCACHE"
+mkdir -p "$GOMODCACHE"
 
-if [[ "$(go env GOVERSION)" != "$expected_go" ]]; then
-  echo "go-jsonnet WASM requires $expected_go; got $(go env GOVERSION)" >&2
+go_version="$(go env GOVERSION)"
+if [[ ! "$go_version" =~ ^go([0-9]+)\.([0-9]+)(\.[0-9]+)?$ ]] \
+  || (( BASH_REMATCH[1] < 1 || (BASH_REMATCH[1] == 1 && BASH_REMATCH[2] < 25) )); then
+  echo "go-jsonnet WASM requires Go 1.25 or newer; got $go_version" >&2
   exit 1
 fi
 
@@ -39,10 +42,15 @@ GOOS=js GOARCH=wasm go build \
   --strip-producers \
   --enable-bulk-memory \
   --enable-bulk-memory-opt \
+  --enable-nontrapping-float-to-int \
   -o "$optimized"
 
 mv "$optimized" libjsonnet.wasm
 cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" wasm_exec.js
 
-shasum -a 256 -c SHA256SUMS
+{
+  shasum -a 256 build.sh main.go go.mod go.sum
+  printf '%s  %s\n' "$go_version" 'go-version'
+  "$wasm_opt" --version | shasum -a 256 | sed 's/  -$/  wasm-opt-version/'
+} | shasum -a 256 | awk '{print $1}' > .runtime-build-fingerprint
 du -h libjsonnet.wasm

@@ -25,9 +25,9 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 const FEATURES = [
-  { title: 'Guided wizard', body: 'Step through Foundation, Hub Network, Projects, Platforms and Review.' },
-  { title: 'Live diagram', body: 'A network diagram builds up as you go; export its complete structural view from Review.' },
-  { title: 'Canonical config', body: 'Every input feeds one Blueprint Factory-aligned Landing Zone config.' },
+  { title: 'Guided setup', body: 'Choose your OCI region, environments, network model, and workload platforms in order.' },
+  { title: 'Network view', body: 'Use the live diagram to check the networks and traffic paths your choices create.' },
+  { title: 'Deployment package', body: 'Download the generated files and follow the built-in, phased deployment guide.' },
 ];
 
 export default function Hero({ onNew, compact = false }: { onNew: () => void; compact?: boolean }) {
@@ -37,8 +37,8 @@ export default function Hero({ onNew, compact = false }: { onNew: () => void; co
       <div style={compact ? styles.titleCompact : styles.title}>Landing Zone Studio</div>
       {!compact && (
         <div style={styles.sub}>
-          Build an OCI Landing Zone step by step. Each input updates a canonical Blueprint Factory config and a
-          live, exportable network diagram. Review all output files before deployment.
+          Plan an OCI Landing Zone step by step. Check the network as you make decisions, then download the
+          generated files and follow the deployment guide.
         </div>
       )}
       <button type="button" style={styles.cta} onClick={onNew}>New Landing Zone →</button>

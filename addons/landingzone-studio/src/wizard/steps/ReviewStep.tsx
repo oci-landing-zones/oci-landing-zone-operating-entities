@@ -61,6 +61,10 @@ const local: Record<string, CSSProperties> = {
   fileChip: { padding: '3px 7px', borderRadius: 4, border: `1px solid ${oracle.border}`, background: oracle.surface, fontSize: 11.5, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
   ordered: { margin: '14px 0 0 22px', padding: 0, color: oracle.text, fontSize: 13, lineHeight: 1.7 },
   links: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, marginTop: 8, fontSize: 12.5 },
+  guide: { marginTop: 16, padding: 16, border: `1px solid ${oracle.borderStrong}`, borderRadius: 6, background: oracle.surfaceAlt },
+  guideTitle: { fontSize: 13.5, fontWeight: 800, color: oracle.ink },
+  phaseChange: { display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 14, padding: '12px 14px', border: `1px solid ${oracle.red}`, borderLeft: `4px solid ${oracle.red}`, borderRadius: 6, background: oracle.redTint, fontSize: 12.5, lineHeight: 1.5, color: oracle.text },
+  phaseChangeTitle: { fontWeight: 800, color: oracle.redDark },
 };
 
 function expectedCoreFiles(cisLevel: 1 | 2): string[] {
@@ -69,6 +73,69 @@ function expectedCoreFiles(cisLevel: 1 | 2): string[] {
     `security_cis${cisLevel}_pre.json`, `security_cis${cisLevel}.json`,
     `observability_cis${cisLevel}_pre.json`, `observability_cis${cisLevel}.json`,
   ];
+}
+
+const RESOURCE_MANAGER_STACKS_URL = 'https://cloud.oracle.com/resourcemanager/stacks';
+const RESOURCE_MANAGER_CREATE_STACK_GUIDE_URL = 'https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-stack.htm';
+const RESOURCE_MANAGER_PLAN_GUIDE_URL = 'https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-plan.htm';
+const RESOURCE_MANAGER_APPLY_GUIDE_URL = 'https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-apply.htm';
+const NETWORK_FIREWALL_IP_HELP_URL = 'https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/howto_identify_private_ip_ocid_network_firewall.md';
+
+function Placeholder({ children }: { children: string }) {
+  return <code className="required-value">&quot;{children}&quot;</code>;
+}
+
+function Setting({ name, value }: { name: string; value?: string }) {
+  return (
+    <code className="required-setting">
+      <span className="required-setting-name">{name}</span>
+      {value && <><span className="required-setting-equals"> = </span><span className="required-setting-value">&quot;{value}&quot;</span></>}
+    </code>
+  );
+}
+
+function RouteCompletionGuide({ hubKind }: { hubKind: string }) {
+  if (hubKind === 'hub_a') {
+    return (
+      <div style={local.guide}>
+        <div style={local.guideTitle}>Before phase 2 — finish Hub A routing</div>
+        <ol style={local.ordered}>
+          <li>After phase 1 succeeds, copy the private IP OCID for each OCI Network Firewall. Use the OCID, not the IP address. <a className="guide-link" href={NETWORK_FIREWALL_IP_HELP_URL} target="_blank" rel="noreferrer">Find a Network Firewall private IP OCID ↗</a></li>
+          <li>In <code>network.json</code>, replace <Placeholder>DMZ OCI NFW PRIVATE IP OCID</Placeholder> and <Placeholder>Internal OCI NFW PRIVATE IP OCID</Placeholder>.</li>
+          <li>For phase 2, replace <code>network_pre.json</code> with <code>network.json</code> in the stack configuration. Never supply both files together.</li>
+        </ol>
+      </div>
+    );
+  }
+
+  if (hubKind === 'hub_b') {
+    return (
+      <div style={local.guide}>
+        <div style={local.guideTitle}>Before phase 2 — finish Hub B routing</div>
+        <ol style={local.ordered}>
+          <li>After phase 1 succeeds, copy the OCI Network Firewall private IP OCID. Use the OCID, not the IP address. <a className="guide-link" href={NETWORK_FIREWALL_IP_HELP_URL} target="_blank" rel="noreferrer">Find a Network Firewall private IP OCID ↗</a></li>
+          <li>In <code>network.json</code>, replace every <Placeholder>OCI NFW PRIVATE IP OCID</Placeholder> value.</li>
+          <li>For phase 2, replace <code>network_pre.json</code> with <code>network.json</code> in the stack configuration. Never supply both files together.</li>
+        </ol>
+      </div>
+    );
+  }
+
+  if (hubKind === 'hub_c') {
+    return (
+      <div style={local.guide}>
+        <div style={local.guideTitle}>Before phase 2 — finish Hub C routing</div>
+        <ol style={local.ordered}>
+          <li>After phase 1 succeeds, copy the private IP OCIDs for the trust and untrust Network Load Balancers.</li>
+          <li>Use <code>network.json</code> when the Network Load Balancers do not need third-party firewall backends. Replace <Placeholder>TRUST NLB PRIVATE IP OCID</Placeholder> and <Placeholder>UNTRUST NLB PRIVATE IP OCID</Placeholder>.</li>
+          <li>If third-party firewalls are part of this design, configure them outside Studio before phase 2, then use <code>network_backends.json</code> instead. Fill the trust and untrust NLB OCIDs and every <Placeholder>NETWORK FIREWALL-1/2 PRIVATE IP OCID</Placeholder> value.</li>
+          <li>For phase 2, replace <code>network_pre.json</code> with exactly one final network file: <code>network.json</code> or <code>network_backends.json</code>.</li>
+        </ol>
+      </div>
+    );
+  }
+
+  return null;
 }
 
 export default function ReviewStep({ designName }: { designName: string }) {
@@ -92,6 +159,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
     ? Object.keys(result.files)
     : expectedCoreFiles(model.foundation.cisLevel).filter((file) => model.network.hubKind !== 'hub_e' || file !== 'network_pre.json');
   const deployStages = deploymentStages(deployFiles);
+  const [firstStage, ...remainingStages] = deployStages;
 
   // Outputs are a snapshot. A model change forces a transparent rebuild before
   // download, so stale files are never surfaced to the customer.
@@ -164,7 +232,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Review</div>
+          <div style={s.title}>Review your landing zone</div>
           <div className="review-summary-grid" style={local.sumGrid}>
             {[
               ['Region', model.foundation.region],
@@ -183,20 +251,10 @@ export default function ReviewStep({ designName }: { designName: string }) {
             ))}
           </div>
 
-          <div style={s.title}>Review and outputs</div>
+          <div style={s.title}>Download deployment files</div>
           <div style={local.note}>
-            Download one complete ZIP containing the Landing Zone source config and all required artifacts.
+            Download one package containing a record of this design and the deployment files. Review the files and resolve every placeholder before you deploy.
           </div>
-          {model.network.hubKind === 'hub_c' && (
-            <div style={local.stale}>
-              <strong>Manual post-deployment configuration required</strong>
-              <span style={{ color: oracle.textMuted }}>
-                — complete the first ORM apply, deploy the third-party firewalls, then replace the
-                placeholders in <code>network_backends.json</code>. For the final update, use either
-                <code> network.json</code> or <code> network_backends.json</code>, never both.
-              </span>
-            </div>
-          )}
           {contractErrors.length > 0 && (
             <div style={local.errBox}>
               <div style={local.errHead}>Resolve these conflicts before downloading</div>
@@ -211,7 +269,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
               onClick={generateAndDownload}
               disabled={busy}
             >
-              {busy ? 'Preparing download…' : 'Download LZ config'}
+              {busy ? 'Preparing download…' : 'Generate and download files'}
             </button>
             <button type="button" style={local.secondary} onClick={downloadDrawio}>
               Export diagram (.drawio)
@@ -232,18 +290,37 @@ export default function ReviewStep({ designName }: { designName: string }) {
         <div style={s.body}>
           <div style={s.title}>Deploy with OCI Resource Manager</div>
           <div style={local.note}>
-            Use only the files in this ZIP. Do not mix them with published blueprint JSON files.
-            Store the selected files in a customer-controlled private Object Storage bucket or an
-            approved private Git repository, then use the orchestrator&apos;s <code>rms-facade</code> working directory.
+            Resource Manager runs the Landing Zone Orchestrator. The files from Studio are a separate configuration source for that stack. Use one stack for both phases; phase 2 updates its configuration source.
           </div>
-          <ol style={local.ordered}>
-            <li>Download the ZIP, review the config and JSON output, and resolve every placeholder.</li>
-            <li>Create or edit an ORM stack from a pinned orchestrator release. Set the working directory to <code>rms-facade</code>.</li>
-            <li>Choose <code>ocibucket</code> or approved private Git as the configuration source and select only the files listed for the current phase.</li>
-            <li>Run a plan, review changes and policy impact, then apply. Wait for it to finish before moving to the next phase.</li>
-          </ol>
+          <div style={local.guide}>
+            <div style={local.guideTitle}>Create and run the stack</div>
+            <ol style={local.ordered}>
+              <li>Unzip the download. Keep the generated files in a customer-controlled private Object Storage bucket or approved private GitHub repository. Do not mix them with published blueprint files.</li>
+              <li>Open <a className="guide-link" href={RESOURCE_MANAGER_STACKS_URL} target="_blank" rel="noreferrer">Resource Manager → Stacks ↗</a> and select <strong>Create stack</strong>. Use a pinned Landing Zone Orchestrator release as the stack code, then set its working directory to <code>rms-facade</code>.</li>
+              <li>In the stack variables, set <Setting name="configuration_source" value="ocibucket" />. Then enter the bucket name in <Setting name="oci_configuration_bucket" /> and the current phase's file list in <Setting name="oci_configuration_objects" />. You can instead use an approved private GitHub source.</li>
+              <li>Select <strong>Create</strong> without running an apply. From the stack details page, select <strong>Plan</strong>, review the changes and policy impact, then select <strong>Apply</strong>. Wait for a successful apply before starting phase 2.</li>
+            </ol>
+          </div>
           <div style={local.deployGrid}>
-            {deployStages.map((deployment) => (
+            {firstStage && (
+              <div style={local.deployCard}>
+                <div style={local.deployTitle}>{firstStage.title}</div>
+                <div style={{ fontSize: 12.5, color: oracle.textMuted, lineHeight: 1.5 }}>{firstStage.description}</div>
+                <div style={local.fileList}>
+                  {firstStage.files.map((file) => <code key={file} style={local.fileChip}>{file}</code>)}
+                </div>
+              </div>
+            )}
+            <div style={local.phaseChange}>
+              <div>
+                <div style={local.phaseChangeTitle}>Important — update the configuration before phase 2</div>
+                <div>
+                  Files ending in <code>_pre</code> are only for phase 1. In phase 2, replace every pre file with its final file. Supplying both variants can create duplicate configuration families.
+                </div>
+              </div>
+            </div>
+            <RouteCompletionGuide hubKind={model.network.hubKind} />
+            {remainingStages.map((deployment) => (
               <div key={deployment.title} style={local.deployCard}>
                 <div style={local.deployTitle}>{deployment.title}</div>
                 <div style={{ fontSize: 12.5, color: oracle.textMuted, lineHeight: 1.5 }}>{deployment.description}</div>
@@ -253,18 +330,14 @@ export default function ReviewStep({ designName }: { designName: string }) {
               </div>
             ))}
           </div>
-          <div style={local.stale}>
-            <strong>Important</strong>
-            <span style={{ color: oracle.textMuted }}>
-              — replace pre-phase files with final files. Supplying both variants can create duplicate top-level configuration families.
-            </span>
-          </div>
-          <div className="deployment-links-heading">Helpful deployment links</div>
-          <div className="deployment-links" style={local.links} aria-label="Helpful deployment links">
-            <a href="https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator" target="_blank" rel="noreferrer"><span>Landing Zone Orchestrator</span><span aria-hidden="true">↗</span></a>
-            <a href="https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm" target="_blank" rel="noreferrer"><span>Resource Manager overview</span><span aria-hidden="true">↗</span></a>
-            <a href="https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-stack-object-storage.htm" target="_blank" rel="noreferrer"><span>Create a stack from Object Storage</span><span aria-hidden="true">↗</span></a>
-            <a href="https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/managingconfigurationsourceproviders.htm" target="_blank" rel="noreferrer"><span>Private configuration sources</span><span aria-hidden="true">↗</span></a>
+          <div className="deployment-links-heading">OCI Resource Manager resources</div>
+          <div className="deployment-links" style={local.links} aria-label="OCI Resource Manager resources">
+            <a href={RESOURCE_MANAGER_STACKS_URL} target="_blank" rel="noreferrer"><span>Open Resource Manager stacks</span><span aria-hidden="true">↗</span></a>
+            <a href={RESOURCE_MANAGER_CREATE_STACK_GUIDE_URL} target="_blank" rel="noreferrer"><span>Read: create a stack</span><span aria-hidden="true">↗</span></a>
+            <a href={RESOURCE_MANAGER_PLAN_GUIDE_URL} target="_blank" rel="noreferrer"><span>Read: plan a deployment</span><span aria-hidden="true">↗</span></a>
+            <a href={RESOURCE_MANAGER_APPLY_GUIDE_URL} target="_blank" rel="noreferrer"><span>Read: apply a deployment</span><span aria-hidden="true">↗</span></a>
+            <a href="https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator" target="_blank" rel="noreferrer"><span>Landing Zone Orchestrator source</span><span aria-hidden="true">↗</span></a>
+            <a href="https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/managingconfigurationsourceproviders.htm" target="_blank" rel="noreferrer"><span>Read: private configuration sources</span><span aria-hidden="true">↗</span></a>
           </div>
         </div>
       </section>

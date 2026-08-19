@@ -219,20 +219,102 @@ a:focus:not(:focus-visible) {
   justify-content: space-between;
   gap: 12px;
   min-width: 0;
-  padding: 10px 12px;
+  padding: 11px 12px;
   color: #235a8c;
-  background: #fff;
+  background: #f8fbfd;
   border: 1px solid #b8c9d8;
-  border-radius: 4px;
+  border-radius: 6px;
   font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration: none;
+  box-shadow: 0 1px 1px rgba(32, 31, 28, 0.04);
+  transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.deployment-links a span:last-child {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #fff;
+  background: #235a8c;
+  font-size: 13px;
 }
 
 .deployment-links a:hover {
   color: #163f66;
   background: #f3f7fa;
   border-color: #7d9bb3;
+  box-shadow: 0 2px 5px rgba(32, 31, 28, 0.1);
+}
+
+.deployment-links a:focus-visible {
+  outline: 3px solid #7db5d9;
+  outline-offset: 2px;
+}
+
+.required-value {
+  display: inline-block;
+  margin: 1px 2px;
+  padding: 1px 5px;
+  border: 1px solid #e6b06c;
+  border-radius: 3px;
+  color: #8a3b08;
+  background: #fff5e7;
+  font-weight: 800;
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+}
+
+.required-setting {
+  display: inline-block;
+  margin: 1px 2px;
+  padding: 2px 5px;
+  border: 1px solid #a8c6da;
+  border-radius: 4px;
+  background: #edf6fb;
+  font-size: 0.92em;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.required-setting-name {
+  color: #174d75;
+  font-weight: 800;
+}
+
+.required-setting-equals {
+  color: #5c5c5c;
+}
+
+.required-setting-value {
+  color: #096b55;
+  font-weight: 800;
+}
+
+.guide-link {
+  display: inline;
+  padding: 1px 3px;
+  border-radius: 3px;
+  color: #235a8c;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.guide-link:hover {
+  color: #163f66;
+  background: #e8f2f8;
+}
+
+.guide-link:focus-visible {
+  outline: 3px solid #7db5d9;
+  outline-offset: 2px;
 }
 
 .wizard-footer-nav button {

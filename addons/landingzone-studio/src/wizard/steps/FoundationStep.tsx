@@ -101,8 +101,9 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Foundation</div>
+          <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>Set the OCI location, security baseline, and environments for this landing zone.</div>
           <div style={s.field}>
-            <label style={s.label} htmlFor="saved-lz-name">Saved design name</label>
+            <label style={s.label} htmlFor="saved-lz-name">Design name</label>
             <input
               id="saved-lz-name"
               style={{ ...s.input, border: `1px solid ${nameError ? '#9f1d1d' : oracle.borderStrong}` }}
@@ -112,15 +113,16 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
               aria-invalid={!!nameError}
               aria-describedby={nameError ? 'saved-lz-name-error' : undefined}
             />
-            <div style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Stored only in this browser and used for saved records and download filenames. It does not change OCI resource names.</div>
+            <div style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Stored in this browser and used for download filenames. It does not change OCI resource names.</div>
             {nameError && <div id="saved-lz-name-error" role="alert" style={s.error}>{nameError}</div>}
           </div>
           <div style={s.twoCol} className="foundation-two-col">
             <div>
               <label style={s.label} htmlFor="lz-realm">Realm</label>
-              <select id="lz-realm" style={s.select} value={f.realm} onChange={(e) => onRealm(e.target.value)}>
+              <select id="lz-realm" style={s.select} value={f.realm} onChange={(e) => onRealm(e.target.value)} aria-describedby="lz-realm-help">
                 {REALM_OPTIONS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
               </select>
+              <div id="lz-realm-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Use OC1 for commercial OCI. Select another realm only when your tenancy uses a sovereign or isolated cloud.</div>
             </div>
             <div>
               <label style={s.label} htmlFor="lz-region">Region</label>
@@ -166,7 +168,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.body}>
           <div style={s.title}>Environments</div>
           <div style={{ color: oracle.textMuted, fontSize: 12.5, lineHeight: 1.5, margin: '-8px 0 14px' }}>
-            Security Zone applies a stricter security recipe to that environment. Confirm the recipe permits every service the environment needs before deployment.
+            An environment is an isolated stage of your workload, such as development or production. A Security Zone applies stricter OCI controls; confirm it permits every service you plan to use.
           </div>
 
           <div style={s.tableHead} className="foundation-environment-grid">

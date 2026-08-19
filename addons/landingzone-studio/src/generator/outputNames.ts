@@ -49,13 +49,13 @@ export function deploymentStages(availableFiles: string[]): DeploymentStage[] {
     {
       title: '1. Create the landing zone',
       description: available.has('network_pre.json')
-        ? 'Use the pre-phase network, security, and observability files. Plan and apply this set before completing final routes.'
-        : 'Use the final network with the pre-phase security and observability files. Plan and apply this set first.',
+        ? 'Use this first set once. Files ending in _pre create resources before their final route targets exist.'
+        : 'Use this first set once. This hub does not need a preliminary network file.',
       files: keep([...persistent, available.has('network_pre.json') ? 'network_pre.json' : 'network.json', ...pre]),
     },
     {
       title: '2. Complete routing and controls',
-      description: 'Edit the existing stack source: replace each pre file with its final counterpart, then plan, review, and apply again.',
+      description: 'Update the same stack: replace every _pre file with its final counterpart, then plan and apply again.',
       files: keep([...persistent, ...finalCore, ...extensionFiles]),
     },
   ];

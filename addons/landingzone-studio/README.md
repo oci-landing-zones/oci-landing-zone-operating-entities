@@ -15,14 +15,14 @@ You fill in a step-by-step wizard (text fields, dropdowns, checkboxes, switches)
 ## Run
 
 ```bash
-npm install
-npm run build:wasm   # build the ignored, optimized browser Jsonnet runtime
-npm run dev          # Vite dev server on http://localhost:5173
-npm run typecheck    # tsc --noEmit (app + tooling configs)
-npm run lint         # eslint
-npm run test         # vitest (pure-function unit tests)
-npm run build        # typecheck + vite build → dist/
-npm run preview      # preview the production build
+bun install
+bun run build:wasm   # build the ignored, optimized browser Jsonnet runtime
+bun run dev          # Vite dev server on http://localhost:5173
+bun run typecheck    # tsc --noEmit (app + tooling configs)
+bun run lint         # eslint
+bun run test         # vitest (pure-function unit tests)
+bun run build        # typecheck + vite build → dist/
+bun run preview      # preview the production build
 ```
 
 Open **http://localhost:5173/** — the dashboard lists your Landing Zones; create one to open the wizard at `/lz/:id`. No auth, no backend required for development; every route is public and all generation happens in the browser. (First visit shows a one-time disclaimer gate.)

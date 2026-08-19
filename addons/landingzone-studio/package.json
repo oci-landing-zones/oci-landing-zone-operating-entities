@@ -5,15 +5,15 @@
   "type": "module",
   "scripts": {
     "ensure:wasm": "bash 3rd/go-jsonnet/ensure.sh",
-    "predev": "npm run ensure:wasm",
+    "predev": "bun run ensure:wasm",
     "dev": "vite",
     "build:wasm": "bash 3rd/go-jsonnet/build.sh",
-    "prebuild": "npm run ensure:wasm",
+    "prebuild": "bun run ensure:wasm",
     "build": "tsc --noEmit -p tsconfig.json && vite build",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
     "lint": "eslint .",
     "preview": "vite preview",
-    "pretest": "npm run ensure:wasm",
+    "pretest": "bun run ensure:wasm",
     "test": "vitest run",
     "test:watch": "vitest"
   },

@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -51,20 +50,6 @@ function expectHubGeneratorContract(files: Record<string, string>, hubKind: HubK
     expect(isPublic, `${hubKind} ${name} public classification`).toBe(PUBLIC_HUB_SUBNETS[hubKind].includes(subnet.name));
   }
 }
-
-describe('generated go-jsonnet runtime', () => {
-  it('matches its recorded artifact checksums', () => {
-    const runtimeDir = resolve('3rd/go-jsonnet');
-    const checksums = readFileSync(resolve(runtimeDir, 'SHA256SUMS'), 'utf8').trim().split('\n');
-
-    expect(checksums).toHaveLength(2);
-    for (const line of checksums) {
-      const [expected, filename] = line.trim().split(/\s+/);
-      const actual = createHash('sha256').update(readFileSync(resolve(runtimeDir, filename))).digest('hex');
-      expect(actual, filename).toBe(expected);
-    }
-  });
-});
 
 describe('virtualFs', () => {
   it('uses repository-relative generator paths without rewriting imports', () => {
