@@ -2,7 +2,7 @@
  * WizardShell — Milestone 0 vertical slice, styled in the Oracle Redwood / OCI
  * look. Proves the whole pipeline end to end:
  *   form inputs → canonical LzModel → live React Flow diagram
- *              → JSON preview        → Review downloads
+ *              → debug config preview → Review downloads
  */
 
 import React, { useMemo } from 'react';
@@ -30,6 +30,14 @@ import { oracle } from '../theme';
 import { EMPTY_DEBUG_SEQUENCE, registerDebugClick } from '../services/debugMode';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
+
+const STEP_PROGRESS_LABELS: Record<number, string> = {
+  1: 'Name your landing zone and select its region',
+  2: 'Set up the shared network',
+  3: 'Add projects and their networks',
+  4: 'Add workload platforms',
+  5: 'Review and download your files',
+};
 
 const layout = {
   app:     { minHeight: '100vh', background: oracle.appBg, fontFamily: FONT, color: oracle.text } as React.CSSProperties,
@@ -80,7 +88,9 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
   const [debugMode, setDebugMode] = React.useState(false);
   const debugClicks = React.useRef(EMPTY_DEBUG_SEQUENCE);
   const [diagramOpts, setDiagramOpts] = React.useState<DiagramOptions>({});
-  const activeStepLabel = WIZARD_STEPS.find((s) => s.id === activeStep)?.label ?? '';
+  const activeStepLabel = STEP_PROGRESS_LABELS[activeStep]
+    ?? WIZARD_STEPS.find((s) => s.id === activeStep)?.label
+    ?? '';
 
   // Load the complete generation chunk and boot Jsonnet after the first paint.
   // Generate shares its singleton promise, so an in-flight warm-up also removes
@@ -108,7 +118,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
   const railActive = viewMode === 'split' && diagramCollapsed;
 
   // The endpoints / route-table dots (and, later, flows) are a diagram-only-mode
-  // layer — in split / form / json the diagram stays a clean overview. The
+  // layer — in split and form modes the diagram stays a clean overview. The
   // Review builds a separate step-5 structural graph for Draw.io export.
   const diagramOnly = viewMode === 'diagram';
   const effectiveOpts = useMemo<DiagramOptions>(
@@ -218,7 +228,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
             <div style={layout.header}>
               <div>
                 <div style={layout.title}>{name}</div>
-                <div style={layout.sub}>Step {activeStep} of {WIZARD_STEPS.length} — {activeStepLabel}. The diagram and JSON build up as you go.</div>
+                <div style={layout.sub}>Step {activeStep} of {WIZARD_STEPS.length} — {activeStepLabel}</div>
               </div>
             </div>
 
@@ -226,13 +236,10 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
           </>
         )}
 
-        {viewMode === 'json' ? (
-          <JsonViewer inline title="Landing Zone Config" value={configText} inlineHeight="72vh" />
-        ) : (
-          <div
-            style={{ ...layout.grid, gridTemplateColumns: gridCols }}
-            className={`studio-workspace${viewMode === 'split' ? ' studio-workspace--split' : ''}${flowsOpen ? ' studio-workspace--flows' : ''}`}
-          >
+        <div
+          style={{ ...layout.grid, gridTemplateColumns: gridCols }}
+          className={`studio-workspace${viewMode === 'split' ? ' studio-workspace--split' : ''}${flowsOpen ? ' studio-workspace--flows' : ''}`}
+        >
             {showForm && (
               <div style={{ display: 'grid', gap: 14, alignContent: 'start' }}>
                 {activeStep === 1 ? (
@@ -296,12 +303,11 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
                 />
               </div>
             )}
-          </div>
-        )}
+        </div>
 
-        {viewMode !== 'json' && stepNav}
+        {stepNav}
 
-        {debugMode && viewMode === 'split' && (
+        {debugMode && (
           <JsonViewer title="Landing Zone Config" value={configText} />
         )}
       </div>

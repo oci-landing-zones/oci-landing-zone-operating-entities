@@ -392,8 +392,9 @@ export default function HubNetworkStep() {
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Hub network</div>
+          <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>The hub is the shared network that connects environments and controls traffic to the internet and between workloads.</div>
 
-          <label style={s.label}>Hub kind</label>
+          <label style={s.label}>Network model</label>
           <div style={s.kindRow} role="group" aria-label="Hub kind">
             {HUB_KINDS.map((k) => {
               const active = k.id === n.hubKind;

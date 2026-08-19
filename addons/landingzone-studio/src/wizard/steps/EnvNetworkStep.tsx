@@ -114,6 +114,7 @@ function ProjectsPanel({ projects, envs, onChange }: {
       <div style={s.accent} />
       <div style={s.body}>
         <div style={s.title}>Projects</div>
+        <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>Use a project to group one application&apos;s resources. Projects do not create a separate network; use a platform when a workload needs one.</div>
 
         <div style={{ ...s.tableHead, ...local.projGrid }}>
           <span>Project</span>
@@ -238,6 +239,7 @@ export default function EnvNetworkStep() {
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Environments</div>
+          <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>Set the private network range for each environment. Keep these ranges separate from each other and from any connected network.</div>
           {model.environments.length === 0 ? (
             <div style={{ ...s.empty, borderTop: `1px dashed ${oracle.border}`, borderRadius: 6 }}>
               No environments yet — add them in step 1, then their spoke networks appear here.

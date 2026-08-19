@@ -56,17 +56,12 @@ const css = {
   // Bottom-docked, full-bleed console.
   drawer: { position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 80, display: 'flex', flexDirection: 'column', background: night.bg, borderTop: `1px solid ${night.border}`, boxShadow: '0 -8px 24px rgba(0,0,0,0.28)' } as React.CSSProperties,
 
-  // Inline (JSON view mode) — fills the working area instead of docking.
-  inlinePanel: { display: 'flex', flexDirection: 'column', height: '70vh', border: `1px solid ${night.border}`, borderRadius: 8, overflow: 'hidden', background: night.bg } as React.CSSProperties,
-
   overlay: { position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(1,4,9,0.55)' } as React.CSSProperties,
   fullPanel: { position: 'fixed', inset: 0, zIndex: 101, display: 'flex', flexDirection: 'column', background: night.bg } as React.CSSProperties,
   floatPanel: { position: 'fixed', zIndex: 90, display: 'flex', flexDirection: 'column', minWidth: 360, minHeight: 200, width: 760, height: 460, border: `1px solid ${night.border}`, borderRadius: 8, overflow: 'hidden', resize: 'both', boxShadow: '0 18px 50px rgba(0,0,0,0.5)', background: night.bg } as React.CSSProperties,
 };
 
-export default function JsonViewer({
-  title, value, inline = false, inlineHeight = '70vh',
-}: { title: string; value: string; inline?: boolean; inlineHeight?: number | string }) {
+export default function JsonViewer({ title, value }: { title: string; value: string }) {
   const [mode, setMode] = useState<Mode>('docked');
   const [collapsed, setCollapsed] = useState(true); // collapsed by default
   const [pos, setPos] = useState({ x: 120, y: 90 });
@@ -156,22 +151,6 @@ export default function JsonViewer({
           <pre style={{ ...css.body, flex: 1, padding: 16, overflow: 'auto' }}>{content}</pre>
         </div>
       </>
-    );
-  }
-
-  // Inline: in-flow panel (JSON view mode, or below the form/diagram).
-  if (inline) {
-    return (
-      <div style={{ ...css.inlinePanel, height: inlineHeight }}>
-        <div style={{ ...css.bar, borderBottom: `1px solid ${night.border}` }}>
-          <span style={css.dot} />
-          <span style={css.title}>{title}</span>
-          <button type="button" style={css.btn} onClick={copy}>{copied ? 'Copied' : 'Copy'}</button>
-          <button type="button" style={css.btn} onClick={() => setMode('undocked')}>Undock</button>
-          <button type="button" style={css.btn} onClick={() => setMode('fullscreen')}>Fullscreen ⤢</button>
-        </div>
-        <pre style={{ ...css.body, flex: 1, padding: 16, overflow: 'auto' }}>{content}</pre>
-      </div>
     );
   }
 

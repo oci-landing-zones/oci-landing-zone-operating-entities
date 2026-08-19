@@ -1,12 +1,12 @@
 /**
  * ViewModeToggle — segmented control to switch the wizard's working area
- * between Split (form + diagram), Form only, Diagram only, and JSON only.
+ * between Split (form + diagram), Form only, and Diagram only.
  */
 
 import React from 'react';
 import { oracle } from '../theme';
 
-export type ViewMode = 'split' | 'form' | 'diagram' | 'json';
+export type ViewMode = 'split' | 'form' | 'diagram';
 
 const OPTIONS: { mode: ViewMode; title: string; shortLabel: string; icon: React.ReactNode }[] = [
   {
@@ -20,10 +20,6 @@ const OPTIONS: { mode: ViewMode; title: string; shortLabel: string; icon: React.
   {
     mode: 'diagram', title: 'Diagram only', shortLabel: 'Diagram',
     icon: (<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2.5" width="12" height="11" rx="1.5" /><rect x="4.5" y="5" width="4" height="3" rx="0.5" /><rect x="8.5" y="9" width="3" height="2.2" rx="0.5" /></svg>),
-  },
-  {
-    mode: 'json', title: 'JSON only', shortLabel: 'JSON',
-    icon: (<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3.5 L2.5 8 L6 12.5" /><path d="M10 3.5 L13.5 8 L10 12.5" /></svg>),
   },
 ];
 

@@ -18,6 +18,7 @@ dist-ssr
 
 # Generated locally from 3rd/go-jsonnet/main.go
 3rd/go-jsonnet/libjsonnet.wasm
+3rd/go-jsonnet/.runtime-build-fingerprint
 
 # Draw.io backup files
 *.bkp

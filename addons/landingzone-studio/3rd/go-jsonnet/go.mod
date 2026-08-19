@@ -2,8 +2,6 @@ module landing-zone-studio-jsonnet-wasm
 
 go 1.25.0
 
-toolchain go1.25.4
-
 require github.com/google/go-jsonnet v0.22.0
 
 require (

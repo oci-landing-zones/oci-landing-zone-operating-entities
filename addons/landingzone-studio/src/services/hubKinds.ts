@@ -53,7 +53,7 @@ export const HUB_KINDS: HubKindDef[] = [
   {
     id: 'hub_c',
     label: 'Hub C',
-    description: 'Third-party firewalls sit behind trust and untrust Network Load Balancers. Deployment requires firewall and load-balancer private IP OCIDs between ORM phases.',
+    description: 'Third-party firewalls sit behind trust and untrust Network Load Balancers. After the first deployment phase, provide the private IP identifiers needed to complete routing.',
     implemented: true,
     defaultVcnCidr: '10.0.0.0/21',
     defaultSubnets: [

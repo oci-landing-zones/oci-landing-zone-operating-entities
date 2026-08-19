@@ -66,7 +66,7 @@ function OcvsSettingsFields({ id, value, onChange }: {
   return (
     <div style={s.subCard}>
       <div style={s.subHead}>OCVS management cluster</div>
-      <div style={local.note}>One platform is one SDDC management cluster. The SSH public key is required; HCX remains unavailable because its NAT pattern is not yet supported by Blueprint Factory.</div>
+      <div style={local.note}>One platform creates one SDDC management cluster. An SSH public key is required. HCX is not included in this deployment package.</div>
       <div style={local.okeGrid}>
         <div><label style={s.addLabel} htmlFor={`${id}-ssh`}>SSH public key</label><input id={`${id}-ssh`} style={s.rowInput} value={value.sshAuthorizedKeys} onChange={(e) => onChange({ sshAuthorizedKeys: e.target.value })} /></div>
         <div><label style={s.addLabel} htmlFor={`${id}-sddc`}>SDDC name</label><input id={`${id}-sddc`} style={s.rowInput} value={value.sddcDisplayName} onChange={(e) => onChange({ sddcDisplayName: e.target.value })} /></div>
@@ -129,8 +129,9 @@ function SharedPlatformPanel({ platform, open, onToggle, onChange, onDelete }: {
           <option value="ocvs">OCVS management cluster</option>
         </select>
 
-        <label style={s.label} htmlFor={`shared-platform-${platform.id}-key`}>Config key</label>
+        <label style={s.label} htmlFor={`shared-platform-${platform.id}-key`}>Platform name</label>
         <input id={`shared-platform-${platform.id}-key`} style={s.input} value={key} placeholder="core" onChange={(e) => onChange({ key: e.target.value })} />
+        <div style={local.fieldHint}>Used to create consistent names for this platform's OCI resources.</div>
         {nameErr && <div style={s.errText}>{nameErr}</div>}
 
         {isOcvs ? (
@@ -139,7 +140,7 @@ function SharedPlatformPanel({ platform, open, onToggle, onChange, onDelete }: {
             <div style={{ ...s.subCard, marginTop: 12 }}>
               <div style={s.subHead}>OCVS platform VCN</div>
               <input id={`shared-ocvs-${platform.id}-vcn`} aria-label={`VCN CIDR for shared platform ${key}`} style={s.rowInput} value={vcnCidr} onChange={(e) => onChange({ vcnCidr: e.target.value, subnets: [] })} />
-              <div style={local.fieldHint}>Only /21, /22, /23, or /24 is supported. Blueprint Factory derives the provisioning subnet: {ocvsDefaultSubnets(vcnCidr)[0]?.cidr ?? 'choose a supported VCN prefix'}.</div>
+              <div style={local.fieldHint}>Use /21, /22, /23, or /24. The deployment package reserves this provisioning subnet: {ocvsDefaultSubnets(vcnCidr)[0]?.cidr ?? 'choose a supported VCN prefix'}.</div>
             </div>
           </>
         ) : (
@@ -303,9 +304,9 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <label style={s.label} htmlFor={`${platform.id}-key`}>Config key</label>
+            <label style={s.label} htmlFor={`${platform.id}-key`}>Platform name</label>
             <input id={`${platform.id}-key`} style={s.rowInput} value={platform.key} onChange={(e) => onPlatform({ key: e.target.value })} />
-            <div style={local.fieldHint}>Blueprint Factory derives the compartment, VCN, gateway, and DRG attachment names from this key.</div>
+            <div style={local.fieldHint}>Used to create consistent names for this platform's compartment, network, gateway, and DRG attachment.</div>
           </div>
 
           {isOke && (
@@ -363,7 +364,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
                   </div>
                 </div>
               </div>
-              {oke.clusterSize && <div style={local.fieldHint}>The selected Blueprint Factory profile replaces the manual subnet map. To return to manual networking, select Manual subnets and define the required roles.</div>}
+              {oke.clusterSize && <div style={local.fieldHint}>This network profile sets the subnet layout. To define subnets yourself, select Manual subnets.</div>}
             </div>
           )}
 
@@ -373,9 +374,9 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
             <label style={s.label}>Platform VCN &amp; subnets</label>
             {isOke && oke.clusterSize ? (
               <div style={{ ...s.subCard, marginTop: 0 }}>
-                <div style={s.subHead}>Blueprint Factory {oke.clusterSize} profile · {platform.vcnCidr}</div>
-                <div style={local.fieldHint}>Blueprint Factory manages these subnets. Switch to Manual subnets only when this layout does not fit the address plan.</div>
-                <div style={local.subnetGrid} role="list" aria-label="Blueprint Factory subnet allocation">
+                <div style={s.subHead}>{oke.clusterSize} network profile · {platform.vcnCidr}</div>
+                <div style={local.fieldHint}>This profile reserves the following subnets. Select Manual subnets only when you need a different address plan.</div>
+                <div style={local.subnetGrid} role="list" aria-label="Network profile subnet allocation">
                   {okeProfileSubnets(platform.vcnCidr, oke.clusterSize, oke.cniType, oke.createFss).map((sn) => (
                     <div key={sn.name} style={local.subnetCell} role="listitem">
                       <span style={local.subnetName}>{sn.name.replace('-', ' ')}</span>
@@ -386,9 +387,9 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
               </div>
             ) : isOcvs ? (
               <div style={{ ...s.subCard, marginTop: 0 }}>
-                <div style={s.subHead}>Blueprint Factory OCVS provisioning network</div>
+                <div style={s.subHead}>OCVS provisioning network</div>
                 <input id={`${platform.id}-ocvs-vcn`} style={s.rowInput} value={platform.vcnCidr} onChange={(e) => onPlatform({ vcnCidr: e.target.value, subnets: [] })} />
-                <div style={local.fieldHint}>Only /21, /22, /23, or /24 is supported. Blueprint Factory derives the provisioning subnet: {ocvsDefaultSubnets(platform.vcnCidr)[0]?.cidr ?? 'choose a supported VCN prefix'}.</div>
+                <div style={local.fieldHint}>Use /21, /22, /23, or /24. The deployment package reserves this provisioning subnet: {ocvsDefaultSubnets(platform.vcnCidr)[0]?.cidr ?? 'choose a supported VCN prefix'}.</div>
               </div>
             ) : (
               <VcnEditor
@@ -470,7 +471,7 @@ export default function PlatformTemplatesStep() {
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Shared platforms</div>
-          <div style={local.note}>Optional platform compartments shared across environments. Their VCNs are created in cmp-lz-network and attached to the Hub DRG.</div>
+          <div style={local.note}>Optional platforms for services shared by more than one environment. Add one only when the same service must be used across environments.</div>
           {model.sharedPlatforms.length === 0 && (
             <div style={{ ...s.empty, borderRadius: 6, borderTop: `1px dashed ${oracle.border}`, marginBottom: 14 }}>No shared platforms. Add one only when a workload must be shared across environments.</div>
           )}
@@ -505,8 +506,7 @@ export default function PlatformTemplatesStep() {
         <div style={s.body}>
           <div style={s.title}>Environment platforms</div>
           <div style={local.note}>
-            A platform is a compartment with its own VCN, dropped inside one or more environments
-            (unlike a project, which has no network). Each environment it lands in gets its own VCN.
+            Add a platform when a workload needs its own network, such as an OKE or OCVS platform. Each selected environment receives a separate platform network.
           </div>
 
           {model.platforms.length === 0 && (
