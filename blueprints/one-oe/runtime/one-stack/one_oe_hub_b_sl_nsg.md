@@ -8,7 +8,7 @@ For additional information, see: [Stateful compared to Stateless rules](https://
 
 &nbsp;
 
-### The diagram represents the Security List and NSG rule configuration for the [One-OE + Hub B deployment](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_b.md)
+### The diagram represents the Security List and NSG configuration for the [One-OE + Hub B deployment](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/blueprints/one-oe/runtime/one-stack/one_oe_hub_b.md)
 
 &nbsp;
 <img src="../../design/images/sl_nsg_hub_b.png" width="980" height="value">
