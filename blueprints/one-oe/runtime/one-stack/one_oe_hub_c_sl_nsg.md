@@ -4,7 +4,7 @@ This document describes the Security List (SL) and Network Security Group (NSG) 
 
 Within the Hub VCN, the NSGs associated with the Network Load Balancers, Network Firewalls and public Load Balancers are configured with stateless rules. This follows Oracle’s recommendation to use stateless rules for subnets with high traffic volumes, helping to avoid the connection-tracking limitations associated with stateful rules.
 
-For additional information, refer to: [Stateful compared to Stateless rules](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/securityrules.htm#stateful)
+For additional information, see: [Stateful compared to Stateless rules](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/securityrules.htm#stateful)
 
 &nbsp;
 
