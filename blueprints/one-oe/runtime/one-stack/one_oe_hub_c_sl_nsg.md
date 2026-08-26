@@ -16,7 +16,7 @@ For additional information, see: [Stateful compared to Stateless rules](https://
 &nbsp;
 
 | Legend&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           | Description and configuration details |
-|--------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+|:-|:-|
 | <img src="../../design/images/sl.png"  height="100" align="center"> | **Security List** with Ingress and Egress rules, associated with the respective subnets in the Hub and Spoke VCNs and configured exclusively with stateful rules. </br>The diagram uses the exact SL naming convention defined in the JSON configuration templates. |
 | <img src="../../design/images/nsg.png"  height="100" align="center"> | **Network Security Group** with Ingress and Egress rules, associated with the Network Load Balancers, Network Firewalls and public Load Balancer, and configured to be associated with workloads when they are onboarded to the respective Spoke VCN tiers. </br>The diagram uses the exact NSG naming convention defined in the JSON configuration templates. </br>Note: each firewall-specific NSG is associated with the corresponding trust or untrust vNICs of both FW1 and FW2.|
 | <img src="../../design/images/stateful.png"  height="23" align="center">| **Stateful** security rules. </br>These can be defined in either a Security List or a Network Security Group. |
