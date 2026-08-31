@@ -226,6 +226,10 @@ For more details on the network design refer to the [OCI Open LZ One-OE Drawio -
 
 This chapter will be added soon.
 
+## Monitoring View
+
+The Monitoring View describes the One-OE operational baseline for Events, Monitoring alarms, Notifications, and VCN Flow Logs. See the [One-OE observability runtime inventory](../runtime/one-stack/observability_runtime.md) for the deployed rules, alarms, and log configurations.
+
 &nbsp; 
 &nbsp; 
 
