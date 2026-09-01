@@ -1,9 +1,11 @@
 {
   "alarm_count": 52,
   "all_stored_in_security": true,
-  "cpu_and_memory_enabled": true,
+  "all_warning_alarms_disabled": true,
+  "cpu_and_memory_critical_enabled": true,
+  "cpu_and_memory_warning_enabled": false,
   "default_alarm_compartment": "CMP-LZ-SECURITY-KEY",
-  "enabled_count": 50,
+  "enabled_count": 38,
   "event_delivery": {
     "message_format": "PRETTY_JSON",
     "metric_compartment_id": "CMP-LZ-SECURITY-KEY",

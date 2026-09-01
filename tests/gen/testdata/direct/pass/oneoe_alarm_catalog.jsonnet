@@ -16,11 +16,18 @@ local sandbox_alarms = lz(defaults.hub_e + {
     true
   ),
   default_alarm_compartment: alarm_config.default_compartment_id,
-  cpu_and_memory_enabled:
-    alarms['AL-LZ-COMPUTE-CPU-WARNING-KEY'].is_enabled &&
+  all_warning_alarms_disabled: std.foldl(
+    function(all_disabled, alarm)
+      all_disabled && (alarm.supplied_alarm.severity != 'WARNING' || !alarm.is_enabled),
+    std.objectValues(alarms),
+    true
+  ),
+  cpu_and_memory_critical_enabled:
     alarms['AL-LZ-COMPUTE-CPU-CRITICAL-KEY'].is_enabled &&
-    alarms['AL-LZ-COMPUTE-MEMORY-WARNING-KEY'].is_enabled &&
     alarms['AL-LZ-COMPUTE-MEMORY-CRITICAL-KEY'].is_enabled,
+  cpu_and_memory_warning_enabled:
+    alarms['AL-LZ-COMPUTE-CPU-WARNING-KEY'].is_enabled ||
+    alarms['AL-LZ-COMPUTE-MEMORY-WARNING-KEY'].is_enabled,
   nlb_backend_enabled: alarms['AL-LZ-NETWORK-NLB-UNHEALTHY-BACKEND-KEY'].is_enabled,
   shared_lb_enabled: alarms['AL-LZ-NETWORK-LB-UNHEALTHY-BACKEND-KEY'].is_enabled,
   shared_lb_metric_compartment: alarms['AL-LZ-NETWORK-LB-UNHEALTHY-BACKEND-KEY'].supplied_alarm.metric_compartment_id,
@@ -32,6 +39,6 @@ local sandbox_alarms = lz(defaults.hub_e + {
   preprod_vnic_conntrack_critical: alarms['AL-LZ-PREPROD-VNIC-CONNTRACK-CRITICAL-KEY'].supplied_alarm,
   networkless_environment_precreated:
     std.objectHas(sandbox_alarms, 'AL-LZ-SANDBOX-VNIC-CONNTRACK-WARNING-KEY') &&
-    sandbox_alarms['AL-LZ-SANDBOX-VNIC-CONNTRACK-WARNING-KEY'].is_enabled &&
+    !sandbox_alarms['AL-LZ-SANDBOX-VNIC-CONNTRACK-WARNING-KEY'].is_enabled &&
     sandbox_alarms['AL-LZ-SANDBOX-VNIC-CONNTRACK-WARNING-KEY'].supplied_alarm.metric_compartment_id == 'CMP-LZ-SANDBOX-NETWORK-KEY',
 }

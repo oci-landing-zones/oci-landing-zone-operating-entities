@@ -23,7 +23,7 @@
                 "display_name"                            : "al-lz-audit-connector-source-errors",
                 "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
-                "is_enabled"                              : true,
+                "is_enabled"                              : false,
 
                 "supplied_alarm": {
                     "message_format"                      : "PRETTY_JSON",
@@ -119,7 +119,7 @@
                 "display_name"                            : "al-lz-compute-cpu-warning",
                 "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
-                "is_enabled"                              : true,
+                "is_enabled"                              : false,
 
                 "supplied_alarm": {
                     "message_format"                      : "PRETTY_JSON",
@@ -167,7 +167,7 @@
                 "display_name"                            : "al-lz-compute-maintenance-scheduled",
                 "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
-                "is_enabled"                              : true,
+                "is_enabled"                              : false,
 
                 "supplied_alarm": {
                     "message_format"                      : "PRETTY_JSON",
@@ -199,7 +199,7 @@
                 "display_name"                            : "al-lz-compute-memory-warning",
                 "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
-                "is_enabled"                              : true,
+                "is_enabled"                              : false,
 
                 "supplied_alarm": {
                     "message_format"                      : "PRETTY_JSON",
@@ -279,7 +279,7 @@
                 "display_name"                            : "al-lz-network-nlb-egress-security-drops",
                 "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
-                "is_enabled"                              : true,
+                "is_enabled"                              : false,
 
                 "supplied_alarm": {
                     "message_format"                      : "PRETTY_JSON",
@@ -295,7 +295,7 @@
                 "display_name"                            : "al-lz-network-nlb-ingress-security-drops",
                 "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
-                "is_enabled"                              : true,
+                "is_enabled"                              : false,
 
                 "supplied_alarm": {
                     "message_format"                      : "PRETTY_JSON",
@@ -391,7 +391,7 @@
                 "display_name"                            : "al-lz-prod-vnic-conntrack-warning",
                 "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
-                "is_enabled"                              : true,
+                "is_enabled"                              : false,
 
                 "supplied_alarm": {
                     "message_format"                      : "PRETTY_JSON",
@@ -423,7 +423,7 @@
                 "display_name"                            : "al-lz-prod-vnic-egress-security-drops",
                 "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
-                "is_enabled"                              : true,
+                "is_enabled"                              : false,
 
                 "supplied_alarm": {
                     "message_format"                      : "PRETTY_JSON",
@@ -551,7 +551,7 @@
                 "display_name"                            : "al-lz-vnic-conntrack-warning",
                 "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
-                "is_enabled"                              : true,
+                "is_enabled"                              : false,
 
                 "supplied_alarm": {
                     "message_format"                      : "PRETTY_JSON",
@@ -583,7 +583,7 @@
                 "display_name"                            : "al-lz-vnic-egress-security-drops",
                 "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
-                "is_enabled"                              : true,
+                "is_enabled"                              : false,
 
                 "supplied_alarm": {
                     "message_format"                      : "PRETTY_JSON",
