@@ -34,14 +34,14 @@ local prod_preprod_exacs_uc1_config(hub_kind) = {
   },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
       platforms: {
         exacs: env_exacs_platform(['proj1']),
       },
     },
     preprod: {
-      shared_project_network: { network: { vcn: '10.0.128.0/21' } },
+      project_network: { network: { vcn: '10.0.128.0/21' } },
       projects: { proj1: {} },
       platforms: {
         exacs: env_exacs_platform(['proj1']),

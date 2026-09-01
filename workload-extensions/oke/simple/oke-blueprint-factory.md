@@ -71,7 +71,7 @@ Create a configuration file, for example `oke-native.jsonnet`:
   },
   environments: {
     prod: {
-      shared_project_network: {
+      project_network: {
         network: {
           vcn: '10.0.72.0/21',
         },
@@ -131,7 +131,7 @@ Create a configuration file, for example `oke-overlay-hub-a.jsonnet`:
   },
   environments: {
     prod: {
-      shared_project_network: {
+      project_network: {
         network: {
           vcn: '10.0.64.0/21',
         },
@@ -159,7 +159,7 @@ Create a configuration file, for example `oke-overlay-hub-a.jsonnet`:
       },
     },
     preprod: {
-      shared_project_network: {
+      project_network: {
         network: {
           vcn: '10.0.128.0/21',
         },

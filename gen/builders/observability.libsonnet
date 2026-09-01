@@ -208,7 +208,7 @@ function(config, n, realm_constants, topo)
   };
 
   // --- Per-env event rules ---
-  // Each env gets a security notify rule. Only envs with shared_project_network
+  // Each env gets a security notify rule. Only envs with project_network
   // get network notify rules because only those envs have env network compartments.
   local env_security_event_rules = std.foldl(
     function(acc, entry)

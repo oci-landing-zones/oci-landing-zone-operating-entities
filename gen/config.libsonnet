@@ -138,26 +138,116 @@ local validation = import 'lib/validation.libsonnet';
       + (if extension != null then { extension: extension } else {})
       + normalized_network;
 
-    local norm_spn(env_name, env) =
-      local spn = validation.required_object(
-        env,
-        'shared_project_network',
-        'Environment %s.shared_project_network' % env_name
+    local norm_project_network(env_name, raw_network) =
+      local project_network = validation.object(
+        raw_network,
+        'Environment %s.project_network' % env_name
       );
       local network = validation.required_object(
-        spn,
+        project_network,
         'network',
-        'Environment %s.shared_project_network.network' % env_name
+        'Environment %s.project_network.network' % env_name
       );
-      local network_label = 'Environment %s.shared_project_network.network' % env_name;
-      spn {
-        network+: normalize_auto_subnet_network(network, network_label, spoke_subnet_names),
+      local network_label = 'Environment %s.project_network.network' % env_name;
+      local vcn = required_vcn(network, network_label);
+      // Tri-state contract: omitted uses defaults, {} emits none, and a
+      // non-empty map is authoritative (no implicit standard subnets).
+      local shared_subnets =
+        if std.objectHas(network, 'subnets') then
+          local raw_subnets = validation.object(network.subnets, '%s.subnets' % network_label);
+          if std.length(std.objectFields(raw_subnets)) == 0 then {}
+          else subnet_utils.validate_named_subnets(
+            raw_subnets,
+            '%s.subnets' % network_label,
+            vcn
+          )
+        else subnet_utils.auto_subnets_24(vcn, spoke_subnet_names);
+      local routing =
+        if std.objectHas(project_network, 'subnet_routing') && project_network.subnet_routing != null then project_network.subnet_routing
+        else 'vcn';
+      assert routing == 'vcn' || routing == 'hub' :
+        'Environment %s.project_network.subnet_routing must be one of: vcn, hub' % env_name;
+      assert !(routing == 'hub' && hub_kind == 'hub_e') :
+        'Environment %s.project_network.subnet_routing hub is not supported with hub_e' % env_name;
+      project_network {
+        subnet_routing: routing,
+        network+: {
+          vcn: vcn,
+          subnets: shared_subnets,
+        },
       };
 
     local norm_envs = {
-      [env_name]: local env = environments[env_name]; env {
-        [if std.objectHas(env, 'shared_project_network') then 'shared_project_network']:
-          norm_spn(env_name, env),
+      [env_name]:
+        local env = validation.object(environments[env_name], 'Environment %s' % env_name);
+        assert !std.objectHas(env, 'shared_project_network') :
+          'Environment %s.shared_project_network is not supported; use project_network' % env_name;
+        local raw_project_network =
+          if std.objectHas(env, 'project_network') then env.project_network
+          else null;
+        local normalized_project_network =
+          if raw_project_network != null then norm_project_network(env_name, raw_project_network)
+          else null;
+        local raw_projects =
+          if std.objectHas(env, 'projects') then
+            validation.object(env.projects, 'Environment %s.projects' % env_name)
+          else {};
+        local projects_with_subnets = [
+          project_name
+          for project_name in std.objectFields(raw_projects)
+          if std.objectHas(
+            validation.object(
+              raw_projects[project_name],
+              'Environment %s.projects.%s' % [env_name, project_name]
+            ),
+            'subnets'
+          )
+        ];
+        assert raw_project_network != null || std.length(projects_with_subnets) == 0 :
+          'Environment %s.projects.%s.subnets requires project_network' % [
+            env_name,
+            projects_with_subnets[0],
+          ];
+        local normalized_projects =
+          if std.objectHas(env, 'projects') then
+            {
+              [project_name]:
+                local project = validation.object(
+                  raw_projects[project_name],
+                  'Environment %s.projects.%s' % [env_name, project_name]
+                );
+                project + if std.objectHas(project, 'subnets') then {
+                  subnets: subnet_utils.validate_named_subnets(
+                    project.subnets,
+                    'Environment %s.projects.%s.subnets' % [env_name, project_name],
+                    normalized_project_network.network.vcn
+                  ),
+                } else {}
+              for project_name in std.objectFields(raw_projects)
+            }
+          else {};
+        local all_project_subnets =
+          if normalized_project_network == null then []
+          else [
+            { label: 'Environment %s shared subnet %s' % [env_name, subnet_name], cidr: normalized_project_network.network.subnets[subnet_name] }
+            for subnet_name in std.objectFields(normalized_project_network.network.subnets)
+          ] + std.flattenArrays([
+            [
+              { label: 'Environment %s project %s subnet %s' % [env_name, project_name, subnet_name], cidr: normalized_projects[project_name].subnets[subnet_name] }
+              for subnet_name in std.objectFields(normalized_projects[project_name].subnets)
+            ]
+            for project_name in std.objectFields(normalized_projects)
+            if std.objectHas(normalized_projects[project_name], 'subnets')
+          ]);
+        assert normalized_project_network == null || cidrs.assert_non_overlapping(
+          all_project_subnets,
+          'Environment %s project network subnets' % env_name
+        );
+        { [key]: env[key] for key in std.objectFields(env) if key != 'project_network' && key != 'projects' } {
+        [if normalized_project_network != null then 'project_network']:
+          normalized_project_network,
+
+        [if std.objectHas(env, 'projects') then 'projects']: normalized_projects,
 
         [if std.objectHas(env, 'platforms') then 'platforms']: {
           [p_name]: norm_platform(env.platforms[p_name], p_name)
@@ -174,10 +264,10 @@ local validation = import 'lib/validation.libsonnet';
 
     local env_vcn_entries = std.flattenArrays([
       local env = norm_envs[env_name];
-      (if std.objectHas(env, 'shared_project_network') then [
+      (if std.objectHas(env, 'project_network') then [
         {
           label: 'Environment %s shared project network' % env_name,
-          cidr: env.shared_project_network.network.vcn,
+          cidr: env.project_network.network.vcn,
         },
       ] else [])
       + (if std.objectHas(env, 'platforms') then [

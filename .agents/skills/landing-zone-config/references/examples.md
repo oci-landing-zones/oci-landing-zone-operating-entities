@@ -12,7 +12,7 @@ Use this when you need the smallest config that still exercises the Blueprint Fa
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
     },
   },
@@ -33,7 +33,7 @@ Based on `tests/gen/testdata/direct/pass/config_preprod_security_targets.jsonnet
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     preprod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
       platforms: {
         oke: {
@@ -67,7 +67,7 @@ Based on `tests/gen/testdata/direct/pass/config_platform_compartments.jsonnet`.
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
     },
   },
@@ -101,11 +101,11 @@ Based on `tests/gen/testdata/configs/pass/prod_preprod_exacs_uc1.jsonnet`.
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
     },
     preprod: {
-      shared_project_network: { network: { vcn: '10.0.128.0/21' } },
+      project_network: { network: { vcn: '10.0.128.0/21' } },
       projects: { proj1: {} },
     },
   },
@@ -132,7 +132,7 @@ Based on `tests/gen/testdata/configs/pass/prod_preprod_exacs_uc1.jsonnet`.
 }
 ```
 
-Use this when Exadata infrastructure and AVMC/VMC placement are shared, and Autonomous Database Dedicated should be delegated to selected project DB tiers. The `shared_project_network` entries are only needed when those environments also need project network resources. Do not add environment ExaCS platforms for this shared-only case.
+Use this when Exadata infrastructure and AVMC/VMC placement are shared, and Autonomous Database Dedicated should be delegated to selected project DB tiers. The `project_network` entries are only needed when those environments also need project network resources. Do not add environment ExaCS platforms for this shared-only case.
 
 ## Multi-Environment Example
 
@@ -146,7 +146,7 @@ Based on `tests/gen/testdata/direct/pass/config_hub_a_staging.jsonnet`.
   hub: { kind: 'hub_a', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
       platforms: {
         oke: {
@@ -163,7 +163,7 @@ Based on `tests/gen/testdata/direct/pass/config_hub_a_staging.jsonnet`.
       },
     },
     preprod: {
-      shared_project_network: { network: { vcn: '10.0.128.0/21' } },
+      project_network: { network: { vcn: '10.0.128.0/21' } },
       projects: { proj1: {} },
       platforms: {
         oke: {
@@ -201,7 +201,7 @@ jsonnet --multi output/ --tla-code-file config=path/to/config.jsonnet gen/landin
 
 ## Common Choices
 
-- Prefer omitted hub and spoke subnet maps when canonical auto-subnet allocation is acceptable.
+- Omit `project_network.network.subnets` for the default `web`, `app`, `db`, and `infra` shared subnets; use `{}` for none; otherwise list the complete desired shared-subnet map explicitly.
 - Prefer explicit platform subnet maps only when you need non-default layout or the platform is not extension-backed.
 - Prefer environment platforms over `shared_platforms` when the platform belongs operationally to one environment.
 - Ask for and record the target `region` and `region_short_name`; omit `realm` when the customer does not provide one because Blueprint Factory config mode defaults it to `oc1`.
