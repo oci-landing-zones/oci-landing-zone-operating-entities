@@ -230,6 +230,8 @@ This section covers two main areas: how One-OE is operated and the OCI Monitorin
 
 One-OE provides the monitoring capabilities needed to understand activity across the tenancy. It includes event rules for important changes, alarms for critical conditions, and VCN Flow Logs for network troubleshooting and audit purposes.
 
+<img src="images/obs_view.png" alt= “” width="1000" height="value">
+
 ### Events
 
 Events capture relevant resource and service state changes and route them to configured destinations. They provide operational visibility, support security monitoring and change tracking, and can trigger automated responses to configuration updates, lifecycle changes, or detected issues.
