@@ -13,6 +13,7 @@ function(config, n, realm_constants, topo)
   local env_entries = topo.ordered_env_entries();
   local networked_env_entries = topo.networked_env_entries();
   local security_cmp_key = n.key_global('CMP', ['SECURITY']);
+  local shared_network_cmp_key = n.key_global('CMP', ['NETWORK']);
 
   // --- Event type constants ---
   local network_events = [
@@ -114,70 +115,96 @@ function(config, n, realm_constants, topo)
   // Concrete operational alarms. Parameterized "disabled candidate" alarms are
   // deliberately omitted: their placeholder thresholds are not valid MQL and
   // must be chosen by the deployer before an alarm can be created.
+  local all_network_metric_scopes = [{
+    key_segments: [],
+    name_segments: [],
+    metric_compartment_id: shared_network_cmp_key,
+  }] + [
+    {
+      key_segments: entry.key_segments,
+      name_segments: entry.name_segments,
+      metric_compartment_id: topo.env_child_compartment_key(entry, 'NETWORK'),
+    }
+    for entry in env_entries
+  ];
+  local shared_network_metric_scope = [{
+    key_segments: [],
+    name_segments: [],
+    metric_compartment_id: shared_network_cmp_key,
+  }];
+  local security_metric_scope = [{
+    key_segments: [],
+    name_segments: [],
+    metric_compartment_id: security_cmp_key,
+  }];
+  // Alarms are created preemptively. A scope does not need to contain a
+  // matching resource yet; evaluation starts when the metric stream appears.
+  // Only NLB backend-readiness alarms are disabled by default.
   local alarm_catalog = [
     // VNIC (oci_vcn)
-    { key: ['VNIC', 'CONNTRACK', 'WARNING'], name: ['vnic', 'conntrack', 'warning'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 80', severity: 'WARNING', pending: 'PT10M' },
-    { key: ['VNIC', 'CONNTRACK', 'CRITICAL'], name: ['vnic', 'conntrack', 'critical'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 90', severity: 'CRITICAL', pending: 'PT5M' },
-    { key: ['VNIC', 'CONNTRACK', 'FULL'], name: ['vnic', 'conntrack', 'full'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicConntrackIsFull[1m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT1M' },
-    { key: ['VNIC', 'INGRESS', 'CONNTRACK', 'DROPS'], name: ['vnic', 'ingress', 'conntrack', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicIngressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M' },
-    { key: ['VNIC', 'EGRESS', 'CONNTRACK', 'DROPS'], name: ['vnic', 'egress', 'conntrack', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicEgressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M' },
-    { key: ['VNIC', 'INGRESS', 'THROTTLE', 'DROPS'], name: ['vnic', 'ingress', 'throttle', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicIngressDropsThrottle[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M' },
-    { key: ['VNIC', 'EGRESS', 'THROTTLE', 'DROPS'], name: ['vnic', 'egress', 'throttle', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicEgressDropsThrottle[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M' },
-    { key: ['VNIC', 'SMARTNIC', 'NETWORK', 'DROPS'], name: ['vnic', 'smartnic', 'network', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'SmartnicBufferDropsFromNetwork[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M' },
-    { key: ['VNIC', 'SMARTNIC', 'HOST', 'DROPS'], name: ['vnic', 'smartnic', 'host', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'SmartnicBufferDropsFromHost[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M' },
-    { key: ['VNIC', 'EGRESS', 'SECURITY', 'DROPS'], name: ['vnic', 'egress', 'security', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicEgressDropsSecurityList[5m].groupBy(resourceId).sum() > 0', severity: 'WARNING', pending: 'PT5M' },
+    { key: ['VNIC', 'CONNTRACK', 'WARNING'], name: ['vnic', 'conntrack', 'warning'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 80', severity: 'WARNING', pending: 'PT10M', default_enabled: true, scopes: all_network_metric_scopes },
+    { key: ['VNIC', 'CONNTRACK', 'CRITICAL'], name: ['vnic', 'conntrack', 'critical'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 90', severity: 'CRITICAL', pending: 'PT5M', default_enabled: true, scopes: all_network_metric_scopes },
+    { key: ['VNIC', 'CONNTRACK', 'FULL'], name: ['vnic', 'conntrack', 'full'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicConntrackIsFull[1m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: all_network_metric_scopes },
+    { key: ['VNIC', 'INGRESS', 'CONNTRACK', 'DROPS'], name: ['vnic', 'ingress', 'conntrack', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicIngressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: all_network_metric_scopes },
+    { key: ['VNIC', 'EGRESS', 'CONNTRACK', 'DROPS'], name: ['vnic', 'egress', 'conntrack', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicEgressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: all_network_metric_scopes },
+    { key: ['VNIC', 'INGRESS', 'THROTTLE', 'DROPS'], name: ['vnic', 'ingress', 'throttle', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicIngressDropsThrottle[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: all_network_metric_scopes },
+    { key: ['VNIC', 'EGRESS', 'THROTTLE', 'DROPS'], name: ['vnic', 'egress', 'throttle', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicEgressDropsThrottle[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: all_network_metric_scopes },
+    { key: ['VNIC', 'SMARTNIC', 'NETWORK', 'DROPS'], name: ['vnic', 'smartnic', 'network', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'SmartnicBufferDropsFromNetwork[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: all_network_metric_scopes },
+    { key: ['VNIC', 'SMARTNIC', 'HOST', 'DROPS'], name: ['vnic', 'smartnic', 'host', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'SmartnicBufferDropsFromHost[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: all_network_metric_scopes },
+    { key: ['VNIC', 'EGRESS', 'SECURITY', 'DROPS'], name: ['vnic', 'egress', 'security', 'drops'], topic: 'NETWORK', namespace: 'oci_vcn', query: 'VnicEgressDropsSecurityList[5m].groupBy(resourceId).sum() > 0', severity: 'WARNING', pending: 'PT5M', default_enabled: true, scopes: all_network_metric_scopes },
 
     // Load Balancer (oci_lbaas)
-    { key: ['NETWORK', 'LB', 'UNHEALTHY', 'BACKEND'], name: ['network', 'lb', 'unhealthy', 'backend'], topic: 'NETWORK', namespace: 'oci_lbaas', query: 'unhealthyBackendServers[1m]{lbComponent = "backendSet"}.max() > 0', severity: 'CRITICAL', pending: 'PT2M' },
-    { key: ['NETWORK', 'LB', 'BACKEND', 'TIMEOUT'], name: ['network', 'lb', 'backend', 'timeout'], topic: 'NETWORK', namespace: 'oci_lbaas', query: 'backendTimeouts[1m]{lbComponent = "backendSet"}.sum() > 0', severity: 'CRITICAL', pending: 'PT2M' },
+    { key: ['NETWORK', 'LB', 'UNHEALTHY', 'BACKEND'], name: ['network', 'lb', 'unhealthy', 'backend'], topic: 'NETWORK', namespace: 'oci_lbaas', query: 'unhealthyBackendServers[1m]{lbComponent = "backendSet"}.max() > 0', severity: 'CRITICAL', pending: 'PT2M', default_enabled: true, scopes: shared_network_metric_scope },
+    { key: ['NETWORK', 'LB', 'BACKEND', 'TIMEOUT'], name: ['network', 'lb', 'backend', 'timeout'], topic: 'NETWORK', namespace: 'oci_lbaas', query: 'backendTimeouts[1m]{lbComponent = "backendSet"}.sum() > 0', severity: 'CRITICAL', pending: 'PT2M', default_enabled: true, scopes: shared_network_metric_scope },
 
     // Network Load Balancer (oci_nlb)
-    { key: ['NETWORK', 'NLB', 'UNHEALTHY', 'BACKEND'], name: ['network', 'nlb', 'unhealthy', 'backend'], topic: 'NETWORK', namespace: 'oci_nlb', query: 'UnhealthyBackendsPerNlb[1m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT2M' },
-    { key: ['NETWORK', 'NLB', 'NO', 'HEALTHY', 'BACKENDS'], name: ['network', 'nlb', 'no', 'healthy', 'backends'], topic: 'NETWORK', namespace: 'oci_nlb', query: 'HealthyBackendsPerNlb[1m].groupBy(resourceId).min() < 1', severity: 'CRITICAL', pending: 'PT2M' },
-    { key: ['NETWORK', 'NLB', 'INGRESS', 'SECURITY', 'DROPS'], name: ['network', 'nlb', 'ingress', 'security', 'drops'], topic: 'NETWORK', namespace: 'oci_nlb', query: 'IngressPacketsDroppedBySL[1m].groupBy(resourceId).sum() > 0', severity: 'WARNING', pending: 'PT2M' },
-    { key: ['NETWORK', 'NLB', 'EGRESS', 'SECURITY', 'DROPS'], name: ['network', 'nlb', 'egress', 'security', 'drops'], topic: 'NETWORK', namespace: 'oci_nlb', query: 'EgressPacketsDroppedBySL[1m].groupBy(resourceId).sum() > 0', severity: 'WARNING', pending: 'PT2M' },
+    { key: ['NETWORK', 'NLB', 'UNHEALTHY', 'BACKEND'], name: ['network', 'nlb', 'unhealthy', 'backend'], topic: 'NETWORK', namespace: 'oci_nlb', query: 'UnhealthyBackendsPerNlb[1m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT2M', default_enabled: false, scopes: shared_network_metric_scope },
+    { key: ['NETWORK', 'NLB', 'NO', 'HEALTHY', 'BACKENDS'], name: ['network', 'nlb', 'no', 'healthy', 'backends'], topic: 'NETWORK', namespace: 'oci_nlb', query: 'HealthyBackendsPerNlb[1m].groupBy(resourceId).min() < 1', severity: 'CRITICAL', pending: 'PT2M', default_enabled: false, scopes: shared_network_metric_scope },
+    { key: ['NETWORK', 'NLB', 'INGRESS', 'SECURITY', 'DROPS'], name: ['network', 'nlb', 'ingress', 'security', 'drops'], topic: 'NETWORK', namespace: 'oci_nlb', query: 'IngressPacketsDroppedBySL[1m].groupBy(resourceId).sum() > 0', severity: 'WARNING', pending: 'PT2M', default_enabled: true, scopes: shared_network_metric_scope },
+    { key: ['NETWORK', 'NLB', 'EGRESS', 'SECURITY', 'DROPS'], name: ['network', 'nlb', 'egress', 'security', 'drops'], topic: 'NETWORK', namespace: 'oci_nlb', query: 'EgressPacketsDroppedBySL[1m].groupBy(resourceId).sum() > 0', severity: 'WARNING', pending: 'PT2M', default_enabled: true, scopes: shared_network_metric_scope },
 
     // Compute accessibility and infrastructure health
-    { key: ['COMPUTE', 'VM', 'UNRESPONSIVE'], name: ['compute', 'vm', 'unresponsive'], topic: 'SECURITY', namespace: 'oci_compute_instance_health', query: 'instance_accessibility_status[1m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT2M' },
-    { key: ['COMPUTE', 'FILE', 'SYSTEM', 'ANOMALY'], name: ['compute', 'file', 'system', 'anomaly'], topic: 'SECURITY', namespace: 'oci_compute_instance_health', query: 'InstanceFileSystemStatus[5m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT1M' },
-    { key: ['COMPUTE', 'INFRASTRUCTURE', 'ISSUE'], name: ['compute', 'infrastructure', 'issue'], topic: 'SECURITY', namespace: 'oci_compute_infrastructure_health', query: 'instance_status[1m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT2M' },
-    { key: ['COMPUTE', 'BARE', 'METAL', 'DEFECT'], name: ['compute', 'bare', 'metal', 'defect'], topic: 'SECURITY', namespace: 'oci_compute_infrastructure_health', query: 'health_status[1m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT1M' },
-    { key: ['COMPUTE', 'MAINTENANCE', 'SCHEDULED'], name: ['compute', 'maintenance', 'scheduled'], topic: 'SECURITY', namespace: 'oci_compute_infrastructure_health', query: 'maintenance_status[5m].groupBy(resourceId).max() > 0', severity: 'WARNING', pending: 'PT1M' },
+    { key: ['COMPUTE', 'VM', 'UNRESPONSIVE'], name: ['compute', 'vm', 'unresponsive'], topic: 'SECURITY', namespace: 'oci_compute_instance_health', query: 'instance_accessibility_status[1m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT2M', default_enabled: true, scopes: shared_network_metric_scope },
+    { key: ['COMPUTE', 'FILE', 'SYSTEM', 'ANOMALY'], name: ['compute', 'file', 'system', 'anomaly'], topic: 'SECURITY', namespace: 'oci_compute_instance_health', query: 'InstanceFileSystemStatus[5m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: shared_network_metric_scope },
+    { key: ['COMPUTE', 'INFRASTRUCTURE', 'ISSUE'], name: ['compute', 'infrastructure', 'issue'], topic: 'SECURITY', namespace: 'oci_compute_infrastructure_health', query: 'instance_status[1m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT2M', default_enabled: true, scopes: shared_network_metric_scope },
+    { key: ['COMPUTE', 'BARE', 'METAL', 'DEFECT'], name: ['compute', 'bare', 'metal', 'defect'], topic: 'SECURITY', namespace: 'oci_compute_infrastructure_health', query: 'health_status[1m].groupBy(resourceId).max() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: shared_network_metric_scope },
+    { key: ['COMPUTE', 'MAINTENANCE', 'SCHEDULED'], name: ['compute', 'maintenance', 'scheduled'], topic: 'SECURITY', namespace: 'oci_compute_infrastructure_health', query: 'maintenance_status[5m].groupBy(resourceId).max() > 0', severity: 'WARNING', pending: 'PT1M', default_enabled: true, scopes: shared_network_metric_scope },
 
     // Compute utilization (oci_computeagent)
-    { key: ['COMPUTE', 'CPU', 'WARNING'], name: ['compute', 'cpu', 'warning'], topic: 'SECURITY', namespace: 'oci_computeagent', query: 'CpuUtilization[5m].groupBy(resourceId).mean() >= 75', severity: 'WARNING', pending: 'PT10M' },
-    { key: ['COMPUTE', 'CPU', 'CRITICAL'], name: ['compute', 'cpu', 'critical'], topic: 'SECURITY', namespace: 'oci_computeagent', query: 'CpuUtilization[5m].groupBy(resourceId).mean() >= 90', severity: 'CRITICAL', pending: 'PT5M' },
-    { key: ['COMPUTE', 'MEMORY', 'WARNING'], name: ['compute', 'memory', 'warning'], topic: 'SECURITY', namespace: 'oci_computeagent', query: 'MemoryUtilization[5m].groupBy(resourceId).mean() >= 75', severity: 'WARNING', pending: 'PT10M' },
-    { key: ['COMPUTE', 'MEMORY', 'CRITICAL'], name: ['compute', 'memory', 'critical'], topic: 'SECURITY', namespace: 'oci_computeagent', query: 'MemoryUtilization[5m].groupBy(resourceId).mean() >= 90', severity: 'CRITICAL', pending: 'PT5M' },
+    { key: ['COMPUTE', 'CPU', 'WARNING'], name: ['compute', 'cpu', 'warning'], topic: 'SECURITY', namespace: 'oci_computeagent', query: 'CpuUtilization[5m].groupBy(resourceId).mean() >= 75', severity: 'WARNING', pending: 'PT10M', default_enabled: true, scopes: shared_network_metric_scope },
+    { key: ['COMPUTE', 'CPU', 'CRITICAL'], name: ['compute', 'cpu', 'critical'], topic: 'SECURITY', namespace: 'oci_computeagent', query: 'CpuUtilization[5m].groupBy(resourceId).mean() >= 90', severity: 'CRITICAL', pending: 'PT5M', default_enabled: true, scopes: shared_network_metric_scope },
+    { key: ['COMPUTE', 'MEMORY', 'WARNING'], name: ['compute', 'memory', 'warning'], topic: 'SECURITY', namespace: 'oci_computeagent', query: 'MemoryUtilization[5m].groupBy(resourceId).mean() >= 75', severity: 'WARNING', pending: 'PT10M', default_enabled: true, scopes: shared_network_metric_scope },
+    { key: ['COMPUTE', 'MEMORY', 'CRITICAL'], name: ['compute', 'memory', 'critical'], topic: 'SECURITY', namespace: 'oci_computeagent', query: 'MemoryUtilization[5m].groupBy(resourceId).mean() >= 90', severity: 'CRITICAL', pending: 'PT5M', default_enabled: true, scopes: shared_network_metric_scope },
 
     // Block Volume (oci_blockstore)
-    { key: ['BLOCK', 'VOLUME', 'THROTTLED', 'IO'], name: ['block', 'volume', 'throttled', 'io'], topic: 'SECURITY', namespace: 'oci_blockstore', query: 'VolumeThrottledIOs[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M' },
+    { key: ['BLOCK', 'VOLUME', 'THROTTLED', 'IO'], name: ['block', 'volume', 'throttled', 'io'], topic: 'SECURITY', namespace: 'oci_blockstore', query: 'VolumeThrottledIOs[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: shared_network_metric_scope },
 
     // Shared observability services
-    { key: ['NOTIFICATION', 'DELIVERY', 'FAILED'], name: ['notification', 'delivery', 'failed'], topic: 'SECURITY', namespace: 'oci_notification', query: 'FailedMessagesCount[5m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', metric_compartment_id: security_cmp_key },
-    { key: ['EVENT', 'DELIVERY', 'FAILED'], name: ['event', 'delivery', 'failed'], topic: 'SECURITY', namespace: 'oci_cloudevents', query: 'DeliveryFailedEvents[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', metric_compartment_id: security_cmp_key },
-    { key: ['AUDIT', 'CONNECTOR', 'INTERNAL', 'ERRORS'], name: ['audit', 'connector', 'internal', 'errors'], topic: 'SECURITY', namespace: 'oci_service_connector_hub', query: 'ServiceConnectorHubErrors[5m].groupBy(connectorId).sum() > 0', severity: 'CRITICAL', pending: 'PT15M', metric_compartment_id: security_cmp_key },
-    { key: ['AUDIT', 'CONNECTOR', 'SOURCE', 'ERRORS'], name: ['audit', 'connector', 'source', 'errors'], topic: 'SECURITY', namespace: 'oci_service_connector_hub', query: 'ErrorsAtSource[15m].groupBy(errorCode,connectorId).min() > 0', severity: 'WARNING', pending: 'PT30M', metric_compartment_id: security_cmp_key },
-    { key: ['AUDIT', 'CONNECTOR', 'TARGET', 'ERRORS'], name: ['audit', 'connector', 'target', 'errors'], topic: 'SECURITY', namespace: 'oci_service_connector_hub', query: 'ErrorsAtTarget[15m].groupBy(errorCode,connectorId).min() > 0', severity: 'CRITICAL', pending: 'PT30M', metric_compartment_id: security_cmp_key },
-    { key: ['AUDIT', 'CONNECTOR', 'STALE'], name: ['audit', 'connector', 'stale'], topic: 'SECURITY', namespace: 'oci_service_connector_hub', query: 'DataFreshness[1h].groupBy(connectorId).mean() > 43200000', severity: 'CRITICAL', pending: 'PT30M', metric_compartment_id: security_cmp_key },
+    { key: ['NOTIFICATION', 'DELIVERY', 'FAILED'], name: ['notification', 'delivery', 'failed'], topic: 'SECURITY', namespace: 'oci_notification', query: 'FailedMessagesCount[5m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: security_metric_scope },
+    { key: ['EVENT', 'DELIVERY', 'FAILED'], name: ['event', 'delivery', 'failed'], topic: 'SECURITY', namespace: 'oci_cloudevents', query: 'DeliveryFailedEvents[1m].groupBy(resourceId).sum() > 0', severity: 'CRITICAL', pending: 'PT1M', default_enabled: true, scopes: security_metric_scope },
+    { key: ['AUDIT', 'CONNECTOR', 'INTERNAL', 'ERRORS'], name: ['audit', 'connector', 'internal', 'errors'], topic: 'SECURITY', namespace: 'oci_service_connector_hub', query: 'ServiceConnectorHubErrors[5m].groupBy(connectorId).sum() > 0', severity: 'CRITICAL', pending: 'PT15M', default_enabled: true, scopes: security_metric_scope },
+    { key: ['AUDIT', 'CONNECTOR', 'SOURCE', 'ERRORS'], name: ['audit', 'connector', 'source', 'errors'], topic: 'SECURITY', namespace: 'oci_service_connector_hub', query: 'ErrorsAtSource[15m].groupBy(errorCode,connectorId).min() > 0', severity: 'WARNING', pending: 'PT30M', default_enabled: true, scopes: security_metric_scope },
+    { key: ['AUDIT', 'CONNECTOR', 'TARGET', 'ERRORS'], name: ['audit', 'connector', 'target', 'errors'], topic: 'SECURITY', namespace: 'oci_service_connector_hub', query: 'ErrorsAtTarget[15m].groupBy(errorCode,connectorId).min() > 0', severity: 'CRITICAL', pending: 'PT30M', default_enabled: true, scopes: security_metric_scope },
+    { key: ['AUDIT', 'CONNECTOR', 'STALE'], name: ['audit', 'connector', 'stale'], topic: 'SECURITY', namespace: 'oci_service_connector_hub', query: 'DataFreshness[1h].groupBy(connectorId).mean() > 43200000', severity: 'CRITICAL', pending: 'PT30M', default_enabled: true, scopes: security_metric_scope },
   ];
 
   local catalog_alarms = {
-    [n.key_global('AL', spec.key)]: {
-      display_name: n.display_global('al', spec.name),
+    [n.key_global('AL', scope.key_segments + spec.key)]: {
+      compartment_id: security_cmp_key,
+      display_name: n.display_global('al', scope.name_segments + spec.name),
       destination_topic_ids: [n.key_global('NOTT', [spec.topic])],
-      is_enabled: false,
+      is_enabled: spec.default_enabled,
       supplied_alarm: {
         message_format: 'PRETTY_JSON',
+        metric_compartment_id: scope.metric_compartment_id,
         namespace: spec.namespace,
         pending_duration: spec.pending,
         query: spec.query,
         severity: spec.severity,
-      } + if std.objectHas(spec, 'metric_compartment_id') then {
-        metric_compartment_id: spec.metric_compartment_id,
-      } else {},
+      },
     }
     for spec in alarm_catalog
+    for scope in spec.scopes
   };
 
   // --- Per-env event rules ---
@@ -213,7 +240,7 @@ function(config, n, realm_constants, topo)
   // --- Base observability (CIS1 pre / CIS1) ---
   local base = {
     alarms_configuration: {
-      default_compartment_id: n.key_global('CMP', ['NETWORK']),
+      default_compartment_id: security_cmp_key,
 
       alarms: catalog_alarms,
     },
