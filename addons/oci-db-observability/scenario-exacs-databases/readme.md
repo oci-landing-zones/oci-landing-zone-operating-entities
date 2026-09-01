@@ -3,7 +3,7 @@
 
 ## OCI Native Services Configuration Prerequisites
 
-This scenario documents the ExaDB-D implementation details for the OCI Database Observability add-on. Before continuing, review and finalize the design decisions listed in the general [OCI Database Observability README](../readme.md#3-design-decisions), including the Platform private endpoint placement decision.
+This scenario documents the ExaDB-D implementation details for the OCI Database Observability add-on. Before continuing, review and finalize the design decisions listed in the general [OCI Database Observability README](../README.md#3-design-decisions), including the Platform private endpoint placement decision.
 
 ### Services covered
 
@@ -26,7 +26,7 @@ Follow these steps to extend your One-OE Landing Zone:
 
 **Step 0**. ( prerequisite )
 
-Deploy the One-OE + ExaDB-D use case 1 in single stack. You can follow these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/workload-extensions/exacs/single-stack). To work with multiple stacks, you need to use the orchestrator's outputs and dependencies features within [ORM](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/orm_bp.md).
+Deploy the One-OE + ExaDB-D use case 1 in single stack. You can follow these [steps](../../../workload-extensions/exacs/single-stack/readme.md). To work with multiple stacks, you need to use the orchestrator's outputs and dependencies features within [ORM](../../../commons/content/orm_bp.md).
 
 
 
@@ -49,14 +49,14 @@ Deploy the Observability Landing Zone add-on using Option 1.
 | **Vault and key:** `vlt-lz-shared-mon-security`, `key-lz-mon-bkt`. |
 | **Monitoring instance:** none; Logging Analytics uses a Management Agent installed on the monitored ExaDB-D VM Cluster database hosts. |
 | Files loaded:<br>[addon_obs_iam_exacs_platform.json](addon_obs_iam_exacs_platform.json)<br>[addon_obs_network_exacs_platform.json](addon_obs_network_exacs_platform.json)<br>[addon_obs_security_exacs.json](addon_obs_security_exacs.json) |
-| ORM deployment:<br><a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacs-databases/addon_obs_iam_exacs_platform.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacs-databases/addon_obs_network_exacs_platform.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/obs/addons/oci-db-observability/scenario-exacs-databases/addon_obs_security_exacs.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
+| ORM deployment:<br><a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.1.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-db-observability/scenario-exacs-databases/addon_obs_iam_exacs_platform.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-db-observability/scenario-exacs-databases/addon_obs_network_exacs_platform.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/addons/oci-db-observability/scenario-exacs-databases/addon_obs_security_exacs.json"}'><img src="../../../commons/images/DeployToOCI.svg" height="25" align="center"></a> |
 
-Click the Deploy to OCI button and follow step-by-step instructions in [Implementation add-on steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/obs/addons/oci-db-observability/scenario-exacs-databases/Implementation_addon_steps.md).
+After starting the deployment, follow the [add-on deployment instructions](Implementation_addon_steps.md).
 
 
 **Step 2**.
 
-Now that we have all required resources, we can continue with the remaining manual service-onboarding actions, including creating the database monitoring user, storing its password as a secret, creating the service private endpoints, enabling DBM/OPSI for the target databases, and completing Logging Analytics onboarding on the ExaDB-D VM Cluster database hosts. Follow these [steps to enable Database Management, Ops Insights, and Logging Analytics](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/obs/addons/oci-db-observability/scenario-exacs-databases/steps_to_enable_observability_exacs.md).
+Now that we have all required resources, we can continue with the remaining manual service-onboarding actions, including creating the database monitoring user, storing its password as a secret, creating the service private endpoints, enabling DBM/OPSI for the target databases, and completing Logging Analytics onboarding on the ExaDB-D VM Cluster database hosts. After deployment completes, follow the [manual onboarding instructions for Database Management, Ops Insights, and Logging Analytics](steps_to_enable_observability_exacs.md).
 
 &nbsp;
 

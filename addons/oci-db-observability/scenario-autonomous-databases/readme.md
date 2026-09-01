@@ -3,7 +3,7 @@
 
 ## OCI Native Services Configuration Prerequisites
 
-This scenario documents the Autonomous Database implementation details for the OCI Database Observability add-on. Before continuing, review and finalize the design decisions listed in the general [OCI Database Observability README](../readme.md#3-design-decisions), including the Centralized vs Project private endpoint decision.
+This scenario documents the Autonomous Database implementation details for the OCI Database Observability add-on. Before continuing, review and finalize the design decisions listed in the general [OCI Database Observability README](../README.md#3-design-decisions), including the Centralized vs Project private endpoint decision.
 
 ### Services covered
 
@@ -24,7 +24,7 @@ Follow these steps to extend your One-OE Landing Zone:
 
 **Step 0**. ( prerequisite )
 
-Deploy the One-OE Landing Zone. You can follow these [steps](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack). To work with multiple stacks, you need to use the orchestrator's outputs and dependencies features within [ORM](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/orm_bp.md).
+Deploy the One-OE Landing Zone. You can follow these [steps](../../../blueprints/one-oe/runtime/one-stack/readme.md). To work with multiple stacks, you need to use the orchestrator's outputs and dependencies features within [ORM](../../../commons/content/orm_bp.md).
 
 
 
