@@ -224,13 +224,37 @@ For more details on the network design refer to the [OCI Open LZ One-OE Drawio -
 
 # **5. Operations View**
 
-This chapter will be added soon.
+This section covers two main areas: how One-OE is operated and the OCI Monitoring capabilities included in the design. It provides the foundation for day-one and day-two operations, including observability, event rules, alarms, notifications, and network flow logging.
 
 ## Monitoring View
 
-The Monitoring View describes the One-OE operational baseline for Events, Monitoring alarms, Notifications, and VCN Flow Logs. See the [One-OE observability runtime inventory](../runtime/one-stack/observability_runtime.md) for the deployed rules, alarms, and log configurations.
+One-OE provides the monitoring capabilities needed to understand activity across the tenancy. It includes event rules for important changes, alarms for critical conditions, and VCN Flow Logs for network troubleshooting and audit purposes.
+
+### Events
+
+Events capture relevant resource and service state changes and route them to configured destinations. They provide operational visibility, support security monitoring and change tracking, and can trigger automated responses to configuration updates, lifecycle changes, or detected issues.
+
+### Alarms
+
+Alarms continuously evaluate monitoring metrics against defined thresholds and notify the relevant teams when a condition is met. They enable proactive detection of availability, performance, capacity, and service-health issues, supporting timely incident response.
+
+### Notifications
+
+Notifications deliver alarm messages and event-driven alerts to the relevant teams and operational tools. They provide the communication channel for timely incident response and should be configured with active subscriptions, appropriate routing, and reliable delivery paths.
+
+### Logs
+
+VCN Flow Logs provide traffic metadata such as source and destination IP addresses, ports, protocols, and actions. They show whether traffic was **ACCEPTED** or **REJECTED**, helping teams identify traffic blocked by security rules. They are also valuable for security compliance, auditing, and forensic analysis after a potential breach.
+
+Refer to the [One-OE observability runtime inventory](../runtime/one-stack/observability_runtime.md) for the complete set of deployed observability configurations.
 
 &nbsp; 
+
+## Operation View
+
+This chapter will be added soon.
+
+
 &nbsp; 
 
 # **6. Runtime View**
