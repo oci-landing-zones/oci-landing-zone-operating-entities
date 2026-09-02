@@ -1,31 +1,690 @@
 {
     "alarms_configuration": {
-        "default_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+        "default_compartment_id"                          : "CMP-LZ-SECURITY-KEY",
 
         "alarms": {
-            "AL-LZ-NETWORK-LB-KEY": {
-                "display_name"                 : "al-lz-network-lb",
-                "destination_topic_ids"        : ["NOTT-LZ-NETWORK-KEY"],
-                "is_enabled"                   : "false",
+            "AL-LZ-AUDIT-CONNECTOR-INTERNAL-ERRORS-KEY": {
+                "display_name"                            : "al-lz-audit-connector-internal-errors",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
 
                 "supplied_alarm": {
-                    "message_format"           : "PRETTY_JSON",
-                    "namespace"                : "oci_lbaas",
-                    "pending_duration"         : "PT5M",
-                    "query"                    : "UnHealthyBackendServers[1m].mean() >= 0"
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                           : "oci_service_connector_hub",
+                    "pending_duration"                    : "PT15M",
+                    "query"                               : "ServiceConnectorHubErrors[5m].groupBy(connectorId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-AUDIT-CONNECTOR-SOURCE-ERRORS-KEY": {
+                "display_name"                            : "al-lz-audit-connector-source-errors",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                           : "oci_service_connector_hub",
+                    "pending_duration"                    : "PT30M",
+                    "query"                               : "ErrorsAtSource[15m].groupBy(errorCode,connectorId).min() > 0",
+                    "severity"                            : "WARNING"
+                }
+            },
+
+            "AL-LZ-AUDIT-CONNECTOR-STALE-KEY": {
+                "display_name"                            : "al-lz-audit-connector-stale",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                           : "oci_service_connector_hub",
+                    "pending_duration"                    : "PT30M",
+                    "query"                               : "DataFreshness[1h].groupBy(connectorId).mean() > 43200000",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-AUDIT-CONNECTOR-TARGET-ERRORS-KEY": {
+                "display_name"                            : "al-lz-audit-connector-target-errors",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                           : "oci_service_connector_hub",
+                    "pending_duration"                    : "PT30M",
+                    "query"                               : "ErrorsAtTarget[15m].groupBy(errorCode,connectorId).min() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-BLOCK-VOLUME-THROTTLED-IO-KEY": {
+                "display_name"                            : "al-lz-block-volume-throttled-io",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_blockstore",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VolumeThrottledIOs[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-BARE-METAL-DEFECT-KEY": {
+                "display_name"                            : "al-lz-compute-bare-metal-defect",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_compute_infrastructure_health",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "health_status[1m].groupBy(resourceId).max() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-CPU-CRITICAL-KEY": {
+                "display_name"                            : "al-lz-compute-cpu-critical",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_computeagent",
+                    "pending_duration"                    : "PT5M",
+                    "query"                               : "CpuUtilization[5m].groupBy(resourceId).mean() >= 90",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-CPU-WARNING-KEY": {
+                "display_name"                            : "al-lz-compute-cpu-warning",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_computeagent",
+                    "pending_duration"                    : "PT10M",
+                    "query"                               : "CpuUtilization[5m].groupBy(resourceId).mean() >= 75",
+                    "severity"                            : "WARNING"
+                }
+            },
+
+            "AL-LZ-COMPUTE-FILE-SYSTEM-ANOMALY-KEY": {
+                "display_name"                            : "al-lz-compute-file-system-anomaly",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_compute_instance_health",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "InstanceFileSystemStatus[5m].groupBy(resourceId).max() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-INFRASTRUCTURE-ISSUE-KEY": {
+                "display_name"                            : "al-lz-compute-infrastructure-issue",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_compute_infrastructure_health",
+                    "pending_duration"                    : "PT2M",
+                    "query"                               : "instance_status[1m].groupBy(resourceId).max() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-MAINTENANCE-SCHEDULED-KEY": {
+                "display_name"                            : "al-lz-compute-maintenance-scheduled",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_compute_infrastructure_health",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "maintenance_status[5m].groupBy(resourceId).max() > 0",
+                    "severity"                            : "WARNING"
+                }
+            },
+
+            "AL-LZ-COMPUTE-MEMORY-CRITICAL-KEY": {
+                "display_name"                            : "al-lz-compute-memory-critical",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_computeagent",
+                    "pending_duration"                    : "PT5M",
+                    "query"                               : "MemoryUtilization[5m].groupBy(resourceId).mean() >= 90",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-MEMORY-WARNING-KEY": {
+                "display_name"                            : "al-lz-compute-memory-warning",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_computeagent",
+                    "pending_duration"                    : "PT10M",
+                    "query"                               : "MemoryUtilization[5m].groupBy(resourceId).mean() >= 75",
+                    "severity"                            : "WARNING"
+                }
+            },
+
+            "AL-LZ-COMPUTE-VM-UNRESPONSIVE-KEY": {
+                "display_name"                            : "al-lz-compute-vm-unresponsive",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_compute_instance_health",
+                    "pending_duration"                    : "PT2M",
+                    "query"                               : "instance_accessibility_status[1m].groupBy(resourceId).max() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-EVENT-DELIVERY-FAILED-KEY": {
+                "display_name"                            : "al-lz-event-delivery-failed",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                           : "oci_cloudevents",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "DeliveryFailedEvents[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-NETWORK-LB-BACKEND-TIMEOUT-KEY": {
+                "display_name"                            : "al-lz-network-lb-backend-timeout",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_lbaas",
+                    "pending_duration"                    : "PT2M",
+                    "query"                               : "backendTimeouts[1m]{lbComponent = \"backendSet\"}.sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-NETWORK-LB-UNHEALTHY-BACKEND-KEY": {
+                "display_name"                            : "al-lz-network-lb-unhealthy-backend",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_lbaas",
+                    "pending_duration"                    : "PT2M",
+                    "query"                               : "unhealthyBackendServers[1m]{lbComponent = \"backendSet\"}.max() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-NETWORK-NLB-EGRESS-SECURITY-DROPS-KEY": {
+                "display_name"                            : "al-lz-network-nlb-egress-security-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_nlb",
+                    "pending_duration"                    : "PT2M",
+                    "query"                               : "EgressPacketsDroppedBySL[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "WARNING"
+                }
+            },
+
+            "AL-LZ-NETWORK-NLB-INGRESS-SECURITY-DROPS-KEY": {
+                "display_name"                            : "al-lz-network-nlb-ingress-security-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_nlb",
+                    "pending_duration"                    : "PT2M",
+                    "query"                               : "IngressPacketsDroppedBySL[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "WARNING"
+                }
+            },
+
+            "AL-LZ-NETWORK-NLB-NO-HEALTHY-BACKENDS-KEY": {
+                "display_name"                            : "al-lz-network-nlb-no-healthy-backends",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_nlb",
+                    "pending_duration"                    : "PT2M",
+                    "query"                               : "HealthyBackendsPerNlb[1m].groupBy(resourceId).min() < 1",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-NETWORK-NLB-UNHEALTHY-BACKEND-KEY": {
+                "display_name"                            : "al-lz-network-nlb-unhealthy-backend",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_nlb",
+                    "pending_duration"                    : "PT2M",
+                    "query"                               : "UnhealthyBackendsPerNlb[1m].groupBy(resourceId).max() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-NOTIFICATION-DELIVERY-FAILED-KEY": {
+                "display_name"                            : "al-lz-notification-delivery-failed",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                           : "oci_notification",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "FailedMessagesCount[5m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-CONNTRACK-CRITICAL-KEY": {
+                "display_name"                            : "al-lz-prod-vnic-conntrack-critical",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT5M",
+                    "query"                               : "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 90",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-CONNTRACK-FULL-KEY": {
+                "display_name"                            : "al-lz-prod-vnic-conntrack-full",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VnicConntrackIsFull[1m].groupBy(resourceId).max() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-CONNTRACK-WARNING-KEY": {
+                "display_name"                            : "al-lz-prod-vnic-conntrack-warning",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT10M",
+                    "query"                               : "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 80",
+                    "severity"                            : "WARNING"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-EGRESS-CONNTRACK-DROPS-KEY": {
+                "display_name"                            : "al-lz-prod-vnic-egress-conntrack-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VnicEgressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-EGRESS-SECURITY-DROPS-KEY": {
+                "display_name"                            : "al-lz-prod-vnic-egress-security-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT5M",
+                    "query"                               : "VnicEgressDropsSecurityList[5m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "WARNING"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-EGRESS-THROTTLE-DROPS-KEY": {
+                "display_name"                            : "al-lz-prod-vnic-egress-throttle-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VnicEgressDropsThrottle[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-INGRESS-CONNTRACK-DROPS-KEY": {
+                "display_name"                            : "al-lz-prod-vnic-ingress-conntrack-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VnicIngressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-INGRESS-THROTTLE-DROPS-KEY": {
+                "display_name"                            : "al-lz-prod-vnic-ingress-throttle-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VnicIngressDropsThrottle[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-SMARTNIC-HOST-DROPS-KEY": {
+                "display_name"                            : "al-lz-prod-vnic-smartnic-host-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "SmartnicBufferDropsFromHost[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-SMARTNIC-NETWORK-DROPS-KEY": {
+                "display_name"                            : "al-lz-prod-vnic-smartnic-network-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "SmartnicBufferDropsFromNetwork[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-CONNTRACK-CRITICAL-KEY": {
+                "display_name"                            : "al-lz-vnic-conntrack-critical",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT5M",
+                    "query"                               : "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 90",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-CONNTRACK-FULL-KEY": {
+                "display_name"                            : "al-lz-vnic-conntrack-full",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VnicConntrackIsFull[1m].groupBy(resourceId).max() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-CONNTRACK-WARNING-KEY": {
+                "display_name"                            : "al-lz-vnic-conntrack-warning",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT10M",
+                    "query"                               : "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 80",
+                    "severity"                            : "WARNING"
+                }
+            },
+
+            "AL-LZ-VNIC-EGRESS-CONNTRACK-DROPS-KEY": {
+                "display_name"                            : "al-lz-vnic-egress-conntrack-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VnicEgressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-EGRESS-SECURITY-DROPS-KEY": {
+                "display_name"                            : "al-lz-vnic-egress-security-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : false,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT5M",
+                    "query"                               : "VnicEgressDropsSecurityList[5m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "WARNING"
+                }
+            },
+
+            "AL-LZ-VNIC-EGRESS-THROTTLE-DROPS-KEY": {
+                "display_name"                            : "al-lz-vnic-egress-throttle-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VnicEgressDropsThrottle[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-INGRESS-CONNTRACK-DROPS-KEY": {
+                "display_name"                            : "al-lz-vnic-ingress-conntrack-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VnicIngressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-INGRESS-THROTTLE-DROPS-KEY": {
+                "display_name"                            : "al-lz-vnic-ingress-throttle-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "VnicIngressDropsThrottle[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-SMARTNIC-HOST-DROPS-KEY": {
+                "display_name"                            : "al-lz-vnic-smartnic-host-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "SmartnicBufferDropsFromHost[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-SMARTNIC-NETWORK-DROPS-KEY": {
+                "display_name"                            : "al-lz-vnic-smartnic-network-drops",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                              : true,
+
+                "supplied_alarm": {
+                    "message_format"                      : "PRETTY_JSON",
+                    "metric_compartment_id"               : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                           : "oci_vcn",
+                    "pending_duration"                    : "PT1M",
+                    "query"                               : "SmartnicBufferDropsFromNetwork[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                            : "CRITICAL"
                 }
             }
         }
     },
 
     "events_configuration": {
-        "default_compartment_id"               : "CMP-LANDINGZONE-KEY",
+        "default_compartment_id"                          : "CMP-LANDINGZONE-KEY",
 
         "event_rules": {
             "RUL-LZ-NOTIFY-NETWORK-KEY": {
-                "compartment_id"               : "CMP-LZ-NETWORK-KEY",
-                "destination_topic_ids"        : ["NOTT-LZ-NETWORK-KEY"],
-                "event_display_name"           : "rul-lz-notify-network",
+                "compartment_id"                          : "CMP-LZ-NETWORK-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-NETWORK-KEY"],
+                "event_display_name"                      : "rul-lz-notify-network",
 
                 "supplied_events": [
                     "com.oraclecloud.virtualnetwork.createvcn",
@@ -75,9 +734,9 @@
             },
 
             "RUL-LZ-NOTIFY-SECURITY-KEY": {
-                "compartment_id"               : "CMP-LZ-SECURITY-KEY",
-                "destination_topic_ids"        : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"           : "rul-lz-notify-security",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"                      : "rul-lz-notify-security",
 
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
@@ -90,9 +749,9 @@
             },
 
             "RUL-LZ-PROD-NOTIFY-SECURITY-KEY": {
-                "compartment_id"               : "CMP-LZ-PROD-SECURITY-KEY",
-                "destination_topic_ids"        : ["NOTT-LZ-SECURITY-KEY"],
-                "event_display_name"           : "rul-lz-prod-notify-security",
+                "compartment_id"                          : "CMP-LZ-PROD-SECURITY-KEY",
+                "destination_topic_ids"                   : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"                      : "rul-lz-prod-notify-security",
 
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
@@ -107,12 +766,12 @@
     },
 
     "home_region_events_configuration": {
-        "default_compartment_id"               : "TENANCY-ROOT",
+        "default_compartment_id"                          : "TENANCY-ROOT",
 
         "event_rules": {
             "RUL-LZ-CLOUDGUARD-KEY": {
-                "destination_topic_ids"        : ["NOTT-LZ-CLOUDGUARD-KEY"],
-                "event_display_name"           : "rul-lz-notify-on-cloudguard-changes",
+                "destination_topic_ids"                   : ["NOTT-LZ-CLOUDGUARD-KEY"],
+                "event_display_name"                      : "rul-lz-notify-on-cloudguard-changes",
 
                 "supplied_events": [
                     "com.oraclecloud.cloudguard.problemdetected",
@@ -125,8 +784,8 @@
             },
 
             "RUL-LZ-IAM-KEY": {
-                "destination_topic_ids"        : ["NOTT-LZ-IAM-KEY"],
-                "event_display_name"           : "rul-lz-notify-on-iam-changes",
+                "destination_topic_ids"                   : ["NOTT-LZ-IAM-KEY"],
+                "event_display_name"                      : "rul-lz-notify-on-iam-changes",
 
                 "supplied_events": [
                     "com.oraclecloud.identitycontrolplane.createidentityprovider",
@@ -156,82 +815,82 @@
     },
 
     "logging_configuration": {
-        "default_compartment_id"               : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                          : "CMP-LZ-SECURITY-KEY",
 
         "flow_logs": {
             "LOG-LZ-SUBNET-FLOW-KEY": {
-                "log_group_id"                 : "LGRP-LZ-VCN-FLOW-KEY",
-                "target_compartment_ids"       : ["CMP-LZ-NETWORK-KEY"],
-                "target_resource_type"         : "subnet"
+                "log_group_id"                            : "LGRP-LZ-VCN-FLOW-KEY",
+                "target_compartment_ids"                  : ["CMP-LZ-NETWORK-KEY"],
+                "target_resource_type"                    : "subnet"
             },
 
             "LOG-LZ-VCN-FLOW-KEY": {
-                "log_group_id"                 : "LGRP-LZ-VCN-FLOW-KEY",
-                "target_compartment_ids"       : ["CMP-LZ-NETWORK-KEY"],
-                "target_resource_type"         : "vcn"
+                "log_group_id"                            : "LGRP-LZ-VCN-FLOW-KEY",
+                "target_compartment_ids"                  : ["CMP-LZ-NETWORK-KEY"],
+                "target_resource_type"                    : "vcn"
             }
         },
 
         "log_groups": {
             "LGRP-LZ-VCN-FLOW-KEY": {
-                "name"                         : "lgrp-lz-vcn-flow",
-                "compartment_id"               : "CMP-LZ-SECURITY-KEY"
+                "name"                                    : "lgrp-lz-vcn-flow",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY"
             }
         }
     },
 
     "notifications_configuration": {
-        "default_compartment_id"               : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                          : "CMP-LZ-SECURITY-KEY",
 
         "topics": {
             "NOTT-LZ-CLOUDGUARD-KEY": {
-                "name"                         : "nott-lz-cloudguard",
-                "description"                  : "Topic for Cloud Guard related notifications.",
-                "compartment_id"               : "CMP-LZ-SECURITY-KEY",
+                "name"                                    : "nott-lz-cloudguard",
+                "description"                             : "Topic for Cloud Guard related notifications.",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
-                        "protocol"             : "EMAIL",
-                        "values"               : ["email.address@example.com"]
+                        "protocol"                        : "EMAIL",
+                        "values"                          : ["email.address@example.com"]
                     }
                 ]
             },
 
             "NOTT-LZ-IAM-KEY": {
-                "name"                         : "nott-lz-iam",
-                "description"                  : "Topic for IAM related notifications.",
-                "compartment_id"               : "CMP-LZ-SECURITY-KEY",
+                "name"                                    : "nott-lz-iam",
+                "description"                             : "Topic for IAM related notifications.",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
-                        "protocol"             : "EMAIL",
-                        "values"               : ["email.address@example.com"]
+                        "protocol"                        : "EMAIL",
+                        "values"                          : ["email.address@example.com"]
                     }
                 ]
             },
 
             "NOTT-LZ-NETWORK-KEY": {
-                "name"                         : "nott-lz-network",
-                "description"                  : "Topic for network related notifications.",
-                "compartment_id"               : "CMP-LZ-SECURITY-KEY",
+                "name"                                    : "nott-lz-network",
+                "description"                             : "Topic for network related notifications.",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
-                        "protocol"             : "EMAIL",
-                        "values"               : ["email.address@example.com"]
+                        "protocol"                        : "EMAIL",
+                        "values"                          : ["email.address@example.com"]
                     }
                 ]
             },
 
             "NOTT-LZ-SECURITY-KEY": {
-                "name"                         : "nott-lz-security",
-                "description"                  : "Topic for notifications.",
-                "compartment_id"               : "CMP-LZ-SECURITY-KEY",
+                "name"                                    : "nott-lz-security",
+                "description"                             : "Topic for notifications.",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
 
                 "subscriptions": [
                     {
-                        "protocol"             : "EMAIL",
-                        "values"               : ["email.address@example.com"]
+                        "protocol"                        : "EMAIL",
+                        "values"                          : ["email.address@example.com"]
                     }
                 ]
             }
@@ -239,41 +898,41 @@
     },
 
     "service_connectors_configuration": {
-        "default_compartment_id"               : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                          : "CMP-LZ-SECURITY-KEY",
 
         "buckets": {
             "BKT-LZ-SERVICE-CONNECTOR-KEY": {
-                "name"                         : "bkt-lz-service-connector",
-                "compartment_id"               : "CMP-LZ-SECURITY-KEY",
-                "cis_level"                    : "2",
-                "kms_key_id"                   : "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY"
+                "name"                                    : "bkt-lz-service-connector",
+                "compartment_id"                          : "CMP-LZ-SECURITY-KEY",
+                "cis_level"                               : "2",
+                "kms_key_id"                              : "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY"
             }
         },
 
         "service_connectors": {
             "SCH-LZ-MONITOR-KEY": {
-                "display_name"                 : "sch-lz-monitor",
+                "display_name"                            : "sch-lz-monitor",
 
                 "policy": {
-                    "name"                     : "service-connector-audit-policy",
-                    "description"              : "IAM policy for letting Service Connector to push data to target resource.",
-                    "compartment_id"           : "CMP-LZ-SECURITY-KEY"
+                    "name"                                : "service-connector-audit-policy",
+                    "description"                         : "IAM policy for letting Service Connector to push data to target resource.",
+                    "compartment_id"                      : "CMP-LZ-SECURITY-KEY"
                 },
 
                 "source": {
-                    "kind"                     : "logging",
+                    "kind"                                : "logging",
 
                     "audit_logs": [
                         {
-                            "cmp_id"           : "ALL"
+                            "cmp_id"                      : "ALL"
                         }
                     ]
                 },
 
                 "target": {
-                    "bucket_name"              : "bkt-lz-service-connector",
-                    "bucket_object_name_prefix": "sch",
-                    "kind"                     : "objectstorage"
+                    "bucket_name"                         : "bkt-lz-service-connector",
+                    "bucket_object_name_prefix"           : "sch",
+                    "kind"                                : "objectstorage"
                 }
             }
         }

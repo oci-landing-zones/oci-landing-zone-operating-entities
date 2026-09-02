@@ -17,7 +17,7 @@ Core principle: treat the landing zone config as the source of truth, then verif
 
 - Creating a new config file for `bash gen/generate.sh --config ...`
 - Reviewing or fixing an Blueprint Factory topology change
-- Adding or changing `environments`, `shared_project_network`, `platforms`, or `shared_platforms`
+- Adding or changing `environments`, `project_network`, `platforms`, or `shared_platforms`
 - Wiring a platform extension such as `oke_simple`
 - Debugging why Blueprint Factory config mode generated an unexpected JSON output or omitted a file
 
@@ -49,7 +49,10 @@ Do not use this skill as the first response to an open-ended customer request su
 | Security targets | Omit `security_targets` to target all environments; set it explicitly to narrow which environments get security-zone targeting. |
 | Hub kinds | Only `hub_a`, `hub_b`, `hub_c`, and `hub_e` are valid. |
 | Hub subnets | Omit `hub.network.subnets` to auto-generate canonical hub subnets from the hub VCN. |
-| Spoke subnets | Omit `shared_project_network.network.subnets` to auto-generate `web`, `app`, `db`, and `infra`. |
+| Shared project subnets | Omitted generates default `web`, `app`, `db`, `infra`; `{}` emits none; a non-empty map is exact and suppresses all implicit defaults. |
+| Dedicated project subnets | Use `projects.<project>.subnets`; they require `project_network`, must not overlap any shared/dedicated subnet, and remain in the environment `NETWORK` compartment. |
+| Shared vs dedicated | Recommend shared subnets by default for address efficiency. Dedicated subnets provide separate project CIDR allocation, not IAM isolation; access is governed at the environment network compartment. Same-subnet traffic is controlled by NSGs/security lists, not the hub firewall. |
+| Project subnet routing | Omit `project_network.subnet_routing` for `vcn`; use `hub` with firewalled Hub A, B, or C. Hub C requires its normal staged backend replacement; Hub E is rejected. |
 | Platform subnets | Platforms need explicit subnets unless they also declare an extension that provides subnet metadata. |
 | Realm | `realm` is optional and defaults to `oc1`, including when explicitly set to `null`; supported config realms are `oc1` and `oc19`. |
 | CIS level | `cis_level` is optional and technically defaults to `2`, but customer-use discovery must obtain an explicit CIS1/CIS2 choice. CIS2 is recommended and adds CMEK dependencies for applicable resources; set `1` for the less complex CIS1 output set. |
@@ -60,16 +63,17 @@ Do not use this skill as the first response to an open-ended customer request su
 | Networked extension CIDRs | Include CIDRs only for network scopes the selected config will emit; do not allocate for unchosen optional placement branches or networkless/infrastructure-only scopes. |
 | Preferred deployment | ORM with a customer-controlled private Object Storage bucket through a pinned Orchestrator `rms-facade`; Terraform CLI and customer CI/CD remain alternatives. |
 | ExaCS network | Network is required for ExaCS AVMC/VMC placement and forbidden for ExaCS infrastructure-only placement. |
-| ExaCS project DB tiers | Use `project_db_compartments` only for Autonomous Database Dedicated project tiers; `shared_project_network` is only needed when the environment also needs project network resources. |
+| ExaCS project DB tiers | Use `project_db_compartments` only for Autonomous Database Dedicated project tiers; `project_network` is only needed when the environment also needs project network resources. |
 
 ## Authoring Guidance
 
 - Prefer one small config file per scenario and compose from imports if reuse is needed.
 - For customer-use work, keep config sources and generated outputs in customer-chosen or explicitly approved working directories. Reserve `tests/gen/testdata/...` for repo-development fixtures and automated tests, not customer artifact placement.
-- Use `shared_project_network` only for environments that should produce spoke VCN outputs.
+- Use `project_network` only for environments that should produce spoke VCN outputs.
 - Put environment-scoped platforms under `environments.<env>.platforms`.
 - Put shared platforms under top-level `shared_platforms`.
-- Keep CIDRs explicit even when subnets are auto-generated. Auto-subnetting helps with subnet layout, not top-level network planning.
+- Treat the three shared-subnet states deliberately: omit the map for the four defaults, use `{}` for none, or provide the complete exact map. The factory never adds standard shared subnets around a supplied map.
+- Before authoring project subnet maps, confirm shared versus dedicated placement. Explain that per-project subnet allocation can strand addresses in mostly empty ranges and is not an IAM boundary. Also explain that dedicated placement does not send same-subnet traffic through the hub firewall; NSGs and security lists remain mandatory for that traffic.
 - Resolve network-producing extension scope and sizing before CIDR allocation; make any deliberate reserved space explicit in the customer-facing rationale.
 - When selecting CIDRs, check whether the landing zone will connect to on-premises or other clouds; any routed OCI or Kubernetes ranges must avoid overlap with those external networks.
 - When adding a new extension-backed platform, verify both the config schema and the extension contract.
@@ -87,6 +91,7 @@ Do not use this skill as the first response to an open-ended customer request su
 
 ## References
 
+- For the customer-facing supported configuration shape, read `addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md`.
 - For the schema and behavior map, read `references/schema-and-behavior.md`.
 - For starter patterns and repo-native examples, read `references/examples.md`.
 - For ORM + private Object Storage deployment and staged in-place updates, read `../landing-zone-customer-guidance/references/orm-bucket-deployment.md`.

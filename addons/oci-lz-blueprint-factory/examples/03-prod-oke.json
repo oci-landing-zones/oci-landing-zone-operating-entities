@@ -3,6 +3,14 @@
     "region"                                            : "eu-frankfurt-1",
     "region_short_name"                                 : "fra",
 
+    "hub": {
+        "kind"                                          : "hub_b",
+
+        "network": {
+            "vcn"                                       : "10.0.0.0/21"
+        }
+    },
+
     "environments": {
         "prod": {
             "platforms": {
@@ -18,28 +26,20 @@
                     },
 
                     "network": {
-                        "vcn"                           : "10.0.96.0/21"
+                        "vcn"                           : "10.0.96.0/20"
                     }
+                }
+            },
+
+            "project_network": {
+                "network": {
+                    "vcn"                               : "10.0.64.0/21"
                 }
             },
 
             "projects": {
                 "proj1"                                 : {}
-            },
-
-            "shared_project_network": {
-                "network": {
-                    "vcn"                               : "10.0.64.0/21"
-                }
             }
-        }
-    },
-
-    "hub": {
-        "kind"                                          : "hub_b",
-
-        "network": {
-            "vcn"                                       : "10.0.0.0/21"
         }
     }
 }

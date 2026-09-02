@@ -74,7 +74,7 @@ For `customer-use` and `ambiguous-or-mixed` requests, assume the customer may ha
 - Explain what you are recommending, why it is recommended, and the main security implications in plain language.
 - Ask discovery questions one at a time. Do not present the full required discovery list as a single customer questionnaire unless the customer explicitly asks for a checklist.
 - Before asking the customer to choose between repository or Blueprint Factory terms, explain those terms in customer language first and say why the choice matters.
-- Do not ask customers to choose between labels such as `One-OE`, `Hub A`, `Hub B`, `Hub C`, `Hub E`, `platform`, `project`, `environment`, or `shared_project_network` without first explaining them in plain language and confirming they are relevant.
+- Do not ask customers to choose between labels such as `One-OE`, `Hub A`, `Hub B`, `Hub C`, `Hub E`, `platform`, `project`, `environment`, or `project_network` without first explaining them in plain language and confirming they are relevant.
 - Start each discovery step with a short explanation of what decision is being made, then ask only the next missing question.
 - After each customer answer, briefly summarize what is now known before moving to the next discovery item.
 - Prefer text explanations and simple diagrams over raw config snippets.
@@ -172,6 +172,8 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - For network-producing workload extensions, identify every VCN/subnet-producing or CIDR-bearing scope the selected path will actually emit, including hub VCNs, spoke VCNs, platform VCNs, extension VCNs, Kubernetes service CIDRs, Kubernetes pod ranges, or any other routed or internal ranges defined by the selected extension contract.
    - Use the selected workload extension's local guide under `gen/workload-extensions/*/AGENTS.md` to decide which placement, component, and sizing questions must be answered before CIDR allocation.
    - Ask for rough scale and growth expectations only where they affect address planning, such as VM count, cluster count, node count, pod density, database network scope, environment count, expected subnet growth, and future environments or workloads that need reserved address space.
+   - For project workloads, ask whether shared or project-dedicated subnet allocations are needed before allocating subnet CIDRs. Recommend shared subnets by default because they consolidate address space and avoid lightly used per-project ranges. Recommend dedicated subnets only when separate project CIDR allocation or lifecycle management is required.
+   - Explain the boundaries before the customer decides: dedicated allocation is not an IAM boundary, so principals with subnet permissions in the environment network compartment may use any of its subnets. Traffic between endpoints in the same subnet also does not traverse the hub firewall and must be controlled with network security groups and security lists. Dedicated subnets can make inter-subnet inspection possible with supported firewalled Hub A, B, or C, but do not make same-subnet traffic visible to the hub firewall.
    - Do not reserve CIDRs for unchosen extension placement branches. Allocate only for the network scopes the selected design will emit, plus deliberate future reserves that are explained to the customer.
    - If a selected extension or placement scope is networkless, infrastructure-only, or otherwise forbidden from emitting network resources, do not assign it a VCN or subnet CIDR.
 
@@ -224,7 +226,7 @@ For `customer-use` and `ambiguous-or-mixed` requests that include ExaDB-D, Exada
 4. **Autonomous project tiers**
    - If Autonomous Database Dedicated will be used, determine which environments and projects need Autonomous Database project tiers.
    - Explain that each selected project needs a project DB compartment. A separate project/spoke network is only needed when applications or other project resources such as VMs must be deployed in that project and connect to the Autonomous Database.
-   - In config terms, this means `project_db_compartments` only for selected projects. Define `shared_project_network` only for environments that need project network resources.
+   - In config terms, this means `project_db_compartments` only for selected projects. Define `project_network` only for environments that need project network resources.
 
 Use the existing config contract for these outcomes:
 
@@ -274,9 +276,10 @@ Do not move the customer to the Blueprint Factory merely to represent a resource
 
 Start from:
 
-1. `gen/README.md`
-2. `gen/AGENTS.md`
-3. `gen/JSONNET_COMPOSITION.md`
+1. `addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md`
+2. `gen/README.md`
+3. `gen/AGENTS.md`
+4. `gen/JSONNET_COMPOSITION.md`
 
 When a customer uses the Blueprint Factory, the deployable working set becomes the files produced by that customer's own factory run.
 
@@ -288,8 +291,8 @@ When a customer uses the Blueprint Factory, the deployable working set becomes t
 - Keep Terraform CLI, customer-controlled CI/CD, or an approved private GitHub source as alternatives; never default to repo-hosted public raw URLs.
 - Remember that those generated configs are deployed through `terraform-oci-modules-orchestrator`. When deep-dive debugging or deployment-behavior investigation is needed, inspect the orchestrator contract and its downstream module wiring in addition to this repo. For published OKE flows, follow the exact orchestrator tag referenced by the published OKE docs instead of inspecting `HEAD`.
 - Do not assume OKE requires `projects`.
-- Do not assume an environment requires `shared_project_network`; use it only when the desired topology needs a spoke/projects VCN.
-- Verify Blueprint Factory behavior before telling customers that a config must include `projects` or `shared_project_network`.
+- Do not assume an environment requires `project_network`; use it only when the desired topology needs a spoke/projects VCN.
+- Verify Blueprint Factory behavior before telling customers that a config must include `projects` or `project_network`.
 
 ## No-Assumptions Rule
 

@@ -1,4 +1,4 @@
-// environments without shared_project_network still get environment security-zone targets
+// environments without project_network still get environment security-zone targets
 local multi = import 'gen/landing_zone_multi.jsonnet';
 local outputs = multi({
   cis_level: 1,

@@ -9,7 +9,7 @@ The Blueprint Factory accepts JSON and Jsonnet input. Jsonnet is available for a
 [1. Region and Security Settings](#1-region-and-security-settings)<br>
 [2. Hub](#2-hub)<br>
 [3. Environments](#3-environments)<br>
-[4. Shared Project Network](#4-shared-project-network)<br>
+[4. Project Network](#4-project-network)<br>
 [5. Projects](#5-projects)<br>
 [6. Environment Platforms](#6-environment-platforms)<br>
 [7. Shared Platforms](#7-shared-platforms)<br>
@@ -28,10 +28,11 @@ Blueprint Factory configuration
 ├── <additional add-on>
 ├── Environments
 │   └── <environment>
-│       ├── Shared project network
-│       │   └── Network
+│       ├── Project network
+│       │   └── Shared subnets
 │       ├── Projects
 │       │   └── <project>
+│       │       └── Dedicated subnets
 │       └── Platforms
 │           └── <platform>
 │               ├── Network
@@ -60,7 +61,7 @@ The corresponding configuration nesting is:
 
   environments: {
     '<environment>': {
-      shared_project_network: {
+      project_network: {
         network: {
           vcn: '<spoke-vcn-cidr>',
         },
@@ -116,7 +117,7 @@ Every Blueprint Factory configuration needs a hub and at least one named environ
 }
 ```
 
-This smallest shape creates the shared landing-zone domains for `dev`. Add a shared project network only when the environment needs a spoke VCN, and add projects only when the target design needs project compartments.
+This smallest shape creates the shared landing-zone domains for `dev`. Add a project network only when the environment needs a spoke VCN, and add projects only when the target design needs project compartments.
 
 ## 1. Region and Security Settings
 
@@ -157,7 +158,7 @@ hub: {
 
 ## 3. Environments
 
-Environment names are object keys. An environment can contain projects, a shared project network, and platforms.
+Environment names are object keys. An environment can contain projects, a project network, and platforms.
 
 ```jsonnet
 environments: {
@@ -166,14 +167,21 @@ environments: {
 },
 ```
 
-## 4. Shared Project Network
+## 4. Project Network
 
-Use `shared_project_network` when an environment needs a spoke VCN shared by its projects. Omit the subnet map to allocate the standard `web`, `app`, `db`, and `infra` subnet set.
+Use `project_network` when an environment needs a spoke VCN. Its network may contain subnets shared by all projects as well as subnets allocated separately to individual projects.
+
+| Field | Type | Required | Default | Description |
+|---|---|---:|---|---|
+| `project_network.network` | object | Yes | — | Project VCN configuration. |
+| `project_network.network.vcn` | CIDR string | Yes | — | CIDR of the environment project VCN. |
+| `project_network.network.subnets` | object | No | Standard shared set | Exact map of shared subnet names to CIDRs. Omit it for `web`, `app`, `db`, and `infra`; use `{}` for no shared subnets. |
+| `project_network.subnet_routing` | `vcn` or `hub` | No | `vcn` | Routing between subnets in the project VCN. |
 
 ```jsonnet
 environments: {
   prod: {
-    shared_project_network: {
+    project_network: {
       network: {
         vcn: '10.0.64.0/21',
       },
@@ -182,20 +190,38 @@ environments: {
 },
 ```
 
+A non-empty shared-subnet map is authoritative: the factory emits exactly those entries and does not add standard subnets around them. Every subnet CIDR must be canonical, contained by the project VCN, and non-overlapping.
+
+`subnet_routing: 'vcn'` retains OCI local routing. `hub` routes traffic between different subnets through the generated firewall path and is supported with Hub A, Hub B, and Hub C. Hub E rejects `hub` because it has no firewall. Hub C retains its normal staged deployment and requires real firewall targets in place of the generated non-working backend placeholders.
+
 ## 5. Projects
 
-Use `projects` to create project scopes in an environment. The project name is the object key.
+Use `projects` to create project scopes in an environment. The project name is the object key. A project can optionally request one or more separately allocated subnets inside its environment's `project_network` VCN.
 
 ```jsonnet
 environments: {
   prod: {
+    project_network: {
+      network: {
+        vcn: '10.0.64.0/21',
+        subnets: {
+          frontend: '10.0.64.0/24',
+        },
+      },
+    },
     projects: {
-      api: {},
+      api: {
+        subnets: {
+          jobs: '10.0.68.0/26',
+        },
+      },
       data: {},
     },
   },
 },
 ```
+
+`projects.<project>.subnets` must be a non-empty map and requires `project_network`. Project-dedicated subnet CIDRs follow the same canonical, containment, and non-overlap rules as shared subnets.
 
 ## 6. Environment Platforms
 

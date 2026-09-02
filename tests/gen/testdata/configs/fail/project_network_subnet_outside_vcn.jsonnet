@@ -1,10 +1,10 @@
-// Shared project subnets must fit inside shared project VCN
-// error_contains: Environment prod.shared_project_network.network.subnets must be contained by 10.0.64.0/21
+// Shared subnets must fit inside their project VCN.
+// error_contains: Environment prod.project_network.network.subnets must be contained by 10.0.64.0/21
 {
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: {
+      project_network: {
         network: {
           vcn: '10.0.64.0/21',
           subnets: {

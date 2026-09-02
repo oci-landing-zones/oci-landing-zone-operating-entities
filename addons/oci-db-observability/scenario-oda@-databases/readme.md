@@ -3,7 +3,7 @@
 
 ## OCI Native Services Configuration Prerequisites
 
-This scenario documents the ODA@ implementation details for the OCI Database Observability add-on. Before continuing, review the design decisions listed in the general [OCI Database Observability README](../readme.md#3-design-decisions). This ODA@ scenario covers the Global Approach for DBM/OPSI private endpoints.
+This scenario documents the ODA@ implementation details for the OCI Database Observability add-on. Before continuing, review the design decisions listed in the general [OCI Database Observability README](../README.md#3-design-decisions). This ODA@ scenario covers the Global Approach for DBM/OPSI private endpoints.
 
 ### Services covered
 

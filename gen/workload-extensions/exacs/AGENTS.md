@@ -16,7 +16,7 @@ Scope: this file covers `gen/workload-extensions/exacs/**` and published ExaCS s
 - ExaCS component selection is inferred from platform placement, `platform.network`, and `project_db_compartments`.
 - If database placement is inferred, the platform represents AVMC/VMC placement and requires `platform.network`. The extension emits a managed VCN with `db` and `backup` subnets.
 - If infrastructure-only placement is inferred, the platform must omit `platform.network`. It must not emit database child compartments, AVMC/VMC permissions, database alarms, or VMC event rules for that scope.
-- `project_db_compartments` is only for Autonomous Database Dedicated project tiers. It requires database placement but does not require `shared_project_network`.
+- `project_db_compartments` is only for Autonomous Database Dedicated project tiers. It requires database placement but does not require `project_network`.
 - Regular Exadata Database Service-only designs use VMC placement and must omit `project_db_compartments`.
 - Do not hardcode `prod`, `preprod`, `proj1`, `fra`, or CIDRs in reusable source.
 - Multi-stack `oneoe_network_hub_*_post.jsonnet` publication files must be generated from topology and routed VCN entries, not copied from branch hardcoded patches.

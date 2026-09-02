@@ -114,7 +114,7 @@ local common = import 'hub/hub_common.libsonnet';
         {
           name: s.entry.qualified_name,
           display: std.join(' ', s.entry.display_segments),
-          vcn: s.env.shared_project_network.network.vcn,
+          vcn: s.env.project_network.network.vcn,
           priority: (i + 1) * 10,
           kind: 'spoke',
           drg_att_key: n.key('DRGATT', s.entry.key_segments + ['PROJ']),

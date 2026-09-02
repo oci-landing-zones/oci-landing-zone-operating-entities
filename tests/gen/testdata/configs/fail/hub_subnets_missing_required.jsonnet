@@ -14,7 +14,7 @@
   },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
     },
   },
