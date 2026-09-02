@@ -30,9 +30,10 @@ Do not use this skill for repo-development work. Once the request is clearly on 
 4. Before asking the customer to choose between repo labels, explain those options in customer language and recommend a default when the repo has one.
 5. After each answer, summarize what is now known in one sentence, then ask the next missing question.
 6. After the hub family is known and before discussing public exposure, load balancers, or OKE ingress, inspect the matching hub guide or runtime artifacts first so you know what load balancer pattern already exists.
-7. Only after all required decisions are known, including target region and any non-`oc1` realm requirement, may you recommend a published runtime path, a workload extension path, or config-mode generation.
-8. When deployment execution comes up, use the secure delivery defaults from `AGENTS.md`: prefer Terraform CLI or customer-controlled CI/CD; for ORM, use customer-controlled private Object Storage or approved private GitHub source, not public raw URLs.
-9. If the conversation turns into Orchestrator or Resource Manager runtime troubleshooting, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier after this customer flow has established the deployment context.
+7. Before recommending deployment artifacts or config-mode generation, ask the customer to choose CIS Level 1 or CIS Level 2. Explain that CIS1 is the less complex baseline; recommend CIS2 for its stricter security posture, while making clear that generated CIS2 configurations require customer-managed encryption keys for applicable resources and therefore add Vault, key, IAM, deployment-ordering, rotation, recovery, and workload-lifecycle complexity. For OKE, mention Kubernetes-secret and worker boot-volume CMEKs specifically. Do not silently accept the generator's CIS2 default.
+8. Only after all required decisions are known, including target region, any non-`oc1` realm requirement, and the explicit CIS-level choice, may you recommend a published runtime path, a workload extension path, or config-mode generation.
+9. When deployment execution comes up, use the secure delivery defaults from `AGENTS.md`: prefer ORM with customer-controlled private Object Storage and the Orchestrator `rms-facade`; keep Terraform CLI, customer-controlled CI/CD, or approved private GitHub as alternatives. Read `references/orm-bucket-deployment.md` before giving exact deployment or staged-update steps.
+10. If the conversation turns into Orchestrator or Resource Manager runtime troubleshooting, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier after this customer flow has established the deployment context.
 
 ## Unsupported Requirements
 
@@ -47,7 +48,7 @@ If the selected published path, Blueprint Factory, or workload extension does no
 ## Discovery Reminders
 
 - Always default to `One-OE`; do not ask who operates the landing zone or ask the customer to choose a landing zone family.
-- Ask in root `AGENTS.md` order: One-OE baseline, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, then CIDRs.
+- Ask in root `AGENTS.md` order: One-OE baseline, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, CIDRs, then the explicit CIS-level choice.
 - Ask for the target OCI region early. Explain that realm defaults to `oc1` public cloud when omitted, and ask for realm only when a non-public or sovereign deployment may apply, such as `oc19` EU Sovereign Cloud.
 - Explain each decision in customer language before using repo terms such as `One-OE`, `Hub A`, `platform`, `project`, or `shared_project_network`.
 - Do not propose concrete CIDRs until the root `AGENTS.md` network-scope gate is complete; use extension guides such as OKE or ExaCS only for extension-specific sizing inputs.
@@ -60,6 +61,12 @@ If the selected published path, Blueprint Factory, or workload extension does no
 - Explain OCI CIDRs separately from Kubernetes pod and service CIDRs; use `gen/workload-extensions/oke/AGENTS.md` for repo-specific OKE networking semantics.
 - Do not treat non-production as an automatic reason to recommend a no-firewall hub. Firewall-based designs are still the recommended default unless the customer explicitly accepts the tradeoff for a simpler non-production layout.
 - When the customer asks for public access, do not assume the chosen hub needs a brand-new public load balancer design. Check the selected hub guide or runtime artifacts first; in the One-OE one-stack runtime, each hub family already includes a public load balancer example with placeholder backends.
+
+## Deployment Reference
+
+- For the preferred ORM + private Object Storage workflow, staged file replacement, Plan/Apply controls, monitoring, and handoff requirements, read `references/orm-bucket-deployment.md`.
+- Verify exact Resource Manager fields against the pinned Orchestrator ref; do not copy values from an unrelated stack, bucket, namespace, or tenancy.
+- This skill is advisory only. Explain the deployment procedure and prepare customer-executable commands or UI steps, but do not upload objects, create or update ORM stacks, run Plan/Apply/Destroy jobs, or start deployment monitoring. A deployment action requires a separate explicit user request and must be handled outside this skill workflow with its own authorization checks.
 
 ## ExaDB-D / ExaCS-Specific Guardrails
 

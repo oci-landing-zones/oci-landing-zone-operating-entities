@@ -17,6 +17,8 @@ gen/
 ├── generate.sh                  # Entry point: default mode or --config mode
 ├── lib/
 │   ├── extension_components.libsonnet # Cross-entry extension component summary
+│   ├── environment_names.libsonnet # Shared environment labels and compact identifiers
+│   ├── network_scope_names.libsonnet # Compact identifiers for known network scopes
 │   ├── policy_limits.libsonnet        # Generated IAM policy safety checks
 │   └── publication_network.libsonnet  # Publication-only network projection helpers
 │
