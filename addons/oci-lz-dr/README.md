@@ -25,13 +25,19 @@ In summary: IAM and governance are reused from the home region, Cloud Guard is t
 - For **operations**, the platform must be resilient enough to support provisioning and day-to-day operation of the solution, including CI/CD, monitoring, and third-party integrations. Multi-region deployment state should be managed separately per region, for example with distinct OCI Resource Manager stacks or Terraform workspaces, so each regional deployment can be planned, applied, and operated independently.
 
 
+<img src="images/ops_view.png" width="900" alt="Multi-stack deployment.One-oe in Home region and DR extension in DR region">
+
+<p align="center"><em>Figure 2</em></p>
+
+**Figure 2: Multi-stack deployment**
+
 The DR workload can reuse the production compartment or run in a dedicated DR compartment; each option can use a separate Availability Domain or a dedicated region. The selected model has different resource provisioning and maintenance requirements. A dedicated DR compartment is useful when a separate team manages DR resources.
 
 <img src="images/optionsDR.png" width="900" alt="Four DR deployment variants: a shared or dedicated DR compartment, each deployed across separate Availability Domains or a dedicated secondary region.">
 
-<p align="center"><em>Figure 2</em></p>
+<p align="center"><em>Figure 3</em></p>
 
-**Figure 2: DR deployment options across Availability Domains or regions**
+**Figure 3: DR deployment options across Availability Domains or regions**
 
 To review best practices about BCDR, go [here](BCDR-best-practices.md).
 
