@@ -154,6 +154,49 @@
                     "com.oraclecloud.notification.resendsubscriptionconfirmation",
                     "com.oraclecloud.notification.updatesubscription"
                 ]
+            },
+
+            "RUL-AMS-LZ-CLOUDGUARD-KEY": {
+                "destination_topic_ids"          : ["NOTT-AMS-LZ-CLOUDGUARD-KEY"],
+                "event_display_name"             : "rul-ams-lz-notify-on-cloudguard-changes",
+
+                "supplied_events": [
+                    "com.oraclecloud.cloudguard.problemdetected",
+                    "com.oraclecloud.cloudguard.problemdismissed",
+                    "com.oraclecloud.cloudguard.problemremediated",
+                    "com.oraclecloud.cloudguard.announcements",
+                    "com.oraclecloud.cloudguard.status",
+                    "com.oraclecloud.cloudguard.problemthresholdreached"
+                ]
+            },
+
+            "RUL-AMS-LZ-IAM-KEY": {
+                "destination_topic_ids"          : ["NOTT-AMS-LZ-IAM-KEY"],
+                "event_display_name"             : "rul-ams-lz-notify-on-iam-changes",
+
+                "supplied_events": [
+                    "com.oraclecloud.identitycontrolplane.createidentityprovider",
+                    "com.oraclecloud.identitycontrolplane.deleteidentityprovider",
+                    "com.oraclecloud.identitycontrolplane.updateidentityprovider",
+                    "com.oraclecloud.identitycontrolplane.createidpgroupmapping",
+                    "com.oraclecloud.identitycontrolplane.deleteidpgroupmapping",
+                    "com.oraclecloud.identitycontrolplane.updateidpgroupmapping",
+                    "com.oraclecloud.identitycontrolplane.addusertogroup",
+                    "com.oraclecloud.identitycontrolplane.creategroup",
+                    "com.oraclecloud.identitycontrolplane.deletegroup",
+                    "com.oraclecloud.identitycontrolplane.removeuserfromgroup",
+                    "com.oraclecloud.identitycontrolplane.updategroup",
+                    "com.oraclecloud.identitycontrolplane.createpolicy",
+                    "com.oraclecloud.identitycontrolplane.deletepolicy",
+                    "com.oraclecloud.identitycontrolplane.updatepolicy",
+                    "com.oraclecloud.identitycontrolplane.createuser",
+                    "com.oraclecloud.identitycontrolplane.deleteuser",
+                    "com.oraclecloud.identitycontrolplane.updateuser",
+                    "com.oraclecloud.identitycontrolplane.updateusercapabilities",
+                    "com.oraclecloud.identitycontrolplane.updateuserstate",
+                    "com.oraclecloud.identityControlPlane.UpdateSwiftPassword",
+                    "com.oraclecloud.identityControlPlane.CreateOrResetPassword"
+                ]
             }
         }
     },
