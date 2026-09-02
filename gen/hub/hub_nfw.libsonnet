@@ -20,6 +20,8 @@
 //   Hub B extends _nfw_firewall_policy with extra lb address lists and lb2spokes rules.
 //   The _nfw_rules function inserts extra rules after east-west and auto-renumbers all keys.
 
+local network_scope_names = import '../lib/network_scope_names.libsonnet';
+
 {
   // --- TCP Services ---
 
@@ -88,11 +90,20 @@
   // address_entries: [{name: 'prod', cidr: '10.0.64.0/21'}, {name: 'preprod', cidr: '10.0.128.0/21'}, ...]
   // Generates: one address list per entry + aggregate SPOKES list + public list
 
+  // OCI Network Firewall limits address-list names to 28 characters. Reuse the
+  // canonical scope tokens, but never silently truncate custom names.
+  local nfw_address_list_name(n, entry_name) =
+    local max_length = 28;
+    local name = n.display('nfw', ['al', network_scope_names.compact(entry_name)]);
+    assert std.length(name) <= max_length :
+      'OCI Network Firewall address-list name exceeds the 28-character limit: "%s" (%d characters). Use a shorter custom environment or platform key.' % [name, std.length(name)];
+    name,
+
   _nfw_address_lists(n, address_entries)::
     // Per-entry address lists
     {
       [n.key('NFW', ['ADDRLIST', std.asciiUpper(entry.name)])]: {
-        name: n.display('nfw', ['addrlist', entry.name]),
+        name: nfw_address_list_name(n, entry.name),
         type: 'IP',
         addresses: [entry.cidr],
       }

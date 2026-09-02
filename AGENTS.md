@@ -85,8 +85,8 @@ For `customer-use` and `ambiguous-or-mixed` requests, assume the customer may ha
 
 For `customer-use` and `ambiguous-or-mixed` requests, recommend secure delivery of deployable artifacts.
 
-- Prefer Terraform CLI locally or from customer-controlled CI/CD.
-- If ORM is used, stage the configuration files in a customer-controlled private OCI Object Storage bucket or approved private GitHub source and run them through the orchestrator `rms-facade` workflow.
+- Prefer OCI Resource Manager (ORM) with configuration files staged in a customer-controlled private OCI Object Storage bucket and run through a pinned orchestrator `rms-facade` workflow.
+- Keep Terraform CLI, customer-controlled CI/CD, or an approved private GitHub source as supported alternatives.
 - Do not recommend public raw GitHub or public bucket URLs as the default customer path.
 - If repository runtime docs show public repo-hosted one-click ORM examples, treat them as reference material only. They are not the recommended customer deployment path.
 
@@ -191,7 +191,14 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - If the customer has not defined CIDRs yet, help them decide the allocation first.
    - If repository behavior and official OCI documentation appear inconsistent for OKE networking, say so and verify with official OCI docs before advising.
 
-Only after these eight decisions are known may the agent continue with:
+9. **CIS benchmark level**
+   - Determine whether the generated landing zone should use CIS Level 1 or CIS Level 2 before recommending deployment artifacts or creating the final Blueprint Factory config.
+   - Explain both choices in customer language. CIS Level 1 provides the less complex baseline. CIS Level 2 is the recommended security posture and enables stricter controls, but the generated CIS2 path also requires customer-managed encryption keys for applicable resources.
+   - Explain that CIS2 CMEKs add deployment and operational dependencies such as Vault and key provisioning, IAM grants, resource-to-key ordering, key availability, rotation, recovery, and workload configuration. For OKE, CIS2 uses CMEKs for Kubernetes secrets and worker boot volumes, while CIS1 omits those generated OKE CMEK references.
+   - Ask the customer to choose explicitly; do not silently select CIS2 merely because it is the Blueprint Factory default. If the customer chooses CIS1, explain that they are accepting a less restrictive posture in exchange for lower deployment and workload-lifecycle complexity.
+   - Map the decision to top-level `cis_level: 1` or `cis_level: 2` in Blueprint Factory config mode.
+
+Only after these nine decisions are known may the agent continue with:
 
 - recommending the standard published path versus the Blueprint Factory
 - explaining OKE deployment options such as single-stack, multi-stack, or Blueprint Factory `oke_simple`
@@ -280,8 +287,8 @@ When a customer uses the Blueprint Factory, the deployable working set becomes t
 - Do not mix those generated files with the repo's published JSON snapshots under `blueprints/` or `workload-extensions/`.
 - If the customer later wants help adjusting the deployment file set, help with that generated file set specifically.
 - Before creating a config file or generated landing zone output, follow the artifact placement defaults above and ask where those files should live.
-- Prefer Terraform CLI locally or from customer-controlled CI/CD for deploying that generated file set.
-- If ORM is used for generated files, stage them in a customer-controlled private OCI Object Storage bucket or approved private GitHub source instead of using repo-hosted public raw URLs.
+- Prefer ORM with the generated files staged in a customer-controlled private OCI Object Storage bucket and consumed through a pinned orchestrator `rms-facade` workflow.
+- Keep Terraform CLI, customer-controlled CI/CD, or an approved private GitHub source as alternatives; never default to repo-hosted public raw URLs.
 - Remember that those generated configs are deployed through `terraform-oci-modules-orchestrator`. When deep-dive debugging or deployment-behavior investigation is needed, inspect the orchestrator contract and its downstream module wiring in addition to this repo. For published OKE flows, follow the exact orchestrator tag referenced by the published OKE docs instead of inspecting `HEAD`.
 - Do not assume OKE requires `projects`.
 - Do not assume an environment requires `project_network`; use it only when the desired topology needs a spoke/projects VCN.

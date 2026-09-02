@@ -778,7 +778,7 @@
                                     },
 
                                     "NFW-FRA-LZ-ADDRLIST-PROD-KEY": {
-                                        "name"                            : "nfw-fra-lz-addrlist-prod",
+                                        "name"                            : "nfw-fra-lz-al-p",
                                         "type"                            : "IP",
                                         "addresses"                       : ["10.0.64.0/21"]
                                     },
@@ -790,7 +790,7 @@
                                     },
 
                                     "NFW-FRA-LZ-ADDRLIST-PREPROD-KEY": {
-                                        "name"                            : "nfw-fra-lz-addrlist-preprod",
+                                        "name"                            : "nfw-fra-lz-al-pp",
                                         "type"                            : "IP",
                                         "addresses"                       : ["10.0.128.0/21"]
                                     },

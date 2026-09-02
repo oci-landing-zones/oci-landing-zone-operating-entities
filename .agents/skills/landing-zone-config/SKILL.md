@@ -38,6 +38,7 @@ Do not use this skill as the first response to an open-ended customer request su
 6. Add environments and platforms incrementally, then run Blueprint Factory config mode and inspect the generated outputs.
 7. When behavior is unclear, prefer reading the normalization and extension code over guessing from checked-in JSON.
 8. If the question is about Orchestrator runtime behavior, dependency files, output files, Resource Manager source settings, or duplicate top-level configuration collisions, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier rather than expanding this skill into runtime troubleshooting.
+9. For customer deployment handoff, read `../landing-zone-customer-guidance/references/orm-bucket-deployment.md` and provide the exact phase file sets emitted by the current run. Prefer an in-place update of the same ORM stack for staged outputs. This is advisory guidance only: do not upload the files or invoke ORM Plan, Apply, Destroy, stack updates, or monitoring from this skill.
 
 ## Quick Rules
 
@@ -54,12 +55,13 @@ Do not use this skill as the first response to an open-ended customer request su
 | Project subnet routing | Omit `project_network.subnet_routing` for `vcn`; use `hub` with firewalled Hub A, B, or C. Hub C requires its normal staged backend replacement; Hub E is rejected. |
 | Platform subnets | Platforms need explicit subnets unless they also declare an extension that provides subnet metadata. |
 | Realm | `realm` is optional and defaults to `oc1`, including when explicitly set to `null`; supported config realms are `oc1` and `oc19`. |
-| CIS level | `cis_level` is optional and defaults to `2`; set `1` to emit CIS level 1 security/observability files instead. |
+| CIS level | `cis_level` is optional and technically defaults to `2`, but customer-use discovery must obtain an explicit CIS1/CIS2 choice. CIS2 is recommended and adds CMEK dependencies for applicable resources; set `1` for the less complex CIS1 output set. |
 | Extensions | Extension `type` must be registered in `gen/landing_zone.libsonnet`. |
 | Config-mode network outputs | `network.json` is canonical final output; `network_pre.json` appears only for staged hubs. |
 | Artifact placement | Ask for both the config file location and the output directory before creating customer artifacts; do not default them into `tests/`. |
 | Unsupported resources | Do not add unsupported config keys or fake extension types. Generate only supported prerequisites, then document the unsupported resource as manual post-deployment configuration. |
 | Networked extension CIDRs | Include CIDRs only for network scopes the selected config will emit; do not allocate for unchosen optional placement branches or networkless/infrastructure-only scopes. |
+| Preferred deployment | ORM with a customer-controlled private Object Storage bucket through a pinned Orchestrator `rms-facade`; Terraform CLI and customer CI/CD remain alternatives. |
 | ExaCS network | Network is required for ExaCS AVMC/VMC placement and forbidden for ExaCS infrastructure-only placement. |
 | ExaCS project DB tiers | Use `project_db_compartments` only for Autonomous Database Dedicated project tiers; `project_network` is only needed when the environment also needs project network resources. |
 
@@ -92,5 +94,6 @@ Do not use this skill as the first response to an open-ended customer request su
 - For the customer-facing supported configuration shape, read `addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md`.
 - For the schema and behavior map, read `references/schema-and-behavior.md`.
 - For starter patterns and repo-native examples, read `references/examples.md`.
+- For ORM + private Object Storage deployment and staged in-place updates, read `../landing-zone-customer-guidance/references/orm-bucket-deployment.md`.
 - For Blueprint Factory OKE semantics and CIDR guardrails, read `gen/workload-extensions/oke/AGENTS.md`.
 - For Blueprint Factory ExaCS placement and component semantics, read `gen/workload-extensions/exacs/AGENTS.md`.

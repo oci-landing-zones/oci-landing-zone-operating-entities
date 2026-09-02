@@ -4,7 +4,13 @@ local desc = import '../../../descriptions.libsonnet';
 
 function(ctx) {
   local n = ctx.n,
-  local root = self,
+  // Do not derive names through `self`: this object is merged across OKE
+  // platforms, and self can resolve to a later platform's context.
+  local group_names = {
+    admins: n.display_global('grp', ctx.display_segments + ['admins']),
+    rbac_admin: n.display_global('grp', ctx.display_segments + ['rbac-admin']),
+    rbac_viewer: n.display_global('grp', ctx.display_segments + ['rbac-viewer']),
+  },
   local cmp_path = ctx.scope.compartment_path,
   local net_path = ctx.scope.network_compartment_path,
   // Policies attached to their target compartment must use its short name, not a root-relative path.
@@ -23,15 +29,15 @@ function(ctx) {
   groups_configuration+: {
     groups+: {
       [n.key_global('GRP', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
-        name: root._group_names.admins,
+        name: group_names.admins,
         description: desc.group.platform(ctx.env_long_title, 'OKE', 'cluster management administration'),
       },
       [n.key_global('GRP', [ctx.env, 'PLATFORM', ctx.plat, 'RBAC-ADMIN'])]: {
-        name: root._group_names.rbac_admin,
+        name: group_names.rbac_admin,
         description: desc.group.platform(ctx.env_long_title, 'OKE', 'Kubernetes RBAC administration'),
       },
       [n.key_global('GRP', [ctx.env, 'PLATFORM', ctx.plat, 'RBAC-VIEWER'])]: {
-        name: root._group_names.rbac_viewer,
+        name: group_names.rbac_viewer,
         description: desc.group.platform(ctx.env_long_title, 'OKE', 'Kubernetes RBAC viewer'),
       },
     },
@@ -42,24 +48,24 @@ function(ctx) {
       [n.key_global('PCY', [ctx.env, 'PLATFORM', ctx.plat, 'ADMINS'])]: {
         name: n.display_global('pcy', ctx.display_segments + ['admins']),
         description: desc.policy.grants(
-          root._group_names.admins,
+          group_names.admins,
           'OKE platform administration access',
           'the %s environment OKE platform and network compartments' % ctx.env_long_title
         ),
         compartment_id: 'TENANCY-ROOT',
 
         statements: [
-          "allow group 'id_lz_common'/'%s' to read all-resources in compartment %s" % [root._group_names.admins, cmp_path],
-          "allow group 'id_lz_common'/'%s' to manage cluster-family in compartment %s" % [root._group_names.admins, cmp_path],
-          "allow group 'id_lz_common'/'%s' to manage instance-family in compartment %s" % [root._group_names.admins, cmp_path],
-          "allow group 'id_lz_common'/'%s' to use vnics in compartment %s" % [root._group_names.admins, cmp_path],
-          "allow group 'id_lz_common'/'%s' to inspect compartments in compartment %s" % [root._group_names.admins, cmp_path],
-          "allow group 'id_lz_common'/'%s' to read virtual-network-family in compartment %s" % [root._group_names.admins, net_path],
-          "allow group 'id_lz_common'/'%s' to use subnets in compartment %s" % [root._group_names.admins, net_path],
-          "allow group 'id_lz_common'/'%s' to use network-security-groups in compartment %s" % [root._group_names.admins, net_path],
-          "allow group 'id_lz_common'/'%s' to use vnics in compartment %s" % [root._group_names.admins, net_path],
-          "allow group 'id_lz_common'/'%s' to manage private-ips in compartment %s" % [root._group_names.admins, net_path],
-          "allow group 'id_lz_common'/'%s' to use compute-capacity-reservations in compartment %s" % [root._group_names.admins, cmp_path],
+          "allow group 'id_lz_common'/'%s' to read all-resources in compartment %s" % [group_names.admins, cmp_path],
+          "allow group 'id_lz_common'/'%s' to manage cluster-family in compartment %s" % [group_names.admins, cmp_path],
+          "allow group 'id_lz_common'/'%s' to manage instance-family in compartment %s" % [group_names.admins, cmp_path],
+          "allow group 'id_lz_common'/'%s' to use vnics in compartment %s" % [group_names.admins, cmp_path],
+          "allow group 'id_lz_common'/'%s' to inspect compartments in compartment %s" % [group_names.admins, cmp_path],
+          "allow group 'id_lz_common'/'%s' to read virtual-network-family in compartment %s" % [group_names.admins, net_path],
+          "allow group 'id_lz_common'/'%s' to use subnets in compartment %s" % [group_names.admins, net_path],
+          "allow group 'id_lz_common'/'%s' to use network-security-groups in compartment %s" % [group_names.admins, net_path],
+          "allow group 'id_lz_common'/'%s' to use vnics in compartment %s" % [group_names.admins, net_path],
+          "allow group 'id_lz_common'/'%s' to manage private-ips in compartment %s" % [group_names.admins, net_path],
+          "allow group 'id_lz_common'/'%s' to use compute-capacity-reservations in compartment %s" % [group_names.admins, cmp_path],
         ],
       },
 
@@ -73,8 +79,8 @@ function(ctx) {
         compartment_id: 'TENANCY-ROOT',
 
         statements: [
-          "allow group 'id_lz_common'/'%s' to use cluster in compartment %s" % [root._group_names.rbac_admin, cmp_path],
-          "allow group 'id_lz_common'/'%s' to use cluster in compartment %s" % [root._group_names.rbac_viewer, cmp_path],
+          "allow group 'id_lz_common'/'%s' to use cluster in compartment %s" % [group_names.rbac_admin, cmp_path],
+          "allow group 'id_lz_common'/'%s' to use cluster in compartment %s" % [group_names.rbac_viewer, cmp_path],
         ],
       },
 
@@ -181,9 +187,4 @@ function(ctx) {
     },
   },
 
-  _group_names:: {
-    admins: n.display_global('grp', ctx.display_segments + ['admins']),
-    rbac_admin: n.display_global('grp', ctx.display_segments + ['rbac-admin']),
-    rbac_viewer: n.display_global('grp', ctx.display_segments + ['rbac-viewer']),
-  },
 }

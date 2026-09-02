@@ -4,6 +4,7 @@
 // function(config, n) -> topology helper object
 
 function(config, n)
+  local environment_names = import './lib/environment_names.libsonnet';
   local labels = import './labels.libsonnet';
   local raw_env_names = std.objectFields(config.environments);
   local preferred_env_names = ['prod', 'preprod', 'staging', 'uat', 'dev', 'test'];
@@ -11,24 +12,8 @@ function(config, n)
     [name for preferred_name in preferred_env_names for name in raw_env_names if name == preferred_name]
     + [name for name in raw_env_names if !std.member(preferred_env_names, name)];
 
-  local env_labels = {
-    prod: { short: 'Prod', long: 'Production', network: 'Prod', dns: 'p' },
-    preprod: { short: 'PreProd', long: 'Pre-Production', network: 'Pre-Production', dns: 'pp' },
-    dev: { short: 'Dev', long: 'Dev', network: 'Dev', dns: 'd' },
-    staging: { short: 'Staging', long: 'Staging', network: 'Staging', dns: 'st' },
-    uat: { short: 'UAT', long: 'UAT', network: 'UAT', dns: 'ua' },
-    test: { short: 'Test', long: 'Test', network: 'Test', dns: 't' },
-  };
-
   local title_case(name) = labels.title_case(name);
-  local env_label(env_name) =
-    if std.objectHas(env_labels, env_name) then env_labels[env_name]
-    else {
-      short: title_case(env_name),
-      long: title_case(env_name),
-      network: title_case(env_name),
-      dns: env_name[0:2],
-    };
+  local env_label(env_name) = environment_names.label(env_name);
 
   local env_entry(env_name, env_config) =
     local key_segments = [env_name];
