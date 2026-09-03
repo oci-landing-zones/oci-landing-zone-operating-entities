@@ -38,7 +38,7 @@ The One-OE BC/DR design extends an existing One-OE baseline into a DR region whi
 
 <p align="center"><em>Figure 1</em></p>
 
-**Figure 1: Generic two-region One-OE disaster recovery architecture**
+<p align="right"><strong>Figure 1: Generic two-region One-OE disaster recovery architecture</strong></p>
 
 The architecture shows shared management groups, regional hub and production networks, and data replication to the DR region.
 
@@ -66,7 +66,7 @@ This is a multi-stack deployment. Section 4.0 deploys the One-OE baseline stack 
 
 <p align="center"><em>Figure 2</em></p>
 
-**Figure 2: Home-region One-OE stack in Frankfurt**
+<p align="right"><strong>Figure 2: Home-region One-OE stack in Frankfurt</strong></p>
 
 It saves output dependency files in Object Storage so they can be replicated for the BCDR stack.
 
@@ -103,7 +103,7 @@ Do not redeploy or duplicate IAM or home-region-managed security baseline files 
 
 <p align="center"><em>Figure 3</em></p>
 
-**Figure 3: DR-region BCDR stack in Amsterdam**
+<p align="right"><strong>Figure 3: DR-region BCDR stack in Amsterdam</strong></p>
 
 It reads the replicated One-OE output dependency files from Object Storage and does not save a new output file.
 
@@ -203,12 +203,12 @@ All requester and acceptor files are in the [`runtime`](./runtime/) directory.
 
 <p align="center"><em>Figure 4</em></p>
 
-**Figure 4: cross-region RPC. Example: Frankfurt - Amsterdam**
+<p align="right"><strong>Figure 4: cross-region RPC. Example: Frankfurt - Amsterdam</strong></p>
 
 
 | Network visualizer — FRA | Network visualizer — AMS |
 |---|---|
-| <img src="../images/net_view_fra.png" width="600" alt="network visualizer view from FRA"><br><em>Figure 5: Network visualizer view from FRA</em> | <img src="../images/net_view_ams.png" width="600" alt="network visualizer view from AMS"><br><em>Figure 6: Network visualizer view from AMS</em> |
+| <img src="../images/net_view_fra.png" width="600" alt="network visualizer view from FRA"><br><p align="center"><em>Figure 5</em></p><p align="right"><strong>Figure 5: Network visualizer view from FRA</strong></p> | <img src="../images/net_view_ams.png" width="600" alt="network visualizer view from AMS"><br><p align="center"><em>Figure 6</em></p><p align="right"><strong>Figure 6: Network visualizer view from AMS</strong></p> |
 
 
 Use the [OCI Remote Peering Connections addon](/addons/oci-x-rpc/README.md) to follow the required steps and automate this connectivity layer.
