@@ -151,7 +151,7 @@ After the One-OE BCDR addon is deployed, establish the Remote Peering Connection
 
 #### 4.2.1. Replace the Amsterdam requester and Frankfurt acceptor network files
 
-First, in the home region: replace the matching final Frankfurt One-OE network file in the home-region stack with its complete `*_acceptor.json` variant. Each acceptor file contains the final One-OE network configuration plus the FRA-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file. Applying this variant updates the Frankfurt network dependency output, making the acceptor RPC available to the AMS BCDR stack.
+First, in the home region: replace the matching final Frankfurt One-OE network file in the home-region stack with its complete `*_acceptor.json` variant. Each acceptor file contains the final One-OE network configuration plus the FRA-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file. Apply the replacement and confirm that the Frankfurt network output contains the `RPC-FRA-LZ-HUB-DR-KEY` entry and its OCID. Then replicate the updated output dependency files to the DR-region bucket. This second replication is required because the acceptor RPC does not exist in the dependency files replicated before the AMS BCDR stack was created.
 
 
 <img src="../images/op1_2run.png" width="900" alt="cross region rpc">
@@ -179,7 +179,7 @@ region_name	"eu-frankfurt-1"
 
 
 
-Then, in the DR region: to establish an RPC to Frankfurt, replace the matching final network file in the same stack with its complete `*_requester.json` variant after staged hub networking is complete. Each requester file contains the final network configuration plus the AMS-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file.
+Then, in the DR region: after the updated Frankfurt dependency files are available, refresh the BCDR stack dependency and replace the matching final network file in the same stack with its complete `*_requester.json` variant after staged hub networking is complete. Each requester file contains the final network configuration plus the AMS-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file.
 
 <img src="../images/op2_2run.png" width="900" alt="cross region rpc">
 

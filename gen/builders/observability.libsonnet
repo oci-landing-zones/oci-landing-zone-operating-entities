@@ -150,13 +150,13 @@ function(config, n, realm_constants, topo)
         [n.key('AL', ['NETWORK', 'LB'])]: {
           display_name: n.display('al', ['network', 'lb']),
           destination_topic_ids: [n.key('NOTT', ['NETWORK'])],
-          is_enabled: 'false',
+          is_enabled: false,
 
           supplied_alarm: {
             message_format: 'PRETTY_JSON',
             namespace: 'oci_lbaas',
             pending_duration: 'PT5M',
-            query: 'UnHealthyBackendServers[1m].mean() >= 0',
+            query: 'unhealthyBackendServers[1m]{lbComponent = "backendSet"}.max() > 0',
           },
         },
       },
