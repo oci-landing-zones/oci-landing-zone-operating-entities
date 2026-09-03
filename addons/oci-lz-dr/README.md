@@ -21,7 +21,7 @@ In summary: IAM and governance are reused from the home region, Cloud Guard is t
 
 <p align="center"><em>Figure 1</em></p>
 
-<p align="right"><strong>Figure 1: BCDR resource scope</strong></p>
+<p align="left"><strong>Figure 1: BCDR resource scope</strong></p>
 
 <img src="images/ops_view.png" width="900" alt="Multi-stack deployment.One-oe in Home region and DR extension in DR region">
 
@@ -35,7 +35,7 @@ For operational resilience, the landing zone deployment is managed as separate s
 
 <p align="center"><em>Figure 3</em></p>
 
-<p align="right"><strong>Figure 3: DR deployment options across Availability Domains or regions</strong></p>
+<p align="left"><strong>Figure 3: DR deployment options across Availability Domains or regions</strong></p>
 
 The DR workload can reuse the production compartment or run in a dedicated DR compartment; each option can use a separate Availability Domain or a dedicated region. The selected model has different resource provisioning and maintenance requirements. A dedicated DR compartment is useful when a separate team manages DR resources.
 

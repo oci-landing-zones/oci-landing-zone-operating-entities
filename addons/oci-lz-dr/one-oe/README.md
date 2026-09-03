@@ -24,21 +24,21 @@
 
 ## 1. Overview
 
-This folder contains the Disaster Recovery (DR) extension for the published One-OE One-Stack Baseline.
+This folder contains the Disaster Recovery (DR) extension for the published One-OE One-Stack blueprint.
 
-The extension deploys the regional resources required in the DR Region to support cross-region Business Continuity and Disaster Recovery (BC/DR). It complements the existing One-OE baseline by reusing resources that are centrally managed from the tenancy’s Home Region and available across regions.
+The extension deploys the regional resources required in the DR Region to support cross-region Business Continuity and Disaster Recovery (BC/DR). It complements the existing One-OE blueprint by reusing resources that are centrally managed from the tenancy’s Home Region and available across regions.
 
 &nbsp;
 
 ## 2. Design
 
-The One-OE BC/DR design extends an existing One-OE baseline into a DR region while reusing tenancy-level resources managed from the home region.
+The One-OE BC/DR design extends an existing One-OE blueprint into a DR region while reusing tenancy-level resources managed from the home region.
 
 <img src="../images/one-oe-multi-region.png" width="900" alt="Generic two-region One-OE disaster recovery architecture with shared management groups, regional hub and production networks, and data replication to the DR region">
 
 <p align="center"><em>Figure 1</em></p>
 
-<p align="right"><strong>Figure 1: Generic two-region One-OE disaster recovery architecture</strong></p>
+<p align="left"><strong>Figure 1: Generic two-region One-OE disaster recovery architecture</strong></p>
 
 The architecture shows shared management groups, regional hub and production networks, and data replication to the DR region.
 
@@ -49,6 +49,7 @@ The architecture shows shared management groups, regional hub and production net
 For a One-OE DR cross-region extension, the required deployable files are limited to:
 
 - **Network**: regional VCN, DRG, routing, peering, gateways, subnets, and other connectivity resources required by the selected DR pattern.
+- **Inter-region connectivity**: Remote Peering Connection (RPC) resources and the associated DRG attachments and routes. RPC resources are added in the staged connectivity step after the regional network is deployed; use the [OCI Remote Peering Connections addon](/addons/oci-x-rpc/README.md) for cross-tenancy scenarios.
 - **Observability**: regional events, alarms, logs, topics, subscriptions, and monitoring resources required to operate and validate the DR environment.
 - **Security**: regional Vulnerability Scanning Service (VSS) configuration. Security Zones remain managed by the One-OE baseline.
 
@@ -103,7 +104,7 @@ Do not redeploy or duplicate IAM or home-region-managed security baseline files 
 
 <p align="center"><em>Figure 3</em></p>
 
-<p align="right"><strong>Figure 3: DR-region BCDR stack in Amsterdam</strong></p>
+<p align="left"><strong>Figure 3: DR-region BCDR stack in Amsterdam</strong></p>
 
 It reads the replicated One-OE output dependency files from Object Storage and does not save a new output file.
 
@@ -203,12 +204,12 @@ All requester and acceptor files are in the [`runtime`](./runtime/) directory.
 
 <p align="center"><em>Figure 4</em></p>
 
-<p align="right"><strong>Figure 4: cross-region RPC. Example: Frankfurt - Amsterdam</strong></p>
+<p align="left"><strong>Figure 4: cross-region RPC. Example: Frankfurt - Amsterdam</strong></p>
 
 
 | Network visualizer — FRA | Network visualizer — AMS |
 |---|---|
-| <img src="../images/net_view_fra.png" width="600" alt="network visualizer view from FRA"><br><p align="center"><em>Figure 5</em></p><p align="right"><strong>Figure 5: Network visualizer view from FRA</strong></p> | <img src="../images/net_view_ams.png" width="600" alt="network visualizer view from AMS"><br><p align="center"><em>Figure 6</em></p><p align="right"><strong>Figure 6: Network visualizer view from AMS</strong></p> |
+| <img src="../images/net_view_fra.png" width="600" alt="network visualizer view from FRA"><br><p align="center"><em>Figure 5</em></p><p align="left"><strong>Figure 5: Network visualizer view from FRA</strong></p> | <img src="../images/net_view_ams.png" width="600" alt="network visualizer view from AMS"><br><p align="center"><em>Figure 6</em></p><p align="left"><strong>Figure 6: Network visualizer view from AMS</strong></p> |
 
 
 Use the [OCI Remote Peering Connections addon](/addons/oci-x-rpc/README.md) to follow the required steps and automate this connectivity layer.
