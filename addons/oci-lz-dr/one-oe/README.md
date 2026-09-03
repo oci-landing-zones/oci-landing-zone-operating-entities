@@ -66,7 +66,7 @@ This is a multi-stack deployment. Section 4.0 deploys the One-OE baseline stack 
 
 <p align="center"><em>Figure 2</em></p>
 
-<p align="right"><strong>Figure 2: Home-region One-OE stack in Frankfurt</strong></p>
+<p align="left"><strong>Figure 2: Home-region One-OE stack in Frankfurt</strong></p>
 
 It saves output dependency files in Object Storage so they can be replicated for the BCDR stack.
 

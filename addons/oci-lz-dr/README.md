@@ -27,7 +27,7 @@ In summary: IAM and governance are reused from the home region, Cloud Guard is t
 
 <p align="center"><em>Figure 2</em></p>
 
-<p align="right"><strong>Figure 2: Multi-stack deployment</strong></p>
+<p align="left"><strong>Figure 2: Multi-stack deployment</strong></p>
 
 For operational resilience, the landing zone deployment is managed as separate stacks: the One-OE in the home region and the DR extension in the target region. This separation allows each regional deployment to be planned, applied, and operated independently, enabling flexible management and targeted updates without affecting the other region.
 
