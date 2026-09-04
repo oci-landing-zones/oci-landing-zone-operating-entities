@@ -142,7 +142,6 @@
                         "security_lists": {
                             "SL-FRA-LZ-HUB-LB-KEY": {
                                 "display_name"                            : "sl-fra-lz-hub-lb",
-                                "egress_rules"                            : [],
 
                                 "ingress_rules": [
                                     {
@@ -169,6 +168,16 @@
                                         "protocol"                        : "ICMP",
                                         "icmp_type"                       : 8,
                                         "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "Allow outbound ICMP to 10.0.0.0/21",
+                                        "dst"                             : "10.0.0.0/21",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
                                         "stateless"                       : false
                                     }
                                 ]
@@ -228,7 +237,6 @@
 
                             "SL-FRA-LZ-HUB-TRUST-KEY": {
                                 "display_name"                            : "sl-fra-lz-hub-trust",
-                                "egress_rules"                            : [],
 
                                 "ingress_rules": [
                                     {
@@ -249,12 +257,22 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
-                                        "src"                             : "10.0.0.0/21",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo) from 0.0.0.0/0",
+                                        "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
                                         "icmp_type"                       : 8,
                                         "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "Allow outbound ICMP to 0.0.0.0/0",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
                                         "stateless"                       : false
                                     }
                                 ]
@@ -262,7 +280,6 @@
 
                             "SL-FRA-LZ-HUB-UNTRUST-KEY": {
                                 "display_name"                            : "sl-fra-lz-hub-untrust",
-                                "egress_rules"                            : [],
 
                                 "ingress_rules": [
                                     {
@@ -283,12 +300,22 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
-                                        "src"                             : "10.0.0.0/21",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo) from 0.0.0.0/0",
+                                        "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
                                         "icmp_type"                       : 8,
                                         "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "Allow outbound ICMP to 0.0.0.0/0",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
                                         "stateless"                       : false
                                     }
                                 ]
@@ -301,23 +328,23 @@
 
                                 "ingress_rules": {
                                     "http_80": {
-                                        "description"                     : "Allow inbound traffic from Hub Untrust subnet over HTTP",
-                                        "src"                             : "10.0.0.0/24",
+                                        "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTP",
+                                        "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "dst_port_min"                    : 80,
                                         "dst_port_max"                    : 80,
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
                                     },
 
                                     "https_443": {
-                                        "description"                     : "Allow inbound traffic from Hub Untrust subnet over HTTPS",
-                                        "src"                             : "10.0.0.0/24",
+                                        "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTPS",
+                                        "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "dst_port_min"                    : 443,
                                         "dst_port_max"                    : 443,
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
                                     }
                                 },
 
@@ -327,7 +354,7 @@
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
                                     }
                                 }
                             },
@@ -336,69 +363,46 @@
                                 "display_name"                            : "nsg-fra-lz-hub-trust-fw",
 
                                 "ingress_rules": {
-                                    "from_trust_nlb_http": {
-                                        "description"                     : "Allow inbound from NSG nsg-fra-lz-hub-trust-nlb over HTTP",
-                                        "src"                             : "NSG-FRA-LZ-HUB-TRUST-NLB-KEY",
-                                        "src_type"                        : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                    : 80,
-                                        "dst_port_max"                    : 80,
+                                    "from_hub": {
+                                        "description"                     : "Allow inbound traffic from Hub VCN over TCP",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
-                                    },
-
-                                    "from_trust_nlb_https": {
-                                        "description"                     : "Allow inbound from NSG nsg-fra-lz-hub-trust-nlb over HTTPS",
-                                        "src"                             : "NSG-FRA-LZ-HUB-TRUST-NLB-KEY",
-                                        "src_type"                        : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                    : 443,
-                                        "dst_port_max"                    : 443,
-                                        "protocol"                        : "TCP",
-                                        "stateless"                       : false
-                                    },
-
-                                    "from_trust_nlb_icmp": {
-                                        "description"                     : "Allow ICMP type 8 (Echo) from NSG nsg-fra-lz-hub-trust-nlb",
-                                        "src"                             : "NSG-FRA-LZ-HUB-TRUST-NLB-KEY",
-                                        "src_type"                        : "NETWORK_SECURITY_GROUP",
-                                        "protocol"                        : "ICMP",
-                                        "icmp_type"                       : 8,
-                                        "icmp_code"                       : 0,
-                                        "stateless"                       : false
-                                    },
-
-                                    "from_trust_nlb_ssh": {
-                                        "description"                     : "Allow inbound from NSG nsg-fra-lz-hub-trust-nlb over SSH",
-                                        "src"                             : "NSG-FRA-LZ-HUB-TRUST-NLB-KEY",
-                                        "src_type"                        : "NETWORK_SECURITY_GROUP",
-                                        "dst_port_min"                    : 22,
-                                        "dst_port_max"                    : 22,
-                                        "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "description"                     : "Allow outbound traffic to 0.0.0.0/0 over TCP",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ALL",
-                                        "stateless"                       : false
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
                                     }
                                 }
                             },
 
                             "NSG-FRA-LZ-HUB-TRUST-NLB-KEY": {
                                 "display_name"                            : "nsg-fra-lz-hub-trust-nlb",
-                                "ingress_rules"                           : {},
+
+                                "ingress_rules": {
+                                    "from_hub": {
+                                        "description"                     : "Allow inbound traffic from Hub VCN over TCP",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    }
+                                },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "description"                     : "Allow outbound traffic to 0.0.0.0/0 over TCP",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ALL",
-                                        "stateless"                       : false
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
                                     }
                                 }
                             },
@@ -407,22 +411,66 @@
                                 "display_name"                            : "nsg-fra-lz-hub-untrust-fw",
 
                                 "ingress_rules": {
-                                    "from_untrust_nlb": {
-                                        "description"                     : "Allow inbound from NSG nsg-fra-lz-hub-untrust-nlb over TCP ALL",
-                                        "src"                             : "NSG-FRA-LZ-HUB-UNTRUST-NLB-KEY",
-                                        "src_type"                        : "NETWORK_SECURITY_GROUP",
+                                    "http_80": {
+                                        "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTP",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 80,
+                                        "dst_port_max"                    : 80,
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
+                                    },
+
+                                    "https_443": {
+                                        "description"                     : "Allow inbound traffic from 0.0.0.0/0 over HTTPS",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 443,
+                                        "dst_port_max"                    : 443,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
+                                    "from_hub": {
+                                        "description"                     : "Allow inbound traffic from Hub VCN over TCP",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
+                                    "http_return_80": {
+                                        "description"                     : "Return flow: allow inbound traffic from 0.0.0.0/0 over HTTP to ephemeral ports",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "src_port_min"                    : 80,
+                                        "src_port_max"                    : 80,
+                                        "dst_port_min"                    : 1024,
+                                        "dst_port_max"                    : 65535,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
+                                    "https_return_443": {
+                                        "description"                     : "Return flow: allow inbound traffic from 0.0.0.0/0 over HTTPS to ephemeral ports",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "src_port_min"                    : 443,
+                                        "src_port_max"                    : 443,
+                                        "dst_port_min"                    : 1024,
+                                        "dst_port_max"                    : 65535,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ALL",
-                                        "stateless"                       : false
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
                                     }
                                 }
                             },
@@ -438,7 +486,7 @@
                                         "dst_port_min"                    : 80,
                                         "dst_port_max"                    : 80,
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
                                     },
 
                                     "https_443": {
@@ -448,17 +496,25 @@
                                         "dst_port_min"                    : 443,
                                         "dst_port_max"                    : 443,
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
+                                    },
+
+                                    "from_hub": {
+                                        "description"                     : "Allow inbound traffic from Hub VCN over TCP",
+                                        "src"                             : "10.0.0.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
                                     }
                                 },
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ALL",
-                                        "stateless"                       : false
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
                                     }
                                 }
                             }

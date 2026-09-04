@@ -2,7 +2,7 @@
 // Subnets: untrust, trust, lb, mgmt, mon, dns.
 // DRG ingress route table, NLBs (trust + untrust), L7 LB.
 //
-// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc, backends }
+// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, spoke_ingress_nsg_keys, lb_return_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc, backends }
 //
 // hub_ctx.naming: naming object from naming('fra')
 // hub_ctx.hub_config: { kind: 'hub_c', network: { vcn: '...', subnets: { untrust, trust, lb, mgmt, mon, dns } } }
@@ -135,103 +135,112 @@ function(hub_ctx)
 
                 default_security_list: common._empty_default_security_list,
 
-                security_lists: common._icmp_sl(n, ['HUB', 'LB'], vcn_cidr)
-                  + common._icmp_sl(n, ['HUB', 'TRUST'], vcn_cidr)
-                  + common._icmp_sl(n, ['HUB', 'UNTRUST'], vcn_cidr)
+                security_lists: common._icmp_sl(n, ['HUB', 'LB'], vcn_cidr, egress_cidr=vcn_cidr)
+                  + common._icmp_sl(
+                    n,
+                    ['HUB', 'TRUST'],
+                    vcn_cidr,
+                    echo_cidr='0.0.0.0/0',
+                    echo_source_label='0.0.0.0/0',
+                    egress_cidr='0.0.0.0/0'
+                  )
+                  + common._icmp_sl(
+                    n,
+                    ['HUB', 'UNTRUST'],
+                    vcn_cidr,
+                    echo_cidr='0.0.0.0/0',
+                    echo_source_label='0.0.0.0/0',
+                    egress_cidr='0.0.0.0/0'
+                  )
                   + common._mgmt_security_list(n, vcn_cidr, bastion_ip),
 
-                network_security_groups: {
-                  [n.key('NSG', ['HUB', 'LB'])]: {
-                    display_name: n.display('nsg', ['hub', 'lb']),
-                    egress_rules: common._nsg_egress_tcp_only,
-
-                    ingress_rules: {
-                      http_80: common._tcp_ingress_rule(
-                        'Allow inbound traffic from Hub Untrust subnet over HTTP',
-                        subnets.untrust,
-                        80
-                      ),
-
-                      https_443: common._tcp_ingress_rule(
-                        'Allow inbound traffic from Hub Untrust subnet over HTTPS',
-                        subnets.untrust,
-                        443
-                      ),
-                    },
-                  },
-
+                network_security_groups: lb._lb_nsg(n, stateless=true) {
                   [n.key('NSG', ['HUB', 'TRUST', 'FW'])]: {
                     display_name: n.display('nsg', ['hub', 'trust', 'fw']),
-                    egress_rules: common._nsg_egress_all_protocols,
-
-                    ingress_rules: {
-                      from_trust_nlb_http: common._tcp_ingress_rule(
-                        'Allow inbound from NSG %s over HTTP' % n.display('nsg', ['hub', 'trust', 'nlb']),
-                        n.key('NSG', ['HUB', 'TRUST', 'NLB']),
-                        80,
-                        src_type='NETWORK_SECURITY_GROUP'
-                      ),
-
-                      from_trust_nlb_https: common._tcp_ingress_rule(
-                        'Allow inbound from NSG %s over HTTPS' % n.display('nsg', ['hub', 'trust', 'nlb']),
-                        n.key('NSG', ['HUB', 'TRUST', 'NLB']),
-                        443,
-                        src_type='NETWORK_SECURITY_GROUP'
-                      ),
-
-                      from_trust_nlb_icmp: {
-                        description: 'Allow ICMP type 8 (Echo) from NSG %s' % n.display('nsg', ['hub', 'trust', 'nlb']),
-                        src: n.key('NSG', ['HUB', 'TRUST', 'NLB']),
-                        src_type: 'NETWORK_SECURITY_GROUP',
-                        protocol: 'ICMP',
-                        icmp_type: 8,
-                        icmp_code: 0,
-                        stateless: false,
+                    egress_rules: common._nsg_egress_tcp_stateless {
+                      anywhere+: {
+                        description: 'Allow outbound traffic to 0.0.0.0/0 over TCP',
                       },
-
-                      from_trust_nlb_ssh: common._tcp_ingress_rule(
-                        'Allow inbound from NSG %s over SSH' % n.display('nsg', ['hub', 'trust', 'nlb']),
-                        n.key('NSG', ['HUB', 'TRUST', 'NLB']),
-                        22,
-                        src_type='NETWORK_SECURITY_GROUP'
+                    },
+                    ingress_rules: {
+                      from_hub: common._tcp_ingress_rule(
+                        'Allow inbound traffic from Hub VCN over TCP',
+                        vcn_cidr,
+                        stateless=true
                       ),
                     },
                   },
 
                   [n.key('NSG', ['HUB', 'TRUST', 'NLB'])]: {
                     display_name: n.display('nsg', ['hub', 'trust', 'nlb']),
-                    ingress_rules: {},
-                    egress_rules: common._nsg_egress_all_protocols,
+                    ingress_rules: {
+                      from_hub: common._tcp_ingress_rule(
+                        'Allow inbound traffic from Hub VCN over TCP',
+                        vcn_cidr,
+                        stateless=true
+                      ),
+                    },
+                    egress_rules: common._nsg_egress_tcp_stateless {
+                      anywhere+: {
+                        description: 'Allow outbound traffic to 0.0.0.0/0 over TCP',
+                      },
+                    },
                   },
 
                   [n.key('NSG', ['HUB', 'UNTRUST', 'FW'])]: {
                     display_name: n.display('nsg', ['hub', 'untrust', 'fw']),
-                    egress_rules: common._nsg_egress_all_protocols,
-
+                    egress_rules: common._nsg_egress_tcp_stateless,
                     ingress_rules: {
-                      from_untrust_nlb: common._tcp_ingress_rule(
-                        'Allow inbound from NSG %s over TCP ALL' % n.display('nsg', ['hub', 'untrust', 'nlb']),
-                        n.key('NSG', ['HUB', 'UNTRUST', 'NLB']),
-                        src_type='NETWORK_SECURITY_GROUP'
+                      from_hub: common._tcp_ingress_rule(
+                        'Allow inbound traffic from Hub VCN over TCP',
+                        vcn_cidr,
+                        stateless=true
+                      ),
+                      http_80: common._tcp_ingress_rule(
+                        'Allow inbound traffic from 0.0.0.0/0 over HTTP',
+                        '0.0.0.0/0',
+                        80,
+                        stateless=true
+                      ),
+                      https_443: common._tcp_ingress_rule(
+                        'Allow inbound traffic from 0.0.0.0/0 over HTTPS',
+                        '0.0.0.0/0',
+                        443,
+                        stateless=true
+                      ),
+                      http_return_80: common._tcp_return_ingress_rule(
+                        'Return flow: allow inbound traffic from 0.0.0.0/0 over HTTP to ephemeral ports',
+                        '0.0.0.0/0',
+                        80
+                      ),
+                      https_return_443: common._tcp_return_ingress_rule(
+                        'Return flow: allow inbound traffic from 0.0.0.0/0 over HTTPS to ephemeral ports',
+                        '0.0.0.0/0',
+                        443
                       ),
                     },
                   },
 
                   [n.key('NSG', ['HUB', 'UNTRUST', 'NLB'])]: {
                     display_name: n.display('nsg', ['hub', 'untrust', 'nlb']),
-                    egress_rules: common._nsg_egress_all_protocols,
-
+                    egress_rules: common._nsg_egress_tcp_stateless,
                     ingress_rules: {
+                      from_hub: common._tcp_ingress_rule(
+                        'Allow inbound traffic from Hub VCN over TCP',
+                        vcn_cidr,
+                        stateless=true
+                      ),
                       https_443: common._tcp_ingress_rule(
                         'Allow inbound traffic from 0.0.0.0/0 over HTTPS',
                         '0.0.0.0/0',
-                        443
+                        443,
+                        stateless=true
                       ),
-
                       http_80: common._tcp_ingress_rule(
                         'Allow inbound traffic from 0.0.0.0/0 over HTTP',
                         '0.0.0.0/0',
-                        80
+                        80,
+                        stateless=true
                       ),
                     },
                   },
@@ -322,6 +331,11 @@ function(hub_ctx)
     ],
 
     fw_nsg_key: n.key('NSG', ['HUB', 'TRUST', 'NLB']),
+    spoke_ingress_nsg_keys: [
+      n.key('NSG', ['HUB', 'TRUST', 'FW']),
+      n.key('NSG', ['HUB', 'TRUST', 'NLB']),
+    ],
+    lb_return_nsg_key: n.key('NSG', ['HUB', 'LB']),
 
     has_spoke_natgw: false,
 

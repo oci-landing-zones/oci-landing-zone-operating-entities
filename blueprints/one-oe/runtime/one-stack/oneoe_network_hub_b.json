@@ -248,7 +248,6 @@
                         "security_lists": {
                             "SL-FRA-LZ-HUB-LB-KEY": {
                                 "display_name"                            : "sl-fra-lz-hub-lb",
-                                "egress_rules"                            : [],
 
                                 "ingress_rules": [
                                     {
@@ -277,12 +276,21 @@
                                         "icmp_code"                       : 0,
                                         "stateless"                       : false
                                     }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "Allow outbound ICMP to 10.0.0.0/21",
+                                        "dst"                             : "10.0.0.0/21",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
+                                        "stateless"                       : false
+                                    }
                                 ]
                             },
 
                             "SL-FRA-LZ-HUB-FW-KEY": {
                                 "display_name"                            : "sl-fra-lz-hub-fw",
-                                "egress_rules"                            : [],
 
                                 "ingress_rules": [
                                     {
@@ -303,12 +311,22 @@
                                         "stateless"                       : false
                                     },
                                     {
-                                        "description"                     : "Allow inbound ICMP type 8 (Echo)",
-                                        "src"                             : "10.0.0.0/21",
+                                        "description"                     : "Allow inbound ICMP type 8 (Echo) from 0.0.0.0/0",
+                                        "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "ICMP",
                                         "icmp_type"                       : 8,
                                         "icmp_code"                       : 0,
+                                        "stateless"                       : false
+                                    }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"                     : "Allow outbound ICMP to 0.0.0.0/0",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ICMP",
                                         "stateless"                       : false
                                     }
                                 ]
@@ -379,7 +397,7 @@
                                         "dst_port_min"                    : 80,
                                         "dst_port_max"                    : 80,
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
                                     },
 
                                     "https_443": {
@@ -389,7 +407,55 @@
                                         "dst_port_min"                    : 443,
                                         "dst_port_max"                    : 443,
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
+                                    },
+
+                                    "http_preprod_80": {
+                                        "description"                     : "Return flow: allow inbound traffic from PreProd VCN over HTTP to ephemeral ports",
+                                        "src"                             : "10.0.128.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "src_port_min"                    : 80,
+                                        "src_port_max"                    : 80,
+                                        "dst_port_min"                    : 1024,
+                                        "dst_port_max"                    : 65535,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
+                                    "http_prod_80": {
+                                        "description"                     : "Return flow: allow inbound traffic from Prod VCN over HTTP to ephemeral ports",
+                                        "src"                             : "10.0.64.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "src_port_min"                    : 80,
+                                        "src_port_max"                    : 80,
+                                        "dst_port_min"                    : 1024,
+                                        "dst_port_max"                    : 65535,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
+                                    "https_preprod_443": {
+                                        "description"                     : "Return flow: allow inbound traffic from PreProd VCN over HTTPS to ephemeral ports",
+                                        "src"                             : "10.0.128.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "src_port_min"                    : 443,
+                                        "src_port_max"                    : 443,
+                                        "dst_port_min"                    : 1024,
+                                        "dst_port_max"                    : 65535,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
+                                    "https_prod_443": {
+                                        "description"                     : "Return flow: allow inbound traffic from Prod VCN over HTTPS to ephemeral ports",
+                                        "src"                             : "10.0.64.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "src_port_min"                    : 443,
+                                        "src_port_max"                    : 443,
+                                        "dst_port_min"                    : 1024,
+                                        "dst_port_max"                    : 65535,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
                                     }
                                 },
 
@@ -399,7 +465,7 @@
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
                                     }
                                 }
                             },
@@ -408,90 +474,62 @@
                                 "display_name"                            : "nsg-fra-lz-hub-fw",
 
                                 "ingress_rules": {
-                                    "from_lb": {
-                                        "description"                     : "Allow inbound traffic from Hub LB subnet over all protocols",
-                                        "src"                             : "10.0.0.0/24",
+                                    "from_hub": {
+                                        "description"                     : "Allow inbound traffic from Hub VCN over TCP",
+                                        "src"                             : "10.0.0.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ALL",
+                                        "protocol"                        : "TCP",
                                         "stateless"                       : true
                                     },
 
-                                    "from_prod_http": {
-                                        "description"                     : "Allow inbound traffic from Prod VCN over HTTP",
-                                        "src"                             : "10.0.64.0/21",
-                                        "src_type"                        : "CIDR_BLOCK",
-                                        "dst_port_min"                    : 80,
-                                        "dst_port_max"                    : 80,
-                                        "protocol"                        : "TCP",
-                                        "stateless"                       : false
-                                    },
-
-                                    "from_prod_https": {
-                                        "description"                     : "Allow inbound traffic from Prod VCN over HTTPS",
-                                        "src"                             : "10.0.64.0/21",
-                                        "src_type"                        : "CIDR_BLOCK",
-                                        "dst_port_min"                    : 443,
-                                        "dst_port_max"                    : 443,
-                                        "protocol"                        : "TCP",
-                                        "stateless"                       : false
-                                    },
-
-                                    "from_prod_icmp": {
-                                        "description"                     : "Allow ICMP type 8 (Echo) from Prod VCN",
-                                        "src"                             : "10.0.64.0/21",
-                                        "src_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ICMP",
-                                        "icmp_type"                       : 8,
-                                        "icmp_code"                       : 0,
-                                        "stateless"                       : false
-                                    },
-
-                                    "from_preprod_http": {
-                                        "description"                     : "Allow inbound traffic from PreProd VCN over HTTP",
+                                    "from_preprod": {
+                                        "description"                     : "Allow inbound traffic from PreProd VCN over TCP",
                                         "src"                             : "10.0.128.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
-                                        "dst_port_min"                    : 80,
-                                        "dst_port_max"                    : 80,
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
                                     },
 
-                                    "from_preprod_https": {
-                                        "description"                     : "Allow inbound traffic from PreProd VCN over HTTPS",
-                                        "src"                             : "10.0.128.0/21",
+                                    "from_prod": {
+                                        "description"                     : "Allow inbound traffic from Prod VCN over TCP",
+                                        "src"                             : "10.0.64.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
-                                        "dst_port_min"                    : 443,
-                                        "dst_port_max"                    : 443,
                                         "protocol"                        : "TCP",
-                                        "stateless"                       : false
+                                        "stateless"                       : true
                                     },
 
-                                    "from_preprod_icmp": {
-                                        "description"                     : "Allow ICMP type 8 (Echo) from PreProd VCN",
-                                        "src"                             : "10.0.128.0/21",
+                                    "http_return_80": {
+                                        "description"                     : "Return flow: allow inbound traffic from 0.0.0.0/0 over HTTP to ephemeral ports",
+                                        "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ICMP",
-                                        "icmp_type"                       : 8,
-                                        "icmp_code"                       : 0,
-                                        "stateless"                       : false
+                                        "src_port_min"                    : 80,
+                                        "src_port_max"                    : 80,
+                                        "dst_port_min"                    : 1024,
+                                        "dst_port_max"                    : 65535,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
+                                    "https_return_443": {
+                                        "description"                     : "Return flow: allow inbound traffic from 0.0.0.0/0 over HTTPS to ephemeral ports",
+                                        "src"                             : "0.0.0.0/0",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "src_port_min"                    : 443,
+                                        "src_port_max"                    : 443,
+                                        "dst_port_min"                    : 1024,
+                                        "dst_port_max"                    : 65535,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
                                     }
                                 },
 
                                 "egress_rules": {
-                                    "to_lb": {
-                                        "description"                     : "Allow all outbound traffic to LB subnet over all protocols",
-                                        "dst"                             : "10.0.0.0/24",
-                                        "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ALL",
-                                        "stateless"                       : true
-                                    },
-
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over all protocols",
+                                        "description"                     : "Allow outbound traffic to 0.0.0.0/0 over TCP",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ALL",
-                                        "stateless"                       : false
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
                                     }
                                 }
                             }
@@ -986,10 +1024,10 @@
 
                                 "egress_rules": [
                                     {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over ALL protocols",
+                                        "description"                     : "Allow outbound ICMP to 0.0.0.0/0",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ALL",
+                                        "protocol"                        : "ICMP",
                                         "stateless"                       : false
                                     },
                                     {
@@ -1042,10 +1080,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "TCP",
+                                        "protocol"                        : "ALL",
                                         "stateless"                       : false
                                     }
                                 }
@@ -1069,10 +1107,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "TCP",
+                                        "protocol"                        : "ALL",
                                         "stateless"                       : false
                                     }
                                 }
@@ -1116,10 +1154,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "TCP",
+                                        "protocol"                        : "ALL",
                                         "stateless"                       : false
                                     }
                                 }
@@ -1260,10 +1298,10 @@
 
                                 "egress_rules": [
                                     {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over ALL protocols",
+                                        "description"                     : "Allow outbound ICMP to 0.0.0.0/0",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ALL",
+                                        "protocol"                        : "ICMP",
                                         "stateless"                       : false
                                     },
                                     {
@@ -1316,10 +1354,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "TCP",
+                                        "protocol"                        : "ALL",
                                         "stateless"                       : false
                                     }
                                 }
@@ -1363,10 +1401,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "TCP",
+                                        "protocol"                        : "ALL",
                                         "stateless"                       : false
                                     }
                                 }
@@ -1390,10 +1428,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                             : "0.0.0.0/0",
                                         "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "TCP",
+                                        "protocol"                        : "ALL",
                                         "stateless"                       : false
                                     }
                                 }

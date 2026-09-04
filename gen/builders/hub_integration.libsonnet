@@ -69,29 +69,45 @@ function(params)
   // --- 4. Firewall NSG Ingress Rules ---
   local nsg_fw_spoke_ingress = std.foldl(
     function(acc, e) acc {
-      ['from_%s_http' % e.name]: common._tcp_ingress_rule(
-        'Allow inbound traffic from %s VCN over HTTP' % e.display,
+      ['from_%s' % e.name]: common._tcp_ingress_rule(
+        'Allow inbound traffic from %s VCN over TCP' % e.display,
         e.vcn,
-        80
+        stateless=true
       ),
-      ['from_%s_https' % e.name]: common._tcp_ingress_rule(
-        'Allow inbound traffic from %s VCN over HTTPS' % e.display,
-        e.vcn,
-        443
-      ),
-      ['from_%s_icmp' % e.name]: {
-        description: 'Allow ICMP type 8 (Echo) from %s VCN' % e.display,
-        src: e.vcn,
-        src_type: 'CIDR_BLOCK',
-        protocol: 'ICMP',
-        icmp_type: 8,
-        icmp_code: 0,
-        stateless: false,
-      },
     },
     all_vcn_entries,
     {}
   );
+
+  local nsg_lb_spoke_return = std.foldl(
+    function(acc, e) acc {
+      ['http_%s_80' % e.name]: common._tcp_return_ingress_rule(
+        'Return flow: allow inbound traffic from %s VCN over HTTP to ephemeral ports' % e.display,
+        e.vcn,
+        80
+      ),
+      ['https_%s_443' % e.name]: common._tcp_return_ingress_rule(
+        'Return flow: allow inbound traffic from %s VCN over HTTPS to ephemeral ports' % e.display,
+        e.vcn,
+        443
+      ),
+    },
+    all_vcn_entries,
+    {}
+  );
+
+  local nsg_ingress_overlay(nsg_key, rules) = {
+    [nsg_key]+: { ingress_rules+: rules },
+  };
+  local nsg_fw_overlays = std.foldl(
+    function(acc, nsg_key) acc + nsg_ingress_overlay(nsg_key, nsg_fw_spoke_ingress),
+    hub.spoke_ingress_nsg_keys,
+    {}
+  );
+  local nsg_lb_overlay =
+    if hub.lb_return_nsg_key == null then {}
+    else nsg_ingress_overlay(hub.lb_return_nsg_key, nsg_lb_spoke_return);
+  local nsg_integration_overlays = nsg_fw_overlays + nsg_lb_overlay;
 
   // --- 5. Post-Deploy Routes ---
   // Route rules through firewall IP for each VCN CIDR
@@ -123,9 +139,10 @@ function(params)
                 hub.spoke_route_tables,
                 hub_spoke_routes_via_drg
               ),
-            } + (if hub.fw_nsg_key != null then {
+            } + (if std.length(std.objectFields(nsg_integration_overlays)) > 0 then {
                    network_security_groups+: {
-                     [hub.fw_nsg_key]+: { ingress_rules+: nsg_fw_spoke_ingress },
+                     [key]+: nsg_integration_overlays[key]
+                     for key in std.objectFields(nsg_integration_overlays)
                    },
                  } else {}),
           },
