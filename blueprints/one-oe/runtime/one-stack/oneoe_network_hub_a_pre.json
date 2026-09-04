@@ -227,7 +227,7 @@
                                         "stateless"                       : false
                                     }
                                 ],
-                    
+
                                 "egress_rules": [
                                     {
                                         "description"                     : "Allow outbound ICMP to 0.0.0.0/0",
@@ -447,30 +447,6 @@
                                         "stateless"                       : true
                                     },
 
-                                    "http_prod_80": {
-                                        "description"                     : "Return flow: allow inbound traffic from Prod VCN over HTTP to ephemeral ports",
-                                        "src"                             : "10.0.64.0/21",
-                                        "src_type"                        : "CIDR_BLOCK",
-                                        "src_port_min"                    : 80,
-                                        "src_port_max"                    : 80,
-                                        "dst_port_min"                    : 1024,
-                                        "dst_port_max"                    : 65535,
-                                        "protocol"                        : "TCP",
-                                        "stateless"                       : true
-                                    },
-
-                                    "https_prod_443": {
-                                        "description"                     : "Return flow: allow inbound traffic from Prod VCN over HTTPS to ephemeral ports",
-                                        "src"                             : "10.0.64.0/21",
-                                        "src_type"                        : "CIDR_BLOCK",
-                                        "src_port_min"                    : 443,
-                                        "src_port_max"                    : 443,
-                                        "dst_port_min"                    : 1024,
-                                        "dst_port_max"                    : 65535,
-                                        "protocol"                        : "TCP",
-                                        "stateless"                       : true
-                                    },
-                            
                                     "http_preprod_80": {
                                         "description"                     : "Return flow: allow inbound traffic from PreProd VCN over HTTP to ephemeral ports",
                                         "src"                             : "10.0.128.0/21",
@@ -483,9 +459,33 @@
                                         "stateless"                       : true
                                     },
 
+                                    "http_prod_80": {
+                                        "description"                     : "Return flow: allow inbound traffic from Prod VCN over HTTP to ephemeral ports",
+                                        "src"                             : "10.0.64.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "src_port_min"                    : 80,
+                                        "src_port_max"                    : 80,
+                                        "dst_port_min"                    : 1024,
+                                        "dst_port_max"                    : 65535,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
                                     "https_preprod_443": {
                                         "description"                     : "Return flow: allow inbound traffic from PreProd VCN over HTTPS to ephemeral ports",
                                         "src"                             : "10.0.128.0/21",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "src_port_min"                    : 443,
+                                        "src_port_max"                    : 443,
+                                        "dst_port_min"                    : 1024,
+                                        "dst_port_max"                    : 65535,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : true
+                                    },
+
+                                    "https_prod_443": {
+                                        "description"                     : "Return flow: allow inbound traffic from Prod VCN over HTTPS to ephemeral ports",
+                                        "src"                             : "10.0.64.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "src_port_min"                    : 443,
                                         "src_port_max"                    : 443,
@@ -519,17 +519,17 @@
                                         "stateless"                       : true
                                     },
 
-                                    "from_prod": {
-                                        "description"                     : "Allow inbound traffic from Prod VCN over TCP",
-                                        "src"                             : "10.0.64.0/21",
+                                    "from_preprod": {
+                                        "description"                     : "Allow inbound traffic from PreProd VCN over TCP",
+                                        "src"                             : "10.0.128.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "TCP",
                                         "stateless"                       : true
                                     },
 
-                                    "from_preprod": {
-                                        "description"                     : "Allow inbound traffic from PreProd VCN over TCP",
-                                        "src"                             : "10.0.128.0/21",
+                                    "from_prod": {
+                                        "description"                     : "Allow inbound traffic from Prod VCN over TCP",
+                                        "src"                             : "10.0.64.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "protocol"                        : "TCP",
                                         "stateless"                       : true
@@ -1120,7 +1120,7 @@
                                     }
                                 ],
 
-                                "egress_rules": [                                   
+                                "egress_rules": [
                                     {
                                         "description"                     : "Allow outbound ICMP to 0.0.0.0/0",
                                         "dst"                             : "0.0.0.0/0",
@@ -1140,53 +1140,6 @@
                         },
 
                         "network_security_groups": {
-                            "NSG-FRA-LZ-PROD-PROJ1-WEB-KEY": {
-                                "display_name"                            : "nsg-fra-lz-prod-proj1-web",
-                                "compartment_id"                          : "CMP-LZ-PROD-PROJ1-KEY",
-
-                                "ingress_rules": {
-                                    "http_80": {
-                                        "description"                     : "Allow inbound traffic from Hub LB subnet over HTTP",
-                                        "src"                             : "10.0.1.0/24",
-                                        "src_type"                        : "CIDR_BLOCK",
-                                        "dst_port_min"                    : 80,
-                                        "dst_port_max"                    : 80,
-                                        "protocol"                        : "TCP",
-                                        "stateless"                       : false
-                                    },
-
-                                    "https_443": {
-                                        "description"                     : "Allow inbound traffic from Hub LB subnet over HTTPS",
-                                        "src"                             : "10.0.1.0/24",
-                                        "src_type"                        : "CIDR_BLOCK",
-                                        "dst_port_min"                    : 443,
-                                        "dst_port_max"                    : 443,
-                                        "protocol"                        : "TCP",
-                                        "stateless"                       : false
-                                    },
-
-                                    "ssh_22": {
-                                        "description"                     : "Allow inbound traffic from Hub management subnet over SSH",
-                                        "src"                             : "10.0.3.0/24",
-                                        "src_type"                        : "CIDR_BLOCK",
-                                        "dst_port_min"                    : 22,
-                                        "dst_port_max"                    : 22,
-                                        "protocol"                        : "TCP",
-                                        "stateless"                       : false
-                                    }
-                                },
-
-                                "egress_rules": {
-                                    "anywhere": {
-                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0",
-                                        "dst"                             : "0.0.0.0/0",
-                                        "dst_type"                        : "CIDR_BLOCK",
-                                        "protocol"                        : "ALL",
-                                        "stateless"                       : false
-                                    }
-                                }
-                            },
-                            
                             "NSG-FRA-LZ-PROD-PROJ1-APP-KEY": {
                                 "display_name"                            : "nsg-fra-lz-prod-proj1-app",
                                 "compartment_id"                          : "CMP-LZ-PROD-PROJ1-KEY",
@@ -1245,6 +1198,53 @@
                                         "src_type"                        : "NETWORK_SECURITY_GROUP",
                                         "dst_port_min"                    : 1521,
                                         "dst_port_max"                    : 1521,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                     : "Allow all outbound traffic to 0.0.0.0/0",
+                                        "dst"                             : "0.0.0.0/0",
+                                        "dst_type"                        : "CIDR_BLOCK",
+                                        "protocol"                        : "ALL",
+                                        "stateless"                       : false
+                                    }
+                                }
+                            },
+
+                            "NSG-FRA-LZ-PROD-PROJ1-WEB-KEY": {
+                                "display_name"                            : "nsg-fra-lz-prod-proj1-web",
+                                "compartment_id"                          : "CMP-LZ-PROD-PROJ1-KEY",
+
+                                "ingress_rules": {
+                                    "http_80": {
+                                        "description"                     : "Allow inbound traffic from Hub LB subnet over HTTP",
+                                        "src"                             : "10.0.1.0/24",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 80,
+                                        "dst_port_max"                    : 80,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+
+                                    "https_443": {
+                                        "description"                     : "Allow inbound traffic from Hub LB subnet over HTTPS",
+                                        "src"                             : "10.0.1.0/24",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 443,
+                                        "dst_port_max"                    : 443,
+                                        "protocol"                        : "TCP",
+                                        "stateless"                       : false
+                                    },
+
+                                    "ssh_22": {
+                                        "description"                     : "Allow inbound traffic from Hub management subnet over SSH",
+                                        "src"                             : "10.0.3.0/24",
+                                        "src_type"                        : "CIDR_BLOCK",
+                                        "dst_port_min"                    : 22,
+                                        "dst_port_max"                    : 22,
                                         "protocol"                        : "TCP",
                                         "stateless"                       : false
                                     }
