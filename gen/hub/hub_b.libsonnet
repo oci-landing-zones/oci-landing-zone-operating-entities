@@ -2,7 +2,7 @@
 // Subnets: lb, fw, mgmt, mon, dns.
 // DRG ingress route table, one OCI Network Firewall, L7 LB.
 //
-// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc }
+// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, spoke_ingress_nsg_keys, lb_return_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc }
 //
 // hub_ctx.naming: naming object from naming('fra')
 // hub_ctx.hub_config: { kind: 'hub_b', network: { vcn: '...', subnets: { lb, fw, mgmt, mon, dns } } }
@@ -82,32 +82,41 @@ function(hub_ctx)
 
                 default_security_list: common._empty_default_security_list,
 
-                security_lists: common._icmp_sl(n, ['HUB', 'LB'], vcn_cidr)
-                  + common._icmp_sl(n, ['HUB', 'FW'], vcn_cidr)
+                security_lists: common._icmp_sl(n, ['HUB', 'LB'], vcn_cidr, egress_cidr=vcn_cidr)
+                  + common._icmp_sl(
+                    n,
+                    ['HUB', 'FW'],
+                    vcn_cidr,
+                    echo_cidr='0.0.0.0/0',
+                    echo_source_label='0.0.0.0/0',
+                    egress_cidr='0.0.0.0/0'
+                  )
                   + common._mgmt_security_list(n, vcn_cidr, bastion_ip),
 
-                network_security_groups: lb._lb_nsg(n) {
+                network_security_groups: lb._lb_nsg(n, stateless=true) {
                   [n.key('NSG', ['HUB', 'FW'])]: {
                     display_name: n.display('nsg', ['hub', 'fw']),
-
-                    egress_rules: common._nsg_egress_all_protocols {
-                      to_lb: {
-                        description: 'Allow all outbound traffic to LB subnet over all protocols',
-                        dst: subnets.lb,
-                        dst_type: 'CIDR_BLOCK',
-                        protocol: 'ALL',
-                        stateless: true,
+                    egress_rules: common._nsg_egress_tcp_stateless {
+                      anywhere+: {
+                        description: 'Allow outbound traffic to 0.0.0.0/0 over TCP',
                       },
                     },
-
                     ingress_rules: {
-                      from_lb: {
-                        description: 'Allow inbound traffic from Hub LB subnet over all protocols',
-                        src: subnets.lb,
-                        src_type: 'CIDR_BLOCK',
-                        protocol: 'ALL',
-                        stateless: true,
-                      },
+                      from_hub: common._tcp_ingress_rule(
+                        'Allow inbound traffic from Hub VCN over TCP',
+                        vcn_cidr,
+                        stateless=true
+                      ),
+                      http_return_80: common._tcp_return_ingress_rule(
+                        'Return flow: allow inbound traffic from 0.0.0.0/0 over HTTP to ephemeral ports',
+                        '0.0.0.0/0',
+                        80
+                      ),
+                      https_return_443: common._tcp_return_ingress_rule(
+                        'Return flow: allow inbound traffic from 0.0.0.0/0 over HTTPS to ephemeral ports',
+                        '0.0.0.0/0',
+                        443
+                      ),
                     },
                   },
                 },
@@ -216,6 +225,8 @@ function(hub_ctx)
     ],
 
     fw_nsg_key: n.key('NSG', ['HUB', 'FW']),
+    spoke_ingress_nsg_keys: [n.key('NSG', ['HUB', 'FW'])],
+    lb_return_nsg_key: n.key('NSG', ['HUB', 'LB']),
 
     has_spoke_natgw: false,
 

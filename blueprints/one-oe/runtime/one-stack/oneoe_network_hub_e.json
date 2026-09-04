@@ -657,10 +657,10 @@
 
                                 "egress_rules": [
                                     {
-                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over ALL protocols",
+                                        "description"                  : "Allow outbound ICMP to 0.0.0.0/0",
                                         "dst"                          : "0.0.0.0/0",
                                         "dst_type"                     : "CIDR_BLOCK",
-                                        "protocol"                     : "ALL",
+                                        "protocol"                     : "ICMP",
                                         "stateless"                    : false
                                     },
                                     {
@@ -713,10 +713,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                          : "0.0.0.0/0",
                                         "dst_type"                     : "CIDR_BLOCK",
-                                        "protocol"                     : "TCP",
+                                        "protocol"                     : "ALL",
                                         "stateless"                    : false
                                     }
                                 }
@@ -740,10 +740,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                          : "0.0.0.0/0",
                                         "dst_type"                     : "CIDR_BLOCK",
-                                        "protocol"                     : "TCP",
+                                        "protocol"                     : "ALL",
                                         "stateless"                    : false
                                     }
                                 }
@@ -787,10 +787,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                          : "0.0.0.0/0",
                                         "dst_type"                     : "CIDR_BLOCK",
-                                        "protocol"                     : "TCP",
+                                        "protocol"                     : "ALL",
                                         "stateless"                    : false
                                     }
                                 }
@@ -951,10 +951,10 @@
 
                                 "egress_rules": [
                                     {
-                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over ALL protocols",
+                                        "description"                  : "Allow outbound ICMP to 0.0.0.0/0",
                                         "dst"                          : "0.0.0.0/0",
                                         "dst_type"                     : "CIDR_BLOCK",
-                                        "protocol"                     : "ALL",
+                                        "protocol"                     : "ICMP",
                                         "stateless"                    : false
                                     },
                                     {
@@ -1007,10 +1007,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                          : "0.0.0.0/0",
                                         "dst_type"                     : "CIDR_BLOCK",
-                                        "protocol"                     : "TCP",
+                                        "protocol"                     : "ALL",
                                         "stateless"                    : false
                                     }
                                 }
@@ -1054,10 +1054,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                          : "0.0.0.0/0",
                                         "dst_type"                     : "CIDR_BLOCK",
-                                        "protocol"                     : "TCP",
+                                        "protocol"                     : "ALL",
                                         "stateless"                    : false
                                     }
                                 }
@@ -1081,10 +1081,10 @@
 
                                 "egress_rules": {
                                     "anywhere": {
-                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0 over TCP",
+                                        "description"                  : "Allow all outbound traffic to 0.0.0.0/0",
                                         "dst"                          : "0.0.0.0/0",
                                         "dst_type"                     : "CIDR_BLOCK",
-                                        "protocol"                     : "TCP",
+                                        "protocol"                     : "ALL",
                                         "stateless"                    : false
                                     }
                                 }
