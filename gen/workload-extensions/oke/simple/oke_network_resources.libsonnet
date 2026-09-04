@@ -328,7 +328,13 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
           nsg_workers_udp_2048: nsg.udp_ingress('Allow UDP ingress for NFS from workers on port 2048', ctx.nsg_workers_key, '2048'),
           nsg_workers_tcp_2048_2050: nsg.tcp_ingress_range('Allow TCP ingress for NFS from workers on ports 2048-2050', ctx.nsg_workers_key, '2048', '2050'),
           nsg_workers_tcp_2051: nsg.tcp_ingress('Allow TCP ingress for encrypted NFS from workers on port 2051', ctx.nsg_workers_key, '2051'),
-        },
+        } + (if ctx.is_overlay_network then {} else {
+          nsg_pods_udp_111: nsg.udp_ingress('Allow UDP ingress for NFS portmapper from pods on port 111', ctx.nsg_pods_key, '111'),
+          nsg_pods_tcp_111: nsg.tcp_ingress('Allow TCP ingress for NFS portmapper from pods on port 111', ctx.nsg_pods_key, '111'),
+          nsg_pods_udp_2048: nsg.udp_ingress('Allow UDP ingress for NFS from pods on port 2048', ctx.nsg_pods_key, '2048'),
+          nsg_pods_tcp_2048_2050: nsg.tcp_ingress_range('Allow TCP ingress for NFS from pods on ports 2048-2050', ctx.nsg_pods_key, '2048', '2050'),
+          nsg_pods_tcp_2051: nsg.tcp_ingress('Allow TCP ingress for encrypted NFS from pods on port 2051', ctx.nsg_pods_key, '2051'),
+        }),
 
         egress_rules: {
           nsg_workers_udp_111: nsg.udp_egress_src('Allow UDP return traffic from NFS portmapper to workers on source port 111', ctx.nsg_workers_key, '111'),
@@ -336,7 +342,13 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
           nsg_workers_udp_2048: nsg.udp_egress_src('Allow UDP return traffic from NFS to workers on source port 2048', ctx.nsg_workers_key, '2048'),
           nsg_workers_tcp_2048_2050: nsg.tcp_egress_src_range('Allow TCP return traffic from NFS to workers on source ports 2048-2050', ctx.nsg_workers_key, '2048', '2050'),
           nsg_workers_tcp_2051: nsg.tcp_egress_src('Allow TCP return traffic from encrypted NFS to workers on source port 2051', ctx.nsg_workers_key, '2051'),
-        },
+        } + (if ctx.is_overlay_network then {} else {
+          nsg_pods_udp_111: nsg.udp_egress_src('Allow UDP return traffic from NFS portmapper to pods on source port 111', ctx.nsg_pods_key, '111'),
+          nsg_pods_tcp_111: nsg.tcp_egress_src('Allow TCP return traffic from NFS portmapper to pods on source port 111', ctx.nsg_pods_key, '111'),
+          nsg_pods_udp_2048: nsg.udp_egress_src('Allow UDP return traffic from NFS to pods on source port 2048', ctx.nsg_pods_key, '2048'),
+          nsg_pods_tcp_2048_2050: nsg.tcp_egress_src_range('Allow TCP return traffic from NFS to pods on source ports 2048-2050', ctx.nsg_pods_key, '2048', '2050'),
+          nsg_pods_tcp_2051: nsg.tcp_egress_src('Allow TCP return traffic from encrypted NFS to pods on source port 2051', ctx.nsg_pods_key, '2051'),
+        }),
       },
     } else {}) + (if ctx.is_overlay_network then {} else {
       [ctx.nsg_pods_key]: {
@@ -357,7 +369,13 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
           nsg_pods: nsg.all_egress('Allow ALL egress from pods to other pods', ctx.nsg_pods_key),
           nsg_service: service.tcp_egress('Allow TCP egress from pods to OCI Services'),
           nsg_workers: nsg.all_egress('Allow ALL egress from pods to workers', ctx.nsg_workers_key),
-        } + hub_public_lb.pod_egress(ctx),
+        } + (if ctx.create_fss then {
+          nsg_fss_udp_111: nsg.udp_egress('Allow UDP egress from pods to NFS portmapper on port 111', ctx.nsg_fss_key, '111'),
+          nsg_fss_tcp_111: nsg.tcp_egress('Allow TCP egress from pods to NFS portmapper on port 111', ctx.nsg_fss_key, '111'),
+          nsg_fss_udp_2048: nsg.udp_egress('Allow UDP egress from pods to NFS on port 2048', ctx.nsg_fss_key, '2048'),
+          nsg_fss_tcp_2048_2050: nsg.tcp_egress_range('Allow TCP egress from pods to NFS on ports 2048-2050', ctx.nsg_fss_key, '2048', '2050'),
+          nsg_fss_tcp_2051: nsg.tcp_egress('Allow TCP egress from pods to encrypted NFS on port 2051', ctx.nsg_fss_key, '2051'),
+        } else {}) + hub_public_lb.pod_egress(ctx),
 
         ingress_rules: {
           nsg_cp: nsg.all_ingress('Broad webhook rule: allow all ingress to pods from Kubernetes control plane. Needed for pod-hosted webhooks on arbitrary target ports.', ctx.nsg_cp_key),
@@ -367,7 +385,13 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
           nsg_pods: nsg.all_ingress('Allow ALL ingress to pods from other pods', ctx.nsg_pods_key),
           nsg_service: service.tcp_ingress('Allow TCP ingress from OCI services to pods'),
           nsg_workers: nsg.all_ingress('Allow ALL ingress to pods from workers', ctx.nsg_workers_key),
-        } + hub_public_lb.pod_ingress(ctx),
+        } + (if ctx.create_fss then {
+          nsg_fss_udp_111: nsg.udp_ingress_src('Allow UDP return traffic to pods from NFS portmapper on source port 111', ctx.nsg_fss_key, '111'),
+          nsg_fss_tcp_111: nsg.tcp_ingress_src('Allow TCP return traffic to pods from NFS portmapper on source port 111', ctx.nsg_fss_key, '111'),
+          nsg_fss_udp_2048: nsg.udp_ingress_src('Allow UDP return traffic to pods from NFS on source port 2048', ctx.nsg_fss_key, '2048'),
+          nsg_fss_tcp_2048_2050: nsg.tcp_ingress_src_range('Allow TCP return traffic to pods from NFS on source ports 2048-2050', ctx.nsg_fss_key, '2048', '2050'),
+          nsg_fss_tcp_2051: nsg.tcp_ingress_src('Allow TCP return traffic to pods from encrypted NFS on source port 2051', ctx.nsg_fss_key, '2051'),
+        } else {}) + hub_public_lb.pod_ingress(ctx),
       },
     }) + {
       [ctx.nsg_workers_key]: {
