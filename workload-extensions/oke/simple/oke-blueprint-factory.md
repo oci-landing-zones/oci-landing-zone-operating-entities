@@ -300,7 +300,7 @@ This adds:
 
 - A private FSS subnet with a service-gateway-only route table.
 - An FSS security list and NSG.
-- Paired stateless NFS rules between the FSS and worker NSGs.
+- Paired stateless NFS rules between the FSS and worker NSGs, plus the same rules between the FSS and pod NSGs in VCN-native mode for virtual-node access.
 - Permission for the cluster principal to manage `file-family` resources in its OKE platform compartment.
 
 The extension does not create a file system, mount target, export, Kubernetes `StorageClass`, or persistent volume claim. After deployment, create a mount target in the generated FSS subnet and associate the generated FSS NSG with it. Configure the OCI File Storage CSI StorageClass with that existing `mountTargetOcid` and the OKE platform `compartmentOcid`. The CSI provisioner then manages file systems and Kubernetes persistent volumes while the mount target remains infrastructure-managed.
