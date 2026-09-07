@@ -34,7 +34,7 @@ Do not use this skill as the first response to an open-ended customer request su
 2. Before creating files, ask where the config source file should live and where the generated landing zone outputs should go. Use separate paths.
 3. Build the config as a Jsonnet object, not raw JSON, so imports and composition stay available.
 4. Ask for the target OCI region before authoring customer config. Default `realm` to `oc1` when it is not provided, and set `realm` explicitly for non-`oc1` deployments such as `oc19`.
-5. Keep only the smallest top-level shape first: `hub` and non-empty `environments`, plus region values when the customer has provided them and realm only when needed.
+5. Keep only the smallest top-level shape first: `hub`, plus region values when the customer has provided them and realm only when needed. Add `environments` only when the Landing Zone has named environments.
 6. Add environments and platforms incrementally, then run Blueprint Factory config mode and inspect the generated outputs.
 7. When behavior is unclear, prefer reading the normalization and extension code over guessing from checked-in JSON.
 8. If the question is about Orchestrator runtime behavior, dependency files, output files, Resource Manager source settings, or duplicate top-level configuration collisions, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier rather than expanding this skill into runtime troubleshooting.
@@ -44,7 +44,7 @@ Do not use this skill as the first response to an open-ended customer request su
 
 | Topic | Rule |
 |---|---|
-| Required fields | `hub.kind`, `hub.network.vcn`, and non-empty `environments` are mandatory. |
+| Required fields | `hub.kind` and `hub.network.vcn` are mandatory. `environments` is optional and defaults to `{}` for a hub-only Landing Zone. |
 | Region defaults | `region` and `region_short_name` must be provided together or omitted together; when omitted (or both explicitly set to `null`) they default to `eu-frankfurt-1` and `fra`. |
 | Security targets | Omit `security_targets` to target all environments; set it explicitly to narrow which environments get security-zone targeting. |
 | Hub kinds | Only `hub_a`, `hub_b`, `hub_c`, and `hub_e` are valid. |
