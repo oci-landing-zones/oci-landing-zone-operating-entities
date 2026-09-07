@@ -9,6 +9,7 @@
 //   _nfw_applications(n)            — ICMP Echo application definition
 //   _nfw_application_lists(n)       — Application list for ICMP
 //   _nfw_url_lists(n)               — URL filter lists (oracle.com, google.com)
+//   _nfw_address_list_name(n, scope) — Checked OCI NFW address-list display name
 //   _nfw_address_lists(n, address_entries) — Address lists from dynamic [{name, cidr}] entries + aggregate SPOKES + public
 //   _nfw_security_rules(n, address_entries) — Base security rules (east-west, url-filter, icmp)
 //   _nfw_rules(n, address_entries, extras=null) — Default rules with optional insertion + auto-renumber
@@ -92,18 +93,18 @@ local network_scope_names = import '../lib/network_scope_names.libsonnet';
 
   // OCI Network Firewall limits address-list names to 28 characters. Reuse the
   // canonical scope tokens, but never silently truncate custom names.
-  local nfw_address_list_name(n, entry_name) =
+  _nfw_address_list_name(n, scope_name)::
     local max_length = 28;
-    local name = n.display('nfw', ['al', network_scope_names.compact(entry_name)]);
+    local name = n.display('nfw', ['al', network_scope_names.compact(scope_name)]);
     assert std.length(name) <= max_length :
-      'OCI Network Firewall address-list name exceeds the 28-character limit: "%s" (%d characters). Use a shorter custom environment or platform key.' % [name, std.length(name)];
+      'OCI Network Firewall address-list name exceeds the 28-character limit: "%s" (%d characters). Use a shorter network-scope key.' % [name, std.length(name)];
     name,
 
   _nfw_address_lists(n, address_entries)::
     // Per-entry address lists
     {
       [n.key('NFW', ['ADDRLIST', std.asciiUpper(entry.name)])]: {
-        name: nfw_address_list_name(n, entry.name),
+        name: $._nfw_address_list_name(n, entry.name),
         type: 'IP',
         addresses: [entry.cidr],
       }
@@ -112,7 +113,7 @@ local network_scope_names = import '../lib/network_scope_names.libsonnet';
     // Public address list
     + {
       [n.key('NFW', ['ADDRLIST', 'PUB'])]: {
-        name: n.display('nfw', ['addrlist', 'public']),
+        name: $._nfw_address_list_name(n, 'public'),
         type: 'IP',
         addresses: ['0.0.0.0/0'],
       },
@@ -120,7 +121,7 @@ local network_scope_names = import '../lib/network_scope_names.libsonnet';
     // Aggregate SPOKES list (all entry CIDRs)
     + {
       [n.key('NFW', ['ADDRLIST', 'SPOKES'])]: {
-        name: n.display('nfw', ['addrlist', 'spokes']),
+        name: $._nfw_address_list_name(n, 'spokes'),
         type: 'IP',
         addresses: [entry.cidr for entry in address_entries],
       },

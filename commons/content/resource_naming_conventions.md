@@ -695,6 +695,7 @@ ndp-&lt;region&gt;-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;workload&gt;
 | Log Groups | lgrp |
 | NAT Gateway | nat |
 | Network Security Group | nsg |
+| Network Firewall Address List | al |
 | Notification Topic | nott |
 | Managed key | key |
 | OCI Function Application | fn |

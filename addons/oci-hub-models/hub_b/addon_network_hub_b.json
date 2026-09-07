@@ -633,7 +633,7 @@
 
                                 "address_lists": {
                                     "NFW-FRA-LZ-ADDRLIST-PUB-KEY": {
-                                        "name"                            : "nfw-fra-lz-addrlist-public",
+                                        "name"                            : "nfw-fra-lz-al-public",
                                         "type"                            : "IP",
                                         "addresses"                       : ["0.0.0.0/0"]
                                     },
@@ -645,7 +645,7 @@
                                     },
 
                                     "NFW-FRA-LZ-ADDRLIST-LB-KEY": {
-                                        "name"                            : "nfw-fra-lz-addrlist-lb",
+                                        "name"                            : "nfw-fra-lz-al-lb",
                                         "type"                            : "IP",
                                         "addresses"                       : ["10.0.0.0/24"]
                                     },
@@ -657,7 +657,7 @@
                                     },
 
                                     "NFW-FRA-LZ-ADDRLIST-SPOKES-KEY": {
-                                        "name"                            : "nfw-fra-lz-addrlist-spokes",
+                                        "name"                            : "nfw-fra-lz-al-spokes",
                                         "type"                            : "IP",
                                         "addresses"                       : ["10.0.64.0/21", "10.0.128.0/21"]
                                     }

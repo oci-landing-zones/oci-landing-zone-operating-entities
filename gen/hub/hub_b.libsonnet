@@ -150,7 +150,7 @@ function(hub_ctx)
                   ],
                   extra_address_lists={
                     [n.key('NFW', ['ADDRLIST', 'LB'])]: {
-                      name: n.display('nfw', ['addrlist', 'lb']),
+                      name: nfw._nfw_address_list_name(n, 'lb'),
                       type: 'IP',
                       addresses: [subnets.lb],
                     },

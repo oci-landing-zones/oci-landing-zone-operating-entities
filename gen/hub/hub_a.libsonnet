@@ -193,13 +193,13 @@ function(hub_ctx)
 
                     address_lists: {
                       [n.key('NFW', ['ADDRLIST', 'PUB'])]: {
-                        name: n.display('nfw', ['addrlist', 'public']),
+                        name: nfw._nfw_address_list_name(n, 'public'),
                         type: 'IP',
                         addresses: ['0.0.0.0/0'],
                       },
 
                       [n.key('NFW', ['ADDRLIST', 'LB'])]: {
-                        name: n.display('nfw', ['addrlist', 'lb']),
+                        name: nfw._nfw_address_list_name(n, 'lb'),
                         type: 'IP',
                         addresses: [subnets.lb],
                       },

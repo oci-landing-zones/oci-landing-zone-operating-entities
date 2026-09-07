@@ -1016,13 +1016,13 @@
 
                                 "address_lists": {
                                     "NFW-FRA-LZ-ADDRLIST-PUB-KEY": {
-                                        "name"                                     : "nfw-fra-lz-addrlist-public",
+                                        "name"                                     : "nfw-fra-lz-al-public",
                                         "type"                                     : "IP",
                                         "addresses"                                : ["0.0.0.0/0"]
                                     },
 
                                     "NFW-FRA-LZ-ADDRLIST-LB-KEY": {
-                                        "name"                                     : "nfw-fra-lz-addrlist-lb",
+                                        "name"                                     : "nfw-fra-lz-al-lb",
                                         "type"                                     : "IP",
                                         "addresses"                                : ["10.0.1.0/24"]
                                     }
@@ -1082,7 +1082,7 @@
 
                                 "address_lists": {
                                     "NFW-FRA-LZ-ADDRLIST-PUB-KEY": {
-                                        "name"                                     : "nfw-fra-lz-addrlist-public",
+                                        "name"                                     : "nfw-fra-lz-al-public",
                                         "type"                                     : "IP",
                                         "addresses"                                : ["0.0.0.0/0"]
                                     },
@@ -1106,7 +1106,7 @@
                                     },
 
                                     "NFW-FRA-LZ-ADDRLIST-SPOKES-KEY": {
-                                        "name"                                     : "nfw-fra-lz-addrlist-spokes",
+                                        "name"                                     : "nfw-fra-lz-al-spokes",
                                         "type"                                     : "IP",
 
                                         "addresses": [
@@ -1329,6 +1329,53 @@
                         },
 
                         "network_security_groups": {
+                            "NSG-FRA-LZ-PROD-PROJ1-WEB-KEY": {
+                                "display_name"                                     : "nsg-fra-lz-prod-proj1-web",
+                                "compartment_id"                                   : "CMP-LZ-PROD-PROJ1-KEY",
+
+                                "ingress_rules": {
+                                    "http_80": {
+                                        "description"                              : "Allow inbound traffic from Hub LB subnet over HTTP",
+                                        "src"                                      : "10.0.1.0/24",
+                                        "src_type"                                 : "CIDR_BLOCK",
+                                        "dst_port_min"                             : 80,
+                                        "dst_port_max"                             : 80,
+                                        "protocol"                                 : "TCP",
+                                        "stateless"                                : false
+                                    },
+
+                                    "https_443": {
+                                        "description"                              : "Allow inbound traffic from Hub LB subnet over HTTPS",
+                                        "src"                                      : "10.0.1.0/24",
+                                        "src_type"                                 : "CIDR_BLOCK",
+                                        "dst_port_min"                             : 443,
+                                        "dst_port_max"                             : 443,
+                                        "protocol"                                 : "TCP",
+                                        "stateless"                                : false
+                                    },
+
+                                    "ssh_22": {
+                                        "description"                              : "Allow inbound traffic from Hub management subnet over SSH",
+                                        "src"                                      : "10.0.3.0/24",
+                                        "src_type"                                 : "CIDR_BLOCK",
+                                        "dst_port_min"                             : 22,
+                                        "dst_port_max"                             : 22,
+                                        "protocol"                                 : "TCP",
+                                        "stateless"                                : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "anywhere": {
+                                        "description"                              : "Allow all outbound traffic to 0.0.0.0/0",
+                                        "dst"                                      : "0.0.0.0/0",
+                                        "dst_type"                                 : "CIDR_BLOCK",
+                                        "protocol"                                 : "ALL",
+                                        "stateless"                                : false
+                                    }
+                                }
+                            },
+
                             "NSG-FRA-LZ-PROD-PROJ1-APP-KEY": {
                                 "display_name"                                     : "nsg-fra-lz-prod-proj1-app",
                                 "compartment_id"                                   : "CMP-LZ-PROD-PROJ1-KEY",
@@ -1387,53 +1434,6 @@
                                         "src_type"                                 : "NETWORK_SECURITY_GROUP",
                                         "dst_port_min"                             : 1521,
                                         "dst_port_max"                             : 1521,
-                                        "protocol"                                 : "TCP",
-                                        "stateless"                                : false
-                                    }
-                                },
-
-                                "egress_rules": {
-                                    "anywhere": {
-                                        "description"                              : "Allow all outbound traffic to 0.0.0.0/0",
-                                        "dst"                                      : "0.0.0.0/0",
-                                        "dst_type"                                 : "CIDR_BLOCK",
-                                        "protocol"                                 : "ALL",
-                                        "stateless"                                : false
-                                    }
-                                }
-                            },
-
-                            "NSG-FRA-LZ-PROD-PROJ1-WEB-KEY": {
-                                "display_name"                                     : "nsg-fra-lz-prod-proj1-web",
-                                "compartment_id"                                   : "CMP-LZ-PROD-PROJ1-KEY",
-
-                                "ingress_rules": {
-                                    "http_80": {
-                                        "description"                              : "Allow inbound traffic from Hub LB subnet over HTTP",
-                                        "src"                                      : "10.0.1.0/24",
-                                        "src_type"                                 : "CIDR_BLOCK",
-                                        "dst_port_min"                             : 80,
-                                        "dst_port_max"                             : 80,
-                                        "protocol"                                 : "TCP",
-                                        "stateless"                                : false
-                                    },
-
-                                    "https_443": {
-                                        "description"                              : "Allow inbound traffic from Hub LB subnet over HTTPS",
-                                        "src"                                      : "10.0.1.0/24",
-                                        "src_type"                                 : "CIDR_BLOCK",
-                                        "dst_port_min"                             : 443,
-                                        "dst_port_max"                             : 443,
-                                        "protocol"                                 : "TCP",
-                                        "stateless"                                : false
-                                    },
-
-                                    "ssh_22": {
-                                        "description"                              : "Allow inbound traffic from Hub management subnet over SSH",
-                                        "src"                                      : "10.0.3.0/24",
-                                        "src_type"                                 : "CIDR_BLOCK",
-                                        "dst_port_min"                             : 22,
-                                        "dst_port_max"                             : 22,
                                         "protocol"                                 : "TCP",
                                         "stateless"                                : false
                                     }
