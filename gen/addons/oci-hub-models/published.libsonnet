@@ -16,7 +16,7 @@ local hub_builders = {
       naming: ctx.n,
       hub_config: ctx.config.hub,
       vcn_list: [
-        { name: s.name, cidr: s.env.shared_project_network.network.vcn }
+        { name: s.name, cidr: s.env.project_network.network.vcn }
         for s in ctx.spoke_envs
       ],
       lb_backends: ctx.lb_backends,

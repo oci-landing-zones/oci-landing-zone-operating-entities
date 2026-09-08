@@ -1,0 +1,8 @@
+{
+  "hub_a_final_target": "DRG-FRA-LZ-HUB-KEY",
+  "hub_b_final_target": "DRG-FRA-LZ-HUB-KEY",
+  "hub_c_backend_network_present": true,
+  "hub_c_final_target": "DRG-FRA-LZ-HUB-KEY",
+  "hub_c_pre_target": "DRG-FRA-LZ-HUB-KEY",
+  "hub_c_staged_network_present": true
+}

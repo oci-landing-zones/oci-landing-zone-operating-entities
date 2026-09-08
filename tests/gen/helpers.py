@@ -116,7 +116,7 @@ def normalize_jsonnet_error(text: str) -> str:
 def render_direct_failure_message(jsonnet_file: Path) -> str:
     jsonnet_path = (REPO_ROOT / jsonnet_file).resolve()
     proc = run_cmd(
-        [jsonnet_command(), "-J", str(REPO_ROOT), str(jsonnet_path)],
+        [jsonnet_command(), "-J", str(REPO_ROOT), "--", str(jsonnet_path)],
         expect_success=False,
     )
     if proc.returncode == 0:
@@ -132,7 +132,7 @@ def render_config_failure_message(config_file: Path) -> str:
 
 def render_jsonnet_object(jsonnet_file: Path) -> dict:
     jsonnet_path = (REPO_ROOT / jsonnet_file).resolve()
-    proc = run_cmd([jsonnet_command(), "-J", str(REPO_ROOT), str(jsonnet_path)])
+    proc = run_cmd([jsonnet_command(), "-J", str(REPO_ROOT), "--", str(jsonnet_path)])
     try:
         return json.loads(proc.stdout)
     except json.JSONDecodeError as exc:

@@ -16,7 +16,7 @@
   },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.1.64.0/21' } },
+      project_network: { network: { vcn: '10.1.64.0/21' } },
     },
   },
   remote_peering_connections: {

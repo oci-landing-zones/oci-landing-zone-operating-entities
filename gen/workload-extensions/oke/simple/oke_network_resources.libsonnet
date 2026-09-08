@@ -287,7 +287,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
         ingress_rules: {
           nsg_cp_6443: nsg.tcp_ingress_src('Allow TCP ingress for Kubernetes control plane inter-communication on source port 6443', ctx.nsg_cp_key, '6443'),
         } + ctx.api_endpoint_ingress_rules + {
-          nsg_service: service.tcp_ingress(ctx, 'Allow TCP ingress from OCI services to control plane for responses'),
+          nsg_service: service.tcp_ingress('Allow TCP ingress from OCI services to control plane for responses'),
           nsg_workers_10250: nsg.tcp_ingress_src('Allow TCP ingress to control plane from worker nodes for Kubelet responses on source port 10250', ctx.nsg_workers_key, '10250'),
           nsg_workers_12250: nsg.tcp_ingress('Allow TCP ingress to kube-apiserver from workers on port 12250', ctx.nsg_workers_key, '12250'),
           nsg_workers_6443: nsg.tcp_ingress('Allow TCP ingress to kube-apiserver from workers on port 6443', ctx.nsg_workers_key, '6443'),
@@ -365,7 +365,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
           nsg_lb_tcp: nsg.tcp_ingress_any('Allow TCP ingress to pods from load balancers', ctx.nsg_lb_key),
           nsg_lb_udp: nsg.udp_ingress_any('Allow UDP ingress to pods from load balancers', ctx.nsg_lb_key),
           nsg_pods: nsg.all_ingress('Allow ALL ingress to pods from other pods', ctx.nsg_pods_key),
-          nsg_service: service.tcp_ingress(ctx, 'Allow TCP ingress from OCI services to pods'),
+          nsg_service: service.tcp_ingress('Allow TCP ingress from OCI services to pods'),
           nsg_workers: nsg.all_ingress('Allow ALL ingress to pods from workers', ctx.nsg_workers_key),
         } + hub_public_lb.pod_ingress(ctx),
       },
@@ -408,7 +408,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
           nsg_lb_10256: nsg.tcp_ingress('Allow TCP ingress to workers for health check from load balancer on port 10256', ctx.nsg_lb_key, '10256'),
           nsg_lb_tcp: nsg.tcp_ingress_range('Allow TCP ingress to workers from load balancers on service ports 30000-32767', ctx.nsg_lb_key, '30000', '32767'),
           nsg_lb_udp: nsg.udp_ingress_range('Allow UDP ingress to workers from load balancers on service ports 30000-32767', ctx.nsg_lb_key, '30000', '32767'),
-          nsg_service: service.tcp_ingress(ctx, 'Allow TCP ingress from OCI services to workers'),
+          nsg_service: service.tcp_ingress('Allow TCP ingress from OCI services to workers'),
           nsg_workers: nsg.all_ingress('Allow ALL ingress to workers from other workers', ctx.nsg_workers_key),
         } + (if ctx.create_fss then {
           nsg_fss_udp_111: nsg.udp_ingress_src('Allow UDP return traffic to workers from NFS portmapper on source port 111', ctx.nsg_fss_key, '111'),

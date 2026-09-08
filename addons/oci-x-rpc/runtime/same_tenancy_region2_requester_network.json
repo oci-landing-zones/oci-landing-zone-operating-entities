@@ -1015,13 +1015,13 @@
                                     },
 
                                     "NFW-AMS-LZ-ADDRLIST-PREPROD-KEY": {
-                                        "name"                                  : "nfw-ams-lz-addrlist-preprod",
+                                        "name"                                  : "nfw-ams-lz-al-pp",
                                         "type"                                  : "IP",
                                         "addresses"                             : ["10.1.128.0/21"]
                                     },
 
                                     "NFW-AMS-LZ-ADDRLIST-PROD-KEY": {
-                                        "name"                                  : "nfw-ams-lz-addrlist-prod",
+                                        "name"                                  : "nfw-ams-lz-al-p",
                                         "type"                                  : "IP",
                                         "addresses"                             : ["10.1.64.0/21"]
                                     },

@@ -383,7 +383,7 @@
 
                                     "nsg_service": {
                                         "description"                       : "Allow TCP ingress from OCI services to control plane for responses",
-                                        "src"                               : "all-fra-services-in-oracle-services-network",
+                                        "src"                               : "all-services",
                                         "src_type"                          : "SERVICE_CIDR_BLOCK",
                                         "protocol"                          : "TCP",
                                         "stateless"                         : true
@@ -673,7 +673,7 @@
 
                                     "nsg_service": {
                                         "description"                       : "Allow TCP ingress from OCI services to pods",
-                                        "src"                               : "all-fra-services-in-oracle-services-network",
+                                        "src"                               : "all-services",
                                         "src_type"                          : "SERVICE_CIDR_BLOCK",
                                         "protocol"                          : "TCP",
                                         "stateless"                         : true
@@ -885,7 +885,7 @@
 
                                     "nsg_service": {
                                         "description"                       : "Allow TCP ingress from OCI services to workers",
-                                        "src"                               : "all-fra-services-in-oracle-services-network",
+                                        "src"                               : "all-services",
                                         "src_type"                          : "SERVICE_CIDR_BLOCK",
                                         "protocol"                          : "TCP",
                                         "stateless"                         : true

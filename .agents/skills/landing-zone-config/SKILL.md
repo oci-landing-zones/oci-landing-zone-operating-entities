@@ -1,27 +1,27 @@
 ---
 name: landing-zone-config
-description: Use when authoring, reviewing, or debugging the config-driven OCI landing zone Jsonnet input used by `gen/generate.sh --config`, especially when adding environments, shared platforms, environment platforms, hub changes, or extension-backed network layouts.
+description: Use when authoring, reviewing, or debugging Blueprint Factory input used by `gen/generate.sh --config`, especially when adding environments, shared platforms, environment platforms, hub changes, or extension-backed network layouts.
 ---
 
 # Landing Zone Config
 
 ## Overview
 
-Use this skill when work should go through the new config-driven generator instead of editing generated JSON files directly.
+Use this skill when work should go through the Blueprint Factory instead of editing generated JSON files directly.
 
-Core principle: treat the landing zone config as the source of truth, then verify behavior against the generator's normalization and orchestration code before changing schema assumptions.
+Core principle: treat the landing zone config as the source of truth, then verify behavior against the Blueprint Factory normalization and orchestration code before changing schema assumptions.
 
-`AGENTS.md` remains canonical for customer safety, discovery, artifact placement, unsupported resources, and deployment defaults. If the request starts as customer design or deployment guidance and the customer path is not yet chosen, use `landing-zone-customer-guidance` first. This skill starts after the conversation has reached the config-driven path or the user explicitly asks for config-mode details.
+`AGENTS.md` remains canonical for customer safety, discovery, artifact placement, unsupported resources, and deployment defaults. If the request starts as customer design or deployment guidance and the customer path is not yet chosen, use `landing-zone-customer-guidance` first. This skill starts after the conversation has reached the Blueprint Factory path or the user explicitly asks for Blueprint Factory config-mode details.
 
 ## When to Use
 
 - Creating a new config file for `bash gen/generate.sh --config ...`
-- Reviewing or fixing a config-driven topology change
-- Adding or changing `environments`, `shared_project_network`, `platforms`, or `shared_platforms`
+- Reviewing or fixing an Blueprint Factory topology change
+- Adding or changing `environments`, `project_network`, `platforms`, or `shared_platforms`
 - Wiring a platform extension such as `oke_simple`
-- Debugging why config mode generated an unexpected JSON output or omitted a file
+- Debugging why Blueprint Factory config mode generated an unexpected JSON output or omitted a file
 
-Do not use this skill for legacy checked-in JSON output edits unless the task is explicitly about the config-driven path.
+Do not use this skill for legacy checked-in JSON output edits unless the task is explicitly about the Blueprint Factory path.
 Do not use this skill as the first response to an open-ended customer request such as "I want landing zone to run OKE" when the required customer discovery decisions are still unknown.
 
 ## Workflow
@@ -35,9 +35,10 @@ Do not use this skill as the first response to an open-ended customer request su
 3. Build the config as a Jsonnet object, not raw JSON, so imports and composition stay available.
 4. Ask for the target OCI region before authoring customer config. Default `realm` to `oc1` when it is not provided, and set `realm` explicitly for non-`oc1` deployments such as `oc19`.
 5. Keep only the smallest top-level shape first: `hub` and non-empty `environments`, plus region values when the customer has provided them and realm only when needed.
-6. Add environments and platforms incrementally, then run config mode and inspect the generated outputs.
+6. Add environments and platforms incrementally, then run Blueprint Factory config mode and inspect the generated outputs.
 7. When behavior is unclear, prefer reading the normalization and extension code over guessing from checked-in JSON.
 8. If the question is about Orchestrator runtime behavior, dependency files, output files, Resource Manager source settings, or duplicate top-level configuration collisions, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier rather than expanding this skill into runtime troubleshooting.
+9. For customer deployment handoff, read `../landing-zone-customer-guidance/references/orm-bucket-deployment.md` and provide the exact phase file sets emitted by the current run. Prefer an in-place update of the same ORM stack for staged outputs. This is advisory guidance only: do not upload the files or invoke ORM Plan, Apply, Destroy, stack updates, or monitoring from this skill.
 
 ## Quick Rules
 
@@ -48,27 +49,32 @@ Do not use this skill as the first response to an open-ended customer request su
 | Security targets | Omit `security_targets` to target all environments; set it explicitly to narrow which environments get security-zone targeting. |
 | Hub kinds | Only `hub_a`, `hub_b`, `hub_c`, and `hub_e` are valid. |
 | Hub subnets | Omit `hub.network.subnets` to auto-generate canonical hub subnets from the hub VCN. |
-| Spoke subnets | Omit `shared_project_network.network.subnets` to auto-generate `web`, `app`, `db`, and `infra`. |
+| Shared project subnets | Omitted generates default `web`, `app`, `db`, `infra`; `{}` emits none; a non-empty map is exact and suppresses all implicit defaults. |
+| Dedicated project subnets | Use `projects.<project>.subnets`; they require `project_network`, must not overlap any shared/dedicated subnet, and remain in the environment `NETWORK` compartment. |
+| Shared vs dedicated | Recommend shared subnets by default for address efficiency. Dedicated subnets provide separate project CIDR allocation, not IAM isolation; access is governed at the environment network compartment. Same-subnet traffic is controlled by NSGs/security lists, not the hub firewall. |
+| Project subnet routing | Omit `project_network.subnet_routing` for `vcn`; use `hub` with firewalled Hub A, B, or C. Hub C requires its normal staged backend replacement; Hub E is rejected. |
 | Platform subnets | Platforms need explicit subnets unless they also declare an extension that provides subnet metadata. |
 | Realm | `realm` is optional and defaults to `oc1`, including when explicitly set to `null`; supported config realms are `oc1` and `oc19`. |
-| CIS level | `cis_level` is optional and defaults to `2`; set `1` to emit CIS level 1 security/observability files instead. |
+| CIS level | `cis_level` is optional and technically defaults to `2`, but customer-use discovery must obtain an explicit CIS1/CIS2 choice. CIS2 is recommended and adds CMEK dependencies for applicable resources; set `1` for the less complex CIS1 output set. |
 | Extensions | Extension `type` must be registered in `gen/landing_zone.libsonnet`. |
 | Config-mode network outputs | `network.json` is canonical final output; `network_pre.json` appears only for staged hubs. |
 | RPC config | Model each Landing Zone in a separate source config and each requested connection under top-level `remote_peering_connections`; read `gen/addons/oci-x-rpc/AGENTS.md`, derive local VCNs dynamically, and collect per-connection role, peer region, reviewed remote CIDRs, requestor peer reference, cross-tenancy peer tenancy OCID, and the foreign requestor group OCID only for acceptors. |
 | Artifact placement | Ask for both the config file location and the output directory before creating customer artifacts; do not default them into `tests/`. |
 | Unsupported resources | Do not add unsupported config keys or fake extension types. Generate only supported prerequisites, then document the unsupported resource as manual post-deployment configuration. |
 | Networked extension CIDRs | Include CIDRs only for network scopes the selected config will emit; do not allocate for unchosen optional placement branches or networkless/infrastructure-only scopes. |
+| Preferred deployment | ORM with a customer-controlled private Object Storage bucket through a pinned Orchestrator `rms-facade`; Terraform CLI and customer CI/CD remain alternatives. |
 | ExaCS network | Network is required for ExaCS AVMC/VMC placement and forbidden for ExaCS infrastructure-only placement. |
-| ExaCS project DB tiers | Use `project_db_compartments` only for Autonomous Database Dedicated project tiers; `shared_project_network` is only needed when the environment also needs project network resources. |
+| ExaCS project DB tiers | Use `project_db_compartments` only for Autonomous Database Dedicated project tiers; `project_network` is only needed when the environment also needs project network resources. |
 
 ## Authoring Guidance
 
 - Prefer one small config file per scenario and compose from imports if reuse is needed.
 - For customer-use work, keep config sources and generated outputs in customer-chosen or explicitly approved working directories. Reserve `tests/gen/testdata/...` for repo-development fixtures and automated tests, not customer artifact placement.
-- Use `shared_project_network` only for environments that should produce spoke VCN outputs.
+- Use `project_network` only for environments that should produce spoke VCN outputs.
 - Put environment-scoped platforms under `environments.<env>.platforms`.
 - Put shared platforms under top-level `shared_platforms`.
-- Keep CIDRs explicit even when subnets are auto-generated. Auto-subnetting helps with subnet layout, not top-level network planning.
+- Treat the three shared-subnet states deliberately: omit the map for the four defaults, use `{}` for none, or provide the complete exact map. The factory never adds standard shared subnets around a supplied map.
+- Before authoring project subnet maps, confirm shared versus dedicated placement. Explain that per-project subnet allocation can strand addresses in mostly empty ranges and is not an IAM boundary. Also explain that dedicated placement does not send same-subnet traffic through the hub firewall; NSGs and security lists remain mandatory for that traffic.
 - Resolve network-producing extension scope and sizing before CIDR allocation; make any deliberate reserved space explicit in the customer-facing rationale.
 - When selecting CIDRs, check whether the landing zone will connect to on-premises or other clouds; any routed OCI or Kubernetes ranges must avoid overlap with those external networks.
 - When adding a new extension-backed platform, verify both the config schema and the extension contract.
@@ -77,11 +83,11 @@ Do not use this skill as the first response to an open-ended customer request su
 - Keep RPC `remote_cidrs` separate from local topology. Include every reviewed peer VCN range that must be reachable, and reject overlaps with local hub, environment, and platform VCNs.
 - For ExaCS, complete the placement decisions in `AGENTS.md`, then use `gen/workload-extensions/exacs/AGENTS.md` for the config mapping.
 - For ExaDB-C@C, complete the placement decisions in `AGENTS.md`, then use the generator guide under `gen/workload-extensions/exacc/` for config and publication semantics.
-- If a requested resource is unsupported by config mode, keep unsupported resources out of generated files and mark the separate work as "Manual post-deployment configuration required."
+- If a requested resource is unsupported by Blueprint Factory config mode, keep unsupported resources out of generated files and mark the separate work as "Manual post-deployment configuration required."
 
 ## Verification
 
-- Run `bash gen/generate.sh --config <config_file> [output_dir]` for normal config-mode generation.
+- Run `bash gen/generate.sh --config <config_file> [output_dir]` for normal Blueprint Factory generation.
 - When validating a customer config, point generation at a separate output directory such as a temp directory or customer-approved working directory rather than a repo test fixture path.
 - If you need raw multi-output behavior without formatting, run `jsonnet --multi <output_dir>/ --tla-code-file config=<config_file> gen/landing_zone_multi.jsonnet`.
 - Compare generated files with the expected output set from `gen/landing_zone_multi.jsonnet`: `network.json`, `iam.json`, `governance.json`, and the selected `security_cis*` / `observability_cis*` files are emitted; `network_pre.json` appears only for staged hubs, and `network_backends.json` plus extension outputs remain conditional.
@@ -89,8 +95,10 @@ Do not use this skill as the first response to an open-ended customer request su
 
 ## References
 
+- For the customer-facing supported configuration shape, read `addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md`.
 - For the schema and behavior map, read `references/schema-and-behavior.md`.
 - For starter patterns and repo-native examples, read `references/examples.md`.
-- For config-driven OKE semantics and CIDR guardrails, read `gen/workload-extensions/oke/AGENTS.md`.
-- For config-driven RPC roles, routing, IAM, CIDR guardrails, publication, and deployment order, read `gen/addons/oci-x-rpc/AGENTS.md`.
-- For config-driven ExaCS placement and component semantics, read `gen/workload-extensions/exacs/AGENTS.md`.
+- For ORM + private Object Storage deployment and staged in-place updates, read `../landing-zone-customer-guidance/references/orm-bucket-deployment.md`.
+- For Blueprint Factory OKE semantics and CIDR guardrails, read `gen/workload-extensions/oke/AGENTS.md`.
+- For Blueprint Factory RPC roles, routing, IAM, CIDR guardrails, publication, and deployment order, read `gen/addons/oci-x-rpc/AGENTS.md`.
+- For Blueprint Factory ExaCS placement and component semantics, read `gen/workload-extensions/exacs/AGENTS.md`.

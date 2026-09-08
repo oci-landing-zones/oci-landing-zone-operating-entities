@@ -1,0 +1,9 @@
+{
+  "dedicated_subnet_cidr": "10.0.68.0/26",
+  "dedicated_subnet_display_name": "sn-fra-lz-prod-api-jobs",
+  "dedicated_subnet_is_untagged": true,
+  "default_vcn_routing_has_no_hub_override": true,
+  "empty_shared_map_emits_no_subnets": true,
+  "explicit_shared_map_is_exact": true,
+  "omitted_shared_map_emits_defaults": true
+}

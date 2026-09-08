@@ -1,7 +1,7 @@
 // gen/landing_zone.libsonnet — Main orchestrator for config-driven OCI Landing Zone.
 //
 // Takes a raw config, normalizes it, builds the hub, generates spoke VCNs
-// for each environment with shared_project_network, and composes the output.
+// for each environment with project_network, and composes the output.
 //
 // function(raw_config) → { network, network_pre, network_backends? }
 //

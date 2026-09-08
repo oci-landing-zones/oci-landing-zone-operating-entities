@@ -18,7 +18,7 @@ local render(
   hub: { kind: kind, network: { vcn: local_cidrs.hub } },
   environments: {
     workload: {
-      shared_project_network: { network: { vcn: local_cidrs.workload } },
+      project_network: { network: { vcn: local_cidrs.workload } },
     },
   },
   remote_peering_connections: {

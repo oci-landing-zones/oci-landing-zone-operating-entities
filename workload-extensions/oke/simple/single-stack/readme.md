@@ -59,6 +59,8 @@ The quickstart creates one production OKE platform.
 - **OKE Network Mode**: The committed JSON uses VCN-native networking
 - **Public workload ingress**: OKE has narrowly scoped permissions to create public OCI Load Balancers in the prepared Hub subnet.
 
+See the shared [private and public LB/NLB Service examples](../readme.md#deploying-workload-load-balancers) before deploying workload ingress.
+
 &nbsp;
 
 ## **3. Architecture Components**

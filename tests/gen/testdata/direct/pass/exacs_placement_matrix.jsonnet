@@ -19,11 +19,11 @@ local extension(params) = {
 
 local base_envs = {
   prod: {
-    shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+    project_network: { network: { vcn: '10.0.64.0/21' } },
     projects: { proj1: {} },
   },
   preprod: {
-    shared_project_network: { network: { vcn: '10.0.128.0/21' } },
+    project_network: { network: { vcn: '10.0.128.0/21' } },
     projects: { proj1: {} },
   },
 };

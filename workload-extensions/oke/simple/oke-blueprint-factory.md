@@ -15,7 +15,7 @@
 
 Use one of the supported Landing Zone add-on entry paths when the committed OKE JSON files do not match the required landing zone:
 
-- [OCI LZ Blueprint Factory](../../../addons/oci-lz-blueprint-factory/README.md) for a directly authored and reviewed source configuration.
+- [Blueprint Factory](../../../addons/oci-lz-blueprint-factory/README.md) for a directly authored and reviewed source configuration.
 - [OCI LZ AI Agent](../../../addons/oci-lz-ai-agent/README.md) for AI-assisted discovery, source-configuration drafting, and review.
 
 Both paths produce a reviewed source input and generated deployment package. They support custom CIDR ranges, multiple environments, multiple OKE platforms with one cluster per platform, and overlay networking.
@@ -49,7 +49,6 @@ This is different from the committed quickstart folders:
 | `oke_simple` | The OKE extension type. | Use this when generating a landing zone whose requirements are outside the committed quickstart configurations. |
 | `simple/single-stack` | A committed OKE JSON package that deploys the landing zone and OKE together. | Use this for the standard Hub E single-stack deployment. |
 | `simple/multi-stack` | A committed OKE JSON package that adds OKE to an existing landing zone. | Use this for the standard multi-stack deployment path. |
-| `advanced` | A separate guided deployment path with more manual steps. | Use this only when following the advanced OKE extension documentation. |
 
 In either add-on path, use `oke_simple` for OKE platforms.
 
@@ -72,7 +71,7 @@ Create a configuration file, for example `oke-native.jsonnet`:
   },
   environments: {
     prod: {
-      shared_project_network: {
+      project_network: {
         network: {
           vcn: '10.0.72.0/21',
         },
@@ -132,7 +131,7 @@ Create a configuration file, for example `oke-overlay-hub-a.jsonnet`:
   },
   environments: {
     prod: {
-      shared_project_network: {
+      project_network: {
         network: {
           vcn: '10.0.64.0/21',
         },
@@ -160,7 +159,7 @@ Create a configuration file, for example `oke-overlay-hub-a.jsonnet`:
       },
     },
     preprod: {
-      shared_project_network: {
+      project_network: {
         network: {
           vcn: '10.0.128.0/21',
         },
@@ -195,7 +194,7 @@ Overlay mode omits the OCI pod subnet, pod route table, pod security list, pod N
 
 ## **6. OKE VCN Sizing**
 
-Auto-subnet profiles are the default way to define OKE subnetting. The user provides the OKE VCN CIDR, and may optionally provide `cluster_size`; when `cluster_size` is omitted, the generator uses the `small` profile. The generator then creates the required OKE subnets.
+Auto-subnet profiles are the default way to define OKE subnetting. The user provides the OKE VCN CIDR, and may optionally provide `cluster_size`; when `cluster_size` is omitted, the Blueprint Factory uses the `small` profile. The factory then creates the required OKE subnets.
 
 The OKE VCN CIDR prefix must match the selected or defaulted size exactly:
 
@@ -205,7 +204,7 @@ The OKE VCN CIDR prefix must match the selected or defaulted size exactly:
 | `medium` | `/18` |
 | `large` | `/16` |
 
-With native networking, the generator creates these subnet sizes:
+With native networking, the Blueprint Factory creates these subnet sizes:
 
 | `cluster_size` | Pod subnet | Worker subnet | Internal LB subnet | Optional FSS subnet | Control plane subnet |
 | --- | --- | --- | --- | --- | --- |
@@ -213,7 +212,7 @@ With native networking, the generator creates these subnet sizes:
 | `medium` | `/19` | `/22` | `/25` | `/25` | `/29` |
 | `large` | `/17` | `/19` | `/24` | `/24` | `/29` |
 
-With overlay networking, the generator creates these subnet sizes:
+With overlay networking, the Blueprint Factory creates these subnet sizes:
 
 | `cluster_size` | Worker subnet | Internal LB subnet | Optional FSS subnet | Control plane subnet |
 | --- | --- | --- | --- | --- |
@@ -310,7 +309,7 @@ See [Provisioning PVCs on the File Storage Service](https://docs.oracle.com/en-u
 
 ## **9. Generate the JSON Files**
 
-Run the generator from the repository root:
+Run the Blueprint Factory from the repository root:
 
 ```bash
 bash gen/generate.sh --config /path/to/oke-config.jsonnet /path/to/generated-oke

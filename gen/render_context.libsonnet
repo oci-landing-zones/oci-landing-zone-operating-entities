@@ -34,9 +34,10 @@
 //   - `spoke_envs` follows topology ordering, not raw object-field order.
 //   - `all_vcn_entries` carries the canonical routed VCN metadata used by
 //     render-time consumers.
-//   - `lb_backends` derives stable example backend IPs from the first spoke's
-//     web subnet when available; otherwise it falls back to `0.0.0.0`
-//     placeholders so hub-only publications can still render.
+//   - `lb_backends` derives example backend IPs from the first spoke whose
+//     normalized shared-subnet map contains `web`. Otherwise it deliberately
+//     uses non-working `0.0.0.0` placeholders; the hub LB is an example, not a
+//     production ingress configuration.
 //   - `lb_env_name` follows that same first ordered workload spoke so example
 //     hub LB names track the backend source.
 //   - `shared_only_config` keeps the normalized shared services/root state but
@@ -64,6 +65,11 @@ local common = import 'hub/hub_common.libsonnet';
       { entry: entry, name: entry.qualified_name, env: entry.env }
       for entry in spoke_env_entries
     ];
+    local web_spoke_envs = [
+      spoke
+      for spoke in spoke_envs
+      if std.objectHas(spoke.env.project_network.network.subnets, 'web')
+    ];
     local platform_state = platforms.collect_entries(config, topo);
     local all_platform_entries = platform_state.all_platform_entries;
     local routed_vcn_state =
@@ -80,11 +86,11 @@ local common = import 'hub/hub_common.libsonnet';
       network_only_platforms: platform_state.network_only_platforms,
       all_vcn_entries: all_vcn_entries,
       lb_env_name:
-        if std.length(spoke_envs) > 0 then spoke_envs[0].entry.qualified_name
+        if std.length(web_spoke_envs) > 0 then web_spoke_envs[0].entry.qualified_name
         else 'prod',
       lb_backends:
-        if std.length(spoke_envs) > 0 then
-          local web_subnet = spoke_envs[0].env.shared_project_network.network.subnets.web;
+        if std.length(web_spoke_envs) > 0 then
+          local web_subnet = web_spoke_envs[0].env.project_network.network.subnets.web;
           {
             backend1_ip: common.host_ip_from_subnet(web_subnet, 10),
             backend2_ip: common.host_ip_from_subnet(web_subnet, 20),

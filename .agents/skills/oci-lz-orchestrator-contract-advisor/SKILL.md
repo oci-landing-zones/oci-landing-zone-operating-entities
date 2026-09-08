@@ -13,7 +13,7 @@ Use the existing repo workflows first when the request is about design or genera
 
 - Customer discovery and deployment recommendations: use `landing-zone-customer-guidance`.
 - Config-mode authoring or review: use `landing-zone-config`.
-- Extension-specific generator semantics: use the relevant guide under `gen/workload-extensions/<extension>/`.
+- Extension-specific Blueprint Factory semantics: use the relevant guide under `gen/workload-extensions/<extension>/`.
 
 Do not use this skill for customer discovery, landing-zone design, config generation, ExaDB-C@C / ExaCC generation, or blueprint selection.
 

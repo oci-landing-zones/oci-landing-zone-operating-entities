@@ -57,13 +57,13 @@ local prod = lz({
   },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.1.64.0/21' } },
+      project_network: { network: { vcn: '10.1.64.0/21' } },
     },
     preprod: {
-      shared_project_network: { network: { vcn: '10.1.128.0/21' } },
+      project_network: { network: { vcn: '10.1.128.0/21' } },
     },
     dr: {
-      shared_project_network: { network: { vcn: '10.1.192.0/21' } },
+      project_network: { network: { vcn: '10.1.192.0/21' } },
     },
   },
   remote_peering_connections: {
@@ -85,16 +85,16 @@ local nonprod = lz({
   },
   environments: {
     uat: {
-      shared_project_network: { network: { vcn: '10.2.64.0/21' } },
+      project_network: { network: { vcn: '10.2.64.0/21' } },
     },
     dev: {
-      shared_project_network: { network: { vcn: '10.2.128.0/21' } },
+      project_network: { network: { vcn: '10.2.128.0/21' } },
     },
     test: {
-      shared_project_network: { network: { vcn: '10.2.192.0/21' } },
+      project_network: { network: { vcn: '10.2.192.0/21' } },
     },
     sandbox: {
-      shared_project_network: { network: { vcn: '10.2.224.0/21' } },
+      project_network: { network: { vcn: '10.2.224.0/21' } },
     },
   },
   remote_peering_connections: {

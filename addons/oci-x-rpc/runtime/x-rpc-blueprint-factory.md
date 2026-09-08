@@ -48,7 +48,7 @@ The acceptor creates the RPC and omits `peer_id` and all cross-tenancy IAM field
   },
   environments: {
     prod: {
-      shared_project_network: {
+      project_network: {
         network: { vcn: '10.0.64.0/21' },
       },
     },
@@ -85,7 +85,7 @@ The requester sets `peer_id` to the Region 1 acceptor RPC OCID:
   },
   environments: {
     prod: {
-      shared_project_network: {
+      project_network: {
         network: { vcn: '10.1.64.0/21' },
       },
     },

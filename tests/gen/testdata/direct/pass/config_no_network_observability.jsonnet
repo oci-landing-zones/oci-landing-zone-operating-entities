@@ -1,4 +1,4 @@
-// environments without shared_project_network keep security rules but skip env network observability
+// environments without project_network keep security rules but skip env network observability
 local multi = import 'gen/landing_zone_multi.jsonnet';
 local outputs = multi({
   cis_level: 1,

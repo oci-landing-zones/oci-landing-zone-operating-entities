@@ -89,10 +89,10 @@ local cidr_ingress(description, protocol, src_cidr, port_fields={}) = {
       stateless: true,
     },
 
-    tcp_ingress(ctx, description):: {
+    tcp_ingress(description):: {
       description: description,
       protocol: 'TCP',
-      src: 'all-%s-services-in-oracle-services-network' % ctx.n.region,
+      src: 'all-services',
       src_type: 'SERVICE_CIDR_BLOCK',
       stateless: true,
     },

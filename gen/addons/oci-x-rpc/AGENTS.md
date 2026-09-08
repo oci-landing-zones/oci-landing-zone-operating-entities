@@ -2,7 +2,7 @@
 
 ## Scope
 
-This guide owns config-driven Remote Peering Connection (RPC) behavior under `gen/addons/oci-x-rpc/` and the shared RPC builders. Root `AGENTS.md` owns customer safety, normal One-OE discovery, artifact placement, and deployment defaults. Use this guide after RPC is in scope and before authoring either side of a peering design.
+This guide owns Blueprint Factory Remote Peering Connection (RPC) behavior under `gen/addons/oci-x-rpc/` and the shared RPC builders. Root `AGENTS.md` owns customer safety, normal One-OE discovery, artifact placement, and deployment defaults. Use this guide after RPC is in scope and before authoring either side of a peering design.
 
 ## Source Priority
 
@@ -25,7 +25,7 @@ This guide owns config-driven Remote Peering Connection (RPC) behavior under `ge
 ## Dynamic Topology
 
 - Environment names and counts come from `config.environments`; never hardcode `prod`, `preprod`, `uat`, or a fixed environment count.
-- Local routed VCNs are derived from every environment `shared_project_network` and every network-producing environment or shared platform.
+- Local routed VCNs are derived from every environment `project_network` and every network-producing environment or shared platform.
 - Extension-backed platform VCNs, including OKE VCNs, participate automatically through the normalized platform topology.
 - Identity-only or otherwise networkless environments do not receive VCN routes or DRG attachments.
 - A Landing Zone may own multiple named RPC connections. Build the full tenancy/region connection graph first, then create one config per Landing Zone and one `remote_peering_connections` entry per attached graph edge.

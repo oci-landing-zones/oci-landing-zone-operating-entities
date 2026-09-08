@@ -17,10 +17,10 @@ Core principle: guide the customer through the required design decisions one at 
 
 - A customer asks for landing zone design, deployment, or recommendation help
 - The request is outcome-first, such as "I want landing zone to run OKE"
-- The customer may not know repo or generator terms
-- You need to determine whether the standard published path or the config-driven path fits
+- The customer may not know repository or Blueprint Factory terms
+- You need to determine whether the standard published path or the Blueprint Factory fits
 
-Do not use this skill for repo-development work. Once the request is clearly on the config-driven path and the customer decisions are already known, switch to `landing-zone-config`.
+Do not use this skill for repo-development work. Once the request is clearly on the Blueprint Factory path and the customer decisions are already known, switch to `landing-zone-config`.
 
 ## Workflow
 
@@ -30,13 +30,14 @@ Do not use this skill for repo-development work. Once the request is clearly on 
 4. Before asking the customer to choose between repo labels, explain those options in customer language and recommend a default when the repo has one.
 5. After each answer, summarize what is now known in one sentence, then ask the next missing question.
 6. After the hub family is known and before discussing public exposure, load balancers, or OKE ingress, inspect the matching hub guide or runtime artifacts first so you know what load balancer pattern already exists.
-7. Only after all required decisions are known, including target region and any non-`oc1` realm requirement, may you recommend a published runtime path, a workload extension path, or config-mode generation.
-8. When deployment execution comes up, use the secure delivery defaults from `AGENTS.md`: prefer Terraform CLI or customer-controlled CI/CD; for ORM, use customer-controlled private Object Storage or approved private GitHub source, not public raw URLs.
-9. If the conversation turns into Orchestrator or Resource Manager runtime troubleshooting, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier after this customer flow has established the deployment context.
+7. Before recommending deployment artifacts or config-mode generation, ask the customer to choose CIS Level 1 or CIS Level 2. Explain that CIS1 is the less complex baseline; recommend CIS2 for its stricter security posture, while making clear that generated CIS2 configurations require customer-managed encryption keys for applicable resources and therefore add Vault, key, IAM, deployment-ordering, rotation, recovery, and workload-lifecycle complexity. For OKE, mention Kubernetes-secret and worker boot-volume CMEKs specifically. Do not silently accept the generator's CIS2 default.
+8. Only after all required decisions are known, including target region, any non-`oc1` realm requirement, and the explicit CIS-level choice, may you recommend a published runtime path, a workload extension path, or config-mode generation.
+9. When deployment execution comes up, use the secure delivery defaults from `AGENTS.md`: prefer ORM with customer-controlled private Object Storage and the Orchestrator `rms-facade`; keep Terraform CLI, customer-controlled CI/CD, or approved private GitHub as alternatives. Read `references/orm-bucket-deployment.md` before giving exact deployment or staged-update steps.
+10. If the conversation turns into Orchestrator or Resource Manager runtime troubleshooting, use `oci-lz-orchestrator-contract-advisor` as a supporting verifier after this customer flow has established the deployment context.
 
 ## Unsupported Requirements
 
-If the selected published path, config generator, or workload extension does not support a requested resource, service, topology, or behavior:
+If the selected published path, Blueprint Factory, or workload extension does not support a requested resource, service, topology, or behavior:
 
 - Say plainly that it is not supported by the Landing Zone framework today.
 - Do not invent config keys, edit generated JSON, or imply the framework can create it.
@@ -47,16 +48,19 @@ If the selected published path, config generator, or workload extension does not
 ## Discovery Reminders
 
 - Always default to `One-OE`; do not ask who operates the landing zone or ask the customer to choose a landing zone family.
-- Ask in root `AGENTS.md` order: One-OE baseline, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, then CIDRs.
+- Ask in root `AGENTS.md` order: One-OE baseline, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, CIDRs, then the explicit CIS-level choice.
 - Ask for the target OCI region early. Explain that realm defaults to `oc1` public cloud when omitted, and ask for realm only when a non-public or sovereign deployment may apply, such as `oc19` EU Sovereign Cloud.
-- Explain each decision in customer language before using repo terms such as `One-OE`, `Hub A`, `platform`, `project`, or `shared_project_network`.
+- Explain each decision in customer language before using repo terms such as `One-OE`, `Hub A`, `platform`, `project`, or `project_network`.
+- During network-scope sizing, ask whether project workloads can use shared subnets or require project-dedicated subnet allocations. Recommend shared subnets unless separate CIDR allocation or lifecycle management is required: shared subnets use address space more efficiently, while dedicated subnets commonly leave capacity stranded in lightly used per-project ranges.
+- Before asking for that choice, explain that dedicated allocation is not an IAM boundary: principals with subnet permissions in the environment network compartment may use any of its subnets. Also explain that same-subnet traffic never traverses the hub firewall and must be controlled with NSGs and security lists.
+- Use a professional, outcome-based question such as: “Shared subnets are the recommended default because they use the allocated address space efficiently. Do any projects need separately allocated subnet CIDRs for operational reasons, or can their workloads use shared subnets with NSGs and security lists for segmentation? Dedicated allocation does not provide IAM isolation.” Ask it as the next single discovery question, not as part of a bulk questionnaire.
 - Do not propose concrete CIDRs until the root `AGENTS.md` network-scope gate is complete; use extension guides such as OKE or ExaCS only for extension-specific sizing inputs.
 
 ## OKE-Specific Guardrails
 
 - If the customer only says they want OKE, do not jump to `oke_simple`, single-stack vs multi-stack, or config snippets.
 - Do not assume OKE means `projects` are required.
-- Do not assume an environment needs `shared_project_network` unless the intended topology requires a spoke VCN.
+- Do not assume an environment needs `project_network` unless the intended topology requires a spoke VCN.
 - Explain OCI CIDRs separately from Kubernetes pod and service CIDRs; use `gen/workload-extensions/oke/AGENTS.md` for repo-specific OKE networking semantics.
 - Do not treat non-production as an automatic reason to recommend a no-firewall hub. Firewall-based designs are still the recommended default unless the customer explicitly accepts the tradeoff for a simpler non-production layout.
 - When the customer asks for public access, do not assume the chosen hub needs a brand-new public load balancer design. Check the selected hub guide or runtime artifacts first; in the One-OE one-stack runtime, each hub family already includes a public load balancer example with placeholder backends.
@@ -64,7 +68,7 @@ If the selected published path, config generator, or workload extension does not
 ## RPC Requests
 
 - For explicit RPC, Remote Peering Connection, inter-region OCI VCN peering, same-tenancy remote peering, or cross-tenancy remote peering requests, complete the standard landing zone discovery sequence and then use `landing-zone-config`.
-- Model RPC through config mode with top-level `remote_peering_connections`.
+- Model RPC through Blueprint Factory configuration with top-level `remote_peering_connections`.
 - Read `gen/addons/oci-x-rpc/AGENTS.md` before collecting RPC-specific values or recommending a deployment sequence.
 - For more than two Landing Zones, map the tenancy/region connection graph first. Identify every requested RPC edge and the acceptor/requestor role on each edge, then complete One-OE discovery for each Landing Zone.
 - Ask whether each connection is only for access to the peer Landing Zone or whether traffic must transit through that peer to another connected Landing Zone. Do not infer transitive routing from "connect these tenancies."
@@ -73,6 +77,12 @@ If the selected published path, config generator, or workload extension does not
 - Collect the peer region and all reviewed remote routable CIDRs for each side. A side cannot infer the other side's CIDRs from its own config.
 - For the requestor, collect the acceptor RPC OCID or approved orchestrator dependency key. For cross tenancy, also collect both tenancy OCIDs and the requestor network-administrator group OCID.
 - Explain that One-OE continues to provide governance and baseline IAM. Same-tenancy RPC adds only network changes; cross-tenancy RPC adds the minimum peering policy surface.
+
+## Deployment Reference
+
+- For the preferred ORM + private Object Storage workflow, staged file replacement, Plan/Apply controls, monitoring, and handoff requirements, read `references/orm-bucket-deployment.md`.
+- Verify exact Resource Manager fields against the pinned Orchestrator ref; do not copy values from an unrelated stack, bucket, namespace, or tenancy.
+- This skill is advisory only. Explain the deployment procedure and prepare customer-executable commands or UI steps, but do not upload objects, create or update ORM stacks, run Plan/Apply/Destroy jobs, or start deployment monitoring. A deployment action requires a separate explicit user request and must be handled outside this skill workflow with its own authorization checks.
 
 ## ExaDB-D / ExaCS-Specific Guardrails
 

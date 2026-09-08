@@ -4,6 +4,7 @@
 // function(config, n) -> topology helper object
 
 function(config, n)
+  local environment_names = import './lib/environment_names.libsonnet';
   local labels = import './labels.libsonnet';
   local raw_env_names = std.objectFields(config.environments);
   local preferred_env_names = ['prod', 'preprod', 'staging', 'uat', 'dev', 'test'];
@@ -11,24 +12,8 @@ function(config, n)
     [name for preferred_name in preferred_env_names for name in raw_env_names if name == preferred_name]
     + [name for name in raw_env_names if !std.member(preferred_env_names, name)];
 
-  local env_labels = {
-    prod: { short: 'Prod', long: 'Production', network: 'Prod', dns: 'p' },
-    preprod: { short: 'PreProd', long: 'Pre-Production', network: 'Pre-Production', dns: 'pp' },
-    dev: { short: 'Dev', long: 'Dev', network: 'Dev', dns: 'd' },
-    staging: { short: 'Staging', long: 'Staging', network: 'Staging', dns: 'st' },
-    uat: { short: 'UAT', long: 'UAT', network: 'UAT', dns: 'ua' },
-    test: { short: 'Test', long: 'Test', network: 'Test', dns: 't' },
-  };
-
   local title_case(name) = labels.title_case(name);
-  local env_label(env_name) =
-    if std.objectHas(env_labels, env_name) then env_labels[env_name]
-    else {
-      short: title_case(env_name),
-      long: title_case(env_name),
-      network: title_case(env_name),
-      dns: env_name[0:2],
-    };
+  local env_label(env_name) = environment_names.label(env_name);
 
   local env_entry(env_name, env_config) =
     local key_segments = [env_name];
@@ -54,7 +39,7 @@ function(config, n)
   local ordered_spoke_env_entries = [
     entry
     for entry in env_entries
-    if std.objectHas(entry.env, 'shared_project_network')
+    if std.objectHas(entry.env, 'project_network')
   ];
   local ordered_spoke_env_names = [entry.qualified_name for entry in ordered_spoke_env_entries];
   local security_target_env_entries =
@@ -198,6 +183,13 @@ function(config, n)
 
     project_names_by_env_name(env_name)::
       self.project_names(self.env_entry_by_qualified_name(env_name)),
+
+    project_subnets(scope, project_name)::
+      local entry = if std.type(scope) == 'string' then self.env_entry_by_qualified_name(scope) else scope;
+      if std.objectHas(entry.env, 'projects') &&
+         std.objectHas(entry.env.projects[project_name], 'subnets') then
+        entry.env.projects[project_name].subnets
+      else {},
 
     env_label(env_name):: env_label(env_name),
     env_display(env_name):: self.env_label(env_name).short,

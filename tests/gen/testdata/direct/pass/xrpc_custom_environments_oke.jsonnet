@@ -28,7 +28,7 @@ local rendered = lz({
   },
   environments: {
     blue: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       platforms: {
         oke: {
           network: { vcn: '10.0.80.0/20' },
@@ -44,7 +44,7 @@ local rendered = lz({
       },
     },
     sandbox: {
-      shared_project_network: { network: { vcn: '10.0.128.0/21' } },
+      project_network: { network: { vcn: '10.0.128.0/21' } },
     },
     identity_only: {},
   },

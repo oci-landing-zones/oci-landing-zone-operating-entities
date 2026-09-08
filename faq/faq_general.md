@@ -105,4 +105,4 @@ Based on real-world customer engagements, the following are the most common bad 
 9. Public exposure of services and data (e.g., public Buckets, Database/OKE/Compute with public endpoints, etc.).
 10. Deploying production workloads without logging, monitoring, and notifications.
 
-By using OCI Landing Zones blueprints, these practices are avoided by design. We also recommend periodic [security health checks](https://github.com/oracle-devrel/technology-engineering/blob/main/security/security-design/shared-assets/oci-security-health-check-standard/README.md) to identify any potential misconfigurations.
+By using OCI Landing Zones blueprints, these practices are avoided by design. We also recommend periodic [security health checks](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart) to identify any potential misconfigurations.

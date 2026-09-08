@@ -1,5 +1,5 @@
 local environment(vcn) = {
-  shared_project_network: {
+  project_network: {
     network: {
       vcn: vcn,
     },

@@ -1,11 +1,11 @@
-// environments with shared_project_network get environment security zones and env network observability
+// environments with project_network get environment security zones and env network observability
 local multi = import 'gen/landing_zone_multi.jsonnet';
 local outputs = multi({
   cis_level: 1,
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
     },
   },

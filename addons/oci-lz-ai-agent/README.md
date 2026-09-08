@@ -19,6 +19,13 @@
 
 The **OCI LZ AI Agent** addon helps to use AI coding agents with the OCI Landing Zone Operating Entities repository. It aligns landing zone design with repository knowledge, json structure and review before manual deployment.
 
+### 1.1. Demo Videos
+
+Watch these demos before starting with the OCI LZ AI Agent:
+
+- **[AI Driven Landing Zones](https://www.youtube.com/watch?v=Vuny0Cdmi1U)**
+- **[Secure and Scalable OCI with AI-Driven Landing Zones - Demo](https://www.youtube.com/watch?v=e-KlGvRzHqQ)**
+
 <p align="center">
   <img src="images/oci-lz-ai-agent-flow.png" alt="Three step flow for AI guided Operating Entities setup" width="600">
 </p>

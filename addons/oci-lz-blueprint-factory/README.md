@@ -41,7 +41,7 @@ Paths 1 and 2 produce customer-specific generated files. Path 3 does not require
 
 ## 3. Configuration Syntax and Examples
 
-The source configuration for the Blueprint Factory is a JSON document. JSON keeps the input easy to review, store, and compare in normal code review workflows. The generator also accepts Jsonnet for advanced composition, but the examples in this add-on use JSON.
+The source configuration for the Blueprint Factory is a JSON document. JSON keeps the input easy to review, store, and compare in normal code review workflows. The generator also accepts Jsonnet for advanced composition; see the [Blueprint Factory Configuration Reference](./blueprint-factory-configuration-reference.md) for the supported configuration shape. The examples in this add-on use JSON.
 
 A typical configuration describes the target Landing Zone in a few top-level blocks:
 
@@ -65,7 +65,7 @@ Example shape:
   },
   "environments": {
     "prod": {
-      "shared_project_network": {
+      "project_network": {
         "network": {
           "vcn": "10.0.64.0/21"
         }
@@ -76,7 +76,7 @@ Example shape:
       "platforms": {
         "oke": {
           "network": {
-            "vcn": "10.0.96.0/22"
+            "vcn": "10.0.96.0/20"
           },
           "extension": {
             "type": "oke_simple",
@@ -95,7 +95,7 @@ Example shape:
 }
 ```
 
-Not every configuration needs every block. A small Landing Zone may only define a hub and one or two environments, while a larger design may add platforms, projects, and workload extensions.
+Not every configuration needs every block. A small Landing Zone may only define a hub and one or two environments, while a larger design may add platforms, projects, and workload extensions. `project_network` is optional and supports both shared and project-dedicated subnet allocations. Prefer shared subnets for address efficiency; dedicated allocation does not provide IAM isolation. See the [Blueprint Factory Configuration Reference](./blueprint-factory-configuration-reference.md#4-project-network) for the complete contract and routing implications.
 
 The [examples](./examples) folder contains small and medium-size config files that can be used as starting points for common Blueprint Factory scenarios.
 
@@ -135,15 +135,14 @@ At a high level, the factory:
 1. Produces a generated output package in the selected output directory.
 1. Leaves the generated files ready for review before Terraform or OCI Resource Manager deployment.
 
-The output package commonly includes files such as:
+The output package includes the common files below and only the security and
+observability pair selected by `cis_level` (`2` by default):
 
 - `network.json`
 - `iam.json`
 - `governance.json`
-- `security_cis1.json`
-- `security_cis2.json`
-- `observability_cis1.json`
-- `observability_cis2.json`
+- `security_cis1.json` or `security_cis2.json`
+- `observability_cis1.json` or `observability_cis2.json`
 
 Some configurations emit `*_pre.json` files, such as `network_pre.json` or `observability_*_pre.json`. These files support staged deployments where some resources need to exist before dependent resources are configured.
 
@@ -193,6 +192,7 @@ Deployment follows the standard [Terraform deployment guide](/commons/content/te
 | Resource | Purpose |
 |---|---|
 | [OCI LZ AI Agent](/addons/oci-lz-ai-agent/README.md) | AI-assisted discovery and config drafting guidance. |
+| [Blueprint Factory Configuration Reference](./blueprint-factory-configuration-reference.md) | Blueprint Factory configuration elements and supported shapes. |
 | [Generator README](/gen/README.md) | Local setup and generator commands. |
 | [Generator Architecture](/gen/AGENTS.md) | Advanced generator reference for repository contributors. |
 | [Jsonnet Composition Guide](/gen/JSONNET_COMPOSITION.md) | Advanced composition reference for repository contributors. |
