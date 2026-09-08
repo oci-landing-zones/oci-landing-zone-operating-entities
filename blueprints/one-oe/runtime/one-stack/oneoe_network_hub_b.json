@@ -411,7 +411,7 @@
                                     },
 
                                     "http_preprod_80": {
-                                        "description"                     : "Return flow: allow inbound traffic from PreProd VCN over HTTP to ephemeral ports",
+                                        "description"                     : "Return flow: allow inbound HTTP responses from PreProd VCN to ephemeral ports",
                                         "src"                             : "10.0.128.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "src_port_min"                    : 80,
@@ -423,7 +423,7 @@
                                     },
 
                                     "http_prod_80": {
-                                        "description"                     : "Return flow: allow inbound traffic from Prod VCN over HTTP to ephemeral ports",
+                                        "description"                     : "Return flow: allow inbound HTTP responses from Prod VCN to ephemeral ports",
                                         "src"                             : "10.0.64.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "src_port_min"                    : 80,
@@ -435,7 +435,7 @@
                                     },
 
                                     "https_preprod_443": {
-                                        "description"                     : "Return flow: allow inbound traffic from PreProd VCN over HTTPS to ephemeral ports",
+                                        "description"                     : "Return flow: allow inbound HTTPS responses from PreProd VCN to ephemeral ports",
                                         "src"                             : "10.0.128.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "src_port_min"                    : 443,
@@ -447,7 +447,7 @@
                                     },
 
                                     "https_prod_443": {
-                                        "description"                     : "Return flow: allow inbound traffic from Prod VCN over HTTPS to ephemeral ports",
+                                        "description"                     : "Return flow: allow inbound HTTPS responses from Prod VCN to ephemeral ports",
                                         "src"                             : "10.0.64.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "src_port_min"                    : 443,
@@ -499,7 +499,7 @@
                                     },
 
                                     "http_return_80": {
-                                        "description"                     : "Return flow: allow inbound traffic from 0.0.0.0/0 over HTTP to ephemeral ports",
+                                        "description"                     : "Return flow: allow inbound HTTP responses from 0.0.0.0/0 to ephemeral destination ports",
                                         "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "src_port_min"                    : 80,
@@ -511,7 +511,7 @@
                                     },
 
                                     "https_return_443": {
-                                        "description"                     : "Return flow: allow inbound traffic from 0.0.0.0/0 over HTTPS to ephemeral ports",
+                                        "description"                     : "Return flow: allow inbound HTTPS responses from 0.0.0.0/0 to ephemeral destination ports",
                                         "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "src_port_min"                    : 443,
