@@ -265,7 +265,7 @@ See the [summary of OKE load-balancer annotations](https://docs.oracle.com/en-us
 
 Config-driven OKE generation can prepare OCI File Storage networking and IAM by setting `create_fss: true` in the `oke_simple` parameters. The option defaults to `false`, so the committed quickstarts and existing configurations do not gain extra subnets or permissions.
 
-When enabled, the generated OKE VCN includes a private FSS subnet, service-gateway-only route table, FSS security list and NSG, and paired stateless NFS rules between the FSS and worker NSGs. The OKE cluster principal also receives `manage file-family` in its own platform compartment.
+When enabled, the generated OKE VCN includes a private FSS subnet, service-gateway-only route table, FSS security list and NSG, and paired stateless NFS rules between the FSS and worker NSGs. For VCN-native networking, the same rules are generated between the FSS and pod NSGs so OKE virtual nodes can mount FSS directly from pods. The OKE cluster principal also receives `manage file-family` in its own platform compartment.
 
 The extension does not create a file system, mount target, or Kubernetes storage objects. After infrastructure deployment, create a mount target in the generated FSS subnet and associate the generated FSS NSG with it. Then configure the `fss.csi.oraclecloud.com` StorageClass with that existing `mountTargetOcid` and the OKE platform compartment. This keeps the mount target and its NSG association under infrastructure management while CSI manages file systems and persistent volumes. See [Provisioning PVCs on the File Storage Service](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingpersistentvolumeclaim_Provisioning_PVCs_on_FSS.htm).
 
