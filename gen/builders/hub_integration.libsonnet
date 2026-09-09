@@ -82,12 +82,12 @@ function(params)
   local nsg_lb_spoke_return = std.foldl(
     function(acc, e) acc {
       ['http_%s_80' % e.name]: common._tcp_return_ingress_rule(
-        'Return flow: allow inbound traffic from %s VCN over HTTP to ephemeral ports' % e.display,
+        'Return flow: allow inbound HTTP responses from %s VCN to ephemeral ports' % e.display,
         e.vcn,
         80
       ),
       ['https_%s_443' % e.name]: common._tcp_return_ingress_rule(
-        'Return flow: allow inbound traffic from %s VCN over HTTPS to ephemeral ports' % e.display,
+        'Return flow: allow inbound HTTPS responses from %s VCN to ephemeral ports' % e.display,
         e.vcn,
         443
       ),

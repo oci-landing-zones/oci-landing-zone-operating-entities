@@ -448,7 +448,7 @@
                                     },
 
                                     "http_prod_80": {
-                                        "description"                     : "RReturn flow: allow inbound HTTP responses from Prod VCN to ephemeral ports",
+                                        "description"                     : "Return flow: allow inbound HTTP responses from Prod VCN to ephemeral ports",
                                         "src"                             : "10.0.64.0/21",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "src_port_min"                    : 80,

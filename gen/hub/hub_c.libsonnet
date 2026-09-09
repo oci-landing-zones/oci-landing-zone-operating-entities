@@ -209,12 +209,12 @@ function(hub_ctx)
                         stateless=true
                       ),
                       http_return_80: common._tcp_return_ingress_rule(
-                        'Return flow: allow inbound traffic from 0.0.0.0/0 over HTTP to ephemeral ports',
+                        'Return flow: allow inbound HTTP responses from 0.0.0.0/0 to ephemeral destination ports',
                         '0.0.0.0/0',
                         80
                       ),
                       https_return_443: common._tcp_return_ingress_rule(
-                        'Return flow: allow inbound traffic from 0.0.0.0/0 over HTTPS to ephemeral ports',
+                        'Return flow: allow inbound HTTPS responses from 0.0.0.0/0 to ephemeral destination ports',
                         '0.0.0.0/0',
                         443
                       ),
