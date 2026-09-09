@@ -88,7 +88,7 @@ In this asset, we assume that One-OE has already been deployed, and we focus on 
       <td rowspan="2"><strong>Use Case 1 (UC1)</strong></td>
       <td><strong>IAM configuration</strong><br><a href="exacc_identity_uc1.json">exacc_identity_uc1.json</a></td>
       <td>• ExaDB-C@C compartments<br>• ExaDB-C@C IAM groups and policies</td>
-      <td>cmp-lz-shared-exacc, cmp-lz-shared-exacc-db, cmp-lz-shared-exacc-infra, cmp-lz-preprod-proj1-exacc-db, cmp-lz-prod-proj1-exacc-db <br><br> grp-lz-global-exacc-db-admin, grp-lz-global-exacc-infra-admin, grp-lz-preprod-proj1-exacc-admin, grp-lz-prod-proj1-exacc-admin <br><br> pcy-lz-global-exacc-db-admin, pcy-lz-global-exacc-generic, pcy-lz-global-exacc-infra-admin, pcy-lz-preprod-exacc-proj1-admin, pcy-lz-prod-exacc-proj1-admin</td>
+      <td>Shared ExaDB-C@C infrastructure and database compartments, plus project database compartments.<br><br>Global Infra, Global DBA, and Project DBA groups and policies, including read access from each Project DBA to its hosting ACD.</td>
     </tr>
     <tr>
       <td><strong>Observability configuration</strong><br><a href="exacc_observability_uc1.json">exacc_observability_uc1.json</a></td>
@@ -99,18 +99,18 @@ In this asset, we assume that One-OE has already been deployed, and we focus on 
       <td rowspan="2"><strong>Use Case 2 (UC2)</strong></td>
       <td><strong>IAM configuration</strong><br><a href="exacc_identity_uc2.json">exacc_identity_uc2.json</a></td>
       <td>• ExaDB-C@C compartments<br>• ExaDB-C@C IAM groups and policies</td>
-      <td>cmp-lz-shared-exacc, cmp-lz-shared-exacc-db, cmp-lz-shared-exacc-infra, cmp-lz-preprod-exacc, cmp-lz-preprod-exacc-db, cmp-lz-preprod-exacc-infra, cmp-lz-preprod-proj1-exacc-db, cmp-lz-prod-exacc, cmp-lz-prod-exacc-db, cmp-lz-prod-exacc-infra, cmp-lz-prod-proj1-exacc-db <br><br> grp-lz-global-exacc-db-admin, grp-lz-global-exacc-infra-admin, grp-lz-preprod-proj1-exacc-admin, grp-lz-prod-proj1-exacc-admin <br><br> pcy-lz-global-exacc-db-admin, pcy-lz-global-exacc-generic, pcy-lz-global-exacc-infra-admin, pcy-lz-preprod-exacc-proj1-admin, pcy-lz-prod-exacc-proj1-admin</td>
+      <td>Shared ExaDB-C@C infrastructure, environment database platform compartments, and project database compartments.<br><br>Global Infra umbrella, environment Infra and DBA, and Project DBA groups and policies. Environment roles receive only the shared-infrastructure dependency permissions required for their VMC, AVMC, and ACD operations.</td>
     </tr>
     <tr>
       <td><strong>Observability configuration</strong><br><a href="exacc_observability_uc2.json">exacc_observability_uc2.json</a></td>
       <td>• Events<br>• Alarms<br>• Notifications</td>
-      <td>rul-lz-notify-on-opctl-events, rul-lz-notify-on-exacc-db-events, rul-lz-notify-on-exacc-infra-events, rul-lz-notify-on-exacc-vmc-events, rul-lz-preprod-notify-on-exacc-db-events, rul-lz-preprod-notify-on-exacc-infra-events, rul-lz-preprod-notify-on-exacc-vmc-events, rul-lz-preprod-notify-on-notifications, rul-lz-prod-notify-on-exacc-db-events, rul-lz-prod-notify-on-exacc-infra-events, rul-lz-prod-notify-on-exacc-vmc-events, rul-lz-prod-notify-on-notifications <br><br> al-lz-db-cpuutil, al-lz-vmc-cpuutil, al-lz-vmc-dgutil, al-lz-vmc-fsutil, al-lz-vmc-memutil, al-lz-vmc-swaputil, al-lz-preprod-db-cpuutil, al-lz-preprod-vmc-cpuutil, al-lz-preprod-vmc-dgutil, al-lz-preprod-vmc-fsutil, al-lz-preprod-vmc-memutil, al-lz-preprod-vmc-swaputil, al-lz-preprod-db-storageutil, al-lz-prod-db-cpuutil, al-lz-prod-vmc-cpuutil, al-lz-prod-vmc-dgutil, al-lz-prod-vmc-fsutil, al-lz-prod-vmc-memutil, al-lz-prod-vmc-swaputil, al-lz-prod-db-storageutil, al-lz-db-storageutil <br><br> nott-lz-exacc-db-workloads, nott-lz-exacc-infra-workloads, nott-lz-preprod-exacc-projects, nott-lz-prod-exacc-projects</td>
+      <td>Shared-infrastructure events and topic; per-environment database/VMC events, seven alarms per environment, and environment/project topics. Extension totals: 8 event rules, 14 alarms, and 3 topics.</td>
     </tr>
     <tr>
       <td rowspan="2"><strong>Use Case 3 (UC3)</strong></td>
       <td><strong>IAM configuration</strong><br><a href="exacc_identity_uc3.json">exacc_identity_uc3.json</a></td>
       <td>• ExaDB-C@C compartments<br>• ExaDB-C@C IAM groups and policies</td>
-      <td>cmp-lz-preprod-exacc, cmp-lz-preprod-exacc-db, cmp-lz-preprod-exacc-infra, cmp-lz-preprod-proj1-exacc-db, cmp-lz-prod-exacc, cmp-lz-prod-exacc-db, cmp-lz-prod-exacc-infra, cmp-lz-prod-proj1-exacc-db <br><br> grp-lz-global-exacc-db-admin, grp-lz-global-exacc-infra-admin, grp-lz-preprod-proj1-exacc-admin, grp-lz-prod-proj1-exacc-admin <br><br> pcy-lz-global-exacc-db-admin, pcy-lz-global-exacc-generic, pcy-lz-global-exacc-infra-admin, pcy-lz-preprod-exacc-proj1-admin, pcy-lz-prod-exacc-proj1-admin</td>
+      <td>Environment-dedicated ExaDB-C@C infrastructure and database platform compartments, plus project database compartments.<br><br>Environment Infra and DBA groups per environment, plus Project DBA groups and policies. No global ExaDB-C@C administration group is generated.</td>
     </tr>
     <tr>
       <td><strong>Observability configuration</strong><br><a href="exacc_observability_uc3.json">exacc_observability_uc3.json</a></td>

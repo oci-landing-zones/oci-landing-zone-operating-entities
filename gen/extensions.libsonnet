@@ -318,11 +318,31 @@ local collections = import 'lib/collections.libsonnet';
       }
       for ext_type in extension_types
     };
+    local extension_shared_components = {
+      [ext_type]: {
+        infrastructure: std.length([
+          entry
+          for entry in extension_entries
+          if entry.platform_config.extension.type == ext_type &&
+             entry.scope.scope_type == 'shared' &&
+             entry_components(entry).infrastructure
+        ]) > 0,
+        database: std.length([
+          entry
+          for entry in extension_entries
+          if entry.platform_config.extension.type == ext_type &&
+             entry.scope.scope_type == 'shared' &&
+             entry_components(entry).database
+        ]) > 0,
+      }
+      for ext_type in extension_types
+    };
     local results = std.map(
       function(entry)
         local entry_with_summary = entry {
           scope_config+: {
             extension_components: extension_components,
+            extension_shared_components: extension_shared_components,
             extension_entry_components: entry_components(entry),
             extension_entry_uses_publication_components: publication_components(entry) != null,
             extension_has_networks: extension_has_networks,

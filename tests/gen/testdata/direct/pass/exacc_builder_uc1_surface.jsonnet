@@ -13,7 +13,15 @@
 // contains: exacc-db@example.com
 // contains: exacc-infra@example.com
 // contains: exacc-projects@example.com
-// contains: "db_admin_uses_db_tag_for_exadata": true
+// contains: "db_admin_uses_infra_tag_for_exadata": true
+// contains: "infra_admin_uses_exacc_vm_permissions": true
+// contains: "db_admin_uses_exacc_vm_permissions": true
+// contains: "infra_admin_uses_autonomous_vmclusters": true
+// contains: "db_admin_uses_autonomous_vmclusters": true
+// contains: "project_db_uses_distinct_tag": true
+// contains: "project_policy_manages_acd": false
+// contains: "platform_acd_policy_attached_to_platform_db": true
+// contains: read autonomous-container-databases in compartment cmp-lz-prod-exacc-db
 local lz = import 'gen/landing_zone.libsonnet';
 
 local env_exacc_platform(projects=[]) = {
@@ -62,6 +70,19 @@ local result = lz({
 });
 
 local global_db_policy = result.iam.policies_configuration.supplied_policies['PCY-LZ-GLOBAL-EXACC-DB-ADMIN-KEY'];
+local global_infra_policy = result.iam.policies_configuration.supplied_policies['PCY-LZ-GLOBAL-EXACC-INFRA-ADMIN-KEY'];
+local project_policy = result.iam.policies_configuration.supplied_policies['PCY-LZ-PROD-EXACC-PROJ1-ADMIN-KEY'];
+local platform_acd_policy = result.iam.policies_configuration.supplied_policies['PCY-LZ-PROD-EXACC-PROJECT-ACD-READ-KEY'];
+local prod_project_db = result.iam.compartments_configuration.compartments['CMP-LANDINGZONE-KEY']
+  .children['CMP-LZ-PROD-KEY']
+  .children['CMP-LZ-PROD-PROJECTS-KEY']
+  .children['CMP-LZ-PROD-PROJ1-KEY']
+  .children['CMP-LZ-PROD-PROJ1-EXACC-DB-KEY'];
+local statements_contain(statements, needle) = std.length([
+  statement
+  for statement in statements
+  if std.length(std.findSubstr(needle, statement)) > 0
+]) > 0;
 
 std.manifestJsonEx({
   compartments: result.iam.compartments_configuration.compartments,
@@ -80,10 +101,25 @@ std.manifestJsonEx({
     prod_projects: result.observability_cis1.notifications_configuration.topics['NOTT-LZ-PROD-EXACC-PROJECTS-KEY'].description,
   },
   policy_description: result.iam.policies_configuration.supplied_policies['PCY-LZ-PROD-EXACC-PROJ1-ADMIN-KEY'].description,
-  db_admin_uses_db_tag_for_exadata: std.length([
+  db_admin_uses_infra_tag_for_exadata: std.length([
     statement
     for statement in global_db_policy.statements
     if std.length(std.findSubstr('use exadata-infrastructures', statement)) > 0
-       && std.length(std.findSubstr("'lz-exacc-db-admin'", statement)) > 0
+       && std.length(std.findSubstr("'lz-exacc-infra-admin'", statement)) > 0
   ]) == 1,
+  infra_admin_uses_exacc_vm_permissions:
+    statements_contain(global_infra_policy.statements, "request.permission !='VM_CLUSTER_UPDATE_GI_SOFTWARE'"),
+  db_admin_uses_exacc_vm_permissions:
+    statements_contain(global_db_policy.statements, "request.permission !='VM_CLUSTER_UPDATE_CPU'"),
+  infra_admin_uses_autonomous_vmclusters:
+    statements_contain(global_infra_policy.statements, 'manage autonomous-vmclusters'),
+  db_admin_uses_autonomous_vmclusters:
+    statements_contain(global_db_policy.statements, 'use autonomous-vmclusters'),
+  project_db_uses_distinct_tag:
+    prod_project_db.defined_tags['tagns-lz-role.tag-lz-role'] == 'lz-exacc-project-db-admin',
+  project_policy_manages_acd:
+    statements_contain(project_policy.statements, 'manage autonomous-container-databases'),
+  platform_acd_policy_attached_to_platform_db:
+    platform_acd_policy.compartment_id == 'CMP-LZ-PROD-EXACC-DB-KEY',
+  platform_acd_policy_statements: platform_acd_policy.statements,
 }, '  ')

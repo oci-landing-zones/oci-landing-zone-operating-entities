@@ -58,23 +58,6 @@ local db_events = [
   'com.oraclecloud.databaseservice.dbsystem.information',
 ];
 
-local vmc_events = [
-  'com.oraclecloud.databaseservice.deletevmclusternetwork.begin',
-  'com.oraclecloud.databaseservice.deletevmclusternetwork.end',
-  'com.oraclecloud.databaseservice.changevmclustercompartment',
-  'com.oraclecloud.databaseservice.deletevmcluster.begin',
-  'com.oraclecloud.databaseservice.deletevmcluster.end',
-  'com.oraclecloud.databaseservice.updatevmcluster.begin',
-  'com.oraclecloud.databaseservice.updatevmcluster.end',
-  'com.oraclecloud.databaseservice.patchvmcluster.begin',
-  'com.oraclecloud.databaseservice.patchvmcluster.end',
-  'com.oraclecloud.databaseservice.changeautonomousvmclustercompartment',
-  'com.oraclecloud.databaseservice.deleteautonomousvmcluster.begin',
-  'com.oraclecloud.databaseservice.deleteautonomousvmcluster.end',
-  'com.oraclecloud.databaseservice.updateautonomousvmcluster.begin',
-  'com.oraclecloud.databaseservice.updateautonomousvmcluster.end',
-];
-
 local operator_events = [
   'com.oraclecloud.operatorcontrol.UpdateOperatorControl',
   'com.oraclecloud.operatorcontrol.DeleteOperatorControl',
@@ -96,26 +79,8 @@ local operator_events = [
 {
   catalog(product):: {
     db: db_events,
-    infra: [
-      'com.oraclecloud.databaseservice.changeexadatainfrastructurecompartment',
-      'com.oraclecloud.databaseservice.deleteexadatainfrastructure.begin',
-      'com.oraclecloud.databaseservice.deleteexadatainfrastructure.end',
-      'com.oraclecloud.databaseservice.updateexadatainfrastructure.begin',
-      'com.oraclecloud.databaseservice.updateexadatainfrastructure.end',
-      'com.oraclecloud.databaseservice.exadatainfrastructureconnectstatus',
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenancereminder' % product.infra_event_stem,
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenance.begin' % product.infra_event_stem,
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenance.end' % product.infra_event_stem,
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenancecustomactiontime.begin' % product.infra_event_stem,
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenancecustomactiontime.end' % product.infra_event_stem,
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenancenetworkswitches.begin' % product.infra_event_stem,
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenancenetworkswitches.end' % product.infra_event_stem,
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenancestorageservers.start' % product.infra_event_stem,
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenancestorageservers.end' % product.infra_event_stem,
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenancedbservers.start' % product.infra_event_stem,
-      'com.oraclecloud.databaseservice.%sinfrastructuremaintenancedbservers.end' % product.infra_event_stem,
-    ],
+    infra: product.events.infra,
     operator: operator_events,
-    vmc: vmc_events,
+    vmc: product.events.vmc,
   },
 }

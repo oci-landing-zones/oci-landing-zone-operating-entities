@@ -10,18 +10,23 @@ local exacs_params(projects=null) = {
   notification_emails: notification_emails,
 };
 
-local exacs_extension(projects=null) = {
+local infra_only = { infrastructure: true, database: false };
+local db_only = { infrastructure: false, database: true };
+local infra_and_db = { infrastructure: true, database: true };
+
+local exacs_extension(projects=null, components=null) = {
+  [if components != null then 'publication_components']: components,
   extension: {
     type: 'exacs',
     params: exacs_params(projects),
   },
 };
 
-local env_exacs_platform(projects, vcn) = exacs_extension(projects) {
+local env_exacs_platform(projects, vcn, components=null) = exacs_extension(projects, components) + {
   network: { vcn: vcn },
 };
 
-local shared_exacs_platform = exacs_extension() {
+local shared_exacs_platform(projects=null) = exacs_extension(projects, infra_and_db) + {
   network: { vcn: '10.0.24.0/21' },
 };
 
@@ -50,36 +55,27 @@ local base_prod_preprod_config(hub_kind) = {
 };
 
 local prod_preprod_exacs_uc1_config(hub_kind) = base_prod_preprod_config(hub_kind) {
-  environments+: {
-    prod+: {
-      platforms: {
-        exacs: exacs_extension(['proj1']),
-      },
-    },
-    preprod+: {
-      platforms: {
-        exacs: exacs_extension(['proj1']),
-      },
-    },
-  },
   shared_platforms: {
-    exacs: shared_exacs_platform,
+    exacs: shared_exacs_platform({
+      prod: ['proj1'],
+      preprod: ['proj1'],
+    }),
   },
 };
 
 local prod_preprod_exacs_uc2_config(hub_kind) = base_prod_preprod_config(hub_kind) {
   shared_platforms: {
-    exacs: exacs_extension(),
+    exacs: exacs_extension(null, infra_only),
   },
   environments+: {
     prod+: {
       platforms: {
-        exacs: env_exacs_platform(['proj1'], prod_exacs_vcn),
+        exacs: env_exacs_platform(['proj1'], prod_exacs_vcn, db_only),
       },
     },
     preprod+: {
       platforms: {
-        exacs: env_exacs_platform(['proj1'], preprod_exacs_vcn),
+        exacs: env_exacs_platform(['proj1'], preprod_exacs_vcn, db_only),
       },
     },
   },
@@ -89,12 +85,12 @@ local prod_preprod_exacs_uc3_config(hub_kind) = base_prod_preprod_config(hub_kin
   environments+: {
     prod+: {
       platforms: {
-        exacs: env_exacs_platform(['proj1'], prod_exacs_vcn),
+        exacs: env_exacs_platform(['proj1'], prod_exacs_vcn, infra_and_db),
       },
     },
     preprod+: {
       platforms: {
-        exacs: env_exacs_platform(['proj1'], preprod_exacs_vcn),
+        exacs: env_exacs_platform(['proj1'], preprod_exacs_vcn, infra_and_db),
       },
     },
   },
