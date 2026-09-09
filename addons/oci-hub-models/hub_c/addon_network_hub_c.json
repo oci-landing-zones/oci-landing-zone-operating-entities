@@ -471,7 +471,7 @@
                                     },
 
                                     "http_return_80": {
-                                        "description"                     : "Return flow: allow inbound traffic from 0.0.0.0/0 over HTTP to ephemeral ports",
+                                        "description"                     : "Return flow: allow inbound HTTP responses from 0.0.0.0/0 to ephemeral destination ports",
                                         "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "src_port_min"                    : 80,
@@ -483,7 +483,7 @@
                                     },
 
                                     "https_return_443": {
-                                        "description"                     : "Return flow: allow inbound traffic from 0.0.0.0/0 over HTTPS to ephemeral ports",
+                                        "description"                     : "Return flow: allow inbound HTTPS responses from 0.0.0.0/0 to ephemeral destination ports",
                                         "src"                             : "0.0.0.0/0",
                                         "src_type"                        : "CIDR_BLOCK",
                                         "src_port_min"                    : 443,
