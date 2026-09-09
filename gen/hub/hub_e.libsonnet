@@ -1,7 +1,7 @@
 // hub_e.libsonnet — Hub E builder (no firewall, DRG-only routing).
 // Simplest hub: 4 subnets (LB, MGMT, MON, DNS), direct DRG spoke-to-spoke routing.
 //
-// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc }
+// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, spoke_ingress_nsg_keys, lb_return_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc }
 //
 // hub_ctx.naming: naming object from naming('fra')
 // hub_ctx.hub_config: { kind: 'hub_e', network: { vcn: '...', subnets: { lb, mgmt, mon, dns } } }

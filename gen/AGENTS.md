@@ -278,6 +278,8 @@ function(hub_ctx) -> {
   spoke_route_tables:  [string],    // RT keys that need spoke CIDR routes via DRG
   post_route_tables:   [string],    // RT keys that need spoke CIDR routes via firewall IP
   fw_nsg_key:          string|null, // NSG key for firewall ingress rules (null if no FW)
+  spoke_ingress_nsg_keys: [string], // NSGs that receive generated ingress rules for every routed VCN
+  lb_return_nsg_key:   string|null, // stateless LB NSG that receives generated backend return-flow rules
   has_spoke_natgw:     bool,        // whether spokes get NAT GW + direct peer routes
   post_route_entity_id:   string,   // (if firewall) OCID placeholder for post-deploy routes
   post_route_entity_desc: string,   // human description of the post-deploy route target
@@ -290,7 +292,7 @@ function(hub_ctx) -> {
 - `hub_ctx.lb_backends`: `{ backend1_ip, backend2_ip }` -- example LB backend IPs supplied by the orchestrator
 - `hub_ctx.lb_env_name`: first ordered workload spoke name used for example LB naming
 
-The orchestrator (`landing_zone.libsonnet`) dispatches to the correct hub builder, delegates spoke category rendering to `gen/builders/network_spokes.libsonnet`, and delegates DRG and hub overlays to `gen/builders/hub_integration.libsonnet`.
+The orchestrator (`landing_zone.libsonnet`) dispatches to the correct hub builder, delegates spoke category rendering to `gen/builders/network_spokes.libsonnet`, and delegates DRG and hub overlays to `gen/builders/hub_integration.libsonnet`. The integration builder uses `spoke_ingress_nsg_keys` and `lb_return_nsg_key` to generate stateless forward and return rules from normalized routed-VCN entries; hub builders must not hardcode environment names or spoke CIDRs.
 
 LB example backend term definitions:
 

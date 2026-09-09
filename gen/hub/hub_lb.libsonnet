@@ -16,31 +16,33 @@ local common = import 'hub_common.libsonnet';
 {
   // --- LB NSG ---
 
-  _lb_nsg(n):: {
+  _lb_nsg(n, ingress_cidr='0.0.0.0/0', stateless=false):: {
     [n.key('NSG', ['HUB', 'LB'])]: {
       display_name: n.display('nsg', ['hub', 'lb']),
 
-      egress_rules: common._nsg_egress_tcp_only,
+      egress_rules:
+        if stateless then common._nsg_egress_tcp_stateless
+        else common._nsg_egress_tcp_only,
 
       ingress_rules: {
         http_80: {
           description: 'Allow inbound traffic from 0.0.0.0/0 over HTTP',
-          src: '0.0.0.0/0',
+          src: ingress_cidr,
           src_type: 'CIDR_BLOCK',
           dst_port_max: 80,
           dst_port_min: 80,
           protocol: 'TCP',
-          stateless: false,
+          stateless: stateless,
         },
 
         https_443: {
           description: 'Allow inbound traffic from 0.0.0.0/0 over HTTPS',
-          src: '0.0.0.0/0',
+          src: ingress_cidr,
           src_type: 'CIDR_BLOCK',
           dst_port_max: 443,
           dst_port_min: 443,
           protocol: 'TCP',
-          stateless: false,
+          stateless: stateless,
         },
       },
     },

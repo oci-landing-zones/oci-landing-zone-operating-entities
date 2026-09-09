@@ -159,7 +159,7 @@ function(inputs)
         [web_nsg_key]: {
           compartment_id: proj_cmp,
           display_name: n.display('nsg', name_segments + [proj_name, 'web']),
-          egress_rules: common._nsg_egress_tcp_only,
+          egress_rules: common._nsg_egress_all,
           ingress_rules: {
             http_80: hub_tcp_ingress_rule(
               'Allow inbound traffic from Hub LB subnet over HTTP',
@@ -181,7 +181,7 @@ function(inputs)
         [app_nsg_key]: {
           compartment_id: proj_cmp,
           display_name: n.display('nsg', name_segments + [proj_name, 'app']),
-          egress_rules: common._nsg_egress_tcp_only,
+          egress_rules: common._nsg_egress_all,
           ingress_rules: {
             http_80: nsg_tcp_ingress_rule(
               'Allow inbound from NSG %s over HTTP' % n.display('nsg', name_segments + [proj_name, 'web']),
@@ -203,7 +203,7 @@ function(inputs)
         [db_nsg_key]: {
           compartment_id: proj_cmp,
           display_name: n.display('nsg', name_segments + [proj_name, 'db']),
-          egress_rules: common._nsg_egress_tcp_only,
+          egress_rules: common._nsg_egress_all,
           ingress_rules: {
             db_1521: nsg_tcp_ingress_rule(
               'Allow inbound from NSG %s over TCP 1521' % n.display('nsg', name_segments + [proj_name, 'app']),
@@ -296,10 +296,10 @@ function(inputs)
               display_name: n.display('sl', name_segments + ['proj', 'generic']),
               egress_rules: [
                 {
-                  description: 'Allow all outbound traffic to 0.0.0.0/0 over ALL protocols',
+                  description: 'Allow outbound ICMP to 0.0.0.0/0',
                   dst: '0.0.0.0/0',
                   dst_type: 'CIDR_BLOCK',
-                  protocol: 'ALL',
+                  protocol: 'ICMP',
                   stateless: false,
                 },
                 {
