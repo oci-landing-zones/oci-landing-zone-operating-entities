@@ -154,6 +154,7 @@ Update this diagram when any of these change:
   - `gen/workload-extensions/exacs/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacs/multi-stack/profiles.libsonnet`
   - `gen/addons/oci-hub-models/profiles.libsonnet`
+  - `gen/addons/oci-x-rpc/profiles.libsonnet`
 - Published entrypoints must stay thin:
   - import the local `profiles.libsonnet`
   - call either `landing_zone.libsonnet`, a local `output_builder.libsonnet`, or a local `published.libsonnet` adapter with one profile config
@@ -190,10 +191,12 @@ Rules:
 Current adapters:
 
 - `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. It reuses `gen/render_context.libsonnet` for normalization/topology-derived inputs while preserving the hub-only network contract and shared-only IAM/governance projections.
+- `gen/addons/oci-x-rpc/published.libsonnet` — owns RPC-only network/IAM projections for config-driven verification and the complete governance, IAM, and network surfaces used by the X-RPC runtime reference templates.
 - `gen/workload-extensions/exacc/{single-stack,multi-stack}/published.libsonnet` — own ExaDB-C@C stack-local publication projections.
 - `gen/workload-extensions/exacs/multi-stack/published.libsonnet` — owns ExaDB-D / ExaCS multi-stack publication projections.
 
 Extension-specific adapters are documented in the owning extension directory when an extension has its own `AGENTS.md`.
+Add-on-specific adapters are documented in the owning add-on directory when an add-on has its own `AGENTS.md`.
 
 ## 3. Config Schema
 
