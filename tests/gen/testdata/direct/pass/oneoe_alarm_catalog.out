@@ -1,0 +1,16 @@
+{
+  "alarm_count": 52,
+  "default_alarm_compartment": "CMP-LZ-SECURITY-KEY",
+  "enabled_count": 38,
+  "phoenix_key": true,
+  "phoenix_name": "al-phx-lz-network-lb-unhealthy-backend",
+  "phoenix_topic": [
+    "NOTT-PHX-LZ-NETWORK-KEY"
+  ],
+  "preprod_scope": "CMP-LZ-PREPROD-NETWORK-KEY",
+  "prod_scope": "CMP-LZ-PROD-NETWORK-KEY",
+  "shared_lb_query": "unhealthyBackendServers[1m]{lbComponent = \"backendSet\"}.max() > 0",
+  "shared_lb_topic": [
+    "NOTT-FRA-LZ-NETWORK-KEY"
+  ]
+}

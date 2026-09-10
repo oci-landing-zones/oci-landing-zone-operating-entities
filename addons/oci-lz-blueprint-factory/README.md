@@ -110,6 +110,7 @@ The [examples](./examples) folder contains small and medium-size config files th
 | [Prod and preprod projects](./examples/02-prod-preprod-projects.json) | Two environments, project networks, and multiple projects. |
 | [Prod with OKE](./examples/03-prod-oke.json) | Environment-scoped OKE platform using the `oke_simple` extension. |
 | [Shared ExaCS with Autonomous DB tiers](./examples/04-shared-exacs-autonomous.json) | Shared ExaCS platform and project DB tiers across environments. |
+| [One-OE regional DR pair](./examples/oneoe-dr/) | Separate home and DR configurations with exact RPC-advertised VCN CIDRs. |
 
 Generate any example from the repository root:
 
@@ -118,6 +119,17 @@ bash gen/generate.sh --config addons/oci-lz-blueprint-factory/examples/01-single
 ```
 
 Use the examples as readable patterns. Replace region, hub model, environment names, CIDRs, project names, extension parameters, and notification emails with values reviewed for the target deployment.
+
+Generate the One-OE DR pair into separate deployment units:
+
+```bash
+bash gen/generate.sh --dr-config \
+  addons/oci-lz-blueprint-factory/examples/oneoe-dr/home.json \
+  addons/oci-lz-blueprint-factory/examples/oneoe-dr/dr.json \
+  generated/oneoe-dr
+```
+
+Deploy `generated/oneoe-dr/home/` and `generated/oneoe-dr/dr/` with different OCI Resource Manager stacks or Terraform states. Using the same hub model in both regions is recommended for operational consistency, but mixed Hub A, B, C, and E models are supported; each side derives its routing from its own configuration.
 
 &nbsp;
 
@@ -128,6 +140,14 @@ The factory flow starts with a source configuration and produces a generated fil
 ```bash
 bash gen/generate.sh --config <config_file> [output_dir]
 ```
+
+For a regional DR pair, provide both independently runnable configurations:
+
+```bash
+bash gen/generate.sh --dr-config <home_config> <dr_config> [output_dir]
+```
+
+The DR mode publishes network-only packages in `home/` and `dr/`, including the acceptor and requester replacements. The output directory must not already exist, so an invalid side cannot leave a partial published package.
 
 At a high level, the factory:
 

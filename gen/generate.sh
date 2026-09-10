@@ -88,6 +88,38 @@ fi
 INPUT_DIR=$(dirname "${BASH_SOURCE[0]}")
 OUTPUT_DIR="$INPUT_DIR/.."
 
+# --- DR config mode: publish separate, network-only home and DR packages ---
+if [[ "${1:-}" == "--dr-config" ]]; then
+  HOME_CONFIG_FILE="${2:?Usage: generate.sh --dr-config <home_config> <dr_config> [output_dir]}"
+  DR_CONFIG_FILE="${3:?Usage: generate.sh --dr-config <home_config> <dr_config> [output_dir]}"
+  DR_OUTPUT_DIR="${4:-output}"
+  if [[ "$DR_OUTPUT_DIR" == "/" || "$DR_OUTPUT_DIR" == "." || -e "$DR_OUTPUT_DIR" ]]; then
+    echo "Error: DR output directory must be a new, non-root path: $DR_OUTPUT_DIR" >&2
+    exit 1
+  fi
+  DR_OUTPUT_PARENT=$(dirname "$DR_OUTPUT_DIR")
+  mkdir -p "$DR_OUTPUT_PARENT"
+  DR_STAGE_DIR=$(mktemp -d "$DR_OUTPUT_PARENT/.oneoe-dr-generate.XXXXXX")
+  trap 'rm -rf "$DR_STAGE_DIR"' EXIT
+  mkdir -p "$DR_STAGE_DIR/home" "$DR_STAGE_DIR/dr"
+
+  for side in home dr; do
+    output_files=$("$JSONNET_BIN" -J "$OUTPUT_DIR" --multi "$DR_STAGE_DIR/$side/" \
+      --tla-code-file "home_config=$HOME_CONFIG_FILE" \
+      --tla-code-file "dr_config=$DR_CONFIG_FILE" \
+      --tla-str "side=$side" \
+      "$INPUT_DIR/landing_zone_dr_multi.jsonnet")
+    while read -r outfile; do
+      python3 "$INPUT_DIR/format_json.py" < "$outfile" > "${outfile}.tmp" && mv "${outfile}.tmp" "$outfile"
+    done <<< "$output_files"
+  done
+
+  mv "$DR_STAGE_DIR" "$DR_OUTPUT_DIR"
+  trap - EXIT
+  echo "Generated DR network outputs in $DR_OUTPUT_DIR/"
+  exit 0
+fi
+
 # --- Config mode: generate all outputs from a single config file ---
 if [[ "${1:-}" == "--config" ]]; then
   CONFIG_FILE="${2:?Usage: generate.sh --config <config_file> [output_dir]}"
@@ -127,5 +159,7 @@ while IFS= read -r -d '' file; do
 done < <(
   find "$INPUT_DIR" \
     -path "$INPUT_DIR/testdata" -prune -o \
-    -type f -name "*.jsonnet" ! -name "landing_zone_multi.jsonnet" -print0
+    -type f -name "*.jsonnet" \
+    ! -name "landing_zone_multi.jsonnet" \
+    ! -name "landing_zone_dr_multi.jsonnet" -print0
 )

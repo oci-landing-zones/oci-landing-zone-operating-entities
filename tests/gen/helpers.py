@@ -63,6 +63,8 @@ def render_config_outputs(config_file: Path) -> dict[str, dict]:
         run_cmd(
             [
                 jsonnet_command(),
+                "-J",
+                str(REPO_ROOT),
                 "--multi",
                 f"{tmpdir}/",
                 "--tla-code-file",
@@ -75,6 +77,36 @@ def render_config_outputs(config_file: Path) -> dict[str, dict]:
         for rendered_file in sorted(Path(tmpdir).glob("*.json")):
             outputs[rendered_file.name] = json.loads(rendered_file.read_text(encoding="utf-8"))
         return outputs
+
+
+def render_dr_config_outputs(
+    home_file: Path, dr_file: Path, side: str
+) -> dict[str, dict]:
+    if side not in {"home", "dr"}:
+        raise ValueError(f"unsupported DR side: {side}")
+    home_path = (REPO_ROOT / home_file).resolve()
+    dr_path = (REPO_ROOT / dr_file).resolve()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        run_cmd(
+            [
+                jsonnet_command(),
+                "-J",
+                str(REPO_ROOT),
+                "--multi",
+                f"{tmpdir}/",
+                "--tla-code-file",
+                f"home_config={home_path}",
+                "--tla-code-file",
+                f"dr_config={dr_path}",
+                "--tla-str",
+                f"side={side}",
+                "gen/landing_zone_dr_multi.jsonnet",
+            ]
+        )
+        return {
+            path.name: json.loads(path.read_text(encoding="utf-8"))
+            for path in sorted(Path(tmpdir).glob("*.json"))
+        }
 
 
 def render_config_failure(config_file: Path) -> str:

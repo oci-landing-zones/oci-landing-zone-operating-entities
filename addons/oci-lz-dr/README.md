@@ -1,10 +1,10 @@
-# **[OCI LZ BCDR](#)**
-## **An OCI Open LZ [Addon](#) for Business Continuity and Disaster Recovery landing zone blueprints**
+# **OCI LZ BCDR**
+## **An OCI Open LZ Addon for Business Continuity and Disaster Recovery landing zone blueprints**
 
 
 ## 1. Overview
 
-The **OCI LZ BCDR** addon provides the core landing zone resources required to support **Business Continuity** and **Disaster Recovery** scenarios for OCI Landing Zone blueprints. It complements a landing zone with the network, security and observability components required to support recovery scenarios across regions. 
+The **OCI LZ BCDR** addon provides the core landing zone resources required to support **Business Continuity** and **Disaster Recovery** scenarios for OCI Landing Zone blueprints. It complements a landing zone with the network, security and observability components required to support recovery scenarios across regions.
 
 ### Landing Zone DR design considerations
 
@@ -16,14 +16,14 @@ The **OCI LZ BCDR** addon provides the core landing zone resources required to s
 
 In summary: IAM and governance are reused from the home region, Cloud Guard is tenancy-wide, and network and observability are deployed per region. Vault replication is outside the landing zone scope.
 
-  
+
 <img src="images/layers.png" width="900" alt="BCDR architecture showing IAM and governance managed from the home region, tenancy-wide Cloud Guard, and regional security, network, and observability resources in the home and DR regions. Vault replication is not covered by the landing zone.">
 
 <p align="center"><em>Figure 1</em></p>
 
 <p align="left"><strong>Figure 1: BCDR resource scope</strong></p>
 
-<img src="images/ops_view.png" width="900" alt="Multi-stack deployment.One-oe in Home region and DR extension in DR region">
+<img src="images/ops_view.png" width="900" alt="Multi-stack deployment. One-OE in Home region and DR extension in DR region">
 
 <p align="center"><em>Figure 2</em></p>
 
