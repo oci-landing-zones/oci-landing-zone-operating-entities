@@ -214,20 +214,22 @@ local vcn_entries(network) = std.flattenArrays([
         for subnet in std.objectValues(entry.vcn.subnets)
       ])
       else [];
+    local base_categories = categories(final_network);
     local remote_route_categories = {
-      [category_key]+: {
-        vcns+: {
-          [entry.vcn_key]+: {
-            route_tables+: {
-              [route_table_key]+: {
-                route_rules+: remote_routes(
-                  n,
-                  drg_key,
-                  local_role,
-                  peer_side.ctx.config.region,
-                  peer_side.advertised_cidrs
-                ),
-              }
+      [category_key]: base_categories[category_key] + {
+        vcns: base_categories[category_key].vcns + {
+          [entry.vcn_key]: entry.vcn + {
+            route_tables: entry.vcn.route_tables + {
+              [route_table_key]:
+                entry.vcn.route_tables[route_table_key] + {
+                  route_rules+: remote_routes(
+                    n,
+                    drg_key,
+                    local_role,
+                    peer_side.ctx.config.region,
+                    peer_side.advertised_cidrs
+                  ),
+                }
               for route_table_key in target_route_tables(entry)
             },
           }
@@ -236,7 +238,7 @@ local vcn_entries(network) = std.flattenArrays([
              std.length(target_route_tables(entry)) > 0
         },
       }
-      for category_key in std.objectFields(categories(final_network))
+      for category_key in std.objectFields(base_categories)
       if std.length([
         entry
         for entry in local_vcns
@@ -246,7 +248,8 @@ local vcn_entries(network) = std.flattenArrays([
     };
     local with_remote_routes = final_network + {
       network_configuration+: {
-        network_configuration_categories+: remote_route_categories,
+        network_configuration_categories:
+          base_categories + remote_route_categories,
       },
     };
     with_remote_routes + {
