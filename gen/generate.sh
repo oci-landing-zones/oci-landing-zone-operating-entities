@@ -155,7 +155,13 @@ while IFS= read -r -d '' file; do
   jsonnet_file="$file"
   json_file="$OUTPUT_DIR/$rel_path"
   json_file="${json_file%.jsonnet}.json"
-  "$JSONNET_BIN" "$jsonnet_file" | python3 "$INPUT_DIR/format_json.py" >"$json_file"
+  json_tmp_file="${json_file}.tmp"
+  if ! "$JSONNET_BIN" "$jsonnet_file" |
+    python3 "$INPUT_DIR/format_json.py" >"$json_tmp_file"; then
+    rm -f "$json_tmp_file"
+    exit 1
+  fi
+  mv "$json_tmp_file" "$json_file"
 done < <(
   find "$INPUT_DIR" \
     -path "$INPUT_DIR/testdata" -prune -o \
