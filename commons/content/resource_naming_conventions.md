@@ -499,87 +499,87 @@ vlt-key-&lt;landing_zone&gt;-&lt;security_compartment&gt;
 ### 6.1 Alarms
 
 #### Naming Convention
-al-&lt;landing_zone&gt;-&lt;resource_type&gt;-&lt;resource&gt;
+al-&lt;region&gt;-&lt;landing_zone&gt;-&lt;resource_type&gt;-&lt;resource&gt;
 
 #### Examples
 | Name | Object Name | Description |
 |---|---|---|
-| al-lz-network-lb | AL-LZ-NETWORK-LB-KEY | Hub Network load balancer alarm | 
+| al-fra-lz-network-lb | AL-FRA-LZ-NETWORK-LB-KEY | Hub Network load balancer alarm |
 
 ### 6.2 Event Rules
 
 #### Naming Convention
-rul-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;action_type&gt;-&lt;resource&gt;
+rul-&lt;region&gt;-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;action_type&gt;-&lt;resource&gt;
 
 #### Examples
 | Name | Object Name | Description |
 |---|---|---|
-| rul-lz-notify-network | RUL-LZ-NOTIFY-NETWORK-KEY | Hub Network changes notification rule | 
-| rul-lz-notify-security | RUL-LZ-NOTIFY-SECURITY-KEY | Shared Security changes notification rule | 
-| rul-lz-preprod-notify-network | RUL-LZ-PREPROD-NOTIFY-NETWORK-KEY | Pre-Production Network changes notification rule | 
-| rul-lz-preprod-notify-security | RUL-LZ-PREPROD-NOTIFY-SECURITY-KEY | Pre-Production Security changes notification rule | 
-| rul-lz-prod-notify-network | RUL-LZ-PROD-NOTIFY-NETWORK-KEY | Production Network changes notification rule | 
-| rul-lz-prod-notify-security | RUL-LZ-PROD-NOTIFY-SECURITY-KEY | Production Security changes notification rule | 
+| rul-fra-lz-notify-network | RUL-FRA-LZ-NOTIFY-NETWORK-KEY | Hub Network changes notification rule |
+| rul-fra-lz-notify-security | RUL-FRA-LZ-NOTIFY-SECURITY-KEY | Shared Security changes notification rule |
+| rul-fra-lz-preprod-notify-network | RUL-FRA-LZ-PREPROD-NOTIFY-NETWORK-KEY | Pre-Production Network changes notification rule |
+| rul-fra-lz-preprod-notify-security | RUL-FRA-LZ-PREPROD-NOTIFY-SECURITY-KEY | Pre-Production Security changes notification rule |
+| rul-fra-lz-prod-notify-network | RUL-FRA-LZ-PROD-NOTIFY-NETWORK-KEY | Production Network changes notification rule |
+| rul-fra-lz-prod-notify-security | RUL-FRA-LZ-PROD-NOTIFY-SECURITY-KEY | Production Security changes notification rule |
 
 ### 6.3 Notification Topics
 
 #### Naming Convention
-nott-&lt;landing_zone&gt;-&lt;resource&gt;
+nott-&lt;region&gt;-&lt;landing_zone&gt;-&lt;resource&gt;
 
 #### Examples
 | Name | Object Name | Description |
 |---|---|---|
-| nott-lz-cloudguard | NOTT-LZ-CLOUDGUARD-KEY | Cloud Guard notification topic | 
-| nott-lz-iam | NOTT-LZ-IAM-KEY | IAM notification topic | 
-| nott-lz-network | NOTT-LZ-NETWORK-KEY | Hub Network notification topic | 
-| nott-lz-security | NOTT-LZ-SECURITY-KEY | Shared Security notification topic | 
+| nott-fra-lz-cloudguard | NOTT-FRA-LZ-CLOUDGUARD-KEY | Cloud Guard notification topic |
+| nott-fra-lz-iam | NOTT-FRA-LZ-IAM-KEY | IAM notification topic |
+| nott-fra-lz-network | NOTT-FRA-LZ-NETWORK-KEY | Hub Network notification topic |
+| nott-fra-lz-security | NOTT-FRA-LZ-SECURITY-KEY | Shared Security notification topic |
 
 ### 6.4 Service Connector Hub
 
 #### Naming Convention
-sch-&lt;landing_zone&gt;-&lt;resource&gt;
+sch-&lt;region&gt;-&lt;landing_zone&gt;-&lt;resource&gt;
 
 #### Examples
 | Name | Object Name | Description |
 |---|---|---|
-| sch-lz-monitor | SCH-LZ-MONITOR | Service Connector for Landing Zone monitoring | 
+| sch-fra-lz-monitor | SCH-FRA-LZ-MONITOR-KEY | Service Connector for Landing Zone monitoring |
 
 ### 6.5 Buckets
 
 #### Naming Convention
-bkt-&lt;landing_zone&gt;-&lt;resource&gt;
+bkt-&lt;region&gt;-&lt;landing_zone&gt;-&lt;resource&gt;
 
 #### Examples
 | Name | Object Name | Description |
 |---|---|---|
-| bkt-lz-service-connector | BKT-LZ-SERVICE-CONNECTOR | Bucket for Service Connector logging | 
+| bkt-fra-lz-service-connector | BKT-FRA-LZ-SERVICE-CONNECTOR-KEY | Bucket for Service Connector logging |
 
 ### 6.6 Log Groups
 
 #### Naming Convention
-lgrp-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;resource_type&gt;
+lgrp-&lt;region&gt;-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;resource_type&gt;
 
 #### Examples
 | Name | Object Name | Description |
 |---|---|---|
-| lgrp-lz-preprod-vcn-flow | LGRP-LZ-PREPROD-VCN-FLOW-KEY | Log Group for Pre-Production network | 
-| lgrp-lz-prod-vcn-flow | LGRP-LZ-PROD-VCN-FLOW-KEY | Log Group for Production network | 
-| lgrp-lz-vcn-flow | LGRP-LZ-VCN-FLOW-KEY | Log Group for Hub network | 
+| lgrp-fra-lz-preprod-vcn-flow | LGRP-FRA-LZ-PREPROD-VCN-FLOW-KEY | Log Group for Pre-Production network |
+| lgrp-fra-lz-prod-vcn-flow | LGRP-FRA-LZ-PROD-VCN-FLOW-KEY | Log Group for Production network |
+| lgrp-fra-lz-vcn-flow | LGRP-FRA-LZ-VCN-FLOW-KEY | Log Group for Hub network |
 
 ### 6.7 Flow Logs
 
 #### Naming Convention
-log-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;resource_type&gt;
+log-&lt;region&gt;-&lt;landing_zone&gt;-&lt;environment&gt;-&lt;resource_type&gt;
 
 #### Examples
 | Object Name | Description |
 |---|---|
-| LOG-LZ-PREPROD-SUBNET-FLOW-KEY | Flow log Pre-Production Subnets | 
-| LOG-LZ-PREPROD-VCN-FLOW-KEY | Flow log Pre-Production VCNs | 
-| LOG-LZ-PROD-SUBNET-FLOW-KEY | Flow log Production Subnets | 
-| LOG-LZ-PROD-VCN-FLOW-KEY | Flow log Production VCNs | 
-| LOG-LZ-SUBNET-FLOW-KEY | Flow log Hub Subnets | 
-| LOG-LZ-VCN-FLOW-KEY | Flow log Hub VCNs | 
+| LOG-FRA-LZ-PREPROD-SUBNET-FLOW-KEY | Flow log Pre-Production Subnets |
+| LOG-FRA-LZ-PREPROD-VCN-FLOW-KEY | Flow log Pre-Production VCNs |
+| LOG-FRA-LZ-PROD-SUBNET-FLOW-KEY | Flow log Production Subnets |
+| LOG-FRA-LZ-PROD-VCN-FLOW-KEY | Flow log Production VCNs |
+| LOG-FRA-LZ-SUBNET-FLOW-KEY | Flow log Hub Subnets |
+| LOG-FRA-LZ-VCN-FLOW-KEY | Flow log Hub VCNs |
 
 &nbsp;
 

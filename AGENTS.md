@@ -188,7 +188,14 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - If the customer has not defined CIDRs yet, help them decide the allocation first.
    - If repository behavior and official OCI documentation appear inconsistent for OKE networking, say so and verify with official OCI docs before advising.
 
-Only after these nine decisions are known may the agent continue with:
+10. **CIS benchmark level**
+   - Determine whether the generated landing zone should use CIS Level 1 or CIS Level 2 before recommending deployment artifacts or creating the final Blueprint Factory config.
+   - Explain both choices in customer language. CIS Level 1 provides the less complex baseline. CIS Level 2 is the recommended security posture and enables stricter controls, but the generated CIS2 path also requires customer-managed encryption keys for applicable resources.
+   - Explain that CIS2 CMEKs add deployment and operational dependencies such as Vault and key provisioning, IAM grants, resource-to-key ordering, key availability, rotation, recovery, and workload configuration. For OKE, CIS2 uses CMEKs for Kubernetes secrets and worker boot volumes, while CIS1 omits those generated OKE CMEK references.
+   - Ask the customer to choose explicitly; do not silently select CIS2 merely because it is the Blueprint Factory default. If the customer chooses CIS1, explain that they are accepting a less restrictive posture in exchange for lower deployment and workload-lifecycle complexity.
+   - Map the decision to top-level `cis_level: 1` or `cis_level: 2` in Blueprint Factory config mode.
+
+Only after these ten decisions are known may the agent continue with:
 
 - recommending the standard published path versus the config-driven path
 - explaining OKE deployment options such as single-stack, multi-stack, or config-driven `oke_simple`
@@ -299,10 +306,11 @@ When helping customers, make no assumptions and do not hallucinate data, file pa
 
 - `gen/` is the source of truth for generator behavior and customization logic.
 - `terraform-oci-modules-orchestrator` is the source of truth for how generated configuration files are interpreted at deployment time. When a generated field seems unused, transformed, or contradictory, inspect the orchestrator and the downstream modules it invokes before changing this repo's contract. For published OKE behavior, inspect the exact orchestrator tag referenced by the published OKE docs.
-- `gen/workload-extensions/oke/AGENTS.md` plus `gen/workload-extensions/oke/simple/*` are the source of truth for config-driven `oke_simple` behavior and OKE-native networking semantics in this repo.
+- `gen/workload-extensions/oke/AGENTS.md` plus `gen/workload-extensions/oke/simple/*` are the source of truth for Blueprint Factory `oke_simple` behavior and OKE-native networking semantics in this repo.
+- `gen/workload-extensions/ocvs/AGENTS.md` plus `gen/workload-extensions/ocvs/*` are the source of truth for Blueprint Factory `ocvs` behavior, OCVS network prerequisites, and generated `ocvs_configuration` semantics in this repo.
 - `gen/addons/oci-x-rpc/AGENTS.md` plus `gen/builders/remote_peering.libsonnet` are the source of truth for Blueprint Factory RPC behavior, routing overlays, cross-tenancy IAM, and RPC publication semantics.
-- `gen/workload-extensions/exacs/AGENTS.md` plus `gen/workload-extensions/exacs/*` are the source of truth for config-driven ExaDB-D / ExaCS placement, component, network, and project DB tier semantics in this repo.
-- The ExaDB-C@C generator guide under `gen/workload-extensions/exacc/` plus the source files in that directory are the source of truth for config-driven ExaDB-C@C IAM, observability, notification email, and publication semantics in this repo.
+- `gen/workload-extensions/exacs/AGENTS.md` plus `gen/workload-extensions/exacs/*` are the source of truth for Blueprint Factory ExaDB-D / ExaCS placement, component, network, and project DB tier semantics in this repo.
+- The ExaDB-C@C generator guide under `gen/workload-extensions/exacc/` plus the source files in that directory are the source of truth for Blueprint Factory ExaDB-C@C IAM, observability, notification email, and publication semantics in this repo.
 - Published JSON files under `blueprints/` and `workload-extensions/` are deployable artifacts for the standard published path, but they are not the source of truth for generator logic.
 - For config-driven changes, start from `gen/config.libsonnet`, `gen/landing_zone.libsonnet`, `gen/topology.libsonnet`, or `gen/workload-extensions/*` before touching generated outputs.
 
