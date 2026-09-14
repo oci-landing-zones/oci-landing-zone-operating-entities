@@ -31,21 +31,17 @@ In summary: IAM and governance are reused from the home region, Cloud Guard is t
 
 For operational resilience, the landing zone deployment is managed as separate stacks: the One-OE in the home region and the DR extension in the target region. This separation allows each regional deployment to be planned, applied, and operated independently, enabling flexible management and targeted updates without affecting the other region.
 
-<img src="images/optionsDR.png" width="900" alt="General DR deployment variants using a shared or dedicated DR compartment across Availability Domains or regions. This add-on reuses the production compartment in a dedicated DR region.">
+<img src="images/optionsDR.png" width="900" alt="General DR deployment variants using a shared or dedicated DR compartment across Availability Domains or regions. This add-on reuses the production compartment for DR resources.">
 
 <p align="center"><em>Figure 3</em></p>
 
-<p align="left"><strong>Figure 3: General DR deployment options; this add-on reuses the production compartment in a dedicated DR region</strong></p>
+<p align="left"><strong>Figure 3: General DR deployment options; this add-on reuses the production compartment for DR resources.</strong></p>
 
 The DR workload can reuse the production compartment or run in a dedicated DR compartment; each option can use a separate Availability Domain or a dedicated region. The selected model has different resource provisioning and maintenance requirements. This DR add-on reuses the existing production compartment hierarchy for DR workload resources and does not create a dedicated DR compartment. A dedicated DR compartment can be useful when a separate team manages DR resources, but that model is outside the scope of this add-on.
 
 See the [BCDR best practices](BCDR-best-practices.md).
 
 ## 2. Deployment Guide
-
-> [!NOTE]
-> This add-on covers the DR Landing Zone scope, including core infrastructure resources such as VCNs, route tables, security resources, events, notifications, and other foundational Landing Zone components. It does not deploy workload-specific resources, such as databases, OKE clusters, Exadata Cloud Service (ExaCS), Compute instances, or other application-specific resources.
-> The appropriate [DR strategy](./BCDR-best-practices.md#5-dr-strategies) for each workload should be selected and implemented separately, based on its specific availability, RTO, and RPO requirements.
 
 1. Confirm the DR scenario, workloads, regions, tenancy boundaries, connectivity model, and recovery objectives.
 2. Deploy or confirm the [One-OE blueprint](../../blueprints/one-oe/runtime/one-stack/readme.md) in the home region.
@@ -56,6 +52,10 @@ See the [BCDR best practices](BCDR-best-practices.md).
    | One-OE | The DR environment requires the One-OE landing zone without any workload extension. | [One-OE BCDR](one-oe/README.md) |
 
 4. Validate connectivity, failover behavior, workload replication health, access to keys and secrets in the DR region, monitoring, and operational runbooks.
+
+> [!NOTE]
+> This add-on covers the DR Landing Zone scope, including core infrastructure resources such as VCNs, route tables, security resources, events, notifications, and other foundational Landing Zone components. It does not deploy workload-specific resources, such as databases, OKE clusters, Exadata Cloud Service (ExaCS), Compute instances, or other application-specific resources.
+> The appropriate [DR strategy](./BCDR-best-practices.md#5-dr-strategies) for each workload should be selected and implemented separately, based on its specific availability, RTO, and RPO requirements.
 
 &nbsp;
 
