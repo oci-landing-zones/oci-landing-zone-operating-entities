@@ -21,5 +21,4 @@ local summarize(network) =
   hub_c_pre: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_c_pre.jsonnet'),
   hub_c_backends: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_c_backends.jsonnet'),
   hub_c: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_c.jsonnet'),
-  hub_e: summarize(import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_network_hub_e.jsonnet'),
 }

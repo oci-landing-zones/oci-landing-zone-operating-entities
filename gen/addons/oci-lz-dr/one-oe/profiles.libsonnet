@@ -34,7 +34,6 @@ local profile(kind) = base + {
 local hub_a = profile('hub_a');
 local hub_b = profile('hub_b');
 local hub_c = profile('hub_c');
-local hub_e = profile('hub_e');
 local home_profile(kind) = defaults[kind] + {
   disaster_recovery: {
     rpc: {
@@ -50,14 +49,12 @@ local dr_profiles = {
   hub_a: hub_a,
   hub_b: hub_b,
   hub_c: hub_c,
-  hub_e: hub_e,
 };
 
 {
   hub_a: hub_a,
   hub_b: hub_b,
   hub_c: hub_c,
-  hub_e: hub_e,
   kms_pair: {
     home: defaults.hub_a,
     dr: hub_a,

@@ -9,6 +9,7 @@
 function(config, n, realm_constants, topo)
   local labels = import '../labels.libsonnet';
   local desc = import '../descriptions.libsonnet';
+  local remote_peering_policies = import 'iam/remote_peering_policies.libsonnet';
 
   // --- Display-name helpers ---
   local env_desc(env_name) = topo.env_display_long(env_name);
@@ -519,7 +520,12 @@ function(config, n, realm_constants, topo)
           tbac_allow(grp_network, 'read', 'logging-family', cmp_lz, tag_security),
         ],
       },
-    } + env_project_policies + {
+    } + env_project_policies + remote_peering_policies({
+      config: config,
+      n: n,
+      domain_grp: domain_grp,
+      grp_network: grp_network,
+    }) + {
       [n.key_global('PCY', ['SECURITY', 'ADMIN'])]: {
         name: n.display_global('PCY', ['SECURITY', 'ADMIN']),
         description: desc.policy.grants(

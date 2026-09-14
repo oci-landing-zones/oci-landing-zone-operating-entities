@@ -54,6 +54,11 @@ function(home_raw_config, dr_raw_config)
     'DR pair regions must be different';
   assert home.ctx.config.realm == dr.ctx.config.realm :
     'DR pair must use the same OCI realm';
+  assert home.ctx.config.hub.kind == dr.ctx.config.hub.kind :
+    'DR pair hub models must match: home uses %s, dr uses %s' % [
+      home.ctx.config.hub.kind,
+      dr.ctx.config.hub.kind,
+    ];
   assert cidrs.assert_non_overlapping(
     home.vcn_entries + dr.vcn_entries,
     'Home and DR VCN CIDRs'

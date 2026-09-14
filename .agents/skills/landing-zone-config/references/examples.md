@@ -185,6 +185,59 @@ Based on `tests/gen/testdata/direct/pass/config_hub_a_staging.jsonnet`.
 
 This is the right pattern when route priority, platform ordering, and sample backend derivation all matter.
 
+## Cross-Tenancy RPC Pair
+
+Use two source configs because each tenancy/region owns its own complete One-OE output set. The acceptor omits `peer_id`:
+
+```jsonnet
+remote_peering_connections: {
+  tenancy2: {
+    remote_cidrs: ['10.1.0.0/21', '10.1.64.0/21'],
+    peer_region_name: 'eu-amsterdam-1',
+    peer_tenancy_ocid: 'ocid1.tenancy.oc1..requestor',
+    requestor_group_ocid: 'ocid1.group.oc1..requestor-network-admin',
+  },
+},
+```
+
+The requestor points to the acceptor RPC:
+
+```jsonnet
+remote_peering_connections: {
+  tenancy1: {
+    remote_cidrs: ['10.0.0.0/21', '10.0.64.0/21'],
+    peer_id: 'ocid1.remotepeeringconnection.oc1.eu-frankfurt-1.example',
+    peer_region_name: 'eu-frankfurt-1',
+    peer_tenancy_ocid: 'ocid1.tenancy.oc1..acceptor',
+  },
+},
+```
+
+The requester policy uses its local `'id_lz_common'/'grp-lz-network-admin'` group. Only the acceptor config needs the requestor group's OCID because that group is foreign to the acceptor tenancy.
+
+The surrounding `environments` map remains customer-defined. See the paired JSON examples under `addons/oci-lz-blueprint-factory/examples/` and `gen/addons/oci-x-rpc/AGENTS.md`.
+
+For a connectivity tenancy accepting RPCs from separate production and non-production tenancies, keep one connectivity source config and use two named acceptor entries:
+
+```jsonnet
+remote_peering_connections: {
+  prod: {
+    remote_cidrs: ['10.1.0.0/21', '10.1.64.0/21'],
+    peer_region_name: 'eu-amsterdam-1',
+    peer_tenancy_ocid: 'ocid1.tenancy.oc1..production',
+    requestor_group_ocid: 'ocid1.group.oc1..production-network-admin',
+  },
+  nonprod: {
+    remote_cidrs: ['10.2.0.0/21', '10.2.64.0/21'],
+    peer_region_name: 'eu-amsterdam-1',
+    peer_tenancy_ocid: 'ocid1.tenancy.oc1..nonproduction',
+    requestor_group_ocid: 'ocid1.group.oc1..nonproduction-network-admin',
+  },
+},
+```
+
+Create separate production and non-production requestor configs. Each requestor contains only its reviewed connection to the connectivity tenancy unless the approved design explicitly requires additional or transitive reachability.
+
 ## Commands
 
 Generate formatted config-mode outputs:

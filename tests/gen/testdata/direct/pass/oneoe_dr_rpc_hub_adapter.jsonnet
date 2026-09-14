@@ -4,12 +4,16 @@
 local validate = import 'gen/dr_pair.libsonnet';
 local adapter = import 'gen/addons/oci-lz-dr/one-oe/rpc_hub_adapter.libsonnet';
 local home = import 'tests/gen/testdata/dr/home_hub_b.jsonnet';
-local dr = import 'tests/gen/testdata/dr/dr_hub_e.jsonnet';
+local dr = import 'tests/gen/testdata/dr/dr_hub_b.jsonnet';
 
-local side(kind) = validate(
-  home,
-  dr + { hub+: { kind: kind } }
-).dr;
+local base_side = validate(home, dr).dr;
+local side(kind) = base_side + {
+  ctx+: {
+    config+: {
+      hub+: { kind: kind },
+    },
+  },
+};
 local actual = {
   [kind]: adapter(side(kind))
   for kind in ['hub_a', 'hub_b', 'hub_c', 'hub_e']

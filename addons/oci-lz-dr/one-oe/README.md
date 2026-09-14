@@ -17,7 +17,6 @@
       - [4.1.2. Complete staged observability](#412-complete-staged-observability)
       - [4.1.3. Configure Service Connector bucket replication](#413-configure-service-connector-bucket-replication)
     - [4.2. Deploy inter-region RPC within the same tenancy](#42-deploy-inter-region-rpc-within-the-same-tenancy)
-      - [4.2.1. Replace the Amsterdam requester and Frankfurt acceptor network files](#421-replace-the-amsterdam-requester-and-frankfurt-acceptor-network-files)
 - [License](#license)
 
 &nbsp;
@@ -76,7 +75,7 @@ It saves output dependency files in Object Storage so they can be replicated for
 > [!NOTE]
 > Our One-OE blueprint uses `eu-frankfurt-1` as the home region. For the DR extension, we use `eu-amsterdam-1` as the DR region.
 
-The DR environment may follow the same hub model and CIS security level as the primary environment, aligned with the One-OE blueprint configuration already deployed.
+The DR environment must use the same hub model as the primary environment, aligned with the One-OE blueprint configuration already deployed. The CIS security level may be selected independently from the hub model.
 
 For a different region pair or DR topology, use the [OCI LZ Blueprint Factory](../../oci-lz-blueprint-factory/README.md) to create and review custom JSON configuration files.
 
@@ -148,86 +147,15 @@ This post-deployment replication is separate from the output dependency file rep
 
 ### 4.2. Deploy inter-region RPC within the same tenancy
 
-After the One-OE BCDR addon is deployed, establish the Remote Peering Connection (RPC) between the home-region DRG and the DR-region DRG inside the same tenancy.
+This add-on uses the X-RPC same-tenancy pattern: the Frankfurt home region is the
+RPC acceptor and the Amsterdam DR region is the requester. No additional
+cross-tenancy IAM or governance configuration is required. Both regions must use
+the same Hub A, Hub B, or Hub C model.
 
-Using the same hub model in both regions is recommended for operational consistency, but different Hub A, B, C, and E models are supported. Each side places remote routes according to its own hub design, and every RPC route-distribution statement matches the specific RPC attachment ID rather than all attachments of that type.
-
-Use this deployment order:
-
-1. Deploy the base home-region stack.
-2. Replace its final network file with the matching home acceptor and apply it. For Hub C with third-party firewall backends, use `oneoe_network_hub_c_backends_acceptor.json`.
-3. Replicate the updated home dependency outputs to the DR-region bucket.
-4. Deploy and complete the base DR-region stack, including any staged network replacement.
-5. Replace its final network file with the matching DR requester and apply it. For Hub C with third-party firewall backends, use `oneoe_bcdr_network_hub_c_backends_requester.json`.
-6. Validate bidirectional connectivity only after both RPC resources and exact advertised routes are present.
-
-#### 4.2.1. Replace the Amsterdam requester and Frankfurt acceptor network files
-
-First, in the home region: replace the matching final Frankfurt One-OE network file in the home-region stack with its complete `*_acceptor.json` variant. Each acceptor file contains the final One-OE network configuration plus the FRA-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file. Apply the replacement and confirm that the Frankfurt network output contains the `RPC-FRA-LZ-HUB-DR-KEY` entry and its OCID. Then replicate the updated output dependency files to the DR-region bucket. This second replication is required because the acceptor RPC does not exist in the dependency files replicated before the AMS BCDR stack was created.
-
-
-<img src="../images/op1_2run.png" width="900" alt="cross region rpc">
-
-
-**oneoe_network_hub_N_acceptor.json**
-
-```
-"remote_peering_connections":
-{
-"RPC-FRA-LZ-HUB-DR-KEY": {
-"display_name"     : "rpc-fra-lz-hub-dr",
-"peer_region_name" : "eu-amsterdam-1"
-}
-}
-```
-
-**network_output.json**
-
-```
-RPC-FRA-LZ-HUB-DR-KEY
-id	"ocid1.remotepeeringconnection.oc1.eu-frankfurt-1.xxxxxxxxxxxxnnbmuunntekppwfezefy4rms3oq"
-region_name	"eu-frankfurt-1"
-```
-
-
-
-Then, in the DR region: after the updated Frankfurt dependency files are available, refresh the BCDR stack dependency and replace the matching final network file in the same stack with its complete `*_requester.json` variant after staged hub networking is complete. Each requester file contains the final network configuration plus the AMS-side RPC, DRG routing, and VCN routes; do not deploy it together with its corresponding final network file.
-
-<img src="../images/op2_2run.png" width="900" alt="cross region rpc">
-
-
-**oneoe_bcdr_network_hub_<hub>_requester.json**
-
-
-```
-"remote_peering_connections": {
-"RPC-AMS-LZ-HUB-HOME-KEY": {
-"display_name"      : "rpc-ams-lz-hub-home",
-"peer_key"          : "RPC-FRA-LZ-HUB-DR-KEY",
-"peer_region_name"  : "eu-frankfurt-1"
-}
-}
-```
-
-All requester and acceptor files are in the [`runtime`](./runtime/) directory.
-
-<img src="../images/s-tenancy.png" width="900" alt="cross region rpc">
-
-<p align="center"><em>Figure 4</em></p>
-
-<p align="left"><strong>Figure 4: cross-region RPC. Example: Frankfurt - Amsterdam</strong></p>
-
-
-| Network visualizer — FRA | Network visualizer — AMS |
-|---|---|
-| <img src="../images/net_view_fra.png" width="600" alt="network visualizer view from FRA"><br><p align="center"><em>Figure 5</em></p><p align="left"><strong>Figure 5: Network visualizer view from FRA</strong></p> | <img src="../images/net_view_ams.png" width="600" alt="network visualizer view from AMS"><br><p align="center"><em>Figure 6</em></p><p align="left"><strong>Figure 6: Network visualizer view from AMS</strong></p> |
-
-
-Use the [OCI Remote Peering Connections addon](../../oci-x-rpc/README.md) to follow the required steps and automate this connectivity layer.
-
-After applying both replacements, validate connectivity between the home-region and DR-region networks.
-
-For deployable RPC examples and routing guidance, see the [OCI X-RPC runtime guide](../../oci-x-rpc/runtime/README.md).
+For the complete deployment order, acceptor/requester file selection, dependency
+replication, RPC examples, peer-reference handling, and validation steps, see
+[Same-Tenancy, Multi-Region Deployment](../../oci-x-rpc/runtime/README.md#same-tenancy-multi-region-deployment)
+in the OCI X-RPC runtime guide.
 
 
 

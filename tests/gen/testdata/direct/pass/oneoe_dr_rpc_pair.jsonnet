@@ -1,4 +1,4 @@
-// A mixed Hub B/Hub E pair builds reciprocal, exact, attachment-scoped RPC routes.
+// A Hub B pair builds reciprocal, exact, attachment-scoped RPC routes.
 // contains: "requester_peer_region": "eu-frankfurt-1"
 // contains: "requester_peer_key": "RPC-FRA-LZ-HUB-DR-KEY"
 // contains: "acceptor_peer_region": "uk-london-1"
@@ -13,7 +13,7 @@ local lz = import 'gen/landing_zone.libsonnet';
 local requester_builder = import 'gen/addons/oci-lz-dr/one-oe/rpc_requester.libsonnet';
 local acceptor_builder = import 'gen/addons/oci-lz-dr/one-oe/rpc_acceptor.libsonnet';
 local home = import 'tests/gen/testdata/dr/home_hub_b.jsonnet';
-local dr = import 'tests/gen/testdata/dr/dr_hub_e.jsonnet';
+local dr = import 'tests/gen/testdata/dr/dr_hub_b.jsonnet';
 
 local pair = validate(home, dr);
 local requester = requester_builder(
