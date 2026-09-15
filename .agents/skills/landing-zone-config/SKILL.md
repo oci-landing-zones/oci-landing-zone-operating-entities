@@ -51,6 +51,8 @@ Do not use this skill as the first response to an open-ended customer request su
 | Hub subnets | Omit `hub.network.subnets` to auto-generate canonical hub subnets from the hub VCN. |
 | Shared project subnets | Omitted generates default `web`, `app`, `db`, `infra`; `{}` emits none; a non-empty map is exact and suppresses all implicit defaults. |
 | Dedicated project subnets | Use `projects.<project>.subnets`; they require `project_network`, must not overlap any shared/dedicated subnet, and remain in the environment `NETWORK` compartment. |
+| Shared vs dedicated | Recommend shared subnets by default for address efficiency. Dedicated subnets provide separate project CIDR allocation, not IAM isolation; access is governed at the environment network compartment. Same-subnet traffic is controlled by NSGs/security lists, not the hub firewall. |
+| Project subnet routing | Omit `project_network.subnet_routing` for `vcn`; use `hub` with firewalled Hub A, B, or C. Hub C requires its normal staged backend replacement; Hub E is rejected. |
 | Platform subnets | Platforms need explicit subnets unless they also declare an extension that provides subnet metadata. |
 | Realm | `realm` is optional and defaults to `oc1`, including when explicitly set to `null`; supported config realms are `oc1` and `oc19`. |
 | CIS level | `cis_level` is optional and technically defaults to `2`, but customer-use discovery must obtain an explicit CIS1/CIS2 choice. CIS2 is recommended and adds CMEK dependencies for applicable resources; set `1` for the less complex CIS1 output set. |
