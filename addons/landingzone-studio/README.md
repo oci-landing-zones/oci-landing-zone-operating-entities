@@ -22,12 +22,15 @@ bun run typecheck    # tsc --noEmit (app + tooling configs)
 bun run lint         # eslint
 bun run test         # vitest (pure-function unit tests)
 bun run build        # typecheck + vite build → dist/
+bun run build:pages  # typecheck + GitHub Pages build → dist/
 bun run preview      # preview the production build
 ```
 
 Open **http://localhost:5173/** — the dashboard lists your Landing Zones; create one to open the wizard at `/lz/:id`. No auth, no backend required for development; every route is public and all generation happens in the browser. (First visit shows a one-time disclaimer gate.)
 
-For production hosting, publish the `dist` directory and configure an SPA fallback so deep links resolve to `index.html`. Serve the Content Security Policy from `index.html` as an HTTP response header when the hosting platform supports it. The narrow `wasm-unsafe-eval` source permits WebAssembly compilation for Jsonnet; it does not permit JavaScript `eval`.
+The regular development and production builds use `/` as their base path. `bun run build:pages` uses `/oci-landing-zone-operating-entities/`, matching this repository's GitHub Pages project-site URL while leaving local development unchanged. Before copying `dist/` to the Pages publishing branch, copy `dist/index.html` to `dist/404.html` for the client-side route fallback and add an empty `dist/.nojekyll` file. The publishing branch should contain the contents of `dist/`, not the directory itself.
+
+For other production hosting, publish the `dist` directory and configure an SPA fallback so deep links resolve to `index.html`. Serve the Content Security Policy from `index.html` as an HTTP response header when the hosting platform supports it. The narrow `wasm-unsafe-eval` source permits WebAssembly compilation for Jsonnet; it does not permit JavaScript `eval`.
 
 ## Security and data handling
 

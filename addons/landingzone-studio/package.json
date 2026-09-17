@@ -10,6 +10,7 @@
     "build:wasm": "bash 3rd/go-jsonnet/build.sh",
     "prebuild": "bun run ensure:wasm",
     "build": "tsc --noEmit -p tsconfig.json && vite build",
+    "build:pages": "bun run ensure:wasm && tsc --noEmit -p tsconfig.json && vite build --mode github-pages",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
     "lint": "eslint .",
     "preview": "vite preview",

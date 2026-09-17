@@ -1,4 +1,4 @@
-export const DEFAULT_PAGES_BASE_PATH = '/landing-zone-studio/';
+export const DEFAULT_PAGES_BASE_PATH = '/oci-landing-zone-operating-entities/';
 
 export function normalizeBasePath(value: string = DEFAULT_PAGES_BASE_PATH): string {
   const trimmed = String(value || '/').trim();

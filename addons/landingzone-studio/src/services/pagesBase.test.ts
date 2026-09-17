@@ -8,8 +8,8 @@ describe('Pages base path helpers', () => {
   });
 
   it('normalizes GitHub Pages project paths for Vite and React Router', () => {
-    expect(normalizeBasePath('landing-zone-studio')).toBe('/landing-zone-studio/');
-    expect(normalizeBasePath('/landing-zone-studio/')).toBe('/landing-zone-studio/');
-    expect(getRouterBasename('/landing-zone-studio/')).toBe('/landing-zone-studio');
+    expect(normalizeBasePath()).toBe('/oci-landing-zone-operating-entities/');
+    expect(normalizeBasePath('/oci-landing-zone-operating-entities/')).toBe('/oci-landing-zone-operating-entities/');
+    expect(getRouterBasename('/oci-landing-zone-operating-entities/')).toBe('/oci-landing-zone-operating-entities');
   });
 });
