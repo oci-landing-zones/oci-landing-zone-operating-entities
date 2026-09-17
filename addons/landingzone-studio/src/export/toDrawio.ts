@@ -263,17 +263,27 @@ export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone')
 
   const sideXY: Record<string, [number, number]> = { left: [0, 0.5], right: [1, 0.5], top: [0.5, 0], bottom: [0.5, 1] };
   const edgeCells = diagram.edges.flatMap((edge) => {
-    // Flow overlay edges carry the full waypoint chain — expand them into one
-    // coloured, animated cell per hop so the export mirrors the on-screen packet path.
-    if (edge.waypoints && edge.waypoints.length > 1) {
+    // Flow overlay edges carry the exact obstacle-aware polyline used on screen.
+    // Fixed terminal points plus explicit intermediate points prevent Draw.io
+    // from independently rerouting each logical hop across unrelated resources.
+    if (edge.waypoints && edge.waypoints.length > 1 && edge.points && edge.points.length > 1) {
       const color = edge.color ?? '#2196F3';
-      const fstyle = `edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;startArrow=none;strokeColor=${color};strokeWidth=2.4;flowAnimation=1;jettySize=auto;`;
-      return edge.waypoints.slice(1).map((to, i) => (
-        `        <mxCell id="${escapeXml(edge.id)}-${i}" value="" style="${fstyle}" edge="1" parent="1" ` +
-        `source="${escapeXml(edge.waypoints![i])}" target="${escapeXml(to)}">\n` +
-        `          <mxGeometry relative="1" as="geometry" />\n` +
-        `        </mxCell>`
-      ));
+      const fstyle = `edgeStyle=none;orthogonal=1;rounded=1;html=1;endArrow=block;startArrow=none;strokeColor=${color};strokeWidth=2.4;flowAnimation=1;`;
+      const shifted = edge.points.map((point) => ({ x: point.x + offsetX, y: point.y + offsetY }));
+      const first = shifted[0];
+      const last = shifted[shifted.length - 1];
+      const middle = shifted.slice(1, -1);
+      const pointArray = middle.length > 0
+        ? `\n            <Array as="points">\n${middle.map((point) => `              <mxPoint x="${point.x}" y="${point.y}" />`).join('\n')}\n            </Array>`
+        : '';
+      return [
+        `        <mxCell id="${escapeXml(edge.id)}" value="" style="${fstyle}" edge="1" parent="1">\n` +
+        `          <mxGeometry relative="1" as="geometry">\n` +
+        `            <mxPoint x="${first.x}" y="${first.y}" as="sourcePoint" />\n` +
+        `            <mxPoint x="${last.x}" y="${last.y}" as="targetPoint" />${pointArray}\n` +
+        `          </mxGeometry>\n` +
+        `        </mxCell>`,
+      ];
     }
     // Routing connectors: thin muted right-angle lines, no arrowheads (VCN ─ attach ─ DRG).
     let base = `edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=none;startArrow=none;strokeColor=#6b6660;strokeWidth=1.4;jettySize=auto;`;

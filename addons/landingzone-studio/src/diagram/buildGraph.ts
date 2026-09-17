@@ -6,6 +6,7 @@ import { buildRouteTables } from '../services/routeTables';
 import { buildFlowTraces } from '../services/flowTrace';
 import { ocvsDefaultSubnets, platformInEnv, platformSubnetsForEnv, platformVcnForEnv } from '../services/platforms';
 import { generatorNames } from '../services/generatorNaming';
+import { absoluteNodeRects, flowAnchorPoint, routeFlowGeometry } from './flowGeometry';
 
 /**
  * Pure: canonical LzModel → renderer-agnostic DiagramModel.
@@ -736,64 +737,20 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     }
   }
 
-  // Animated flow path: ONE multi-waypoint edge per active flow. The renderer
-  // draws a continuous coloured line through every hop node with a single moving
-  // packet (ONTV-style) and numbered hop badges; the .drawio exporter expands it
-  // back into per-segment animated cells.
+  // Animated flow path: ONE multi-waypoint edge per active flow. The shared
+  // geometry router draws a continuous coloured line through every hop resource,
+  // keeping each leg clear of unrelated leaf resources. Live SVG and Draw.io use
+  // this same polyline, so neither renderer can independently reroute the flow.
   //
   // Positions are precomputed HERE (in the same pass that lays out the diagram,
   // route-table margins included) so the overlay never reads stale live node
   // positions — reading the React Flow store lagged a layout behind when a flow
   // opened the tables and shifted everything by the route-table margin.
-  const nodeById = new Map(nodes.map((n) => [n.id, n]));
-  const absRect = (id: string): { x: number; y: number; w: number; h: number; cx: number; cy: number } | null => {
-    const cur = nodeById.get(id);
-    if (!cur) return null;
-    let x = cur.x, y = cur.y;
-    let p = cur.parentId;
-    while (p) {
-      const pn = nodeById.get(p);
-      if (!pn) break;
-      x += pn.x; y += pn.y; p = pn.parentId;
-    }
-    return { x, y, w: cur.width, h: cur.height, cx: x + cur.width / 2, cy: y + cur.height / 2 };
-  };
-  const absCenter = (id: string) => {
-    const r = absRect(id);
-    return r ? { x: r.cx, y: r.cy } : null;
-  };
+  const absoluteRects = absoluteNodeRects(nodes);
   // The clean vertical channel between the hub compartment and the env column —
   // the same gutter the structural VCN→attachment links run in. Routing the long
   // hub↔spoke crossings through it keeps them off the compartments.
   const gutterX = 2 * PAD + leftX + netCompW + midMargin + gutter / 2;
-  // Orthogonal route through the waypoint nodes: straight elbows, with any segment
-  // that crosses the gutter pinned to run vertically inside it.
-  const routeFlow = (ids: string[]): { x: number; y: number }[] => {
-    const rects = ids.map(absRect).filter((r): r is NonNullable<typeof r> => r !== null);
-    if (rects.length < 2) return [];
-    const verts: { x: number; y: number }[] = [{ x: rects[0].cx, y: rects[0].cy }];
-    const push = (p: { x: number; y: number }) => {
-      const last = verts[verts.length - 1];
-      if (last.x !== p.x || last.y !== p.y) verts.push(p);
-    };
-    for (let i = 1; i < rects.length; i++) {
-      const a = verts[verts.length - 1];
-      const b = rects[i];
-      const crosses = (a.x - gutterX) * (b.cx - gutterX) < 0;
-      if (crosses) {
-        push({ x: gutterX, y: a.y });
-        push({ x: gutterX, y: b.cy });
-        push({ x: b.cx, y: b.cy });
-      } else if (Math.abs(b.cx - a.x) >= Math.abs(b.cy - a.y)) {
-        push({ x: b.cx, y: a.y });
-        push({ x: b.cx, y: b.cy });
-      } else {
-        push({ x: a.x, y: b.cy });
-        push({ x: b.cx, y: b.cy });
-      }
-    }
-    return verts;
-  };
   const nodeIds = new Set(nodes.map((n) => n.id));
   const seenGroup = new Set<string>();
   for (const t of flowTraces) {
@@ -804,7 +761,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     // Keep endpoints and shared legs on their real resources. Artificially
     // shifting complete traces made packets float beside the subnet/DRG icons;
     // same-colour endpoint traces can safely merge on their common route.
-    const points = routeFlow(waypoints);
+    const points = routeFlowGeometry(nodes, waypoints, gutterX);
     if (points.length < 2) continue;
     // Numbered hop badges render once per flow group (the first endpoint) so they
     // don't stack at the shared hub nodes.
@@ -812,9 +769,10 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     seenGroup.add(base);
     const badges = isPrimary
       ? t.hops
-          .map((h) => ({ h, c: absCenter(h.node) }))
-          .filter((b): b is { h: typeof t.hops[number]; c: { x: number; y: number } } => b.c !== null)
-          .map(({ h, c }) => ({ node: h.node, seq: h.seq, ...c }))
+          .flatMap((h) => {
+            const rect = absoluteRects.get(h.node);
+            return rect ? [{ node: h.node, seq: h.seq, ...flowAnchorPoint(rect) }] : [];
+          })
       : [];
     edges.push({
       id: `flow-${t.id}`, source: waypoints[0], target: waypoints[waypoints.length - 1],

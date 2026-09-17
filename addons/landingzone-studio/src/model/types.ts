@@ -231,8 +231,8 @@ export interface DiagramEdge {
   /** Flow overlay: ordered node ids the packet visits (used by the .drawio export
    * + auto-fit). The on-screen path uses the precomputed `points` below. */
   waypoints?: string[];
-  /** Flow overlay: absolute centre of each waypoint, precomputed by buildGraph so
-   * the overlay never reads (and lags behind) the live node positions. */
+  /** Flow overlay: the absolute obstacle-aware orthogonal polyline, precomputed
+   * by buildGraph and consumed unchanged by the live and Draw.io renderers. */
   points?: { x: number; y: number }[];
   /** Flow overlay: numbered hop badges with their precomputed absolute centres. */
   badges?: { node: string; seq: number; x: number; y: number }[];

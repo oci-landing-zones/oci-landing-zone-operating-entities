@@ -470,7 +470,7 @@ export default function PlatformTemplatesStep() {
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Shared platforms</div>
+          <div style={s.title}>Shared Platforms</div>
           <div style={local.note}>Optional platforms for services shared by more than one environment. Add one only when the same service must be used across environments.</div>
           {model.sharedPlatforms.length === 0 && (
             <div style={{ ...s.empty, borderRadius: 6, borderTop: `1px dashed ${oracle.border}`, marginBottom: 14 }}>No shared platforms. Add one only when a workload must be shared across environments.</div>
@@ -486,7 +486,7 @@ export default function PlatformTemplatesStep() {
             />
           ))}
           <div style={s.subCard}>
-            <div style={s.subHead}>Add shared platform</div>
+            <div style={s.subHead}>Add Shared Platform</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end' }}>
               <div>
                 <label style={s.addLabel} htmlFor="new-shared-platform-type">Type</label>
@@ -495,7 +495,7 @@ export default function PlatformTemplatesStep() {
                   <option value="ocvs">OCVS management cluster</option>
                 </select>
               </div>
-              <button type="button" style={s.addBtn} onClick={addSharedPlatform}>Add shared platform</button>
+              <button type="button" style={s.addBtn} onClick={addSharedPlatform}>Add Shared Platform</button>
             </div>
           </div>
         </div>
@@ -504,7 +504,7 @@ export default function PlatformTemplatesStep() {
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Environment platforms</div>
+          <div style={s.title}>Environment Platforms</div>
           <div style={local.note}>
             Add a platform when a workload needs its own network, such as an OKE or OCVS platform. Each selected environment receives a separate platform network.
           </div>

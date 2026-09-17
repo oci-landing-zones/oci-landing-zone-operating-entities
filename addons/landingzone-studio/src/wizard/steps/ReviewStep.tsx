@@ -79,6 +79,7 @@ const RESOURCE_MANAGER_STACKS_URL = 'https://cloud.oracle.com/resourcemanager/st
 const RESOURCE_MANAGER_CREATE_STACK_GUIDE_URL = 'https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-stack.htm';
 const RESOURCE_MANAGER_PLAN_GUIDE_URL = 'https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-plan.htm';
 const RESOURCE_MANAGER_APPLY_GUIDE_URL = 'https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-apply.htm';
+const LANDING_ZONE_ORCHESTRATOR_URL = 'https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator';
 const NETWORK_FIREWALL_IP_HELP_URL = 'https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/howto_identify_private_ip_ocid_network_firewall.md';
 
 function Placeholder({ children }: { children: string }) {
@@ -269,7 +270,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
               onClick={generateAndDownload}
               disabled={busy}
             >
-              {busy ? 'Preparing download…' : 'Generate and download files'}
+              {busy ? 'Preparing download…' : 'Download files'}
             </button>
             <button type="button" style={local.secondary} onClick={downloadDrawio}>
               Export diagram (.drawio)
@@ -290,13 +291,13 @@ export default function ReviewStep({ designName }: { designName: string }) {
         <div style={s.body}>
           <div style={s.title}>Deploy with OCI Resource Manager</div>
           <div style={local.note}>
-            Resource Manager runs the Landing Zone Orchestrator. The files from Studio are a separate configuration source for that stack. Use one stack for both phases; phase 2 updates its configuration source.
+            Resource Manager runs the <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator ↗</a>. The files from Studio are a separate configuration source for that stack. Use one stack for both phases; phase 2 updates its configuration source.
           </div>
           <div style={local.guide}>
             <div style={local.guideTitle}>Create and run the stack</div>
             <ol style={local.ordered}>
               <li>Unzip the download. Keep the generated files in a customer-controlled private Object Storage bucket or approved private GitHub repository. Do not mix them with published blueprint files.</li>
-              <li>Open <a className="guide-link" href={RESOURCE_MANAGER_STACKS_URL} target="_blank" rel="noreferrer">Resource Manager → Stacks ↗</a> and select <strong>Create stack</strong>. Use a pinned Landing Zone Orchestrator release as the stack code, then set its working directory to <code>rms-facade</code>.</li>
+              <li>Open <a className="guide-link" href={RESOURCE_MANAGER_STACKS_URL} target="_blank" rel="noreferrer">Resource Manager → Stacks ↗</a> and select <strong>Create stack</strong>. Use a pinned <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator release ↗</a> as the stack code, then set its working directory to <code>rms-facade</code>.</li>
               <li>In the stack variables, set <Setting name="configuration_source" value="ocibucket" />. Then enter the bucket name in <Setting name="oci_configuration_bucket" /> and the current phase's file list in <Setting name="oci_configuration_objects" />. You can instead use an approved private GitHub source.</li>
               <li>Select <strong>Create</strong> without running an apply. From the stack details page, select <strong>Plan</strong>, review the changes and policy impact, then select <strong>Apply</strong>. Wait for a successful apply before starting phase 2.</li>
             </ol>
@@ -336,7 +337,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
             <a href={RESOURCE_MANAGER_CREATE_STACK_GUIDE_URL} target="_blank" rel="noreferrer"><span>Read: create a stack</span><span aria-hidden="true">↗</span></a>
             <a href={RESOURCE_MANAGER_PLAN_GUIDE_URL} target="_blank" rel="noreferrer"><span>Read: plan a deployment</span><span aria-hidden="true">↗</span></a>
             <a href={RESOURCE_MANAGER_APPLY_GUIDE_URL} target="_blank" rel="noreferrer"><span>Read: apply a deployment</span><span aria-hidden="true">↗</span></a>
-            <a href="https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator" target="_blank" rel="noreferrer"><span>Landing Zone Orchestrator source</span><span aria-hidden="true">↗</span></a>
+            <a href={LANDING_ZONE_ORCHESTRATOR_URL} target="_blank" rel="noreferrer"><span>Landing Zone Orchestrator source</span><span aria-hidden="true">↗</span></a>
             <a href="https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/managingconfigurationsourceproviders.htm" target="_blank" rel="noreferrer"><span>Read: private configuration sources</span><span aria-hidden="true">↗</span></a>
           </div>
         </div>

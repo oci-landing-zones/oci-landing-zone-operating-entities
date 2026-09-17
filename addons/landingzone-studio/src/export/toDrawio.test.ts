@@ -155,6 +155,17 @@ describe('toDrawioXml', () => {
     expect(xml).toContain('target="b"');
   });
 
+  it('exports one fixed obstacle-aware polyline instead of rerouting every flow hop', () => {
+    const graph = buildGraph(emptyLzModel(), 3, { activeFlows: ['prod:egress:web'] });
+    const xml = toDrawioXml(graph);
+    expect(xml.match(/id="flow-prod:egress:web#0"/g)).toHaveLength(1);
+    expect(xml).not.toContain('id="flow-prod:egress:web#0-0"');
+    expect(xml).toContain('edgeStyle=none;orthogonal=1;');
+    expect(xml).toContain('as="sourcePoint"');
+    expect(xml).toContain('as="targetPoint"');
+    expect(xml).toContain('<Array as="points">');
+  });
+
   it('escapes XML-significant characters in labels', () => {
     const diagram: DiagramModel = {
       nodes: [{ id: 'n1', kind: 'vcn', label: 'A & B <co>', x: 0, y: 0, width: 100, height: 40 }],

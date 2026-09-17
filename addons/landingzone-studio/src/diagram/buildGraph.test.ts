@@ -4,24 +4,32 @@ import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { hubKindDefaults } from '../services/hubKinds';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
 import type { Environment, LzModel } from '../model/types';
+import { absoluteNodeRects, flowAnchorPoint, type FlowPoint, type FlowRect } from './flowGeometry';
 
 function env(name: string, securityZone: boolean, index: number): Environment {
   return { id: `environment-${index + 1}`, name, securityZone, network: envNetworkDefaults(index) };
 }
 
-function absoluteCenter(graph: ReturnType<typeof buildGraph>, id: string): { x: number; y: number } {
-  const byId = new Map(graph.nodes.map((node) => [node.id, node]));
-  const node = byId.get(id)!;
-  let x = node.x;
-  let y = node.y;
-  let parentId = node.parentId;
-  while (parentId) {
-    const parent = byId.get(parentId)!;
-    x += parent.x;
-    y += parent.y;
-    parentId = parent.parentId;
+function flowAnchor(graph: ReturnType<typeof buildGraph>, id: string): FlowPoint {
+  return flowAnchorPoint(absoluteNodeRects(graph.nodes).get(id)!);
+}
+
+function pathContains(points: FlowPoint[], point: FlowPoint): boolean {
+  return points.slice(1).some((to, index) => {
+    const from = points[index];
+    return from.x === to.x
+      ? point.x === from.x && point.y >= Math.min(from.y, to.y) && point.y <= Math.max(from.y, to.y)
+      : point.y === from.y && point.x >= Math.min(from.x, to.x) && point.x <= Math.max(from.x, to.x);
+  });
+}
+
+function crossesInterior(from: FlowPoint, to: FlowPoint, rect: FlowRect): boolean {
+  if (from.y === to.y) {
+    return from.y > rect.y && from.y < rect.y + rect.height &&
+      Math.max(from.x, to.x) > rect.x && Math.min(from.x, to.x) < rect.x + rect.width;
   }
-  return { x: x + node.width / 2, y: y + node.height / 2 };
+  return from.x > rect.x && from.x < rect.x + rect.width &&
+    Math.max(from.y, to.y) > rect.y && Math.min(from.y, to.y) < rect.y + rect.height;
 }
 
 describe('generator-aligned graph', () => {
@@ -193,8 +201,8 @@ describe('generator-aligned graph', () => {
     ]);
 
     const flow = graph.edges.find((edge) => edge.id === 'flow-prod:egress:web#0')!;
-    expect(flow.points?.[0]).toEqual(absoluteCenter(graph, 'cmp-env-0-vcn-sn-0'));
-    expect(flow.points?.at(-1)).toEqual(absoluteCenter(graph, 'gw-natgw'));
+    expect(flow.points?.[0]).toEqual(flowAnchor(graph, 'cmp-env-0-vcn-sn-0'));
+    expect(flow.points?.at(-1)).toEqual(flowAnchor(graph, 'gw-natgw'));
   });
 
   it('opens a consulted route table only on request and keeps all of its real attachment points', () => {
@@ -211,9 +219,40 @@ describe('generator-aligned graph', () => {
     const flows = graph.edges.filter((edge) => edge.id.startsWith('flow-prod:egress#'));
     expect(flows).toHaveLength(4);
     flows.forEach((flow, index) => {
-      expect(flow.points?.[0]).toEqual(absoluteCenter(graph, `cmp-env-0-vcn-sn-${index}`));
+      expect(flow.points?.[0]).toEqual(flowAnchor(graph, `cmp-env-0-vcn-sn-${index}`));
     });
   });
+
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)(
+    'routes every %s flow through its logical resources without crossing unrelated leaf resources',
+    (kind) => {
+      const base = emptyLzModel();
+      const model: LzModel = { ...base, network: { hubKind: kind, ...hubKindDefaults(kind) } };
+      const leafKinds = new Set(['subnet', 'gateway', 'attachment', 'drg', 'routetable', 'project']);
+      for (const activeFlow of ['prod:egress:web', 'prod:ingress:web', 'prod:east-west:web', 'prod:services:web']) {
+        const graph = buildGraph(model, 3, { activeFlows: [activeFlow] });
+        const flow = graph.edges.find((edge) => edge.id.startsWith('flow-'))!;
+        const points = flow.points ?? [];
+        const rects = absoluteNodeRects(graph.nodes);
+
+        expect(points.length, activeFlow).toBeGreaterThan(1);
+        points.slice(1).forEach((point, index) => {
+          const previous = points[index];
+          expect(point.x === previous.x || point.y === previous.y, `${activeFlow} segment ${index}`).toBe(true);
+        });
+        flow.waypoints?.forEach((id) => {
+          expect(pathContains(points, flowAnchorPoint(rects.get(id)!)), `${activeFlow} misses ${id}`).toBe(true);
+        });
+        points.slice(1).forEach((point, index) => {
+          const previous = points[index];
+          for (const rect of rects.values()) {
+            if (!leafKinds.has(rect.node.kind) || flow.waypoints?.includes(rect.id)) continue;
+            expect(crossesInterior(previous, point, rect), `${activeFlow} crosses ${rect.id}`).toBe(false);
+          }
+        });
+      }
+    },
+  );
 
   it('shows shared DRG route tables on each attachment and keeps attachment lines distinct', () => {
     const model: LzModel = {

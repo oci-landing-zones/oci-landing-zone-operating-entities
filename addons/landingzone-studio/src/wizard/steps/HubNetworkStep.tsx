@@ -19,6 +19,8 @@ import {
 import type { HubKind, NetworkConfig, Subnet } from '../../model/types';
 import { FONT, s } from './networkEditorStyles';
 
+const HUB_MODELS_DOCUMENTATION_URL = 'https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models';
+
 /** Per-hub-kind documentation shown by the ⓘ button; placeholders have none yet. */
 const HUB_INFO: Partial<Record<HubKind, { title: string; body: React.ReactNode }>> = {
   hub_a: {
@@ -392,7 +394,10 @@ export default function HubNetworkStep() {
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Hub network</div>
-          <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>The hub is the shared network that connects environments and controls traffic to the internet and between workloads.</div>
+          <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>
+            The hub is the shared network that connects environments and controls traffic to the internet and between workloads.{' '}
+            <a className="guide-link" href={HUB_MODELS_DOCUMENTATION_URL} target="_blank" rel="noreferrer">Review the hub models in the documentation ↗</a>
+          </div>
 
           <label style={s.label}>Network model</label>
           <div style={s.kindRow} role="group" aria-label="Hub kind">
