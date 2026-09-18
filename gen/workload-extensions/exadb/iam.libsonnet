@@ -51,18 +51,21 @@
       [n.key_global('GRP', global_group_key_segments('DB'))]: {
         name: group_name('DB'),
         description: descriptions.global_db_group,
+        requestable: false,
       },
     } else {}) +
     (if has_infra_group then {
       [n.key_global('GRP', global_group_key_segments('INFRA'))]: {
         name: group_name('INFRA'),
         description: descriptions.global_infra_group,
+        requestable: false,
       },
     } else {});
     local project_groups = {
       [n.key_global('GRP', spec.scope.key_segments + [product_upper, spec.project_name, 'ADMIN'])]: {
         name: project_group_name(spec),
         description: descriptions.project_group(spec.scope, spec.project_name),
+        requestable: false,
       }
       for spec in model.specs
     };
