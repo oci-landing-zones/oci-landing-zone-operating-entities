@@ -1,0 +1,17 @@
+{
+    "include"                       : ["vite.config.ts", "scripts/**/*.mjs"],
+
+    "compilerOptions": {
+        "allowImportingTsExtensions": true,
+        "isolatedModules"           : true,
+        "lib"                       : ["ES2023"],
+        "module"                    : "ESNext",
+        "moduleDetection"           : "force",
+        "moduleResolution"          : "bundler",
+        "noEmit"                    : true,
+        "skipLibCheck"              : true,
+        "strict"                    : true,
+        "target"                    : "ES2022",
+        "types"                     : ["node"]
+    }
+}
