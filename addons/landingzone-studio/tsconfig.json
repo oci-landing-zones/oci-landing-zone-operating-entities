@@ -1,30 +1,30 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
+    "include"                       : ["src"],
 
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "jsx": "react-jsx",
+    "compilerOptions": {
+        "allowImportingTsExtensions": true,
+        "allowJs"                   : true,
+        "checkJs"                   : false,
+        "isolatedModules"           : true,
+        "jsx"                       : "react-jsx",
+        "module"                    : "ESNext",
+        "moduleDetection"           : "force",
+        "moduleResolution"          : "bundler",
+        "noEmit"                    : true,
+        "noFallthroughCasesInSwitch": true,
+        "noUnusedLocals"            : true,
+        "noUnusedParameters"        : true,
+        "resolveJsonModule"         : true,
+        "skipLibCheck"              : true,
+        "strict"                    : true,
+        "target"                    : "ES2022",
+        "types"                     : ["vitest/globals", "node"],
+        "useDefineForClassFields"   : true,
 
-    /* Allow the few remaining .jsx files to coexist during migration */
-    "allowJs": true,
-    "checkJs": false,
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "types": ["vitest/globals", "node"]
-  },
-  "include": ["src"]
+        "lib": [
+            "ES2022",
+            "DOM",
+            "DOM.Iterable"
+        ]
+    }
 }

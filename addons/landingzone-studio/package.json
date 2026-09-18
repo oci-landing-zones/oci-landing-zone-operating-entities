@@ -1,45 +1,48 @@
 {
-  "name": "landing-zone-studio",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "scripts": {
-    "ensure:wasm": "bash 3rd/go-jsonnet/ensure.sh",
-    "predev": "bun run ensure:wasm",
-    "dev": "vite",
-    "build:wasm": "bash 3rd/go-jsonnet/build.sh",
-    "prebuild": "bun run ensure:wasm",
-    "build": "tsc --noEmit -p tsconfig.json && vite build",
-    "build:pages": "bun run ensure:wasm && tsc --noEmit -p tsconfig.json && vite build --mode github-pages",
-    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "pretest": "bun run ensure:wasm",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "dependencies": {
-    "@xyflow/react": "^12.11.0",
-    "fflate": "^0.8.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.18.2"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/node": "^25.9.1",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react": "^4.3.4",
-    "@vitest/ui": "^4.1.8",
-    "binaryen": "131.0.0",
-    "eslint": "^10.8.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.3",
-    "globals": "^17.8.0",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.1",
-    "vite": "^6.2.0",
-    "vitest": "^4.0.18"
-  }
+    "name"                           : "landing-zone-studio",
+    "type"                           : "module",
+    "private"                        : true,
+    "version"                        : "0.1.0",
+
+    "dependencies": {
+        "@xyflow/react"              : "^12.11.0",
+        "fflate"                     : "^0.8.3",
+        "react"                      : "^19.0.0",
+        "react-dom"                  : "^19.0.0",
+        "react-router-dom"           : "^7.18.2"
+    },
+
+    "devDependencies": {
+        "@eslint/js"                 : "^10.0.1",
+        "@types/node"                : "^25.9.1",
+        "@types/react"               : "^19.0.10",
+        "@types/react-dom"           : "^19.0.4",
+        "@vitejs/plugin-react"       : "^4.3.4",
+        "@vitest/ui"                 : "^4.1.8",
+        "binaryen"                   : "131.0.0",
+        "eslint"                     : "^10.8.0",
+        "eslint-plugin-react-hooks"  : "^7.1.1",
+        "eslint-plugin-react-refresh": "^0.5.3",
+        "globals"                    : "^17.8.0",
+        "typescript"                 : "^6.0.3",
+        "typescript-eslint"          : "^8.60.1",
+        "vite"                       : "^6.2.0",
+        "vitest"                     : "^4.0.18"
+    },
+
+    "scripts": {
+        "dev"                        : "vite",
+        "build"                      : "tsc --noEmit -p tsconfig.json && vite build",
+        "build:pages"                : "bun run ensure:wasm && tsc --noEmit -p tsconfig.json && vite build --mode github-pages",
+        "build:wasm"                 : "bash 3rd/go-jsonnet/build.sh",
+        "ensure:wasm"                : "bash 3rd/go-jsonnet/ensure.sh",
+        "lint"                       : "eslint .",
+        "prebuild"                   : "bun run ensure:wasm",
+        "predev"                     : "bun run ensure:wasm",
+        "pretest"                    : "bun run ensure:wasm",
+        "preview"                    : "vite preview",
+        "test"                       : "vitest run",
+        "test:watch"                 : "vitest",
+        "typecheck"                  : "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json"
+    }
 }

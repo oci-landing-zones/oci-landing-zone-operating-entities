@@ -1,16 +1,17 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2023"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "strict": true,
-    "types": ["node"]
-  },
-  "include": ["vite.config.ts", "scripts/**/*.mjs"]
+    "include"                       : ["vite.config.ts", "scripts/**/*.mjs"],
+
+    "compilerOptions": {
+        "allowImportingTsExtensions": true,
+        "isolatedModules"           : true,
+        "lib"                       : ["ES2023"],
+        "module"                    : "ESNext",
+        "moduleDetection"           : "force",
+        "moduleResolution"          : "bundler",
+        "noEmit"                    : true,
+        "skipLibCheck"              : true,
+        "strict"                    : true,
+        "target"                    : "ES2022",
+        "types"                     : ["node"]
+    }
 }
