@@ -121,22 +121,26 @@
         "groups": {
             "GRP-LZ-GLOBAL-EXACS-DB-ADMIN-KEY": {
                 "name"                                 : "grp-lz-global-exacs-db-admin",
-                "description"                          : "Landing Zone global ExaDB-D database administration access group."
+                "description"                          : "Landing Zone global ExaDB-D database administration access group.",
+                "requestable"                          : false
             },
 
             "GRP-LZ-GLOBAL-EXACS-INFRA-ADMIN-KEY": {
                 "name"                                 : "grp-lz-global-exacs-infra-admin",
-                "description"                          : "Landing Zone global ExaDB-D infrastructure administration access group."
+                "description"                          : "Landing Zone global ExaDB-D infrastructure administration access group.",
+                "requestable"                          : false
             },
 
             "GRP-LZ-PREPROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                 : "grp-lz-preprod-proj1-exacs-admin",
-                "description"                          : "Landing Zone Pre-Production environment, Project 1 ExaDB-D database administration access group."
+                "description"                          : "Landing Zone Pre-Production environment, Project 1 ExaDB-D database administration access group.",
+                "requestable"                          : false
             },
 
             "GRP-LZ-PROD-EXACS-PROJ1-ADMIN-KEY": {
                 "name"                                 : "grp-lz-prod-proj1-exacs-admin",
-                "description"                          : "Landing Zone Production environment, Project 1 ExaDB-D database administration access group."
+                "description"                          : "Landing Zone Production environment, Project 1 ExaDB-D database administration access group.",
+                "requestable"                          : false
             }
         }
     },

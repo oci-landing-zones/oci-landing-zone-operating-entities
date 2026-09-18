@@ -20,6 +20,7 @@
               [n.key_global('GRP', entry.key_segments + [proj_name, 'ADMIN'])]: {
                 name: ctx.proj_grp_name(entry, proj_name),
                 description: desc.group.project(ctx.env_desc(entry.env_name), proj_name, 'administration'),
+                requestable: false,
               },
             },
           project_names,
@@ -36,27 +37,33 @@
         [n.key_tenancy('GRP', ['AUDITORS', 'ADMIN'])]: {
           name: n.display_tenancy('GRP', ['AUDITORS', 'ADMIN']),
           description: desc.group.tenancy('audit and read-only'),
+          requestable: false,
         },
         [n.key_tenancy('GRP', ['COST', 'ADMIN'])]: {
           name: n.display_tenancy('GRP', ['COST', 'ADMIN']),
           description: desc.group.tenancy('cost management'),
+          requestable: false,
         },
         [n.key_tenancy('GRP', ['IAM', 'ADMIN'])]: {
           name: n.display_tenancy('GRP', ['IAM', 'ADMIN']),
           description: desc.group.tenancy('IAM administration'),
+          requestable: false,
         },
         [n.key_global('GRP', ['NETWORK', 'ADMIN'])]: {
           name: n.display_global('GRP', ['NETWORK', 'ADMIN']),
           description: desc.group.landing_zone('shared', 'network administration'),
+          requestable: false,
         },
       } + env_project_groups + {
         [n.key_global('GRP', ['SECURITY', 'ADMIN'])]: {
           name: n.display_global('GRP', ['SECURITY', 'ADMIN']),
           description: desc.group.landing_zone('shared', 'security administration'),
+          requestable: false,
         },
         [n.key_tenancy('GRP', ['SECURITY', 'ADMIN'])]: {
           name: n.display_tenancy('GRP', ['SECURITY', 'ADMIN']),
           description: desc.group.tenancy('security service administration'),
+          requestable: false,
         },
       },
     },

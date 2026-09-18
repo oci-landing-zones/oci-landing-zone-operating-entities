@@ -14,6 +14,7 @@
 // contains: exacs-projects@example.com
 // contains: cloud-exadata-infrastructures
 // contains: cloud-vmclusters
+// contains: "all_identity_domain_groups_non_requestable": true
 local lz = import 'gen/landing_zone.libsonnet';
 
 local exacs_params(projects=[]) = {
@@ -45,9 +46,21 @@ local result = lz({
   },
 });
 
+local groups = result.iam.identity_domain_groups_configuration.groups;
+
 std.manifestJsonEx({
   compartments: result.iam.compartments_configuration.compartments,
-  groups: result.iam.identity_domain_groups_configuration.groups,
+  groups: groups,
   policies: result.iam.policies_configuration.supplied_policies,
   observability_cis1: result.observability_cis1,
+  all_identity_domain_groups_non_requestable:
+    std.foldl(
+      function(all, key)
+        all &&
+        std.objectHas(groups, key) &&
+        std.objectHas(groups[key], 'requestable') &&
+        groups[key].requestable == false,
+      std.objectFields(groups),
+      true
+    ),
 }, '  ')

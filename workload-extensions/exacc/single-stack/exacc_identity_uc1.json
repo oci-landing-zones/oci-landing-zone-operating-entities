@@ -241,62 +241,74 @@
         "groups": {
             "GRP-AUDITORS-ADMIN-KEY": {
                 "name"                                                         : "grp-auditors-admin",
-                "description"                                                  : "Tenancy-scoped audit and read-only access group."
+                "description"                                                  : "Tenancy-scoped audit and read-only access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-COST-ADMIN-KEY": {
                 "name"                                                         : "grp-cost-admin",
-                "description"                                                  : "Tenancy-scoped cost management access group."
+                "description"                                                  : "Tenancy-scoped cost management access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-IAM-ADMIN-KEY": {
                 "name"                                                         : "grp-iam-admin",
-                "description"                                                  : "Tenancy-scoped IAM administration access group."
+                "description"                                                  : "Tenancy-scoped IAM administration access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-LZ-GLOBAL-DB-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-global-exacc-db-admin",
-                "description"                                                  : "Landing Zone global ExaDB-C@C database administration access group."
+                "description"                                                  : "Landing Zone global ExaDB-C@C database administration access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-LZ-GLOBAL-INFRA-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-global-exacc-infra-admin",
-                "description"                                                  : "Landing Zone global ExaDB-C@C infrastructure administration access group."
+                "description"                                                  : "Landing Zone global ExaDB-C@C infrastructure administration access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-LZ-NETWORK-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-network-admin",
-                "description"                                                  : "Landing Zone shared network administration access group."
+                "description"                                                  : "Landing Zone shared network administration access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-LZ-PREPROD-EXACC-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-preprod-proj1-exacc-admin",
-                "description"                                                  : "Landing Zone Pre-Production environment, Project 1 ExaDB-C@C database administration access group."
+                "description"                                                  : "Landing Zone Pre-Production environment, Project 1 ExaDB-C@C database administration access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-LZ-PREPROD-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-preprod-proj1-admin",
-                "description"                                                  : "Landing Zone Pre-Production environment, Project 1 administration access group."
+                "description"                                                  : "Landing Zone Pre-Production environment, Project 1 administration access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-LZ-PROD-EXACC-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-prod-proj1-exacc-admin",
-                "description"                                                  : "Landing Zone Production environment, Project 1 ExaDB-C@C database administration access group."
+                "description"                                                  : "Landing Zone Production environment, Project 1 ExaDB-C@C database administration access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-LZ-PROD-PROJ1-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-prod-proj1-admin",
-                "description"                                                  : "Landing Zone Production environment, Project 1 administration access group."
+                "description"                                                  : "Landing Zone Production environment, Project 1 administration access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-LZ-SECURITY-ADMIN-KEY": {
                 "name"                                                         : "grp-lz-security-admin",
-                "description"                                                  : "Landing Zone shared security administration access group."
+                "description"                                                  : "Landing Zone shared security administration access group.",
+                "requestable"                                                  : false
             },
 
             "GRP-SECURITY-ADMIN-KEY": {
                 "name"                                                         : "grp-security-admin",
-                "description"                                                  : "Tenancy-scoped security service administration access group."
+                "description"                                                  : "Tenancy-scoped security service administration access group.",
+                "requestable"                                                  : false
             }
         }
     },
