@@ -1,128 +1,106 @@
-# Landing Zone Studio
+# **[OCI Landing Zone Studio](#)**
+## **An OCI Open LZ [Addon](#) for visual Landing Zone design**
 
-Wizard-driven generator for OCI Landing Zone config with a **live, exportable network diagram** and an **interactive packet-flow tracer**.
+&nbsp;
 
-You fill in a step-by-step wizard (text fields, dropdowns, checkboxes, switches). Each input updates a single canonical Landing Zone model **and** a live network diagram that grows as you go. Review generates one complete ZIP containing `config.jsonnet` and every Jsonnet artifact; the diagram exports separately to **draw.io** (`.drawio`) so you can keep editing it anywhere.
+**Table of Contents**
 
-> **Status:** Steps 1–5 are built end to end — **Foundation** (saved-design name and region), **Hub Network** (Hub A/B/C/E generator-aligned layouts, CIDR engine, gateways, DRG + attachments, editable subnet config keys), **Projects / Environment Networks**, **Platforms** (optional repeatable shared Custom/OCVS platforms plus environment OKE, OCVS, and custom platforms), and **Review**. The model is saved continuously. Review invokes the canonical browser Jsonnet runtime, downloads the complete ZIP, and is the only place that exports the structural Draw.io diagram. Packet-flow tracing has dedicated adapters for every supported hub; Hub C retains the generator's external firewall backend placeholders in `network_backends.json` for manual completion.
+[1. Overview](#1-overview)<br>
+[2. Design workflow](#2-design-workflow)<br>
+[3. What Studio supports](#3-what-studio-supports)<br>
+[4. Review and deployment](#4-review-and-deployment)<br>
+[5. Security and data handling](#5-security-and-data-handling)<br>
+[6. Complementary resources](#6-complementary-resources)<br>
 
-## Stack
+&nbsp;
 
-- **Vite** + **React 19** + **TypeScript**
-- **[React Flow](https://reactflow.dev/)** (`@xyflow/react`) for the interactive, animated, clickable diagram canvas
-- **Vitest** for unit tests, **ESLint** (typescript-eslint) for linting
+## 1. Overview
 
-## Run
+**OCI Landing Zone Studio** is a browser-based visual design tool for OCI Landing Zone Operating Entities. It guides an operator through a Landing Zone design, shows the resulting network as a live diagram, and creates a reviewable deployment package from the repository's Jsonnet generator.
 
-```bash
-bun install
-bun run build:wasm   # build the ignored, optimized browser Jsonnet runtime
-bun run dev          # Vite dev server on http://localhost:5173
-bun run typecheck    # tsc --noEmit (app + tooling configs)
-bun run lint         # eslint
-bun run test         # vitest (pure-function unit tests)
-bun run build        # typecheck + vite build → dist/
-bun run build:pages  # typecheck + GitHub Pages build → dist/
-bun run preview      # preview the production build
-```
+Studio is designed for teams that want a guided alternative to editing configuration files by hand while keeping the design, generated files, and deployment decision under their own control.
 
-Open **http://localhost:5173/** — the dashboard lists your Landing Zones; create one to open the wizard at `/lz/:id`. No auth, no backend required for development; every route is public and all generation happens in the browser. (First visit shows a one-time disclaimer gate.)
+> [!IMPORTANT]
+> Studio is provided as-is and used at your own risk. Review every design, generated file, placeholder, route, security setting, and compliance requirement before deployment. Studio does not deploy resources to OCI and is not an Oracle-managed deployment service.
 
-The regular development and production builds use `/` as their base path. `bun run build:pages` uses `/oci-landing-zone-operating-entities/`, matching this repository's GitHub Pages project-site URL while leaving local development unchanged. Before copying `dist/` to the Pages publishing branch, copy `dist/index.html` to `dist/404.html` for the client-side route fallback and add an empty `dist/.nojekyll` file. The publishing branch should contain the contents of `dist/`, not the directory itself.
+Studio complements the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md). Blueprint Factory provides the config-driven generation path; Studio provides a guided visual interface for creating and reviewing a supported config-driven design.
 
-For other production hosting, publish the `dist` directory and configure an SPA fallback so deep links resolve to `index.html`. Serve the Content Security Policy from `index.html` as an HTTP response header when the hosting platform supports it. The narrow `wasm-unsafe-eval` source permits WebAssembly compilation for Jsonnet; it does not permit JavaScript `eval`.
+&nbsp;
 
-## Security and data handling
+## 2. Design workflow
 
-Studio is a browser-only generator: it does not deploy to OCI, request OCI credentials, or transmit Landing Zone models or generated artifacts to a service. Designs and the most recent generated ZIP snapshot are stored only in the active browser profile through `localStorage`; use a browser profile controlled by the intended operator and do not enter secrets into Studio. Browser-storage failures are shown in the UI, and a downloaded ZIP remains usable even if its local snapshot cannot be retained. Review generated files, placeholders, routing, and security settings before deployment; Studio is not an Oracle-managed deployment service.
+Studio keeps one canonical Landing Zone model while you work. The wizard, JSON configuration, live network diagram, packet-flow trace, downloadable Draw.io diagram, and generated deployment files all derive from that same model.
 
-## Architecture — one source of truth, many consumers
+1. **Start a design**: choose a design name, OCI region and realm, and the CIS baseline.
+1. **Design the hub network**: select a Hub A, B, C, or E layout and review the VCN, subnets, gateways, DRG, and attachments.
+1. **Add environments and projects**: define environment networks and the projects that need to be represented in each environment.
+1. **Add platforms**: add supported OKE, OCVS, or custom platforms. Shared custom and OCVS platforms can also be included.
+1. **Review and export**: download one ZIP containing `config.jsonnet` and the generated deployment files. Export the structural diagram as a `.drawio` file when you need to continue diagramming outside Studio.
 
-The load-bearing idea: a **single canonical model** drives everything, and rendering is **decoupled** from export so neither compromises the other.
+The diagram grows with the wizard. In diagram-only view, Studio can show route tables, example endpoints, and packet paths for supported traffic flows. This gives network and security reviewers a way to inspect the intended path before deployment.
 
-```
- wizard inputs (text / dropdown / checkbox / switch)
-        │
-        ▼
-   canonical LzModel              ◄── single source of truth (model/types.ts)
-        │
-        ├─► serializeConfig()  →  Review ZIP input (`config.jsonnet`)
-        │
-        ├─► buildRouteTables() →  RouteTable[]   ◄── derived OCI route tables
-        │                              │
-        │                              └─► flowTrace() walks them → packet paths
-        │
-        └─► buildGraph()  →  DiagramModel        ◄── renderer-agnostic intermediate
-                                  │              (consumes route tables + active flows)
-                                  ├─► LzDiagram (React Flow)  — live, animated, clickable
-                                  └─► toDrawio() → .drawio XML — animated edges → draw.io flowAnimation
-```
+&nbsp;
 
-- **`LzModel`** is the canonical object. The wizard only ever writes into it (via a dotted-path setter).
-- **`buildGraph(model, upToStep, options)`** is a pure function producing a `DiagramModel` (nodes + edges + metadata). It limits the diagram to the wizard step reached, and folds in the endpoints / route-table / flow layers when those options are on.
-- The on-screen React Flow canvas and Review's `.drawio` exporter both consume `DiagramModel`; Review deliberately builds the complete step-5 structural view without flow/debug overlays.
-- Adding a wizard step = add fields to `LzModel` + grow `buildGraph`. The pure transforms (`buildGraph`, `buildRouteTables`, `flowTrace`, `toDrawio`, `cidr`) are the unit-tested spine.
+## 3. What Studio supports
 
-## Network diagram & flow engine
+Studio currently provides a guided interface for the following repository-supported design choices:
 
-In **Diagram-only** view at **Step 3**, two layers light up:
+| Area | Supported choices |
+|---|---|
+| Landing Zone baseline | One-OE config-driven generation |
+| Hub network | Hub A, Hub B, Hub C, and Hub E |
+| Environments | Environment networks, optional OCI Security Zones, and projects |
+| Platforms | Environment OKE (`oke_simple`), OCVS, and custom platforms; shared OCVS and custom platforms |
+| Outputs | Generated deployment ZIP, `config.jsonnet`, live diagram, and Draw.io export |
 
-- **Show endpoints** — draws a VM in each spoke / management subnet and a route-table dot on every subnet, gateway, and DRG attachment. Click a dot to open that route table.
-- **Show flows** — a docked, collapsible picker of the four canonical traffic flows, per environment:
-  - **Spoke → Internet** (egress, via NAT after firewall inspection)
-  - **Internet → Spoke** (ingress, via the hub public Load Balancer → DMZ FW → INT FW → DRG → private backend)
-  - **Spoke ↔ Spoke** (east-west, hair-pinned through the internal firewall)
-  - **Spoke → OCI Services** (per-spoke Service Gateway local breakout)
+Hub A, B, and C are staged network deployments. The downloaded package preserves the required `*_pre.json` and final files together. Before the final network phase, resolve the generated firewall or load-balancer private-IP-OCID placeholders as described in the review screen and the selected hub documentation.
 
-`services/flowTrace.ts` **walks the generated route tables** (longest-prefix match → follow the matched rule's next-hop → resolve the next table) to compute the exact packet path — so the trace stays correct as you edit CIDRs and rules. A selected flow:
+Studio intentionally does not replace the Landing Zone framework contract. A resource, topology, or behavior not supported by the generator must be handled as a separate manual post-deployment activity, with customer ownership for lifecycle, drift, and compliance review.
 
-- draws a continuous, orthogonal **animated path** (routed through clean channels, with a moving **source→dest pill** and per-segment direction arrows),
-- **auto-opens** every route table it traverses and shows **only the rows it uses**,
-- lists the **step-by-step hops** in the sidebar with **Prev / Auto / Next** manual packet stepping (the packet glides along the path),
-- can be scoped to **a single endpoint** (e.g. `prod-db` only) via per-endpoint chips.
+&nbsp;
 
-The route paths are validated against OCI hub-and-spoke semantics (DRG v2 attachment route tables, firewall re-injection, public-LB-with-private-backends ingress).
+## 4. Review and deployment
 
-## Layout
+The Studio download is a deployment input, not an automatic deployment. The ZIP contains the design configuration and the complete set of generated JSON artifacts for that snapshot. Review it in your normal architecture, network, security, and change-management processes.
 
-```
-index.html                 mounts src/main.tsx
-src/                       application source
-  main.tsx                 React entry
-  App.tsx                  router + disclaimer gate (Dashboard / WizardShell)
-  index.css
-  model/                   canonical LzModel types + defaults / normalize (source of truth)
-  wizard/                  WizardContext (model + dotted-path setter), WizardStepper,
-                           steps/ (Foundation, HubNetwork, EnvNetwork)
-  diagram/                 buildGraph (pure: model → DiagramModel) + LzDiagram (React Flow + flow overlay)
-  export/                  toDrawio (pure: DiagramModel → .drawio XML) + download helper
-  pages/                   Dashboard (manage LZs) + WizardShell (the wizard + diagram + flows)
-  components/              FlowSidebar, ViewModeToggle, TopBar, JsonViewer, Disclaimer, …
-  services/                cidr (CIDR engine), routeTables (derived OCI route tables),
-                           flowTrace (route-table-walking packet tracer), lzConfig (.jsonnet),
-                           hubKinds, regions, lzStore (localStorage), pagesBase
-```
+Before deployment:
 
-## State & persistence
+- Confirm region, realm, environment names, CIDRs, connectivity assumptions, and workload placement.
+- Confirm CIDRs do not overlap with OCI, on-premises, or other-cloud networks that require routed connectivity.
+- Review IAM, compartment, security, governance, and observability outputs.
+- Resolve every generated placeholder and follow the required staged network workflow.
+- Store source configuration and generated artifacts in a private, organization-controlled location.
 
-All persistence lives behind `services/lzStore.ts`; the UI never touches `localStorage` directly.
+Use Terraform locally or from customer-controlled CI/CD where possible. If you use OCI Resource Manager, stage the artifacts in a private Object Storage bucket or approved private source repository controlled by your organization.
 
-| Key                       | Holds |
-|---------------------------|-------|
-| `lzng.lz.index`           | The list of saved Landing Zones (id, name, timestamps). The namespace remains stable so local designs are not orphaned by the product rename. |
-| `lzng.lz.<id>`            | One Landing Zone record — its canonical `LzModel`, saved on every field change. |
-| `lzng.lz.<id>.outputs`    | Gzipped generator snapshot: config plus the complete artifact set. |
-| `lzng.disclaimer.accepted`| One-time acceptance of the front-page disclaimer. |
+For deployment details, use the [Terraform deployment guide](../../commons/content/terraform.md) or [OCI Resource Manager deployment guide](../../commons/content/orm.md).
 
-Flow/diagram view state (active flows, packet step, open route tables) is in-memory only — it drives the live overlay but isn't persisted.
+&nbsp;
 
-## Jsonnet browser runtime
+## 5. Security and data handling
 
-`3rd/go-jsonnet` is the active go-jsonnet WASM runtime used by the browser and tests.
-Its custom in-memory importer caches canonical paths, which the current generator
-requires when a function-local import is evaluated more than once.
+Studio runs entirely in the browser. It does not request OCI credentials, deploy to OCI, or send Landing Zone models or generated files to a service. Designs and the latest generated ZIP snapshot are retained only in the active browser profile using local storage.
 
-The dashboard and disclaimer do not load the large engine. Opening a Landing Zone
-wizard schedules the complete generation chunk, WASM download, and VM boot during
-browser idle time; generation reuses that same in-flight or completed VM instead
-of adding the startup delay to the first config download.
+Use a browser profile controlled by the intended operator, and do not enter secrets into Studio. A downloaded ZIP remains usable if browser storage is unavailable, but the design may not be retained locally. Treat exported files as sensitive deployment artifacts and store them accordingly.
+
+The first visit displays a disclaimer that must be accepted before using the tool. This does not replace your organization's architecture, security, compliance, or deployment approvals.
+
+&nbsp;
+
+## 6. Complementary resources
+
+| Resource | Purpose |
+|---|---|
+| [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/README.md) | Config-driven Landing Zone generation and examples. |
+| [OCI LZ AI Agent](../oci-lz-ai-agent/README.md) | AI-assisted discovery and config drafting guidance. |
+| [One-OE runtime documentation](../../blueprints/one-oe/runtime/one-stack/readme.md) | Published One-OE deployment reference. |
+| [OCI Network Hubs](../oci-hub-models/readme.md) | Hub A, B, C, and E guidance. |
+| [Workload Extensions](../../workload-extensions/readme.md) | Published workload-extension entry point. |
+
+#### License
+
+Copyright (c) 2026 Oracle and/or its affiliates.
+
+Licensed under the Universal Permissive License (UPL), Version 1.0.
+
+See [LICENSE](../../LICENSE.txt) for more details.
