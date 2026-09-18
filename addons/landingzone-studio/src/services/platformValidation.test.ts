@@ -41,7 +41,15 @@ describe('validatePlatformContracts', () => {
       'Duplicate project config key: APP.',
       'Duplicate hub subnet config key: LB.',
       'Project APP references a removed environment.',
-      'Platform cust references a removed environment.',
+      'Platform cus references a removed environment.',
     ]));
+  });
+
+  it('rejects environment platform keys that exceed the firewall naming limit', () => {
+    const base = emptyLzModel();
+    const platform = { ...newPlatform('custom', []), key: 'long' };
+    expect(validatePlatformContracts({ ...base, platforms: [platform] })).toContain(
+      'Environment platform long config key must be 3 characters or less for OCI Network Firewall names.',
+    );
   });
 });

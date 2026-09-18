@@ -29,7 +29,7 @@ describe('buildConfig', () => {
     expect(Object.keys(c.environments)).toEqual(['prod', 'preprod', 'dev']);
     // each env now carries its spoke network + the projects dropped in it (+ platforms, empty by default)
     expect(c.environments.prod).toEqual({
-      shared_project_network: { network: { vcn: '10.0.64.0/21', subnets: { web: '10.0.64.0/24', app: '10.0.65.0/24', db: '10.0.66.0/24', infra: '10.0.67.0/24' } } },
+      project_network: { network: { vcn: '10.0.64.0/21', subnets: { web: '10.0.64.0/24', app: '10.0.65.0/24', db: '10.0.66.0/24', infra: '10.0.67.0/24' } } },
       projects: { proj1: {} },
       platforms: {},
     });
@@ -99,7 +99,7 @@ describe('serializeConfig', () => {
     // step 3 (default) nests each environment's spoke network + projects
     expect(out).toContain('  environments: {');
     expect(out).toContain('    prod: {');
-    expect(out).toContain('      shared_project_network: {');
+    expect(out).toContain('      project_network: {');
     expect(out).toContain("          vcn: '10.0.64.0/21',");
     expect(out).toContain("            web: '10.0.64.0/24', app: '10.0.65.0/24',");
     expect(out).toContain("      projects: { proj1: {} },");
@@ -109,7 +109,7 @@ describe('serializeConfig', () => {
   it('keeps environments as empty named compartments before step 3', () => {
     const out = serializeConfig(model(), 2);
     expect(out).toContain('environments: { prod: {}, preprod: {} },');
-    expect(out).not.toContain('shared_project_network');
+    expect(out).not.toContain('project_network');
   });
 
   it('drops a project into only the environments it applies to', () => {
@@ -203,8 +203,8 @@ describe('serializeConfig', () => {
       sharedPlatforms: [{ id: 'shared-ocv', key: 'ocv', type: 'ocvs', vcnCidr: '10.170.0.0/21', subnets: [], ocvsParams: settings }],
     });
     const c = buildConfig(m);
-    expect(c.environments.prod.platforms.ocvs).toMatchObject({ network: { vcn: '10.0.80.0/21' }, extension: { type: 'ocvs' } });
-    expect(c.environments.prod.platforms.ocvs.network.subnets).toBeUndefined();
+    expect(c.environments.prod.platforms.ocv).toMatchObject({ network: { vcn: '10.0.80.0/21' }, extension: { type: 'ocvs' } });
+    expect(c.environments.prod.platforms.ocv.network.subnets).toBeUndefined();
     expect(c.shared_platforms.ocv).toMatchObject({ network: { vcn: '10.170.0.0/21' }, extension: { type: 'ocvs' } });
     expect(c.shared_platforms.ocv.network.subnets).toBeUndefined();
     const text = serializeConfig(m, 4);
@@ -218,7 +218,7 @@ describe('serializeConfig', () => {
       environments: [env('prod', true, 0)],
       platforms: [custom],
     });
-    const entry = buildConfig(m).environments.prod.platforms.cust;
+    const entry = buildConfig(m).environments.prod.platforms.cus;
     expect(entry).toEqual({
       network: {
         vcn: '10.0.80.0/21',
@@ -227,7 +227,7 @@ describe('serializeConfig', () => {
     });
 
     const out = serializeConfig(m, 4);
-    expect(out).toContain("        cust: {\n          network: {");
+    expect(out).toContain("        cus: {\n          network: {");
     expect(out).not.toContain("type: 'custom'");
   });
 

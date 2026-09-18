@@ -38,7 +38,7 @@ export interface PlatformConfigEntry {
 
 /** One environment in the config — its spoke network, projects, and platforms. */
 export interface EnvConfigEntry {
-  shared_project_network: { network: { vcn: string; subnets: Record<string, string> } };
+  project_network: { network: { vcn: string; subnets: Record<string, string> } };
   projects: Record<string, Record<string, never>>;
   platforms: Record<string, PlatformConfigEntry>;
 }
@@ -165,7 +165,7 @@ export function buildConfig(model: LzModel): LzConfig {
     }
 
     environments[name] = {
-      shared_project_network: { network: { vcn: net.vcnCidr.trim(), subnets: envSubnets } },
+      project_network: { network: { vcn: net.vcnCidr.trim(), subnets: envSubnets } },
       projects,
       platforms,
     };
@@ -271,7 +271,7 @@ function jsonnetValue(v: unknown): string {
 
 /** Lines for one environment entry (step 3): its spoke network + projects (+ platforms at step 4). */
 function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: boolean): string[] {
-  const net = entry.shared_project_network.network;
+  const net = entry.project_network.network;
   const subEntries = Object.entries(net.subnets).map(([k, v]) => `${key(k)}: ${quote(v)}`);
   const subnetLines = subEntries.length === 0
     ? ['          subnets: {},']
@@ -286,7 +286,7 @@ function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: bo
       : ['      platforms: {', ...platformKeys.flatMap((p) => platformEntryLines(p, entry.platforms[p])), '      },'];
   return [
     `    ${key(name)}: {`,
-    '      shared_project_network: {',
+    '      project_network: {',
     '        network: {',
     `          vcn: ${quote(net.vcn)},`,
     ...subnetLines,

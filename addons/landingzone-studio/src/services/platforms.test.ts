@@ -27,9 +27,9 @@ describe('newPlatform', () => {
 
   it('seeds a Custom network-only platform with a required subnet and DNS-safe id', () => {
     const p = newPlatform('custom', []);
-    // `cust`, not `custom`: a preprod platform gets 5 chars of the 15-char DNS label.
+    // `cus`, not `custom`: the generated firewall address-list name is capped at 28 characters.
     expect(p).toMatchObject({
-      id: 'cust',
+      id: 'cus',
       type: 'custom',
       subnets: [{ name: 'core', cidr: '10.0.80.0/24' }],
     });
@@ -38,7 +38,7 @@ describe('newPlatform', () => {
 
   it('seeds OCVS with generator-owned provisioning networking and an incomplete credential field', () => {
     const p = newPlatform('ocvs', []);
-    expect(p).toMatchObject({ id: 'ocvs', type: 'ocvs', subnets: [] });
+    expect(p).toMatchObject({ id: 'ocv', type: 'ocvs', subnets: [] });
     expect(p.ocvsParams?.sshAuthorizedKeys).toBe('');
   });
 
@@ -47,7 +47,7 @@ describe('newPlatform', () => {
     const b = newPlatform('oke_simple', [a]);
     expect(a.vcnCidr).toBe('10.0.80.0/20');
     expect(b.vcnCidr).toBe('10.0.144.0/20'); // +16384 addresses (a /18 stride)
-    expect(b.id).toBe('oke-2');
+    expect(b.id).toBe('ok2');
   });
 });
 

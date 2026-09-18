@@ -147,19 +147,18 @@ export function ocvsDefaultSubnets(baseVcn: string): Subnet[] {
 }
 
 /**
- * Next free "<base>-N" platform name for a type, counting past existing ones.
+ * Next free compact platform name for a type, counting past existing ones.
  *
- * Stems stay short on purpose. The generator folds the platform name into an OCI
- * DNS label (`vcn` + region + `lz` + env + name) capped at 15 chars, which leaves
- * 5 for a `preprod` platform — so `cust`, not `custom`. A longer name (or a `-2`
- * suffix) can still overflow; the generator says so by name in Step 5.
+ * Environment-platform keys stay at three characters so their derived OCI
+ * Network Firewall address-list names remain within the 28-character limit.
  */
 function nextPlatformId(type: PlatformType, existing: PlatformConfig[]): string {
-  const stem = type === 'oke_simple' ? 'oke' : type === 'ocvs' ? 'ocvs' : 'cust';
+  const stem = type === 'oke_simple' ? 'oke' : type === 'ocvs' ? 'ocv' : 'cus';
   if (!existing.some((p) => p.id === stem || p.key === stem)) return stem;
   let n = 2;
-  while (existing.some((p) => p.id === `${stem}-${n}` || p.key === `${stem}-${n}`)) n += 1;
-  return `${stem}-${n}`;
+  const candidate = () => `${stem.slice(0, Math.max(1, 3 - String(n).length))}${n}`;
+  while (existing.some((p) => p.id === candidate() || p.key === candidate())) n += 1;
+  return candidate();
 }
 
 /**

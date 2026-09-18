@@ -128,7 +128,7 @@ describe('buildRouteTables', () => {
     const ocvs = newPlatform('ocvs', []);
     const model = { ...base, platforms: [{ ...ocvs, environments: ['environment-1'], ocvsParams: { ...ocvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' } }] };
     const table = buildRouteTables(model).find((entry) => entry.id === 'rt-ocvs-0-0-provisioning')!;
-    expect(table).toMatchObject({ name: 'rt-fra-lz-prod-ocvs-provisioning', attachTo: 'cmp-env-0-plat-0-sn-0', note: expect.stringMatching(/VLAN route tables and NSGs/) });
+    expect(table).toMatchObject({ name: 'rt-fra-lz-prod-ocv-provisioning', attachTo: 'cmp-env-0-plat-0-sn-0', note: expect.stringMatching(/VLAN route tables and NSGs/) });
     expect(table.rules[0]).toMatchObject({ destination: 'OSN Services', nextHopKind: 'sgw', flowTarget: 'cmp-env-0-plat-0-sgw' });
     expect(table.rules).toContainEqual(expect.objectContaining({ destination: '10.0.0.0/21', nextHopKind: 'drg' }));
   });

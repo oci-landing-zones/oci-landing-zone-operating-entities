@@ -51,6 +51,9 @@ export function validatePlatformContracts(model: LzModel): string[] {
   }
   for (const platform of model.platforms) {
     if (!platform.key.trim()) errors.push('Every environment platform needs a non-empty config key.');
+    if (platform.key.trim().length > 3) {
+      errors.push(`Environment platform ${platform.key.trim()} config key must be 3 characters or less for OCI Network Firewall names.`);
+    }
     if (platform.environments !== 'all' && platform.environments.some((id) => !environmentIds.has(id))) {
       errors.push(`Platform ${platform.key.trim() || platform.id} references a removed environment.`);
     }

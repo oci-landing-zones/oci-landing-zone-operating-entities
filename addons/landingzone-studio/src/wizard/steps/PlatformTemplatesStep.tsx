@@ -305,7 +305,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
 
           <div style={{ marginBottom: 16 }}>
             <label style={s.label} htmlFor={`${platform.id}-key`}>Platform name</label>
-            <input id={`${platform.id}-key`} style={s.rowInput} value={platform.key} onChange={(e) => onPlatform({ key: e.target.value })} />
+            <input id={`${platform.id}-key`} style={s.rowInput} value={platform.key} maxLength={3} onChange={(e) => onPlatform({ key: e.target.value })} />
             <div style={local.fieldHint}>Used to create consistent names for this platform's compartment, network, gateway, and DRG attachment.</div>
           </div>
 
@@ -545,8 +545,9 @@ export default function PlatformTemplatesStep() {
                 <input
                   id="new-platform-name"
                   style={s.rowInput}
-                  placeholder={newType === 'oke_simple' ? 'oke' : 'custom'}
+                  placeholder={newType === 'oke_simple' ? 'oke' : newType === 'ocvs' ? 'ocv' : 'cus'}
                   value={newName}
+                  maxLength={3}
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') addPlatform(); }}
                 />
