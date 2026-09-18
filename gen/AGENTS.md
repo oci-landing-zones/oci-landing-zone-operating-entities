@@ -401,7 +401,7 @@ Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produce
 
 For customer-use artifact placement and deployment defaults, follow root `AGENTS.md`. This generator guide defines emitted files and generator behavior only.
 
-Config mode validates required fields during normalization. `config.environments` must be present and non-empty; omitted environments are a hard error rather than an implicit default.
+Config mode validates required fields during normalization. `config.environments` is optional and defaults to an empty object for a shared-services and hub-only Landing Zone. When provided, it must be an object.
 
 ## 10. Network Artifact Phases
 

@@ -148,9 +148,11 @@ local validation = import 'lib/validation.libsonnet';
     assert std.member(supported_hub_kinds, hub_kind) :
            'config.hub.kind must be one of: %s' % std.join(', ', supported_hub_kinds);
     local hub_network = validation.required_object(hub, 'network', 'config.hub.network');
-    local environments = validation.required_object(config, 'environments', 'config.environments');
+    local environments =
+      if std.objectHas(config, 'environments') then
+        validation.object(config.environments, 'config.environments')
+      else {};
     local env_names = std.objectFields(environments);
-    assert std.length(std.objectFields(environments)) > 0 : 'config.environments must have at least one environment';
 
     local security_target_names =
       if std.objectHas(config, 'security_targets') && config.security_targets != null then

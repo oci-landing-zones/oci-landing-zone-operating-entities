@@ -101,7 +101,7 @@ The corresponding configuration nesting is:
 
 This is a nesting template, not a single deployable configuration. Omit optional blocks that do not apply, and follow the selected workload extension's network requirement.
 
-Every Blueprint Factory configuration needs a hub and at least one named environment. Region metadata is optional as a pair; if omitted, the factory defaults it to `eu-frankfurt-1` and `fra`.
+Every Blueprint Factory configuration needs a hub. The `environments` object is optional and defaults to empty for a shared-services and hub-only Landing Zone. Region metadata is optional as a pair; if omitted, the factory defaults it to `eu-frankfurt-1` and `fra`.
 
 ```jsonnet
 {
@@ -117,7 +117,7 @@ Every Blueprint Factory configuration needs a hub and at least one named environ
 }
 ```
 
-This smallest shape creates the shared landing-zone domains for `dev`. Add a project network only when the environment needs a spoke VCN, and add projects only when the target design needs project compartments.
+This small shape creates the shared landing-zone domains plus the `dev` environment compartments. For a hub-only Landing Zone without environment compartments or spoke networks, omit `environments` as shown in the [no-environments example](./examples/00-no-environments.json). An explicit `environments: {}` has the same result. Add a project network only when an environment needs a spoke VCN, and add projects only when the target design needs project compartments.
 
 ## 1. Region and Security Settings
 
@@ -158,7 +158,7 @@ hub: {
 
 ## 3. Environments
 
-Environment names are object keys. An environment can contain projects, a project network, and platforms.
+`environments` is optional. When present, environment names are object keys and each environment can contain projects, a project network, and platforms. Omitting the field or using an empty object emits no environment-scoped compartments, policies, networks, security-zone targets, or observability resources.
 
 ```jsonnet
 environments: {
