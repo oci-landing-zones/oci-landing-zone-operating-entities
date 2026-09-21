@@ -95,12 +95,13 @@ Example shape:
 }
 ```
 
-Not every configuration needs every block. A small Landing Zone may only define a hub and one or two environments, while a larger design may add platforms, projects, and workload extensions. `project_network` is optional and supports both shared and project-dedicated subnet allocations. Prefer shared subnets for address efficiency; dedicated allocation does not provide IAM isolation. See the [Blueprint Factory Configuration Reference](./blueprint-factory-configuration-reference.md#4-project-network) for the complete contract and routing implications.
+Not every configuration needs every block. A hub-only Landing Zone may omit environments, while a larger design may add environments, platforms, projects, and workload extensions. `project_network` is optional and supports both shared and project-dedicated subnet allocations. Prefer shared subnets for address efficiency; dedicated allocation does not provide IAM isolation. See the [Blueprint Factory Configuration Reference](./blueprint-factory-configuration-reference.md#4-project-network) for the complete contract and routing implications.
 
 The [examples](./examples) folder contains small and medium-size config files that can be used as starting points for common Blueprint Factory scenarios.
 
 | Example | Shows |
 |---|---|
+| [No environments](./examples/00-no-environments.json) | Shared Landing Zone services and a hub, without environment compartments or spoke networks. |
 | [Single environment](./examples/01-single-environment.json) | One environment with a project network and one project. |
 | [Prod and preprod projects](./examples/02-prod-preprod-projects.json) | Two environments, project networks, and multiple projects. |
 | [Prod with OKE](./examples/03-prod-oke.json) | Environment-scoped OKE platform using the `oke_simple` extension. |
