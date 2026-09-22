@@ -27,6 +27,9 @@ local validation = import '../../lib/validation.libsonnet';
   platform_db_key(product, n, scope)::
     n.key_global('CMP', [scope.scope_name, scope.platform_name, 'DB']),
 
+  platform_db_name(product, scope)::
+    '%s-db' % scope.compartment_name,
+
   platform_infra_key(product, n, scope)::
     n.key_global('CMP', [scope.scope_name, scope.platform_name, 'INFRA']),
 
@@ -41,7 +44,7 @@ local validation = import '../../lib/validation.libsonnet';
       else self.component_defaults;
     (if components.database then {
       [self.platform_db_key(product, n, scope)]: {
-        name: '%s-db' % scope.compartment_name,
+        name: $.platform_db_name(product, scope),
         description: descriptions.platform_child_compartment(scope, 'Database'),
         defined_tags: { [tag_key]: product.tags.db },
       },
@@ -122,7 +125,7 @@ local validation = import '../../lib/validation.libsonnet';
                 model.environment_scope(env_name),
                 project_name
               ),
-              defined_tags: { [tag_key]: product.tags.db },
+              defined_tags: { [tag_key]: product.tags.project_db },
             },
           },
         },
@@ -216,7 +219,7 @@ local validation = import '../../lib/validation.libsonnet';
         name: $.project_db_name(product, env_name, project_name),
         description: descriptions.project_db_compartment(scope_for(env_name), project_name),
         parent_id: n.key_global('CMP', [env_name, project_name]),
-        defined_tags: { [tag_key]: product.tags.db },
+        defined_tags: { [tag_key]: product.tags.project_db },
       }
       for env_name in std.objectFields(project_db_compartments)
       for project_name in project_db_compartments[env_name]

@@ -28,6 +28,11 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
          std.objectHas(scope_config.extension_components, product.code) then
         scope_config.extension_components[product.code]
       else components;
+    local shared_components =
+      if std.objectHas(scope_config, 'extension_shared_components') &&
+         std.objectHas(scope_config.extension_shared_components, product.code) then
+        scope_config.extension_shared_components[product.code]
+      else { infrastructure: false, database: false };
     local model = exadb_project_db.normalize({
       product: product,
       scope: scope,
@@ -39,16 +44,22 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
       exadb_project_db.project_db_key(product, n, env_name, project_name);
     local project_db_name(env_name, project_name) =
       exadb_project_db.project_db_name(product, env_name, project_name);
+    local platform_db_key = exadb_project_db.platform_db_key(product, n, scope);
+    local platform_db_name = exadb_project_db.platform_db_name(product, scope);
     local iam = exadb_iam.render({
       product: product,
       naming: n,
       descriptions: descriptions,
       model: model,
+      scope: scope,
       tag_key: tag_key,
+      platform_db_key: platform_db_key,
+      platform_db_name: platform_db_name,
       project_db_key: project_db_key,
       project_db_name: project_db_name,
       components: components,
       aggregate_components: aggregate_components,
+      shared_components: shared_components,
     });
     local observability = exadb_observability.render({
       product: product,
@@ -58,7 +69,7 @@ local notification_emails = import '../../lib/notification_emails.libsonnet';
       scope_config: scope_config,
       model: model,
       notification: notification,
-      db_key: exadb_project_db.platform_db_key(product, n, scope),
+      db_key: platform_db_key,
       infra_key: exadb_project_db.platform_infra_key(product, n, scope),
       project_db_key: project_db_key,
       components: components,

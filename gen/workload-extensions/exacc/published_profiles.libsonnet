@@ -65,7 +65,7 @@ local exacc_no_network_base = {
   hub_e_prod_preprod_exacc_uc2_config: exacc_no_network_base {
     shared_platforms: {
       exacc: exacc_platform(
-        components=infra_and_db,
+        components=infra_only,
         emails={
           db_workloads: notification_emails.db_workloads,
           infra_workloads: notification_emails.infra_workloads,
@@ -77,7 +77,7 @@ local exacc_no_network_base = {
         platforms+: {
           exacc: exacc_platform(
             projects=['proj1'],
-            components=infra_and_db,
+            components=db_only,
             emails={
               infra_workloads: notification_emails.infra_workloads,
               db_workloads: notification_emails.db_workloads,
@@ -90,7 +90,7 @@ local exacc_no_network_base = {
         platforms+: {
           exacc: exacc_platform(
             projects=['proj1'],
-            components=infra_and_db,
+            components=db_only,
             emails={
               infra_workloads: notification_emails.infra_workloads,
               db_workloads: notification_emails.db_workloads,

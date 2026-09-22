@@ -3,25 +3,22 @@
 // contains: "uc2_identity_has_preprod_exacc_root": true
 // contains: "uc2_identity_prod_children": [
 // contains: "CMP-LZ-PROD-EXACC-DB-KEY"
-// contains: "CMP-LZ-PROD-EXACC-INFRA-KEY"
 // contains: "uc2_identity_preprod_children": [
 // contains: "CMP-LZ-PREPROD-EXACC-DB-KEY"
-// contains: "CMP-LZ-PREPROD-EXACC-INFRA-KEY"
 // contains: "uc2_identity_has_prod_project_db": true
 // contains: "uc2_identity_has_preprod_project_db": true
 // contains: "uc2_identity_shared_children": [
-// contains: "CMP-LZ-SHARED-EXACC-DB-KEY"
 // contains: "CMP-LZ-SHARED-EXACC-INFRA-KEY"
 // contains: "uc2_governance_tag_namespaces": [
 // contains: "TAGNS-LZ-ROLE-KEY"
 // contains: "uc2_security_cis2_vaults": [
 // contains: "VLT-LZ-SHARED-SECURITY-KEY"
 // contains: "uc2_observability_cis1_event_rules": [
-// contains: "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-DB-KEY"
+// contains: "RUL-LZ-NOTIFICATION-PLATFORM-EXACC-INFRA-KEY"
 // contains: "uc2_observability_prod_has_db_rule": true
-// contains: "uc2_observability_prod_has_infra_rule": true
+// contains: "uc2_observability_prod_has_infra_rule": false
 // contains: "uc2_observability_cis1_alarms": [
-// contains: "AL-LZ-CPUUTIL-KEY"
+// contains: "AL-LZ-PROD-CPUUTIL-KEY"
 // contains: "uc3_identity_shared_exists": false
 // contains: "uc3_identity_prod_children": [
 // contains: "CMP-LZ-PROD-EXACC-INFRA-KEY"

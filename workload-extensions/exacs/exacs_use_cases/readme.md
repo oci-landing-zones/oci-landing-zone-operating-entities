@@ -91,7 +91,7 @@ The groups associated with the shared ExaCS environment are:
 
 In addition, environment-specific database administration is handled by dedicated groups:
 
-- **Project DBA Team (per environment and project)**, responsible exclusively for managing the ADB-D databases deployed within their respective project compartments
+- **Project DBA Team (per environment and project)**, responsible for managing the ADB-D databases and backups deployed within their respective project DB compartments, with read-only access to the hosting ACD in the shared ExaCS DB compartment
 
 This approach ensures that infrastructure and shared database layers are centrally managed, while granting each environment its own level of autonomy over its dedicated Autonomous Databases, reinforcing both governance and operational efficiency.
 
@@ -169,24 +169,24 @@ The images used to provision the different Oracle Homes, both for Grid Infrastru
 
 #### **ExaDB-D Groups**
 
-The administrative groups <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined following a hybrid model, combining global, environment-level, and project-level responsibilities to balance central governance with environment isolation.
+The administrative groups <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> use the same hybrid ownership model as ExaDB-C@C UC2: the shared physical infrastructure keeps a global owner, while environment platform operations are delegated per environment.
 
-At the global level, shared administration groups are defined:
+At the global level, one shared administration group is defined:
 
-- **Global Infra Admin Team**, responsible for managing infrastructure resources across the entire Landing Zone, including the ExaDB-D infrastructure and shared components
+- **Global Infra Admin Team**, responsible for the shared ExaDB-D infrastructure and retaining umbrella infrastructure-level capabilities for the environment VMCs/AVMCs
 
-At the environment level, dedicated groups are defined per environment:
+For each environment, dedicated groups are defined:
 
-- **Env Infra Admin Team (per environment)**, responsible for the management and maintenance of infrastructure resources within the environment, including VMCs and AVMCs
-- **Environment DBA Team (per environment)**, responsible for database administration within the environment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs
+- **Env Infra Admin Team (per environment)**, responsible for VMC/AVMC infrastructure operations in that environment. The generated IAM grants only the limited shared-infrastructure dependency access required by those operations
+- **Env DBA Team (per environment)**, responsible for Oracle Homes (OHs), CDBs, PDBs, ACDs, and other database operations in that environment. The generated IAM grants only the shared-infrastructure and AVMC dependency access required for ACD operations
 
 In addition, project-scoped groups are defined:
 
-- **Project DBA Team (per environment and project)**, responsible exclusively for managing the ADB-D databases deployed within their respective project compartments
+- **Project DBA Team (per environment and project)**, responsible for managing ADB-D databases and backups in their respective project DB compartments, with read-only access to the hosting ACD in the corresponding environment Platform DB compartment
 
 These project-level DBA groups are scoped at the project level within each environment, enabling fine-grained ownership and access control.
 
-This model enforces a layered separation of duties, where infrastructure governance is partially centralized at the global level, environment-specific resources are managed at the environment level, and Autonomous Databases Dedicated (ADB-D) are managed at the project level providing a balanced approach between central control, environment isolation, and project-level autonomy.
+This model preserves central ownership of the shared physical infrastructure while keeping environment platform operations isolated. Each Project DBA can administer only its delegated ADB-D resources and read the ACD required to place and operate those databases.
 
 #### **ExaDB-D Observability**
 
@@ -265,24 +265,24 @@ The images used to provision the different Oracle Homes, both for Grid Infrastru
 
 #### **ExaDB-D Groups**
 
-The administrative groups <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined following a fully dedicated model, where responsibilities are primarily scoped at the environment level, with additional segregation at the project level for Autonomous databases.
+The administrative groups <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> follow the dedicated placement model, with infrastructure and database administration scoped independently to each environment.
 
 For each environment, dedicated groups are defined:
 
-- **Env Infra Admin Team (per environment)**, responsible for the management and maintenance of the ExaDB-D infrastructure within that environment, including VMCs and AVMCs, as well as all infrastructure-related operations
-- **Environment DBA Team (per environment)**, responsible for database administration within the environment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs
+- **Env Infra Admin Team (per environment)**, responsible for ExaDB-D infrastructure and VMC/AVMC infrastructure operations in that environment
+- **Env DBA Team (per environment)**, responsible for database administration in that environment, including Oracle Homes (OHs), CDBs, PDBs, and ACDs
 
 In addition, project-scoped groups are defined:
 
-- **Project DBA Team (per environment and project)**, responsible exclusively for the ADB-D databases deployed within their respective project compartments
+- **Project DBA Team (per environment and project)**, responsible for managing ADB-D databases and backups in their respective project DB compartments, with read-only access to the hosting ACD in the corresponding environment Platform DB compartment
 
-These project-level DBA groups are not scoped at the environment level, but rather at the project level within each environment, ensuring fine-grained ownership and access control for Autonomous databases.
+These Project DBA groups are scoped to their project DB tier. The environment administration groups operate only their own dedicated platform compartments without granting Project DBAs control over the hosting ACD.
 
-This model enforces a clear multi-level separation of duties, where infrastructure and core database layers are managed at the environment level and Autonomous Databases Dedicated (ADB-D) are managed at the project level ensuring strong isolation, governance, and operational ownership across both environments and projects.
+This model separates duties by both resource layer and environment: each environment team operates only its dedicated platform resources, while each Project DBA can administer only its delegated ADB-D resources and read the ACD required to place and operate those databases.
 
 #### **ExaDB-D Observability**
 
-The observability framework for this scenario is based on the combined use of **Events, Alarms, and Notifications**, enabling centralized monitoring and controlled dissemination of operational signals across both shared and environment-specific resources.
+The observability framework for this scenario is based on the combined use of **Events, Alarms, and Notifications**, enabling centralized monitoring and controlled dissemination of operational signals across the environment-dedicated resources.
 
 **Events**
 
@@ -326,7 +326,7 @@ The observability components operate in an integrated manner:
 - *Events* capture resource state changes and operational signals. Event Rules route events to notification topics
 - *Notifications* deliver messages to subscribed endpoints
 
-This model provides a consistent and scalable observability approach, combining centralized monitoring of shared ExaDB-D resources with environment-specific visibility and control.
+This model provides a consistent and scalable observability approach across the environment-dedicated ExaDB-D resources, with environment-specific visibility and notification routing.
 
 ## **3. Design Decisions**
 

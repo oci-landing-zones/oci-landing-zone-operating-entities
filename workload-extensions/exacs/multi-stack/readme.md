@@ -68,6 +68,8 @@ In this asset, we assume that One-OE has already been deployed, and we focus on 
   </tbody>
 </table>
 
+On every re-apply, retain all configuration documents whose top-level family is not being replaced. For the One-OE re-apply, keep its IAM, governance, security, and observability documents and replace only the One-OE network document with the matching `oneoe_network_*_post.json` file. For the ExaDB-D extension re-apply, keep the matching `exacs_identity_uc*.json` document and replace the pre network and observability documents with their final counterparts. Do not provide both the pre and final document for the same top-level family in one operation.
+
 &nbsp;
 
 ## **4. Architecture Components**
@@ -86,7 +88,7 @@ In this asset, we assume that One-OE has already been deployed, and we focus on 
       <td rowspan="4"><strong>Use Case 1 (UC1)</strong></td>
       <td><strong>IAM configuration</strong><br><a href="exacs_identity_uc1.json">exacs_identity_uc1.json</a></td>
       <td>• ExaDB-D compartments<br>• ExaDB-D IAM groups and policies</td>
-      <td>Shared ExaDB-D platform compartments and project database compartments.<br><br>ExaDB-D database, infrastructure, and project admin groups and policies.</td>
+      <td>Shared ExaDB-D platform compartments and project database compartments.<br><br>Global Infra, Global DBA, and Project DBA groups and policies, including read access from each Project DBA to its hosting ACD.</td>
     </tr>
     <tr>
       <td><strong>Network configuration</strong><br><strong>Hub A pre</strong>: <a href="exacs_network_uc1_a_pre.json">exacs_network_uc1_a_pre.json</a><br><strong>Hub A final</strong>: <a href="exacs_network_uc1_a.json">exacs_network_uc1_a.json</a><br><strong>Hub E pre</strong>: <a href="exacs_network_uc1_e_pre.json">exacs_network_uc1_e_pre.json</a><br><strong>Hub E final</strong>: <a href="exacs_network_uc1_e.json">exacs_network_uc1_e.json</a></td>
@@ -107,7 +109,7 @@ In this asset, we assume that One-OE has already been deployed, and we focus on 
       <td rowspan="4"><strong>Use Case 2 (UC2)</strong></td>
       <td><strong>IAM configuration</strong><br><a href="exacs_identity_uc2.json">exacs_identity_uc2.json</a></td>
       <td>• ExaDB-D compartments<br>• ExaDB-D IAM groups and policies</td>
-      <td>Shared ExaDB-D infrastructure compartments, environment ExaDB-D platform compartments, and project database compartments.<br><br>ExaDB-D database, infrastructure, and project admin groups and policies.</td>
+      <td>Shared ExaDB-D infrastructure, environment database platform compartments, and project database compartments.<br><br>Global Infra umbrella, environment Infra and DBA, and Project DBA groups and policies. Environment roles receive only the shared-infrastructure dependency permissions required for their VMC, AVMC, and ACD operations.</td>
     </tr>
     <tr>
       <td><strong>Network configuration</strong><br><strong>Hub A pre</strong>: <a href="exacs_network_uc2_a_pre.json">exacs_network_uc2_a_pre.json</a><br><strong>Hub A final</strong>: <a href="exacs_network_uc2_a.json">exacs_network_uc2_a.json</a><br><strong>Hub E pre</strong>: <a href="exacs_network_uc2_e_pre.json">exacs_network_uc2_e_pre.json</a><br><strong>Hub E final</strong>: <a href="exacs_network_uc2_e.json">exacs_network_uc2_e.json</a></td>
@@ -128,7 +130,7 @@ In this asset, we assume that One-OE has already been deployed, and we focus on 
       <td rowspan="4"><strong>Use Case 3 (UC3)</strong></td>
       <td><strong>IAM configuration</strong><br><a href="exacs_identity_uc3.json">exacs_identity_uc3.json</a></td>
       <td>• ExaDB-D compartments<br>• ExaDB-D IAM groups and policies</td>
-      <td>Environment ExaDB-D platform compartments and project database compartments.<br><br>ExaDB-D database, infrastructure, and project admin groups and policies.</td>
+      <td>Environment-dedicated ExaDB-D infrastructure and database platform compartments, plus project database compartments.<br><br>Environment Infra and DBA groups per environment, plus Project DBA groups and policies. No global ExaDB-D administration group is generated.</td>
     </tr>
     <tr>
       <td><strong>Network configuration</strong><br><strong>Hub A pre</strong>: <a href="exacs_network_uc3_a_pre.json">exacs_network_uc3_a_pre.json</a><br><strong>Hub A final</strong>: <a href="exacs_network_uc3_a.json">exacs_network_uc3_a.json</a><br><strong>Hub E pre</strong>: <a href="exacs_network_uc3_e_pre.json">exacs_network_uc3_e_pre.json</a><br><strong>Hub E final</strong>: <a href="exacs_network_uc3_e.json">exacs_network_uc3_e.json</a></td>
