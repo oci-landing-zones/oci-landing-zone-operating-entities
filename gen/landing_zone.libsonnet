@@ -62,6 +62,7 @@ function(raw_config)
   local remote_peering = remote_peering_builder({
     naming: n,
     connections: remote_peering_connections,
+    hub_vcn_cidr: hub_vcn_cidr,
     local_vcn_entries: all_vcn_entries,
     hub_has_spoke_natgw: config.hub.kind == 'hub_e',
   });
@@ -156,6 +157,7 @@ function(raw_config)
   {
     // Normalized config-mode selector used by landing_zone_multi.jsonnet.
     cis_level: config.cis_level,
+    stack_scope: config.stack_scope,
 
     // Canonical network output: final deployable artifact for all hub types.
     network: assembled_network,

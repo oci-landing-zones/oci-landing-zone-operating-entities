@@ -1,3 +1,3 @@
+local lz = import '../../../landing_zone.libsonnet';
 local profiles = import '../profiles.libsonnet';
-local published = import '../published.libsonnet';
-published.network(profiles.same_tenancy_acceptor)
+lz(profiles.same_tenancy_acceptor).network

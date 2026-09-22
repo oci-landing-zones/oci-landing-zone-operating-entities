@@ -1,3 +1,3 @@
+local lz = import '../../../landing_zone.libsonnet';
 local profiles = import '../profiles.libsonnet';
-local published = import '../published.libsonnet';
-published.iam(profiles.cross_tenancy_requestor)
+lz(profiles.cross_tenancy_requestor).iam

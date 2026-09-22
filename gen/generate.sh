@@ -110,6 +110,11 @@ if [[ "${1:-}" == "--config" ]]; then
   exit 0
 fi
 
+if [[ $# -gt 0 ]]; then
+  echo "Error: unsupported argument '$1'. Use --config." >&2
+  exit 1
+fi
+
 # Walk through the directory structure
 while IFS= read -r -d '' file; do
   # Get the relative path of the file
@@ -127,5 +132,6 @@ while IFS= read -r -d '' file; do
 done < <(
   find "$INPUT_DIR" \
     -path "$INPUT_DIR/testdata" -prune -o \
-    -type f -name "*.jsonnet" ! -name "landing_zone_multi.jsonnet" -print0
+    -type f -name "*.jsonnet" \
+    ! -name "landing_zone_multi.jsonnet" -print0
 )

@@ -155,10 +155,11 @@ Update this diagram when any of these change:
   - `gen/workload-extensions/exacs/multi-stack/profiles.libsonnet`
   - `gen/addons/oci-hub-models/profiles.libsonnet`
   - `gen/addons/oci-x-rpc/profiles.libsonnet`
+  - `gen/addons/oci-lz-dr/one-oe/profiles.libsonnet`
 - Published entrypoints must stay thin:
   - import the local `profiles.libsonnet`
-  - call either `landing_zone.libsonnet`, a local `output_builder.libsonnet`, or a local `published.libsonnet` adapter with one profile config
-  - select exactly one result field
+  - call `landing_zone.libsonnet`, import and call the canonical `landing_zone_multi.jsonnet` output map, or call a local `output_builder.libsonnet` or `published.libsonnet` adapter with one profile config
+  - select exactly one result field or canonical output filename
 - Published entrypoints must not rewrite outputs, compose checked-in JSONs together, import another published entrypoint as a wrapper, or push publication flags down into generic extension params.
 
 ### Profile Output Builder Pattern (`output_builder.libsonnet`)
@@ -191,7 +192,6 @@ Rules:
 Current adapters:
 
 - `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. It reuses `gen/render_context.libsonnet` for normalization/topology-derived inputs while preserving the hub-only network contract and shared-only IAM/governance projections.
-- `gen/addons/oci-x-rpc/published.libsonnet` — owns RPC-only network/IAM projections for config-driven verification and the complete governance, IAM, and network surfaces used by the X-RPC runtime reference templates.
 - `gen/workload-extensions/exacc/{single-stack,multi-stack}/published.libsonnet` — own ExaDB-C@C stack-local publication projections.
 - `gen/workload-extensions/exacs/multi-stack/published.libsonnet` — owns ExaDB-D / ExaCS multi-stack publication projections.
 
@@ -208,6 +208,7 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
   region_short_name: 'fra',            // optional, but must be paired with region when set
   realm: 'oc1' | 'oc19',                // optional, defaults to 'oc1'
   cis_level: 1 | 2,                     // optional, defaults to 2; config-mode emits only this CIS level
+  stack_scope: 'complete' | 'regional', // optional, defaults to complete
   security_targets: ['prod'],          // optional, defaults to all environments in config mode
   hub: {
     kind: 'hub_a' | 'hub_b' | 'hub_c' | 'hub_e',
@@ -239,7 +240,7 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 }
 ```
 
-Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`) and must be one of the realms in `constants.libsonnet`. `cis_level` defaults to `2` and must be `1` or `2`; config mode emits only the selected CIS security and observability file pair. `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Hub and extension subnet defaults use `auto_subnets()`. For project-network shared subnets, omission auto-generates `web`, `app`, `db`, and `infra`; an explicit empty map emits none; a non-empty map is authoritative.
+Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`) and must be one of the realms in `constants.libsonnet`. `cis_level` defaults to `2` and must be `1` or `2`; config mode emits only the selected CIS security and observability file pair. `stack_scope` defaults to `complete` and accepts `complete` or `regional`; it declares resource ownership in the source config. `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Hub and extension subnet defaults use `auto_subnets()`. For project-network shared subnets, omission auto-generates `web`, `app`, `db`, and `infra`; an explicit empty map emits none; a non-empty map is authoritative.
 
 Plain platforms still require `platform.network`. Extension-backed platforms follow the registered extension's `metadata.network_mode`: `required` means `platform.network` must exist, `forbidden` means it must be omitted, and `optional` means the same extension can emit network when `platform.network` exists or non-network domains when it is absent. Legacy `metadata.requires_network: true|false` remains supported and maps to `required` or `forbidden`.
 
@@ -398,6 +399,8 @@ Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes f
 
 **Config mode** (`bash gen/generate.sh --config my_config.libsonnet [output_dir]`):
 Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json`, `iam.json`, `governance.json`, and only the selected CIS security/observability files for every config. `cis_level` defaults to `2`, so omitted `cis_level` emits `security_cis2*.json` and `observability_cis2*.json`; `cis_level: 1` emits the CIS1 pairs instead. Staged hubs also emit `network_pre.json`, Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs.
+
+Regional DR uses ordinary config mode twice. The complete home source explicitly defines the X-RPC acceptor. The regional DR source explicitly defines the requester and uses `stack_scope: 'regional'`. Generate each source independently into a different output directory and deploy it with a separate stack or state. Regional scope emits only regional network, VSS, and observability outputs. IAM, governance, Cloud Guard, Security Zones, primary Vault resources, platforms, shared platforms, workload extensions, and cross-tenancy RPCs remain excluded.
 
 For customer-use artifact placement and deployment defaults, follow root `AGENTS.md`. This generator guide defines emitted files and generator behavior only.
 
