@@ -1,0 +1,20 @@
+{
+    "tags_configuration": {
+        "namespaces": {
+            "TAGNS-LZ-OKE-KEY": {
+                "name"                       : "tagns-lz-oke",
+                "description"                : "Landing Zone-owned tag that isolates OKE platforms.",
+                "is_retired"                 : false,
+
+                "tags": {
+                    "TAG-LZ-OKE-PLATFORM-KEY": {
+                        "name"               : "platform",
+                        "description"        : "Identifies the owning OKE platform for principal-to-resource tag matching.",
+                        "is_cost_tracking"   : false,
+                        "is_retired"         : false
+                    }
+                }
+            }
+        }
+    }
+}

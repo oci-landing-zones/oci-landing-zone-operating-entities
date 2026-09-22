@@ -34,12 +34,12 @@ local shared_exacc_platform = {
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
       platforms: { exacc: env_exacc_platform(['proj1']) },
     },
     preprod: {
-      shared_project_network: { network: { vcn: '10.0.128.0/21' } },
+      project_network: { network: { vcn: '10.0.128.0/21' } },
       projects: { proj1: {} },
       platforms: { exacc: env_exacc_platform(['proj1']) },
     },

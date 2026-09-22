@@ -2,7 +2,7 @@
 
 ## Minimal Single-Spoke Example
 
-Use this when you need the smallest config that still exercises the new config-driven path.
+Use this when you need the smallest config that still exercises the Blueprint Factory path.
 
 ```jsonnet
 {
@@ -12,7 +12,7 @@ Use this when you need the smallest config that still exercises the new config-d
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
     },
   },
@@ -33,7 +33,7 @@ Based on `tests/gen/testdata/direct/pass/config_preprod_security_targets.jsonnet
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     preprod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
       platforms: {
         oke: {
@@ -67,7 +67,7 @@ Based on `tests/gen/testdata/direct/pass/config_platform_compartments.jsonnet`.
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
     },
   },
@@ -95,14 +95,17 @@ Based on `tests/gen/testdata/configs/pass/prod_preprod_exacs_uc1.jsonnet`.
 
 ```jsonnet
 {
+  region: 'eu-frankfurt-1',
+  region_short_name: 'fra',
+  realm: 'oc1',
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
     },
     preprod: {
-      shared_project_network: { network: { vcn: '10.0.128.0/21' } },
+      project_network: { network: { vcn: '10.0.128.0/21' } },
       projects: { proj1: {} },
     },
   },
@@ -129,7 +132,7 @@ Based on `tests/gen/testdata/configs/pass/prod_preprod_exacs_uc1.jsonnet`.
 }
 ```
 
-Use this when Exadata infrastructure and AVMC/VMC placement are shared, and Autonomous Database Dedicated should be delegated to selected project DB tiers. The `shared_project_network` entries are only needed when those environments also need project network resources. Do not add environment ExaCS platforms for this shared-only case.
+Use this when Exadata infrastructure and AVMC/VMC placement are shared, and Autonomous Database Dedicated should be delegated to selected project DB tiers. The `project_network` entries are only needed when those environments also need project network resources. Do not add environment ExaCS platforms for this shared-only case.
 
 ## Multi-Environment Example
 
@@ -143,7 +146,7 @@ Based on `tests/gen/testdata/direct/pass/config_hub_a_staging.jsonnet`.
   hub: { kind: 'hub_a', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
       platforms: {
         oke: {
@@ -160,7 +163,7 @@ Based on `tests/gen/testdata/direct/pass/config_hub_a_staging.jsonnet`.
       },
     },
     preprod: {
-      shared_project_network: { network: { vcn: '10.0.128.0/21' } },
+      project_network: { network: { vcn: '10.0.128.0/21' } },
       projects: { proj1: {} },
       platforms: {
         oke: {
@@ -182,6 +185,59 @@ Based on `tests/gen/testdata/direct/pass/config_hub_a_staging.jsonnet`.
 
 This is the right pattern when route priority, platform ordering, and sample backend derivation all matter.
 
+## Cross-Tenancy RPC Pair
+
+Use two source configs because each tenancy/region owns its own complete One-OE output set. The acceptor omits `peer_id`:
+
+```jsonnet
+remote_peering_connections: {
+  tenancy2: {
+    remote_cidrs: ['10.1.0.0/21', '10.1.64.0/21'],
+    peer_region_name: 'eu-amsterdam-1',
+    peer_tenancy_ocid: 'ocid1.tenancy.oc1..requestor',
+    requestor_group_ocid: 'ocid1.group.oc1..requestor-network-admin',
+  },
+},
+```
+
+The requestor points to the acceptor RPC:
+
+```jsonnet
+remote_peering_connections: {
+  tenancy1: {
+    remote_cidrs: ['10.0.0.0/21', '10.0.64.0/21'],
+    peer_id: 'ocid1.remotepeeringconnection.oc1.eu-frankfurt-1.example',
+    peer_region_name: 'eu-frankfurt-1',
+    peer_tenancy_ocid: 'ocid1.tenancy.oc1..acceptor',
+  },
+},
+```
+
+The requester policy uses its local `'id_lz_common'/'grp-lz-network-admin'` group. Only the acceptor config needs the requestor group's OCID because that group is foreign to the acceptor tenancy.
+
+The surrounding `environments` map remains customer-defined. See the paired JSON examples under `addons/oci-lz-blueprint-factory/examples/` and `gen/addons/oci-x-rpc/AGENTS.md`.
+
+For a connectivity tenancy accepting RPCs from separate production and non-production tenancies, keep one connectivity source config and use two named acceptor entries:
+
+```jsonnet
+remote_peering_connections: {
+  prod: {
+    remote_cidrs: ['10.1.0.0/21', '10.1.64.0/21'],
+    peer_region_name: 'eu-amsterdam-1',
+    peer_tenancy_ocid: 'ocid1.tenancy.oc1..production',
+    requestor_group_ocid: 'ocid1.group.oc1..production-network-admin',
+  },
+  nonprod: {
+    remote_cidrs: ['10.2.0.0/21', '10.2.64.0/21'],
+    peer_region_name: 'eu-amsterdam-1',
+    peer_tenancy_ocid: 'ocid1.tenancy.oc1..nonproduction',
+    requestor_group_ocid: 'ocid1.group.oc1..nonproduction-network-admin',
+  },
+},
+```
+
+Create separate production and non-production requestor configs. Each requestor contains only its reviewed connection to the connectivity tenancy unless the approved design explicitly requires additional or transitive reachability.
+
 ## Commands
 
 Generate formatted config-mode outputs:
@@ -198,6 +254,8 @@ jsonnet --multi output/ --tla-code-file config=path/to/config.jsonnet gen/landin
 
 ## Common Choices
 
-- Prefer omitted hub and spoke subnet maps when canonical auto-subnet allocation is acceptable.
+- Omit `project_network.network.subnets` for the default `web`, `app`, `db`, and `infra` shared subnets; use `{}` for none; otherwise list the complete desired shared-subnet map explicitly.
 - Prefer explicit platform subnet maps only when you need non-default layout or the platform is not extension-backed.
 - Prefer environment platforms over `shared_platforms` when the platform belongs operationally to one environment.
+- Ask for and record the target `region` and `region_short_name`; omit `realm` when the customer does not provide one because Blueprint Factory config mode defaults it to `oc1`.
+- Set `cis_level: 1` only when the requested output set should use CIS level 1; omitted `cis_level` emits CIS level 2 files.

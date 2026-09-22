@@ -1,5 +1,7 @@
 # OCI Landing Zone Jsonnet -- Architecture & Conventions
 
+The `gen/` Jsonnet implementation powers the [Blueprint Factory](../addons/oci-lz-blueprint-factory/README.md). This contributor guide uses implementation terms such as generator, config mode, and Jsonnet where technical precision is required.
+
 ## 1. File Organization
 
 ```
@@ -13,6 +15,12 @@ gen/
 ├── naming.libsonnet             # Single naming template for all resources
 ├── topology.libsonnet           # Shared topology semantics (env labels, platform scope, targeting)
 ├── generate.sh                  # Entry point: default mode or --config mode
+├── lib/
+│   ├── extension_components.libsonnet # Cross-entry extension component summary
+│   ├── environment_names.libsonnet # Shared environment labels and compact identifiers
+│   ├── network_scope_names.libsonnet # Compact identifiers for known network scopes
+│   ├── policy_limits.libsonnet        # Generated IAM policy safety checks
+│   └── publication_network.libsonnet  # Publication-only network projection helpers
 │
 ├── hub/                         # Hub builders (one per hub type)
 │   ├── hub_common.libsonnet     # Shared building blocks (subnets, gateways, ICMP, NSGs)
@@ -26,7 +34,13 @@ gen/
 ├── builders/                    # Domain and network-assembly builders
 │   ├── hub_integration.libsonnet
 │   ├── network_spokes.libsonnet
-│   ├── iam.libsonnet
+│   ├── iam.libsonnet            # IAM facade; subdomains live under builders/iam/
+│   ├── iam/
+│   │   ├── compartments.libsonnet
+│   │   ├── context.libsonnet
+│   │   ├── identity_domains.libsonnet
+│   │   ├── project_policies.libsonnet
+│   │   └── tenancy_policies.libsonnet
 │   ├── security.libsonnet
 │   ├── observability.libsonnet
 │   └── governance.libsonnet
@@ -35,15 +49,17 @@ gen/
 │   ├── exadb/                   # Shared ExaDB helpers used by ExaDB extensions
 │   ├── exacc/                   # ExaDB-C@C extension; see its local guide
 │   ├── exacs/                   # ExaDB-D / ExaCS extension; see workload-extensions/exacs/AGENTS.md
+│   ├── ocvs/                    # OCVS extension; see workload-extensions/ocvs/AGENTS.md
 │   └── oke/simple/
 │       ├── oke_builder.libsonnet # Shared OKE builder internals
 │       ├── oke_simple.libsonnet # Generic extension wrapper
 │       ├── single-stack/
 │       │   ├── profiles.libsonnet
+│       │   ├── output_builder.libsonnet
 │       │   └── *.jsonnet
 │       └── multi-stack/
 │           ├── profiles.libsonnet
-│           ├── published.libsonnet # Published-entrypoint adapter
+│           ├── output_builder.libsonnet # Profile-to-JSON publication output builder
 │           └── *.jsonnet
 │
 ├── addons/oci-hub-models/         # Published addon hub-model entrypoints
@@ -105,8 +121,11 @@ flowchart TD
 - `config.libsonnet` handles normalization and auto-subnet calculation.
 - `render_context.libsonnet` centralizes normalized config, topology, spoke ordering, VCN lists, shared-only config, and example LB backend derivation for render-time consumers.
 - `landing_zone.libsonnet` is the shared composition engine, merge owner, and output assembler.
+- `gen/builders/iam.libsonnet` is a facade. IAM subdomain ownership lives under `gen/builders/iam/`: compartments, identity domain objects, project policies, and tenancy/shared policies.
+- Builders that need environment identity, resource key segments, display segments, DNS segments, or compartment paths should use topology entries from `topology.libsonnet` instead of passing raw environment-name strings across builder boundaries.
 - Detailed spoke rendering is delegated to `gen/builders/network_spokes.libsonnet`.
 - DRG and hub integration overlays are delegated to `gen/builders/hub_integration.libsonnet`.
+- `extensions.libsonnet` owns extension metadata/render contract resolution. An extension builder may also expose `aggregate(results)` to contribute shared artifacts across all instances of its type; the composition core merges those contributions without importing extension-specific code. Cross-entry extension component summary lives in `gen/lib/extension_components.libsonnet`.
 - `landing_zone_multi.jsonnet` is the config-mode wrapper that maps result fields to filenames.
 - `format_json.py` is the final presentation formatting step invoked after Jsonnet evaluation.
 
@@ -129,16 +148,34 @@ Update this diagram when any of these change:
   - `gen/blueprints/one-oe/runtime/one-stack/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/oke/simple/multi-stack/profiles.libsonnet`
+  - `gen/workload-extensions/ocvs/profiles.libsonnet`
   - `gen/workload-extensions/exacc/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacc/multi-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacs/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacs/multi-stack/profiles.libsonnet`
   - `gen/addons/oci-hub-models/profiles.libsonnet`
+  - `gen/addons/oci-x-rpc/profiles.libsonnet`
 - Published entrypoints must stay thin:
   - import the local `profiles.libsonnet`
-  - call either `landing_zone.libsonnet` or a local `published.libsonnet` adapter with one profile config
+  - call either `landing_zone.libsonnet`, a local `output_builder.libsonnet`, or a local `published.libsonnet` adapter with one profile config
   - select exactly one result field
 - Published entrypoints must not rewrite outputs, compose checked-in JSONs together, import another published entrypoint as a wrapper, or push publication flags down into generic extension params.
+
+### Profile Output Builder Pattern (`output_builder.libsonnet`)
+
+A profile is the predefined Jsonnet config used to generate committed repository JSON artifacts. A profile lives in a local `profiles.libsonnet` file. An `output_builder.libsonnet` lives next to the profile and transforms that profile's rendered landing-zone result into the exact JSON surfaces committed for that published family.
+
+Rules:
+
+- Use a local `output_builder.libsonnet` when committed JSON output names or shapes need a stable publication projection over a profile config.
+- Keep profile data and output shaping separate. Profiles own predefined parameters; output builders own projection and transformation.
+- Output builders may pass through generic `landing_zone.libsonnet` outputs when the generated shape already matches the committed JSON contract.
+- Output builders may reshape only the published output surface. Do not push publication flags into generic extension params.
+
+Current output builders:
+
+- `gen/workload-extensions/oke/simple/{single-stack,multi-stack}/output_builder.libsonnet` — own the profile-to-committed-JSON output surfaces for published OKE simple artifacts. The multi-stack builder owns the publication-only OKE network and identity projections.
+- `gen/workload-extensions/ocvs/output_builder.libsonnet` — owns the profile-to-committed-JSON output surface for published OCVS artifacts.
 
 ### Published Adapter Pattern (`published.libsonnet`)
 
@@ -154,11 +191,12 @@ Rules:
 Current adapters:
 
 - `gen/addons/oci-hub-models/published.libsonnet` — owns the hub-only addon network publication adapter used by the committed hub model JSON artifacts under `addons/oci-hub-models/`. It reuses `gen/render_context.libsonnet` for normalization/topology-derived inputs while preserving the hub-only network contract and shared-only IAM/governance projections.
-- `gen/workload-extensions/oke/simple/multi-stack/published.libsonnet` — owns the multi-stack publication-only OKE network and identity projections used by the multi-stack OKE entrypoints.
+- `gen/addons/oci-x-rpc/published.libsonnet` — owns RPC-only network/IAM projections for config-driven verification and the complete governance, IAM, and network surfaces used by the X-RPC runtime reference templates.
 - `gen/workload-extensions/exacc/{single-stack,multi-stack}/published.libsonnet` — own ExaDB-C@C stack-local publication projections.
 - `gen/workload-extensions/exacs/multi-stack/published.libsonnet` — owns ExaDB-D / ExaCS multi-stack publication projections.
 
 Extension-specific adapters are documented in the owning extension directory when an extension has its own `AGENTS.md`.
+Add-on-specific adapters are documented in the owning add-on directory when an add-on has its own `AGENTS.md`.
 
 ## 3. Config Schema
 
@@ -168,7 +206,8 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 {
   region: 'eu-frankfurt-1',            // optional, but must be paired with region_short_name when set
   region_short_name: 'fra',            // optional, but must be paired with region when set
-  realm: 'oc1',                         // optional, defaults to 'oc1'
+  realm: 'oc1' | 'oc19',                // optional, defaults to 'oc1'
+  cis_level: 1 | 2,                     // optional, defaults to 2; config-mode emits only this CIS level
   security_targets: ['prod'],          // optional, defaults to all environments in config mode
   hub: {
     kind: 'hub_a' | 'hub_b' | 'hub_c' | 'hub_e',
@@ -179,14 +218,19 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
   },
   environments: {
     prod: {
-      shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: '10.0.64.0/21' } },
       projects: { proj1: {} },
       platforms: {                        // optional
         oke: {
-          network: { vcn: '10.0.96.0/22' },
+          network: { vcn: '10.0.96.0/20' },
           extension: {
             type: 'oke_simple',
-            params: { kubernetes_version: 'v1.35.2', services_cidr: '...', api_endpoint_allowed_cidrs: ['...'] },
+            params: {
+              kubernetes_version: 'v1.35.2',
+              services_cidr: '...',
+              api_endpoint_allowed_cidrs: ['...'],
+              cni_type: 'overlay',             // optional; omit for native, or set overlay for Flannel-compatible networking
+            },
           },
         },
       },
@@ -195,7 +239,7 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 }
 ```
 
-Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`). `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Missing subnets are still auto-calculated from VCN CIDRs using `auto_subnets()`.
+Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`) and must be one of the realms in `constants.libsonnet`. `cis_level` defaults to `2` and must be `1` or `2`; config mode emits only the selected CIS security and observability file pair. `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Hub and extension subnet defaults use `auto_subnets()`. For project-network shared subnets, omission auto-generates `web`, `app`, `db`, and `infra`; an explicit empty map emits none; a non-empty map is authoritative.
 
 Plain platforms still require `platform.network`. Extension-backed platforms follow the registered extension's `metadata.network_mode`: `required` means `platform.network` must exist, `forbidden` means it must be omitted, and `optional` means the same extension can emit network when `platform.network` exists or non-network domains when it is absent. Legacy `metadata.requires_network: true|false` remains supported and maps to `required` or `forbidden`.
 
@@ -237,6 +281,8 @@ function(hub_ctx) -> {
   spoke_route_tables:  [string],    // RT keys that need spoke CIDR routes via DRG
   post_route_tables:   [string],    // RT keys that need spoke CIDR routes via firewall IP
   fw_nsg_key:          string|null, // NSG key for firewall ingress rules (null if no FW)
+  spoke_ingress_nsg_keys: [string], // NSGs that receive generated ingress rules for every routed VCN
+  lb_return_nsg_key:   string|null, // stateless LB NSG that receives generated backend return-flow rules
   has_spoke_natgw:     bool,        // whether spokes get NAT GW + direct peer routes
   post_route_entity_id:   string,   // (if firewall) OCID placeholder for post-deploy routes
   post_route_entity_desc: string,   // human description of the post-deploy route target
@@ -249,15 +295,15 @@ function(hub_ctx) -> {
 - `hub_ctx.lb_backends`: `{ backend1_ip, backend2_ip }` -- example LB backend IPs supplied by the orchestrator
 - `hub_ctx.lb_env_name`: first ordered workload spoke name used for example LB naming
 
-The orchestrator (`landing_zone.libsonnet`) dispatches to the correct hub builder, delegates spoke category rendering to `gen/builders/network_spokes.libsonnet`, and delegates DRG and hub overlays to `gen/builders/hub_integration.libsonnet`.
+The orchestrator (`landing_zone.libsonnet`) dispatches to the correct hub builder, delegates spoke category rendering to `gen/builders/network_spokes.libsonnet`, and delegates DRG and hub overlays to `gen/builders/hub_integration.libsonnet`. The integration builder uses `spoke_ingress_nsg_keys` and `lb_return_nsg_key` to generate stateless forward and return rules from normalized routed-VCN entries; hub builders must not hardcode environment names or spoke CIDRs.
 
 LB example backend term definitions:
 
 - Ordered environment/spoke order: environments are ordered as `prod`, `preprod`, `staging`, `uat`, `dev`, `test`, then any remaining environment names in their existing config order.
-- Workload spoke: an environment entry that has `shared_project_network` and therefore produces a spoke VCN category.
-- First ordered workload spoke: the first environment in that ordered list that qualifies as a workload spoke.
+- Workload spoke: an environment entry that has `project_network` and therefore produces a spoke VCN category.
+- First ordered web spoke: the first workload spoke in that ordered list whose normalized shared-subnet map contains `web`, whether supplied explicitly or generated from an omitted map.
 
-LB example backends are derived centrally from the first ordered workload spoke's `shared_project_network.network.subnets.web` CIDR (`.10` and `.20` host IPs). This keeps generated examples deterministic and aligned with the canonical prod-first topology; if no workload spoke exists, the orchestrator passes explicit `0.0.0.0` placeholders rather than relying on silent defaults inside hub components.
+LB example backends are derived centrally from the first ordered web spoke's `project_network.network.subnets.web` CIDR (`.10` and `.20` host IPs). If no normalized workload spoke contains `web`, the example uses deliberately non-working `0.0.0.0` backend placeholders. This does not expose a workload, but the public listener and ingress NSG still exist and must be replaced or removed before production use. The generator never infers a backend subnet from another shared or dedicated subnet.
 
 ## 6. Extension Contract
 
@@ -300,11 +346,13 @@ Contract phases:
 - `render(params)`: returns contributions keyed by domain:
   - `network_pre`: merged into `network_configuration_categories` for networked extensions
   - `iam`: merged into IAM output
-  - `security_cis1`, `security_cis2`: merged into security outputs
+  - `security_cis1`, `security_cis2`: merged into both pre and final security outputs so extension prerequisites exist before extension resources are deployed
   - `observability_cis1`, `observability_cis2`: merged into observability outputs
   - Any other generic key (e.g. `oke_clusters`, `oke_workers`): collected into `result.extra`
 
 Generic extension contracts must not change emitted artifact sets based on repo publication mode. If a published family needs additional projections, create a dedicated adapter next to the published entrypoints and keep profile-local configs free of publication flags.
+
+Publication-only network reshaping for workload-extension adapters, such as OKE or Exa multi-stack artifacts, belongs in `gen/lib/publication_network.libsonnet`, not in generic platform rendering helpers. Keep `gen/platforms.libsonnet` focused on platform entries, routed VCN metadata, and generic platform network categories.
 
 Extension guides for networked extensions: any extension with `network_mode: required` or `network_mode: optional` must document the sizing inputs and CIDR-relevant ranges that customer guidance needs before customer guidance proposes concrete CIDRs. Keep those extension-specific placement, scale, and address-range questions in the extension's local `AGENTS.md`; root `AGENTS.md` owns the customer discovery ordering.
 
@@ -312,7 +360,11 @@ Current extension ownership:
 
 - `gen/workload-extensions/oke/simple/oke_builder.libsonnet` owns the reusable OKE rendering logic.
 - `gen/workload-extensions/oke/simple/oke_simple.libsonnet` is the active generic extension wrapper for config mode and integrated landing-zone assembly.
-- `gen/workload-extensions/oke/simple/multi-stack/published.libsonnet` owns the multi-stack publication-only OKE network and identity projections used by repo entrypoints.
+- `gen/workload-extensions/oke/simple/{single-stack,multi-stack}/output_builder.libsonnet` owns the profile-to-committed-JSON OKE output surfaces used by repo entrypoints.
+- `gen/workload-extensions/ocvs/AGENTS.md` owns OCVS extension-specific contracts and validation boundaries.
+- `gen/workload-extensions/ocvs/ocvs_builder.libsonnet` owns reusable OCVS rendering logic.
+- `gen/workload-extensions/ocvs/ocvs.libsonnet` is the active generic extension wrapper for config mode and integrated landing-zone assembly.
+- `gen/workload-extensions/ocvs/output_builder.libsonnet` owns the profile-to-committed-JSON OCVS output surfaces used by repo entrypoints.
 - The local ExaDB-C@C guide owns extension-specific contracts, notification email semantics, publication layout, and tests.
 - `gen/workload-extensions/exacs/AGENTS.md` owns ExaDB-D / ExaCS placement mapping, component inference, network rules, and discovery addenda.
 
@@ -342,14 +394,14 @@ Keep extension-specific placement and parameter semantics in the extension's own
 ## 9. Generation Modes
 
 **Default mode** (`bash gen/generate.sh`):
-Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes formatted JSON output to the repo root (mirroring the directory structure). Generic entry points may import `defaults.libsonnet` for reusable baselines, while published entry points import their local `profiles.libsonnet`. Both patterns call `landing_zone.libsonnet` and select a single result field.
+Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes formatted JSON output to the repo root (mirroring the directory structure). Generic entry points may import `defaults.libsonnet` for reusable baselines, while published entry points import their local `profiles.libsonnet`. Published entry points either call `landing_zone.libsonnet` directly or select a single result field from a local profile output builder.
 
 **Config mode** (`bash gen/generate.sh --config my_config.libsonnet [output_dir]`):
-Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json`, `iam.json`, `security_*.json`, `observability_*.json`, and `governance.json` for every config. Staged hubs also emit `network_pre.json`, Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs.
+Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json`, `iam.json`, `governance.json`, and only the selected CIS security/observability files for every config. `cis_level` defaults to `2`, so omitted `cis_level` emits `security_cis2*.json` and `observability_cis2*.json`; `cis_level: 1` emits the CIS1 pairs instead. Staged hubs also emit `network_pre.json`, Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs.
 
 For customer-use artifact placement and deployment defaults, follow root `AGENTS.md`. This generator guide defines emitted files and generator behavior only.
 
-Config mode validates required fields during normalization. `config.environments` must be present and non-empty; omitted environments are a hard error rather than an implicit default.
+Config mode validates required fields during normalization. `config.environments` is optional and defaults to an empty object for a shared-services and hub-only Landing Zone. When provided, it must be an object.
 
 ## 10. Network Artifact Phases
 
@@ -365,9 +417,10 @@ Config mode validates required fields during normalization. `config.environments
 - `landing_zone.libsonnet` and builder modules may consume topology ordering helpers, but they must not define their own `preferred_env_names` list.
 - Environment platform compartments live under `CMP-LZ-<ENV>-PLATFORM-KEY`, but their child keys omit the redundant parent segment: `CMP-LZ-<ENV>-<NAME>-KEY`.
 - Shared platform compartments live under `CMP-LZ-PLATFORM-KEY`, but their child keys omit the redundant parent segment: `CMP-LZ-SHARED-<NAME>-KEY`.
-- Shared platform OCI compartment names include the shared scope without repeating the parent platform segment. Example: shared OKE uses `cmp-lz-shared-oke` and `cmp-landingzone:cmp-lz-platform:cmp-lz-shared-oke`.
+- Shared platform OCI compartment names include the shared scope without repeating the parent platform segment. Example: a shared ExaCS platform uses `cmp-lz-shared-exacs` and `cmp-landingzone:cmp-lz-platform:cmp-lz-shared-exacs`. Individual workload extensions may reject shared placement; `oke_simple` is environment-only.
 - Platform identity/resources use platform compartments, while platform network categories use the scope's network compartment references.
-- Integrated IAM owns platform child compartments for config-driven outputs.
+- Project-dedicated subnets are allocation constructs only. They remain in the environment network compartment, and the generator does not add subnet-specific IAM conditions.
+- Integrated IAM owns platform child compartments for Blueprint Factory outputs.
 - Standalone multi-stack OKE may overlay the same platform child compartment only to stay self-contained.
 - Extensions receive scope semantics via `params.topology`; naming remains formatting-only.
 - Security-target environment selection is centralized in `topology.libsonnet`. Current behavior targets all defined environments when `security_targets` is omitted; set `security_targets` explicitly when a published profile needs narrower targeting.

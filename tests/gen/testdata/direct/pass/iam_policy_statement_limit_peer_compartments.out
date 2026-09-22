@@ -1,0 +1,5 @@
+{
+  "max_chain_statement_count": 400,
+  "policy_count": 700,
+  "returned_iam": true
+}

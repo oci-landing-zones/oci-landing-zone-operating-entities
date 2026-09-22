@@ -34,13 +34,13 @@ To store the Json files in a OCI bucket follow the next steps:
 Click on each file to download it, and make any necessary changes if required.
 
 * IAM: 
-[oci_open_lz_one-oe_iam.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_iam.auto.tfvars.json)
+[oneoe_iam.json](../../blueprints/one-oe/runtime/one-stack/oneoe_iam.json)
 * Security:
-[oci_open_lz_one-oe_security_cisl1.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_security_cisl1.auto.tfvars.json)
+[oneoe_security_cis1.json](../../blueprints/one-oe/runtime/one-stack/oneoe_security_cis1.json)
 * Network Hub A, with DNS: 
 oci_open_lz_hub_a_network_light_post_DNS.auto.tfvars.json
 * Observability:
-[oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json](/blueprints/one-oe/runtime/one-stack/oci_open_lz_one-oe_observability_cisl1.auto.tfvars.json)
+[oneoe_observability_cis1.json](../../blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1.json)
 
 <img src="../oke/multi-stack/content/UploadBucket.png" width="1000" height="auto">
 

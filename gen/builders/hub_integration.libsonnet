@@ -10,6 +10,10 @@ function(params)
   local n = params.naming;
   local hub = params.hub;
   local all_vcn_entries = params.all_vcn_entries;
+  local remote_peering =
+    if std.objectHas(params, 'remote_peering') then params.remote_peering
+    else { route_entries: [], network_overlay: {} };
+  local all_routed_cidr_entries = all_vcn_entries + remote_peering.route_entries;
 
   local drg_key = n.key('DRG', ['HUB']);
 
@@ -51,10 +55,10 @@ function(params)
   local drg_spoke_distribution_statements = drg_distribution_statements(10, '-S');
 
   // --- 3. Hub Route Table Injection ---
-  // Route rules for each VCN CIDR through DRG
+  // Route rules for each local VCN and remote RPC CIDR through DRG.
   local hub_spoke_routes_via_drg = {
     [e.route_key]: common._route_via_key('%s through DRG' % e.route_desc, e.vcn, drg_key)
-    for e in all_vcn_entries
+    for e in all_routed_cidr_entries
   };
   local route_tables_with_routes(route_tables, routes) = std.foldl(
     function(acc, rt) acc {
@@ -69,32 +73,48 @@ function(params)
   // --- 4. Firewall NSG Ingress Rules ---
   local nsg_fw_spoke_ingress = std.foldl(
     function(acc, e) acc {
-      ['from_%s_http' % e.name]: common._tcp_ingress_rule(
-        'Allow inbound traffic from %s VCN over HTTP' % e.display,
+      ['from_%s' % e.name]: common._tcp_ingress_rule(
+        'Allow inbound traffic from %s VCN over TCP' % e.display,
+        e.vcn,
+        stateless=true
+      ),
+    },
+    all_routed_cidr_entries,
+    {}
+  );
+
+  local nsg_lb_spoke_return = std.foldl(
+    function(acc, e) acc {
+      ['http_%s_80' % e.name]: common._tcp_return_ingress_rule(
+        'Return flow: allow inbound HTTP responses from %s VCN to ephemeral ports' % e.display,
         e.vcn,
         80
       ),
-      ['from_%s_https' % e.name]: common._tcp_ingress_rule(
-        'Allow inbound traffic from %s VCN over HTTPS' % e.display,
+      ['https_%s_443' % e.name]: common._tcp_return_ingress_rule(
+        'Return flow: allow inbound HTTPS responses from %s VCN to ephemeral ports' % e.display,
         e.vcn,
         443
       ),
-      ['from_%s_icmp' % e.name]: {
-        description: 'Allow ICMP type 8 (Echo) from %s VCN' % e.display,
-        src: e.vcn,
-        src_type: 'CIDR_BLOCK',
-        protocol: 'ICMP',
-        icmp_type: 8,
-        icmp_code: 0,
-        stateless: false,
-      },
     },
     all_vcn_entries,
     {}
   );
 
+  local nsg_ingress_overlay(nsg_key, rules) = {
+    [nsg_key]+: { ingress_rules+: rules },
+  };
+  local nsg_fw_overlays = std.foldl(
+    function(acc, nsg_key) acc + nsg_ingress_overlay(nsg_key, nsg_fw_spoke_ingress),
+    hub.spoke_ingress_nsg_keys,
+    {}
+  );
+  local nsg_lb_overlay =
+    if hub.lb_return_nsg_key == null then {}
+    else nsg_ingress_overlay(hub.lb_return_nsg_key, nsg_lb_spoke_return);
+  local nsg_integration_overlays = nsg_fw_overlays + nsg_lb_overlay;
+
   // --- 5. Post-Deploy Routes ---
-  // Route rules through firewall IP for each VCN CIDR
+  // Route rules through firewall IP for each local VCN and remote RPC CIDR.
   local post_route_tables =
     if std.objectHas(hub, 'post_route_tables') then hub.post_route_tables else [];
   local post_route_entity_desc =
@@ -109,7 +129,7 @@ function(params)
       e.vcn,
       hub.post_route_entity_id
     )
-    for e in all_vcn_entries
+    for e in all_routed_cidr_entries
   } else {};
 
   local pre = {
@@ -123,9 +143,10 @@ function(params)
                 hub.spoke_route_tables,
                 hub_spoke_routes_via_drg
               ),
-            } + (if hub.fw_nsg_key != null then {
+            } + (if std.length(std.objectFields(nsg_integration_overlays)) > 0 then {
                    network_security_groups+: {
-                     [hub.fw_nsg_key]+: { ingress_rules+: nsg_fw_spoke_ingress },
+                     [key]+: nsg_integration_overlays[key]
+                     for key in std.objectFields(nsg_integration_overlays)
                    },
                  } else {}),
           },
@@ -151,12 +172,12 @@ function(params)
         },
       },
     },
-  };
+  } + remote_peering.network_overlay;
 
   local post =
     if has_post_route_entity
        && std.length(post_route_tables) > 0
-       && std.length(all_vcn_entries) > 0 then {
+       && std.length(all_routed_cidr_entries) > 0 then {
       network_configuration+: {
         network_configuration_categories+: {
           '0-shared'+: {

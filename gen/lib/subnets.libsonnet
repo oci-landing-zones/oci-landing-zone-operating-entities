@@ -44,8 +44,8 @@ local validation = import 'validation.libsonnet';
 
   block_size_for_prefix(size)::
     local prefix = std.parseInt(std.stripChars(size, '/'));
-    assert prefix >= 21 && prefix <= 28 :
-      'Unsupported subnet prefix /%d. Supported: /21 through /28' % prefix;
+    assert prefix >= 16 && prefix <= 29 :
+      'Unsupported subnet prefix /%d. Supported: /16 through /29' % prefix;
     cidrs.block_size(prefix),
 
   auto_subnets(vcn_cidr, subnet_defs)::

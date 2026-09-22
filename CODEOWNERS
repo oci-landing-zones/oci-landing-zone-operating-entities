@@ -1,7 +1,8 @@
 /workload-extensions/ocvs/ @hrvolapeter
 /workload-extensions/ebs/ @rphibbert
-/workload-extensions/oke/ @paolajuarezgomez
+/workload-extensions/oke/ @alcampag
 /addons/oci-hub-models/ @vavardan
 /addons/oci-sovereign-landing-zone/ @vavardan @hrvolapeter @paolajuarezgomez
 /addons/oci-lz-subnetting/ @paolajuarezgomez
 /workload-extensions/exacc/ @paolajuarezgomez
+/workload-extensions/exacs/ @paolajuarezgomez

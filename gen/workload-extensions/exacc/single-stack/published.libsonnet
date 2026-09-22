@@ -11,16 +11,6 @@ local is_network_compartment(value) =
   && std.length(std.findSubstr('CMP-LZ-', value)) > 0
   && std.length(std.findSubstr('-NETWORK-KEY', value)) > 0;
 
-local strip_network_security_targets(doc) = doc {
-  security_zones_configuration+: {
-    security_zones: filter_object(
-      doc.security_zones_configuration.security_zones,
-      function(key, zone)
-        !(std.objectHas(zone, 'compartment_id') && is_network_compartment(zone.compartment_id))
-    ),
-  },
-};
-
 local strip_network_observability(doc) =
   local without_logging = {
     [key]: doc[key]
@@ -58,8 +48,10 @@ local strip_network_observability(doc) =
     {
       iam: rendered.iam,
       governance: rendered.governance,
-      security_cis1: strip_network_security_targets(rendered.security_cis1),
-      security_cis2: strip_network_security_targets(rendered.security_cis2),
+      security_cis1_pre: rendered.security_cis1_pre,
+      security_cis1: rendered.security_cis1,
+      security_cis2_pre: rendered.security_cis2_pre,
+      security_cis2: rendered.security_cis2,
       observability_cis1: strip_network_observability(rendered.observability_cis1),
       observability_cis2: strip_network_observability(rendered.observability_cis2),
     },

@@ -1,3 +1,3 @@
 local profiles = import './profiles.libsonnet';
-local published = import './published.libsonnet';
-published.render(profiles.multi_stack.config).identity
+local output_builder = import './output_builder.libsonnet';
+output_builder(profiles.multi_stack).oke_identity

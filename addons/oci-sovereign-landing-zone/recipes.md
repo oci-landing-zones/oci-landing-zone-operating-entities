@@ -38,7 +38,7 @@
 | Include            | RECIPE 3 Statements                                                           |
 | Deny Public Access | Subnets in a security zone can't be public. All subnets must be private.      |
 | Deny Public Access | You can't add an internet gateway to a VCN within the security zone.          |
-| Deny Public Access | Load balancers in a security zone can't be public. All load balancers must be | private. |
+| Deny Public Access | Load balancers in a security zone can't be public. All load balancers must be private. |
 | Deny Public Access | Deny public network access in cloud shell.                                    |
 
 

@@ -1,0 +1,54 @@
+{
+    "realm"                     : "oc1",
+    "region"                    : "eu-amsterdam-1",
+    "region_short_name"         : "ams",
+
+    "hub": {
+        "kind"                  : "hub_b",
+
+        "network": {
+            "vcn"               : "10.1.0.0/21"
+        }
+    },
+
+    "environments": {
+        "prod": {
+            "project_network": {
+                "network": {
+                    "vcn"       : "10.1.64.0/21"
+                }
+            }
+        },
+
+        "preprod": {
+            "project_network": {
+                "network": {
+                    "vcn"       : "10.1.128.0/21"
+                }
+            }
+        },
+
+        "uat": {
+            "project_network": {
+                "network": {
+                    "vcn"       : "10.1.192.0/21"
+                }
+            }
+        }
+    },
+
+    "remote_peering_connections": {
+        "tenancy1": {
+            "peer_id"           : "ocid1.remotepeeringconnection.oc1.eu-frankfurt-1.replace-me",
+            "peer_region_name"  : "eu-frankfurt-1",
+            "peer_tenancy_ocid" : "ocid1.tenancy.oc1..acceptor",
+
+            "remote_cidrs": [
+                "10.0.0.0/21",
+                "10.0.64.0/21",
+                "10.0.128.0/21",
+                "10.0.192.0/21"
+            ]
+        }
+    }
+}

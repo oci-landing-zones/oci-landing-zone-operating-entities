@@ -45,7 +45,7 @@ The configuration files are organized in different folders, according to the bro
         - [customer-tasks.yml](mgmt-plane/tooling/ansible-playbooks/tasks/customer_tasks.yml), defining Ansible tasks for managing namespaces, quota policies and network policies. Each customer is assigned a namespace, a quota policy and a network policy. It is part of *customer-play*.yml.    
 
 - pod: containing customer configurations for the Pod model.
-    - customer1: [compartments_config.json](pod/customer1/ccompartments_config.json), [budgets_config.json](pod/customer1/budgets_config.json), [network_three_tier_config.json](pod/customer1/network_three_tier_config.json), [network_oke_flannel_config.json](pod/customer1/network_oke_flannel_config.json), [oke_flannel_cluster_config.json](pod/customer1/oke_flannel_cluster_config.json) with sample resources configurations for one customer, including IAM, budget, networking (supporting traditional three tier apps or Kubernetes-based apps), respectively; and an OKE cluster. Use these files as templates to onboard other customers.
+    - customer1: [compartments_config.json](pod/customer1/compartments_config.json), [budgets_config.json](pod/customer1/budgets_config.json), [network_three_tier_config.json](pod/customer1/network_three_tier_config.json), [network_oke_flannel_config.json](pod/customer1/network_oke_flannel_config.json), [oke_flannel_cluster_config.json](pod/customer1/oke_flannel_cluster_config.json) with sample resources configurations for one customer, including IAM, budget, networking (supporting traditional three tier apps or Kubernetes-based apps), respectively; and an OKE cluster. Use these files as templates to onboard other customers.
         - **IMPORTANT:** customer1 template has CIDR range 10.0.0.0/26 for the three-tier vcn and 10.0.1.0/24 for the OKE VCN. 
 
 - mt: containing shared and customer configurations for the Multi-Tenant model.     
@@ -119,4 +119,3 @@ Onboarding customers in the Multi-Tenant model requires shared infrastructure as
  The diagram below depicts the deployment sequencing. Note that the Network stack must be updated once after Firewall deployment (step 4). Also note that the customer stack (step 5 in Pod model and step 7 in multi-tenant model) must be executed for each new customer.
 
  ![Deployment Sequencing](../design/images/deployment-sequencing.png)
-

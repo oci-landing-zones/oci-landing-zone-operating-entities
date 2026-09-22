@@ -7,7 +7,9 @@
 // Exports:
 //   _icmp_ingress_rules(own_vcn_cidr, management_cidr=null) — 3-rule ICMP ingress array
 //   _nsg_egress_all_protocols       — NSG egress: all protocols to 0.0.0.0/0
-//   _nsg_egress_tcp_only            — NSG egress: TCP only to 0.0.0.0/0
+//   _nsg_egress_tcp_only            — stateful NSG egress: TCP only to 0.0.0.0/0
+//   _nsg_egress_tcp_stateless       — stateless NSG egress: TCP only to 0.0.0.0/0
+//   _tcp_return_ingress_rule(...)   — stateless TCP return rule to ephemeral ports
 //   _mgmt_security_list(n, hub_vcn_cidr, bastion_ip) — MGMT SL with ICMP + SSH from bastion
 //   _empty_default_security_list    — Empty default SL (egress=[], ingress=[])
 //   _hub_vcn(n, hub_vcn_cidr, subnets, extra_subnets={}) — Base hub VCN with common subnets
@@ -19,7 +21,7 @@
 //   _internet_route_via_igw(n)      — Route rule to 0.0.0.0/0 via IGW
 //   _hub_output(n, spec)            — Standard hub builder return envelope
 //   _firewall_hub_drg(n)            — DRG for firewall hubs (A, B, C)
-//   _icmp_sl(n, segments, hub_vcn_cidr) — ICMP-only security list (key via naming)
+//   _icmp_sl(...)                   — parameterized ICMP-only security list (key via naming)
 //   _natgw_firewall_routes(n, subnets, entity_id, fw_desc) — NATGW routes through firewall
 //
 // Architecture notes:
@@ -36,7 +38,7 @@
   //   management_cidr: source for Type 8 Echo (the management network that monitors you).
   //     null (default) = same as own_vcn_cidr (hub case).
   //     Set explicitly for spokes where monitoring comes from hub VCN.
-  _icmp_ingress_rules(own_vcn_cidr, management_cidr=null):: [
+  _icmp_ingress_rules(own_vcn_cidr, management_cidr=null, echo_source_label=null):: [
     {
       description: 'ICMP type 3 code 4',
       src: '0.0.0.0/0',
@@ -56,7 +58,9 @@
     },
     {
       description:
-        if management_cidr != null
+        if echo_source_label != null
+        then 'Allow inbound ICMP type 8 (Echo) from %s' % echo_source_label
+        else if management_cidr != null
         then 'Allow inbound ICMP type 8 (Echo) from Hub VCN'
         else 'Allow inbound ICMP type 8 (Echo)',
       src:
@@ -93,6 +97,26 @@
     },
   },
 
+  _nsg_egress_all:: {
+    anywhere: {
+      description: 'Allow all outbound traffic to 0.0.0.0/0',
+      dst: '0.0.0.0/0',
+      dst_type: 'CIDR_BLOCK',
+      protocol: 'ALL',
+      stateless: false,
+    },
+  },
+
+  _nsg_egress_tcp_stateless:: {
+    anywhere: {
+      description: 'Allow all outbound traffic to 0.0.0.0/0 over TCP',
+      dst: '0.0.0.0/0',
+      dst_type: 'CIDR_BLOCK',
+      protocol: 'TCP',
+      stateless: true,
+    },
+  },
+
   _tcp_ingress_rule(description, src, port=null, src_type='CIDR_BLOCK', stateless=false):: {
     description: description,
     src: src,
@@ -102,6 +126,28 @@
     protocol: 'TCP',
     stateless: stateless,
   },
+
+  _tcp_return_ingress_rule(description, src, source_port):: {
+    description: description,
+    src: src,
+    src_type: 'CIDR_BLOCK',
+    src_port_min: source_port,
+    src_port_max: source_port,
+    dst_port_min: 1024,
+    dst_port_max: 65535,
+    protocol: 'TCP',
+    stateless: true,
+  },
+
+  _icmp_egress_rule(dst):: [
+    {
+      description: 'Allow outbound ICMP to %s' % dst,
+      dst: dst,
+      dst_type: 'CIDR_BLOCK',
+      protocol: 'ICMP',
+      stateless: false,
+    },
+  ],
 
   // --- Security lists ---
 
@@ -284,6 +330,13 @@
     spoke_route_tables: spec.spoke_route_tables,
     post_route_tables: spec.post_route_tables,
     fw_nsg_key: spec.fw_nsg_key,
+    spoke_ingress_nsg_keys:
+      if std.objectHas(spec, 'spoke_ingress_nsg_keys') then spec.spoke_ingress_nsg_keys
+      else if spec.fw_nsg_key == null then []
+      else [spec.fw_nsg_key],
+    lb_return_nsg_key:
+      if std.objectHas(spec, 'lb_return_nsg_key') then spec.lb_return_nsg_key
+      else null,
     has_spoke_natgw: spec.has_spoke_natgw,
     post_route_entity_id: spec.post_route_entity_id,
     post_route_entity_desc: spec.post_route_entity_desc,
@@ -357,11 +410,22 @@
 
   // --- Security list helpers ---
 
-  _icmp_sl(n, segments, hub_vcn_cidr):: {
+  _icmp_sl(
+    n,
+    segments,
+    hub_vcn_cidr,
+    echo_cidr=null,
+    echo_source_label=null,
+    egress_cidr=null
+  ):: {
     [n.key('SL', segments)]: {
       display_name: n.display('sl', segments),
-      egress_rules: [],
-      ingress_rules: $._icmp_ingress_rules(hub_vcn_cidr),
+      egress_rules: if egress_cidr == null then [] else $._icmp_egress_rule(egress_cidr),
+      ingress_rules: $._icmp_ingress_rules(
+        hub_vcn_cidr,
+        management_cidr=echo_cidr,
+        echo_source_label=echo_source_label
+      ),
     },
   },
 

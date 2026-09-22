@@ -16,6 +16,11 @@ local registry = {
       },
       iam: {},
     },
+    aggregate(results):: {
+      iam: {
+        fake_extension_count: std.length(results),
+      },
+    },
   },
 };
 {
@@ -60,4 +65,22 @@ local registry = {
       hub_vcn_cidr: '10.0.0.0/21',
       routed_vcn_entries: [],
     }).network_pre.fake_network,
+
+  extension_owned_aggregate_contribution:
+    extensions.resolve({
+      extension_registry: registry,
+      extension_entries: [{
+        scope: {
+          scope_name: 'prod',
+          platform_name: 'fake',
+        },
+        platform_config: {
+          network: { vcn: '10.0.96.0/24', subnets: null },
+          extension: { type: 'fake', params: {} },
+        },
+      }],
+      naming: naming('fra'),
+      hub_vcn_cidr: '10.0.0.0/21',
+      routed_vcn_entries: [],
+    }).iam.fake_extension_count,
 }

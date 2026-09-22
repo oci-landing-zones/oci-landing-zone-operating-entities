@@ -1,9 +1,12 @@
 .DS_Store
 __pycache__/
 *.py[cod]
+.idea
+.oca
 **/*.drawio.bkp
 **/*.tfstate*
 **/.terraform/*
 **/*oci-credentials.tfvars.json
 **/*.old
 **/*.backup
+__pycache__

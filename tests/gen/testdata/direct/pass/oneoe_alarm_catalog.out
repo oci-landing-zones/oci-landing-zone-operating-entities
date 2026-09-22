@@ -1,0 +1,54 @@
+{
+  "alarm_count": 52,
+  "all_stored_in_security": true,
+  "all_warning_alarms_disabled": true,
+  "cpu_and_memory_critical_enabled": true,
+  "cpu_and_memory_warning_enabled": false,
+  "default_alarm_compartment": "CMP-LZ-SECURITY-KEY",
+  "enabled_count": 38,
+  "event_delivery": {
+    "message_format": "PRETTY_JSON",
+    "metric_compartment_id": "CMP-LZ-SECURITY-KEY",
+    "namespace": "oci_cloudevents",
+    "pending_duration": "PT1M",
+    "query": "DeliveryFailedEvents[1m].groupBy(resourceId).sum() > 0",
+    "severity": "CRITICAL"
+  },
+  "networkless_environment_precreated": true,
+  "nlb_backend_enabled": false,
+  "notification_delivery": {
+    "message_format": "PRETTY_JSON",
+    "metric_compartment_id": "CMP-LZ-SECURITY-KEY",
+    "namespace": "oci_notification",
+    "pending_duration": "PT1M",
+    "query": "FailedMessagesCount[5m].groupBy(resourceId).sum() > 0",
+    "severity": "CRITICAL"
+  },
+  "preprod_vnic_conntrack_critical": {
+    "message_format": "PRETTY_JSON",
+    "metric_compartment_id": "CMP-LZ-PREPROD-NETWORK-KEY",
+    "namespace": "oci_vcn",
+    "pending_duration": "PT5M",
+    "query": "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 90",
+    "severity": "CRITICAL"
+  },
+  "prod_vnic_conntrack_warning": {
+    "message_format": "PRETTY_JSON",
+    "metric_compartment_id": "CMP-LZ-PROD-NETWORK-KEY",
+    "namespace": "oci_vcn",
+    "pending_duration": "PT10M",
+    "query": "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 80",
+    "severity": "WARNING"
+  },
+  "shared_lb_enabled": true,
+  "shared_lb_metric_compartment": "CMP-LZ-NETWORK-KEY",
+  "shared_lb_notifies_network_team": true,
+  "shared_vnic_conntrack_critical": {
+    "message_format": "PRETTY_JSON",
+    "metric_compartment_id": "CMP-LZ-NETWORK-KEY",
+    "namespace": "oci_vcn",
+    "pending_duration": "PT5M",
+    "query": "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 90",
+    "severity": "CRITICAL"
+  }
+}

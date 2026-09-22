@@ -1,20 +1,13 @@
 {
     "oke_workers_configuration": {
-        "default_compartment_id"         : "CMP-LZ-PROD-OKE-KEY",
-
         "node_pools": {
             "NDP-FRA-LZ-PROD-OKE-KEY": {
                 "name"                   : "ndp-fra-lz-prod-oke",
+                "compartment_id"         : "CMP-LZ-PROD-OKE-KEY",
+                "cis_level"              : "1",
                 "cluster_id"             : "CLR-FRA-LZ-PROD-OKE-KEY",
                 "enable_cycling"         : false,
                 "size"                   : 1,
-
-                "cloud_init": [
-                    {
-                        "content"        : "runcmd:\n  - sudo /usr/libexec/oci-growfs -y\n",
-                        "content_type"   : "text/cloud-config"
-                    }
-                ],
 
                 "freeform_tags": {
                     "cluster"            : "clr-fra-lz-prod-oke"
@@ -28,8 +21,13 @@
                 },
 
                 "node_config_details": {
-                    "image"              : "8.10",
+                    "boot_volume_size"   : 60,
+                    "image"              : "9\\.[0-9]+",
                     "node_shape"         : "VM.Standard.E5.Flex",
+
+                    "cloud_init": {
+                        "heredoc_script" : "#!/bin/bash\n\nsudo /usr/libexec/oci-growfs -y\n\ncurl --fail -H \"Authorization: Bearer Oracle\" -L0 http://169.254.169.254/opc/v2/instance/metadata/oke_init_script | base64 --decode >/var/run/oke-init.sh\nbash /var/run/oke-init.sh\n"
+                    },
 
                     "flex_shape_settings": {
                         "memory"         : 8,

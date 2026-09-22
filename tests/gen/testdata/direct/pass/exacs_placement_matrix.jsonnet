@@ -19,16 +19,17 @@ local extension(params) = {
 
 local base_envs = {
   prod: {
-    shared_project_network: { network: { vcn: '10.0.64.0/21' } },
+    project_network: { network: { vcn: '10.0.64.0/21' } },
     projects: { proj1: {} },
   },
   preprod: {
-    shared_project_network: { network: { vcn: '10.0.128.0/21' } },
+    project_network: { network: { vcn: '10.0.128.0/21' } },
     projects: { proj1: {} },
   },
 };
 
 local base_config = {
+  cis_level: 1,
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: base_envs,
 };
@@ -79,6 +80,7 @@ local hybrid = multi(base_config {
 });
 
 local infra_only = multi({
+  cis_level: 1,
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: {
     prod: {

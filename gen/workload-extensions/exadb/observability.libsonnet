@@ -18,9 +18,13 @@ local exadb_events = import './events.libsonnet';
     local topic_emails(key) = notification.topic_emails(key);
     local subscriptions(email_key) = [{ protocol: 'EMAIL', values: topic_emails(email_key) }];
 
+    local env_scope(env_name) = model.environment_scope(env_name);
     local shared_infra_topic_key = n.key_global('NOTT', [product_upper, 'SHARED', 'INFRA', 'WORKLOADS']);
     local db_topic_key = n.key_global('NOTT', [product_upper, 'DB', 'WORKLOADS']);
-    local env_topic_key(env_name) = n.key_global('NOTT', [env_name, product_upper, 'PROJECTS']);
+    local env_topic_key(env_name) = n.key_global(
+      'NOTT',
+      env_scope(env_name).key_segments + [product_upper, 'PROJECTS']
+    );
     local has_environment_platform_topic =
       scope.scope_type == 'environment' &&
       std.objectHas(scope_config, 'extension_entry_uses_publication_components') &&
@@ -33,14 +37,14 @@ local exadb_events = import './events.libsonnet';
     ];
     local topic_environment_names =
       if has_environment_platform_topic &&
-         !std.member(project_environment_names, scope.scope_name) then
-        project_environment_names + [scope.scope_name]
+         !std.member(project_environment_names, model.scope_key) then
+        project_environment_names + [model.scope_key]
       else project_environment_names;
     local project_topics = {
       [env_topic_key(env_name)]: {
-        name: n.display_global('nott', [env_name, product.code, 'projects']),
-        description: descriptions.project_topic(model.environment_scope(env_name)),
-        compartment_id: n.key_global('CMP', [env_name, 'SECURITY']),
+        name: n.display_global('nott', env_scope(env_name).name_segments + [product.code, 'projects']),
+        description: descriptions.project_topic(env_scope(env_name)),
+        compartment_id: n.key_global('CMP', env_scope(env_name).key_segments + ['SECURITY']),
         subscriptions: subscriptions('projects'),
       }
       for env_name in topic_environment_names
@@ -71,20 +75,23 @@ local exadb_events = import './events.libsonnet';
       if product.code == 'exacc' then ['NOTIFICATION', 'OPERATOR', 'ACCESS', 'CONTROL']
       else ['NOTIFICATION', product_upper, 'OPERATOR', 'ACCESS', 'CONTROL'];
     local project_rule_segments(env_name, project_name, project_count) =
+      local scope = env_scope(env_name);
       local base =
-        if product.code == 'exacc' then [env_name, 'NOTIFICATION', 'PROJECTS']
-        else [env_name, product_upper, 'NOTIFICATION', 'PROJECTS'];
+        if product.code == 'exacc' then scope.key_segments + ['NOTIFICATION', 'PROJECTS']
+        else scope.key_segments + [product_upper, 'NOTIFICATION', 'PROJECTS'];
       if project_count == 1 then base else base + [project_name];
     local project_display_segments(env_name, project_name, project_count) =
+      local scope = env_scope(env_name);
       if project_count == 1 then
-        [env_name, 'notify-on-notifications']
+        scope.name_segments + ['notify-on-notifications']
       else
-        [env_name, 'notify-on-notifications', project_name];
+        scope.name_segments + ['notify-on-notifications', project_name];
     local project_event_rules_for_env(env_name) =
       local project_names = model.by_environment[env_name];
+      local scope = env_scope(env_name);
       {
         [n.key_global('RUL', project_rule_segments(env_name, project_name, std.length(project_names)))]: {
-          compartment_id: inputs.project_db_key(env_name, project_name),
+          compartment_id: inputs.project_db_key(scope, project_name),
           destination_topic_ids: [env_topic_key(env_name)],
           event_display_name:
             n.display_global('rul', project_display_segments(env_name, project_name, std.length(project_names))),
@@ -130,35 +137,35 @@ local exadb_events = import './events.libsonnet';
         } else {}) + all_project_event_rules
       else
         if !has_environment_platform_topic then
-          if std.objectHas(model.by_environment, scope.scope_name) then
-            project_event_rules_for_env(scope.scope_name)
+          if std.objectHas(model.by_environment, model.scope_key) then
+            project_event_rules_for_env(model.scope_key)
           else {}
         else
-        local env_topic = env_topic_key(scope.scope_name);
+        local env_topic = env_topic_key(model.scope_key);
         (if components.infrastructure then {
-        [n.key_global('RUL', [scope.scope_name, 'NOTIFICATION', 'PLATFORM', product_upper, 'INFRA'])]: {
+        [n.key_global('RUL', scope.key_segments + ['NOTIFICATION', 'PLATFORM', product_upper, 'INFRA'])]: {
           compartment_id: inputs.infra_key,
           destination_topic_ids: [env_topic],
-          event_display_name: n.display_global('rul', [scope.scope_name, 'notify-on-%s-infra-events' % product.code]),
+          event_display_name: n.display_global('rul', scope.name_segments + ['notify-on-%s-infra-events' % product.code]),
           supplied_events: event_catalog.infra,
         },
         } else {}) +
         (if components.database then {
-        [n.key_global('RUL', [scope.scope_name, 'NOTIFICATION', 'PLATFORM', product_upper, 'DB'])]: {
+        [n.key_global('RUL', scope.key_segments + ['NOTIFICATION', 'PLATFORM', product_upper, 'DB'])]: {
           compartment_id: inputs.db_key,
           destination_topic_ids: [env_topic],
-          event_display_name: n.display_global('rul', [scope.scope_name, 'notify-on-%s-db-events' % product.code]),
+          event_display_name: n.display_global('rul', scope.name_segments + ['notify-on-%s-db-events' % product.code]),
           supplied_events: event_catalog.db,
         },
-        [n.key_global('RUL', [scope.scope_name, 'NOTIFICATION', 'PLATFORM', product_upper, 'VMC'])]: {
+        [n.key_global('RUL', scope.key_segments + ['NOTIFICATION', 'PLATFORM', product_upper, 'VMC'])]: {
           compartment_id: inputs.db_key,
           destination_topic_ids: [env_topic],
-          event_display_name: n.display_global('rul', [scope.scope_name, 'notify-on-%s-vmc-events' % product.code]),
+          event_display_name: n.display_global('rul', scope.name_segments + ['notify-on-%s-vmc-events' % product.code]),
           supplied_events: event_catalog.vmc,
         },
         } else {}) +
-        if std.objectHas(model.by_environment, scope.scope_name) then
-          project_event_rules_for_env(scope.scope_name)
+        if std.objectHas(model.by_environment, model.scope_key) then
+          project_event_rules_for_env(model.scope_key)
         else {};
 
     local alarm(scope_segments, key_segments, display_segments, topic_key, namespace, query, severity='CRITICAL') = {
@@ -178,15 +185,15 @@ local exadb_events = import './events.libsonnet';
     };
     local alarms =
       if components.database && (scope.scope_type == 'shared' || has_environment_platform_topic) then
-        local scope_segments = if scope.scope_type == 'shared' then [] else [scope.scope_name];
-        local display_prefix = if scope.scope_type == 'shared' then [] else [scope.scope_name];
+        local scope_segments = if scope.scope_type == 'shared' then [] else scope.key_segments;
+        local display_prefix = if scope.scope_type == 'shared' then [] else scope.name_segments;
         local db_alarm_topic =
           if scope.scope_type == 'shared' then db_topic_key
-          else env_topic_key(scope.scope_name);
+          else env_topic_key(model.scope_key);
         local infra_alarm_topic =
           if scope.scope_type == 'shared' then
             if components.infrastructure then shared_infra_topic_key else db_topic_key
-          else env_topic_key(scope.scope_name);
+          else env_topic_key(model.scope_key);
         alarm(scope_segments, ['CPUUTIL'], display_prefix + ['db', 'cpuutil'], db_alarm_topic, 'oci_database', 'CpuUtilization[1m].mean() >= 90') +
         alarm(scope_segments, ['STORAGEUTIL'], display_prefix + ['db', 'storageutil'], db_alarm_topic, 'oci_database', 'StorageUtilization[1m].mean() >= 90') +
         alarm(scope_segments, ['DB', 'CLUSTER', 'CPUUTIL'], display_prefix + ['vmc', 'cpuutil'], infra_alarm_topic, 'oci_database_cluster', 'CpuUtilization[1m].mean() >= 90') +

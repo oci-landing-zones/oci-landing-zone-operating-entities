@@ -20,7 +20,8 @@ fi
 # Create target hooks directory if it doesn't exist
 mkdir -p "$HOOKS_TARGET_DIR"
 
-# Process each hook file
+# Process each hook file. Keep installed hooks in sync with the tracked
+# .githooks scripts so local developers do not keep stale hook behavior.
 for hook in "$HOOKS_SOURCE_DIR"/*; do
   hook_name=$(basename "$hook")
 
@@ -34,6 +35,13 @@ for hook in "$HOOKS_SOURCE_DIR"/*; do
     cp "$hook" "$target_hook"
     chmod +x "$target_hook"
     echo "Installed git hook: $hook_name"
+  elif ! cmp -s "$hook" "$target_hook"; then
+    cp "$hook" "$target_hook"
+    chmod +x "$target_hook"
+    echo "Updated git hook: $hook_name"
+  elif [ ! -x "$target_hook" ]; then
+    chmod +x "$target_hook"
+    echo "Made git hook executable: $hook_name"
   fi
 done
 

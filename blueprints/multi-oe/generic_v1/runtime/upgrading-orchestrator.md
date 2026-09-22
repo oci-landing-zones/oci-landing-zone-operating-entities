@@ -97,19 +97,19 @@ Clone the new version of the repository, initialize the configuration to downloa
 To clone the repository do:
 
 ```
-git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git
+git clone git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git
 ```
 
 Cloning the latest version:
 ```
-git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git
+git clone git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git
 ```
 
 For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. 
 
-E.g.: 
+E.g.:
 ```
-git clone git@github.com:oracle-quickstart/terraform-oci-landing-zones-orchestrator.git?ref=v2.0.0
+git clone git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git?ref=v2.1.3
 ```
 
 Initialize:

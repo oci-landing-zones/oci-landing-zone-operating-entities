@@ -2,7 +2,7 @@
 // Governance builder: tag namespaces and tag definitions.
 //
 // Generates the same structure as blueprints/one-oe/runtime/one-stack/oneoe_governance.json.
-// This is static — no per-env iteration needed.
+// Workload-extension namespaces are contributed by their owning extensions.
 //
 // function(config, n) → governance output object
 

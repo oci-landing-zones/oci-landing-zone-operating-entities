@@ -12,5 +12,6 @@
       "app": "10.0.96.0/25",
       "db": "10.0.96.128/25"
     }
-  }
+  },
+  "extension_owned_aggregate_contribution": 1
 }

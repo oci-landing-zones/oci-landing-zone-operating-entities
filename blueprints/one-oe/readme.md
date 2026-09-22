@@ -15,7 +15,8 @@ This model onboards **one Operating Entity (OE)** with its **environments**, **p
 |---|---|:-:|---|
 | 1 | High-level Design - MD | [<img src="../../commons/images/icon_md.jpg" width="45">](/blueprints/one-oe/design/readme.md)   |  [Available](/blueprints/one-oe/design/readme.md) |
 | 2 | High-level Design - Drawio | [ <img src="../../commons/images/icon_drawio.jpg" width="30"> ](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio) | [Available](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/blueprints/one-oe/design/OCI_Open_LZ_One-OE-Blueprint.drawio)
-| 3 | One-stack Deployment with Declarative IaC - Terraform + JSON| [<img src="../../commons/images/icon_terraform.jpg" width="32"><img src="../../commons/images/icon_json.jpg" width="30">](/blueprints/one-oe/runtime/one-stack/readme.md) | [Available](/blueprints/one-oe/runtime/one-stack/readme.md) |
+| 3 | High-level Design - Workshops | [<img src="../../commons/images/icon_youtube.svg" width="34" alt="YouTube">](https://www.youtube.com/playlist?list=PLPIzp-E1msrbur8_CPijJQFpsdzfxQTdd) | [Available](https://www.youtube.com/playlist?list=PLPIzp-E1msrbur8_CPijJQFpsdzfxQTdd) |
+| 4 | One-stack Deployment with Declarative IaC - Terraform + JSON| [<img src="../../commons/images/icon_terraform.jpg" width="32"><img src="../../commons/images/icon_json.jpg" width="30">](/blueprints/one-oe/runtime/one-stack/readme.md) | [Available](/blueprints/one-oe/runtime/one-stack/readme.md) |
 
 
 &nbsp; 

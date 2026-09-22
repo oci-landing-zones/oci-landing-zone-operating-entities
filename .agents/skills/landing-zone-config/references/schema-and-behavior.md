@@ -4,7 +4,7 @@
 
 - `gen/config.libsonnet` validates the required config shape and normalizes omitted values.
 - `gen/landing_zone.libsonnet` turns normalized config into hub, spoke, platform, IAM, governance, security, observability, and extension outputs.
-- `gen/landing_zone_multi.jsonnet` decides which output files appear in config mode.
+- `gen/landing_zone_multi.jsonnet` decides which output files appear in Blueprint Factory config mode.
 - `gen/AGENTS.md` explains the intended architecture, naming conventions, and publication guardrails.
 
 ## Minimal Config Shape
@@ -17,7 +17,7 @@
   },
   environments: {
     prod: {
-      shared_project_network: {
+      project_network: {
         network: { vcn: '10.0.64.0/21' },
       },
       projects: { proj1: {} },
@@ -36,8 +36,11 @@ Optional but important:
 
 - `region`, defaulting to `eu-frankfurt-1`
 - `region_short_name`, defaulting to `fra`
-- `realm`, defaulting to `oc1` (including when explicitly `null`)
+- `realm`, defaulting to `oc1` (including when explicitly `null`); supported values are `oc1` and `oc19`
+- `cis_level`, defaulting to `2`; Blueprint Factory config mode emits only the selected CIS level's security and observability files
 - `hub.network.subnets`
+- `environments.<env>.project_network`
+- `environments.<env>.projects`
 - `shared_platforms`
 - `environments.<env>.platforms`
 
@@ -46,14 +49,22 @@ Optional but important:
 `gen/config.libsonnet` applies these defaults and assertions:
 
 - `hub.kind` must be one of `hub_a`, `hub_b`, `hub_c`, `hub_e`
+- `region` and `region_short_name` must be provided together or omitted together
+- `realm` must be one of the realms defined in `gen/constants.libsonnet`
+- `cis_level` must be `1` or `2`; strings `'1'` and `'2'` are also normalized
 - If `hub.network.subnets` is omitted, hub subnets are auto-generated from the hub VCN using the canonical order for that hub kind
-- If `shared_project_network.network.subnets` is omitted, spoke subnets auto-generate as `web`, `app`, `db`, `infra`
+- If `project_network.network.subnets` is omitted, shared subnets auto-generate as `web`, `app`, `db`, and `infra`
+- If `project_network.network.subnets` is `{}`, the project VCN has no shared subnets
+- A non-empty shared-subnet map is exact: every supplied named CIDR is emitted and no `web`, `app`, `db`, or `infra` subnet is added implicitly
+- `project_network.subnet_routing` defaults to `vcn`; `hub` is supported for firewalled Hub A, Hub B, and Hub C, while Hub E is rejected
+- `projects.<project>.subnets` requires `project_network` and must contain at least one named CIDR
+- Shared and dedicated subnet CIDRs must be canonical, contained by the project VCN, and mutually non-overlapping
 - If a platform omits `network.subnets` and has an `extension`, subnet generation is delegated to that extension
 - If a platform omits `network.subnets` and has no `extension`, normalization fails
 
 ## Spokes, Platforms, And Shared Platforms
 
-- An environment becomes a spoke only when it defines `shared_project_network`
+- An environment becomes a spoke only when it defines `project_network`
 - `environments.<env>.platforms` creates environment-scoped platform VCNs and IAM hierarchy
 - `shared_platforms` creates shared platform VCNs and shared platform compartments
 - Platform scope semantics, display labels, DNS short codes, and security-target eligibility come from `gen/topology.libsonnet`
@@ -61,8 +72,41 @@ Optional but important:
 Current topology behavior worth remembering:
 
 - Preferred environment ordering is `prod`, `preprod`, `staging`, `uat`, `dev`, `test`, then any remaining names
-- Sample load balancer backends are derived from the first ordered workload spoke's `web` subnet
+- Sample load balancer backends are derived from the first ordered workload spoke whose normalized shared-subnet map contains `web` (including the omitted-map defaults); otherwise the public hub LB example uses non-working `0.0.0.0` backends. No workload is exposed by those placeholders, but the public listener and ingress NSG still require review before production use.
 - Security-target selection is centralized in `gen/topology.libsonnet`; omitted `security_targets` targets all defined environments
+
+## Project Networks And Dedicated Subnets
+
+`project_network` creates one environment project VCN. Shared subnets are
+controlled under `project_network.network.subnets`: omission generates the four
+defaults, `{}` means none, and a non-empty map is exact. A project may
+additionally define dedicated subnets under
+`projects.<project>.subnets`:
+
+```jsonnet
+prod: {
+  project_network: {
+    subnet_routing: 'vcn',
+    network: {
+      vcn: '10.0.64.0/21',
+      subnets: { frontend: '10.0.64.0/24' },
+    },
+  },
+  projects: {
+    api: { subnets: { jobs: '10.0.68.0/26' } },
+    data: {},
+  },
+}
+```
+
+- All shared and dedicated subnets stay in the environment `NETWORK` compartment.
+- Shared subnets are the recommended design default because multiple projects can use the allocated ranges efficiently. Dedicated subnet ranges provide separate project CIDR allocation and lifecycle management, but can leave significant unused address capacity.
+- Subnet access is governed at the environment `NETWORK` compartment. The factory does not generate per-subnet IAM conditions, so dedicated allocation is not an IAM boundary.
+- `subnet_routing: 'vcn'` keeps OCI local routing. `hub` sends traffic between
+  different subnets through the Hub A/B/C firewall path. Same-subnet traffic is
+  always direct. Hub C follows its normal staged deployment and requires real
+  firewall backend targets in place of generated placeholders. Hub E has no
+  firewall and is blocked.
 
 ## Extension Contract
 
@@ -73,6 +117,7 @@ Current registered types:
 - `oke_simple`
 - `exacc`
 - `exacs`
+- `ocvs`
 
 An extension-backed platform config looks like this:
 
@@ -104,10 +149,37 @@ It also contributes default platform subnets when the platform omits explicit `n
 
 - Database placement means AVMC/VMC placement and requires `platform.network`; the extension auto-generates `db` and `backup` subnets when explicit subnets are omitted
 - Infrastructure-only placement is inferred when an ExaCS platform has no `network`
-- `project_db_compartments` is only for Autonomous Database Dedicated project tiers; `shared_project_network` is only needed when that environment also needs project network resources
+- `project_db_compartments` is only for Autonomous Database Dedicated project tiers; `project_network` is only needed when that environment also needs project network resources
 - Shared infrastructure plus shared AVMC/VMC uses `shared_platforms.exacs` with `network`
 - Shared infrastructure plus environment AVMC/VMC uses `shared_platforms.exacs` without `network` and networked `environments.<env>.platforms.exacs`
 - Dedicated infrastructure plus dedicated AVMC/VMC uses only networked `environments.<env>.platforms.exacs`
+
+## Remote Peering Connections
+
+RPC is a top-level network integration rather than an environment extension:
+
+```jsonnet
+{
+  remote_peering_connections: {
+    region_b: {
+      remote_cidrs: ['10.1.0.0/21', '10.1.64.0/21'],
+      peer_id: 'ocid1.remotepeeringconnection.oc1.eu-amsterdam-1.example',
+      peer_region_name: 'eu-amsterdam-1',
+    },
+  },
+}
+```
+
+- `remote_cidrs` is required and must not overlap local hub, environment, or platform VCNs.
+- Omit `peer_id` for the acceptor. Set it to the acceptor RPC OCID or dependency key for the requestor.
+- Omit both `peer_tenancy_ocid` and `requestor_group_ocid` for same-tenancy peering.
+- For a cross-tenancy acceptor, set `peer_tenancy_ocid` to the requestor tenancy and `requestor_group_ocid` to the foreign requestor group; omit `peer_id`.
+- For a cross-tenancy requestor, set `peer_tenancy_ocid` to the acceptor tenancy and set `peer_id`; omit `requestor_group_ocid` because requester IAM references the local identity-domain group by name.
+- The map may contain multiple named connections. For an N-tenancy design, create one source config per Landing Zone and one entry for every RPC edge attached to that Landing Zone.
+- Environment names and platform counts are dynamic. RPC routing consumes all network-producing local environments and platforms, including OKE VCNs.
+- Blueprint Factory emits the normal complete One-OE output set. The add-on publication adapter retains compact RPC-only network and IAM projections for verification and also publishes the complete current One-OE governance, IAM, and network surfaces used by the runtime reference templates. X-RPC itself adds no governance resources.
+
+See `gen/addons/oci-x-rpc/AGENTS.md` for role mapping, routing behavior, and deployment sequencing.
 
 ## Output Model
 
@@ -116,14 +188,19 @@ It also contributes default platform subnets when the platform omits explicit `n
 - `network.json`
 - `iam.json`
 - `governance.json`
-- `security_cis1_pre.json`
-- `security_cis1.json`
-- `security_cis2_pre.json`
-- `security_cis2.json`
-- `observability_cis1_pre.json`
-- `observability_cis1.json`
-- `observability_cis2_pre.json`
-- `observability_cis2.json`
+
+For the selected `cis_level`, it also emits one security and one observability pair. Omitted `cis_level` defaults to level 2:
+
+- `cis_level: 1`
+  - `security_cis1_pre.json`
+  - `security_cis1.json`
+  - `observability_cis1_pre.json`
+  - `observability_cis1.json`
+- `cis_level: 2` or omitted
+  - `security_cis2_pre.json`
+  - `security_cis2.json`
+  - `observability_cis2_pre.json`
+  - `observability_cis2.json`
 
 Conditional outputs:
 
@@ -137,4 +214,4 @@ Conditional outputs:
 2. Add one environment or platform at a time.
 3. Run `bash gen/generate.sh --config <config_file> [output_dir]`.
 4. Validate `network.json` as the canonical final network artifact; expect `network_pre.json` only for staged hubs.
-5. When changing schema or extension assumptions, update tests or regression fixtures that cover config mode.
+5. When changing schema or extension assumptions, update tests or regression fixtures that cover Blueprint Factory config mode.

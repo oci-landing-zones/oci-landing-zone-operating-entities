@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 22" role="img" aria-labelledby="title">
+  <title id="title">YouTube</title>
+  <path fill="#f00" d="M31.3 3.4a4 4 0 0 0-2.8-2.8C26 .0 16 0 16 0S6 0 3.5.6A4 4 0 0 0 .7 3.4C0 5.9 0 11 0 11s0 5.1.7 7.6a4 4 0 0 0 2.8 2.8C6 22 16 22 16 22s10 0 12.5-.6a4 4 0 0 0 2.8-2.8C32 16.1 32 11 32 11s0-5.1-.7-7.6Z"/>
+  <path fill="#fff" d="m12.8 15.7 8.4-4.7-8.4-4.7v9.4Z"/>
+</svg>

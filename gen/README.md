@@ -1,10 +1,13 @@
 # Local Set-up
 
+The `gen/` Jsonnet implementation powers the [Blueprint Factory](../addons/oci-lz-blueprint-factory/README.md). This contributor guide uses implementation terms such as generator, config mode, and Jsonnet where technical precision is required.
+
 Run `bash gen/generate.sh` the first time you work on the generator. It sets up the repo hooks, checks that a Jsonnet renderer is installed, and regenerates the checked-in outputs.
 
 ## Documentation Map
 
 - [`../AGENTS.md`](../AGENTS.md): repo-specific workflow rules and generator guardrails.
+- [`../addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md`](../addons/oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md): customer-facing supported configuration shapes and field behavior.
 - [`AGENTS.md`](AGENTS.md): architecture, schema, naming rules, publication rules, and stable generator contracts.
 - [`JSONNET_COMPOSITION.md`](JSONNET_COMPOSITION.md): how the Jsonnet files compose and where to edit for common change types.
 - [`../tests/gen/`](../tests/gen/): generator test modules and fixtures.
@@ -16,8 +19,31 @@ Run `bash gen/generate.sh` the first time you work on the generator. It sets up 
 - Raw config-mode fan-out and debugging: `jsonnet --multi <output_dir>/ --tla-code-file config=<config_file> gen/landing_zone_multi.jsonnet`
 
 Config-mode network artifacts use one canonical final file: `network.json`. Only hubs that require staged deployment also emit `network_pre.json`.
+Config-mode security and observability artifacts follow `cis_level`: omit it for the default CIS level 2 files, or set `cis_level: 1` to emit the CIS level 1 file pair instead.
+Config-mode extension outputs are emitted as additional files from `result.extra`; for example, OKE emits `oke_clusters.json` and `oke_workers.json`.
 If you set `hub.network.subnets` explicitly, provide the full canonical subnet set for that hub kind; partial hub subnet overrides are rejected during normalization.
 For networked extension-backed platforms, explicit `platform.network.subnets` overrides must match the extension metadata-defined subnet set exactly; otherwise omit subnets and let the extension auto-allocate. Extensions declare network behavior with `metadata.network_mode`: `required`, `forbidden`, or `optional`. Legacy `metadata.requires_network: true|false` is still supported and maps to `required` or `forbidden`. Optional-network extensions may omit `platform.network` for IAM/observability-only contributions, or include it to emit `network_pre`.
+Generated IAM is checked against a 400-statement safety budget per root-to-leaf
+compartment chain. OCI documents a hard limit of 500 statements per chain; this
+repo keeps headroom for customer extensions and manual policies.
+
+### Project networks and dedicated subnets
+
+`project_network` is optional. Omit `project_network.network.subnets` for the
+default `web`, `app`, `db`, and `infra` shared subnets; use `{}` for none; a
+non-empty map is exact. Declare project-dedicated subnet allocations under
+`projects.<name>.subnets`. All subnet CIDRs must be canonical, contained by the
+VCN, and non-overlapping.
+
+Dedicated subnet allocation is not an IAM boundary. Subnet access is governed at
+the environment network compartment, and the factory does not generate
+per-subnet IAM conditions. Use dedicated allocations for separate CIDR and
+operational management. Prefer shared subnets for address efficiency.
+
+`subnet_routing` defaults to `vcn`. Set `hub` with Hub A, B, or C to route
+traffic between different subnets through the hub firewall; Hub E rejects it.
+Same-subnet traffic remains local and requires NSGs and security lists. Hub C
+requires backend replacement during staged deployment.
 
 Change the Jsonnet sources under `gen/` first. Checked-in JSON under `blueprints/` and `workload-extensions/` are generated snapshots, not hand-maintained source files.
 

@@ -2,7 +2,7 @@
 // Subnets: lb, fw, mgmt, mon, dns.
 // DRG ingress route table, one OCI Network Firewall, L7 LB.
 //
-// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc }
+// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, spoke_ingress_nsg_keys, lb_return_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc }
 //
 // hub_ctx.naming: naming object from naming('fra')
 // hub_ctx.hub_config: { kind: 'hub_b', network: { vcn: '...', subnets: { lb, fw, mgmt, mon, dns } } }
@@ -17,6 +17,9 @@ function(hub_ctx)
   local n = hub_ctx.naming;
   local hub_config = hub_ctx.hub_config;
   local vcn_list = if std.objectHas(hub_ctx, 'vcn_list') then hub_ctx.vcn_list else [];
+  local create_l7_load_balancer =
+    if std.objectHas(hub_ctx, 'create_l7_load_balancer') then hub_ctx.create_l7_load_balancer
+    else true;
   local lb_backends = if std.objectHas(hub_ctx, 'lb_backends') then hub_ctx.lb_backends else null;
   local lb_env_name = if std.objectHas(hub_ctx, 'lb_env_name') then hub_ctx.lb_env_name else 'prod';
   local vcn_cidr = hub_config.network.vcn;
@@ -79,32 +82,41 @@ function(hub_ctx)
 
                 default_security_list: common._empty_default_security_list,
 
-                security_lists: common._icmp_sl(n, ['HUB', 'LB'], vcn_cidr)
-                  + common._icmp_sl(n, ['HUB', 'FW'], vcn_cidr)
+                security_lists: common._icmp_sl(n, ['HUB', 'LB'], vcn_cidr, egress_cidr=vcn_cidr)
+                  + common._icmp_sl(
+                    n,
+                    ['HUB', 'FW'],
+                    vcn_cidr,
+                    echo_cidr='0.0.0.0/0',
+                    echo_source_label='0.0.0.0/0',
+                    egress_cidr='0.0.0.0/0'
+                  )
                   + common._mgmt_security_list(n, vcn_cidr, bastion_ip),
 
-                network_security_groups: lb._lb_nsg(n) {
+                network_security_groups: lb._lb_nsg(n, stateless=true) {
                   [n.key('NSG', ['HUB', 'FW'])]: {
                     display_name: n.display('nsg', ['hub', 'fw']),
-
-                    egress_rules: common._nsg_egress_all_protocols {
-                      to_lb: {
-                        description: 'Allow all outbound traffic to LB subnet over all protocols',
-                        dst: subnets.lb,
-                        dst_type: 'CIDR_BLOCK',
-                        protocol: 'ALL',
-                        stateless: true,
+                    egress_rules: common._nsg_egress_tcp_stateless {
+                      anywhere+: {
+                        description: 'Allow outbound traffic to 0.0.0.0/0 over TCP',
                       },
                     },
-
                     ingress_rules: {
-                      from_lb: {
-                        description: 'Allow inbound traffic from Hub LB subnet over all protocols',
-                        src: subnets.lb,
-                        src_type: 'CIDR_BLOCK',
-                        protocol: 'ALL',
-                        stateless: true,
-                      },
+                      from_hub: common._tcp_ingress_rule(
+                        'Allow inbound traffic from Hub VCN over TCP',
+                        vcn_cidr,
+                        stateless=true
+                      ),
+                      http_return_80: common._tcp_return_ingress_rule(
+                        'Return flow: allow inbound HTTP responses from 0.0.0.0/0 to ephemeral destination ports',
+                        '0.0.0.0/0',
+                        80
+                      ),
+                      https_return_443: common._tcp_return_ingress_rule(
+                        'Return flow: allow inbound HTTPS responses from 0.0.0.0/0 to ephemeral destination ports',
+                        '0.0.0.0/0',
+                        443
+                      ),
                     },
                   },
                 },
@@ -118,9 +130,11 @@ function(hub_ctx)
 
     non_vcn_specific_gateways: {
               dynamic_routing_gateways: common._firewall_hub_drg(n),
-
+            }
+            + (if create_l7_load_balancer then {
               l7_load_balancers: lb._l7_load_balancer(n, lb_backends, lb_env_name),
-
+            } else {})
+            + {
               network_firewalls_configuration: {
                 network_firewall_policies: nfw._nfw_firewall_policy(
                   n,
@@ -136,7 +150,7 @@ function(hub_ctx)
                   ],
                   extra_address_lists={
                     [n.key('NFW', ['ADDRLIST', 'LB'])]: {
-                      name: n.display('nfw', ['addrlist', 'lb']),
+                      name: nfw._nfw_address_list_name(n, 'lb'),
                       type: 'IP',
                       addresses: [subnets.lb],
                     },
@@ -211,6 +225,8 @@ function(hub_ctx)
     ],
 
     fw_nsg_key: n.key('NSG', ['HUB', 'FW']),
+    spoke_ingress_nsg_keys: [n.key('NSG', ['HUB', 'FW'])],
+    lb_return_nsg_key: n.key('NSG', ['HUB', 'LB']),
 
     has_spoke_natgw: false,
 

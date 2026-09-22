@@ -66,28 +66,30 @@
       else ['GLOBAL', product_upper, role, 'ADMIN'];
     local group_name(role) =
       'grp-lz-global-%s-%s-admin' % [product.code, std.asciiLower(role)];
+    local scope_name(spec) =
+      std.join('-', [std.asciiLower(s) for s in spec.scope.name_segments]);
+    local environment_name = std.join('-', [std.asciiLower(s) for s in scope.name_segments]);
     local environment_group_name(role) =
       'grp-lz-%s-%s-%s-admin' % [
-        std.asciiLower(scope.scope_name),
+        environment_name,
         product.code,
         std.asciiLower(role),
       ];
     local project_group_name(spec) =
       'grp-lz-%s-%s-%s-admin' % [
-        std.asciiLower(spec.env_name),
+        scope_name(spec),
         std.asciiLower(spec.project_name),
         product.code,
       ];
     local project_policy_name(spec) =
       'pcy-lz-%s-%s-%s-admin' % [
-        std.asciiLower(spec.env_name),
+        scope_name(spec),
         product.code,
         std.asciiLower(spec.project_name),
       ];
     local infra_resource = product.resources.infrastructure;
     local vmcluster_resource = product.resources.vmclusters;
     local autonomous_vmcluster_resource = product.resources.autonomous_vmclusters;
-    local environment_name = std.asciiLower(scope.scope_name);
     local environment_platform_path =
       'cmp-lz-%s-platform:%s' % [environment_name, scope.compartment_name];
     local environment_infra_path =
@@ -112,19 +114,19 @@
     } else {});
     local environment_groups =
     (if has_environment_db_group then {
-      [n.key_global('GRP', [scope.scope_name, product_upper, 'DB', 'ADMIN'])]: {
+      [n.key_global('GRP', scope.key_segments + [product_upper, 'DB', 'ADMIN'])]: {
         name: environment_group_name('DB'),
         description: descriptions.environment_db_group(scope),
       },
     } else {}) +
     (if has_environment_infra_group then {
-      [n.key_global('GRP', [scope.scope_name, product_upper, 'INFRA', 'ADMIN'])]: {
+      [n.key_global('GRP', scope.key_segments + [product_upper, 'INFRA', 'ADMIN'])]: {
         name: environment_group_name('INFRA'),
         description: descriptions.environment_infra_group(scope),
       },
     } else {});
     local project_groups = {
-      [n.key_global('GRP', [spec.env_name, product_upper, spec.project_name, 'ADMIN'])]: {
+      [n.key_global('GRP', spec.scope.key_segments + [product_upper, spec.project_name, 'ADMIN'])]: {
         name: project_group_name(spec),
         description: descriptions.project_group(spec.scope, spec.project_name),
       }
@@ -235,10 +237,10 @@
     } else {};
 
     local environment_infra_policy = if has_environment_infra_group then {
-      [n.key_global('PCY', [scope.scope_name, product_upper, 'INFRA', 'ADMIN'])]: {
+      [n.key_global('PCY', scope.key_segments + [product_upper, 'INFRA', 'ADMIN'])]: {
         name: 'pcy-lz-%s-%s-infra-admin' % [environment_name, product.code],
         description: descriptions.environment_infra_policy(scope),
-        compartment_id: n.key_global('CMP', [scope.scope_name]),
+        compartment_id: n.key_global('CMP', scope.key_segments),
         local grp = environment_group_name('INFRA'),
         statements:
           (if components.infrastructure then [
@@ -272,10 +274,10 @@
     } else {};
 
     local environment_db_policy = if has_environment_db_group then {
-      [n.key_global('PCY', [scope.scope_name, product_upper, 'DB', 'ADMIN'])]: {
+      [n.key_global('PCY', scope.key_segments + [product_upper, 'DB', 'ADMIN'])]: {
         name: 'pcy-lz-%s-%s-db-admin' % [environment_name, product.code],
         description: descriptions.environment_db_policy(scope),
-        compartment_id: n.key_global('CMP', [scope.scope_name]),
+        compartment_id: n.key_global('CMP', scope.key_segments),
         local grp = environment_group_name('DB'),
         statements:
           (if components.infrastructure then [
@@ -316,10 +318,10 @@
 
     local environment_generic_policy =
       if has_environment_infra_group || has_environment_db_group then {
-        [n.key_global('PCY', [scope.scope_name, product_upper, 'GENERIC', 'ADMIN'])]: {
+        [n.key_global('PCY', scope.key_segments + [product_upper, 'GENERIC', 'ADMIN'])]: {
           name: 'pcy-lz-%s-%s-generic' % [environment_name, product.code],
           description: descriptions.environment_generic_policy(scope),
-          compartment_id: n.key_global('CMP', [scope.scope_name]),
+          compartment_id: n.key_global('CMP', scope.key_segments),
           local groups = std.join(',', (
             if has_environment_infra_group then
               [domain_grp(environment_group_name('INFRA'))]
@@ -343,7 +345,7 @@
 
     local shared_infrastructure_use_policy =
       if has_environment_infra_group && components.database && shared_components.infrastructure then {
-        [n.key_global('PCY', [scope.scope_name, product_upper, 'SHARED', 'INFRA', 'USE'])]: {
+        [n.key_global('PCY', scope.key_segments + [product_upper, 'SHARED', 'INFRA', 'USE'])]: {
           name: 'pcy-lz-%s-%s-shared-infra-use' % [environment_name, product.code],
           description:
             'Grants the %s environment %s infrastructure and database administration groups the shared infrastructure dependency permissions required by VMC, AVMC, and ACD operations.' % [
@@ -369,12 +371,12 @@
       } else {};
 
     local project_policies = {
-      [n.key_global('PCY', [spec.env_name, product_upper, spec.project_name, 'ADMIN'])]: {
+      [n.key_global('PCY', spec.scope.key_segments + [product_upper, spec.project_name, 'ADMIN'])]: {
         name: project_policy_name(spec),
         description: descriptions.project_policy(spec.scope, spec.project_name),
-        compartment_id: inputs.project_db_key(spec.env_name, spec.project_name),
+        compartment_id: inputs.project_db_key(spec.scope, spec.project_name),
         local grp_name = project_group_name(spec),
-        local cmp_name = inputs.project_db_name(spec.env_name, spec.project_name),
+        local cmp_name = inputs.project_db_name(spec.scope, spec.project_name),
         statements: [
           'allow group %s to read all-resources in compartment %s' % [domain_grp(grp_name), cmp_name],
           'allow group %s to manage alarms in compartment %s' % [domain_grp(grp_name), cmp_name],
@@ -391,8 +393,8 @@
     };
 
     local platform_acd_read_policy = if std.length(model.specs) > 0 then {
-      [n.key_global('PCY', [scope.scope_name, product_upper, 'PROJECT', 'ACD', 'READ'])]: {
-        name: 'pcy-lz-%s-%s-project-acd-read' % [std.asciiLower(scope.scope_name), product.code],
+      [n.key_global('PCY', scope.key_segments + [product_upper, 'PROJECT', 'ACD', 'READ'])]: {
+        name: 'pcy-lz-%s-%s-project-acd-read' % [environment_name, product.code],
         description: 'Grants %s Project DBA groups read access to the hosting Autonomous Container Databases.' % product.display,
         compartment_id: inputs.platform_db_key,
         statements: [

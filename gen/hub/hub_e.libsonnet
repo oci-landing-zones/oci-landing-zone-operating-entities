@@ -1,7 +1,7 @@
 // hub_e.libsonnet — Hub E builder (no firewall, DRG-only routing).
 // Simplest hub: 4 subnets (LB, MGMT, MON, DNS), direct DRG spoke-to-spoke routing.
 //
-// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc }
+// function(hub_ctx) -> { pre, post, spoke_route_tables, post_route_tables, fw_nsg_key, spoke_ingress_nsg_keys, lb_return_nsg_key, has_spoke_natgw, post_route_entity_id, post_route_entity_desc }
 //
 // hub_ctx.naming: naming object from naming('fra')
 // hub_ctx.hub_config: { kind: 'hub_e', network: { vcn: '...', subnets: { lb, mgmt, mon, dns } } }
@@ -13,6 +13,9 @@ local lb = import 'hub_lb.libsonnet';
 function(hub_ctx)
   local n = hub_ctx.naming;
   local hub_config = hub_ctx.hub_config;
+  local create_l7_load_balancer =
+    if std.objectHas(hub_ctx, 'create_l7_load_balancer') then hub_ctx.create_l7_load_balancer
+    else true;
   local lb_backends = if std.objectHas(hub_ctx, 'lb_backends') then hub_ctx.lb_backends else null;
   local lb_env_name = if std.objectHas(hub_ctx, 'lb_env_name') then hub_ctx.lb_env_name else 'prod';
   local vcn_cidr = hub_config.network.vcn;
@@ -112,8 +115,9 @@ function(hub_ctx)
         },
       },
 
+    } + (if create_l7_load_balancer then {
       l7_load_balancers: lb._l7_load_balancer(n, lb_backends, lb_env_name),
-    },
+    } else {}),
 
     spoke_route_tables: [
       n.key('RT', ['HUB', 'LB']),

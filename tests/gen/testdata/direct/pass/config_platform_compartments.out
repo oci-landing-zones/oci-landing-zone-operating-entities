@@ -7,12 +7,5 @@
   ],
   "prod_oke": "cmp-lz-prod-oke",
   "prod_plain_compartment": "CMP-LZ-PROD-NETWORK-KEY",
-  "shared_oke": {
-    "category_compartment_id": "CMP-LZ-NETWORK-KEY",
-    "platform_children": [
-      "CMP-LZ-SHARED-OKE-KEY"
-    ],
-    "platform_name": "cmp-lz-shared-oke"
-  },
   "shared_plain_compartment": "CMP-LZ-NETWORK-KEY"
 }
