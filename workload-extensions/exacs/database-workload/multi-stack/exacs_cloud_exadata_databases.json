@@ -1,0 +1,31 @@
+{
+    "cloud_exadata_database_configuration": {
+        "cloud_db_homes_configuration": {
+            "dbhome_primary": {
+                "display_name"                : "exacs-dbhome-primary",
+                "db_version"                  : "19.0.0.0",
+                "source"                      : "VM_CLUSTER_NEW",
+                "vm_cluster_id"               : "vmc_primary"
+            }
+        },
+
+        "databases_configuration": {
+            "cdb_primary": {
+                "db_home_id"                  : "dbhome_primary",
+                "source"                      : "NONE",
+
+                "database": {
+                    "admin_password_secret_id": "ocid1.vaultsecret.oc1..REPLACE_WITH_SECRET_OCID",
+                    "db_name"                 : "CDBPRIM"
+                }
+            }
+        },
+
+        "pluggable_databases_configuration": {
+            "pdb_primary": {
+                "container_database_id"       : "cdb_primary",
+                "pdb_name"                    : "PDBPRIMARY"
+            }
+        }
+    }
+}
