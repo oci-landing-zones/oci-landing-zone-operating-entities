@@ -1,21 +1,10 @@
 {
-  "output_names": [
+  "multi_output_names": [
     "databases",
     "infrastructure",
     "vmclusters"
   ],
-  "roots": {
-    "databases": [
-      "cloud_exadata_database_configuration"
-    ],
-    "infrastructure": [
-      "cloud_exadata_database_configuration"
-    ],
-    "vmclusters": [
-      "cloud_exadata_database_configuration"
-    ]
-  },
-  "sections": {
+  "multi_sections": {
     "databases": [
       "cloud_db_homes_configuration",
       "databases_configuration",
@@ -28,5 +17,14 @@
       "cloud_vm_clusters_configuration"
     ]
   },
-  "stack_profiles_match": true
+  "single_root_keys": [
+    "cloud_exadata_database_configuration"
+  ],
+  "single_sections": [
+    "cloud_db_homes_configuration",
+    "cloud_exadata_infrastructures_configuration",
+    "cloud_vm_clusters_configuration",
+    "databases_configuration",
+    "pluggable_databases_configuration"
+  ]
 }

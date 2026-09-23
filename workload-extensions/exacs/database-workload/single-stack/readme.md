@@ -1,33 +1,29 @@
 # Cloud Exadata Database Workload — Single-stack UC1 <!-- omit from toc -->
 
-Use this quickstart after the **ExaCS single-stack foundation** for UC1 has completed, including its required post-update and final re-apply. The foundation creates the compartments, IAM, network, routing, security, and observability prerequisites; do not supply its foundation JSON files as inputs to a database workload stage.
+This is a real single-stack quickstart. Deploy the **ExaCS single-stack foundation** JSON package and this workload JSON in the same Orchestrator operation. The operation creates the landing-zone foundation, Cloud Exadata Infrastructure, Cloud VM Cluster, DB Home, CDB, and PDB together.
 
-## Configuration files
+## Configuration file
 
-| Stage | Configuration file | Exadata output input | Saved output and state |
-| --- | --- | --- | --- |
-| Infrastructure | `exacs_cloud_exadata_infrastructure.json` | None | `runtime/exacs/infrastructure/output/cloud_exadata_database_output.json`; `exacs-infrastructure.tfstate` |
-| VM clusters | `exacs_cloud_exadata_vmclusters.json` | Only the infrastructure output | `runtime/exacs/vmclusters/output/cloud_exadata_database_output.json`; `exacs-vmclusters.tfstate` |
-| Database objects | `exacs_cloud_exadata_databases.json` | Only the VM-cluster output | `runtime/exacs/databases/output/cloud_exadata_database_output.json`; `exacs-databases.tfstate` |
+Add this file to the existing ExaCS single-stack foundation configuration package:
 
-`exacs_cloud_exadata_databases.json` creates the DB Home, CDB, and PDB. Do not use both earlier `cloud_exadata_database_output.json` files in the VM-cluster or database stage.
+| Configuration file | Contents |
+| --- | --- |
+| `exacs_cloud_exadata_database.json` | One `cloud_exadata_database_configuration` root with Cloud Exadata Infrastructure, Cloud VM Cluster, DB Home, CDB, and PDB sections. |
+
+Use **one Resource Manager stack** or **one Terraform state** for the foundation JSON files and `exacs_cloud_exadata_database.json`. Do not add the three multi-stack workload files: their repeated Cloud Exadata root would be ignored rather than merged by Orchestrator.
 
 ## Review the copied package
 
-Copy these JSON files to a customer-controlled private bucket or approved private Git repository. Before creating any plan, replace the secret OCID `ocid1.vaultsecret.oc1..REPLACE_WITH_SECRET_OCID` and the SSH key `ssh-rsa REPLACE_WITH_APPROVED_PUBLIC_KEY`. Also review the region, availability domain, shape, CPU capacity, Grid Infrastructure version, database version, and names.
+Copy the foundation package and this workload JSON to a customer-controlled private bucket or approved private Git repository. Before creating a plan, replace the secret OCID `ocid1.vaultsecret.oc1..REPLACE_WITH_SECRET_OCID` and the SSH key `ssh-rsa REPLACE_WITH_APPROVED_PUBLIC_KEY`. Review the region, availability domain, Exadata shape, CPU capacity, Grid Infrastructure version, database version, display names, and database names.
 
 ## OCI Resource Manager
 
-Create three Resource Manager stacks using the pinned Orchestrator source with working directory `rms-facade`. Set one `oci_configuration_objects` entry per stack in the order shown above. Save JSON output with a distinct `oci_object_prefix` for each stage. Add the matching foundation dependencies and exactly one upstream Exadata output:
+Create one Resource Manager stack from the pinned Orchestrator source with working directory `rms-facade`. Include all of the matching ExaCS single-stack foundation JSON files and exactly one workload configuration object, `exacs_cloud_exadata_database.json`. Use one output prefix for the operation and review its plan with automatic apply disabled.
 
-1. Infrastructure: foundation compartments output and any required subscription output.
-2. VM clusters: foundation compartments and network outputs, plus `runtime/exacs/infrastructure/output/cloud_exadata_database_output.json`.
-3. Database objects: the applicable KMS or Recovery Service outputs only when their logical keys are used, plus `runtime/exacs/vmclusters/output/cloud_exadata_database_output.json`.
-
-Review each plan with automatic apply disabled. Start the next stage only after the preceding resources are available and its output has been saved.
+There is no intermediate `cloud_exadata_database_output.json` dependency in this path. Every Cloud Exadata section is present in the same root document and is handled by the same stack state. If the foundation requires its final observability re-apply, retain `exacs_cloud_exadata_database.json` unchanged in that same stack configuration set; replacing it with a foundation-only file list would plan removal of the database resources.
 
 ## Terraform CLI
 
-Use a separate tfvars file and state for every row of the table. Set `configuration_source = "file"`, place only that row's JSON in `local_config_file_paths`, and save output to that row's distinct `output_folder_path`. Preserve infrastructure and VM-cluster outputs until every dependent stage has been destroyed.
+Use one tfvars file and one Terraform state. Set `configuration_source = "file"`; include the full ExaCS single-stack foundation JSON set and `exacs_cloud_exadata_database.json` in `local_config_file_paths`; and provide the foundation dependencies required by those files. Do not split the workload into separate tfvars files or states.
 
-For the complete customization flow, deployment variables, recovery guidance, and cleanup procedure, see [Blueprint Factory](../blueprint-factory.md).
+For Blueprint Factory customization, detailed variable examples, post-deployment verification, recovery, and cleanup, see [Blueprint Factory](../blueprint-factory.md).

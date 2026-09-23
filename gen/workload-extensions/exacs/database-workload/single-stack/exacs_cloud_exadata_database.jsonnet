@@ -1,4 +1,4 @@
 local profiles = import './profiles.libsonnet';
 local published = import '../published.libsonnet';
 
-published.render(profiles.uc1.config).vmclusters
+published.single_stack(profiles.uc1.config)

@@ -10,7 +10,7 @@ Use this quickstart after the **ExaCS multi-stack foundation** for UC1 has compl
 | VM clusters | `exacs_cloud_exadata_vmclusters.json` | Only the infrastructure output | `runtime/exacs/vmclusters/output/cloud_exadata_database_output.json`; `exacs-vmclusters.tfstate` |
 | Database objects | `exacs_cloud_exadata_databases.json` | Only the VM-cluster output | `runtime/exacs/databases/output/cloud_exadata_database_output.json`; `exacs-databases.tfstate` |
 
-`exacs_cloud_exadata_databases.json` creates the DB Home, CDB, and PDB. Each row is an independent Orchestrator state because the three documents use the same `cloud_exadata_database_configuration` root.
+`exacs_cloud_exadata_databases.json` creates the DB Home, CDB, and PDB. Each row is an independent Orchestrator state because the three documents repeat the same `cloud_exadata_database_configuration` root. The single-stack path avoids that collision by publishing one combined document instead.
 
 ## Review the copied package
 

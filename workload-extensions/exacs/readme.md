@@ -75,7 +75,7 @@ This Landing Zone Extension provides **two deployment approaches**, single-stack
 
 ## **4. Cloud Exadata Database workload deployment**
 
-The published single-stack and multi-stack artifacts establish the ExaDB-D Landing Zone prerequisites. The database workload layer creates Cloud Exadata Infrastructure, Cloud VM Clusters, DB Homes, CDBs, and PDBs through the Orchestrator after those prerequisites are deployed.
+The published UC1 single-stack database workload can be added to the reviewed ExaDB-D Landing Zone foundation package and deployed in the same Orchestrator operation. The unmodified foundation quickstart remains foundation-only because the workload needs tenancy-specific secret and SSH-key substitutions. The multi-stack path establishes the foundation first, then deploys Cloud Exadata Infrastructure, Cloud VM Clusters, DB Homes, CDBs, and PDBs through ordered Orchestrator operations.
 
 For the published UC1 quickstart files, ordered state boundaries, and the Blueprint Factory customization path, use the [Cloud Exadata Database workload guide](./database-workload/readme.md). It keeps database workload deployment separate from the ExaCS foundation flow.
 
