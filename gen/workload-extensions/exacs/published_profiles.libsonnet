@@ -63,6 +63,66 @@ local prod_preprod_exacs_uc1_config(hub_kind) = base_prod_preprod_config(hub_kin
   },
 };
 
+local prod_preprod_exacs_database_workload_uc1_config =
+  prod_preprod_exacs_uc1_config('hub_e') {
+    shared_platforms+: {
+      exacs+: {
+        extension+: {
+          params+: {
+            exacs_database_workload: {
+              infrastructure: {
+                cloud_exadata_infrastructures: {
+                  infra_primary: {
+                    display_name: 'exacs-infra-primary',
+                    shape: 'Exadata.X11M',
+                  },
+                },
+              },
+              vmclusters: {
+                cloud_vm_clusters: {
+                  vmc_primary: {
+                    display_name: 'exacs-vmc-primary',
+                    cpu_core_count: 2,
+                    exadata_infrastructure_id: 'infra_primary',
+                    gi_version: '19.0.0.0',
+                    hostname: 'exacsvmc',
+                    ssh_public_keys: ['ssh-rsa REPLACE_WITH_APPROVED_PUBLIC_KEY'],
+                  },
+                },
+              },
+              databases: {
+                cloud_db_homes: {
+                  dbhome_primary: {
+                    db_version: '19.0.0.0',
+                    display_name: 'exacs-dbhome-primary',
+                    source: 'VM_CLUSTER_NEW',
+                    vm_cluster_id: 'vmc_primary',
+                  },
+                },
+                databases: {
+                  cdb_primary: {
+                    database: {
+                      admin_password_secret_id: 'ocid1.vaultsecret.oc1..REPLACE_WITH_SECRET_OCID',
+                      db_name: 'CDBPRIM',
+                    },
+                    db_home_id: 'dbhome_primary',
+                    source: 'NONE',
+                  },
+                },
+                pluggable_databases: {
+                  pdb_primary: {
+                    container_database_id: 'cdb_primary',
+                    pdb_name: 'PDBPRIMARY',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+
 local prod_preprod_exacs_uc2_config(hub_kind) = base_prod_preprod_config(hub_kind) {
   shared_platforms: {
     exacs: exacs_extension(null, infra_only),
@@ -101,6 +161,8 @@ local prod_preprod_exacs_uc3_config(hub_kind) = base_prod_preprod_config(hub_kin
 
   hub_a_prod_preprod_exacs_uc1_config: prod_preprod_exacs_uc1_config('hub_a'),
   hub_e_prod_preprod_exacs_uc1_config: prod_preprod_exacs_uc1_config('hub_e'),
+  hub_e_prod_preprod_exacs_database_workload_uc1_config:
+    prod_preprod_exacs_database_workload_uc1_config,
   hub_a_prod_preprod_exacs_uc2_config: prod_preprod_exacs_uc2_config('hub_a'),
   hub_e_prod_preprod_exacs_uc2_config: prod_preprod_exacs_uc2_config('hub_e'),
   hub_a_prod_preprod_exacs_uc3_config: prod_preprod_exacs_uc3_config('hub_a'),
