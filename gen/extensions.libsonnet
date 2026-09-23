@@ -269,7 +269,10 @@ local extension_components = import 'lib/extension_components.libsonnet';
         local entry_with_summary = entry {
           scope_config+: {
             extension_components: component_summary.extension_components,
+            extension_shared_components: component_summary.extension_shared_components,
             extension_entry_components: component_summary.entry_components(entry),
+            extension_entry_uses_publication_components:
+              component_summary.entry_uses_publication_components(entry),
             extension_has_networks: component_summary.extension_has_networks,
           },
         };

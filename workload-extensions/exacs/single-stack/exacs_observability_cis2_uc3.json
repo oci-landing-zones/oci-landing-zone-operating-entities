@@ -1,0 +1,1885 @@
+{
+    "alarms_configuration": {
+        "default_compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+
+        "alarms": {
+            "AL-LZ-AUDIT-CONNECTOR-INTERNAL-ERRORS-KEY": {
+                "display_name"                                    : "al-lz-audit-connector-internal-errors",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                                   : "oci_service_connector_hub",
+                    "pending_duration"                            : "PT15M",
+                    "query"                                       : "ServiceConnectorHubErrors[5m].groupBy(connectorId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-AUDIT-CONNECTOR-SOURCE-ERRORS-KEY": {
+                "display_name"                                    : "al-lz-audit-connector-source-errors",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                                   : "oci_service_connector_hub",
+                    "pending_duration"                            : "PT30M",
+                    "query"                                       : "ErrorsAtSource[15m].groupBy(errorCode,connectorId).min() > 0",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-AUDIT-CONNECTOR-STALE-KEY": {
+                "display_name"                                    : "al-lz-audit-connector-stale",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                                   : "oci_service_connector_hub",
+                    "pending_duration"                            : "PT30M",
+                    "query"                                       : "DataFreshness[1h].groupBy(connectorId).mean() > 43200000",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-AUDIT-CONNECTOR-TARGET-ERRORS-KEY": {
+                "display_name"                                    : "al-lz-audit-connector-target-errors",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                                   : "oci_service_connector_hub",
+                    "pending_duration"                            : "PT30M",
+                    "query"                                       : "ErrorsAtTarget[15m].groupBy(errorCode,connectorId).min() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-BLOCK-VOLUME-THROTTLED-IO-KEY": {
+                "display_name"                                    : "al-lz-block-volume-throttled-io",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_blockstore",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VolumeThrottledIOs[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-BARE-METAL-DEFECT-KEY": {
+                "display_name"                                    : "al-lz-compute-bare-metal-defect",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_compute_infrastructure_health",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "health_status[1m].groupBy(resourceId).max() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-CPU-CRITICAL-KEY": {
+                "display_name"                                    : "al-lz-compute-cpu-critical",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_computeagent",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "CpuUtilization[5m].groupBy(resourceId).mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-CPU-WARNING-KEY": {
+                "display_name"                                    : "al-lz-compute-cpu-warning",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_computeagent",
+                    "pending_duration"                            : "PT10M",
+                    "query"                                       : "CpuUtilization[5m].groupBy(resourceId).mean() >= 75",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-COMPUTE-FILE-SYSTEM-ANOMALY-KEY": {
+                "display_name"                                    : "al-lz-compute-file-system-anomaly",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_compute_instance_health",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "InstanceFileSystemStatus[5m].groupBy(resourceId).max() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-INFRASTRUCTURE-ISSUE-KEY": {
+                "display_name"                                    : "al-lz-compute-infrastructure-issue",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_compute_infrastructure_health",
+                    "pending_duration"                            : "PT2M",
+                    "query"                                       : "instance_status[1m].groupBy(resourceId).max() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-MAINTENANCE-SCHEDULED-KEY": {
+                "display_name"                                    : "al-lz-compute-maintenance-scheduled",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_compute_infrastructure_health",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "maintenance_status[5m].groupBy(resourceId).max() > 0",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-COMPUTE-MEMORY-CRITICAL-KEY": {
+                "display_name"                                    : "al-lz-compute-memory-critical",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_computeagent",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "MemoryUtilization[5m].groupBy(resourceId).mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-COMPUTE-MEMORY-WARNING-KEY": {
+                "display_name"                                    : "al-lz-compute-memory-warning",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_computeagent",
+                    "pending_duration"                            : "PT10M",
+                    "query"                                       : "MemoryUtilization[5m].groupBy(resourceId).mean() >= 75",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-COMPUTE-VM-UNRESPONSIVE-KEY": {
+                "display_name"                                    : "al-lz-compute-vm-unresponsive",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_compute_instance_health",
+                    "pending_duration"                            : "PT2M",
+                    "query"                                       : "instance_accessibility_status[1m].groupBy(resourceId).max() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-EVENT-DELIVERY-FAILED-KEY": {
+                "display_name"                                    : "al-lz-event-delivery-failed",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                                   : "oci_cloudevents",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "DeliveryFailedEvents[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-NETWORK-LB-BACKEND-TIMEOUT-KEY": {
+                "display_name"                                    : "al-lz-network-lb-backend-timeout",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_lbaas",
+                    "pending_duration"                            : "PT2M",
+                    "query"                                       : "backendTimeouts[1m]{lbComponent = \"backendSet\"}.sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-NETWORK-LB-UNHEALTHY-BACKEND-KEY": {
+                "display_name"                                    : "al-lz-network-lb-unhealthy-backend",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_lbaas",
+                    "pending_duration"                            : "PT2M",
+                    "query"                                       : "unhealthyBackendServers[1m]{lbComponent = \"backendSet\"}.max() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-NETWORK-NLB-EGRESS-SECURITY-DROPS-KEY": {
+                "display_name"                                    : "al-lz-network-nlb-egress-security-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_nlb",
+                    "pending_duration"                            : "PT2M",
+                    "query"                                       : "EgressPacketsDroppedBySL[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-NETWORK-NLB-INGRESS-SECURITY-DROPS-KEY": {
+                "display_name"                                    : "al-lz-network-nlb-ingress-security-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_nlb",
+                    "pending_duration"                            : "PT2M",
+                    "query"                                       : "IngressPacketsDroppedBySL[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-NETWORK-NLB-NO-HEALTHY-BACKENDS-KEY": {
+                "display_name"                                    : "al-lz-network-nlb-no-healthy-backends",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_nlb",
+                    "pending_duration"                            : "PT2M",
+                    "query"                                       : "HealthyBackendsPerNlb[1m].groupBy(resourceId).min() < 1",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-NETWORK-NLB-UNHEALTHY-BACKEND-KEY": {
+                "display_name"                                    : "al-lz-network-nlb-unhealthy-backend",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_nlb",
+                    "pending_duration"                            : "PT2M",
+                    "query"                                       : "UnhealthyBackendsPerNlb[1m].groupBy(resourceId).max() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-NOTIFICATION-DELIVERY-FAILED-KEY": {
+                "display_name"                                    : "al-lz-notification-delivery-failed",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-SECURITY-KEY",
+                    "namespace"                                   : "oci_notification",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "FailedMessagesCount[5m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-EXACS-CPUUTIL-KEY": {
+                "display_name"                                    : "al-lz-preprod-db-cpuutil",
+                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-EXACS-DB-CLUSTER-CPUUTIL-KEY": {
+                "display_name"                                    : "al-lz-preprod-vmc-cpuutil",
+                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database_cluster",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-EXACS-DB-CLUSTER-DISKUTIL-KEY": {
+                "display_name"                                    : "al-lz-preprod-vmc-dgutil",
+                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database_cluster",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "ASMDiskgroupUtilization[1m].mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-EXACS-DB-CLUSTER-FSUTIL-KEY": {
+                "display_name"                                    : "al-lz-preprod-vmc-fsutil",
+                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database_cluster",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "FilesystemUtilization[1m].mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-EXACS-DB-CLUSTER-MEMUTIL-KEY": {
+                "display_name"                                    : "al-lz-preprod-vmc-memutil",
+                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database_cluster",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "MemoryUtilization[1m].mean() >= 80",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-EXACS-DB-CLUSTER-SWAPUTIL-KEY": {
+                "display_name"                                    : "al-lz-preprod-vmc-swaputil",
+                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database_cluster",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "SwapUtilization[1m].mean() >= 75",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-EXACS-STORAGEUTIL-KEY": {
+                "display_name"                                    : "al-lz-preprod-db-storageutil",
+                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "StorageUtilization[1m].mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-VNIC-CONNTRACK-CRITICAL-KEY": {
+                "display_name"                                    : "al-lz-preprod-vnic-conntrack-critical",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PREPROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-VNIC-CONNTRACK-FULL-KEY": {
+                "display_name"                                    : "al-lz-preprod-vnic-conntrack-full",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PREPROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicConntrackIsFull[1m].groupBy(resourceId).max() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-VNIC-CONNTRACK-WARNING-KEY": {
+                "display_name"                                    : "al-lz-preprod-vnic-conntrack-warning",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PREPROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT10M",
+                    "query"                                       : "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 80",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-PREPROD-VNIC-EGRESS-CONNTRACK-DROPS-KEY": {
+                "display_name"                                    : "al-lz-preprod-vnic-egress-conntrack-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PREPROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicEgressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-VNIC-EGRESS-SECURITY-DROPS-KEY": {
+                "display_name"                                    : "al-lz-preprod-vnic-egress-security-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PREPROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "VnicEgressDropsSecurityList[5m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-PREPROD-VNIC-EGRESS-THROTTLE-DROPS-KEY": {
+                "display_name"                                    : "al-lz-preprod-vnic-egress-throttle-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PREPROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicEgressDropsThrottle[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-VNIC-INGRESS-CONNTRACK-DROPS-KEY": {
+                "display_name"                                    : "al-lz-preprod-vnic-ingress-conntrack-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PREPROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicIngressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-VNIC-INGRESS-THROTTLE-DROPS-KEY": {
+                "display_name"                                    : "al-lz-preprod-vnic-ingress-throttle-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PREPROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicIngressDropsThrottle[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-VNIC-SMARTNIC-HOST-DROPS-KEY": {
+                "display_name"                                    : "al-lz-preprod-vnic-smartnic-host-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PREPROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "SmartnicBufferDropsFromHost[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PREPROD-VNIC-SMARTNIC-NETWORK-DROPS-KEY": {
+                "display_name"                                    : "al-lz-preprod-vnic-smartnic-network-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PREPROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "SmartnicBufferDropsFromNetwork[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-EXACS-CPUUTIL-KEY": {
+                "display_name"                                    : "al-lz-prod-db-cpuutil",
+                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-EXACS-DB-CLUSTER-CPUUTIL-KEY": {
+                "display_name"                                    : "al-lz-prod-vmc-cpuutil",
+                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database_cluster",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-EXACS-DB-CLUSTER-DISKUTIL-KEY": {
+                "display_name"                                    : "al-lz-prod-vmc-dgutil",
+                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database_cluster",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "ASMDiskgroupUtilization[1m].mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-EXACS-DB-CLUSTER-FSUTIL-KEY": {
+                "display_name"                                    : "al-lz-prod-vmc-fsutil",
+                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database_cluster",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "FilesystemUtilization[1m].mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-EXACS-DB-CLUSTER-MEMUTIL-KEY": {
+                "display_name"                                    : "al-lz-prod-vmc-memutil",
+                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database_cluster",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "MemoryUtilization[1m].mean() >= 80",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-EXACS-DB-CLUSTER-SWAPUTIL-KEY": {
+                "display_name"                                    : "al-lz-prod-vmc-swaputil",
+                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database_cluster",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "SwapUtilization[1m].mean() >= 75",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-EXACS-STORAGEUTIL-KEY": {
+                "display_name"                                    : "al-lz-prod-db-storageutil",
+                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                      : "false",
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "namespace"                                   : "oci_database",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "StorageUtilization[1m].mean() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-CONNTRACK-CRITICAL-KEY": {
+                "display_name"                                    : "al-lz-prod-vnic-conntrack-critical",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-CONNTRACK-FULL-KEY": {
+                "display_name"                                    : "al-lz-prod-vnic-conntrack-full",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicConntrackIsFull[1m].groupBy(resourceId).max() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-CONNTRACK-WARNING-KEY": {
+                "display_name"                                    : "al-lz-prod-vnic-conntrack-warning",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT10M",
+                    "query"                                       : "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 80",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-EGRESS-CONNTRACK-DROPS-KEY": {
+                "display_name"                                    : "al-lz-prod-vnic-egress-conntrack-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicEgressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-EGRESS-SECURITY-DROPS-KEY": {
+                "display_name"                                    : "al-lz-prod-vnic-egress-security-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "VnicEgressDropsSecurityList[5m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-EGRESS-THROTTLE-DROPS-KEY": {
+                "display_name"                                    : "al-lz-prod-vnic-egress-throttle-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicEgressDropsThrottle[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-INGRESS-CONNTRACK-DROPS-KEY": {
+                "display_name"                                    : "al-lz-prod-vnic-ingress-conntrack-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicIngressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-INGRESS-THROTTLE-DROPS-KEY": {
+                "display_name"                                    : "al-lz-prod-vnic-ingress-throttle-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicIngressDropsThrottle[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-SMARTNIC-HOST-DROPS-KEY": {
+                "display_name"                                    : "al-lz-prod-vnic-smartnic-host-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "SmartnicBufferDropsFromHost[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-PROD-VNIC-SMARTNIC-NETWORK-DROPS-KEY": {
+                "display_name"                                    : "al-lz-prod-vnic-smartnic-network-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-PROD-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "SmartnicBufferDropsFromNetwork[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-CONNTRACK-CRITICAL-KEY": {
+                "display_name"                                    : "al-lz-vnic-conntrack-critical",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 90",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-CONNTRACK-FULL-KEY": {
+                "display_name"                                    : "al-lz-vnic-conntrack-full",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicConntrackIsFull[1m].groupBy(resourceId).max() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-CONNTRACK-WARNING-KEY": {
+                "display_name"                                    : "al-lz-vnic-conntrack-warning",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT10M",
+                    "query"                                       : "VnicConntrackUtilPercent[5m].groupBy(resourceId).max() >= 80",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-VNIC-EGRESS-CONNTRACK-DROPS-KEY": {
+                "display_name"                                    : "al-lz-vnic-egress-conntrack-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicEgressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-EGRESS-SECURITY-DROPS-KEY": {
+                "display_name"                                    : "al-lz-vnic-egress-security-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : false,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT5M",
+                    "query"                                       : "VnicEgressDropsSecurityList[5m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "WARNING"
+                }
+            },
+
+            "AL-LZ-VNIC-EGRESS-THROTTLE-DROPS-KEY": {
+                "display_name"                                    : "al-lz-vnic-egress-throttle-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicEgressDropsThrottle[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-INGRESS-CONNTRACK-DROPS-KEY": {
+                "display_name"                                    : "al-lz-vnic-ingress-conntrack-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicIngressDropsConntrackFull[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-INGRESS-THROTTLE-DROPS-KEY": {
+                "display_name"                                    : "al-lz-vnic-ingress-throttle-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "VnicIngressDropsThrottle[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-SMARTNIC-HOST-DROPS-KEY": {
+                "display_name"                                    : "al-lz-vnic-smartnic-host-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "SmartnicBufferDropsFromHost[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            },
+
+            "AL-LZ-VNIC-SMARTNIC-NETWORK-DROPS-KEY": {
+                "display_name"                                    : "al-lz-vnic-smartnic-network-drops",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "is_enabled"                                      : true,
+
+                "supplied_alarm": {
+                    "message_format"                              : "PRETTY_JSON",
+                    "metric_compartment_id"                       : "CMP-LZ-NETWORK-KEY",
+                    "namespace"                                   : "oci_vcn",
+                    "pending_duration"                            : "PT1M",
+                    "query"                                       : "SmartnicBufferDropsFromNetwork[1m].groupBy(resourceId).sum() > 0",
+                    "severity"                                    : "CRITICAL"
+                }
+            }
+        }
+    },
+
+    "events_configuration": {
+        "default_compartment_id"                                  : "CMP-LANDINGZONE-KEY",
+
+        "event_rules": {
+            "RUL-LZ-NOTIFY-NETWORK-KEY": {
+                "compartment_id"                                  : "CMP-LZ-NETWORK-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "event_display_name"                              : "rul-lz-notify-network",
+
+                "supplied_events": [
+                    "com.oraclecloud.virtualnetwork.createvcn",
+                    "com.oraclecloud.virtualnetwork.deletevcn",
+                    "com.oraclecloud.virtualnetwork.updatevcn",
+                    "com.oraclecloud.virtualnetwork.createroutetable",
+                    "com.oraclecloud.virtualnetwork.deleteroutetable",
+                    "com.oraclecloud.virtualnetwork.updateroutetable",
+                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
+                    "com.oraclecloud.virtualnetwork.createsecuritylist",
+                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
+                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
+                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
+                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
+                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
+                    "com.oraclecloud.virtualnetwork.createdrg",
+                    "com.oraclecloud.virtualnetwork.deletedrg",
+                    "com.oraclecloud.virtualnetwork.updatedrg",
+                    "com.oraclecloud.virtualnetwork.createdrgattachment",
+                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
+                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
+                    "com.oraclecloud.virtualnetwork.createinternetgateway",
+                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
+                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
+                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
+                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
+                    "com.oraclecloud.natgateway.createnatgateway",
+                    "com.oraclecloud.natgateway.deletenatgateway",
+                    "com.oraclecloud.natgateway.updatenatgateway",
+                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
+                    "com.oraclecloud.servicegateway.createservicegateway",
+                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
+                    "com.oraclecloud.servicegateway.attachserviceid",
+                    "com.oraclecloud.servicegateway.detachserviceid",
+                    "com.oraclecloud.servicegateway.updateservicegateway",
+                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
+                    "com.oraclecloud.virtualnetwork.createpublicip",
+                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
+                ]
+            },
+
+            "RUL-LZ-NOTIFY-SECURITY-KEY": {
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"                              : "rul-lz-notify-security",
+
+                "supplied_events": [
+                    "com.oraclecloud.notification.createsubscription",
+                    "com.oraclecloud.notification.deletesubscription",
+                    "com.oraclecloud.notification.getunsubscription",
+                    "com.oraclecloud.notification.movesubscription",
+                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
+                    "com.oraclecloud.notification.updatesubscription"
+                ]
+            },
+
+            "RUL-LZ-PREPROD-EXACS-NOTIFICATION-PROJECTS-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                              : "rul-lz-preprod-notify-on-notifications",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
+                    "com.oraclecloud.databaseservice.dbnodeaction.end",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            },
+
+            "RUL-LZ-PREPROD-NOTIFICATION-PLATFORM-EXACS-DB-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                              : "rul-lz-preprod-notify-on-exacs-db-events",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
+                    "com.oraclecloud.databaseservice.dbnodeaction.end",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            },
+
+            "RUL-LZ-PREPROD-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-INFRA-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                              : "rul-lz-preprod-notify-on-exacs-infra-events",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.changecloudexadatainfrastructurecompartment.begin",
+                    "com.oraclecloud.databaseservice.changecloudexadatainfrastructurecompartment.end",
+                    "com.oraclecloud.databaseservice.deletecloudexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.deletecloudexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.updatecloudexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.updatecloudexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructure.critical",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructure.information",
+                    "com.oraclecloud.databaseservice.configureexascalecloudexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.configureexascalecloudexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructuremaintenancereminder",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructuremaintenance.begin",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructuremaintenance.end",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructuremaintenancecustomactiontime.begin",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructuremaintenancecustomactiontime.end",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructureibswitchmaintenance.begin",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructureibswitchmaintenance.end",
+                    "com.oraclecloud.DatabaseService.CloudExadataInfrastructureMaintenanceStorageServers.begin",
+                    "com.oraclecloud.DatabaseService.CloudExadataInfrastructureMaintenanceStorageServers.end",
+                    "com.oraclecloud.DatabaseService.CloudExadataInfrastructureMaintenanceVM.begin",
+                    "com.oraclecloud.DatabaseService.CloudExadataInfrastructureMaintenanceVM.end"
+                ]
+            },
+
+            "RUL-LZ-PREPROD-NOTIFICATION-PLATFORM-EXACS-VMC-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                              : "rul-lz-preprod-notify-on-exacs-vmc-events",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.changecloudvmclustercompartment.begin",
+                    "com.oraclecloud.databaseservice.changecloudvmclustercompartment.end",
+                    "com.oraclecloud.databaseservice.createcloudvmcluster.begin",
+                    "com.oraclecloud.databaseservice.createcloudvmcluster.end",
+                    "com.oraclecloud.databaseservice.deletecloudvmcluster.begin",
+                    "com.oraclecloud.databaseservice.deletecloudvmcluster.end",
+                    "com.oraclecloud.databaseservice.updatecloudvmcluster.begin",
+                    "com.oraclecloud.databaseservice.updatecloudvmcluster.end",
+                    "com.oraclecloud.databaseservice.updatecloudvmclusteriormconfig.begin",
+                    "com.oraclecloud.databaseservice.updatecloudvmclusteriormconfig.end",
+                    "com.oraclecloud.databaseservice.cloudvmclusteraddvirtualmachine.begin",
+                    "com.oraclecloud.databaseservice.cloudvmclusteraddvirtualmachine.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.changecompartment.begin",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.changecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.create.begin",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.create.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.terminate.begin",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.terminate.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.update.begin",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.update.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.autonomous.cloudautonomousvmcluster.critical",
+                    "com.oraclecloud.databaseservice.autonomous.cloudautonomousvmcluster.warning",
+                    "com.oraclecloud.databaseservice.autonomous.cloudautonomousvmcluster.information"
+                ]
+            },
+
+            "RUL-LZ-PREPROD-NOTIFY-NETWORK-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PREPROD-NETWORK-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "event_display_name"                              : "rul-lz-preprod-notify-network",
+
+                "supplied_events": [
+                    "com.oraclecloud.virtualnetwork.createvcn",
+                    "com.oraclecloud.virtualnetwork.deletevcn",
+                    "com.oraclecloud.virtualnetwork.updatevcn",
+                    "com.oraclecloud.virtualnetwork.createroutetable",
+                    "com.oraclecloud.virtualnetwork.deleteroutetable",
+                    "com.oraclecloud.virtualnetwork.updateroutetable",
+                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
+                    "com.oraclecloud.virtualnetwork.createsecuritylist",
+                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
+                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
+                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
+                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
+                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
+                    "com.oraclecloud.virtualnetwork.createdrg",
+                    "com.oraclecloud.virtualnetwork.deletedrg",
+                    "com.oraclecloud.virtualnetwork.updatedrg",
+                    "com.oraclecloud.virtualnetwork.createdrgattachment",
+                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
+                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
+                    "com.oraclecloud.virtualnetwork.createinternetgateway",
+                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
+                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
+                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
+                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
+                    "com.oraclecloud.natgateway.createnatgateway",
+                    "com.oraclecloud.natgateway.deletenatgateway",
+                    "com.oraclecloud.natgateway.updatenatgateway",
+                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
+                    "com.oraclecloud.servicegateway.createservicegateway",
+                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
+                    "com.oraclecloud.servicegateway.attachserviceid",
+                    "com.oraclecloud.servicegateway.detachserviceid",
+                    "com.oraclecloud.servicegateway.updateservicegateway",
+                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
+                    "com.oraclecloud.virtualnetwork.createpublicip",
+                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
+                ]
+            },
+
+            "RUL-LZ-PREPROD-NOTIFY-SECURITY-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"                              : "rul-lz-preprod-notify-security",
+
+                "supplied_events": [
+                    "com.oraclecloud.notification.createsubscription",
+                    "com.oraclecloud.notification.deletesubscription",
+                    "com.oraclecloud.notification.getunsubscription",
+                    "com.oraclecloud.notification.movesubscription",
+                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
+                    "com.oraclecloud.notification.updatesubscription"
+                ]
+            },
+
+            "RUL-LZ-PROD-EXACS-NOTIFICATION-PROJECTS-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                              : "rul-lz-prod-notify-on-notifications",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
+                    "com.oraclecloud.databaseservice.dbnodeaction.end",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            },
+
+            "RUL-LZ-PROD-NOTIFICATION-PLATFORM-EXACS-DB-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                              : "rul-lz-prod-notify-on-exacs-db-events",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.deletebackupdestination",
+                    "com.oraclecloud.databaseservice.updatebackupdestination",
+                    "com.oraclecloud.databaseservice.dbnodeaction.begin",
+                    "com.oraclecloud.databaseservice.dbnodeaction.end",
+                    "com.oraclecloud.databaseservice.deletedbhome.begin",
+                    "com.oraclecloud.databaseservice.deletedbhome.end",
+                    "com.oraclecloud.databaseservice.updatedbhome.begin",
+                    "com.oraclecloud.databaseservice.updatedbhome.end",
+                    "com.oraclecloud.databaseservice.deletebackup.begin",
+                    "com.oraclecloud.databaseservice.deletebackup.end",
+                    "com.oraclecloud.databaseservice.restoredatabase.begin",
+                    "com.oraclecloud.databaseservice.restoredatabase.end",
+                    "com.oraclecloud.databaseservice.deletedatabase.begin",
+                    "com.oraclecloud.databaseservice.deletedatabase.end",
+                    "com.oraclecloud.databaseservice.updatedatabase.begin",
+                    "com.oraclecloud.databaseservice.updatedatabase.end",
+                    "com.oraclecloud.databaseservice.patchdbhome.begin",
+                    "com.oraclecloud.databaseservice.patchdbhome.end",
+                    "com.oraclecloud.databaseservice.movedatabase.end",
+                    "com.oraclecloud.databaseservice.changeautonomouscontainerdatabasecompartment",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.restartautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.restore.end",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.begin",
+                    "com.oraclecloud.databaseservice.terminateautonomouscontainerdatabase.end",
+                    "com.oraclecloud.databaseservice.autonomous.container.database.instance.update.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.begin",
+                    "com.oraclecloud.databaseservice.changeautonomousdatabasecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.begin",
+                    "com.oraclecloud.databaseservice.autonomous.database.restore.end",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.deleteautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.begin",
+                    "com.oraclecloud.databaseservice.updateautonomousdatabase.end",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.switchoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.failoverdataguardassociation.end",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.begin",
+                    "com.oraclecloud.databaseservice.reinstatedataguardassociation.end",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.SwitchoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.FailoverAutonomousDataguardAssociation.end",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.begin",
+                    "com.oraclecloud.DatabaseService.ReinstateAutonomousDataGuardAssociation.end",
+                    "com.oraclecloud.databaseservice.dbnode.critical",
+                    "com.oraclecloud.databaseservice.dbnode.information",
+                    "com.oraclecloud.databaseservice.database.critical",
+                    "com.oraclecloud.databaseservice.database.information",
+                    "com.oraclecloud.databaseservice.dbsystem.critical",
+                    "com.oraclecloud.databaseservice.dbsystem.information"
+                ]
+            },
+
+            "RUL-LZ-PROD-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-INFRA-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                              : "rul-lz-prod-notify-on-exacs-infra-events",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.changecloudexadatainfrastructurecompartment.begin",
+                    "com.oraclecloud.databaseservice.changecloudexadatainfrastructurecompartment.end",
+                    "com.oraclecloud.databaseservice.deletecloudexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.deletecloudexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.updatecloudexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.updatecloudexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructure.critical",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructure.information",
+                    "com.oraclecloud.databaseservice.configureexascalecloudexadatainfrastructure.begin",
+                    "com.oraclecloud.databaseservice.configureexascalecloudexadatainfrastructure.end",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructuremaintenancereminder",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructuremaintenance.begin",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructuremaintenance.end",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructuremaintenancecustomactiontime.begin",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructuremaintenancecustomactiontime.end",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructureibswitchmaintenance.begin",
+                    "com.oraclecloud.databaseservice.cloudexadatainfrastructureibswitchmaintenance.end",
+                    "com.oraclecloud.DatabaseService.CloudExadataInfrastructureMaintenanceStorageServers.begin",
+                    "com.oraclecloud.DatabaseService.CloudExadataInfrastructureMaintenanceStorageServers.end",
+                    "com.oraclecloud.DatabaseService.CloudExadataInfrastructureMaintenanceVM.begin",
+                    "com.oraclecloud.DatabaseService.CloudExadataInfrastructureMaintenanceVM.end"
+                ]
+            },
+
+            "RUL-LZ-PROD-NOTIFICATION-PLATFORM-EXACS-VMC-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                              : "rul-lz-prod-notify-on-exacs-vmc-events",
+
+                "supplied_events": [
+                    "com.oraclecloud.databaseservice.changecloudvmclustercompartment.begin",
+                    "com.oraclecloud.databaseservice.changecloudvmclustercompartment.end",
+                    "com.oraclecloud.databaseservice.createcloudvmcluster.begin",
+                    "com.oraclecloud.databaseservice.createcloudvmcluster.end",
+                    "com.oraclecloud.databaseservice.deletecloudvmcluster.begin",
+                    "com.oraclecloud.databaseservice.deletecloudvmcluster.end",
+                    "com.oraclecloud.databaseservice.updatecloudvmcluster.begin",
+                    "com.oraclecloud.databaseservice.updatecloudvmcluster.end",
+                    "com.oraclecloud.databaseservice.updatecloudvmclusteriormconfig.begin",
+                    "com.oraclecloud.databaseservice.updatecloudvmclusteriormconfig.end",
+                    "com.oraclecloud.databaseservice.cloudvmclusteraddvirtualmachine.begin",
+                    "com.oraclecloud.databaseservice.cloudvmclusteraddvirtualmachine.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.changecompartment.begin",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.changecompartment.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.create.begin",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.create.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.terminate.begin",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.terminate.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.update.begin",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.update.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.maintenance.begin",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.maintenance.end",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.maintenance.reminder",
+                    "com.oraclecloud.databaseservice.autonomous.autonomouscloudvmcluster.maintenance.scheduled",
+                    "com.oraclecloud.databaseservice.autonomous.cloudautonomousvmcluster.critical",
+                    "com.oraclecloud.databaseservice.autonomous.cloudautonomousvmcluster.warning",
+                    "com.oraclecloud.databaseservice.autonomous.cloudautonomousvmcluster.information"
+                ]
+            },
+
+            "RUL-LZ-PROD-NOTIFY-NETWORK-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PROD-NETWORK-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-NETWORK-KEY"],
+                "event_display_name"                              : "rul-lz-prod-notify-network",
+
+                "supplied_events": [
+                    "com.oraclecloud.virtualnetwork.createvcn",
+                    "com.oraclecloud.virtualnetwork.deletevcn",
+                    "com.oraclecloud.virtualnetwork.updatevcn",
+                    "com.oraclecloud.virtualnetwork.createroutetable",
+                    "com.oraclecloud.virtualnetwork.deleteroutetable",
+                    "com.oraclecloud.virtualnetwork.updateroutetable",
+                    "com.oraclecloud.virtualnetwork.changeroutetablecompartment",
+                    "com.oraclecloud.virtualnetwork.createsecuritylist",
+                    "com.oraclecloud.virtualnetwork.deletesecuritylist",
+                    "com.oraclecloud.virtualnetwork.updatesecuritylist",
+                    "com.oraclecloud.virtualnetwork.changesecuritylistcompartment",
+                    "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup",
+                    "com.oraclecloud.virtualnetwork.updatenetworksecuritygroupsecurityrules",
+                    "com.oraclecloud.virtualnetwork.changenetworksecuritygroupcompartment",
+                    "com.oraclecloud.virtualnetwork.createdrg",
+                    "com.oraclecloud.virtualnetwork.deletedrg",
+                    "com.oraclecloud.virtualnetwork.updatedrg",
+                    "com.oraclecloud.virtualnetwork.createdrgattachment",
+                    "com.oraclecloud.virtualnetwork.deletedrgattachment",
+                    "com.oraclecloud.virtualnetwork.updatedrgattachment",
+                    "com.oraclecloud.virtualnetwork.createinternetgateway",
+                    "com.oraclecloud.virtualnetwork.deleteinternetgateway",
+                    "com.oraclecloud.virtualnetwork.updateinternetgateway",
+                    "com.oraclecloud.virtualnetwork.changeinternetgatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.createlocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.deletelocalpeeringgateway.end",
+                    "com.oraclecloud.virtualnetwork.updatelocalpeeringgateway",
+                    "com.oraclecloud.virtualnetwork.changelocalpeeringgatewaycompartment",
+                    "com.oraclecloud.natgateway.createnatgateway",
+                    "com.oraclecloud.natgateway.deletenatgateway",
+                    "com.oraclecloud.natgateway.updatenatgateway",
+                    "com.oraclecloud.natgateway.changenatgatewaycompartment",
+                    "com.oraclecloud.servicegateway.createservicegateway",
+                    "com.oraclecloud.servicegateway.deleteservicegateway.end",
+                    "com.oraclecloud.servicegateway.attachserviceid",
+                    "com.oraclecloud.servicegateway.detachserviceid",
+                    "com.oraclecloud.servicegateway.updateservicegateway",
+                    "com.oraclecloud.servicegateway.changeservicegatewaycompartment",
+                    "com.oraclecloud.virtualnetwork.changepublicipcompartment",
+                    "com.oraclecloud.virtualnetwork.createpublicip",
+                    "com.oraclecloud.virtualnetwork.changedhcpoptionscompartment"
+                ]
+            },
+
+            "RUL-LZ-PROD-NOTIFY-SECURITY-KEY": {
+                "compartment_id"                                  : "CMP-LZ-PROD-SECURITY-KEY",
+                "destination_topic_ids"                           : ["NOTT-LZ-SECURITY-KEY"],
+                "event_display_name"                              : "rul-lz-prod-notify-security",
+
+                "supplied_events": [
+                    "com.oraclecloud.notification.createsubscription",
+                    "com.oraclecloud.notification.deletesubscription",
+                    "com.oraclecloud.notification.getunsubscription",
+                    "com.oraclecloud.notification.movesubscription",
+                    "com.oraclecloud.notification.resendsubscriptionconfirmation",
+                    "com.oraclecloud.notification.updatesubscription"
+                ]
+            }
+        }
+    },
+
+    "home_region_events_configuration": {
+        "default_compartment_id"                                  : "TENANCY-ROOT",
+
+        "event_rules": {
+            "RUL-LZ-CLOUDGUARD-KEY": {
+                "destination_topic_ids"                           : ["NOTT-LZ-CLOUDGUARD-KEY"],
+                "event_display_name"                              : "rul-lz-notify-on-cloudguard-changes",
+
+                "supplied_events": [
+                    "com.oraclecloud.cloudguard.problemdetected",
+                    "com.oraclecloud.cloudguard.problemdismissed",
+                    "com.oraclecloud.cloudguard.problemremediated",
+                    "com.oraclecloud.cloudguard.announcements",
+                    "com.oraclecloud.cloudguard.status",
+                    "com.oraclecloud.cloudguard.problemthresholdreached"
+                ]
+            },
+
+            "RUL-LZ-IAM-KEY": {
+                "destination_topic_ids"                           : ["NOTT-LZ-IAM-KEY"],
+                "event_display_name"                              : "rul-lz-notify-on-iam-changes",
+
+                "supplied_events": [
+                    "com.oraclecloud.identitycontrolplane.createidentityprovider",
+                    "com.oraclecloud.identitycontrolplane.deleteidentityprovider",
+                    "com.oraclecloud.identitycontrolplane.updateidentityprovider",
+                    "com.oraclecloud.identitycontrolplane.createidpgroupmapping",
+                    "com.oraclecloud.identitycontrolplane.deleteidpgroupmapping",
+                    "com.oraclecloud.identitycontrolplane.updateidpgroupmapping",
+                    "com.oraclecloud.identitycontrolplane.addusertogroup",
+                    "com.oraclecloud.identitycontrolplane.creategroup",
+                    "com.oraclecloud.identitycontrolplane.deletegroup",
+                    "com.oraclecloud.identitycontrolplane.removeuserfromgroup",
+                    "com.oraclecloud.identitycontrolplane.updategroup",
+                    "com.oraclecloud.identitycontrolplane.createpolicy",
+                    "com.oraclecloud.identitycontrolplane.deletepolicy",
+                    "com.oraclecloud.identitycontrolplane.updatepolicy",
+                    "com.oraclecloud.identitycontrolplane.createuser",
+                    "com.oraclecloud.identitycontrolplane.deleteuser",
+                    "com.oraclecloud.identitycontrolplane.updateuser",
+                    "com.oraclecloud.identitycontrolplane.updateusercapabilities",
+                    "com.oraclecloud.identitycontrolplane.updateuserstate",
+                    "com.oraclecloud.identityControlPlane.UpdateSwiftPassword",
+                    "com.oraclecloud.identityControlPlane.CreateOrResetPassword"
+                ]
+            }
+        }
+    },
+
+    "logging_configuration": {
+        "default_compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+
+        "flow_logs": {
+            "LOG-LZ-PREPROD-SUBNET-FLOW-KEY": {
+                "log_group_id"                                    : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
+                "target_compartment_ids"                          : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"                            : "subnet"
+            },
+
+            "LOG-LZ-PREPROD-VCN-FLOW-KEY": {
+                "log_group_id"                                    : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
+                "target_compartment_ids"                          : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"                            : "vcn"
+            },
+
+            "LOG-LZ-PROD-SUBNET-FLOW-KEY": {
+                "log_group_id"                                    : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "target_compartment_ids"                          : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"                            : "subnet"
+            },
+
+            "LOG-LZ-PROD-VCN-FLOW-KEY": {
+                "log_group_id"                                    : "LGRP-LZ-PROD-VCN-FLOW-KEY",
+                "target_compartment_ids"                          : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"                            : "vcn"
+            },
+
+            "LOG-LZ-SUBNET-FLOW-KEY": {
+                "log_group_id"                                    : "LGRP-LZ-VCN-FLOW-KEY",
+                "target_compartment_ids"                          : ["CMP-LZ-NETWORK-KEY"],
+                "target_resource_type"                            : "subnet"
+            },
+
+            "LOG-LZ-VCN-FLOW-KEY": {
+                "log_group_id"                                    : "LGRP-LZ-VCN-FLOW-KEY",
+                "target_compartment_ids"                          : ["CMP-LZ-NETWORK-KEY"],
+                "target_resource_type"                            : "vcn"
+            }
+        },
+
+        "log_groups": {
+            "LGRP-LZ-PREPROD-VCN-FLOW-KEY": {
+                "name"                                            : "lgrp-lz-preprod-vcn-flow",
+                "compartment_id"                                  : "CMP-LZ-PREPROD-SECURITY-KEY"
+            },
+
+            "LGRP-LZ-PROD-VCN-FLOW-KEY": {
+                "name"                                            : "lgrp-lz-prod-vcn-flow",
+                "compartment_id"                                  : "CMP-LZ-PROD-SECURITY-KEY"
+            },
+
+            "LGRP-LZ-VCN-FLOW-KEY": {
+                "name"                                            : "lgrp-lz-vcn-flow",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY"
+            }
+        }
+    },
+
+    "notifications_configuration": {
+        "default_compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+
+        "topics": {
+            "NOTT-LZ-CLOUDGUARD-KEY": {
+                "name"                                            : "nott-lz-cloudguard",
+                "description"                                     : "Topic for Cloud Guard related notifications.",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                                : "EMAIL",
+                        "values"                                  : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-IAM-KEY": {
+                "name"                                            : "nott-lz-iam",
+                "description"                                     : "Topic for IAM related notifications.",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                                : "EMAIL",
+                        "values"                                  : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-NETWORK-KEY": {
+                "name"                                            : "nott-lz-network",
+                "description"                                     : "Topic for network related notifications.",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                                : "EMAIL",
+                        "values"                                  : ["email.address@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY": {
+                "name"                                            : "nott-lz-preprod-exacs-projects",
+                "description"                                     : "Topic for Pre-Production ExaDB-D project notifications.",
+                "compartment_id"                                  : "CMP-LZ-PREPROD-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                                : "EMAIL",
+                        "values"                                  : ["exacs-project-team@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-PROD-EXACS-PROJECTS-KEY": {
+                "name"                                            : "nott-lz-prod-exacs-projects",
+                "description"                                     : "Topic for Production ExaDB-D project notifications.",
+                "compartment_id"                                  : "CMP-LZ-PROD-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                                : "EMAIL",
+                        "values"                                  : ["exacs-project-team@example.com"]
+                    }
+                ]
+            },
+
+            "NOTT-LZ-SECURITY-KEY": {
+                "name"                                            : "nott-lz-security",
+                "description"                                     : "Topic for notifications.",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+
+                "subscriptions": [
+                    {
+                        "protocol"                                : "EMAIL",
+                        "values"                                  : ["email.address@example.com"]
+                    }
+                ]
+            }
+        }
+    },
+
+    "service_connectors_configuration": {
+        "default_compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+
+        "buckets": {
+            "BKT-LZ-SERVICE-CONNECTOR-KEY": {
+                "name"                                            : "bkt-lz-service-connector",
+                "compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+                "cis_level"                                       : "2",
+                "kms_key_id"                                      : "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY"
+            }
+        },
+
+        "service_connectors": {
+            "SCH-LZ-MONITOR-KEY": {
+                "display_name"                                    : "sch-lz-monitor",
+
+                "policy": {
+                    "name"                                        : "service-connector-audit-policy",
+                    "description"                                 : "IAM policy for letting Service Connector to push data to target resource.",
+                    "compartment_id"                              : "CMP-LZ-SECURITY-KEY"
+                },
+
+                "source": {
+                    "kind"                                        : "logging",
+
+                    "audit_logs": [
+                        {
+                            "cmp_id"                              : "ALL"
+                        }
+                    ]
+                },
+
+                "target": {
+                    "bucket_name"                                 : "bkt-lz-service-connector",
+                    "bucket_object_name_prefix"                   : "sch",
+                    "kind"                                        : "objectstorage"
+                }
+            }
+        }
+    }
+}

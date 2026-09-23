@@ -36,6 +36,9 @@ local validation = import '../../lib/validation.libsonnet';
   platform_db_key(product, n, scope)::
     n.key_global('CMP', $.scope_key_segments(scope) + [scope.platform_name, 'DB']),
 
+  platform_db_name(product, scope)::
+    '%s-db' % scope.compartment_name,
+
   platform_infra_key(product, n, scope)::
     n.key_global('CMP', $.scope_key_segments(scope) + [scope.platform_name, 'INFRA']),
 
@@ -50,7 +53,7 @@ local validation = import '../../lib/validation.libsonnet';
       else self.component_defaults;
     (if components.database then {
       [self.platform_db_key(product, n, scope)]: {
-        name: '%s-db' % scope.compartment_name,
+        name: $.platform_db_name(product, scope),
         description: descriptions.platform_child_compartment(scope, 'Database'),
         defined_tags: { [tag_key]: product.tags.db },
       },
@@ -148,7 +151,7 @@ local validation = import '../../lib/validation.libsonnet';
                 env_scope,
                 project_name
               ),
-              defined_tags: { [tag_key]: product.tags.db },
+              defined_tags: { [tag_key]: product.tags.project_db },
             },
           },
         },
@@ -186,7 +189,11 @@ local validation = import '../../lib/validation.libsonnet';
     {
       [entry.scope.compartment_key]: {
         local scope = entry.scope,
-        local components = $.normalize_components(product, entry.platform_config.extension.params),
+        local inferred_components =
+          if std.objectHas(entry.platform_config, 'publication_components') then
+            entry.platform_config.publication_components
+          else null,
+        local components = $.normalize_components(product, entry.platform_config.extension.params, inferred_components),
         name: scope.compartment_name,
         description: descriptions.platform_compartment(scope),
         parent_id: scope.parent_compartment_key,
@@ -226,7 +233,7 @@ local validation = import '../../lib/validation.libsonnet';
       local params = entry.platform_config.extension.params;
       if std.objectHas(params, 'project_db_compartments')
          && params.project_db_compartments != null then
-        if product.code == 'exacs' && entry.scope.scope_type == 'shared' then
+        if entry.scope.scope_type == 'shared' then
           {
             [normalize_env_key(env_key)]: params.project_db_compartments[env_key]
             for env_key in std.objectFields(params.project_db_compartments)
@@ -267,7 +274,7 @@ local validation = import '../../lib/validation.libsonnet';
         name: $.project_db_name_for_scope(product, project_scope, project_name),
         description: descriptions.project_db_compartment(project_scope, project_name),
         parent_id: n.key_global('CMP', $.scope_key_segments(project_scope) + [project_name]),
-        defined_tags: { [tag_key]: product.tags.db },
+        defined_tags: { [tag_key]: product.tags.project_db },
       }
       for env_name in std.objectFields(project_db_compartments)
       for project_name in project_db_compartments[env_name]
@@ -278,11 +285,14 @@ local validation = import '../../lib/validation.libsonnet';
       std.objectHas(cfg, 'project_db_compartments') && cfg.project_db_compartments != null;
     if !has_project_db then {}
     else if product.code == 'exacc' then
-      assert scope.scope_type == 'environment' :
-             'exacc project_db_compartments can only be set on environment platforms';
-      assert std.type(cfg.project_db_compartments) == 'array' :
-             'exacc project_db_compartments must be an array';
-      { [$.scope_qualified_name(scope)]: cfg.project_db_compartments }
+      if scope.scope_type == 'shared' then
+        assert std.type(cfg.project_db_compartments) == 'object' :
+               'exacc project_db_compartments must be an object when set on shared platforms';
+        cfg.project_db_compartments
+      else
+        assert std.type(cfg.project_db_compartments) == 'array' :
+               'exacc project_db_compartments must be an array when set on environment platforms';
+        { [$.scope_qualified_name(scope)]: cfg.project_db_compartments }
     else if product.code == 'exacs' then
       if scope.scope_type == 'shared' then
         assert std.type(cfg.project_db_compartments) == 'object' :

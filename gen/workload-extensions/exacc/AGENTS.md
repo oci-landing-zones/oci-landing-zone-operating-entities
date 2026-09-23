@@ -24,9 +24,8 @@ Scope: this file covers `gen/workload-extensions/exacc/**` and the published Exa
 
 ## Use-Case Support
 
-- UC1 is the native published template-backed ExaDB-C@C use case in this repo.
-- UC2 and UC3 are use-case models only unless dedicated source templates and generator fixtures exist in this repo.
-- If UC2, UC3, or a custom combination is requested, stop before deployable artifact changes unless the matching templates and tests are present. Capture design notes or requirements instead of relabeling UC1 output.
+- UC1, UC2, and UC3 are native published template-backed ExaDB-C@C use cases in this repo.
+- If a custom combination is requested, stop before deployable artifact changes unless the matching templates and tests are present. Capture design notes or requirements instead of relabeling an existing UC output.
 - Existing deployed landing zones should use the multi-stack extension-only publication shape unless the user explicitly asks to change the foundation.
 - Fresh foundation plus ExaDB-C@C publication uses the single-stack shape emitted by the local published adapters. Do not mix stack families unless the active Orchestrator merge behavior and top-level family collisions have been checked.
 

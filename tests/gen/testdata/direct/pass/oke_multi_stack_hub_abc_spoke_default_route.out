@@ -1,0 +1,80 @@
+{
+  "hub_a": {
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    },
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    },
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    },
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    }
+  },
+  "hub_b": {
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    },
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    },
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    },
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    }
+  },
+  "hub_c": {
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    },
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    },
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    },
+    "RT-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY": {
+      "description": "Route to the 0.0.0.0/0 through DRG",
+      "destination": "0.0.0.0/0",
+      "destination_type": "CIDR_BLOCK",
+      "network_entity_key": "DRG-FRA-LZ-HUB-KEY"
+    }
+  }
+}
