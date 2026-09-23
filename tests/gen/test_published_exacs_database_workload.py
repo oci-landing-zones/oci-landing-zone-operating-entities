@@ -50,6 +50,43 @@ class PublishedExacsDatabaseWorkloadTests(unittest.TestCase):
                     json.dumps(vmclusters),
                 )
 
+    def test_documentation_contract(self) -> None:
+        root_readme = (WORKLOAD_ROOT / "readme.md").read_text(encoding="utf-8")
+        required_root_markers = {
+            "single-stack",
+            "multi-stack",
+            "Blueprint Factory",
+            "REPLACE_WITH_SECRET_OCID",
+            "REPLACE_WITH_APPROVED_PUBLIC_KEY",
+        }
+        for marker in required_root_markers:
+            with self.subTest(root_marker=marker):
+                self.assertIn(marker, root_readme)
+
+        stack_readmes = {
+            "single-stack": "ExaCS single-stack foundation",
+            "multi-stack": "ExaCS multi-stack foundation",
+        }
+        for stack_name, foundation_marker in stack_readmes.items():
+            with self.subTest(stack=stack_name):
+                readme = (WORKLOAD_ROOT / stack_name / "readme.md").read_text(
+                    encoding="utf-8"
+                )
+                for filename in EXPECTED_SECTIONS:
+                    self.assertIn(filename, readme)
+                self.assertIn("cloud_exadata_database_output.json", readme)
+                self.assertIn(foundation_marker, readme)
+
+        multi_stack_readme = (WORKLOAD_ROOT / "multi-stack/readme.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("hub post-update", multi_stack_readme)
+
+        exacs_readme = (
+            REPO_ROOT / "workload-extensions/exacs/readme.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("database-workload/", exacs_readme)
+
 
 if __name__ == "__main__":
     unittest.main()
