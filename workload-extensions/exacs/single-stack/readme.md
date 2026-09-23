@@ -70,6 +70,10 @@ In this model, the Landing Zone Foundations, the One-OE foundation, and the requ
   </tbody>
 </table>
 
+### Cloud Exadata Database workload deployment <!-- omit from toc -->
+
+The single-stack files establish the Landing Zone prerequisites; "single-stack" does not include the Cloud Exadata Database resources themselves. Cloud Exadata Database workload operations remain three separate config-driven stacks with independent Terraform states because infrastructure, VM cluster, and database documents share the `cloud_exadata_database_configuration` root. Orchestrator 2.1.4 selects the first document for a repeated top-level root instead of deep-merging its nested sections, so the three generated workload files must not be supplied to one stack. Follow the [Cloud Exadata Database workload deployment guide](../database-workload/readme.md) after the single-stack deployment and its final observability re-apply.
+
 &nbsp;
 
 ## **4. Architecture Components**

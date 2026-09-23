@@ -5,6 +5,7 @@
 - [**1. Summary**](#1-summary)
 - [**2. Design Overview**](#2-design-overview)
 - [**3. Deployment Options**](#3-deployment-options)
+- [**4. Cloud Exadata Database workload deployment**](#4-cloud-exadata-database-workload-deployment)
 
 &nbsp;
 
@@ -69,6 +70,14 @@ If you have not reviewed it yet, we recommend checking the [ExaDB-D use cases se
 &nbsp;
 
 This Landing Zone Extension provides **two deployment approaches**, single-stack and multi-stack, to accommodate different use cases and architectural preferences. Both approaches use the [OCI Landing Zone Orchestrator](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator).
+
+&nbsp;
+
+## **4. Cloud Exadata Database workload deployment**
+
+The published single-stack and multi-stack artifacts establish the ExaDB-D Landing Zone prerequisites. The database workload layer is generated separately from `extension.params.exacs_database_workload` and creates Cloud Exadata Infrastructure, Cloud VM Clusters, DB Homes, CDBs, and PDBs through the Orchestrator.
+
+For generated files, dependencies, Resource Manager and Terraform CLI steps, use the dedicated [Cloud Exadata Database workload deployment guide](./database-workload/readme.md). It documents the ExaCS-specific sequential deployment and state boundaries.
 
 &nbsp;
 

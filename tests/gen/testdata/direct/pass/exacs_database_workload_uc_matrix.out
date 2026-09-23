@@ -1,0 +1,48 @@
+{
+  "uc1": {
+    "database_sections": [
+      "cloud_db_homes_configuration",
+      "databases_configuration",
+      "pluggable_databases_configuration"
+    ],
+    "infrastructure_compartment": "CMP-LZ-SHARED-EXACS-INFRA-KEY",
+    "vmcluster_backup_subnet": "SN-FRA-LZ-SHARED-PLATFORM-EXACS-BACKUP-KEY",
+    "vmcluster_compartment": "CMP-LZ-SHARED-EXACS-DB-KEY",
+    "vmcluster_subnet": "SN-FRA-LZ-SHARED-PLATFORM-EXACS-DB-KEY"
+  },
+  "uc2": {
+    "database_sections": [
+      "cloud_db_homes_configuration",
+      "databases_configuration",
+      "pluggable_databases_configuration"
+    ],
+    "infrastructure_compartment": "CMP-LZ-SHARED-EXACS-INFRA-KEY",
+    "vmcluster_backup_subnet": "SN-FRA-LZ-PROD-PLATFORM-EXACS-BACKUP-KEY",
+    "vmcluster_compartment": "CMP-LZ-PROD-EXACS-DB-KEY",
+    "vmcluster_subnet": "SN-FRA-LZ-PROD-PLATFORM-EXACS-DB-KEY"
+  },
+  "uc3": {
+    "preprod": {
+      "database_sections": [
+        "cloud_db_homes_configuration",
+        "databases_configuration",
+        "pluggable_databases_configuration"
+      ],
+      "infrastructure_compartment": "CMP-LZ-PREPROD-EXACS-INFRA-KEY",
+      "vmcluster_backup_subnet": "SN-FRA-LZ-PREPROD-PLATFORM-EXACS-BACKUP-KEY",
+      "vmcluster_compartment": "CMP-LZ-PREPROD-EXACS-DB-KEY",
+      "vmcluster_subnet": "SN-FRA-LZ-PREPROD-PLATFORM-EXACS-DB-KEY"
+    },
+    "prod": {
+      "database_sections": [
+        "cloud_db_homes_configuration",
+        "databases_configuration",
+        "pluggable_databases_configuration"
+      ],
+      "infrastructure_compartment": "CMP-LZ-PROD-EXACS-INFRA-KEY",
+      "vmcluster_backup_subnet": "SN-FRA-LZ-PROD-PLATFORM-EXACS-BACKUP-KEY",
+      "vmcluster_compartment": "CMP-LZ-PROD-EXACS-DB-KEY",
+      "vmcluster_subnet": "SN-FRA-LZ-PROD-PLATFORM-EXACS-DB-KEY"
+    }
+  }
+}

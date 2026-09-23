@@ -5,6 +5,7 @@ Scope: this file covers `gen/workload-extensions/exacs/**` and published ExaCS s
 ## Source Of Truth
 
 - `gen/workload-extensions/exacs/exacs_builder.libsonnet` owns reusable ExaCS network, IAM, and observability rendering.
+- `gen/workload-extensions/exacs/exacs_database_workload.libsonnet` owns the config-driven Cloud Exadata Database operation projection.
 - `gen/workload-extensions/exacs/exacs.libsonnet` is the generic extension wrapper used by config mode.
 - `gen/workload-extensions/exacs/published_profiles.libsonnet` owns repo-published ExaCS use-case defaults.
 - Stack-local `published.libsonnet` files own publication-only projections.
@@ -18,6 +19,11 @@ Scope: this file covers `gen/workload-extensions/exacs/**` and published ExaCS s
 - If infrastructure-only placement is inferred, the platform must omit `platform.network`. It must not emit database child compartments, AVMC/VMC permissions, database alarms, or VMC event rules for that scope.
 - `project_db_compartments` is only for Autonomous Database Dedicated project tiers. It requires database placement but does not require `project_network`.
 - Regular Exadata Database Service-only designs use VMC placement and must omit `project_db_compartments`.
+- `exacs_database_workload` is opt-in and currently supports regular Exadata Database Service on Dedicated Infrastructure only. It emits the three separate `cloud_exadata_database_configuration` documents for infrastructure, VM clusters, and database objects.
+- ExaCS database-workload VM Cluster and database operations require database placement with `platform.network`; infrastructure-only scopes may emit only the infrastructure operation. The builder injects the source-backed platform compartment and, for VMCs, the managed `db` and `backup` subnet keys.
+- ExaCS database-workload logical resource keys must be unique within each operation section across every selected ExaCS scope; the generator rejects duplicates rather than overlaying them.
+- Keep ExaCS database-workload operations as sequential Orchestrator stacks. Their common root family is not a safe multi-file deep-merge boundary. Save `cloud_exadata_database_output.json` after each stage and supply it as `exadata_database_dependency` to the next stage.
+- Autonomous VM Clusters, Autonomous Container Databases, and Autonomous Database Dedicated lifecycle are not part of this ExaCS database-workload contract. Do not add those sections without an inspected Orchestrator and backing-module contract plus dedicated source, tests, and documentation.
 - Do not hardcode `prod`, `preprod`, `proj1`, `fra`, or CIDRs in reusable source.
 - Multi-stack `oneoe_network_hub_*_post.jsonnet` publication files must be generated from topology and routed VCN entries, not copied from branch hardcoded patches.
 

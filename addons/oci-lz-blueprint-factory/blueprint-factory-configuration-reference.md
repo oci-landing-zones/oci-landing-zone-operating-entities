@@ -289,7 +289,7 @@ platforms: {
 |---|---|---|
 | `oke_simple` | Required | [OKE Blueprint Factory guide](/workload-extensions/oke/simple/oke-blueprint-factory.md) |
 | `ocvs` | Required | [OCVS generator guide](/gen/workload-extensions/ocvs/AGENTS.md) |
-| `exacs` | Depends on placement | [ExaCS generator guide](/gen/workload-extensions/exacs/AGENTS.md) |
+| `exacs` | Depends on placement | [ExaCS Blueprint Factory and database workload guide](/workload-extensions/exacs/database-workload/readme.md) |
 | `exacc` | Forbidden | [ExaDB-C@C generator guide](/gen/workload-extensions/exacc/AGENTS.md) |
 
 `params` is required whenever `extension` is present. Extension-specific validation applies after the general configuration is normalized. Do not add unregistered extension types or use a network where the extension contract forbids one.

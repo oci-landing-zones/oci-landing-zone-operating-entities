@@ -70,6 +70,10 @@ In this asset, we assume that One-OE has already been deployed, and we focus on 
 
 On every re-apply, retain all configuration documents whose top-level family is not being replaced. For the One-OE re-apply, keep its IAM, governance, security, and observability documents and replace only the One-OE network document with the matching `oneoe_network_*_post.json` file. For the ExaDB-D extension re-apply, keep the matching `exacs_identity_uc*.json` document and replace the pre network and observability documents with their final counterparts. Do not provide both the pre and final document for the same top-level family in one operation.
 
+### Cloud Exadata Database workload deployment <!-- omit from toc -->
+
+The files above deploy the Landing Zone prerequisites only. When the workload must also create Cloud Exadata Infrastructure, Cloud VM Clusters, DB Homes, CDBs, or PDBs, follow the [Cloud Exadata Database workload deployment guide](../database-workload/readme.md). It adds three generated, sequential stacks with independent Terraform states after this extension flow; it is not an additional set of published files to combine with this stack. Each downstream stack consumes only the immediately preceding stack's `cloud_exadata_database_output.json` through `exadata_database_dependency`.
+
 &nbsp;
 
 ## **4. Architecture Components**
