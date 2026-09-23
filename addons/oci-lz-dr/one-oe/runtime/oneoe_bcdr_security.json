@@ -1,0 +1,38 @@
+{
+    "scanning_configuration": {
+        "default_compartment_id"              : "CMP-LZ-SECURITY-KEY",
+
+        "host_recipes": {
+            "VSS-RCPH-AMS-LZ-KEY": {
+                "name"                        : "vss-rcph-ams-lz",
+                "port_scan_level"             : "STANDARD",
+
+                "agent_settings": {
+                    "cis_benchmark_scan_level": "STRICT",
+                    "scan_level"              : "STANDARD",
+                    "vendor"                  : "OCI"
+                },
+
+                "file_scan_settings": {
+                    "enable"                  : true,
+                    "folders_to_scan"         : ["/"],
+                    "operating_system"        : "LINUX",
+                    "scan_recurrence"         : "FREQ=WEEKLY;INTERVAL=2;WKST=SU"
+                },
+
+                "schedule_settings": {
+                    "type"                    : "WEEKLY",
+                    "day_of_week"             : "SUNDAY"
+                }
+            }
+        },
+
+        "host_targets": {
+            "VSS-TGTH-AMS-LZ-KEY": {
+                "name"                        : "vss-tgth-ams-lz",
+                "host_recipe_id"              : "VSS-RCPH-AMS-LZ-KEY",
+                "target_compartment_id"       : "CMP-LANDINGZONE-KEY"
+            }
+        }
+    }
+}

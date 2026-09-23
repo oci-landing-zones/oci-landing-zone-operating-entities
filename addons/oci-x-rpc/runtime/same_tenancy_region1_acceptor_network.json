@@ -887,7 +887,7 @@
                                             "priority"                          : 30,
 
                                             "match_criteria": {
-                                                "match_type"                    : "DRG_ATTACHMENT_TYPE",
+                                                "match_type"                    : "DRG_ATTACHMENT_ID",
                                                 "attachment_type"               : "REMOTE_PEERING_CONNECTION",
                                                 "drg_attachment_key"            : "DRGATT-FRA-LZ-HUB-RPC-TENANCY2-KEY"
                                             }
@@ -909,8 +909,20 @@
                                     "is_ecmp_enabled"                           : false,
 
                                     "route_rules": {
-                                        "DRGRT-FRA-LZ-RPC-TENANCY2-STATIC-ROUTE": {
-                                            "destination"                       : "0.0.0.0/0",
+                                        "DRGRT-FRA-LZ-RPC-TENANCY2-LOCAL-CIDR-1": {
+                                            "destination"                       : "10.0.0.0/21",
+                                            "destination_type"                  : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key"       : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                        },
+
+                                        "DRGRT-FRA-LZ-RPC-TENANCY2-LOCAL-CIDR-2": {
+                                            "destination"                       : "10.0.64.0/21",
+                                            "destination_type"                  : "CIDR_BLOCK",
+                                            "next_hop_drg_attachment_key"       : "DRGATT-FRA-LZ-HUB-VCN-KEY"
+                                        },
+
+                                        "DRGRT-FRA-LZ-RPC-TENANCY2-LOCAL-CIDR-3": {
+                                            "destination"                       : "10.0.128.0/21",
                                             "destination_type"                  : "CIDR_BLOCK",
                                             "next_hop_drg_attachment_key"       : "DRGATT-FRA-LZ-HUB-VCN-KEY"
                                         }

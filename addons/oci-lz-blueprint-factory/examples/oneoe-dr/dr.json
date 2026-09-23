@@ -1,0 +1,38 @@
+{
+    "realm"                     : "oc1",
+    "region"                    : "eu-amsterdam-1",
+    "region_short_name"         : "ams",
+    "cis_level"                 : 2,
+    "stack_scope"               : "regional",
+
+    "hub": {
+        "kind"                  : "hub_b",
+
+        "network": {
+            "vcn"               : "10.0.192.0/21"
+        }
+    },
+
+    "environments": {
+        "prod": {
+            "project_network": {
+                "network": {
+                    "vcn"       : "10.0.200.0/21"
+                }
+            }
+        }
+    },
+
+    "remote_peering_connections": {
+        "home": {
+            "peer_id"           : "RPC-FRA-LZ-HUB-DR-KEY",
+            "peer_region_name"  : "eu-frankfurt-1",
+
+            "remote_cidrs": [
+                "10.0.0.0/21",
+                "10.0.64.0/21",
+                "10.0.128.0/21"
+            ]
+        }
+    }
+}

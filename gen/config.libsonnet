@@ -15,6 +15,7 @@ local validation = import 'lib/validation.libsonnet';
   },
   local supported_hub_kinds = std.objectFields(hub_subnet_order),
   local supported_realms = std.objectFields(constants),
+  local supported_stack_scopes = ['complete', 'regional'],
 
   local spoke_subnet_names = ['web', 'app', 'db', 'infra'],
 
@@ -195,7 +196,13 @@ local validation = import 'lib/validation.libsonnet';
     local cis_level =
       if raw_cis_level == 1 || raw_cis_level == '1' then 1
       else 2;
-
+    local stack_scope =
+      if std.objectHas(config, 'stack_scope') && config.stack_scope != null then
+        config.stack_scope
+      else 'complete';
+    assert std.member(supported_stack_scopes, stack_scope) :
+           'config.stack_scope must be one of: %s' %
+           std.join(', ', supported_stack_scopes);
     local hub_subnet_keys = hub_subnet_order[hub_kind];
     local hub_subnet_label = 'config.hub.network.subnets for %s' % hub_kind;
     local hub_vcn = required_vcn(hub_network, 'config.hub.network');
@@ -208,6 +215,15 @@ local validation = import 'lib/validation.libsonnet';
          config.remote_peering_connections != null then
         normalize_remote_peering_connections(config.remote_peering_connections, region)
       else {};
+    local regional_cross_tenancy_connections = [
+      name
+      for name in std.objectFields(remote_peering_connections)
+      if remote_peering_connections[name].peer_tenancy_ocid != null
+    ];
+    assert stack_scope != 'regional' ||
+           std.length(regional_cross_tenancy_connections) == 0 :
+           'config.stack_scope regional does not support cross-tenancy remote peering until its IAM policy is owned by a complete stack: %s' %
+           regional_cross_tenancy_connections[0];
 
     local norm_platform(plat, p_name) =
       local extension =
@@ -376,7 +392,17 @@ local validation = import 'lib/validation.libsonnet';
       [p_name]: norm_platform(config.shared_platforms[p_name], p_name)
       for p_name in std.objectFields(config.shared_platforms)
     } else {};
-
+    local regional_platform_envs = [
+      env_name
+      for env_name in std.objectFields(norm_envs)
+      if std.objectHas(norm_envs[env_name], 'platforms') &&
+         std.length(std.objectFields(norm_envs[env_name].platforms)) > 0
+    ];
+    assert stack_scope != 'regional' || std.length(regional_platform_envs) == 0 :
+           'config.stack_scope regional does not support platforms or extensions until their complete-stack prerequisites can be projected: %s' %
+           regional_platform_envs[0];
+    assert stack_scope != 'regional' || std.length(std.objectFields(norm_shared)) == 0 :
+           'config.stack_scope regional does not support shared_platforms until their complete-stack prerequisites can be projected';
     local env_vcn_entries = std.flattenArrays([
       local env = norm_envs[env_name];
       (if std.objectHas(env, 'project_network') then [
@@ -432,6 +458,7 @@ local validation = import 'lib/validation.libsonnet';
       region_short_name: region_short_name,
       realm: realm,
       cis_level: cis_level,
+      stack_scope: stack_scope,
       hub+: {
         network+: { subnets: hub_subnets },
       },

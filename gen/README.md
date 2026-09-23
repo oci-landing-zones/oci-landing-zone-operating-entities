@@ -19,6 +19,7 @@ Run `bash gen/generate.sh` the first time you work on the generator. It sets up 
 - Raw config-mode fan-out and debugging: `jsonnet --multi <output_dir>/ --tla-code-file config=<config_file> gen/landing_zone_multi.jsonnet`
 
 Config-mode network artifacts use one canonical final file: `network.json`. Only hubs that require staged deployment also emit `network_pre.json`.
+Generate a regional DR design as two independent configs. The complete home config explicitly owns the RPC acceptor; the regional DR config explicitly owns the RPC requester. Run `--config` once for each source and use separate output directories. Regional scope emits only network, VSS, and observability outputs; platforms, shared platforms, workload extensions, and cross-tenancy RPCs are rejected until their complete-stack prerequisites and IAM policies can be projected safely.
 Config-mode security and observability artifacts follow `cis_level`: omit it for the default CIS level 2 files, or set `cis_level: 1` to emit the CIS level 1 file pair instead.
 Config-mode extension outputs are emitted as additional files from `result.extra`; for example, OKE emits `oke_clusters.json` and `oke_workers.json`.
 If you set `hub.network.subnets` explicitly, provide the full canonical subnet set for that hub kind; partial hub subnet overrides are rejected during normalization.
