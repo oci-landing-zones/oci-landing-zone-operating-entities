@@ -1,0 +1,206 @@
+{
+  "zpr_configuration": {
+    "namespaces": {
+      "ZPR-NAMESPACE-LZ-HUB-KEY": {
+        "name"                                                            : "ns-lz-hub",
+        "description"                                                     : "ZPR namespace for LZ Hub",
+        "compartment_id"                                                  : "CMP-LZ-SECURITY-KEY"
+      },
+
+      "ZPR-NAMESPACE-LZ-PROD-PROJ-KEY": {
+        "name"                                                            : "ns-lz-prod-proj",
+        "description"                                                     : "ZPR namespace for Projects in Prod environment",
+        "compartment_id"                                                  : "CMP-LZ-SECURITY-KEY"
+      },
+
+      "ZPR-NAMESPACE-LZ-PREPROD-PROJ-KEY": {
+        "name"                                                            : "ns-lz-preprod-proj",
+        "description"                                                     : "ZPR namespace for Projects in PreProd environment",
+        "compartment_id"                                                  : "CMP-LZ-SECURITY-KEY"
+      }      
+    },
+
+    "security_attributes": {
+      "SEC-ATTR-VCN-HUB-KEY": {
+        "name"                                                            : "secattr-vcn",
+        "description"                                                     : "ZPR Security attribute for Hub VCN",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-HUB-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["hub-vcn01", "hub-vcn02", "hub-vnc03"]
+      },
+
+      "SEC-ATTR-LB-KEY": {
+        "name"                                                            : "secattr-lb",
+        "description"                                                     : "ZPR Security attribute for LB in Hub VCN",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-HUB-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["lb01", "lb02", "lb03"]
+      },
+
+      "SEC-ATTR-FW-KEY": {
+        "name"                                                            : "secattr-fw",
+        "description"                                                     : "ZPR Security attribute for Network Firewall in Hub VCN",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-HUB-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["fw01", "fw02", "fw03"]
+      },
+
+      "SEC-ATTR-MGMT-KEY": {
+        "name"                                                            : "secattr-mgmt",
+        "description"                                                     : "ZPR Security attribute for Management in Hub VCN",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-HUB-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["mgmt01", "mgmt02", "mgmt03"]
+      },
+
+      "SEC-ATTR-VCN-PROD-PROJ-KEY": {
+        "name"                                                            : "secattr-vcn",
+        "description"                                                     : "ZPR Security attribute for Prod Project VCNs",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["proj-vcn01", "proj-vcn02", "proj-vnc03"]
+      },
+
+      "SEC-ATTR-VCN-PROD-PROJ-WEB-KEY": {
+        "name"                                                            : "secattr-web",
+        "description"                                                     : "ZPR Security attribute for Web tier in Prod Projects",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["web01", "web02", "web03"]
+      },
+
+      "SEC-ATTR-VCN-PROD-PROJ-APP-KEY": {
+        "name"                                                            : "secattr-app",
+        "description"                                                     : "ZPR Security attribute for App tier in Prod Projects",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["app01", "app02", "app03"]
+      },
+
+      "SEC-ATTR-VCN-PROD-PROJ-DB-KEY": {
+        "name"                                                            : "secattr-db",
+        "description"                                                     : "ZPR Security attribute for DB tier in Prod Projects",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["db01", "db02", "db03"]
+      },
+
+      "SEC-ATTR-VCN-PROD-PROJ-INFRA-KEY": {
+        "name"                                                            : "secattr-infra",
+        "description"                                                     : "ZPR Security attribute for Infra tier in Prod Projects",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["infra01", "infra02", "infra03"]
+      },
+
+      "SEC-ATTR-VCN-PROD-PROJ-GENERIC-KEY": {
+        "name"                                                            : "secattr-generic",
+        "description"                                                     : "ZPR Security attribute Generic in Prod Projects",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["generic01", "generic02", "generic03"]
+      },
+
+      "SEC-ATTR-VCN-PREPROD-PROJ-KEY": {
+        "name"                                                            : "secattr-vcn",
+        "description"                                                     : "ZPR Security attribute for PreProd Project VCNs",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PREPROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["proj-vcn01", "proj-vcn02", "proj-vnc03"]
+      },
+
+      "SEC-ATTR-VCN-PREPROD-PROJ-WEB-KEY": {
+        "name"                                                            : "secattr-web",
+        "description"                                                     : "ZPR Security attribute for Web tier in PreProd Projects",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PREPROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["web01", "web02", "web03"]
+      },
+
+      "SEC-ATTR-VCN-PREPROD-PROJ-APP-KEY": {
+        "name"                                                            : "secattr-app",
+        "description"                                                     : "ZPR Security attribute for App tier in PreProd Projects",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PREPROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["app01", "app02", "app03"]
+      },
+
+      "SEC-ATTR-VCN-PPREROD-PROJ-DB-KEY": {
+        "name"                                                            : "secattr-db",
+        "description"                                                     : "ZPR Security attribute for DB tier in PreProd Projects",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PREPROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["db01", "db02", "db03"]
+      },
+
+      "SEC-ATTR-VCN-PREPROD-PROJ-INFRA-KEY": {
+        "name"                                                            : "secattr-infra",
+        "description"                                                     : "ZPR Security attribute for Infra tier in PreProd Projects",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PREPROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["infra01", "infra02", "infra03"]
+      },
+
+      "SEC-ATTR-VCN-PREPROD-PROJ-GENERIC-KEY": {
+        "name"                                                            : "secattr-generic",
+        "description"                                                     : "ZPR Security attribute Generic in PreProd Projects",
+        "namespace_id"                                                    : "ZPR-NAMESPACE-LZ-PREPROD-PROJ-KEY" ,
+        "validator_type"                                                  : "ENUM",
+        "validator_values"                                                : ["generic01", "generic02", "generic03"]
+      }
+    },
+
+    "zpr_policies": {
+      "ZPR-POLICY-LZ-HUB-KEY": {
+        "name"                                                            : "zpr-policy-lz-hub",
+        "description"                                                     : "ZPR policy controlling traffic for the Hub VCN and its associated resources",
+        "defined_tags" : {
+          "tagns-zpr-role.tag-zpr-role"                                   : "oneoe-lz-name"
+        },
+
+        "statements": [
+            "in ns-lz-hub.secattr-vcn:hub-vcn01 VCN allow all-endpoints to connect to ns-lz-hub.secattr-lb:lb01 endpoints with connection-state = 'stateless'",
+            "in ns-lz-hub.secattr-vcn:hub-vcn01 VCN allow ns-lz-hub.secattr-lb:lb01 endpoints to connect to ns-lz-hub.secattr-fw:fw01 endpoints with connection-state = 'stateless'",
+            "in ns-lz-hub.secattr-vcn:hub-vcn01 VCN allow all-endpoints to connect to ns-lz-hub.secattr-fw:fw01 endpoints with connection-state = 'stateless'",
+            "in ns-lz-hub.secattr-vcn:hub-vcn01 VCN allow ns-lz-hub.secattr-mgmt:mgmt01 endpoints to connect to ns-lz-hub.secattr-fw:fw01 endpoints with connection-state = 'stateless'",
+            "allow ns-lz-hub.secattr-mgmt:mgmt01 endpoints in ns-lz-hub.secattr-vcn:hub-vcn01 VCN to connect to ns-lz-prod-proj.secattr-generic:generic01 endpoints in ns-lz-prod-proj.secattr-vcn:proj-vcn01 VCN",
+            "allow ns-lz-hub.secattr-mgmt:mgmt01 endpoints in ns-lz-hub.secattr-vcn:hub-vcn01 VCN to connect to ns-lz-preprod-proj.secattr-generic:generic01 endpoints in ns-lz-preprod-proj.secattr-vcn:proj-vcn01 VCN",
+            "allow ns-lz-hub.secattr-fw:fw01 endpoints in ns-lz-hub.secattr-vcn:hub-vcn01 VCN to connect to ns-lz-prod-proj.secattr-generic:generic01 endpoints with connection-state = 'stateless' in ns-lz-prod-proj.secattr-vcn:proj-vcn01 VCN",
+            "allow ns-lz-hub.secattr-fw:fw01 endpoints in ns-lz-hub.secattr-vcn:hub-vcn01 VCN to connect to ns-lz-preprod-proj.secattr-generic:generic01 endpoints with connection-state = 'stateless' in ns-lz-preprod-proj.secattr-vcn:proj-vcn01 VCN"
+          ]
+      },
+
+      "ZPR-POLICY-LZ-PROD-PROJ-KEY": {
+        "name"                                                            : "zpr-policy-lz-prod-proj",
+        "description"                                                     : "ZPR policy controlling traffic for the Prod Project VCNs and its associated resources",
+        "defined_tags" : {
+          "tagns-zpr-role.tag-zpr-role"                                   : "oneoe-lz-name"
+        },
+
+        "statements": [
+            "in ns-lz-prod-proj.secattr-vcn:proj-vcn01 VCN allow ns-lz-prod-proj.secattr-web:web01 endpoints to connect to ns-lz-prod-proj.secattr-app:app01 endpoints with protocol='tcp/443'",
+            "in ns-lz-prod-proj.secattr-vcn:proj-vcn01 VCN allow ns-lz-prod-proj.secattr-web:web01 endpoints to connect to ns-lz-prod-proj.secattr-app:app01 endpoints with protocol='tcp/80'",
+            "in ns-lz-prod-proj.secattr-vcn:proj-vcn01 VCN allow ns-lz-prod-proj.secattr-app:app01 endpoints to connect to ns-lz-prod-proj.secattr-app:db01 endpoints with protocol='tcp/1521-1522'",
+            "in ns-lz-prod-proj.secattr-vcn:proj-vcn01 VCN allow ns-lz-prod-proj.secattr-generic:generic01 endpoints to connect to 'osn-services-ip-addresses' with protocol='tcp/443'",
+            "allow ns-lz-prod-proj.secattr-generic:generic01 endpoints in ns-lz-prod-proj.secattr-vcn:proj-vcn01 VCN to connect to ns-lz-hub.secattr-fw:fw01 endpoints with connection-state = 'stateless' in ns-lz-hub.secattr-vcn:hub-vcn01 VCN"
+          ]
+      },
+
+      "ZPR-POLICY-LZ-PREPROD-PROJ-KEY": {
+        "name"                                                            : "zpr-policy-lz-preprod-proj",
+        "description"                                                     : "ZPR policy controlling traffic for the PreProd Project VCNs and its associated resources",
+        "defined_tags" : {
+          "tagns-zpr-role.tag-zpr-role"                                   : "oneoe-lz-name"
+        },
+
+        "statements": [
+            "in ns-lz-preprod-proj.secattr-vcn:proj-vcn01 VCN allow ns-lz-preprod-proj.secattr-web:web01 endpoints to connect to ns-lz-preprod-proj.secattr-app:app01 endpoints with protocol='tcp/443'",
+            "in ns-lz-preprod-proj.secattr-vcn:proj-vcn01 VCN allow ns-lz-preprod-proj.secattr-web:web01 endpoints to connect to ns-lz-preprod-proj.secattr-app:app01 endpoints with protocol='tcp/80'",
+            "in ns-lz-preprod-proj.secattr-vcn:proj-vcn01 VCN allow ns-lz-preprod-proj.secattr-app:app01 endpoints to connect to ns-lz-preprod-proj.secattr-app:db01 endpoints with protocol='tcp/1521-1522'",
+            "in ns-lz-preprod-proj.secattr-vcn:proj-vcn01 VCN allow ns-lz-preprod-proj.secattr-generic:generic01 endpoints to connect to 'osn-services-ip-addresses' with protocol='tcp/443'",
+            "allow ns-lz-preprod-proj.secattr-generic:generic01 endpoints in ns-lz-preprod-proj.secattr-vcn:proj-vcn01 VCN to connect to ns-lz-hub.secattr-fw:fw01 endpoints with connection-state = 'stateless' in ns-lz-hub.secattr-vcn:hub-vcn01 VCN"
+          ]
+      }      
+    }
+  }
+}

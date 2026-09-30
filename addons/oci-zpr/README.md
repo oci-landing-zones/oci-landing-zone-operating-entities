@@ -77,7 +77,7 @@ The ZPR addon provides the following segregation of duties:
 | <img src="./images/lzsec_admin.png"  height="70" align="center"> | **grp-lz-security-admin** manages the ZPR Namespaces and Security Attributes created in the `cmp-lz-security` compartment, as well as the ZPR Policies associated with the deployed One-OE Landing Zone. This group does not have permissions to manage other ZPR Policies in the tenancy. Creation of new ZPR Policies must be performed by the **grp-security-admin** group. |
 | <img src="./images/net_teams.png"  height="70" align="center"> | **grp-lz-network-admin**, **grp-lz-prod-proj1-admin** and **grp-lz-preprod-proj1-admin** can associate the relevant Security Attributes with the network resources and workloads they are responsible for managing. These groups do not manage the ZPR Namespaces or ZPR Policies themselves. |
 
-All the required IAM policies to enforce this segregation of duties are defined in `oneoe_iam.json` and are already included in the deployed One-OE Landing Zone.
+All the required IAM policies to enforce this segregation of duties are defined in [oneoe_iam.json](../../blueprints/one-oe/runtime/one-stack/oneoe_iam.json) and are already included in the deployed One-OE Landing Zone.
 
 &nbsp;
 
@@ -93,7 +93,7 @@ Input configuration for ZPR addon
 
 | JSON configuration | Configuration-defined components | 
 |:-|:-|
-| **ZPR addon configuration**</br> [oneoe_hub_b_zpr.json](oneoe_iam.json) | • ZPR Namespaces</br> • Security Attributes</br> • ZPR Policies |
+| **ZPR addon configuration**</br> [oneoe_hub_b_zpr.json](oneoe_hub_b_zpr.json) | • ZPR Namespaces</br> • Security Attributes</br> • ZPR Policies |
 
 **Prerequisite**: The One-OE Landing Zone must already be deployed before deploying the ZPR addon.
 
@@ -104,13 +104,13 @@ For more information, see [Invoking the OCI Landing Zones Orchestrator Terraform
 
 #### Deploy with OCI Resource Manager (ORM)
 
-Click&nbsp; [<img src="https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.3.zip&zipUrlVariables={"input_config_files_urls":"https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_iam.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_network_hub_b_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_observability_cis1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_security_cis1_pre.json,https://raw.githubusercontent.com/oci-landing-zones/oci-landing-zone-operating-entities/master/blueprints/one-oe/runtime/one-stack/oneoe_governance.json"})&nbsp; button and follow these steps:
+Click&nbsp; [<img src="../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.4.zip&zipUrlVariables={"input_config_files_urls":"https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/zpr-addon/addons/oci-zpr/oneoe_hub_b_zpr.json"})&nbsp; button and follow these steps:
 
   1. Accept the terms and wait for the stack configuration to load.
   2. Set the working directory to “rms-facade”.
   3. Specify the preferred stack name.
   4. Select Terraform version 1.5.x, then click **Next**.
-  5. Use the loaded [oneoe_hub_b_zpr.json](oneoe_iam.json) JSON configuration template, or replace it with your JSON/YAML configuration file.
+  5. Use the loaded [oneoe_hub_b_zpr.json](oneoe_hub_b_zpr.json) JSON configuration template, or replace it with your JSON/YAML configuration file.
   6. Under **Dependencies Source for URL-based Configurations**, select the saved output file from the initial One-OE Landing Zone deployment stack.
   7. Deselect **Run apply** and click **Create** to create the ZPR addon stack.
 
@@ -119,7 +119,7 @@ After the stack is created and the required configuration and dependencies have 
 &nbsp;
 
 > [!IMPORTANT]
-The ZPR addon creates all required ZPR resources and policies for a `One-OE + Hub B` deployment. However, it **does not** configure Security Attribute associations for the respective workloads or resources, such as Network Firewalls, Load Balancers, compute instances, or databases. As a result, deploying the ZPR addon alone **does not** immediately enforce or block network traffic based on ZPR policies.
+The ZPR addon creates all required ZPR resources and policies for a [One-OE + Hub B](../../blueprints/one-oe/runtime/one-stack/one_oe_hub_b.md) deployment. However, it **does not** configure Security Attribute associations for the respective workloads or resources, such as Network Firewalls, Load Balancers, compute instances, or databases. As a result, deploying the ZPR addon alone **does not** immediately enforce or block network traffic based on ZPR policies.
 >
 > To make the ZPR controls fully functional, the required Security Attribute associations **must be** implemented separately, either through an additional deployment stack or manual configuration.
 
