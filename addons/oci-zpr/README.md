@@ -18,7 +18,7 @@ A key objective of this addon is to provide a clear segregation of duties betwee
 
 - **Security** teams manage and govern ZPR Namespaces, Security Attributes, and ZPR Policies that define which protected endpoints are permitted to communicate.
 
-<img src="./group_resp.png" width="1000" height="value">
+<img src="./images/group_resp.png" width="1000" height="value">
 
 &nbsp;
 
@@ -31,7 +31,7 @@ The animations below illustrate this multi-layer enforcement model:
 The Security team allows communication between the two endpoints through ZPR, while routing, Security Lists or NSGs, and Network Firewall also permit the traffic. Because all applicable controls allow the communication - a logical AND, the destination endpoint can be reached.
 
 &nbsp;
-<img src="./zpr_allow.gif" width="900" height="value">
+<img src="https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/addons/oci-zpr/zpr_allow.gif" width="900" height="value">
 
 &nbsp;
 
@@ -39,7 +39,7 @@ The Security team allows communication between the two endpoints through ZPR, wh
 Routing, Security Lists or NSGs, and Network Firewall allow the traffic, but the Security team does not permit the communication through ZPR policies. Because all applicable controls must allow the traffic, the communication is blocked and the destination endpoint cannot be reached.
 
 &nbsp;
-<img src="./zpr_block.gif" width="900" height="value">
+<img src="https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/content/addons/oci-zpr/zpr_block.gif" width="900" height="value">
 
 &nbsp;
 
@@ -51,7 +51,7 @@ A Security Attribute is a label that can be assigned to supported OCI resources 
 
 **Diagram 1** presents the structure of a ZPR Namespace and its Security Attribute key-value relationship. **Diagram 2** shows how this structure is implemented in the ZPR addon, including the exact Namespaces, Security Attributes, and values defined in the JSON configuration template.
 
-<img src="./zpr_struc.png" width="900" height="value">
+<img src="./images/zpr_struc.png" width="900" height="value">
 
 &nbsp;
 
@@ -60,7 +60,7 @@ The architecture diagram below illustrates the ZPR resources deployed by the ZPR
 - **ZPR Namespaces**, each containing its associated Security Attributes and residing in the `cmp-lz-security` compartment.
 - **Security Attribute associations**, illustrating how the defined Security Attributes are assigned to Landing Zone workloads and OCI resources.
 
-<img src="./oneoe_hubb_zpr.png" width="800" height="value">
+<img src="./images/oneoe_hubb_zpr.png" width="800" height="value">
 
 &nbsp;
 
@@ -73,9 +73,9 @@ The architecture diagram below illustrates the ZPR resources deployed by the ZPR
 The ZPR addon provides the following segregation of duties:
 | Groups&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            | Permissions and Scope |
 |:-|:-|
-| <img src="./sec_admin.png"  height="70" align="center"> | **grp-security-admin** provides tenancy-wide administration of ZPR. Members of this group can manage all ZPR Namespaces, Security Attributes, and ZPR Policies in the tenancy, including the creation of new ZPR Policies. |
-| <img src="./lzsec_admin.png"  height="70" align="center"> | **grp-lz-security-admin** manages the ZPR Namespaces and Security Attributes created in the `cmp-lz-security` compartment, as well as the ZPR Policies associated with the deployed One-OE Landing Zone. This group does not have permissions to manage other ZPR Policies in the tenancy. Creation of new ZPR Policies must be performed by the **grp-security-admin** group. |
-| <img src="./net_teams.png"  height="70" align="center"> | **grp-lz-network-admin**, **grp-lz-prod-proj1-admin** and **grp-lz-preprod-proj1-admin** can associate the relevant Security Attributes with the network resources and workloads they are responsible for managing. These groups do not manage the ZPR Namespaces or ZPR Policies themselves. |
+| <img src="./images/sec_admin.png"  height="70" align="center"> | **grp-security-admin** provides tenancy-wide administration of ZPR. Members of this group can manage all ZPR Namespaces, Security Attributes, and ZPR Policies in the tenancy, including the creation of new ZPR Policies. |
+| <img src="./images/lzsec_admin.png"  height="70" align="center"> | **grp-lz-security-admin** manages the ZPR Namespaces and Security Attributes created in the `cmp-lz-security` compartment, as well as the ZPR Policies associated with the deployed One-OE Landing Zone. This group does not have permissions to manage other ZPR Policies in the tenancy. Creation of new ZPR Policies must be performed by the **grp-security-admin** group. |
+| <img src="./images/net_teams.png"  height="70" align="center"> | **grp-lz-network-admin**, **grp-lz-prod-proj1-admin** and **grp-lz-preprod-proj1-admin** can associate the relevant Security Attributes with the network resources and workloads they are responsible for managing. These groups do not manage the ZPR Namespaces or ZPR Policies themselves. |
 
 All the required IAM policies to enforce this segregation of duties are defined in `oneoe_iam.json` and are already included in the deployed One-OE Landing Zone.
 
