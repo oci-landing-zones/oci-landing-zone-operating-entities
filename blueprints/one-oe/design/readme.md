@@ -254,13 +254,119 @@ Refer to the [One-OE observability runtime inventory](../runtime/one-stack/obser
 
 ## Operation View
 
-This chapter will be added soon.
+Default One-OE's runtime provides a single Terraform stack deployment (considering a stack as a collection of different configuration files + Terraform state file), where the whole Landing Zone is managed by the same small team.
 
+For bigger, complex organizations, with more sophisticated Operating Models, one single Terraform stack doesn't fulfil their operating requirements. Thus, a **GitOps design** is required to align the Operating Model with the Operational Security, where the **teams (who)** involved for the Landing Zone Management are aligned with the **Landing Zone Operations (what)** and the **automation configurations (how)** that holds the details for the implementation of the operation. This is called **Multi-Stack deployment**.
+
+Some of design decisions behind working with Multi-Stack scenarios are:
+
+1) **Repeatable Landing Zone Operations.**
+   
+   Landing Zone is split in different reusable operations aligned functionally with the user stories as Manage a Landing Zone environment (prod, non-prod), this is, the shared elements of the Landing zone, manage workload environments (production, preproduction, development, etc.), platforms or projects. 
+   
+   As long as we go in the user stories more often we'll have to on-board new platforms or projects.
+   
+2) **Operating Model aligned with Operational Security.**
+   
+   Operational Security in the different layers is aligned with the team's Operating Model. Implemented through Git security (repo's access, roles, reviewers, approval workflows), CICD automation (shared/dedicated runners, cloud authentication and authorization). 
+   
+   Not all people need access to the same areas of the Landing Zone.
+
+3) **Avoid monolithic configurations and blast radius.**
+
+    Having all the configurations in the same files can lead to unmanageable configurations, for instance, for network files that can hold thousands of lines.
+    Mixing workload environments avoid you to test in non-critical, non-production environments before getting confidence and promote changes to production.
+    Any failure in the automation, APIs backend, state file corruption, can lock and block changes in production.
+
+4) **Configurations separated by region.**
+   
+   Having unique files for different regions for disaster recovery, high availability, business continuity or just to make services geographically available, can cause that a human error or region unavailability you don't be able to change the remaining available regional resources.
+
+5) **Project teams fully independent.**
+
+    Project teams are able to manage independently their workloads, from the deployment and day 2 operations. Organization delegate to their product teams, development or outsourced companies the management of their infrastructure with minimal or no dependency from Central Cloud Operations Team.
+
+The following example has the reference architecture of the One-OE Multi-Stack deployment:
+
+<img src="images/ops_view.jpg" alt= “” width="1000" height="value">
+
+
+### Cloud Operations Teams (Who)
+
+The Operating Model used in the design is distributed ad:
+
+**Central Operations Team**
+
+This team are the responsible to operate the core landing zone resources (shared) of the Tenancy and on-boarding new workload environments or global shared platforms. 
+Holds Tenancy Admin roles.
+They're responsible for the Git repository(es) of the Landing Zone core components (network & security).
+
+**Workload Environment(s) Team(s)**
+
+This team is responsible for a specific workload environment (production, pre-production, development, etc.). This responsibilities can be hold also by the Central Operations Team, for small, uniform, not segregated teams per environment.
+After the on-boarding by the Central Operations Team, they can manage the security and networking dedicated to the workload environment. 
+Coordinates with Central Operations Team for those activities where connecting with shared services is needed (security, network, observability).
+On-boards new platforms or projects.
+
+**Platform Teams**
+
+Platform teams manages specific platforms, complex workloads that can be used for multiple applications. Some examples are OCI Kubernetes clusters (OKE), Exadata Database Dedicated (ExaDB-D), E-Business Suite (EBS), etc. 
+Landing Zones are extended, future-proof with new complex workloads by plugging in Platforms. 
+Platforms can be shared globally (between workload environments), or dedicated for specific workload environments.
+See **Workload Extensions** section [here](../../../workload-extensions/readme.md).
+Platforms are on-boarded, enclosed in their respective compartments, only allowing the platform team to manage the workload they're supposed to, by Workload Environment's or Central Cloud Operations teams.
+
+**Project Teams**
+
+Project teams are application teams who manages independently workloads supporting their applications.
+By default, projects use shared projects workload environments VCNs. Project team can manage network security (NSGs) and provision the general purpose workloads in the respective subnets (Load Balancers, VMs, Autonomous/Base Databases, functions, etc.).-
+Projects are on-boarded, enclosed in their respective compartments, only allowing the project team to manage the workload they're supposed to, by Workload Environment's or Central Cloud Operations teams. They can't manage other projects (unless they're assigned also to them).
+
+**Central IaC Developement Teams**
+
+Infrastructure as Code (IaC) developers is a team who is responsible to manage the Terraform Code that it is extensively reused in the Landing Zone or for platforms and workloads. 
+It is not represented in the diagram and it is out of the scope of the blueprints.
+We encourage to have this **strong separation of duties** to avoid that Cloud Operations teams manage unapproved, one-off code and, IaC Developers don't touch Landing Zone / Workload or applications configurations.
+
+&nbsp; 
+
+### Landing Zone Cloud-Native Operations (What)
+
+The Operations represent the use cases as the operations activities performed by the different Cloud Operations Team to provision or update Landing Zone resources. These operations are requests for the Operations Teams.
+
+**OP.00 — Manage Common Landing Zone.**
+
+The Central Operations team creates tenancy wide IAM groups (IAM admins, Global Security, etc.), Identity Domains and IAM Policies, that are not tied to specific Landing Zone environments.
+
+**OP.01 — Manage Landing Zone Environment.** 
+
+The Central Operations team creates and changes shared landing-zone security and network services, including compartments, IAM policies, DRGs, VCNs, subnets, firewalls, and DNS. It follows initial tenancy onboarding and supplies the foundations required for Workload Environment and Global Shared Platforms.
+
+**OP.02 — Manage Workload Environment.** 
+
+The Central Operations team onboards or changes a Workload Environment by establishing its security and network structure. On first execution, it also prepares the Workload Operations team and hands over the OCIDs for core resources; it depends on shared services and enables department and project operations.
+
+**OP.03 — Manage Platform.** 
+
+The Central Operations or Workload Operations team creates or updates a platform structure that hosts platforms. 
+
+**OP.04 — Manage Project.** 
+
+The Central Operations or Workload Environment team creates projects compartment structure, IAM groups and policies to allow Project Teams to manage autonomously workloads supporting their applications. They can perform Day 1 & 2 operations over their workloads, running in shared VCNs with security built-in.
+
+&nbsp; 
+
+### Automation (How)
+
+Automation covers how the different Operations Terraform stacks (configurations + state file) are organized aligned to Operational Security (teams, Git repos, repo's structure, automation authentication & authorization, execution pipelines), and considering the requirements around isolation, regional availability, blast radius, state file store and locking and integration with runtime environment Git, CICD platforms and other 3rd parties.
+
+To learn more about this don't hesitate to check [GitOps Repository Design](https://github.com/oracle-devrel/technology-engineering/tree/main/oci-and-db/foundation/operations-advisory/multi-cloud-operating-models/landing-zone-repository-design).
 
 &nbsp; 
 
 # **6. Runtime View**
-This chapter will be added soon.
+
+This sec
 
 
 &nbsp; 
