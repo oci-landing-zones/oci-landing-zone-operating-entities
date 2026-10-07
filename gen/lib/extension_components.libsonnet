@@ -46,6 +46,12 @@ local collections = import 'collections.libsonnet';
         ext_type == 'exacs' && has_project_db(entry) && !has_network(entry);
       local explicit_components = publication_components(entry);
       if explicit_components != null then explicit_components
+      else if ext_type == 'exaxs' then {
+        infrastructure:
+          entry.scope.scope_type == 'shared' ||
+          !has_shared_extension_type(ext_type),
+        database: has_network(entry),
+      }
       else if ext_type != 'exacs' then component_defaults
       else {
         infrastructure:

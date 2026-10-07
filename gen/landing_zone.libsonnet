@@ -31,6 +31,7 @@ local extension_registry = {
   oke_simple: import 'workload-extensions/oke/simple/oke_simple.libsonnet',
   exacc: import 'workload-extensions/exacc/exacc.libsonnet',
   exacs: import 'workload-extensions/exacs/exacs.libsonnet',
+  exaxs: import 'workload-extensions/exaxs/exaxs.libsonnet',
   ocvs: import 'workload-extensions/ocvs/ocvs.libsonnet',
 };
 

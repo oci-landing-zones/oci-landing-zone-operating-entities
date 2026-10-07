@@ -152,6 +152,7 @@ Update this diagram when any of these change:
   - `gen/workload-extensions/exacc/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacc/multi-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacs/single-stack/profiles.libsonnet`
+  - `gen/workload-extensions/exaxs/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacs/multi-stack/profiles.libsonnet`
   - `gen/addons/oci-hub-models/profiles.libsonnet`
   - `gen/addons/oci-x-rpc/profiles.libsonnet`
