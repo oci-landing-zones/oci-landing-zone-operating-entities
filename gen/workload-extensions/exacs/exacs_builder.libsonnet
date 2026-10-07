@@ -3,6 +3,7 @@ local descriptions = import './descriptions.libsonnet';
 local exadb_render = import '../exadb/render.libsonnet';
 local exadb_project_db = import '../exadb/project_db.libsonnet';
 local products = import '../exadb/products.libsonnet';
+local exacs_database_workload = import './exacs_database_workload.libsonnet';
 
 {
   metadata(params)::
@@ -200,6 +201,6 @@ local products = import '../exadb/products.libsonnet';
             },
           },
         },
-      },
+      } + exacs_database_workload.contributions(params),
     },
 }

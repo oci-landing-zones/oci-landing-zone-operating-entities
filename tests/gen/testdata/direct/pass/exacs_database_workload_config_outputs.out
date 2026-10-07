@@ -1,0 +1,28 @@
+{
+  "database_input": {
+    "admin_password_secret_id": "ocid1.vaultsecret.oc1..fixture",
+    "db_name": "CDBPRIM"
+  },
+  "database_sections": [
+    "cloud_db_homes_configuration",
+    "databases_configuration",
+    "pluggable_databases_configuration"
+  ],
+  "database_workload_output_files": [
+    "exacs_cloud_exadata_databases.json",
+    "exacs_cloud_exadata_infrastructure.json",
+    "exacs_cloud_exadata_vmclusters.json"
+  ],
+  "infrastructure_root_keys": [
+    "cloud_exadata_database_configuration"
+  ],
+  "infrastructure_sections": [
+    "cloud_exadata_infrastructures_configuration"
+  ],
+  "vmclusters_root_keys": [
+    "cloud_exadata_database_configuration"
+  ],
+  "vmclusters_sections": [
+    "cloud_vm_clusters_configuration"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+    "cloud_exadata_database_configuration": {
+        "cloud_exadata_infrastructures_configuration": {
+            "cloud_exadata_infrastructures": {
+                "infra_preprod": {
+                    "display_name"                   : "exacs-infra-preprod",
+                    "compartment_id"                 : "CMP-LZ-PREPROD-EXACS-INFRA-KEY",
+                    "shape"                          : "Exadata.X11M"
+                },
+
+                "infra_prod": {
+                    "display_name"                   : "exacs-infra-prod",
+                    "compartment_id"                 : "CMP-LZ-PROD-EXACS-INFRA-KEY",
+                    "shape"                          : "Exadata.X11M"
+                }
+            }
+        }
+    }
+}

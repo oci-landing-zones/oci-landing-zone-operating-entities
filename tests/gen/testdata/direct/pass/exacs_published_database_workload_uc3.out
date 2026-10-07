@@ -1,0 +1,33 @@
+{
+  "cdb_keys": [
+    "cdb_preprod",
+    "cdb_prod"
+  ],
+  "dbhome_keys": [
+    "dbhome_preprod",
+    "dbhome_prod"
+  ],
+  "environment_chains": true,
+  "infrastructure_keys": [
+    "infra_preprod",
+    "infra_prod"
+  ],
+  "no_shared_platform": true,
+  "pdb_keys": [
+    "pdb_preprod",
+    "pdb_prod"
+  ],
+  "regular_workload_has_no_project_db_tiers": true,
+  "same_sections": true,
+  "sections": [
+    "cloud_db_homes_configuration",
+    "cloud_exadata_infrastructures_configuration",
+    "cloud_vm_clusters_configuration",
+    "databases_configuration",
+    "pluggable_databases_configuration"
+  ],
+  "vmcluster_keys": [
+    "vmc_preprod",
+    "vmc_prod"
+  ]
+}

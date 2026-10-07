@@ -1,8 +1,8 @@
-# Hub E Routing Notes <!-- omit from toc -->
+# OKE Workload Extension — Hub E Routing Notes <!-- omit from toc -->
 
 The simple multi-stack OKE package is based on **Hub E**. It is a quickstart for adding one OKE platform VCN as a spoke to an existing Hub E landing zone.
 
-## Hub E Assumptions
+## 1. Prerequisites
 
 - The Hub E landing zone already exists.
 - The Hub DRG key is `DRG-FRA-LZ-HUB-KEY` in the Frankfurt configuration.
@@ -11,7 +11,7 @@ The simple multi-stack OKE package is based on **Hub E**. It is a quickstart for
 - The OKE platform VCN uses its own NAT gateway and service gateway.
 - The quickstart enables OKE-created public OCI Load Balancers in the Hub LB subnet and injects a platform-tagged frontend NSG into the existing Hub VCN and Hub network compartment through `network_dependency`. At creation, set `oci.oraclecloud.com/compartment-id` to the Hub network compartment and `service.beta.kubernetes.io/oci-load-balancer-subnet1` to the Hub LB subnet, but do not include an NSG annotation. Wait until the endpoint is active, then add the approved matching-tag NSG annotation with security-rule management mode `None`. OKE receives only this post-create membership permission; the network team retains exclusive NSG rule, tag, movement, and lifecycle control. Initial creation with an NSG and CCM NSG management mode are unsupported. The quickstart does not create a Terraform-managed hub-level OCI L7 Load Balancer.
 
-## Multi-Stack Network Output
+## 2. Network Output
 
 The generated `oke_network.json` contains only the OKE platform network category and injects an OKE VCN attachment into the existing Hub DRG. It does not publish Hub A firewall route-table updates or a hub-level OCI L7 Load Balancer.
 
@@ -24,9 +24,7 @@ Attached VCN: VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY
 OKE VCN CIDR: 10.0.80.0/20
 ```
 
-&nbsp;
-
-# License <!-- omit from toc -->
+## License <!-- omit from toc -->
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 

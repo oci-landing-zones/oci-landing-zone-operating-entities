@@ -1,0 +1,95 @@
+{
+    "cloud_exadata_database_configuration": {
+        "cloud_db_homes_configuration": {
+            "dbhome_preprod": {
+                "display_name"                       : "exacs-dbhome-preprod",
+                "db_version"                         : "19.0.0.0",
+                "source"                             : "VM_CLUSTER_NEW",
+                "vm_cluster_id"                      : "vmc_preprod"
+            },
+
+            "dbhome_prod": {
+                "display_name"                       : "exacs-dbhome-prod",
+                "db_version"                         : "19.0.0.0",
+                "source"                             : "VM_CLUSTER_NEW",
+                "vm_cluster_id"                      : "vmc_prod"
+            }
+        },
+
+        "cloud_exadata_infrastructures_configuration": {
+            "cloud_exadata_infrastructures": {
+                "infra_preprod": {
+                    "display_name"                   : "exacs-infra-preprod",
+                    "compartment_id"                 : "CMP-LZ-PREPROD-EXACS-INFRA-KEY",
+                    "shape"                          : "Exadata.X11M"
+                },
+
+                "infra_prod": {
+                    "display_name"                   : "exacs-infra-prod",
+                    "compartment_id"                 : "CMP-LZ-PROD-EXACS-INFRA-KEY",
+                    "shape"                          : "Exadata.X11M"
+                }
+            }
+        },
+
+        "cloud_vm_clusters_configuration": {
+            "vmc_preprod": {
+                "display_name"                       : "exacs-vmc-preprod",
+                "compartment_id"                     : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "backup_subnet_id"                   : "SN-FRA-LZ-PREPROD-PLATFORM-EXACS-BACKUP-KEY",
+                "cpu_core_count"                     : 2,
+                "exadata_infrastructure_id"          : "infra_preprod",
+                "gi_version"                         : "19.0.0.0",
+                "hostname"                           : "exacspreprod",
+                "ssh_public_keys"                    : ["ssh-rsa REPLACE_WITH_APPROVED_PUBLIC_KEY"],
+                "subnet_id"                          : "SN-FRA-LZ-PREPROD-PLATFORM-EXACS-DB-KEY"
+            },
+
+            "vmc_prod": {
+                "display_name"                       : "exacs-vmc-prod",
+                "compartment_id"                     : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "backup_subnet_id"                   : "SN-FRA-LZ-PROD-PLATFORM-EXACS-BACKUP-KEY",
+                "cpu_core_count"                     : 2,
+                "exadata_infrastructure_id"          : "infra_prod",
+                "gi_version"                         : "19.0.0.0",
+                "hostname"                           : "exacsprod",
+                "ssh_public_keys"                    : ["ssh-rsa REPLACE_WITH_APPROVED_PUBLIC_KEY"],
+                "subnet_id"                          : "SN-FRA-LZ-PROD-PLATFORM-EXACS-DB-KEY"
+            }
+        },
+
+        "databases_configuration": {
+            "cdb_preprod": {
+                "db_home_id"                         : "dbhome_preprod",
+                "source"                             : "NONE",
+
+                "database": {
+                    "admin_password_secret_id"       : "ocid1.vaultsecret.oc1..REPLACE_WITH_SECRET_OCID",
+                    "db_name"                        : "CDBPREP"
+                }
+            },
+
+            "cdb_prod": {
+                "db_home_id"                         : "dbhome_prod",
+                "source"                             : "NONE",
+
+                "database": {
+                    "admin_password_secret_id"       : "ocid1.vaultsecret.oc1..REPLACE_WITH_SECRET_OCID",
+                    "db_name"                        : "CDBPROD"
+                }
+            }
+        },
+
+        "pluggable_databases_configuration": {
+            "pdb_preprod": {
+                "container_database_id"              : "cdb_preprod",
+                "pdb_name"                           : "PDBPREP"
+            },
+
+            "pdb_prod": {
+                "container_database_id"              : "cdb_prod",
+                "pdb_name"                           : "PDBPROD"
+            }
+        }
+    }
+}

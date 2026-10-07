@@ -1,71 +1,45 @@
-# **[OKE Landing Zone Extension](#)**   <!-- omit from toc -->
-## **An OCI Open LZ [Workload Extensions](#) to Reduce Your Time-to-Production** <!-- omit from toc -->
+# OKE Workload Extension — Published Quickstarts <!-- omit from toc -->
 
- <img src="../../../commons/images/icon_oke.jpg" height="100">
-&nbsp; 
+- [1. Summary](#1-summary)
+- [2. Architecture Overview](#2-architecture-overview)
+- [3. Deployment Options](#3-deployment-options)
+- [4. Operational Guidance](#4-operational-guidance)
+- [5. Additional Resources](#5-additional-resources)
 
-## **1. Introduction**
-Welcome to the **OKE Landing Zone Extension**.
+## 1. Summary
 
-The OKE Landing Zone Extension is a secure cloud environment, designed with the best practices to simplify the on-boarding of OKE workloads and enable the continuous operations of their cloud resources. This reference architecture provides an automated landing zone configuration.
-&nbsp;
+The published OKE package prepares one OKE platform using the [One-OE blueprint](/blueprints/one-oe/readme.md), Hub E networking, VCN-native pod networking, and managed workers. It includes infrastructure and IAM prerequisites for private and public workload load balancers. Kubernetes applications and Services are deployed through the workload owner's delivery process.
 
-## **2. Design Overview**
-This workload extension uses the [One-OE](https://github.com/oracle-quickstart/terraform-oci-open-lz/tree/master/blueprints/one-oe) Blueprint as the reference Landing Zone and guides the deployment of OKE on top of it. Extension consists of base infrastructure layer provisioning required OCI resources for deployment of OKE and OKE deployment itself.
-&nbsp;
+OCI Resource Manager (ORM) with configuration files in a customer-controlled private OCI Object Storage bucket is the recommended delivery path. Use the pinned OCI Landing Zone Orchestrator source with working directory `rms-facade`. Terraform CLI, customer-controlled CI/CD, and an approved private Git source are supported alternatives.
 
-## **3. Deployment Options**
+## 2. Architecture Overview
 
-This OKE Landing Zone Extension provides **two quickstart approaches**, [single-stack](single-stack/) and [multi-stack](multi-stack/), to accommodate different use cases and architectural preferences. Both use the committed JSON configurations as-is and are based on **Hub E**.
+Both deployment modes use the same OKE workload baseline. Their foundation ownership and state boundaries differ.
 
-For requirements outside the quickstart configurations, such as other hub models or additional OKE platforms, see [OKE generation options](oke-blueprint-factory.md).
-
-The quickstarts create one production OKE platform by default.
-
-
-### **Choosing the Right Approach**
-
-| Consideration | [Single-stack](single-stack/) | [Multi-stack](multi-stack/) |
-|---------------|-------------|--------------|
-| **Use Case** | PoC, Exploration | Existing Hub E quickstart with separate lifecycle |
-| **Hub Model** |  [Hub E (free)](../../../addons/oci-hub-models/hub_e/) |  Existing [Hub E](../../../addons/oci-hub-models/hub_e/) landing zone |
-| **Routing Configuration** |  Automatic Hub route updates | OKE spoke attachment and Hub E route coordination |
-| **Landing Zone** | Created together  | Already exists |
-| **Deployment Steps** | Single deployment operation | Deploy LZ first, then OKE extension |
-| **Terraform State** |  Combined (1 state) | Separate (2 states) |
-| **Resource Lifecycle** | Coupled | Independent |
-| **Complexity** | Self-contained | Requires key coordination across stacks |
-
-The committed quickstart configurations are designed to be deployed as-is.
-
-
-### Common Features (Both Approaches)
-
-Both deployment options provide:
-- **Automated Dependency Resolution**: Configuration keys instead of manual OCID lookups
-- **CIS-Compliant OKE**: Using [CIS OKE module](https://github.com/oci-landing-zones/terraform-oci-modules-workloads/tree/main/cis-oke)
-- **OKE CNI Network Mode**: VCN-native pod networking
-- **Comprehensive NSG Configuration**: Control plane, workers, load balancers, and, for native networking, pods
-- **Hub-and-Spoke Topology**: OKE VCN as spoke connected to Hub via DRG
-- **Public workload ingress**: Kubernetes `Service` resources can create public OCI Load Balancers in the prepared Hub subnet.
-- **Service Gateway**: Direct connectivity to OCI services
-- **Optional File Storage prerequisites**: Config-driven generation can add a dedicated FSS subnet, NSG rules, and scoped IAM permission.
-
-### Deployment Components
-
-Both approaches deploy the same main components:
-
-| Component | What is deployed |
+| Component | Published resources |
 | --- | --- |
-| IAM | OKE administrator and resource-principal policies, compartments, and groups. |
-| Network | An OKE VCN with cluster, worker, pod, and private load-balancer subnets and NSGs; Hub routing and public-ingress prerequisites are included. |
-| OKE | A Kubernetes cluster with VCN-native pod networking. |
-| Workers | A managed node pool using `VM.Standard.E5.Flex` and an Oracle Linux 9 OKE image. |
-| Workload load balancing | Private OCI Load Balancers and Network Load Balancers use the OKE VCN. Public OCI Load Balancers use the Hub LB subnet and a network-team-controlled frontend NSG. |
+| IAM | OKE compartments, administrator groups, and resource-principal policies |
+| Governance | OKE platform tag namespace and definition |
+| Network | OKE VCN with control-plane, worker, pod, and internal load-balancer subnets and NSGs; Hub/DRG integration |
+| Cluster | One enhanced OKE cluster with VCN-native pod networking |
+| Workers | One managed worker using `VM.Standard.E5.Flex` and a matching Oracle Linux 9 OKE image |
+| Workload ingress | Private LB/NLB prerequisites in the OKE VCN and public OCI Load Balancer prerequisites in the Hub |
 
-This repository deploys OCI infrastructure only. Deploy Kubernetes workloads and `Service` resources through an approved Kubernetes delivery process.
+The cluster and worker snapshots use CIS1 with OCI-managed encryption. The published IAM snapshot is rendered from CIS2 and includes dormant compartment-scoped KMS authority; keep unrelated keys out of the OKE platform compartment. Use Blueprint Factory for a complete CIS2 workload and its generated encryption dependencies.
 
-### Deploying workload load balancers
+## 3. Deployment Options
+
+| Path | Foundation | State and lifecycle | Guide |
+| --- | --- | --- | --- |
+| Published single-stack | Created together with OKE | One combined state | [Single-stack](single-stack/readme.md) |
+| Published multi-stack | Existing One-OE Hub E landing zone | Separate foundation and extension states | [Multi-stack](multi-stack/readme.md) |
+| Blueprint Factory | Generated for the reviewed design | Generated package and its deployment contract | [Customization](oke-blueprint-factory.md) |
+
+The quickstarts use an environment named `prod` and a Hub E without a firewall. Use them for a PoC, lab, or explicitly non-production deployment that accepts that tradeoff. Production requires a firewall-based hub. For production or different environments, platforms, CIDRs, or networking modes, use [Blueprint Factory](oke-blueprint-factory.md).
+
+## 4. Operational Guidance
+
+### Deploying Workload Load Balancers
 
 Use the deployed network-stack outputs to resolve compartment, subnet, and NSG OCIDs. The generated `int-lb-default-backend` NSG provides the preconfigured LB-to-backend connectivity and must be attached to the load balancer. In private deployments, OKE can create and manage a separate frontend NSG in the environment network compartment. Public Hub frontend NSGs remain network-team-managed.
 
@@ -261,26 +235,51 @@ OCI Web Application Firewall (WAF) and Web Application Acceleration (WAA) can al
 
 See the [summary of OKE load-balancer annotations](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingloadbalancer_topic-Summaryofannotations.htm) for the complete LB and NLB annotation reference.
 
+### Kubernetes Add-ons
+
+**Manual post-deployment configuration required:** the extension does not install Kubernetes add-ons. The workload owner manages their versions, lifecycle, drift, and compliance review.
+
+The published OKE baseline uses the following cert-manager release for Kubernetes `v1.35.2`:
+
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.0/cert-manager.yaml
+```
+
+For Metrics Server, review the release selected by the workload delivery process before installation. The upstream manifest location used by the quickstarts is:
+
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+For cert-manager renewal, terminate TLS in an approved ingress controller and use OCI Load Balancer TCP pass-through. OCI Load Balancer termination with imported certificates requires a security-owned external renewal pipeline; an in-cluster Secret update does not rotate the OCI certificate.
+
 ### Using OCI File Storage
 
 Config-driven OKE generation can prepare OCI File Storage networking and IAM by setting `create_fss: true` in the `oke_simple` parameters. The option defaults to `false`, so the committed quickstarts and existing configurations do not gain extra subnets or permissions.
 
 When enabled, the generated OKE VCN includes a private FSS subnet, service-gateway-only route table, FSS security list and NSG, and paired stateless NFS rules between the FSS and worker NSGs. For VCN-native networking, the same rules are generated between the FSS and pod NSGs so OKE virtual nodes can mount FSS directly from pods. The OKE cluster principal also receives `manage file-family` in its own platform compartment.
 
-The extension does not create a file system, mount target, or Kubernetes storage objects. After infrastructure deployment, create a mount target in the generated FSS subnet and associate the generated FSS NSG with it. Then configure the `fss.csi.oraclecloud.com` StorageClass with that existing `mountTargetOcid` and the OKE platform compartment. This keeps the mount target and its NSG association under infrastructure management while CSI manages file systems and persistent volumes. See [Provisioning PVCs on the File Storage Service](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingpersistentvolumeclaim_Provisioning_PVCs_on_FSS.htm).
+**Manual post-deployment configuration required:** the extension prepares prerequisites for File Storage but does not create a file system, mount target, or Kubernetes storage objects. After infrastructure deployment, create a mount target in the generated FSS subnet and associate the generated FSS NSG with it. Then configure the `fss.csi.oraclecloud.com` StorageClass with that existing `mountTargetOcid` and the OKE platform compartment. This keeps the mount target and its NSG association under infrastructure management while CSI manages file systems and persistent volumes. See [Provisioning PVCs on the File Storage Service](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingpersistentvolumeclaim_Provisioning_PVCs_on_FSS.htm).
 
 CIS2 worker initialization installs `oci-fss-utils` from the developer repository matching the runtime Oracle Linux major version. This prepares CIS2 workers for FSS in-transit encryption. CIS1 workers do not install the package.
 
 Worker boot volumes default to `60` GB. Set `worker_boot_volume_size` to an integer from `50` through `32768` in the `oke_simple` parameters to choose another size. Worker initialization runs `oci-growfs` at both CIS levels so the root partition and filesystem use the configured capacity, then executes the OKE-provided bootstrap script so the node can join the cluster.
 
-### Additional operational notes
+<a id="additional-operational-notes"></a>
+
+### Operational and Security Notes
 
 - OCI Load Balancer can terminate TLS with an approved certificate in the owning OKE platform compartment. OKE can read and associate the certificate but cannot renew it. TCP pass-through to an in-cluster TLS endpoint is also supported.
 - The initial public-LB state remains closed only while the Hub LB subnet security list does not permit public ingress. Changing or removing the approved NSG's platform tag causes later attachment requests to fail.
 - When public workload ingress is enabled, the shared Hub policy grants public-IP and floating-IP management plus private-IP use to every OKE cluster principal without platform-tag filtering. The platform-tag restrictions still apply to public Load Balancer lifecycle, Hub subnet/VCN access, and approved NSG attachment.
 - OKE administrators, the OKE service, and managed node pools can use an existing Compute capacity reservation in the owning OKE platform compartment. The extension does not create, select, update, or delete reservations.
 
-&nbsp;
+## 5. Additional Resources
+
+- [Single-stack deployment](single-stack/readme.md)
+- [Multi-stack deployment](multi-stack/readme.md)
+- [Blueprint Factory customization](oke-blueprint-factory.md)
+- [ORM deployment guidance](/commons/content/orm_bp.md)
 
 ## License <!-- omit from toc -->
 

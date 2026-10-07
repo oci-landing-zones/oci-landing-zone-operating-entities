@@ -1,17 +1,17 @@
-# OKE generation options <!-- omit from toc -->
+# OKE Workload Extension — Blueprint Factory <!-- omit from toc -->
 
-- [**1. Overview**](#1-overview)
-- [**2. Prerequisites**](#2-prerequisites)
-- [**3. What `oke_simple` Means**](#3-what-oke_simple-means)
-- [**4. Native OKE Example**](#4-native-oke-example)
-- [**5. Overlay OKE Example**](#5-overlay-oke-example)
-- [**6. OKE VCN Sizing**](#6-oke-vcn-sizing)
-- [**7. Manual OKE Subnet CIDRs**](#7-manual-oke-subnet-cidrs)
-- [**8. File Storage Support**](#8-file-storage-support)
-- [**9. Generate the JSON Files**](#9-generate-the-json-files)
-- [**10. Generated Output Contract**](#10-generated-output-contract)
+- [1. Summary](#1-summary)
+- [2. Prerequisites](#2-prerequisites)
+- [3. What `oke_simple` Means](#3-what-oke_simple-means)
+- [4. Native OKE Example](#4-native-oke-example)
+- [5. Overlay OKE Example](#5-overlay-oke-example)
+- [6. OKE VCN Sizing](#6-oke-vcn-sizing)
+- [7. Manual OKE Subnet CIDRs](#7-manual-oke-subnet-cidrs)
+- [8. File Storage Support](#8-file-storage-support)
+- [9. Generate the JSON Files](#9-generate-the-json-files)
+- [10. Generated Output Contract](#10-generated-output-contract)
 
-## **1. Overview**
+## 1. Summary
 
 Use one of the supported Landing Zone add-on entry paths when the committed OKE JSON files do not match the required landing zone:
 
@@ -29,16 +29,17 @@ The OKE simple workload extension is configured as a platform extension named `o
 
 For overlay clusters, the requested OKE CNI is Flannel. In the workload-extension configuration, do not set `cni_type` to `flannel`; use `cni_type: 'overlay'`.
 
-## **2. Prerequisites**
+## 2. Prerequisites
 
 Before generating the files:
 
 - Clone this repository locally.
 - Install a Jsonnet renderer on your `PATH`. The standard `jsonnet` command works; `jrsonnet` can also be used for faster local generation.
-- Decide the output directory where the generated JSON files should be written.
+- Decide separate locations for the reviewed source configuration and generated deployment files.
+- Confirm the environment names, workload scope, firewall requirement, and explicit CIS1/CIS2 choice. Production requires a firewall-based hub.
 - Confirm the CIDR plan for the hub, any project VCNs, OKE VCNs, Kubernetes services, and, for overlay, Kubernetes pods.
 
-## **3. What `oke_simple` Means**
+## 3. What `oke_simple` Means
 
 `oke_simple` is the OKE workload extension type selected through either supported add-on. When a platform uses `extension.type: 'oke_simple'`, generation adds the OKE network, IAM, cluster, worker, security, and observability JSON needed for that platform.
 
@@ -52,9 +53,11 @@ This is different from the committed quickstart folders:
 
 In either add-on path, use `oke_simple` for OKE platforms.
 
-## **4. Native OKE Example**
+## 4. Native OKE Example
 
 The following example creates a One-OE landing zone with Hub E and one native OKE cluster in the `prod` environment.
+
+This is a PoC/lab address-planning example. The environment name `prod` does not change Hub E's lack of a firewall. Use a firewall-based hub for production and review the full network scope before assigning CIDRs.
 
 Create a configuration file, for example `oke-native.jsonnet`:
 
@@ -112,7 +115,7 @@ Direct OCI Certificates integration stores every certificate in the owning OKE p
 
 The generator creates no Kubernetes certificate-renewal identity. For OCI LB termination, use an OCI-managed certificate or a security-owned external pipeline that updates an imported Let's Encrypt certificate. For automatic cert-manager renewal inside Kubernetes, terminate TLS in an approved ingress controller and use OCI LB TCP pass-through. Review the shared [operational and security notes](readme.md#operational-and-security-notes) before enabling public ingress.
 
-## **5. Overlay OKE Example**
+## 5. Overlay OKE Example
 
 The following example creates a Hub A landing zone with overlay OKE clusters in `prod` and `preprod`.
 
@@ -192,7 +195,7 @@ Create a configuration file, for example `oke-overlay-hub-a.jsonnet`:
 
 Overlay mode omits the OCI pod subnet, pod route table, pod security list, pod NSG, and worker pod networking references. If `pods_cidr` is not provided, it defaults to `10.244.0.0/16`.
 
-## **6. OKE VCN Sizing**
+## 6. OKE VCN Sizing
 
 Auto-subnet profiles are the default way to define OKE subnetting. The user provides the OKE VCN CIDR, and may optionally provide `cluster_size`; when `cluster_size` is omitted, the Blueprint Factory uses the `small` profile. The factory then creates the required OKE subnets.
 
@@ -224,7 +227,7 @@ The FSS subnet is generated only when `create_fss: true`.
 
 If `cluster_size` is set, do not also define OKE platform subnets in the configuration. To use the default `small` profile, omit both `cluster_size` and manual OKE platform subnets.
 
-## **7. Manual OKE Subnet CIDRs**
+## 7. Manual OKE Subnet CIDRs
 
 Use manual subnet CIDRs only when the standard cluster size profiles do not fit the required address plan.
 
@@ -280,7 +283,7 @@ network: {
 
 Do not include `pods` in an overlay manual subnet map. Overlay pod addresses come from the Kubernetes overlay pod CIDR, not from an OCI pod subnet.
 
-## **8. File Storage Support**
+## 8. File Storage Support
 
 OCI File Storage support is disabled by default. Enable its network and IAM prerequisites in the OKE extension parameters:
 
@@ -307,7 +310,7 @@ The extension does not create a file system, mount target, export, Kubernetes `S
 
 See [Provisioning PVCs on the File Storage Service](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingpersistentvolumeclaim_Provisioning_PVCs_on_FSS.htm) for the supported `fss.csi.oraclecloud.com` StorageClass parameters and provisioning workflow.
 
-## **9. Generate the JSON Files**
+## 9. Generate the JSON Files
 
 Run the Blueprint Factory from the repository root:
 
@@ -321,9 +324,11 @@ Example:
 bash gen/generate.sh --config ./oke-overlay-hub-a.jsonnet ./generated/oke-overlay-hub-a
 ```
 
-The generated directory contains the JSON files to use with the OCI Landing Zone Orchestrator.
+The generated directory contains the deployment working set for the OCI Landing Zone Orchestrator. Use only those generated files for that design; do not mix them with published snapshots.
 
-## **10. Generated Output Contract**
+OCI Resource Manager (ORM) with configuration files in a customer-controlled private OCI Object Storage bucket is the recommended delivery path. Use the pinned OCI Landing Zone Orchestrator source with working directory `rms-facade`. Terraform CLI, customer-controlled CI/CD, and an approved private Git source are supported alternatives.
+
+## 10. Generated Output Contract
 
 The generated file set commonly includes:
 
@@ -358,9 +363,7 @@ For overlay OKE, the generator:
 - Omits `pods_subnet_id` and `pods_nsg_ids` from `oke_workers.json`.
 - Omits the OKE pod subnet, pod route table, pod security list, and pod NSG from `network.json`.
 
-&nbsp;
-
-# License <!-- omit from toc -->
+## License <!-- omit from toc -->
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 

@@ -1,31 +1,29 @@
 # ExaDB-D Use Cases <!-- omit from toc -->
 
-## **Table of Contents** <!-- omit from toc -->
+- [1. Summary](#1-summary)
+- [2. Use Cases](#2-use-cases)
+  - [2.1 Shared ExaDB-D Platform: Shared infrastructure and shared VMCs/AVMCs across multiple environments](#21-shared-exadb-d-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments)
+    - [ExaDB-D Resources](#exadb-d-resources)
+    - [ExaDB-D Groups](#exadb-d-groups)
+    - [ExaDB-D Observability](#exadb-d-observability)
+  - [2.2 Hybrid ExaDB-D Platform: Shared infrastructure with dedicated VMCs/AVMCs per environment](#22-hybrid-exadb-d-platform-shared-infrastructure-with-dedicated-vmcsavmcs-per-environment)
+    - [ExaDB-D Resources](#exadb-d-resources-1)
+    - [ExaDB-D Groups](#exadb-d-groups-1)
+    - [ExaDB-D Observability](#exadb-d-observability-1)
+  - [2.3 Dedicated ExaDB-D Platform: Fully dedicated infrastructure and VMCs/AVMCs per environment](#23-dedicated-exadb-d-platform-fully-dedicated-infrastructure-and-vmcsavmcs-per-environment)
+    - [ExaDB-D Resources](#exadb-d-resources-2)
+    - [ExaDB-D Groups](#exadb-d-groups-2)
+    - [ExaDB-D Observability](#exadb-d-observability-2)
+- [3. Design Decisions](#3-design-decisions)
+- [4. Management of Other Resources](#4-management-of-other-resources)
+  - [4.1 Disaster Recovery (DR)](#41-disaster-recovery-dr)
+  - [4.2 Operator Access Control](#42-operator-access-control)
+  - [4.3 Software Images](#43-software-images)
+  - [4.4 Backup Destinations](#44-backup-destinations)
 
-- [**1. Summary**](#1-summary)
-- [**2. Use Cases**](#2-use-cases)
-  - [**2.1 Shared ExaDB-D Platform: Shared infrastructure and shared VMCs/AVMCs across multiple environments**](#21-shared-exadb-d-platform-shared-infrastructure-and-shared-vmcsavmcs-across-multiple-environments)
-    - [**ExaDB-D Resources**](#exadb-d-resources)
-    - [**ExaDB-D Groups**](#exadb-d-groups)
-    - [**ExaDB-D Observability**](#exadb-d-observability)
-  - [**2.2 Hybrid ExaDB-D Platform: Shared infrastructure with dedicated VMCs/AVMCs per environment**](#22-hybrid-exadb-d-platform-shared-infrastructure-with-dedicated-vmcsavmcs-per-environment)
-    - [**ExaDB-D Resources**](#exadb-d-resources-1)
-    - [**ExaDB-D Groups**](#exadb-d-groups-1)
-    - [**ExaDB-D Observability**](#exadb-d-observability-1)
-  - [**2.3 Dedicated ExaDB-D Platform: Fully dedicated infrastructure and VMCs/AVMCs per environment**](#23-dedicated-exadb-d-platform-fully-dedicated-infrastructure-and-vmcsavmcs-per-environment)
-    - [**ExaDB-D Resources**](#exadb-d-resources-2)
-    - [**ExaDB-D Groups**](#exadb-d-groups-2)
-    - [**ExaDB-D Observability**](#exadb-d-observability-2)
-- [**3. Design Decisions**](#3-design-decisions)
-- [**4. Management of other resources**](#4-management-of-other-resources)
-  - [**4.1 Disaster Recovery (DR)**](#41-disaster-recovery-dr)
-  - [**4.2 Operator Access Control**](#42-operator-access-control)
-  - [**4.3 Software Images**](#43-software-images)
-  - [**4.4 Backup Destinations**](#44-backup-destinations)
+Published foundations and regular database workloads cover UC1–UC3. The diagrams also show conceptual Autonomous and disaster recovery placements. The regular workload creates one shared infrastructure in UC1/UC2 or two environment infrastructures in UC3 (`prod` and `preprod`); it does not create a primary/standby pair or Autonomous lifecycle resources. See the [published workload contract](../database-workload/readme.md). **Manual post-deployment configuration required** for lifecycle resources outside that contract; the workload owner manages their lifecycle, drift, and compliance.
 
-Published generated artifacts currently support Use Case 1 (UC1), the shared ExaDB-D platform, Use Case 2 (UC2), the hybrid ExaDB-D platform, and Use Case 3 (UC3), the dedicated ExaDB-D platform.
-
-## **1. Summary**
+## 1. Summary
 
 The ExaDB-D infrastructure is a platform designed for large-scale Oracle Database consolidation. A single infrastructure can support multiple Virtual Machine Clusters (VMCs) and Autonomous Virtual Machine Clusters (AVMCs), which may be shared or dedicated across different workload environments, operating entities, organizational units, lines of business, departments, and more.
 
@@ -39,7 +37,7 @@ We have identified three main use cases:
 2. Hybrid ExaDB-D Platform: Shared infrastructure with dedicated VMCs/AVMCs per environment.
 3. Dedicated ExaDB-D Platform: Fully dedicated infrastructure and VMCs/AVMCs per environment.
 
-While not all possible configurations are covered, these represent the most common scenarios. If your use case involves a combination of these, you can leverage elements from each to design a custom solution.
+While not all possible configurations are covered, these represent the most common scenarios. Use Blueprint Factory for a supported combination that differs from the published profiles.
 
 The ExaDB-D infrastructure consists of database and storage servers connected through a RoCE switch fabric. It supports both "regular" *Virtual Machine Clusters (VMCs)* and *Autonomous Virtual Machine Clusters (AVMCs)*. Each VMC/AVMC is composed of one or more virtual machines distributed across database servers, ensuring high availability through Oracle Grid Infrastructure clusterware.
 
@@ -55,18 +53,17 @@ IAM policies for ExaDB-D provide flexibility to define permissions by *resource 
 
 This extension adopts such approach, as certain operations (e.g., scaling OCPUs, system memory, or local file systems in VMCs) are typically handled by infrastructure or systems teams, while others (e.g., ASM storage scaling or database-related operations) are more suited to DBA teams. In some cases, operations may fail for different reasons, and each team’s expertise is better aligned with troubleshooting within their domain.
 
-
-## **2. Use Cases**
+## 2. Use Cases
 
 In this section, we describe the identified use case scenarios, providing additional guidance on key aspects such as the **separation of duties** across operations teams and the **architectural design decisions** involved in placing resources and ExaDB-D components.
 
-### **2.1 Shared ExaDB-D Platform: Shared infrastructure and shared VMCs/AVMCs across multiple environments**
+### 2.1 Shared ExaDB-D Platform: Shared infrastructure and shared VMCs/AVMCs across multiple environments
 
 <p align="center">
 <img src="../content/exacs_use_case_1.png" width="1000" height="auto">
 </p>
 
-#### **ExaDB-D Resources**
+#### ExaDB-D Resources
 
 In this scenario, the ExaDB-D stack is treated as a **shared platform** from the infrastructure perspective.
 
@@ -80,7 +77,7 @@ For Autonomous deployments AVMCs and Autonomous Container Databases (ACDs) are a
 
 The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in the ExaCS DB compartment <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">.
 
-#### **ExaDB-D Groups**
+#### ExaDB-D Groups
 
 The administrative groups <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> are defined to align with the operational model of this shared platform and enforce a clear separation of responsibilities.
 
@@ -95,7 +92,7 @@ In addition, environment-specific database administration is handled by dedicate
 
 This approach ensures that infrastructure and shared database layers are centrally managed, while granting each environment its own level of autonomy over its dedicated Autonomous Databases, reinforcing both governance and operational efficiency.
 
-#### **ExaDB-D Observability**
+#### ExaDB-D Observability
 
 The observability framework for this scenario is based on the combined use of **Events, Alarms, and Notifications**, enabling centralized monitoring and controlled dissemination of operational signals across both shared and environment-specific resources.
 
@@ -145,13 +142,13 @@ The observability components operate in an integrated manner:
 
 This model provides a consistent and scalable observability approach, combining centralized monitoring of shared ExaDB-D resources with environment-specific visibility and control.
 
-### **2.2 Hybrid ExaDB-D Platform: Shared infrastructure with dedicated VMCs/AVMCs per environment**
+### 2.2 Hybrid ExaDB-D Platform: Shared infrastructure with dedicated VMCs/AVMCs per environment
 
 <p align="center">
 <img src="../content/exacs_use_case_2.png" width="1000" height="auto">
 </p>
 
-#### **ExaDB-D Resources**
+#### ExaDB-D Resources
 
 In this scenario, the ExaDB-D stack follows a **hybrid model**, where the infrastructure layer is shared while compute resources (VMCs/AVMCs) are dedicated per environment.
 
@@ -167,7 +164,7 @@ Autonomous Databases Dedicated (ADB-D) are deployed in project-level compartment
 
 The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCS DB compartment <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
 
-#### **ExaDB-D Groups**
+#### ExaDB-D Groups
 
 The administrative groups <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> use the same hybrid ownership model as ExaDB-C@C UC2: the shared physical infrastructure keeps a global owner, while environment platform operations are delegated per environment.
 
@@ -188,7 +185,7 @@ These project-level DBA groups are scoped at the project level within each envir
 
 This model preserves central ownership of the shared physical infrastructure while keeping environment platform operations isolated. Each Project DBA can administer only its delegated ADB-D resources and read the ACD required to place and operate those databases.
 
-#### **ExaDB-D Observability**
+#### ExaDB-D Observability
 
 The observability framework for this scenario is based on the combined use of **Events, Alarms, and Notifications**, enabling centralized monitoring and controlled dissemination of operational signals across both shared and environment-specific resources.
 
@@ -240,14 +237,13 @@ The observability components operate in an integrated manner:
 
 This model provides a consistent and scalable observability approach, combining centralized monitoring of shared ExaDB-D resources with environment-specific visibility and control.
 
-
-### **2.3 Dedicated ExaDB-D Platform: Fully dedicated infrastructure and VMCs/AVMCs per environment**
+### 2.3 Dedicated ExaDB-D Platform: Fully dedicated infrastructure and VMCs/AVMCs per environment
 
 <p align="center">
 <img src="../content/exacs_use_case_3.png" width="1000" height="auto">
 </p>
 
-#### **ExaDB-D Resources**
+#### ExaDB-D Resources
 
 In this scenario, the ExaDB-D stack follows a **fully dedicated model**, where both the infrastructure and compute layers are isolated per environment.
 
@@ -263,7 +259,7 @@ Autonomous Databases Dedicated (ADB-D) are deployed in project-level compartment
 
 The images used to provision the different Oracle Homes, both for Grid Infrastructure and for the databases, are stored in each environment-specific ExaCS DB compartment <img src="../content/f.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;">, ensuring that software artifacts are fully segregated per environment.
 
-#### **ExaDB-D Groups**
+#### ExaDB-D Groups
 
 The administrative groups <img src="../content/g.png" style="height: 1.5em; vertical-align: text-bottom; margin: 0 2px;"> follow the dedicated placement model, with infrastructure and database administration scoped independently to each environment.
 
@@ -280,7 +276,7 @@ These Project DBA groups are scoped to their project DB tier. The environment ad
 
 This model separates duties by both resource layer and environment: each environment team operates only its dedicated platform resources, while each Project DBA can administer only its delegated ADB-D resources and read the ACD required to place and operate those databases.
 
-#### **ExaDB-D Observability**
+#### ExaDB-D Observability
 
 The observability framework for this scenario is based on the combined use of **Events, Alarms, and Notifications**, enabling centralized monitoring and controlled dissemination of operational signals across the environment-dedicated resources.
 
@@ -328,7 +324,7 @@ The observability components operate in an integrated manner:
 
 This model provides a consistent and scalable observability approach across the environment-dedicated ExaDB-D resources, with environment-specific visibility and notification routing.
 
-## **3. Design Decisions**
+## 3. Design Decisions
 
 This section outlines the key design decisions adopted for the ExaDB-D architecture, covering administrative responsibilities, resource placement, visual representation, and networking strategy.
 
@@ -369,7 +365,7 @@ In this architecture, one or more Virtual Cloud Networks (VCNs) are defined to h
 
 Each VCN is designed to include, at minimum, two subnets: a client subnet, used for application connectivity to the databases, and a backup subnet, dedicated to backup and recovery traffic. This separation ensures proper traffic isolation and aligns with Oracle recommendations for Exadata deployments in OCI.
 
-ExaDB-D deployments are provisioned within these VCNs, and all associated resources, including VMCs, leverage the defined subnets for communication. Multiple database clusters can operate within the same VCN and subnets, provided that appropriate segmentation and security controls are implemented using OCI constructs such as Network Security Groups (NSGs) and route tables.
+ExaDB-D deployments are provisioned within these VCNs, and all associated resources, including VMCs, use the defined subnets for communication. Multiple database clusters can operate within the same VCN and subnets, provided that appropriate segmentation and security controls are implemented using OCI constructs such as Network Security Groups (NSGs) and route tables.
 
 This approach allows network resources to be reused across environments when appropriate, or isolated per environment when required, depending on the chosen architectural pattern. It provides a balance between operational simplicity, resource efficiency, and the level of isolation needed for each workload.
 
@@ -383,11 +379,11 @@ In contrast, Autonomous Databases Dedicated (ADB-D) provide a fundamentally diff
 
 Based on this capability, a deliberate design decision has been made to always deploy Autonomous Databases at the project level. This ensures that each ADB is associated with its corresponding project compartment, enabling clear ownership, fine-grained access control, and independent lifecycle management.
 
-By combining these two approaches, the architecture acknowledges the structural constraints of VMC-based deployments—where the cluster defines the boundary—while leveraging the flexibility of Autonomous Databases to achieve project-level isolation and delegation.
+By combining these two approaches, the architecture acknowledges the structural constraints of VMC-based deployments—where the cluster defines the boundary—while using Autonomous Database placement to achieve project-level isolation and delegation.
 
-## **4. Management of other resources**
+## 4. Management of Other Resources
 
-### **4.1 Disaster Recovery (DR)**
+### 4.1 Disaster Recovery (DR)
 
 In this architecture, Disaster Recovery (DR) is implemented by defining two ExaDB-D infrastructures, one acting as primary and the other as standby.
 
@@ -401,9 +397,9 @@ Cost allocation between primary and DR deployments can be managed through the us
 
 This approach provides a consistent and scalable DR model, where protection is based on databases located in different VM clusters, running on separate ExaDB-D infrastructures, replicating database information between CDBs, while maintaining flexibility in terms of logical organization, cost tracking, and operational ownership.
 
-To know more about how to use Data Guard on ExaDB-D environments you can check the public document [Use Oracle Data Guard with Exadata Cloud Infrastructure](https://docs.oracle.com/en-us/iaas/exadatacloud/doc/ecs-using-data-guard.html).
+See [Use Oracle Data Guard with Exadata Cloud Infrastructure](https://docs.oracle.com/en-us/iaas/exadatacloud/doc/ecs-using-data-guard.html).
 
-### **4.2 Operator Access Control**
+### 4.2 Operator Access Control
 
 Oracle Operator Access Control is an OCI compliance and auditing service that provides visibility into when Oracle operators require access to the underlying ExaDB-D infrastructure for maintenance or issue resolution. It offers near real-time audit trails of all actions performed by Oracle personnel.
 
@@ -413,13 +409,13 @@ Additionally, OCI Event Rules are configured to capture Operator Access Control 
 
 An alternative design may place Operator Access Control resources within environment-specific security compartments, enabling dedicated security teams to manage infrastructure access independently per environment. This approach may be particularly relevant in multi-tenant or multi–Operating Entity (OE) scenarios, where each OE manages its own infrastructure.
 
-To know more about the Oracle Operator Access Control you can check the public document [Oracle Operator Access Control](https://docs.oracle.com/en-us/iaas/operator-access-control/index.html).
+See [Oracle Operator Access Control](https://docs.oracle.com/en-us/iaas/operator-access-control/index.html).
 
-### **4.3 Software Images**
+### 4.3 Software Images
 
 Oracle provides the capability to define custom Database Software Images and Grid Infrastructure Software Images in OCI. These images represent curated versions of Oracle software, including specific Release Updates (RUs) and optional one-off patches, allowing organizations to standardize the software stack used across their database platforms.
 
-These software images can be leveraged both for provisioning new Oracle or Grid Infrastructure Homes and for performing in-place patching of existing homes, enabling a consistent and controlled approach to software lifecycle management.
+Use these software images for provisioning new Oracle or Grid Infrastructure Homes and for performing in-place patching of existing homes, enabling a consistent and controlled approach to software lifecycle management.
 
 In this architecture, the placement of software images is not fixed and depends on the selected use case and operational model. Software images can be managed as shared resources or as environment-specific resources, depending on the required level of isolation and governance.
 
@@ -433,7 +429,7 @@ This flexible approach ensures consistency in software deployment while allowing
 
 For more information, refer to the official documentation [Manage Software Images](https://docs.oracle.com/en-us/iaas/exadatacloud/doc/ecc-manage-images.html).
 
-### **4.4 Backup Destinations**
+### 4.4 Backup Destinations
 
 ExaDB-D supports multiple backup options, based on integration with OCI Autonomous Recovery Service and OCI Object Storage. Autonomous Recovery Service is the recommended backup destination for database workloads, providing advanced data protection, automated validation, and point-in-time recovery capabilities.
 
@@ -449,9 +445,7 @@ IAM policies are defined accordingly, allowing DBA teams to manage backup config
 
 For more information, refer to the official documentation [Manage Database Backup and Recovery on Oracle Exadata Database Service on Dedicated Infrastructure](https://docs.oracle.com/en-us/iaas/exadatacloud/doc/ecs-managing-db-backup-and-recovery.html).
 
-&nbsp;
-
-# License <!-- omit from toc -->
+## License <!-- omit from toc -->
 
 Copyright (c) 2026 Oracle and/or its affiliates.
 

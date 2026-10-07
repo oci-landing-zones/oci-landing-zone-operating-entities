@@ -73,9 +73,9 @@ local products = import '../../exadb/products.libsonnet';
             route_key
             for route_key in std.objectFields(category.vcns[vcn_key].route_tables[rt_key].route_rules)
             if std.objectHas(
-              category.vcns[vcn_key].route_tables[rt_key].route_rules[route_key],
-              'network_entity_key'
-            ) &&
+                 category.vcns[vcn_key].route_tables[rt_key].route_rules[route_key],
+                 'network_entity_key'
+               ) &&
                category.vcns[vcn_key].route_tables[rt_key].route_rules[route_key].network_entity_key == drg_key
           ]
           for rt_key in std.objectFields(category.vcns[vcn_key].route_tables)
@@ -175,7 +175,7 @@ local products = import '../../exadb/products.libsonnet';
         local segments = scope.key_segments + ['PLATFORM', scope.platform_name];
         local log_group_key =
           n.key_global('LGRP', segments + ['VCN', 'FLOW']);
-        acc + {
+        acc {
           [n.key_global('LOG', segments + ['SUBNET', 'FLOW'])]: {
             log_group_id: log_group_key,
             target_compartment_ids: [scope.network_compartment_key],
@@ -194,7 +194,7 @@ local products = import '../../exadb/products.libsonnet';
       function(acc, spec)
         local scope = spec.entry.scope;
         local segments = scope.key_segments + ['PLATFORM', scope.platform_name];
-        acc + {
+        acc {
           [n.key_global('LGRP', segments + ['VCN', 'FLOW'])]: {
             name: n.display_global('lgrp', scope.name_segments + [scope.platform_name, 'vcn', 'flow']),
             compartment_id: security_compartment_for(scope),

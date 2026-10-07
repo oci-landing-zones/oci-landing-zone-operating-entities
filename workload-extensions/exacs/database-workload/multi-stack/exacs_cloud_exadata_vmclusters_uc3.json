@@ -1,0 +1,29 @@
+{
+    "cloud_exadata_database_configuration": {
+        "cloud_vm_clusters_configuration": {
+            "vmc_preprod": {
+                "display_name"             : "exacs-vmc-preprod",
+                "compartment_id"           : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "backup_subnet_id"         : "SN-FRA-LZ-PREPROD-PLATFORM-EXACS-BACKUP-KEY",
+                "cpu_core_count"           : 2,
+                "exadata_infrastructure_id": "infra_preprod",
+                "gi_version"               : "19.0.0.0",
+                "hostname"                 : "exacspreprod",
+                "ssh_public_keys"          : ["ssh-rsa REPLACE_WITH_APPROVED_PUBLIC_KEY"],
+                "subnet_id"                : "SN-FRA-LZ-PREPROD-PLATFORM-EXACS-DB-KEY"
+            },
+
+            "vmc_prod": {
+                "display_name"             : "exacs-vmc-prod",
+                "compartment_id"           : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "backup_subnet_id"         : "SN-FRA-LZ-PROD-PLATFORM-EXACS-BACKUP-KEY",
+                "cpu_core_count"           : 2,
+                "exadata_infrastructure_id": "infra_prod",
+                "gi_version"               : "19.0.0.0",
+                "hostname"                 : "exacsprod",
+                "ssh_public_keys"          : ["ssh-rsa REPLACE_WITH_APPROVED_PUBLIC_KEY"],
+                "subnet_id"                : "SN-FRA-LZ-PROD-PLATFORM-EXACS-DB-KEY"
+            }
+        }
+    }
+}

@@ -34,10 +34,10 @@ local hub_e_prod_oke_base_config = {
     },
   },
 };
-local cis1_config = hub_e_prod_oke_base_config + {
+local cis1_config = hub_e_prod_oke_base_config {
   cis_level: 1,
 };
-local iam_cis2_config = hub_e_prod_oke_base_config + {
+local iam_cis2_config = hub_e_prod_oke_base_config {
   cis_level: 2,
 };
 

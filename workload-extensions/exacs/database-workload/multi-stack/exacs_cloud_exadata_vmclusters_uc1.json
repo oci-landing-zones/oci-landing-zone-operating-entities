@@ -1,0 +1,17 @@
+{
+    "cloud_exadata_database_configuration": {
+        "cloud_vm_clusters_configuration": {
+            "vmc_primary": {
+                "display_name"             : "exacs-vmc-primary",
+                "compartment_id"           : "CMP-LZ-SHARED-EXACS-DB-KEY",
+                "backup_subnet_id"         : "SN-FRA-LZ-SHARED-PLATFORM-EXACS-BACKUP-KEY",
+                "cpu_core_count"           : 2,
+                "exadata_infrastructure_id": "infra_primary",
+                "gi_version"               : "19.0.0.0",
+                "hostname"                 : "exacsvmc",
+                "ssh_public_keys"          : ["ssh-rsa REPLACE_WITH_APPROVED_PUBLIC_KEY"],
+                "subnet_id"                : "SN-FRA-LZ-SHARED-PLATFORM-EXACS-DB-KEY"
+            }
+        }
+    }
+}

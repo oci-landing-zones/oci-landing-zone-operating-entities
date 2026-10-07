@@ -194,9 +194,23 @@ Current adapters:
 - `gen/addons/oci-x-rpc/published.libsonnet` — owns RPC-only network/IAM projections for config-driven verification and the complete governance, IAM, and network surfaces used by the X-RPC runtime reference templates.
 - `gen/workload-extensions/exacc/{single-stack,multi-stack}/published.libsonnet` — own ExaDB-C@C stack-local publication projections.
 - `gen/workload-extensions/exacs/multi-stack/published.libsonnet` — owns ExaDB-D / ExaCS multi-stack publication projections.
+- `gen/workload-extensions/exacs/database-workload/published.libsonnet` — projects the regular ExaDB-D database workload into three ordered multi-stack operations or one combined single-stack document for UC1–UC3.
 
 Extension-specific adapters are documented in the owning extension directory when an extension has its own `AGENTS.md`.
 Add-on-specific adapters are documented in the owning add-on directory when an add-on has its own `AGENTS.md`.
+
+### Workload Publication Conventions
+
+Keep OKE and ExaDB-D publications consistent across code and customer documentation:
+
+- Keep the source and publication directory trees parallel under `gen/workload-extensions/<family>/` and `workload-extensions/<family>/`. Use `single-stack/` and `multi-stack/` for the deployment modes. An intermediate scope such as OKE `simple/` or ExaCS `database-workload/` identifies the published product boundary.
+- Own shared use-case data in `published_profiles.libsonnet`; use stack-local `profiles.libsonnet` to select that data. Keep entrypoints to imports and one render/projection expression, with a blank line before the expression.
+- Use `output_builder.libsonnet` or `published.libsonnet` according to the projection contracts above. Preserve workload-specific state boundaries and dependency handling in that layer.
+- Use two-space indentation and single-quoted Jsonnet strings. Expand nested profile overlays onto separate lines so each scope is readable.
+- Write customer guides in English with consistent product names: `One-OE`, `OKE`, `ExaDB-D`, `Blueprint Factory`, and `OCI LZ AI Agent`. Preserve technical identifiers such as `exacs`, `oke_simple`, and published filenames where exact spelling is required.
+- Use plain Markdown headings, numbered top-level sections, and Markdown tables. Deployment guides follow Summary, Architecture Overview, Configuration Files, Deployment Steps, Post-Deployment Configuration, Customization, Troubleshooting, Cleanup, and Additional Resources. Overview and configuration-reference guides may use the sections appropriate to their scope.
+- Keep stage-specific file lists, Orchestrator pins, required substitutions, state ownership, and pre/final re-apply instructions explicit. Link shared operational detail rather than repeating it across both deployment modes.
+- Apply root `AGENTS.md` deployment and firewall defaults consistently. Label Hub E references as PoC, lab, or explicitly non-production. Resource names containing `prod` do not override that boundary.
 
 ## 3. Config Schema
 
