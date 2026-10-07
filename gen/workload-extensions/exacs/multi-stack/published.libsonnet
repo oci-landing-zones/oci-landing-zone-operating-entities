@@ -21,6 +21,37 @@ local products = import '../../exadb/products.libsonnet';
     );
     local exacs_entries = resolved.entries;
     local extension_state = resolved.state;
+    local has_network(entry) =
+      std.objectHas(entry.platform_config, 'network') && entry.platform_config.network != null;
+    local has_project_db(entry) =
+      local cfg = entry.platform_config.extension.params;
+      std.objectHas(cfg, 'project_db_compartments') && cfg.project_db_compartments != null;
+    local has_shared_exacs =
+      std.length([
+        entry
+        for entry in exacs_entries
+        if entry.scope.scope_type == 'shared'
+      ]) > 0;
+    local publication_components(entry) =
+      if std.objectHas(entry.platform_config, 'publication_components') then
+        entry.platform_config.publication_components
+      else
+        local project_db_only = has_project_db(entry) && !has_network(entry);
+        {
+          infrastructure:
+            entry.scope.scope_type == 'shared' ||
+            !has_shared_exacs ||
+            project_db_only,
+          database: has_network(entry) || project_db_only,
+        };
+    local exacs_entries_with_components = [
+      entry {
+        platform_config+: {
+          publication_components: publication_components(entry),
+        },
+      }
+      for entry in exacs_entries
+    ];
 
     local entry_indices =
       if std.length(exacs_entries) > 0 then std.range(0, std.length(exacs_entries) - 1)
@@ -96,7 +127,7 @@ local products = import '../../exadb/products.libsonnet';
       product: product,
       naming: n,
       descriptions: descriptions,
-      entries: exacs_entries,
+      entries: exacs_entries_with_components,
       tag_key: tag_key,
     });
     local project_db_flat_compartments = exadb_project_db.flat_project_compartments({
@@ -108,13 +139,19 @@ local products = import '../../exadb/products.libsonnet';
       topology: ctx.topo,
     });
 
-    local shared_entries = [
+    local db_entries = [
       entry
-      for entry in exacs_entries
+      for entry in exacs_entries_with_components
+      if entry.platform_config.publication_components.database
+    ];
+    local shared_db_entries = [
+      entry
+      for entry in db_entries
       if entry.scope.scope_type == 'shared'
     ];
     local default_alarm_compartment =
-      if std.length(shared_entries) > 0 then platform_db_key(shared_entries[0].scope)
+      if std.length(shared_db_entries) > 0 then platform_db_key(shared_db_entries[0].scope)
+      else if std.length(db_entries) > 0 then platform_db_key(db_entries[0].scope)
       else platform_db_key(exacs_entries[0].scope);
     local security_compartment = n.key_global('CMP', ['SECURITY']);
     local extension_observability = extension_state.observability_cis1 {

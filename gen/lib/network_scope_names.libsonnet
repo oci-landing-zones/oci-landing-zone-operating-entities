@@ -9,5 +9,7 @@ local environment_names = import './environment_names.libsonnet';
     if std.startsWith(name, 'shared-platform-') then
       'sp-' + name[std.length('shared-platform-'):]
     else
-      environment_names.compact_prefix(name),
+      local compact_environment = environment_names.compact_prefix(name);
+      if compact_environment == name then name
+      else std.strReplace(compact_environment, '-platform-', '-pf-'),
 }
