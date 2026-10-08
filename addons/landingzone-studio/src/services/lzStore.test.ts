@@ -56,6 +56,21 @@ describe('lzStore', () => {
     expect(list[0]).toMatchObject({ id: rec.id, name: 'Acme Prod' });
   });
 
+  it('starts new designs without Exadata and preserves selections in saved designs', () => {
+    const rec = createSaved('Exadata draft');
+    expect(rec.model.exadata.exacc.enabled).toBe(false);
+    expect(rec.model.exadata.exacs.enabled).toBe(false);
+
+    const selected = { ...rec.model, exadata: {
+      ...rec.model.exadata,
+      exacc: { ...rec.model.exadata.exacc, enabled: true },
+    } };
+    expect(saveLZ(rec.id, selected).ok).toBe(true);
+    expect(getLZ(rec.id)?.model.exadata.exacc.enabled).toBe(true);
+    expect(getLZ(rec.id)?.model.exadata.exacs.enabled).toBe(false);
+    expect(createSaved('Fresh design').model.exadata.exacc.enabled).toBe(false);
+  });
+
   it('round-trips the canonical model via getLZ', () => {
     const rec = createSaved();
     const fetched = getLZ(rec.id);

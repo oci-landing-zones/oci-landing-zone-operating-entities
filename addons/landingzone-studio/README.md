@@ -31,10 +31,11 @@ Studio complements the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/RE
 
 Studio keeps one canonical Landing Zone model while you work. The wizard, JSON configuration, live network diagram, packet-flow trace, downloadable Draw.io diagram, and generated deployment files all derive from that same model.
 
-1. **Start a design**: choose a design name, OCI region and realm, and the CIS baseline.
+1. **Start a design**: choose a design name, OCI region and realm, the CIS baseline, and optional One-OE notification recipients. Configure Cloud Guard, IAM, Network, and Security separately, or select one email list for all four. The Network recipient also covers ExaCS network notifications.
 1. **Design the hub network**: select a Hub A, B, C, or E layout and review the VCN, subnets, gateways, DRG, and attachments.
 1. **Add environments and projects**: define environment networks and the projects that need to be represented in each environment.
 1. **Add platforms**: add supported OKE, OCVS, or custom platforms. Shared custom and OCVS platforms can also be included.
+1. **Configure Exadata**: EXACC and EXACS start disabled. Include either extension to choose infrastructure and VMC placement; Studio identifies the resulting UC1 shared, UC2 hybrid, or UC3 dedicated scenario. VMC and AVMC both start unchecked in each extension; select either or both to continue. Autonomous project tiers appear only when AVMC is selected. Configure the notification recipients shown for the selected use case, or select one email list for all of that extension's topics. Add CIDRs for ExaCS VMC/AVMC networks as needed. The diagram shows generated platform child compartments and selected Autonomous project DB compartments.
 1. **Review and export**: download one ZIP containing `config.jsonnet` and the generated deployment files. Export the structural diagram as a `.drawio` file when you need to continue diagramming outside Studio.
 
 The diagram grows with the wizard. In diagram-only view, Studio can show route tables, example endpoints, and packet paths for supported traffic flows. This gives network and security reviewers a way to inspect the intended path before deployment.
@@ -51,6 +52,7 @@ Studio currently provides a guided interface for the following repository-suppor
 | Hub network | Hub A, Hub B, Hub C, and Hub E |
 | Environments | Environment networks, optional OCI Security Zones, and projects |
 | Platforms | Environment OKE (`oke_simple`), OCVS, and custom platforms; shared OCVS and custom platforms |
+| Platforms · Exadata | Optional EXACC and EXACS platforms. Shared, hybrid, and dedicated selections map to UC1, UC2, and UC3; EXACC stays networkless, while EXACS creates networks where AVMC/VMCs are placed. |
 | Outputs | Generated deployment ZIP, `config.jsonnet`, live diagram, and Draw.io export |
 
 Hub A, B, and C are staged network deployments. The downloaded package preserves the required `*_pre.json` and final files together. Before the final network phase, resolve the generated firewall or load-balancer private-IP-OCID placeholders as described in the review screen and the selected hub documentation.

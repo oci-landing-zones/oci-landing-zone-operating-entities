@@ -128,10 +128,20 @@ This small shape creates the shared landing-zone domains plus the `dev` environm
 | `realm` | string | No | `oc1` | OCI realm. Supported values are `oc1` and `oc19`. |
 | `cis_level` | number or string | No | `2` | CIS level to emit: `1` or `2`. |
 | `security_targets` | array of strings | No | All environments | Environment names that receive Security Zone targeting. |
+| `notification_emails` | object of email arrays | No | Published example address | One-OE Cloud Guard, IAM, Network, and Security topic recipients. |
 
 *`region` and `region_short_name` must be supplied together or omitted together. Explicit `null` values are treated as omitted.
 
 `security_targets` can contain only names defined under `environments`. Omit it to apply the default targeting to every configured environment.
+
+`notification_emails` accepts `default`, `cloudguard`, `iam`, `network`, and `security`. Each supplied value is a non-empty array of email addresses. A topic-specific list replaces `default` for that topic. If neither is supplied, that topic retains the published `email.address@example.com` example subscriber. The `network` topic also receives network events and alarms in ExaCS designs; ExaDB-C@C does not create a network topic.
+
+```jsonnet
+notification_emails: {
+  default: ['ops@example.com'],
+  network: ['network-ops@example.com'],
+},
+```
 
 ## 2. Hub
 

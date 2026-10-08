@@ -29,10 +29,12 @@
 import type { HubKind, LzModel, PlatformConfig } from '../model/types';
 import { envNetworkDefaults } from '../model/defaults';
 import { platformSubnetsForEnv, platformVcnForEnv } from './platforms';
+import { exadataEntries } from './exadata';
 
 /** One platform in the config — a network and, where supported, an extension. */
 export interface PlatformConfigEntry {
-  network: { vcn: string; subnets?: Record<string, string> };
+  network?: { vcn: string; subnets?: Record<string, string> };
+  publication_components?: { infrastructure: boolean; database: boolean };
   extension?: { type: string; params?: Record<string, unknown> };
 }
 
@@ -48,6 +50,7 @@ export interface LzConfig {
   region: string;
   region_short_name: string;
   cis_level: 1 | 2;
+  notification_emails?: Partial<Record<'default' | 'cloudguard' | 'iam' | 'network' | 'security', string[]>>;
   hub: {
     kind: HubKind;
     network: {
@@ -136,8 +139,15 @@ function platformEntryFor(platform: PlatformConfig, envId: string, index: number
   return { network, extension: { type: platform.type } };
 }
 
-export function buildConfig(model: LzModel): LzConfig {
+export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
   const f = model.foundation;
+  const notification_emails: NonNullable<LzConfig['notification_emails']> = {};
+  const singleRecipient = f.notifications?.useSingleRecipient ?? Boolean(f.notifications?.default);
+  for (const topic of (singleRecipient ? ['default'] : ['cloudguard', 'iam', 'network', 'security']) as Array<keyof NonNullable<LzConfig['notification_emails']>>) {
+    const recipients = (f.notifications?.[topic] ?? '').split(/[,;\n]/).map((value) => value.trim()).filter(Boolean);
+    if (recipients.length) notification_emails[topic] = recipients;
+  }
+  const exadata = includeExadata ? exadataEntries(model) : { shared: {}, environments: {} };
 
   const environments: Record<string, EnvConfigEntry> = {};
   const security_targets: string[] = [];
@@ -163,6 +173,7 @@ export function buildConfig(model: LzModel): LzConfig {
       if (!inEnv || !key) continue;
       platforms[key] = platformEntryFor(p, env.id, i);
     }
+    Object.assign(platforms, exadata.environments[env.id] ?? {});
 
     environments[name] = {
       project_network: { network: { vcn: net.vcnCidr.trim(), subnets: envSubnets } },
@@ -187,6 +198,7 @@ export function buildConfig(model: LzModel): LzConfig {
       shared_platforms[sharedName] = { network: { vcn: sharedVcn, subnets: sharedSubnets } };
     }
   }
+  Object.assign(shared_platforms, exadata.shared);
 
   const subnets: Record<string, string> = {};
   for (const sn of model.network.subnets) {
@@ -200,6 +212,7 @@ export function buildConfig(model: LzModel): LzConfig {
     region: f.region,
     region_short_name: f.regionShortName,
     cis_level: f.cisLevel,
+    ...(Object.keys(notification_emails).length ? { notification_emails } : {}),
     hub: {
       kind: model.network.hubKind,
       network: {
@@ -231,8 +244,8 @@ function pairLines(entries: string[], indent: string): string[] {
 
 /** Lines for one platform inside an environment's `platforms` block (8-space key indent). */
 function platformEntryLines(name: string, entry: PlatformConfigEntry): string[] {
-  const hasSubnets = entry.network.subnets !== undefined;
-  const subEntries = Object.entries(entry.network.subnets ?? {}).map(([k, v]) => `${key(k)}: ${quote(v)}`);
+  const hasSubnets = entry.network?.subnets !== undefined;
+  const subEntries = Object.entries(entry.network?.subnets ?? {}).map(([k, v]) => `${key(k)}: ${quote(v)}`);
   const subnetLines = !hasSubnets
     ? []
     : subEntries.length === 0
@@ -250,10 +263,12 @@ function platformEntryLines(name: string, entry: PlatformConfigEntry): string[] 
       : [`          extension: { type: ${quote(ext.type)} },`];
   return [
     `        ${key(name)}: {`,
-    '          network: {',
-    `            vcn: ${quote(entry.network.vcn)},`,
-    ...subnetLines,
-    '          },',
+    ...(entry.network ? [
+      '          network: {',
+      `            vcn: ${quote(entry.network.vcn)},`,
+      ...subnetLines,
+      '          },',
+    ] : []),
     ...extLines,
     '        },',
   ];
@@ -304,7 +319,7 @@ function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: bo
  * step 1 the hub block is left out, so the JSON tracks where you are.
  */
 export function serializeConfig(model: LzModel, upToStep = Infinity): string {
-  const c = buildConfig(model);
+  const c = buildConfig(model, upToStep >= 5);
 
   const envNames = Object.keys(c.environments);
   // Steps 1–2: environments are just named, empty compartments. Step 3 fills in
@@ -329,13 +344,14 @@ export function serializeConfig(model: LzModel, upToStep = Infinity): string {
         '  shared_platforms: {',
         ...sharedKeys.map((k) => {
           const entry = c.shared_platforms[k];
-          const sn = Object.entries(entry.network.subnets ?? {})
+          const sn = Object.entries(entry.network?.subnets ?? {})
             .map(([n, cidr]) => `${key(n)}: ${quote(cidr)}`).join(', ');
-          const subnets = entry.network.subnets ? `, subnets: { ${sn} }` : '';
+          const subnets = entry.network?.subnets ? `, subnets: { ${sn} }` : '';
+          const network = entry.network ? `network: { vcn: ${quote(entry.network.vcn)}${subnets} }` : '';
           const extension = entry.extension
-            ? `, extension: { type: ${quote(entry.extension.type)}, params: ${jsonnetValue(entry.extension.params ?? {})} }`
+            ? `${network ? ', ' : ''}extension: { type: ${quote(entry.extension.type)}, params: ${jsonnetValue(entry.extension.params ?? {})} }`
             : '';
-          return `    ${key(k)}: { network: { vcn: ${quote(entry.network.vcn)}${subnets} }${extension} },`;
+          return `    ${key(k)}: { ${network}${extension} },`;
         }),
         '  },',
       ];
@@ -369,6 +385,7 @@ export function serializeConfig(model: LzModel, upToStep = Infinity): string {
     `  region: ${quote(c.region)},`,
     `  region_short_name: ${quote(c.region_short_name)},`,
     `  cis_level: ${c.cis_level},`,
+    ...(c.notification_emails ? [`  notification_emails: ${jsonnetValue(c.notification_emails)},`] : []),
     ...hubBlock,
     ...environmentsBlock,
     ...sharedPlatformsBlock,

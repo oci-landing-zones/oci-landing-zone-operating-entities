@@ -1,8 +1,19 @@
-import type { EnvNetworkConfig, LzModel, ProjectConfig } from './types';
+import type { EnvNetworkConfig, ExadataDesign, LzModel, ProjectConfig } from './types';
 import { getDefaultRegionForRealm } from '../services/regions';
 import { hubKindDefaults } from '../services/hubKinds';
 
-export const LZ_MODEL_VERSION = '0.18.0';
+export const LZ_MODEL_VERSION = '0.19.0';
+
+export function defaultExadata(): ExadataDesign {
+  return {
+    exacc: { enabled: false, shared: true, database: 'shared', service: 'none', environments: [], projectDb: {}, notifications: { default: '' } },
+    exacs: {
+      enabled: false, infrastructure: 'shared', database: 'shared', service: 'none',
+      environments: [], sharedVcnCidr: '10.172.0.0/21', environmentVcnCidrs: {},
+      projectDb: {}, notifications: { default: '' },
+    },
+  };
+}
 
 export function defaultProjects(): ProjectConfig[] {
   return [{ id: 'project-1', name: 'proj1', environments: 'all' }];
@@ -35,6 +46,7 @@ export function emptyLzModel(): LzModel {
       region: region?.id ?? 'eu-frankfurt-1',
       regionShortName: region?.shortName ?? 'fra',
       cisLevel: 2,
+      notifications: { useSingleRecipient: false, default: '', cloudguard: '', iam: '', network: '', security: '' },
     },
     environments: [
       { id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) },
@@ -44,6 +56,7 @@ export function emptyLzModel(): LzModel {
     projects: defaultProjects(),
     platforms: [],
     sharedPlatforms: [],
+    exadata: defaultExadata(),
   };
 }
 
@@ -98,13 +111,18 @@ function migrate016(candidate: Partial<LzModel>): LzModel | null {
         }))
       : undefined,
   }));
-  return { ...candidate, version: LZ_MODEL_VERSION, environments, projects, platforms } as LzModel;
+  return { ...candidate, version: LZ_MODEL_VERSION, environments, projects, platforms, exadata: defaultExadata() } as LzModel;
 }
 
 export function normalizeModel(stored: unknown): LzModel {
   if (!stored || typeof stored !== 'object') return emptyLzModel();
   const candidate = stored as Partial<LzModel>;
   if (candidate.version === '0.16.0') return migrate016(candidate) ?? emptyLzModel();
+  if (candidate.version === '0.18.0' && candidate.foundation && candidate.network
+    && Array.isArray(candidate.environments) && Array.isArray(candidate.projects)
+    && Array.isArray(candidate.platforms) && Array.isArray(candidate.sharedPlatforms)) {
+    return { ...candidate, version: LZ_MODEL_VERSION, exadata: defaultExadata() } as LzModel;
+  }
   if (
     candidate.version !== LZ_MODEL_VERSION
     || !candidate.foundation
@@ -114,6 +132,7 @@ export function normalizeModel(stored: unknown): LzModel {
     || !Array.isArray(candidate.projects)
     || !Array.isArray(candidate.platforms)
     || !Array.isArray(candidate.sharedPlatforms)
+    || !candidate.exadata?.exacc || !candidate.exadata?.exacs
     || candidate.environments.some((env) => !env.id)
     || candidate.projects.some((project) => !project.id)
   ) return emptyLzModel();

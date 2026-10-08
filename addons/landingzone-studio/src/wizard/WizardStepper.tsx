@@ -1,5 +1,5 @@
 /**
- * WizardStepper — the five-step navigation across the top of the wizard.
+ * WizardStepper — navigation across the six-step wizard.
  * Buttons are clickable to jump between steps; the active step is highlighted
  * in Oracle red. Step content is owned by the shell; this is pure navigation.
  */
@@ -18,8 +18,9 @@ export const WIZARD_STEPS: WizardStep[] = [
   { id: 1, label: 'Foundation' },
   { id: 2, label: 'Hub Network' },
   { id: 3, label: 'Projects' },
-  { id: 4, label: 'Platforms' },
-  { id: 5, label: 'Review' },
+  { id: 4, label: 'Platforms · OKE/OCVS' },
+  { id: 5, label: 'Platforms · Exadata' },
+  { id: 6, label: 'Review' },
 ];
 
 const css = {

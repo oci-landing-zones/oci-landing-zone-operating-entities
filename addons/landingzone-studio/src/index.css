@@ -380,6 +380,7 @@ a:focus:not(:focus-visible) {
   }
 
   .foundation-two-col,
+  .foundation-observability-row,
   .foundation-add-grid {
     grid-template-columns: 1fr !important;
   }

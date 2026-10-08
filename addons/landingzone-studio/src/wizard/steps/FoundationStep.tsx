@@ -13,7 +13,7 @@ import { oracle } from '../../theme';
 import {
   findRegion, getDefaultRegionForRealm, getRegionsForRealm, REALM_OPTIONS,
 } from '../../services/regions';
-import type { Environment, FoundationConfig } from '../../model/types';
+import type { Environment, FoundationConfig, OneOeNotifications } from '../../model/types';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 
@@ -24,6 +24,7 @@ const s: Record<string, React.CSSProperties> = {
   body:    { padding: 20 },
   title:   { fontSize: 15, fontWeight: 700, marginBottom: 16, color: oracle.ink },
   twoCol:  { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 },
+  topicRow: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.15fr)', gap: 16, alignItems: 'start', padding: '14px 0', borderTop: `1px solid ${oracle.border}` },
   label:   { display: 'block', fontSize: 12, color: oracle.textMuted, fontWeight: 700, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.3 },
   input:   { width: '100%', boxSizing: 'border-box', padding: '9px 11px', border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, fontSize: 14, background: oracle.surface, color: oracle.text, fontFamily: FONT },
   select:  { width: '100%', boxSizing: 'border-box', padding: '9px 11px', border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, fontSize: 14, background: oracle.surface, color: oracle.text, fontFamily: FONT },
@@ -40,6 +41,13 @@ const s: Record<string, React.CSSProperties> = {
   addLabel:{ display: 'block', fontSize: 12, color: oracle.textMuted, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.3 },
 };
 
+const topicHelp: Record<Exclude<keyof OneOeNotifications, 'default' | 'useSingleRecipient'>, string> = {
+  cloudguard: '6 Cloud Guard event types: problems detected, dismissed or remediated, announcements, status changes, and problem thresholds.',
+  iam: '21 IAM event types: changes to identity providers, groups, policies, users, and passwords.',
+  network: '43 event types per network scope. The published prod/preprod blueprint also routes 36 network alarms for load balancers and VNICs here. ExaCS uses this Network topic too.',
+  security: '6 notification-subscription event types per security scope, plus 16 published alarms for audit connectors, delivery failures, compute, and block volumes.',
+};
+
 export default function FoundationStep({ name, onNameChange, onNameBlur, nameError }: {
   name: string;
   onNameChange: (name: string) => void;
@@ -48,6 +56,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
 }) {
   const { model, setField } = useWizard();
   const f = model.foundation;
+  const singleRecipient = f.notifications?.useSingleRecipient ?? Boolean(f.notifications?.default);
   const envs = model.environments;
 
   const [newName, setNewName] = useState('');
@@ -57,6 +66,20 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
 
   function setFoundation(patch: Partial<FoundationConfig>) {
     setField('foundation', { ...f, ...patch });
+  }
+  function setNotification(topic: keyof OneOeNotifications, value: string) {
+    setFoundation({ notifications: {
+      default: '', cloudguard: '', iam: '', network: '', security: '',
+      ...f.notifications,
+      [topic]: value,
+    } });
+  }
+  function setSingleRecipient(checked: boolean) {
+    setFoundation({ notifications: {
+      default: '', cloudguard: '', iam: '', network: '', security: '',
+      ...f.notifications,
+      useSingleRecipient: checked,
+    } });
   }
   function onRealm(realm: string) {
     const def = getDefaultRegionForRealm(realm);
@@ -208,6 +231,47 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
             <Switch checked={newSecure} onChange={setNewSecure} label={newSecure ? 'On' : 'Off'} ariaLabel="Security zone for new environment" />
             <button type="button" style={s.addBtn} onClick={addEnv}>Add</button>
           </div>
+        </div>
+      </section>
+
+      <section style={s.panel} aria-labelledby="foundation-observability-title">
+        <div style={s.accent} />
+        <div style={s.body}>
+          <div id="foundation-observability-title" style={s.title}>Observability</div>
+          <div style={{ color: oracle.textMuted, fontSize: 12.5, lineHeight: 1.5, margin: '-8px 0 14px' }}>
+            Choose email recipients for the four One-OE notification topics. Separate multiple addresses with commas. If all fields are blank, generated files retain the published example address.
+          </div>
+          {!singleRecipient && <div>
+            {([
+              ['cloudguard', 'Cloud Guard events'],
+              ['iam', 'IAM events'],
+              ['network', 'Network events and alarms'],
+              ['security', 'Security events and alarms'],
+            ] as const).map(([topic, label]) => (
+              <div key={topic} style={s.topicRow} className="foundation-observability-row">
+                <div>
+                  <label style={s.label} htmlFor={`lz-observability-${topic}`}>{label}</label>
+                  <input id={`lz-observability-${topic}`} style={s.input} type="text" inputMode="email"
+                    placeholder="team@example.com" value={f.notifications?.[topic] ?? ''}
+                    onChange={(e) => setNotification(topic, e.target.value)} aria-describedby={`lz-observability-${topic}-help`} />
+                </div>
+                <div id={`lz-observability-${topic}-help`} style={{ color: oracle.textMuted, fontSize: 12, lineHeight: 1.5 }}>{topicHelp[topic]}</div>
+              </div>
+            ))}
+          </div>}
+          <div style={{ borderTop: `1px solid ${oracle.border}`, paddingTop: 16, marginTop: 8 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: oracle.ink }}>
+              <input type="checkbox" checked={singleRecipient} onChange={(e) => setSingleRecipient(e.target.checked)} />
+              Use one email for all notifications
+            </label>
+            <div style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Uses the same recipients for Cloud Guard, IAM, Network and Security.</div>
+          </div>
+          {singleRecipient && <div style={{ ...s.field, marginTop: 16, marginBottom: 0 }}>
+            <label style={s.label} htmlFor="lz-observability-default">Notification emails</label>
+            <input id="lz-observability-default" style={s.input} type="text" inputMode="email"
+              placeholder="ops@example.com" value={f.notifications?.default ?? ''}
+              onChange={(e) => setNotification('default', e.target.value)} />
+          </div>}
         </div>
       </section>
     </div>

@@ -116,6 +116,51 @@ describe('generator (go-jsonnet wasm)', () => {
     expectHubGeneratorContract(out.files, 'hub_a');
   }, 60_000);
 
+  it('writes configured One-OE recipients to their notification topics', async () => {
+    const base = emptyLzModel();
+    const out = await generateOutputs({
+      ...base,
+      foundation: { ...base.foundation, notifications: { useSingleRecipient: false,
+        default: 'ops@example.com, noc@example.com', cloudguard: 'security@example.com',
+        iam: 'iam@example.com', network: 'network@example.com', security: 'soc@example.com',
+      } },
+    });
+    const topics = JSON.parse(out.files['observability_cis2.json']).notifications_configuration.topics;
+    const recipients = (key: string) => topics[`NOTT-LZ-${key}-KEY`].subscriptions[0].values;
+    expect(recipients('CLOUDGUARD')).toEqual(['security@example.com']);
+    expect(recipients('IAM')).toEqual(['iam@example.com']);
+    expect(recipients('NETWORK')).toEqual(['network@example.com']);
+    expect(recipients('SECURITY')).toEqual(['soc@example.com']);
+  }, 60_000);
+
+  it('uses one recipient for all One-OE topics in single-email mode', async () => {
+    const model = emptyLzModel();
+    model.foundation.notifications = {
+      useSingleRecipient: true, default: 'ops@example.com',
+      cloudguard: 'old@example.com', iam: '', network: '', security: '',
+    };
+    const out = await generateOutputs(model);
+    const topics = JSON.parse(out.files['observability_cis2.json']).notifications_configuration.topics;
+    for (const topic of Object.values(topics) as Array<{ subscriptions: Array<{ values: string[] }> }>) {
+      expect(topic.subscriptions[0].values).toEqual(['ops@example.com']);
+    }
+  }, 60_000);
+
+  it('uses the One-OE Network recipients when ExaCS is enabled', async () => {
+    const model = emptyLzModel();
+    model.foundation.notifications = {
+      useSingleRecipient: false,
+      default: 'ops@example.com', cloudguard: '', iam: '', network: 'network@example.com', security: '',
+    };
+    model.exadata.exacs.enabled = true;
+    model.exadata.exacs.service = 'vmc';
+    model.exadata.exacs.notifications.default = 'db@example.com';
+    const out = await generateOutputs(model);
+    const topics = JSON.parse(out.files['observability_cis2.json']).notifications_configuration.topics;
+    expect(topics['NOTT-LZ-NETWORK-KEY'].subscriptions[0].values).toEqual(['network@example.com']);
+    expect(out.files['observability_cis2.json']).toContain('NOTT-LZ-EXACS-DB-WORKLOADS-KEY');
+  }, 60_000);
+
   it('emits the selected CIS level 1 artifact family', async () => {
     const base = emptyLzModel();
     const out = await generateOutputs({

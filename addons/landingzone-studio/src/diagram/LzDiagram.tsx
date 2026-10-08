@@ -212,9 +212,9 @@ function AttachmentNode({ data }: NodeProps) {
 
 /** Project compartment: a square white box with its full generated name. */
 function ProjectNode({ data }: NodeProps) {
-  const d = data as { label?: string };
+  const d = data as { label?: string; container?: boolean };
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px 8px', boxSizing: 'border-box', fontSize: 12, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.2 }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: d.container ? 'flex-start' : 'center', justifyContent: 'center', padding: d.container ? '7px 8px' : '4px 8px', boxSizing: 'border-box', fontSize: 12, fontWeight: 700, color: oracle.ink, textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.2 }}>
       {d.label}
     </div>
   );

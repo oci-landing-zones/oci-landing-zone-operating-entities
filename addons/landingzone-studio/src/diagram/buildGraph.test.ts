@@ -33,6 +33,64 @@ function crossesInterior(from: FlowPoint, to: FlowPoint, rect: FlowRect): boolea
 }
 
 describe('generator-aligned graph', () => {
+  it('shows EXACC as compartment-only and EXACS AVMC/VMC as a network in step 5', () => {
+    const model = emptyLzModel();
+    model.exadata.exacc = { enabled: true, shared: true, environments: ['environment-1'], projectDb: {}, notifications: { default: 'ops@example.com' } };
+    model.exadata.exacs = {
+      enabled: true, infrastructure: 'shared', database: 'per_environment', service: 'vmc',
+      environments: ['environment-1', 'environment-2'], sharedVcnCidr: '10.172.0.0/21',
+      environmentVcnCidrs: { 'environment-1': '10.172.8.0/21', 'environment-2': '10.172.16.0/21' },
+      projectDb: {}, notifications: { default: 'ops@example.com' },
+    };
+    expect(buildGraph(model, 4).nodes.some((node) => node.label.includes('exacc'))).toBe(false);
+    const nodes = buildGraph(model, 5).nodes;
+    expect(nodes.find((node) => node.label === 'cmp-lz-shared-exacc')?.kind).toBe('compartment');
+    expect(nodes.some((node) => node.label.includes('shared-exacc') && node.kind === 'vcn')).toBe(false);
+    expect(nodes.find((node) => node.label === 'cmp-lz-shared-exacs')?.kind).toBe('compartment');
+    expect(nodes.some((node) => node.label.includes('shared-exacs') && node.kind === 'vcn')).toBe(false);
+    expect(nodes.find((node) => node.label === 'vcn-fra-lz-prod-exacs\n10.172.8.0/21')?.kind).toBe('vcn');
+    expect(nodes.find((node) => node.label === 'vcn-fra-lz-preprod-exacs\n10.172.16.0/21')?.kind).toBe('vcn');
+    expect(nodes.find((node) => node.label === 'cmp-lz-prod-exacc')?.kind).toBe('compartment');
+    expect(nodes.find((node) => node.label === 'cmp-lz-shared-exacc-infra')?.parentId).toBe('cmp-shared-exadata-exacc');
+    expect(nodes.some((node) => node.label === 'cmp-lz-shared-exacc-db')).toBe(false);
+    expect(nodes.find((node) => node.label === 'cmp-lz-prod-exacc-db')?.parentId).toBe('cmp-env-0-exadata-exacc');
+    expect(nodes.some((node) => node.label === 'cmp-lz-prod-exacc-infra')).toBe(false);
+    expect(nodes.find((node) => node.label === 'cmp-lz-prod-exacs-db')?.parentId).toBe('cmp-env-0-platform-comp-0');
+  });
+
+  it('shows platform children and selected Autonomous project DB compartments for both Exadata extensions', () => {
+    const model = emptyLzModel();
+    model.exadata.exacc = {
+      enabled: true, shared: false, database: 'per_environment', service: 'autonomous',
+      environments: ['environment-1'], projectDb: { 'environment-1': ['project-1'] },
+      notifications: { default: 'ops@example.com' },
+    };
+    model.exadata.exacs = {
+      enabled: true, infrastructure: 'per_environment', database: 'per_environment', service: 'both',
+      environments: ['environment-1'], sharedVcnCidr: '10.172.0.0/21',
+      environmentVcnCidrs: { 'environment-1': '10.172.8.0/21' },
+      projectDb: { 'environment-1': ['project-1'] }, notifications: { default: 'ops@example.com' },
+    };
+    const nodes = buildGraph(model, 5).nodes;
+    const exacc = nodes.find((node) => node.label === 'cmp-lz-prod-exacc')!;
+    const exacs = nodes.find((node) => node.label === 'cmp-lz-prod-exacs')!;
+    expect(nodes.filter((node) => node.parentId === exacc.id).map((node) => node.label).sort()).toEqual([
+      'cmp-lz-prod-exacc-db', 'cmp-lz-prod-exacc-infra',
+    ]);
+    expect(nodes.filter((node) => node.parentId === exacs.id).map((node) => node.label).sort()).toEqual([
+      'cmp-lz-prod-exacs-db', 'cmp-lz-prod-exacs-infra',
+    ]);
+    const project = nodes.find((node) => node.label === 'cmp-lz-prod-proj1')!;
+    expect(nodes.filter((node) => node.parentId === project.id).map((node) => node.label).sort()).toEqual([
+      'cmp-lz-prod-proj1-exacc-db', 'cmp-lz-prod-proj1-exacs-db',
+    ]);
+    const byId = new Map(nodes.map((node) => [node.id, node]));
+    for (const node of nodes) {
+      if (!node.parentId) continue;
+      const parent = byId.get(node.parentId)!;
+      expect(node.y + node.height, `${node.id} bottom`).toBeLessThanOrEqual(parent.height);
+    }
+  });
   it('uses the fixed landing-zone and top-level compartment names', () => {
     const graph = buildGraph(emptyLzModel(), 1);
     expect(graph.nodes.find((node) => node.id === 'tenancy')?.label).toBe('OCI Tenancy');

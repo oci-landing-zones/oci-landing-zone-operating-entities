@@ -196,6 +196,27 @@ local validation = import 'lib/validation.libsonnet';
       if raw_cis_level == 1 || raw_cis_level == '1' then 1
       else 2;
 
+    local notification_emails =
+      if std.objectHas(config, 'notification_emails') && config.notification_emails != null then
+        local values = validation.allowed_keys(
+          validation.object(config.notification_emails, 'config.notification_emails'),
+          'config.notification_emails',
+          ['default', 'cloudguard', 'iam', 'network', 'security']
+        );
+        {
+          [topic]:
+            local recipients = validation.array(
+              values[topic], 'config.notification_emails.%s' % topic, require_non_empty=true
+            );
+            assert collections.all([
+              std.type(recipient) == 'string' && recipient != ''
+              for recipient in recipients
+            ]) : 'config.notification_emails.%s must contain non-empty email strings' % topic;
+            recipients
+          for topic in std.objectFields(values)
+        }
+      else null;
+
     local hub_subnet_keys = hub_subnet_order[hub_kind];
     local hub_subnet_label = 'config.hub.network.subnets for %s' % hub_kind;
     local hub_vcn = required_vcn(hub_network, 'config.hub.network');
@@ -432,6 +453,7 @@ local validation = import 'lib/validation.libsonnet';
       region_short_name: region_short_name,
       realm: realm,
       cis_level: cis_level,
+      [if notification_emails != null then 'notification_emails']: notification_emails,
       hub+: {
         network+: { subnets: hub_subnets },
       },

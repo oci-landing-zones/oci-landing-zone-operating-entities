@@ -15,6 +15,17 @@ export interface FoundationConfig {
   regionShortName: string; // three-letter region key, e.g. fra
   /** Generator security and observability baseline. */
   cisLevel: 1 | 2;
+  /** One-OE notification topic recipients; blank fields keep the published placeholder. */
+  notifications?: OneOeNotifications;
+}
+
+export interface OneOeNotifications {
+  useSingleRecipient?: boolean;
+  default: string;
+  cloudguard: string;
+  iam: string;
+  network: string;
+  security: string;
 }
 
 /** Per-environment spoke network — seeded with defaults, user-adjustable in step 2. */
@@ -153,6 +164,49 @@ export interface NetworkConfig {
   subnets: Subnet[];
 }
 
+/** Email recipients for Exadata observability topics. Each input may contain comma-separated addresses. */
+export interface ExadataNotifications {
+  /** Omitted in older drafts; a populated default implies the single-recipient mode. */
+  useSingleRecipient?: boolean;
+  default: string;
+  dbWorkloads?: string;
+  infraWorkloads?: string;
+  projects?: string;
+}
+
+export interface ExaccDesign {
+  enabled: boolean;
+  shared: boolean;
+  /** Omitted in older local drafts; infer from environment placement. */
+  database?: 'shared' | 'per_environment';
+  service?: 'none' | 'autonomous' | 'vmc' | 'both';
+  /** Older local drafts used this flag; service takes precedence. */
+  autonomous?: boolean;
+  /** Environment IDs with ExaDB-C@C platform compartments. */
+  environments: string[];
+  /** Project IDs selected for database tiers, keyed by environment ID. */
+  projectDb: Record<string, string[]>;
+  notifications: ExadataNotifications;
+}
+
+export interface ExacsDesign {
+  enabled: boolean;
+  infrastructure: 'shared' | 'per_environment';
+  database: 'shared' | 'per_environment';
+  service: 'none' | 'autonomous' | 'vmc' | 'both';
+  /** Environment IDs for dedicated placement or shared Autonomous project tiers. */
+  environments: string[];
+  sharedVcnCidr: string;
+  environmentVcnCidrs: Record<string, string>;
+  projectDb: Record<string, string[]>;
+  notifications: ExadataNotifications;
+}
+
+export interface ExadataDesign {
+  exacc: ExaccDesign;
+  exacs: ExacsDesign;
+}
+
 export interface LzModel {
   /** Schema version of this canonical object. */
   version: string;
@@ -165,6 +219,8 @@ export interface LzModel {
   platforms: PlatformConfig[];
   /** Optional shared platforms outside all environments (step 4). */
   sharedPlatforms: SharedPlatformConfig[];
+  /** Optional Exadata extensions, configured in step 5. */
+  exadata: ExadataDesign;
 }
 
 /**

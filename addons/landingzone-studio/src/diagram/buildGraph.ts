@@ -5,6 +5,7 @@ import { hostIpInSubnet } from '../services/cidr';
 import { buildRouteTables } from '../services/routeTables';
 import { buildFlowTraces } from '../services/flowTrace';
 import { ocvsDefaultSubnets, platformInEnv, platformSubnetsForEnv, platformVcnForEnv } from '../services/platforms';
+import { exadataDiagramPlatforms } from '../services/exadata';
 import { generatorNames } from '../services/generatorNaming';
 import { absoluteNodeRects, flowAnchorPoint, routeFlowGeometry } from './flowGeometry';
 
@@ -78,6 +79,11 @@ const ENV_COMP_W = PAD * 2 + NET_COMP_W + PROJ_GAP + PROJ_COMP_W;
 // column, so they take its exact width and the VCNs line up edge to edge.
 const PLAT_COMP_W = NET_COMP_W;
 const PLAT_VCN_GAP = 16;   // vertical gap between stacked platform VCNs
+const nestedHeight = (count: number) => count
+  ? TITLE + PAD + count * PROJ_H + (count - 1) * PROJ_GAP_V + PAD
+  : PROJ_H;
+const rowOffset = (heights: number[], index: number) =>
+  heights.slice(0, index).reduce((sum, height) => sum + height + PROJ_GAP_V, 0);
 
 // ---- DRG + VCN attachments. The DRG and ALL attachment pills cluster together
 // inside cmp-network, below the hub VCN: the DRG on the left, the pills stacked
@@ -219,8 +225,12 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   // Platforms (step 4) build on the spoke layer: the shared platform row outside
   // the environments, and a platforms compartment inside each environment.
   const showPlatforms = upToStep >= 4 && hubImplemented;
-  const platforms = model.platforms ?? [];
-  const sharedPlatforms = model.sharedPlatforms ?? [];
+  const exadata = upToStep >= 5 ? exadataDiagramPlatforms(model) : {
+    platforms: [], sharedPlatforms: [], sharedWithoutNetwork: [], environmentsWithoutNetwork: {},
+    sharedChildren: {}, environmentChildren: {}, projectChildren: {},
+  };
+  const platforms = [...(model.platforms ?? []), ...exadata.platforms];
+  const sharedPlatforms = [...(model.sharedPlatforms ?? []), ...exadata.sharedPlatforms];
   const sharedInstances = showPlatforms ? sharedPlatforms.map((platform, index) => {
     const subnets: SubnetSpec[] = (platform.type === 'ocvs'
       ? ocvsDefaultSubnets(platform.vcnCidr)
@@ -313,8 +323,13 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   const netCompH = showHub
     ? TITLE + PAD + hubVcnH + sharedNetworkH + HUB_ATTACH_GAP + clusterH + PAD
     : COMP_H;
-  const sharedChildrenH = sharedInstances.length
-    ? TITLE + PAD + sharedInstances.length * PROJ_H + (sharedInstances.length - 1) * PROJ_GAP_V + PAD
+  const sharedRows = [
+    ...sharedInstances.map((instance) => ({ key: instance.platform.key, height: nestedHeight(exadata.sharedChildren[instance.platform.key]?.length ?? 0) })),
+    ...exadata.sharedWithoutNetwork.map((key) => ({ key, height: nestedHeight(exadata.sharedChildren[key]?.length ?? 0) })),
+  ];
+  const sharedChildCount = sharedRows.length;
+  const sharedChildrenH = sharedChildCount
+    ? TITLE + PAD + sharedRows.reduce((sum, row) => sum + row.height, 0) + (sharedChildCount - 1) * PROJ_GAP_V + PAD
     : COMP_H;
   // The shared platform compartment exists from Foundation onward.
   const leftH = netCompH + COMP_GAP + COMP_H + COMP_GAP + sharedChildrenH;
@@ -331,14 +346,14 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     });
     const vcnH = vcnHeight(subnets);
     // Projects that land in this environment ('all' or an explicit list).
-    const projectNames = showSpokes
+    const projectRows = showSpokes
       ? model.projects
           .filter((p) => p.environments === 'all' || (Array.isArray(p.environments) && p.environments.includes(e.id)))
-          .map((p) => p.name.trim())
-          .filter(Boolean)
+          .filter((p) => p.name.trim())
+          .map((p) => ({ name: p.name.trim(), children: exadata.projectChildren[e.id]?.[p.id] ?? [] }))
       : [];
-    const projStackH = projectNames.length > 0
-      ? projectNames.length * PROJ_H + (projectNames.length - 1) * PROJ_GAP_V
+    const projStackH = projectRows.length > 0
+      ? projectRows.reduce((sum, row) => sum + nestedHeight(row.children.length), 0) + (projectRows.length - 1) * PROJ_GAP_V
       : 0;
     const projCompH = TITLE + PAD + projStackH + PAD;
     // Platforms that land in this environment — each is a VCN with its own subnets,
@@ -367,13 +382,20 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       ? platformInstances.reduce((h, pl) => h + pl.vcnH, 0) + (platformInstances.length - 1) * PLAT_VCN_GAP
       : 0;
     const netH = TITLE + PAD + vcnH + (platformInstances.length ? PLAT_VCN_GAP + platStackH : 0) + PAD;
-    const platCompH = platformInstances.length > 0
-      ? TITLE + PAD + platformInstances.length * PROJ_H + (platformInstances.length - 1) * PROJ_GAP_V + PAD
+    const noNetworkPlatforms = exadata.environmentsWithoutNetwork[e.id] ?? [];
+    const platformRows = [
+      ...platformInstances.map((instance) => ({ key: instance.name, height: nestedHeight(exadata.environmentChildren[e.id]?.[instance.name]?.length ?? 0) })),
+      ...noNetworkPlatforms.map((key) => ({ key, height: nestedHeight(exadata.environmentChildren[e.id]?.[key]?.length ?? 0) })),
+    ];
+    const platformCompCount = platformRows.length;
+    const platCompH = platformCompCount > 0
+      ? TITLE + PAD + platformRows.reduce((sum, row) => sum + row.height, 0) + (platformCompCount - 1) * PROJ_GAP_V + PAD
       : COMP_H;
-    const hasPlatforms = platformInstances.length > 0;
+    const hasPlatforms = platformCompCount > 0;
     const leftColH = netH + COMP_GAP + platCompH;
     return {
       id: `cmp-env-${i}`,
+      sourceId: e.id,
       name,
       label: generatorNames.environmentCompartment(name),
       secure: e.securityZone,
@@ -384,9 +406,11 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       netH,
       sgwName: generatorNames.environmentGateway(regionTok, name, 'sgw'),
       attachName: generatorNames.environmentAttachment(regionTok, name),
-      projectNames,
+      projectRows,
       projCompH,
       platformInstances,
+      noNetworkPlatforms,
+      platformRows,
       platCompH,
       hasPlatforms,
       // The env compartment wraps whichever is taller: the left column (network +
@@ -435,6 +459,14 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     { id: 'landingzone', kind: 'landingzone', secure: true, container: true, label: generatorNames.landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
   ];
   const edges: DiagramEdge[] = [];
+  const pushExadataChildren = (parentId: string, parentLabel: string, parentWidth: number, children: Array<'db' | 'infra'>) => {
+    children.forEach((child, index) => nodes.push({
+      id: `${parentId}-${child}`, kind: 'compartment', tone: 'gray',
+      label: `${parentLabel}-${child}`, parentId,
+      x: PAD, y: TITLE + PAD + index * (PROJ_H + PROJ_GAP_V),
+      width: parentWidth - 2 * PAD, height: PROJ_H,
+    }));
+  };
 
   // network compartment › hub VCN › gateways + hub subnets (step 2+, implemented hub kinds only)
   nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', secure: true, container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
@@ -548,17 +580,35 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   // shared platform child compartments appear here; their VCNs live above in
   // cmp-lz-network.
   nodes.push({
-    id: 'cmp-platform', kind: 'compartment', tone: 'yellow', container: sharedInstances.length > 0 || undefined,
+    id: 'cmp-platform', kind: 'compartment', tone: 'yellow', container: sharedChildCount > 0 || undefined,
     label: generatorNames.platformCompartment, parentId: 'landingzone',
     x: leftX, y: innerTop + leftOffset + netCompH + COMP_GAP + COMP_H + COMP_GAP,
     width: netCompW, height: sharedChildrenH,
   });
   sharedInstances.forEach((instance, index) => {
+    const id = `cmp-shared-platform-${index}`;
+    const label = generatorNames.sharedPlatformCompartment(instance.platform.key);
+    const children = exadata.sharedChildren[instance.platform.key] ?? [];
     nodes.push({
-      id: `cmp-shared-platform-${index}`, kind: 'compartment', tone: 'gray',
-      label: generatorNames.sharedPlatformCompartment(instance.platform.key), parentId: 'cmp-platform',
-      x: PAD, y: TITLE + PAD + index * (PROJ_H + PROJ_GAP_V), width: netCompW - 2 * PAD, height: PROJ_H,
+      id, kind: 'compartment', tone: 'gray', container: children.length > 0 || undefined,
+      label, parentId: 'cmp-platform',
+      x: PAD, y: TITLE + PAD + rowOffset(sharedRows.map((row) => row.height), index),
+      width: netCompW - 2 * PAD, height: sharedRows[index].height,
     });
+    pushExadataChildren(id, label, netCompW - 2 * PAD, children);
+  });
+  exadata.sharedWithoutNetwork.forEach((key, index) => {
+    const rowIndex = sharedInstances.length + index;
+    const id = `cmp-shared-exadata-${key}`;
+    const label = generatorNames.sharedPlatformCompartment(key);
+    const children = exadata.sharedChildren[key] ?? [];
+    nodes.push({
+      id, kind: 'compartment', tone: 'gray', container: children.length > 0 || undefined,
+      label, parentId: 'cmp-platform',
+      x: PAD, y: TITLE + PAD + rowOffset(sharedRows.map((row) => row.height), rowIndex),
+      width: netCompW - 2 * PAD, height: sharedRows[rowIndex].height,
+    });
+    pushExadataChildren(id, label, netCompW - 2 * PAD, children);
   });
 
   // environment compartments › env network compartment › env VCN › its subnets (step 2+)
@@ -619,11 +669,23 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       label: generatorNames.environmentChildCompartment(env.name, 'projects'), parentId: env.id,
       x: PAD + NET_COMP_W + PROJ_GAP, y: TITLE + PAD, width: PROJ_COMP_W, height: env.projCompH,
     });
-    env.projectNames.forEach((pname, k) => {
+    env.projectRows.forEach((project, k) => {
+      const projectId = `${env.id}-proj-${k}`;
+      const projectLabel = generatorNames.environmentProjectCompartment(env.name, project.name);
+      const projectHeight = nestedHeight(project.children.length);
       nodes.push({
-        id: `${env.id}-proj-${k}`, kind: 'project', label: generatorNames.environmentProjectCompartment(env.name, pname), parentId: `${env.id}-projects`,
-        x: (PROJ_COMP_W - PROJ_W) / 2, y: TITLE + PAD + k * (PROJ_H + PROJ_GAP_V), width: PROJ_W, height: PROJ_H,
+        id: projectId, kind: 'project', container: project.children.length > 0 || undefined,
+        label: projectLabel, parentId: `${env.id}-projects`,
+        x: (PROJ_COMP_W - PROJ_W) / 2,
+        y: TITLE + PAD + rowOffset(env.projectRows.map((row) => nestedHeight(row.children.length)), k),
+        width: PROJ_W, height: projectHeight,
       });
+      project.children.forEach((type, index) => nodes.push({
+        id: `${projectId}-${type}-db`, kind: 'compartment', tone: 'gray',
+        label: `${projectLabel}-${type}-db`, parentId: projectId,
+        x: PAD / 2, y: TITLE + PAD + index * (PROJ_H + PROJ_GAP_V),
+        width: PROJ_W - PAD, height: PROJ_H,
+      }));
     });
 
     nodes.push({
@@ -632,11 +694,29 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       x: PAD, y: TITLE + PAD + env.netH + COMP_GAP, width: PLAT_COMP_W, height: env.platCompH,
     });
     env.platformInstances.forEach((pl, k) => {
+      const id = `${env.id}-platform-comp-${k}`;
+      const label = generatorNames.environmentPlatformCompartment(env.name, pl.name);
+      const children = exadata.environmentChildren[env.sourceId]?.[pl.name] ?? [];
       nodes.push({
-        id: `${env.id}-platform-comp-${k}`, kind: 'compartment', tone: 'gray',
-        label: generatorNames.environmentPlatformCompartment(env.name, pl.name), parentId: `${env.id}-platforms`,
-        x: PAD, y: TITLE + PAD + k * (PROJ_H + PROJ_GAP_V), width: PLAT_COMP_W - 2 * PAD, height: PROJ_H,
+        id, kind: 'compartment', tone: 'gray', container: children.length > 0 || undefined,
+        label, parentId: `${env.id}-platforms`,
+        x: PAD, y: TITLE + PAD + rowOffset(env.platformRows.map((row) => row.height), k),
+        width: PLAT_COMP_W - 2 * PAD, height: env.platformRows[k].height,
       });
+      pushExadataChildren(id, label, PLAT_COMP_W - 2 * PAD, children);
+    });
+    env.noNetworkPlatforms.forEach((key, k) => {
+      const rowIndex = env.platformInstances.length + k;
+      const id = `${env.id}-exadata-${key}`;
+      const label = generatorNames.environmentPlatformCompartment(env.name, key);
+      const children = exadata.environmentChildren[env.sourceId]?.[key] ?? [];
+      nodes.push({
+        id, kind: 'compartment', tone: 'gray', container: children.length > 0 || undefined,
+        label, parentId: `${env.id}-platforms`,
+        x: PAD, y: TITLE + PAD + rowOffset(env.platformRows.map((row) => row.height), rowIndex),
+        width: PLAT_COMP_W - 2 * PAD, height: env.platformRows[rowIndex].height,
+      });
+      pushExadataChildren(id, label, PLAT_COMP_W - 2 * PAD, children);
     });
   });
 
