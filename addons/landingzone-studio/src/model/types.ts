@@ -171,6 +171,11 @@ export interface ExadataNotifications {
   default: string;
   dbWorkloads?: string;
   infraWorkloads?: string;
+  environmentInfraEmails?: Record<string, string>;
+  environmentDbEmails?: Record<string, string>;
+  /** Recipient list for each environment project topic, keyed by environment ID. */
+  projectEmails?: Record<string, string>;
+  /** Earlier Studio drafts used one recipient list for every project topic. */
   projects?: string;
 }
 

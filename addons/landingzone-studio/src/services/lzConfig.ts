@@ -263,6 +263,7 @@ function platformEntryLines(name: string, entry: PlatformConfigEntry): string[] 
       : [`          extension: { type: ${quote(ext.type)} },`];
   return [
     `        ${key(name)}: {`,
+    ...(entry.publication_components ? [`          publication_components: ${jsonnetValue(entry.publication_components)},`] : []),
     ...(entry.network ? [
       '          network: {',
       `            vcn: ${quote(entry.network.vcn)},`,
@@ -351,7 +352,9 @@ export function serializeConfig(model: LzModel, upToStep = Infinity): string {
           const extension = entry.extension
             ? `${network ? ', ' : ''}extension: { type: ${quote(entry.extension.type)}, params: ${jsonnetValue(entry.extension.params ?? {})} }`
             : '';
-          return `    ${key(k)}: { ${network}${extension} },`;
+          const components = entry.publication_components
+            ? `${network || extension ? ', ' : ''}publication_components: ${jsonnetValue(entry.publication_components)}` : '';
+          return `    ${key(k)}: { ${network}${extension}${components} },`;
         }),
         '  },',
       ];

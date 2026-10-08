@@ -18,19 +18,45 @@ function recipients(input: string | undefined): string[] {
 
 type ExadataTopic = 'dbWorkloads' | 'infraWorkloads' | 'projects';
 
-function notificationEmails(input: ExadataNotifications, allowed: ExadataTopic[] = ['dbWorkloads', 'infraWorkloads', 'projects']): Record<string, string[]> {
-  if (input.useSingleRecipient ?? Boolean(input.default)) return { default: recipients(input.default) };
-  const result: Record<string, string[]> = {
-    default: allowed.map((field) => recipients(input[field])).find((values) => values.length > 0) ?? [],
+function notificationEmails(input: ExadataNotifications, allowed: ExadataTopic[], projectEnvironments: Array<{ id: string; name: string }>,
+  environmentEnvironments: Array<{ id: string; name: string }> = []): Record<string, unknown> {
+  const split = environmentEnvironments.length > 0;
+  if (input.useSingleRecipient ?? Boolean(input.default)) return {
+    default: recipients(input.default), ...(split ? { split_environment_topics: true } : {}),
+  };
+  const emailMap = (environments: Array<{ id: string; name: string }>, values?: Record<string, string>) =>
+    Object.fromEntries(environments.map((env) => [env.name.trim(), recipients(values?.[env.id])])
+      .filter(([, emails]) => (emails as string[]).length > 0));
+  const projectEmails = emailMap(projectEnvironments, input.projectEmails);
+  const infraEmails = emailMap(environmentEnvironments, input.environmentInfraEmails);
+  const dbEmails = emailMap(environmentEnvironments, input.environmentDbEmails);
+  const firstProjectEmail = Object.values(projectEmails)[0] as string[] | undefined;
+  const firstInfraEmail = Object.values(infraEmails)[0] as string[] | undefined;
+  const firstDbEmail = Object.values(dbEmails)[0] as string[] | undefined;
+  const result: Record<string, unknown> = {
+    default: allowed.map((field) => recipients(input[field])).find((values) => values.length > 0)
+      ?? firstInfraEmail ?? firstDbEmail ?? firstProjectEmail ?? [],
   };
   for (const [field, key] of [
     ['dbWorkloads', 'db_workloads'], ['infraWorkloads', 'infra_workloads'], ['projects', 'projects'],
   ] as const) {
-    if (!allowed.includes(field)) continue;
+    if (!allowed.includes(field) || (field === 'projects' && Object.keys(projectEmails).length)) continue;
     const values = recipients(input[field]);
     if (values.length) result[key] = values;
   }
+  if (Object.keys(projectEmails).length) result.projects_by_environment = projectEmails;
+  if (split) {
+    result.split_environment_topics = true;
+    if (Object.keys(infraEmails).length) result.environment_infra = infraEmails;
+    if (Object.keys(dbEmails).length) result.environment_db = dbEmails;
+  }
   return result;
+}
+
+export function exadataProjectTopicEnvironments(model: LzModel, type: 'exacc' | 'exacs', useCase: 1 | 2 | 3, autonomous: boolean) {
+  const design = model.exadata[type];
+  return model.environments.filter((env) => autonomous && (useCase === 1 || design.environments.includes(env.id))
+    && selectedProjectNames(model, env.id, type).length > 0);
 }
 
 export function defaultExacsEnvCidr(index: number): string {
@@ -61,11 +87,12 @@ export function exadataEntries(model: LzModel): {
     const autonomous = exacc.service
       ? exacc.service === 'autonomous' || exacc.service === 'both'
       : exacc.autonomous ?? Object.values(exacc.projectDb).some((ids) => ids.length > 0);
+    const projectEnvs = exadataProjectTopicEnvironments(model, 'exacc', useCase, autonomous);
     const emails = notificationEmails(exacc.notifications, [
       ...(useCase === 1 ? ['dbWorkloads' as const] : []),
       ...(useCase !== 3 ? ['infraWorkloads' as const] : []),
-      ...(useCase !== 1 || autonomous ? ['projects' as const] : []),
-    ]);
+      ...(projectEnvs.length ? ['projects' as const] : []),
+    ], projectEnvs, useCase === 1 ? [] : model.environments.filter((env) => exacc.environments.includes(env.id)));
     if (useCase !== 3) {
       const projectDb: Record<string, string[]> = {};
       if (useCase === 1 && autonomous) for (const env of model.environments) {
@@ -91,11 +118,13 @@ export function exadataEntries(model: LzModel): {
   const exacs = model.exadata.exacs;
   if (exacs.enabled) {
     const useCase = exacs.infrastructure === 'per_environment' ? 3 : exacs.database === 'per_environment' ? 2 : 1;
+    const autonomous = exacs.service === 'autonomous' || exacs.service === 'both';
+    const projectEnvs = exadataProjectTopicEnvironments(model, 'exacs', useCase, autonomous);
     const emails = notificationEmails(exacs.notifications, [
       ...(useCase === 1 ? ['dbWorkloads' as const] : []),
       ...(useCase !== 3 ? ['infraWorkloads' as const] : []),
-      ...(useCase !== 1 || exacs.service === 'autonomous' || exacs.service === 'both' ? ['projects' as const] : []),
-    ]);
+      ...(projectEnvs.length ? ['projects' as const] : []),
+    ], projectEnvs, useCase === 1 ? [] : model.environments.filter((env) => exacs.environments.includes(env.id)));
     if (useCase !== 3) {
       const sharedDatabase = useCase === 1;
       const projectDb: Record<string, string[]> = {};
@@ -221,17 +250,32 @@ export function validateExadataModel(model: LzModel): string[] {
     const topicFields = [
       ...(useCase === 1 ? ['dbWorkloads' as const] : []),
       ...(useCase !== 3 ? ['infraWorkloads' as const] : []),
-      ...(useCase !== 1 || autonomous ? ['projects' as const] : []),
+      ...(exadataProjectTopicEnvironments(model, type, useCase, autonomous).length ? ['projects' as const] : []),
     ];
+    const projectTopicEnvironments = exadataProjectTopicEnvironments(model, type, useCase, autonomous);
+    const environmentTopicEnvironments = useCase === 1 ? [] : model.environments.filter((env) => design.environments.includes(env.id));
     if (design.notifications.useSingleRecipient ?? Boolean(design.notifications.default)) {
       if (!recipients(design.notifications.default).length) errors.push(`${type.toUpperCase()} needs a default notification recipient.`);
     } else {
+      for (const env of environmentTopicEnvironments) {
+        if (!recipients(design.notifications.environmentInfraEmails?.[env.id]).length)
+          errors.push(`${type.toUpperCase()} needs ${env.name} infrastructure notification recipients.`);
+        if (!recipients(design.notifications.environmentDbEmails?.[env.id]).length)
+          errors.push(`${type.toUpperCase()} needs ${env.name} DBA notification recipients.`);
+      }
       for (const [field, label] of [
         ['dbWorkloads', 'shared database workload'],
         ['infraWorkloads', 'shared infrastructure'],
         ['projects', 'environment and project'],
       ] as const) {
-        if (topicFields.includes(field) && !recipients(design.notifications[field]).length) {
+        if (field === 'projects' && projectTopicEnvironments.length && design.notifications.projectEmails) {
+          for (const env of projectTopicEnvironments) {
+            if (!recipients(design.notifications.projectEmails[env.id]).length) {
+              errors.push(`${type.toUpperCase()} needs ${env.name} project-topic notification recipients.`);
+            }
+          }
+        } else if (topicFields.includes(field) && !(field === 'projects' && !projectTopicEnvironments.length)
+          && !recipients(design.notifications[field]).length) {
           errors.push(`${type.toUpperCase()} needs ${label} notification recipients.`);
         }
       }

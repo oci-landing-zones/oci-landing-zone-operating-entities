@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { useWizard } from '../wizardContext';
 import type { ExaccDesign, ExacsDesign, ExadataNotifications } from '../../model/types';
 import { oracle } from '../../theme';
-import { defaultExacsEnvCidr, validateExadataModel } from '../../services/exadata';
+import { defaultExacsEnvCidr, exadataProjectTopicEnvironments, validateExadataModel } from '../../services/exadata';
 
 const styles: Record<string, CSSProperties> = {
   card: { border: `1px solid ${oracle.border}`, borderTop: `3px solid ${oracle.red}`, borderRadius: 8, background: oracle.surface, padding: 20 },
@@ -18,23 +18,21 @@ const styles: Record<string, CSSProperties> = {
   warning: { border: `1px solid ${oracle.red}`, background: oracle.redTint, color: oracle.redDark, padding: '10px 12px', borderRadius: 6, fontSize: 12.5, lineHeight: 1.5 },
 };
 
-function NotificationFields({ value, onChange, prefix, useCase, autonomous }: {
+function NotificationFields({ value, onChange, prefix, useCase, projectEnvironments, environmentEnvironments }: {
   value: ExadataNotifications;
   onChange: (next: ExadataNotifications) => void;
   prefix: string;
   useCase: 1 | 2 | 3;
-  autonomous: boolean;
+  projectEnvironments: Array<{ id: string; name: string }>;
+  environmentEnvironments: Array<{ id: string; name: string }>;
 }) {
   const exacs = prefix === 'exacs';
   const singleRecipient = value.useSingleRecipient ?? Boolean(value.default);
   const infraEvents = exacs ? (useCase === 1 ? 63 : 36) : (useCase === 1 ? 46 : 32);
-  const environmentEvents = exacs ? (useCase === 2 ? 84 : 105) : (useCase === 2 ? 71 : 88);
-  const fields: Array<{ key: 'dbWorkloads' | 'infraWorkloads' | 'projects'; label: string; help: string; visible: boolean }> = [
-    { key: 'dbWorkloads', label: 'Shared database workload emails', help: '57 database events (backups, DB homes, restore, maintenance). Three database/cluster alarm definitions are disabled by default.', visible: useCase === 1 },
-    { key: 'infraWorkloads', label: 'Shared infrastructure emails', help: `${infraEvents} events for operator access${useCase === 1 ? ', Exadata infrastructure, and VMC/AVMC' : ' and Exadata infrastructure'}. ${useCase === 1 ? 'Four VMC alarm definitions are disabled by default.' : 'This infrastructure-only scope has no VMC alarms.'}`, visible: useCase !== 3 },
-    { key: 'projects', label: 'Environment and project emails', help: useCase === 1
-      ? '57 database event types from each selected Autonomous project DB compartment.'
-      : `${environmentEvents} platform event types in each selected environment${autonomous ? ', plus 57 database event types from each selected Autonomous project DB compartment' : ''}. Seven platform alarm definitions are disabled by default.`, visible: useCase !== 1 || autonomous },
+  const environmentInfraEvents = exacs ? (useCase === 2 ? 27 : 48) : (useCase === 2 ? 14 : 31);
+  const fields: Array<{ key: 'dbWorkloads' | 'infraWorkloads'; label: string; help: string; visible: boolean }> = [
+    { key: 'dbWorkloads', label: 'Shared DBA team emails', help: '57 database events (backups, DB homes, restore, maintenance). 3 database/cluster alarm definitions are disabled by default.', visible: useCase === 1 },
+    { key: 'infraWorkloads', label: 'Shared infrastructure team emails', help: `${infraEvents} events for operator access${useCase === 1 ? ', Exadata infrastructure, and VMC/AVMC' : ' and Exadata infrastructure'}. ${useCase === 1 ? '4 VMC alarm definitions are disabled by default.' : 'This infrastructure-only scope has no VMC alarms.'}`, visible: useCase !== 3 },
   ];
   return (
     <fieldset style={styles.group}>
@@ -49,6 +47,34 @@ function NotificationFields({ value, onChange, prefix, useCase, autonomous }: {
             <span style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>{help}</span>
           </label>
         ))}
+        {environmentEnvironments.flatMap((env) => ([
+          { key: 'environmentInfraEmails' as const, team: 'Infrastructure team',
+            help: `${environmentInfraEvents} infrastructure and VMC event types. 4 VMC alarm definitions are disabled by default.` },
+          { key: 'environmentDbEmails' as const, team: 'DBA team',
+            help: '57 database event types. 3 database/cluster alarm definitions are disabled by default.' },
+        ]).map(({ key, team, help }) => (
+          <label key={`${env.id}-${key}`} style={styles.field} htmlFor={`${prefix}-${key}-${env.id}`}>
+            {env.name} {team} emails *
+            <input id={`${prefix}-${key}-${env.id}`} type="text" style={styles.input}
+              value={value[key]?.[env.id] ?? ''} placeholder="team@example.com"
+              onChange={(event) => onChange({ ...value, [key]: { ...value[key], [env.id]: event.target.value } })} />
+            <span style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>{help}</span>
+          </label>
+        )))}
+        {projectEnvironments.map((env) => (
+          <label key={env.id} style={styles.field} htmlFor={`${prefix}-projects-${env.id}`}>
+            {env.name} Autonomous project DBA emails *
+            <input id={`${prefix}-projects-${env.id}`} type="text" style={styles.input}
+              value={value.projectEmails?.[env.id] ?? value.projects ?? ''} placeholder="team@example.com"
+              onChange={(event) => onChange({ ...value, projectEmails: {
+                ...Object.fromEntries(projectEnvironments.map((candidate) => [candidate.id, value.projectEmails?.[candidate.id] ?? value.projects ?? ''])),
+                [env.id]: event.target.value,
+              } })} />
+            <span style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>
+              Separate {env.name} project topic: 57 database event types from each selected Autonomous project DB compartment.
+            </span>
+          </label>
+        ))}
       </div>}
       <label style={{ ...styles.option, marginTop: 18, fontWeight: 700 }}>
         <input type="checkbox" checked={singleRecipient} onChange={(event) => onChange({ ...value, useSingleRecipient: event.target.checked })} />
@@ -58,7 +84,7 @@ function NotificationFields({ value, onChange, prefix, useCase, autonomous }: {
         Notification emails *
         <input id={`${prefix}-default`} type="text" style={styles.input} value={value.default}
           placeholder="ops@example.com" onChange={(event) => onChange({ ...value, default: event.target.value })} />
-        <span style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>Sends this extension's database, infrastructure, and project notifications to the same recipients.</span>
+        <span style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>Sends this extension's infrastructure, DBA, and Autonomous project notifications to the same recipients.</span>
       </label>}
     </fieldset>
   );
@@ -231,7 +257,8 @@ function ExaccSection() {
         {autonomous && <ProjectChoices type="EXACC" selected={value.projectDb} onChange={(projectDb) => update({ projectDb })}
           environments={useCase === 1 ? model.environments.map((env) => env.id) : value.environments} />}
         <NotificationFields prefix="exacc" value={value.notifications} onChange={(notifications) => update({ notifications })}
-          useCase={useCase} autonomous={autonomous} />
+          useCase={useCase} projectEnvironments={exadataProjectTopicEnvironments(model, 'exacc', useCase, autonomous)}
+          environmentEnvironments={useCase === 1 ? [] : model.environments.filter((env) => value.environments.includes(env.id))} />
       </>}
     </section>
   );
@@ -305,7 +332,8 @@ function ExacsSection() {
         {(value.service === 'autonomous' || value.service === 'both') && <ProjectChoices type="EXACS" selected={value.projectDb} onChange={(projectDb) => update({ projectDb })}
           environments={projectEnvs} />}
         <NotificationFields prefix="exacs" value={value.notifications} onChange={(notifications) => update({ notifications })}
-          useCase={useCase} autonomous={value.service === 'autonomous' || value.service === 'both'} />
+          useCase={useCase} projectEnvironments={exadataProjectTopicEnvironments(model, 'exacs', useCase, value.service === 'autonomous' || value.service === 'both')}
+          environmentEnvironments={useCase === 1 ? [] : model.environments.filter((env) => value.environments.includes(env.id))} />
       </>}
     </section>
   );
