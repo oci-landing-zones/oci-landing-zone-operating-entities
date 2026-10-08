@@ -47,18 +47,23 @@ describe('Exadata configuration', () => {
     model.exadata.exacc.environments = useCase === 1 ? [] : ['environment-1'];
     model.exadata.exacc.notifications = {
       useSingleRecipient: false,
-      default: 'ops@example.com', dbWorkloads: 'dba@example.com',
-      infraWorkloads: 'infra@example.com', projects: 'project@example.com',
+      default: 'ops@example.com', dbWorkloads: 'dba@example.com', infraWorkloads: 'infra@example.com',
+      environmentInfraEmails: { 'environment-1': 'env-infra@example.com' },
+      environmentDbEmails: { 'environment-1': 'env-dba@example.com' },
     };
     const config = buildConfig(model);
     const params = useCase === 3
       ? config.environments.prod.platforms.exacc.extension?.params
       : config.shared_platforms.exacc.extension?.params;
     expect(params?.notification_emails).toEqual({
-      default: [useCase === 3 ? 'project@example.com' : useCase === 1 ? 'dba@example.com' : 'infra@example.com'],
+      default: [useCase === 3 ? 'env-infra@example.com' : useCase === 1 ? 'dba@example.com' : 'infra@example.com'],
       ...(useCase === 1 ? { db_workloads: ['dba@example.com'] } : {}),
       ...(useCase !== 3 ? { infra_workloads: ['infra@example.com'] } : {}),
-      ...(useCase !== 1 ? { projects: ['project@example.com'] } : {}),
+      ...(useCase !== 1 ? {
+        split_environment_topics: true,
+        environment_infra: { prod: ['env-infra@example.com'] },
+        environment_db: { prod: ['env-dba@example.com'] },
+      } : {}),
     });
   });
 
@@ -72,6 +77,74 @@ describe('Exadata configuration', () => {
     };
     expect(buildConfig(model).shared_platforms.exacs.extension?.params?.notification_emails).toEqual({ default: ['ops@example.com'] });
     expect(validateExadataModel(model)).toEqual([]);
+  });
+
+  it.each(['exacc', 'exacs'] as const)('keeps distinct %s project-topic recipients by environment', (type) => {
+    const model = emptyLzModel();
+    const design = model.exadata[type];
+    design.enabled = true;
+    design.service = 'autonomous';
+    design.projectDb = { 'environment-1': ['project-1'], 'environment-2': ['project-1'] };
+    design.notifications = {
+      useSingleRecipient: false, default: '', dbWorkloads: 'dba@example.com', infraWorkloads: 'infra@example.com',
+      projectEmails: { 'environment-1': 'prod-dba@example.com', 'environment-2': 'preprod-dba@example.com' },
+    };
+    expect(validateExadataModel(model)).toEqual([]);
+    expect(buildConfig(model).shared_platforms[type].extension?.params?.notification_emails).toEqual({
+      default: ['dba@example.com'], db_workloads: ['dba@example.com'], infra_workloads: ['infra@example.com'],
+      projects_by_environment: { prod: ['prod-dba@example.com'], preprod: ['preprod-dba@example.com'] },
+    });
+  });
+
+  it.each([['exacc', 2], ['exacs', 3]] as const)('routes %s UC%s infrastructure and DBA topics independently', (type, useCase) => {
+    const model = emptyLzModel();
+    const design = model.exadata[type];
+    design.enabled = true;
+    design.service = 'vmc';
+    design.environments = ['environment-1', 'environment-2'];
+    if (useCase === 2) model.exadata.exacc.database = 'per_environment';
+    else {
+      model.exadata.exacs.infrastructure = 'per_environment';
+      model.exadata.exacs.database = 'per_environment';
+    }
+    design.notifications = {
+      useSingleRecipient: false, default: '', infraWorkloads: 'infra@example.com',
+      environmentInfraEmails: { 'environment-1': 'prod-infra@example.com', 'environment-2': 'preprod-infra@example.com' },
+      environmentDbEmails: { 'environment-1': 'prod-dba@example.com', 'environment-2': 'preprod-dba@example.com' },
+    };
+    expect(validateExadataModel(model)).toEqual([]);
+    const config = buildConfig(model);
+    expect(config.environments.prod.platforms[type].extension?.params?.notification_emails).toMatchObject({
+      split_environment_topics: true,
+      environment_infra: { prod: ['prod-infra@example.com'], preprod: ['preprod-infra@example.com'] },
+      environment_db: { prod: ['prod-dba@example.com'], preprod: ['preprod-dba@example.com'] },
+    });
+  });
+
+  it('requires each generated project topic recipient and ignores uncreated UC1 topics', () => {
+    const model = emptyLzModel();
+    model.exadata.exacc.enabled = true;
+    model.exadata.exacc.service = 'autonomous';
+    model.exadata.exacc.notifications = {
+      useSingleRecipient: false, default: '', dbWorkloads: 'dba@example.com', infraWorkloads: 'infra@example.com',
+      projectEmails: {},
+    };
+    expect(validateExadataModel(model)).toEqual([]);
+    model.exadata.exacc.projectDb = { 'environment-1': ['project-1'] };
+    expect(validateExadataModel(model)).toContain('EXACC needs prod project-topic notification recipients.');
+  });
+
+  it('uses the single recipient for all project topics even when separate addresses are saved', () => {
+    const model = emptyLzModel();
+    model.exadata.exacc.enabled = true;
+    model.exadata.exacc.service = 'autonomous';
+    model.exadata.exacc.projectDb = { 'environment-1': ['project-1'] };
+    model.exadata.exacc.notifications = {
+      useSingleRecipient: true, default: 'all@example.com', dbWorkloads: 'dba@example.com',
+      projectEmails: { 'environment-1': 'prod@example.com' },
+    };
+    expect(validateExadataModel(model)).toEqual([]);
+    expect(buildConfig(model).shared_platforms.exacc.extension?.params?.notification_emails).toEqual({ default: ['all@example.com'] });
   });
 
   it('requires every visible EXACS recipient in separate-email mode', () => {
@@ -137,12 +210,12 @@ describe('Exadata configuration', () => {
     const config = buildConfig(model);
     expect(config.shared_platforms.exacc).toEqual({
       publication_components: { infrastructure: true, database: false },
-      extension: { type: 'exacc', params: { notification_emails: { default: ['ops@example.com'] } } },
+      extension: { type: 'exacc', params: { notification_emails: { default: ['ops@example.com'], split_environment_topics: true } } },
     });
     expect(config.environments.prod.platforms.exacc).toEqual({
       publication_components: { infrastructure: false, database: true },
       extension: { type: 'exacc', params: {
-        notification_emails: { default: ['ops@example.com'] }, project_db_compartments: ['proj1'],
+        notification_emails: { default: ['ops@example.com'], split_environment_topics: true }, project_db_compartments: ['proj1'],
       } },
     });
     expect(serializeConfig(model, 4)).not.toContain("type: 'exacc'");

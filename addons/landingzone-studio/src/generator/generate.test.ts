@@ -161,6 +161,66 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.files['observability_cis2.json']).toContain('NOTT-LZ-EXACS-DB-WORKLOADS-KEY');
   }, 60_000);
 
+  it.each(['exacc', 'exacs'] as const)('routes %s project topics to different environment teams', async (type) => {
+    const model = emptyLzModel();
+    const design = model.exadata[type];
+    design.enabled = true;
+    design.service = 'autonomous';
+    design.projectDb = { 'environment-1': ['project-1'], 'environment-2': ['project-1'] };
+    design.notifications = {
+      useSingleRecipient: false, default: '', dbWorkloads: 'dba@example.com', infraWorkloads: 'infra@example.com',
+      projectEmails: { 'environment-1': 'prod-dba@example.com', 'environment-2': 'preprod-dba@example.com' },
+    };
+    const out = await generateOutputs(model);
+    const topics = JSON.parse(out.files['observability_cis2.json']).notifications_configuration.topics;
+    const code = type.toUpperCase();
+    expect(topics[`NOTT-LZ-PROD-${code}-PROJECTS-KEY`].subscriptions[0].values).toEqual(['prod-dba@example.com']);
+    expect(topics[`NOTT-LZ-PREPROD-${code}-PROJECTS-KEY`].subscriptions[0].values).toEqual(['preprod-dba@example.com']);
+    expect(topics[`NOTT-LZ-${code}-DB-WORKLOADS-KEY`].subscriptions[0].values).toEqual(['dba@example.com']);
+    expect(topics[`NOTT-LZ-${code}-SHARED-INFRA-WORKLOADS-KEY`].subscriptions[0].values).toEqual(['infra@example.com']);
+  }, 60_000);
+
+  it.each([['exacc', 2], ['exacc', 3], ['exacs', 2], ['exacs', 3]] as const)(
+    'separates %s UC%s infrastructure and DBA topics without AVMC tiers', async (type, useCase) => {
+    const model = emptyLzModel();
+    const design = model.exadata[type];
+    design.enabled = true;
+    design.service = 'vmc';
+    design.environments = ['environment-1'];
+    if (type === 'exacc') {
+      model.exadata.exacc.database = 'per_environment';
+      model.exadata.exacc.shared = useCase === 2;
+    } else {
+      model.exadata.exacs.database = 'per_environment';
+      model.exadata.exacs.infrastructure = useCase === 2 ? 'shared' : 'per_environment';
+    }
+    design.notifications = {
+      useSingleRecipient: false, default: '', infraWorkloads: 'shared-infra@example.com',
+      environmentInfraEmails: { 'environment-1': 'prod-infra@example.com' },
+      environmentDbEmails: { 'environment-1': 'prod-dba@example.com' },
+    };
+    const out = await generateOutputs(model);
+    const topics = JSON.parse(out.files['observability_cis2.json']).notifications_configuration.topics;
+    const code = type.toUpperCase();
+    expect(Object.keys(topics)).toContain(`NOTT-LZ-PROD-${code}-INFRA-WORKLOADS-KEY`);
+    expect(topics[`NOTT-LZ-PROD-${code}-INFRA-WORKLOADS-KEY`].subscriptions[0].values).toEqual(['prod-infra@example.com']);
+    expect(topics[`NOTT-LZ-PROD-${code}-DB-WORKLOADS-KEY`].subscriptions[0].values).toEqual(['prod-dba@example.com']);
+    expect(topics[`NOTT-LZ-PROD-${code}-PROJECTS-KEY`]).toBeUndefined();
+    const observability = JSON.parse(out.files['observability_cis2.json']);
+    const rules = observability.events_configuration.event_rules;
+    expect(rules[`RUL-LZ-PROD-NOTIFICATION-PLATFORM-${code}-DB-KEY`].destination_topic_ids)
+      .toEqual([`NOTT-LZ-PROD-${code}-DB-WORKLOADS-KEY`]);
+    expect(rules[`RUL-LZ-PROD-NOTIFICATION-PLATFORM-${code}-VMC-KEY`].destination_topic_ids)
+      .toEqual([`NOTT-LZ-PROD-${code}-INFRA-WORKLOADS-KEY`]);
+    const platformAlarms = Object.values(observability.alarms_configuration.alarms) as Array<{
+      compartment_id: string; destination_topic_ids: string[];
+    }>;
+    const destinations = platformAlarms.filter((alarm) => alarm.compartment_id === `CMP-LZ-PROD-${code}-DB-KEY`)
+      .flatMap((alarm) => alarm.destination_topic_ids);
+    expect(destinations.filter((topic) => topic === `NOTT-LZ-PROD-${code}-DB-WORKLOADS-KEY`)).toHaveLength(3);
+    expect(destinations.filter((topic) => topic === `NOTT-LZ-PROD-${code}-INFRA-WORKLOADS-KEY`)).toHaveLength(4);
+  }, 60_000);
+
   it('emits the selected CIS level 1 artifact family', async () => {
     const base = emptyLzModel();
     const out = await generateOutputs({

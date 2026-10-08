@@ -43,6 +43,9 @@ Scope: this file covers `gen/workload-extensions/exacc/**` and the published Exa
 - `db_workloads`
 - `infra_workloads`
 - `projects`
+- `projects_by_environment` (environment name to recipient array, overriding `projects`)
+- `environment_infra` and `environment_db` (environment name to recipient array)
+- `split_environment_topics` (boolean; separates infrastructure and DBA topics in environment placements)
 
 Unknown keys are rejected. Recipient arrays must be non-empty arrays of non-empty strings. The generator does not validate email address syntax.
 
