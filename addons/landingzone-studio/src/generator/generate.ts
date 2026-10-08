@@ -19,6 +19,7 @@ import { PRIMARY_OUTPUTS } from './outputNames';
 import { validateOkeModel } from '../services/okeValidation';
 import { validateOcvsModel } from '../services/ocvsValidation';
 import { validatePlatformContracts } from '../services/platformValidation';
+import { validateExadataModel } from '../services/exadata';
 
 export interface GeneratedOutputs {
   /** The wizard config that was fed to the generator. */
@@ -88,7 +89,7 @@ export function generateFromUpstreamDefaults(profile: string): Promise<Record<st
 
 /** Run the generator over a wizard model. */
 export async function generateOutputs(model: LzModel): Promise<GeneratedOutputs> {
-  const issues = [...validatePlatformContracts(model), ...validateOkeModel(model), ...validateOcvsModel(model)];
+  const issues = [...validatePlatformContracts(model), ...validateOkeModel(model), ...validateOcvsModel(model), ...validateExadataModel(model)];
   if (issues.length) throw new GeneratorError(issues.join('\n'));
   const config = serializeConfig(model);
   const files = await generateFromConfigCode(config);

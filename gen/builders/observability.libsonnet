@@ -105,11 +105,17 @@ function(config, n, realm_constants, topo)
   ];
 
   local placeholder_email = 'email.address@example.com';
-  local notification_topic(name_segments, description) = {
+  local notification_emails =
+    if std.objectHas(config, 'notification_emails') then config.notification_emails else {};
+  local topic_recipients(topic) =
+    if std.objectHas(notification_emails, topic) then notification_emails[topic]
+    else if std.objectHas(notification_emails, 'default') then notification_emails.default
+    else [placeholder_email];
+  local notification_topic(name_segments, description, topic) = {
     name: n.display_global('nott', name_segments),
     description: description,
     compartment_id: security_cmp_key,
-    subscriptions: [{ protocol: 'EMAIL', values: [placeholder_email] }],
+    subscriptions: [{ protocol: 'EMAIL', values: topic_recipients(topic) }],
   };
 
   // Concrete operational alarms. Parameterized "disabled candidate" alarms are
@@ -287,10 +293,10 @@ function(config, n, realm_constants, topo)
       default_compartment_id: security_cmp_key,
 
       topics: {
-        [n.key_global('NOTT', ['CLOUDGUARD'])]: notification_topic(['cloudguard'], 'Topic for Cloud Guard related notifications.'),
-        [n.key_global('NOTT', ['IAM'])]: notification_topic(['iam'], 'Topic for IAM related notifications.'),
-        [n.key_global('NOTT', ['NETWORK'])]: notification_topic(['network'], 'Topic for network related notifications.'),
-        [n.key_global('NOTT', ['SECURITY'])]: notification_topic(['security'], 'Topic for notifications.'),
+        [n.key_global('NOTT', ['CLOUDGUARD'])]: notification_topic(['cloudguard'], 'Topic for Cloud Guard related notifications.', 'cloudguard'),
+        [n.key_global('NOTT', ['IAM'])]: notification_topic(['iam'], 'Topic for IAM related notifications.', 'iam'),
+        [n.key_global('NOTT', ['NETWORK'])]: notification_topic(['network'], 'Topic for network related notifications.', 'network'),
+        [n.key_global('NOTT', ['SECURITY'])]: notification_topic(['security'], 'Topic for notifications.', 'security'),
       },
     },
 

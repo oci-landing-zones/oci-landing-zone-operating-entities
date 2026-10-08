@@ -13,6 +13,22 @@ function env(name: string, securityZone: boolean, index: number): Environment {
 }
 
 describe('buildConfig', () => {
+  it('maps One-OE notification recipients to a default and topic overrides', () => {
+    const base = emptyLzModel();
+    const configured = model({
+      foundation: { ...base.foundation, notifications: { useSingleRecipient: false,
+        default: 'ops@example.com, noc@example.com', cloudguard: 'security@example.com',
+        iam: '', network: 'network@example.com', security: '',
+      } },
+    });
+    expect(buildConfig(configured).notification_emails).toEqual({
+      cloudguard: ['security@example.com'], network: ['network@example.com'],
+    });
+    expect(serializeConfig(configured, 1)).toContain("notification_emails: { cloudguard: ['security@example.com'], network: ['network@example.com'] },");
+    configured.foundation.notifications!.useSingleRecipient = true;
+    expect(buildConfig(configured).notification_emails).toEqual({ default: ['ops@example.com', 'noc@example.com'] });
+    expect(buildConfig(model()).notification_emails).toBeUndefined();
+  });
   it('maps foundation fields and keys environments by name', () => {
     const c = buildConfig(model({
       foundation: { realm: 'oc1', region: 'eu-frankfurt-1', regionShortName: 'fra', cisLevel: 2 },
@@ -122,7 +138,7 @@ describe('serializeConfig', () => {
     expect(prodBlock).toContain('projects: { alpha: {}, beta: {} },');
     const preprodBlock = out.slice(out.indexOf('preprod: {'));
     expect(preprodBlock).toContain('projects: { alpha: {} },');
-    expect(base.version).toBe('0.18.0');
+    expect(base.version).toBe('0.19.0');
   });
 
   it('renders the step 1 view in the one-field-per-line shape without the hub block', () => {
@@ -157,11 +173,11 @@ describe('serializeConfig', () => {
       platforms: [oke],
     }));
     // prod = base block; preprod/dev derive by index shift
-    expect(c.environments.prod.platforms.oke.network.vcn).toBe('10.0.80.0/20');
-    expect(c.environments.preprod.platforms.oke.network.vcn).toBe('10.0.96.0/20');
-    expect(c.environments.dev.platforms.oke.network.vcn).toBe('10.0.112.0/20');
+    expect(c.environments.prod.platforms.oke.network?.vcn).toBe('10.0.80.0/20');
+    expect(c.environments.preprod.platforms.oke.network?.vcn).toBe('10.0.96.0/20');
+    expect(c.environments.dev.platforms.oke.network?.vcn).toBe('10.0.112.0/20');
     // The selected generator-owned profile intentionally omits a manual map.
-    expect(c.environments.prod.platforms.oke.network.subnets).toBeUndefined();
+    expect(c.environments.prod.platforms.oke.network?.subnets).toBeUndefined();
     // extension type + params
     expect(c.environments.prod.platforms.oke.extension).toEqual({
       type: 'oke_simple',
@@ -204,9 +220,9 @@ describe('serializeConfig', () => {
     });
     const c = buildConfig(m);
     expect(c.environments.prod.platforms.ocv).toMatchObject({ network: { vcn: '10.0.80.0/21' }, extension: { type: 'ocvs' } });
-    expect(c.environments.prod.platforms.ocv.network.subnets).toBeUndefined();
+    expect(c.environments.prod.platforms.ocv.network?.subnets).toBeUndefined();
     expect(c.shared_platforms.ocv).toMatchObject({ network: { vcn: '10.170.0.0/21' }, extension: { type: 'ocvs' } });
-    expect(c.shared_platforms.ocv.network.subnets).toBeUndefined();
+    expect(c.shared_platforms.ocv.network?.subnets).toBeUndefined();
     const text = serializeConfig(m, 4);
     expect(text).toContain("extension: { type: 'ocvs'");
     expect(text).not.toContain("provisioning: '10.0.80.0/25'");
