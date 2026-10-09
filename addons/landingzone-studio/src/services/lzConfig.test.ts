@@ -138,7 +138,7 @@ describe('serializeConfig', () => {
     expect(prodBlock).toContain('projects: { alpha: {}, beta: {} },');
     const preprodBlock = out.slice(out.indexOf('preprod: {'));
     expect(preprodBlock).toContain('projects: { alpha: {} },');
-    expect(base.version).toBe('0.19.0');
+    expect(base.version).toBe('0.20.0');
   });
 
   it('renders the step 1 view in the one-field-per-line shape without the hub block', () => {
@@ -219,13 +219,13 @@ describe('serializeConfig', () => {
       sharedPlatforms: [{ id: 'shared-ocv', key: 'ocv', type: 'ocvs', vcnCidr: '10.170.0.0/21', subnets: [], ocvsParams: settings }],
     });
     const c = buildConfig(m);
-    expect(c.environments.prod.platforms.ocv).toMatchObject({ network: { vcn: '10.0.80.0/21' }, extension: { type: 'ocvs' } });
+    expect(c.environments.prod.platforms.ocv).toMatchObject({ network: { vcn: '10.0.88.0/21' }, extension: { type: 'ocvs' } });
     expect(c.environments.prod.platforms.ocv.network?.subnets).toBeUndefined();
     expect(c.shared_platforms.ocv).toMatchObject({ network: { vcn: '10.170.0.0/21' }, extension: { type: 'ocvs' } });
     expect(c.shared_platforms.ocv.network?.subnets).toBeUndefined();
     const text = serializeConfig(m, 4);
     expect(text).toContain("extension: { type: 'ocvs'");
-    expect(text).not.toContain("provisioning: '10.0.80.0/25'");
+    expect(text).not.toContain("provisioning: '10.0.88.0/25'");
   });
 
   it('serialises Custom as a valid network-only platform without an extension', () => {
@@ -237,8 +237,8 @@ describe('serializeConfig', () => {
     const entry = buildConfig(m).environments.prod.platforms.cus;
     expect(entry).toEqual({
       network: {
-        vcn: '10.0.80.0/21',
-        subnets: { core: '10.0.80.0/24' },
+        vcn: '10.0.112.0/21',
+        subnets: { core: '10.0.112.0/24' },
       },
     });
 
@@ -259,7 +259,7 @@ describe('serializeConfig', () => {
     expect(step4).toContain("            kubernetes_version: 'v1.35.2', services_cidr: '10.96.0.0/16',");
     expect(step4).toContain("            api_endpoint_allowed_cidrs: ['10.0.1.0/24'], worker_image: '9\\\\.[0-9]+',");
     expect(step4).toContain("  shared_platforms: {");
-    expect(step4).toContain("    core: { network: { vcn: '10.170.0.0/21', subnets: { core: '10.170.0.0/24' } } },");
+    expect(step4).toContain("    core: { network: { vcn: '10.0.32.0/21', subnets: { core: '10.0.32.0/24' } } },");
   });
 
   it('emits empty collections when there are no environments or subnets', () => {

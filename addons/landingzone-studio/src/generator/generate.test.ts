@@ -317,7 +317,7 @@ describe('generator (go-jsonnet wasm)', () => {
 
   it('generates an OCVS platform only after its required SSH key is supplied', async () => {
     const base = emptyLzModel();
-    const ocvs = newPlatform('ocvs', []);
+    const ocvs = newPlatform('ocvs', [], [{ id: 'environment-1', name: 'prod' }]);
     const model: LzModel = {
       ...base,
       environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
@@ -332,7 +332,7 @@ describe('generator (go-jsonnet wasm)', () => {
 
   it('generates an OCVS management cluster from the supported shared-platform scope', async () => {
     const base = emptyLzModel();
-    const ocvs = newPlatform('ocvs', []);
+    const ocvs = newPlatform('ocvs', [], [{ id: 'environment-1', name: 'prod' }]);
     const model: LzModel = {
       ...base,
       sharedPlatforms: [{
@@ -345,24 +345,47 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.files['network_pre.json']).toContain('SN-FRA-LZ-SHARED-PLATFORM-OCV-PROVISIONING-KEY');
   }, 60_000);
 
+  it('exports named One-OE networks and distinct additional networks through Jsonnet', async () => {
+    const model = emptyLzModel();
+    model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+    model.foundation.cisLevel = 1;
+    model.environments = ['dev', 'uat', 'dr', 'sandbox', 'demo'].map((name, index) => ({
+      id: name, name, securityZone: false,
+      network: envNetworkDefaults(index, name, index === 4 ? ['10.1.192.0/21'] : []),
+    }));
+    model.platforms = [{ ...newPlatform('ocvs', [], model.environments.filter((env) => env.name === 'dr')), environments: ['dr'] }];
+    model.platforms[0].ocvsParams!.sshAuthorizedKeys = 'ssh-rsa AAAATEST studio@example';
+    model.exadata.exacs = { ...model.exadata.exacs, enabled: true, service: 'vmc',
+      database: 'per_environment', environments: model.environments.map((env) => env.id),
+      notifications: { default: 'team@example.com' } };
+    const out = await generateOutputs(model);
+    const network = out.files['network.json'];
+    for (const cidr of ['10.1.64.0/21', '10.1.128.0/21', '10.0.200.0/21',
+      '10.0.224.0/22',
+      '10.1.104.0/21', '10.1.168.0/21', '10.0.240.0/22',
+      '10.1.192.0/21', '10.1.200.0/21', '10.1.208.0/21', '10.1.216.0/21']) expect(network).toContain(cidr);
+    expect(network).not.toContain('10.172.');
+    expect(Object.entries(out.files).filter(([name]) => name.startsWith('ocvs')).map(([, contents]) => contents).join('\n')).toContain('CMP-LZ-DR-OCV-KEY');
+  }, 60_000);
+
   it('generates a Custom network-only platform without an unsupported extension', async () => {
     const base = emptyLzModel();
     const model: LzModel = {
       ...base,
       environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
-      platforms: [newPlatform('custom', [])],
+      platforms: [newPlatform('custom', [], [{ id: 'environment-1', name: 'prod' }])],
     };
     const out = await generateOutputs(model);
     expect(out.config).not.toContain("type: 'custom'");
-    expect(out.files['network.json']).toContain('10.0.80.0/21');
-    expect(out.files['network.json']).toContain('10.0.80.0/24');
+    expect(out.files['network.json']).toContain('10.0.112.0/21');
+    expect(out.files['network.json']).toContain('10.0.112.0/24');
   }, 60_000);
 
   it('attaches every environment and shared platform VCN to the DRG', async () => {
     const base = emptyLzModel();
     const sharedOne = newSharedPlatform('custom', []);
     const sharedTwo = newSharedPlatform('custom', [sharedOne]);
-    const environmentPlatform = newPlatform('custom', []);
+    const environmentPlatform = newPlatform('custom', [], [{ id: 'environment-1', name: 'prod' }]);
     const model: LzModel = {
       ...base,
       environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],

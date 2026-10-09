@@ -38,6 +38,22 @@ Studio keeps one canonical Landing Zone model while you work. The wizard, JSON c
 1. **Configure Exadata**: EXACC and EXACS start disabled. Include either extension to choose infrastructure and VMC placement; Studio identifies the resulting UC1 shared, UC2 hybrid, or UC3 dedicated scenario. VMC and AVMC both start unchecked in each extension; select either or both to continue. Autonomous project tiers appear only when AVMC is selected. Configure separate infrastructure and DBA recipients for each topic in the selected use case. Autonomous project recipients appear only when a project tier is selected. Alternatively, select one email list for all of that extension's topics. Add CIDRs for ExaCS VMC/AVMC networks as needed. The diagram shows generated platform child compartments and selected Autonomous project DB compartments.
 1. **Review and export**: download one ZIP containing `config.jsonnet` and the generated deployment files. Export the structural diagram as a `.drawio` file when you need to continue diagramming outside Studio.
 
+Studio's initial One-OE address plan uses the following reservations. These are suggestions for new networks; operators can edit CIDRs and saved designs retain their existing values.
+
+| Environment | Projects VCN | OCVS reservation | ExaCS reservation |
+|---|---|---|---|
+| Prod | `10.0.64.0/21` | `10.0.88.0/21` | `10.0.104.0/21` |
+| Preprod | `10.0.128.0/21` | `10.0.152.0/21` | `10.0.168.0/21` |
+| DR | `10.0.200.0/21` | `10.0.224.0/22` | `10.0.240.0/22` |
+| Dev | `10.1.64.0/21` | `10.1.88.0/21` | `10.1.104.0/21` |
+| UAT | `10.1.128.0/21` | `10.1.152.0/21` | `10.1.168.0/21` |
+
+Names are matched without case sensitivity. Shared ExaCS starts at `10.0.24.0/21`. Optional shared Custom/OCVS networks use free `/21` blocks from `10.0.32.0/19`. Custom environment networks use that environment's optional slots; OCVS tries its reserved slot first, then the optional slots if it is occupied. The catalog also retains EBS, AI, and OKE reservations without creating those resources.
+
+Other environment names share the `10.1.192.0/18` pool. Each new Projects, Custom, OCVS, or environment ExaCS VCN consumes a separate free `/21` block from its eight available blocks. `10.1.0.0/18` remains unallocated by these defaults. An exhausted pool leaves the CIDR empty and requires a manual allocation before generation.
+
+OKE keeps its existing allocation: the first platform starts at `10.0.80.0/20` for the `small` profile, with the existing per-platform and per-environment shifts. This can overlap a catalog reservation, including Prod OCVS; Studio checks configured networks for overlaps, so reservations alone do not guarantee a deployable combination.
+
 The diagram grows with the wizard. In diagram-only view, Studio can show route tables, example endpoints, and packet paths for supported traffic flows. This gives network and security reviewers a way to inspect the intended path before deployment.
 
 &nbsp;

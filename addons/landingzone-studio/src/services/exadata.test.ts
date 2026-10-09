@@ -191,7 +191,7 @@ describe('Exadata configuration', () => {
     model.exadata.exacs.notifications.default = 'db@example.com';
     const config = buildConfig(model);
     expect(!!config.shared_platforms.exacs).toBe(useCase !== 3);
-    expect(config.shared_platforms.exacs?.network).toEqual(useCase === 1 ? { vcn: '10.172.0.0/21' } : undefined);
+    expect(config.shared_platforms.exacs?.network).toEqual(useCase === 1 ? { vcn: '10.0.24.0/21' } : undefined);
     expect(!!config.environments.prod.platforms.exacs).toBe(useCase !== 1);
     if (useCase === 2) {
       expect(config.shared_platforms.exacs.publication_components).toEqual({ infrastructure: true, database: false });

@@ -15,6 +15,7 @@
 
 import type { PlatformConfig, PlatformType, OkePlatformParams, OcvsPlatformParams, SharedPlatformConfig, Subnet } from '../model/types';
 import { firstFreeBlock, formatIp, parseCidr, shiftCidr, totalIps } from './cidr';
+import { environmentPlatformCidr, OPTIONAL_SHARED_CIDR } from './oneOeCidrs';
 
 export interface PlatformTypeMeta {
   type: PlatformType;
@@ -39,21 +40,21 @@ export function platformTypeMeta(type: PlatformType): PlatformTypeMeta {
 /** Base block the first environment platform lives in (clear of the step-2 spokes). */
 export const PLATFORM_BASE_VCN = '10.0.80.0/21';
 /** Block the shared platform's VCN defaults to. */
-export const SHARED_PLATFORM_VCN = '10.170.0.0/21';
-export const SHARED_PLATFORM_ALLOCATION = '10.170.0.0/16';
+export const SHARED_PLATFORM_VCN = '10.0.32.0/21';
+export const SHARED_PLATFORM_ALLOCATION = OPTIONAL_SHARED_CIDR;
 
 /**
  * The shared platform's starting subnet. It needs at least one: the generator
  * refuses a platform VCN with an empty subnet map.
  */
 export function sharedPlatformDefaultSubnets(): Subnet[] {
-  return [{ name: 'core', cidr: '10.170.0.0/24' }];
+  return [{ name: 'core', cidr: '10.0.32.0/24' }];
 }
 
 /** A network-only platform must explicitly declare at least one subnet. */
 export function customDefaultSubnets(baseVcn: string): Subnet[] {
-  const start = parseCidr(baseVcn)?.start ?? parseCidr(PLATFORM_BASE_VCN)!.start;
-  return [{ name: 'core', cidr: `${formatIp(start)}/24` }];
+  const start = parseCidr(baseVcn)?.start;
+  return start === undefined ? [] : [{ name: 'core', cidr: `${formatIp(start)}/24` }];
 }
 
 /** OKE's four mandatory subnets, placed inside `baseVcn` (locked = undeletable). */
@@ -162,11 +163,13 @@ function nextPlatformId(type: PlatformType, existing: PlatformConfig[]): string 
 }
 
 /**
- * A fresh platform of `type`, with a base VCN that doesn't collide with the
- * existing platforms (each gets its own /18-sized window, room for the per-env
- * shifts inside it).
+ * New Custom/OCVS platforms use One-OE reservations pinned to environment IDs.
+ * OKE keeps its existing profile and index-based allocation.
  */
-export function newPlatform(type: PlatformType, existing: PlatformConfig[]): PlatformConfig {
+export function newPlatform(type: PlatformType, existing: PlatformConfig[],
+  environments: Array<{ id: string; name: string }> = [{ id: 'environment-1', name: 'prod' }, { id: 'environment-2', name: 'preprod' }],
+  occupiedCidrs: string[] = [],
+): PlatformConfig {
   const id = nextPlatformId(type, existing);
   // Give each platform a generous stride so its per-env /21 shifts never overlap
   // another platform's window (16 384 = a /18, i.e. 8 × /21 blocks).
@@ -179,9 +182,61 @@ export function newPlatform(type: PlatformType, existing: PlatformConfig[]): Pla
     const vcnCidr = `${baseVcn.split('/')[0]}/20`;
     return { ...common, vcnCidr, subnets: [], okeParams: { ...okeDefaultParams(), clusterSize: 'small' } };
   }
-  if (type === 'ocvs') return { ...common, subnets: [], ocvsParams: ocvsDefaultParams() };
-  if (type === 'custom') return { ...common, subnets: customDefaultSubnets(baseVcn) };
-  return { ...common, subnets: customDefaultSubnets(baseVcn) };
+  const occupied = [...occupiedCidrs, ...existing.flatMap((platform) => platformEnvInstances(platform, environments).map((instance) => instance.vcnCidr))];
+  const overrides: NonNullable<PlatformConfig['overrides']> = {};
+  for (const env of environments) {
+    const vcnCidr = environmentPlatformCidr(type, env.name, occupied);
+    overrides[env.id] = { vcnCidr, ...(type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}) };
+    if (vcnCidr) occupied.push(vcnCidr);
+  }
+  const vcnCidr = overrides[environments[0]?.id]?.vcnCidr ?? '';
+  return type === 'ocvs'
+    ? { ...common, vcnCidr, overrides, subnets: [], ocvsParams: ocvsDefaultParams() }
+    : { ...common, vcnCidr, overrides, subnets: customDefaultSubnets(vcnCidr) };
+}
+
+/** Keep the base editor and pinned One-OE networks aligned; allocate new placements once. */
+export function applyPlatformPatch(platform: PlatformConfig, patch: Partial<PlatformConfig>,
+  environments: Array<{ id: string; name: string }>, occupied: string[],
+): PlatformConfig {
+  const next = { ...platform, ...patch };
+  if (next.type === 'oke_simple') return next;
+  const overrides = { ...next.overrides };
+  const firstId = environments[0]?.id;
+  if (firstId && overrides[firstId] && (patch.vcnCidr !== undefined || patch.subnets !== undefined)) {
+    overrides[firstId] = { ...overrides[firstId],
+      ...(patch.vcnCidr !== undefined ? { vcnCidr: patch.vcnCidr } : {}),
+      ...(patch.subnets !== undefined ? { subnets: patch.subnets } : {}),
+    };
+  }
+  if (patch.environments !== undefined) {
+    const used = [...occupied];
+    for (const env of environments) {
+      if (!platformInEnv(next, env.id) || overrides[env.id]) continue;
+      const vcnCidr = environmentPlatformCidr(next.type, env.name, used);
+      overrides[env.id] = { vcnCidr, ...(next.type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}) };
+      if (vcnCidr) used.push(vcnCidr);
+    }
+  }
+  return { ...next, overrides };
+}
+
+/** Reset one network without releasing any other configured VCN from the allocator. */
+export function resetPlatformEnvironment(platform: PlatformConfig, id: string,
+  environments: Array<{ id: string; name: string }>, occupiedCidrs: string[],
+): PlatformConfig {
+  const overrides = { ...platform.overrides };
+  const index = environments.findIndex((env) => env.id === id);
+  if (platform.type === 'oke_simple' || index < 0) {
+    delete overrides[id];
+    return { ...platform, overrides };
+  }
+  const occupied = [...occupiedCidrs];
+  const current = occupied.indexOf(platformVcnForEnv(platform, id, index));
+  if (current >= 0) occupied.splice(current, 1);
+  const vcnCidr = environmentPlatformCidr(platform.type, environments[index].name, occupied);
+  overrides[id] = { vcnCidr, ...(platform.type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}) };
+  return { ...platform, overrides };
 }
 
 function nextSharedKey(type: SharedPlatformConfig['type'], existing: SharedPlatformConfig[]): string {
@@ -203,7 +258,7 @@ export function newSharedPlatform(
     SHARED_PLATFORM_ALLOCATION,
     [...occupiedCidrs, ...existing.map((platform) => platform.vcnCidr)],
     21,
-  ) ?? SHARED_PLATFORM_VCN;
+  ) ?? '';
   const idStem = `shared-${key}`;
   let id = idStem;
   let n = 2;
@@ -233,7 +288,7 @@ export interface PlatformEnvInstance {
 /** The VCN a platform uses in the environment at `index` — override or index-shift. */
 export function platformVcnForEnv(platform: PlatformConfig, envId: string, index: number): string {
   const ov = platform.overrides?.[envId]?.vcnCidr;
-  if (ov) return ov;
+  if (ov !== undefined) return ov;
   const size = totalIps(parseCidr(platform.vcnCidr)?.prefix ?? 21);
   return shiftCidr(platform.vcnCidr, index * size) ?? platform.vcnCidr;
 }
@@ -251,7 +306,7 @@ export function platformSubnetsForEnv(platform: PlatformConfig, envId: string, i
     return ocvsDefaultSubnets(envVcn);
   }
   const ov = platform.overrides?.[envId]?.subnets;
-  if (ov) return ov;
+  if (ov !== undefined) return ov;
   const base = parseCidr(platform.vcnCidr);
   const env = parseCidr(envVcn);
   const delta = base && env ? env.start - base.start : 0;

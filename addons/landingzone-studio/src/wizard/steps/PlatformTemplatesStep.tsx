@@ -16,9 +16,10 @@ import { useState, type CSSProperties } from 'react';
 import { useWizard } from '../wizardContext';
 import { oracle } from '../../theme';
 import { getHubKind } from '../../services/hubKinds';
+import { configuredVcnCidrs } from '../../services/exadata';
 import type { PlatformConfig, PlatformType, SharedPlatformConfig, Subnet } from '../../model/types';
 import {
-  PLATFORM_TYPES, newPlatform, newSharedPlatform, ocvsDefaultParams, ocvsDefaultSubnets, okeDefaultParams, okeDefaultSubnets, okeProfileSubnets, platformEnvInstances, platformTypeMeta,
+  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, ocvsDefaultParams, ocvsDefaultSubnets, okeDefaultParams, okeDefaultSubnets, okeProfileSubnets, platformEnvInstances, platformTypeMeta,
 } from '../../services/platforms';
 import { VcnEditor } from './HubNetworkStep';
 import { s } from './networkEditorStyles';
@@ -183,18 +184,18 @@ function PerEnvTable({ platform, environments, onPlatform }: {
   environments: { id: string; name: string }[];
   onPlatform: (patch: Partial<PlatformConfig>) => void;
 }) {
+  const { model } = useWizard();
   const [editEnv, setEditEnv] = useState<string | null>(null);
   const instances = platformEnvInstances(platform, environments);
-  const profileOwned = (platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize) || platform.type === 'ocvs';
+  const profileOwned = platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize;
 
   function setOverride(env: string, patch: { vcnCidr?: string; subnets?: Subnet[] }) {
     const cur = platform.overrides?.[env] ?? {};
     onPlatform({ overrides: { ...platform.overrides, [env]: { ...cur, ...patch } } });
   }
   function resetOverride(env: string) {
-    const next = { ...platform.overrides };
-    delete next[env];
-    onPlatform({ overrides: next });
+    const next = resetPlatformEnvironment(platform, env, environments, configuredVcnCidrs(model));
+    onPlatform({ overrides: next.overrides });
     if (editEnv === env) setEditEnv(null);
   }
 
@@ -249,13 +250,20 @@ function PerEnvTable({ platform, environments, onPlatform }: {
         return (
           <div style={{ ...s.subCard, marginTop: 14 }}>
             <div style={s.subHead}>Override — {inst.name}</div>
-            <VcnEditor
+            {platform.type === 'ocvs' ? (
+              <>
+                <label style={s.label} htmlFor={`plat-${platform.id}-ov-${editEnv}-vcn`}>VCN CIDR</label>
+                <input id={`plat-${platform.id}-ov-${editEnv}-vcn`} style={s.rowInput} value={inst.vcnCidr}
+                  onChange={(event) => setOverride(editEnv, { vcnCidr: event.target.value })} />
+                <div style={local.fieldHint}>Provisioning subnet: {ocvsDefaultSubnets(inst.vcnCidr)[0]?.cidr ?? 'enter a supported VCN CIDR'}.</div>
+              </>
+            ) : <VcnEditor
               idPrefix={`plat-${platform.id}-ov-${editEnv}`}
               vcnCidr={inst.vcnCidr}
               subnets={inst.subnets}
               emptyNote="No subnets — add one below, or leave empty."
               onApply={(patch) => setOverride(editEnv, patch)}
-            />
+            />}
           </div>
         );
       })()}
@@ -429,21 +437,18 @@ export default function PlatformTemplatesStep() {
     setSharedPlatforms(model.sharedPlatforms.map((platform) => platform.id === id ? { ...platform, ...patch } : platform));
   }
   function addSharedPlatform() {
-    const occupied = [
-      model.network.hubVcnCidr,
-      ...model.environments.map((env) => env.network.vcnCidr),
-      ...model.platforms.flatMap((platform) => platformEnvInstances(platform, environments).map((instance) => instance.vcnCidr)),
-    ];
+    const occupied = configuredVcnCidrs(model);
     const platform = newSharedPlatform(newSharedType, model.sharedPlatforms, occupied);
     setSharedPlatforms([...model.sharedPlatforms, platform]);
     setOpenSharedId(platform.id);
   }
   function updatePlatform(id: string, patch: Partial<PlatformConfig>) {
-    setPlatforms(model.platforms.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+    setPlatforms(model.platforms.map((p) => (p.id === id
+      ? applyPlatformPatch(p, patch, environments, configuredVcnCidrs(model)) : p)));
   }
   function delPlatform(id: string) { setPlatforms(model.platforms.filter((p) => p.id !== id)); }
   function addPlatform() {
-    const created = newPlatform(newType, model.platforms);
+    const created = newPlatform(newType, model.platforms, environments, configuredVcnCidrs(model));
     const platform = { ...created, key: newName.trim() || created.key };
     setPlatforms([...model.platforms, platform]);
     setOpenId(platform.id);

@@ -31,7 +31,7 @@ describe('newPlatform', () => {
     expect(p).toMatchObject({
       id: 'cus',
       type: 'custom',
-      subnets: [{ name: 'core', cidr: '10.0.80.0/24' }],
+      subnets: [{ name: 'core', cidr: '10.0.112.0/24' }],
     });
     expect(p.okeParams).toBeUndefined();
   });
@@ -64,14 +64,14 @@ describe('okeDefaultSubnets', () => {
 
 describe('newSharedPlatform', () => {
   it('allocates repeatable Custom and OCVS platforms from the first free /21', () => {
-    const custom = newSharedPlatform('custom', [], ['10.170.0.0/21']);
-    const ocvs = newSharedPlatform('ocvs', [custom], ['10.170.0.0/21']);
-    const nextCustom = newSharedPlatform('custom', [custom, ocvs], ['10.170.0.0/21']);
+    const custom = newSharedPlatform('custom', [], ['10.0.32.0/21']);
+    const ocvs = newSharedPlatform('ocvs', [custom], ['10.0.32.0/21']);
+    const nextCustom = newSharedPlatform('custom', [custom, ocvs], ['10.0.32.0/21']);
 
-    expect(custom).toMatchObject({ id: 'shared-core', key: 'core', type: 'custom', vcnCidr: '10.170.8.0/21' });
-    expect(custom.subnets).toEqual([{ name: 'core', cidr: '10.170.8.0/24' }]);
-    expect(ocvs).toMatchObject({ id: 'shared-ocv', key: 'ocv', type: 'ocvs', vcnCidr: '10.170.16.0/21', subnets: [] });
-    expect(nextCustom).toMatchObject({ id: 'shared-cor2', key: 'cor2', vcnCidr: '10.170.24.0/21' });
+    expect(custom).toMatchObject({ id: 'shared-core', key: 'core', type: 'custom', vcnCidr: '10.0.40.0/21' });
+    expect(custom.subnets).toEqual([{ name: 'core', cidr: '10.0.40.0/24' }]);
+    expect(ocvs).toMatchObject({ id: 'shared-ocv', key: 'ocv', type: 'ocvs', vcnCidr: '10.0.48.0/21', subnets: [] });
+    expect(nextCustom).toMatchObject({ id: 'shared-cor2', key: 'cor2', vcnCidr: '10.0.56.0/21' });
   });
 });
 
@@ -123,7 +123,7 @@ describe('per-environment derivation', () => {
   });
 
   it('derives the OCVS provisioning subnet for each environment VCN', () => {
-    const p = newPlatform('ocvs', []);
-    expect(platformSubnetsForEnv(p, 'preprod', 1)).toEqual([{ name: 'provisioning', cidr: '10.0.88.0/25', locked: true }]);
+    const p = newPlatform('ocvs', [], ENVS);
+    expect(platformSubnetsForEnv(p, 'preprod', 1)).toEqual([{ name: 'provisioning', cidr: '10.0.152.0/25', locked: true }]);
   });
 });

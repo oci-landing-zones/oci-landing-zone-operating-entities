@@ -32,7 +32,7 @@ describe('OCVS validation', () => {
     const ocvs = newPlatform('ocvs', []);
     const model = {
       ...base,
-      platforms: [{ ...ocvs, environments: ['environment-1'], vcnCidr: '10.0.64.0/21', ocvsParams: { ...ocvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' } }],
+      platforms: [{ ...ocvs, environments: ['environment-1'], vcnCidr: '10.0.64.0/21', overrides: { 'environment-1': { vcnCidr: '10.0.64.0/21' } }, ocvsParams: { ...ocvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' } }],
       sharedPlatforms: [{ id: 'shared-ocv', key: 'ocv', type: 'ocvs' as const, vcnCidr: '10.170.0.0/21', subnets: [], ocvsParams: { ...ocvsDefaultParams(), sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' } }],
     };
     expect(validateOcvsModel(model)).toContain('OCVS platform VCN must not overlap another configured OCI VCN.');
