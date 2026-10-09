@@ -9,6 +9,9 @@ import { useWizard } from '../wizardContext';
 import Switch from '../../components/Switch';
 import DeleteButton from '../../components/DeleteButton';
 import { createModelId, envNetworkDefaults } from '../../model/defaults';
+import { configuredVcnCidrs } from '../../services/exadata';
+import { customDefaultSubnets } from '../../services/platforms';
+import { environmentPlatformCidr } from '../../services/oneOeCidrs';
 import { oracle } from '../../theme';
 import {
   findRegion, getDefaultRegionForRealm, getRegionsForRealm, REALM_OPTIONS,
@@ -113,7 +116,19 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
   function addEnv() {
     const name = newName.trim();
     if (!name) return;
-    setEnvs([...envs, { id: createModelId('environment'), name, securityZone: newSecure, network: envNetworkDefaults(envs.length) }]);
+    const occupied = configuredVcnCidrs(model);
+    const network = envNetworkDefaults(envs.length, name, occupied);
+    const id = createModelId('environment');
+    if (network.vcnCidr) occupied.push(network.vcnCidr);
+    setField('platforms', model.platforms.map((platform) => {
+      if (platform.type === 'oke_simple' || platform.environments !== 'all') return platform;
+      const vcnCidr = environmentPlatformCidr(platform.type, name, occupied);
+      if (vcnCidr) occupied.push(vcnCidr);
+      return { ...platform, overrides: { ...platform.overrides, [id]: {
+        vcnCidr, ...(platform.type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}),
+      } } };
+    }));
+    setEnvs([...envs, { id, name, securityZone: newSecure, network }]);
     setNewName('');
     setNewSecure(false);
   }
@@ -218,6 +233,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
             </div>
           ))}
 
+          <p style={s.help}>Named prod, preprod, dr, dev and uat environments use their One-OE reservations. Other environments share free /21 blocks in 10.1.192.0/18. If the pool is exhausted, enter a CIDR manually in the network step.</p>
           <label style={{ ...s.addLabel, marginTop: 18 }}>Add environment</label>
           <div style={s.addRow} className="foundation-add-grid">
             <input

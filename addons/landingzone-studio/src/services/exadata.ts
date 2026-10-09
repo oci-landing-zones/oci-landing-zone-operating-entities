@@ -1,6 +1,7 @@
 import type { ExadataNotifications, LzModel, PlatformConfig, SharedPlatformConfig, Subnet } from '../model/types';
 import { formatIp, overlaps, parseCidr } from './cidr';
 import { platformEnvInstances } from './platforms';
+import { additionalEnvironmentCidr, oneOeEnvironmentCidrs } from './oneOeCidrs';
 
 export interface ExadataPlatformEntry {
   network?: { vcn: string };
@@ -59,9 +60,8 @@ export function exadataProjectTopicEnvironments(model: LzModel, type: 'exacc' | 
     && selectedProjectNames(model, env.id, type).length > 0);
 }
 
-export function defaultExacsEnvCidr(index: number): string {
-  const base = parseCidr('10.172.8.0/21')!;
-  return `${formatIp((base.start + index * 2048) >>> 0)}/21`;
+export function defaultExacsEnvCidr(index: number, name = ['prod', 'preprod'][index] ?? '', occupied: string[] = []): string {
+  return oneOeEnvironmentCidrs(name)?.exacs ?? additionalEnvironmentCidr(occupied);
 }
 
 function selectedProjectNames(model: LzModel, envId: string, type: 'exacc' | 'exacs'): string[] {
@@ -144,13 +144,22 @@ export function exadataEntries(model: LzModel): {
       };
     }
     if (useCase !== 1) {
+      const occupied = [
+        model.network.hubVcnCidr, ...model.environments.map((env) => env.network.vcnCidr),
+        ...model.sharedPlatforms.map((platform) => platform.vcnCidr),
+        ...model.platforms.flatMap((platform) => platformEnvInstances(platform, model.environments).map((instance) => instance.vcnCidr)),
+        ...Object.values(exacs.environmentVcnCidrs),
+      ];
       for (const envId of exacs.environments) {
+        const index = model.environments.findIndex((env) => env.id === envId);
+        const vcn = (exacs.environmentVcnCidrs[envId]
+          ?? defaultExacsEnvCidr(index, model.environments[index]?.name ?? '', occupied)).trim();
+        if (vcn) occupied.push(vcn);
         const selected = exacs.service === 'autonomous' || exacs.service === 'both'
           ? selectedProjectNames(model, envId, 'exacs') : [];
         addEnv(envId, 'exacs', {
           publication_components: useCase === 2 ? DB_ONLY : INFRA_AND_DB,
-          network: { vcn: (exacs.environmentVcnCidrs[envId]
-            ?? defaultExacsEnvCidr(model.environments.findIndex((env) => env.id === envId))).trim() },
+          network: { vcn },
           extension: { type: 'exacs', params: {
             notification_emails: emails,
             ...(selected.length ? { project_db_compartments: selected } : {}),
@@ -160,6 +169,19 @@ export function exadataEntries(model: LzModel): {
     }
   }
   return { shared, environments };
+}
+
+/** All configured VCNs, including derived Exadata networks, for free-block suggestions. */
+export function configuredVcnCidrs(model: LzModel): string[] {
+  const entries = exadataEntries(model);
+  return [
+    model.network.hubVcnCidr,
+    ...model.environments.map((env) => env.network.vcnCidr),
+    ...model.sharedPlatforms.map((platform) => platform.vcnCidr),
+    ...model.platforms.flatMap((platform) => platformEnvInstances(platform, model.environments).map((instance) => instance.vcnCidr)),
+    ...Object.values(entries.shared).flatMap((entry) => entry.network ? [entry.network.vcn] : []),
+    ...Object.values(entries.environments).flatMap((platforms) => Object.values(platforms).flatMap((entry) => entry.network ? [entry.network.vcn] : [])),
+  ];
 }
 
 /** The generator auto-allocates ExaCS's db and backup /24s in this order. */

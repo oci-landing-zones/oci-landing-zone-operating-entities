@@ -1,15 +1,17 @@
 import type { EnvNetworkConfig, ExadataDesign, LzModel, ProjectConfig } from './types';
 import { getDefaultRegionForRealm } from '../services/regions';
 import { hubKindDefaults } from '../services/hubKinds';
+import { additionalEnvironmentCidr, oneOeEnvironmentCidrs, SHARED_EXACS_CIDR } from '../services/oneOeCidrs';
+import { formatIp, parseCidr } from '../services/cidr';
 
-export const LZ_MODEL_VERSION = '0.19.0';
+export const LZ_MODEL_VERSION = '0.20.0';
 
 export function defaultExadata(): ExadataDesign {
   return {
     exacc: { enabled: false, shared: true, database: 'shared', service: 'none', environments: [], projectDb: {}, notifications: { default: '', projectEmails: {} } },
     exacs: {
       enabled: false, infrastructure: 'shared', database: 'shared', service: 'none',
-      environments: [], sharedVcnCidr: '10.172.0.0/21', environmentVcnCidrs: {},
+      environments: [], sharedVcnCidr: SHARED_EXACS_CIDR, environmentVcnCidrs: {},
       projectDb: {}, notifications: { default: '', projectEmails: {} },
     },
   };
@@ -21,17 +23,14 @@ export function defaultProjects(): ProjectConfig[] {
 
 export const ENV_SUBNET_ROLES = ['web', 'app', 'db', 'infra'] as const;
 
-export function envNetworkDefaults(index: number): EnvNetworkConfig {
-  // Mirrors gen/defaults.libsonnet for prod/preprod and continues the same
-  // non-overlapping /18 stride for environments added in Studio.
-  const block = 64 * (index + 1);
-  const secondOctet = Math.floor(block / 256);
-  const thirdOctet = block % 256;
+export function envNetworkDefaults(index: number, name = ['prod', 'preprod'][index] ?? '', occupied: string[] = []): EnvNetworkConfig {
+  const vcnCidr = oneOeEnvironmentCidrs(name)?.projects ?? additionalEnvironmentCidr(occupied);
+  const start = parseCidr(vcnCidr)?.start;
   return {
-    vcnCidr: `10.${secondOctet}.${thirdOctet}.0/21`,
-    subnets: ENV_SUBNET_ROLES.map((role, subnetIndex) => ({
+    vcnCidr,
+    subnets: start === undefined ? [] : ENV_SUBNET_ROLES.map((role, subnetIndex) => ({
       name: role,
-      cidr: `10.${secondOctet}.${thirdOctet + subnetIndex}.0/24`,
+      cidr: `${formatIp(start + subnetIndex * 256)}/24`,
     })),
   };
 }
@@ -122,6 +121,24 @@ export function normalizeModel(stored: unknown): LzModel {
     && Array.isArray(candidate.environments) && Array.isArray(candidate.projects)
     && Array.isArray(candidate.platforms) && Array.isArray(candidate.sharedPlatforms)) {
     return { ...candidate, version: LZ_MODEL_VERSION, exadata: defaultExadata() } as LzModel;
+  }
+  if (candidate.version === '0.19.0' && candidate.foundation && candidate.network
+    && Array.isArray(candidate.environments) && Array.isArray(candidate.projects)
+    && Array.isArray(candidate.platforms) && Array.isArray(candidate.sharedPlatforms)
+    && candidate.exadata?.exacc && candidate.exadata?.exacs) {
+    const exacs = candidate.exadata.exacs;
+    const environmentVcnCidrs = { ...exacs.environmentVcnCidrs };
+    // Pin previously implicit ExaCS networks so new defaults do not move saved designs.
+    if (exacs.database === 'per_environment' || exacs.infrastructure === 'per_environment') {
+      for (const id of exacs.environments) {
+        const index = candidate.environments.findIndex((env) => env.id === id);
+        if (index >= 0 && environmentVcnCidrs[id] === undefined) {
+          environmentVcnCidrs[id] = `${formatIp(parseCidr('10.172.8.0/21')!.start + index * 2048)}/21`;
+        }
+      }
+    }
+    return normalizeModel({ ...candidate, version: LZ_MODEL_VERSION,
+      exadata: { ...candidate.exadata, exacs: { ...exacs, environmentVcnCidrs } } });
   }
   if (
     candidate.version !== LZ_MODEL_VERSION

@@ -14,7 +14,7 @@ describe('hub generator contracts', () => {
   it('starts with no shared platform and no presentation-only state', () => {
     const model = emptyLzModel();
     expect(model.sharedPlatforms).toEqual([]);
-    expect(model.version).toBe('0.19.0');
+    expect(model.version).toBe('0.20.0');
     expect(model.network).toEqual({ hubKind: 'hub_a', ...hubKindDefaults('hub_a') });
     expect('presentation' in model).toBe(false);
     expect('routing' in model.network).toBe(false);
@@ -29,7 +29,7 @@ describe('saved model versioning', () => {
     const migrated = normalizeModel(previous);
     expect(migrated.environments).toEqual(current.environments);
     expect(migrated.exadata.exacc.enabled).toBe(false);
-    expect(migrated.version).toBe('0.19.0');
+    expect(migrated.version).toBe('0.20.0');
   });
   it('accepts the current contract unchanged', () => {
     const current = emptyLzModel();
@@ -58,7 +58,7 @@ describe('saved model versioning', () => {
     };
     const migrated = normalizeModel(legacy);
     const prodId = migrated.environments[0].id;
-    expect(migrated.version).toBe('0.19.0');
+    expect(migrated.version).toBe('0.20.0');
     expect(migrated.projects[0]).toMatchObject({ id: 'project-1', environments: [prodId] });
     expect(migrated.platforms[0].environments).toEqual([prodId]);
     expect(migrated.platforms[0].overrides).toEqual({ [prodId]: { vcnCidr: '10.200.0.0/21' } });

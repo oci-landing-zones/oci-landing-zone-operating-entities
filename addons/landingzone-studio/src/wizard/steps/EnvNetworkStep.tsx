@@ -208,7 +208,7 @@ export default function EnvNetworkStep() {
 
   /** Stale in-memory records may predate Environment.network — always fall back to defaults. */
   function envNetwork(i: number): EnvNetworkConfig {
-    return model.environments[i].network ?? envNetworkDefaults(i);
+    return model.environments[i].network ?? envNetworkDefaults(i, model.environments[i].name);
   }
   function patchEnvNetwork(i: number, patch: Partial<EnvNetworkConfig>) {
     const current = envNetwork(i);

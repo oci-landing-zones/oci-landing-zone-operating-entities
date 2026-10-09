@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { useWizard } from '../wizardContext';
 import type { ExaccDesign, ExacsDesign, ExadataNotifications } from '../../model/types';
 import { oracle } from '../../theme';
-import { defaultExacsEnvCidr, exadataProjectTopicEnvironments, validateExadataModel } from '../../services/exadata';
+import { exadataEntries, exadataProjectTopicEnvironments, validateExadataModel } from '../../services/exadata';
 
 const styles: Record<string, CSSProperties> = {
   card: { border: `1px solid ${oracle.border}`, borderTop: `3px solid ${oracle.red}`, borderRadius: 8, background: oracle.surface, padding: 20 },
@@ -322,7 +322,7 @@ function ExacsSection() {
               <label key={env.id} style={styles.field} htmlFor={`exacs-vcn-${env.id}`}>
                 {env.name} AVMC/VMC VCN CIDR
                 <input id={`exacs-vcn-${env.id}`} style={styles.input}
-                  value={value.environmentVcnCidrs[env.id] ?? defaultExacsEnvCidr(model.environments.findIndex((candidate) => candidate.id === env.id))}
+                  value={value.environmentVcnCidrs[env.id] ?? exadataEntries(model).environments[env.id]?.exacs.network?.vcn ?? ''}
                   onChange={(event) => update({ environmentVcnCidrs: { ...value.environmentVcnCidrs, [env.id]: event.target.value } })} />
               </label>
             ))}
