@@ -6,7 +6,7 @@ The Blueprint Factory accepts JSON and Jsonnet input. Jsonnet is available for a
 
 ## Table of Contents
 
-[1. Region and Security Settings](#1-region-and-security-settings)<br>
+[1. Region, Stack Scope, and Security Settings](#1-region-stack-scope-and-security-settings)<br>
 [2. Hub](#2-hub)<br>
 [3. Environments](#3-environments)<br>
 [4. Project Network](#4-project-network)<br>
@@ -21,7 +21,7 @@ Projects and environment platforms are nested inside an environment. Hub, Bastio
 
 ```text
 Blueprint Factory configuration
-├── Region and security settings
+├── Region, stack scope, and security settings
 ├── Hub
 │   └── Network
 ├── Bastion
@@ -51,6 +51,7 @@ The corresponding configuration nesting is:
   region_short_name: '<region-short-name>',
   realm: 'oc1',
   cis_level: 2,
+  stack_scope: 'complete',
 
   hub: {
     kind: '<hub-kind>',
@@ -101,7 +102,7 @@ The corresponding configuration nesting is:
 
 This is a nesting template, not a single deployable configuration. Omit optional blocks that do not apply, and follow the selected workload extension's network requirement.
 
-Every Blueprint Factory configuration needs a hub. The `environments` object is optional and defaults to empty for a shared-services and hub-only Landing Zone. Region metadata is optional as a pair; if omitted, the factory defaults it to `eu-frankfurt-1` and `fra`.
+Every Blueprint Factory configuration needs a hub. The `environments` object is optional and defaults to empty for a shared-services and hub-only Landing Zone. Region metadata is optional as a pair; if omitted, the factory defaults it to `eu-frankfurt-1` and `fra`. `stack_scope` defaults to `complete`; set it to `regional` only when the source config intentionally owns regional resources without the home-owned IAM and governance domains.
 
 ```jsonnet
 {
@@ -119,7 +120,7 @@ Every Blueprint Factory configuration needs a hub. The `environments` object is 
 
 This small shape creates the shared landing-zone domains plus the `dev` environment compartments. For a hub-only Landing Zone without environment compartments or spoke networks, omit `environments` as shown in the [no-environments example](./examples/00-no-environments.json). An explicit `environments: {}` has the same result. Add a project network only when an environment needs a spoke VCN, and add projects only when the target design needs project compartments.
 
-## 1. Region and Security Settings
+## 1. Region, Stack Scope, and Security Settings
 
 | Field | Type | Required | Default | Description |
 |---|---|---:|---|---|
@@ -127,11 +128,18 @@ This small shape creates the shared landing-zone domains plus the `dev` environm
 | `region_short_name` | string | No* | `fra` | Short region label used by resource naming. |
 | `realm` | string | No | `oc1` | OCI realm. Supported values are `oc1` and `oc19`. |
 | `cis_level` | number or string | No | `2` | CIS level to emit: `1` or `2`. |
+| `stack_scope` | `complete` or `regional` | No | `complete` | Declares which resource domains this source config owns. |
 | `security_targets` | array of strings | No | All environments | Environment names that receive Security Zone targeting. |
 
 *`region` and `region_short_name` must be supplied together or omitted together. Explicit `null` values are treated as omitted.
 
 `security_targets` can contain only names defined under `environments`. Omit it to apply the default targeting to every configured environment.
+
+`stack_scope: 'complete'` owns the normal complete Landing Zone output set, including IAM and governance. `stack_scope: 'regional'` owns only network, VSS, and regional observability outputs; it omits home-owned IAM, governance, Cloud Guard, Security Zones, and primary Vault resources. Regional scope does not support environment platforms, shared platforms, workload extensions, or cross-tenancy RPCs until their complete-stack prerequisites and IAM policies can be projected safely.
+
+For regional DR, keep the home and DR sources independent. The complete home config explicitly defines an acceptor under `remote_peering_connections`; the regional DR config explicitly defines the requester. Generate each source independently with `--config`.
+
+For CIS2, the regional stack does not own or modify the primary Vault, key, IAM, Cloud Guard, or Security Zone configuration. Configure and review the replicated Vault/key and any required regional service permissions as home-owned or manual DR prerequisites.
 
 ## 2. Hub
 

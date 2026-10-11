@@ -10,8 +10,7 @@ This guide owns Blueprint Factory Remote Peering Connection (RPC) behavior under
 2. `gen/builders/remote_peering.libsonnet` for RPC, DRG attachment, route table, distribution, and route-entry overlays
 3. `gen/builders/iam/remote_peering_policies.libsonnet` for cross-tenancy policies
 4. `gen/landing_zone.libsonnet` for dynamic environment/platform integration
-5. `gen/addons/oci-x-rpc/published.libsonnet` for RPC-only verification projections and committed full reference surfaces
-6. tests and Blueprint Factory examples in this repository
+5. Published runtime entrypoints, tests, and Blueprint Factory examples in this repository
 
 ## Design Boundary
 
@@ -96,7 +95,6 @@ The user or automation principal that establishes the peering must be represente
 - Hub E spoke and platform route tables receive explicit routes for every remote CIDR.
 - Hub A, Hub B, and Hub C route RPC traffic through the common existing hub/firewall path. Hub E uses the direct DRG import-distribution path described above.
 - The RPC builder does not invent or modify customer-specific Network Firewall security policy; the deployed policy must separately permit the approved traffic.
-- RPC-only verification projections retain only RPC-related route rules, attachments, distributions, route tables, RPC objects, and cross-tenancy policies.
 
 ## Deployment Sequence
 
@@ -110,7 +108,7 @@ The user or automation principal that establishes the peering must be represente
 ## Publication And Verification
 
 - `profiles.libsonnet` owns representative complete One-OE configs. The standard runtime profiles use a Frankfurt Hub A acceptor and an Amsterdam Hub B requester with `prod` and `preprod` networks.
-- `published.libsonnet` renders the current One-OE generator. It exposes full governance, IAM, and network surfaces for runtime reference snapshots while retaining RPC-only network and IAM projections for verification.
+- Runtime entrypoints render their complete governance, IAM, or network surface directly from the current One-OE generator.
 - Runtime entrypoints must remain thin and select one complete governance, IAM, or network surface. Same-tenancy runtime publication selects network only.
 - Generate repository snapshots with `bash gen/generate.sh`.
 - Generate an end-user landing zone with `bash gen/generate.sh --config <config_file> <output_dir>`.

@@ -34,6 +34,7 @@ Required by `gen/config.libsonnet`:
 
 Optional but important:
 
+- `stack_scope`, defaulting to `complete`; supported values are `complete` and `regional`
 - `region`, defaulting to `eu-frankfurt-1`
 - `region_short_name`, defaulting to `fra`
 - `realm`, defaulting to `oc1` (including when explicitly `null`); supported values are `oc1` and `oc19`
@@ -52,6 +53,7 @@ Optional but important:
 - `region` and `region_short_name` must be provided together or omitted together
 - `realm` must be one of the realms defined in `gen/constants.libsonnet`
 - `cis_level` must be `1` or `2`; strings `'1'` and `'2'` are also normalized
+- `stack_scope` must be `complete` or `regional`; each independently generated config declares its own ownership
 - If `hub.network.subnets` is omitted, hub subnets are auto-generated from the hub VCN using the canonical order for that hub kind
 - If `project_network.network.subnets` is omitted, shared subnets auto-generate as `web`, `app`, `db`, and `infra`
 - If `project_network.network.subnets` is `{}`, the project VCN has no shared subnets

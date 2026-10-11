@@ -46,6 +46,7 @@ Do not use this skill as the first response to an open-ended customer request su
 |---|---|
 | Required fields | `hub.kind` and `hub.network.vcn` are mandatory. `environments` is optional and defaults to `{}` for a hub-only Landing Zone. |
 | Region defaults | `region` and `region_short_name` must be provided together or omitted together; when omitted (or both explicitly set to `null`) they default to `eu-frankfurt-1` and `fra`. |
+| Stack scope | `stack_scope` defaults to `complete`; use `regional` only when the source config intentionally owns supported regional resources and must omit home-owned IAM and governance domains. |
 | Security targets | Omit `security_targets` to target all environments; set it explicitly to narrow which environments get security-zone targeting. |
 | Hub kinds | Only `hub_a`, `hub_b`, `hub_c`, and `hub_e` are valid. |
 | Hub subnets | Omit `hub.network.subnets` to auto-generate canonical hub subnets from the hub VCN. |
@@ -69,6 +70,7 @@ Do not use this skill as the first response to an open-ended customer request su
 ## Authoring Guidance
 
 - Prefer one small config file per scenario and compose from imports if reuse is needed.
+- For regional DR, author the acceptor in a complete-scope home config and the requester in a regional-scope DR config, then generate each independently with `--config`.
 - For customer-use work, keep config sources and generated outputs in customer-chosen or explicitly approved working directories. Reserve `tests/gen/testdata/...` for repo-development fixtures and automated tests, not customer artifact placement.
 - Use `project_network` only for environments that should produce spoke VCN outputs.
 - Put environment-scoped platforms under `environments.<env>.platforms`.
