@@ -155,7 +155,7 @@
         "name"                                                            : "zpr-policy-lz-hub",
         "description"                                                     : "ZPR policy controlling traffic for the Hub VCN and its associated resources",
         "defined_tags" : {
-          "tagns-zpr-role.tag-zpr-role"                                   : "oneoe-lz-name"
+          "tagns-lz-role.tag-lz-role"                                     : "oneoe-lz"
         },
 
         "statements": [
@@ -174,7 +174,7 @@
         "name"                                                            : "zpr-policy-lz-prod-proj",
         "description"                                                     : "ZPR policy controlling traffic for the Prod Project VCNs and its associated resources",
         "defined_tags" : {
-          "tagns-zpr-role.tag-zpr-role"                                   : "oneoe-lz-name"
+          "tagns-lz-role.tag-lz-role"                                     : "oneoe-lz"
         },
 
         "statements": [
@@ -190,7 +190,7 @@
         "name"                                                            : "zpr-policy-lz-preprod-proj",
         "description"                                                     : "ZPR policy controlling traffic for the PreProd Project VCNs and its associated resources",
         "defined_tags" : {
-          "tagns-zpr-role.tag-zpr-role"                                   : "oneoe-lz-name"
+          "tagns-lz-role.tag-lz-role"                                     : "oneoe-lz"
         },
 
         "statements": [
