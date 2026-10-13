@@ -5,16 +5,15 @@ import { oracle } from '../../theme';
 import PlatformTemplatesStep from './PlatformTemplatesStep';
 import ExadataStep from './ExadataStep';
 
-function PlatformSection({ title, description, status, errors = [], initiallyOpen = false, children }: {
+function PlatformSection({ title, description, status, errors = [], children }: {
   title: string;
   description: string;
   status: string;
   errors?: string[];
-  initiallyOpen?: boolean;
   children: ReactNode;
 }) {
   return (
-    <details className="platform-section" open={initiallyOpen}>
+    <details className="platform-section">
       <summary className="platform-section-summary">
         <span className="platform-section-copy">
           <span className="platform-section-title">{title}</span>
@@ -43,7 +42,7 @@ export default function PlatformsStep() {
     || model.sharedPlatforms.some((platform) => (platform.type ?? 'custom') === 'custom');
   return (
     <div style={{ display: 'grid', gap: 16 }}>
-      <PlatformSection title="OKE" description="Kubernetes platforms per environment" status={oke.status} errors={oke.errors} initiallyOpen>
+      <PlatformSection title="OKE" description="Kubernetes platforms per environment" status={oke.status} errors={oke.errors}>
         <PlatformTemplatesStep platformType="oke_simple" />
       </PlatformSection>
       <PlatformSection title="OCVS" description="Shared or environment VMware platforms" status={ocvs.status} errors={ocvs.errors}>

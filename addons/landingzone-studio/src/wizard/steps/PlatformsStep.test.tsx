@@ -13,6 +13,12 @@ function render(model: LzModel) {
 }
 
 describe('platform readiness and existing custom networks', () => {
+  it('starts every platform collapsed, including saved configurations', () => {
+    const model = emptyLzModel();
+    model.platforms = [newPlatform('oke_simple', [])];
+    expect(render(model)).not.toMatch(/<details class="platform-section"[^>]*\bopen(?:=|[ >])/);
+    expect(render(emptyLzModel())).not.toMatch(/<details class="platform-section"[^>]*\bopen(?:=|[ >])/);
+  });
   it('marks a newly added OCVS with no SSH public key as needing attention', () => {
     const model = emptyLzModel();
     model.platforms = [newPlatform('ocvs', [], model.environments)];
