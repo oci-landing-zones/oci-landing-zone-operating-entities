@@ -33,6 +33,13 @@ function(ctx)
     domain_grp(grp_network),
   ];
   local generic_admin_stmt = 'allow group %s' % std.join(', ', generic_admin_groups);
+  local security_attribute_groups = [domain_grp(grp_network)] + [
+    domain_grp(ctx.proj_grp_name(entry, proj_name))
+    for entry in ctx.env_entries
+    for proj_name in ctx.topo.project_names(entry)
+  ];
+  local compartment_allow(grp_name, verb, resource) =
+    'allow group %s to %s %s in compartment %s' % [domain_grp(grp_name), verb, resource, cmp_lz];
 
   // Service policy: realm-aware FSS and Object Storage service identifiers.
   local fss_service = ctx.realm_constants.service_identifiers.fss;
@@ -92,7 +99,7 @@ function(ctx)
 
       [n.key_tenancy('PCY', ['GENERIC', 'ADMIN'])]: {
         name: n.display_tenancy('PCY', ['GENERIC', 'ADMIN']),
-        description: desc.policy.grants('defined administration groups', 'shared service usage', 'the tenancy'),
+        description: desc.policy.grants('defined administration groups', 'shared service usage', 'the tenancy and LZ compartment'),
         compartment_id: 'TENANCY-ROOT',
         statements: [
           '%s to use cloud-shell in tenancy' % generic_admin_stmt,
@@ -101,6 +108,7 @@ function(ctx)
           '%s to read usage-reports in tenancy' % generic_admin_stmt,
           '%s to read objectstorage-namespaces in tenancy' % generic_admin_stmt,
           "allow any-user to inspect tag-namespaces in tenancy where target.tag-namespace.name='tagns-lz-role'",
+          'allow group %s to use security-attribute-namespace in compartment %s' % [std.join(', ', security_attribute_groups), cmp_lz],
         ],
       },
 
@@ -184,7 +192,7 @@ function(ctx)
           tbac_allow(grp_security_lz, 'read', 'app-catalog-listing', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'read', 'instance-images', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'inspect', 'buckets', cmp_lz, tag_security),
-          tbac_allow(grp_security_lz, 'read', 'all-resources', cmp_lz, tag_security),
+          compartment_allow(grp_security_lz, 'read', 'all-resources'),
           tbac_allow(grp_security_lz, 'manage', 'instance-family', cmp_lz, tag_security),
           tbac_allow(grp_security_lz, 'manage', 'volume-family', cmp_lz, tag_security, vol_deny),
           tbac_allow(grp_security_lz, 'manage', 'object-family', cmp_lz, tag_security, obj_deny),
@@ -218,17 +226,27 @@ function(ctx)
           tbac_allow(grp_security_lz, 'manage', 'private-ips', cmp_lz, tag_network),
           tbac_allow(grp_security_lz, 'read', 'keys', cmp_lz, tag_network),
           tbac_allow(grp_security_lz, 'manage', 'operator-control-family', cmp_lz, tag_security),
+          compartment_allow(grp_security_lz, 'manage', 'zpr-configuration'),
+          compartment_allow(grp_security_lz, 'manage', 'security-attribute-namespace'),
         ],
       },
 
       [n.key_tenancy('PCY', ['SECURITY', 'ADMIN'])]: {
         name: n.display_tenancy('PCY', ['SECURITY', 'ADMIN']),
-        description: desc.policy.grants(grp_security_tenancy, 'security service administration access', 'the tenancy'),
+        description: desc.policy.grants('%s, %s' % [grp_security_tenancy, grp_security_lz], 'security service administration access', 'the tenancy'),
         compartment_id: 'TENANCY-ROOT',
         statements: [
           tenancy_allow(grp_security_tenancy, 'manage', 'cloudevents-rules'),
           tenancy_allow(grp_security_tenancy, 'manage', 'cloud-guard-family'),
           tenancy_allow(grp_security_tenancy, 'read', 'tenancies'),
+          tenancy_allow(grp_security_tenancy, 'use', 'tag-namespaces'),
+          tenancy_allow(grp_security_tenancy, 'manage', 'zpr-configuration'),
+          tenancy_allow(grp_security_tenancy, 'manage', 'zpr-policy'),
+          tenancy_allow(grp_security_tenancy, 'manage', 'security-attribute-namespace'),
+          tenancy_allow(grp_security_lz, 'read', 'zpr-configuration'),
+          tenancy_allow(grp_security_lz, 'read', 'zpr-policy'),
+          tenancy_allow(grp_security_lz, 'read', 'security-attribute-namespace'),
+          tenancy_allow_where(grp_security_lz, 'manage', 'zpr-policy', "where target.resource.tag.tagns-lz-role.tag-lz-role='oneoe-lz'"),
         ],
       },
 
