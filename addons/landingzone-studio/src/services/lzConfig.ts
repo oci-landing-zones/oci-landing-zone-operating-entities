@@ -320,7 +320,7 @@ function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: bo
  * step 1 the hub block is left out, so the JSON tracks where you are.
  */
 export function serializeConfig(model: LzModel, upToStep = Infinity): string {
-  const c = buildConfig(model, upToStep >= 5);
+  const c = buildConfig(model, upToStep >= 4);
 
   const envNames = Object.keys(c.environments);
   // Steps 1–2: environments are just named, empty compartments. Step 3 fills in

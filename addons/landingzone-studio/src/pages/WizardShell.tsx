@@ -16,8 +16,7 @@ import WizardStepper, { WIZARD_STEPS } from '../wizard/WizardStepper';
 import FoundationStep from '../wizard/steps/FoundationStep';
 import HubNetworkStep from '../wizard/steps/HubNetworkStep';
 import EnvNetworkStep from '../wizard/steps/EnvNetworkStep';
-import PlatformTemplatesStep from '../wizard/steps/PlatformTemplatesStep';
-import ExadataStep from '../wizard/steps/ExadataStep';
+import PlatformsStep from '../wizard/steps/PlatformsStep';
 import ReviewStep from '../wizard/steps/ReviewStep';
 import { buildGraph } from '../diagram/buildGraph';
 import { allFlowIds, buildFlowTraces } from '../services/flowTrace';
@@ -40,9 +39,8 @@ const STEP_PROGRESS_LABELS: Record<number, string> = {
   1: 'Name your landing zone and select its region',
   2: 'Set up the shared network',
   3: 'Add projects and their networks',
-  4: 'Configure OKE, OCVS, and custom platforms',
-  5: 'Configure EXACC and EXACS platforms',
-  6: 'Review and download your files',
+  4: 'Configure OKE, OCVS, EXACC, and EXACS platforms',
+  5: 'Review and download your files',
 };
 
 const layout = {
@@ -128,7 +126,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
   // The endpoints / route-table dots and flows are a diagram-only-mode layer — in
   // split and form modes the diagram stays a clean overview. Endpoints live in the
   // spoke subnets, so the layer starts at step 3 (Projects); earlier steps only
-  // point there. The Review builds a separate step-6 structural graph for Draw.io export.
+  // point there. The Review builds a separate step-5 structural graph for Draw.io export.
   const diagramOnly = viewMode === 'diagram';
   const flowStepReached = activeStep >= FLOW_STEP;
   const flowLayer = diagramOnly && flowStepReached;
@@ -284,10 +282,8 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
                 ) : activeStep === 3 ? (
                   <EnvNetworkStep />
                 ) : activeStep === 4 ? (
-                  <PlatformTemplatesStep />
+                  <PlatformsStep />
                 ) : activeStep === 5 ? (
-                  <ExadataStep />
-                ) : activeStep === 6 ? (
                   <ReviewStep designName={name} />
                 ) : null}
               </div>

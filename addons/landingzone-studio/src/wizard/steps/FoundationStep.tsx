@@ -26,6 +26,7 @@ const s: Record<string, React.CSSProperties> = {
   accent:  { height: 3, background: oracle.red, borderRadius: '8px 8px 0 0' },
   body:    { padding: 20 },
   title:   { fontSize: 15, fontWeight: 700, marginBottom: 16, color: oracle.ink },
+  help:    { fontSize: 12.5, lineHeight: 1.5, color: oracle.textMuted },
   twoCol:  { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 },
   topicRow: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.15fr)', gap: 16, alignItems: 'start', padding: '14px 0', borderTop: `1px solid ${oracle.border}` },
   label:   { display: 'block', fontSize: 12, color: oracle.textMuted, fontWeight: 700, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.3 },
@@ -151,7 +152,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
               aria-invalid={!!nameError}
               aria-describedby={nameError ? 'saved-lz-name-error' : undefined}
             />
-            <div style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Stored in this browser and used for download filenames. It does not change OCI resource names.</div>
+            <div style={{ ...s.help, marginTop: 5 }}>Stored in this browser and used for download filenames. It does not change OCI resource names.</div>
             {nameError && <div id="saved-lz-name-error" role="alert" style={s.error}>{nameError}</div>}
           </div>
           <div style={s.twoCol} className="foundation-two-col">
@@ -160,7 +161,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
               <select id="lz-realm" style={s.select} value={f.realm} onChange={(e) => onRealm(e.target.value)} aria-describedby="lz-realm-help">
                 {REALM_OPTIONS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
               </select>
-              <div id="lz-realm-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Use OC1 for commercial OCI. Select another realm only when your tenancy uses a sovereign or isolated cloud.</div>
+              <div id="lz-realm-help" style={{ ...s.help, marginTop: 5 }}>Use OC1 for commercial OCI. Select another realm only when your tenancy uses a sovereign or isolated cloud.</div>
             </div>
             <div>
               <label style={s.label} htmlFor="lz-region">Region</label>
@@ -181,7 +182,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
                 readOnly
                 aria-describedby="lz-region-short-help"
               />
-              <div id="lz-region-short-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Derived from the selected OCI region and included in OCI resource names.</div>
+              <div id="lz-region-short-help" style={{ ...s.help, marginTop: 5 }}>Derived from the selected OCI region and included in OCI resource names.</div>
             </div>
             <div>
               <label style={s.label} htmlFor="lz-cis-level">CIS benchmark level</label>
@@ -195,7 +196,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
                 <option value={2}>Level 2 — CMEK required</option>
                 <option value={1}>Level 1 — foundational security</option>
               </select>
-              <div id="lz-cis-level-help" style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Level 2 requires customer-managed encryption keys (CMEK) for resources protected by Security Zones. Level 1 provides the foundational controls.</div>
+              <div id="lz-cis-level-help" style={{ ...s.help, marginTop: 5 }}>Level 2 requires customer-managed encryption keys (CMEK) for resources protected by Security Zones. Level 1 provides the foundational controls.</div>
             </div>
           </div>
         </div>
@@ -205,7 +206,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Environments</div>
-          <div style={{ color: oracle.textMuted, fontSize: 12.5, lineHeight: 1.5, margin: '-8px 0 14px' }}>
+          <div style={{ ...s.help, margin: '-8px 0 14px' }}>
             An environment is an isolated stage of your workload, such as development or production. A Security Zone applies stricter OCI controls; confirm it permits every service you plan to use.
           </div>
 
@@ -254,7 +255,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.accent} />
         <div style={s.body}>
           <div id="foundation-observability-title" style={s.title}>Observability</div>
-          <div style={{ color: oracle.textMuted, fontSize: 12.5, lineHeight: 1.5, margin: '-8px 0 14px' }}>
+          <div style={{ ...s.help, margin: '-8px 0 14px' }}>
             Choose email recipients for the four One-OE notification topics. Separate multiple addresses with commas. If all fields are blank, generated files retain the published example address.
           </div>
           {!singleRecipient && <div>
@@ -271,7 +272,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
                     placeholder="team@example.com" value={f.notifications?.[topic] ?? ''}
                     onChange={(e) => setNotification(topic, e.target.value)} aria-describedby={`lz-observability-${topic}-help`} />
                 </div>
-                <div id={`lz-observability-${topic}-help`} style={{ color: oracle.textMuted, fontSize: 12, lineHeight: 1.5 }}>{topicHelp[topic]}</div>
+                <div id={`lz-observability-${topic}-help`} style={s.help}>{topicHelp[topic]}</div>
               </div>
             ))}
           </div>}
@@ -280,7 +281,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
               <input type="checkbox" checked={singleRecipient} onChange={(e) => setSingleRecipient(e.target.checked)} />
               Use one email for all notifications
             </label>
-            <div style={{ marginTop: 5, color: oracle.textMuted, fontSize: 12 }}>Uses the same recipients for Cloud Guard, IAM, Network and Security.</div>
+            <div style={{ ...s.help, marginTop: 5 }}>Uses the same recipients for Cloud Guard, IAM, Network and Security.</div>
           </div>
           {singleRecipient && <div style={{ ...s.field, marginTop: 16, marginBottom: 0 }}>
             <label style={s.label} htmlFor="lz-observability-default">Notification emails</label>

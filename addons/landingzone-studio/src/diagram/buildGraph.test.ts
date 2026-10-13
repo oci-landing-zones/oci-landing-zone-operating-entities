@@ -33,7 +33,7 @@ function crossesInterior(from: FlowPoint, to: FlowPoint, rect: FlowRect): boolea
 }
 
 describe('generator-aligned graph', () => {
-  it('shows EXACC as compartment-only and EXACS AVMC/VMC as a network in step 5', () => {
+  it('shows EXACC as compartment-only and EXACS AVMC/VMC as a network in the unified Platforms step', () => {
     const model = emptyLzModel();
     model.exadata.exacc = { enabled: true, shared: true, environments: ['environment-1'], projectDb: {}, notifications: { default: 'ops@example.com' } };
     model.exadata.exacs = {
@@ -42,8 +42,8 @@ describe('generator-aligned graph', () => {
       environmentVcnCidrs: { 'environment-1': '10.172.8.0/21', 'environment-2': '10.172.16.0/21' },
       projectDb: {}, notifications: { default: 'ops@example.com' },
     };
-    expect(buildGraph(model, 4).nodes.some((node) => node.label.includes('exacc'))).toBe(false);
-    const nodes = buildGraph(model, 5).nodes;
+    expect(buildGraph(model, 3).nodes.some((node) => node.label.includes('exacc'))).toBe(false);
+    const nodes = buildGraph(model, 4).nodes;
     expect(nodes.find((node) => node.label === 'cmp-lz-shared-exacc')?.kind).toBe('compartment');
     expect(nodes.some((node) => node.label.includes('shared-exacc') && node.kind === 'vcn')).toBe(false);
     expect(nodes.find((node) => node.label === 'cmp-lz-shared-exacs')?.kind).toBe('compartment');
@@ -71,7 +71,7 @@ describe('generator-aligned graph', () => {
       environmentVcnCidrs: { 'environment-1': '10.172.8.0/21' },
       projectDb: { 'environment-1': ['project-1'] }, notifications: { default: 'ops@example.com' },
     };
-    const nodes = buildGraph(model, 5).nodes;
+    const nodes = buildGraph(model, 4).nodes;
     const exacc = nodes.find((node) => node.label === 'cmp-lz-prod-exacc')!;
     const exacs = nodes.find((node) => node.label === 'cmp-lz-prod-exacs')!;
     expect(nodes.filter((node) => node.parentId === exacc.id).map((node) => node.label).sort()).toEqual([

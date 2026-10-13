@@ -1,5 +1,5 @@
 /**
- * ReviewStep — step 6 ("Review"). Summarises the model, then runs the *real* OCI
+ * ReviewStep — step 5 ("Review"). Summarises the model, then runs the *real* OCI
  * landing-zone jsonnet generator over the config the wizard has been building and
  * packages the resulting artifacts as one complete ZIP download.
  *
@@ -25,6 +25,7 @@ import { toDrawioXml } from '../../export/toDrawio';
 import { downloadTextFile } from '../../export/download';
 import { validatePlatformContracts } from '../../services/platformValidation';
 import { validateExadataModel } from '../../services/exadata';
+import { exadataReadiness, platformReadiness } from '../../services/platformReadiness';
 
 interface RunResult {
   config: string;
@@ -125,7 +126,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
   const { id } = useParams();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Seed from the last saved run, so leaving and returning to step 6 (or reloading)
+  // Seed from the last saved run, so leaving and returning to step 5 (or reloading)
   // doesn't lose artifacts that are already on disk.
   const [result, setResult] = useState<RunResult | null>(() => {
     const saved = id ? getOutputs(id) : null;
@@ -136,7 +137,12 @@ export default function ReviewStep({ designName }: { designName: string }) {
   const currentConfig = useRef(configText);
   useEffect(() => { currentConfig.current = configText; }, [configText]);
   const hub = getHubKind(model.network.hubKind);
-  const contractErrors = useMemo(() => [...validatePlatformContracts(model), ...validateExadataModel(model)], [model]);
+  const exacc = exadataReadiness(model, 'exacc');
+  const exacs = exadataReadiness(model, 'exacs');
+  const contractErrors = useMemo(() => [...new Set([
+    ...validatePlatformContracts(model), ...validateExadataModel(model),
+    ...platformReadiness(model, 'oke_simple').errors, ...platformReadiness(model, 'ocvs').errors,
+  ])], [model]);
   const stale = result !== null && !isCurrentOutputSet(result, configText);
   const deployFiles = result && !stale
     ? Object.keys(result.files)
@@ -199,7 +205,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
     const filename = bundleFilename(designName).replace(/-lz-outputs\.zip$/, '.drawio');
     // Review export is always the complete structural model. Diagram-only
     // endpoint, route-table, and packet-flow overlays are deliberately omitted.
-    downloadTextFile(filename, toDrawioXml(buildGraph(model, 6, {})), 'application/xml');
+    downloadTextFile(filename, toDrawioXml(buildGraph(model, 5, {})), 'application/xml');
   }
 
   const envCount = model.environments.filter((e) => e.name.trim()).length;
@@ -220,8 +226,8 @@ export default function ReviewStep({ designName }: { designName: string }) {
               ['Projects', String(model.projects.length)],
               ['Platforms', String(model.platforms.length)],
               ['Shared platforms', String(model.sharedPlatforms.length)],
-              ['EXACC', model.exadata.exacc.enabled ? 'Included' : 'Off'],
-              ['EXACS', model.exadata.exacs.enabled ? 'Included' : 'Off'],
+              ['EXACC', exacc.status],
+              ['EXACS', exacs.status],
             ].map(([label, value]) => (
               <div key={label} style={local.sumCell}>
                 <div style={local.sumLabel}>{label}</div>

@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { useWizard } from '../wizardContext';
 import type { ExaccDesign, ExacsDesign, ExadataNotifications } from '../../model/types';
 import { oracle } from '../../theme';
-import { exadataEntries, exadataProjectTopicEnvironments, validateExadataModel } from '../../services/exadata';
+import { exadataEntries, exadataProjectTopicEnvironments } from '../../services/exadata';
 
 const styles: Record<string, CSSProperties> = {
   card: { border: `1px solid ${oracle.border}`, borderTop: `3px solid ${oracle.red}`, borderRadius: 8, background: oracle.surface, padding: 20 },
@@ -339,17 +339,6 @@ function ExacsSection() {
   );
 }
 
-export default function ExadataStep() {
-  const { model } = useWizard();
-  const errors = validateExadataModel(model);
-  return (
-    <div style={{ display: 'grid', gap: 16 }}>
-      <ExaccSection />
-      <ExacsSection />
-      {errors.length > 0 && <div role="alert" style={styles.warning}>
-        <strong>Resolve before generating:</strong>
-        <ul style={{ margin: '6px 0 0', paddingLeft: 18 }}>{errors.map((error) => <li key={error}>{error}</li>)}</ul>
-      </div>}
-    </div>
-  );
+export default function ExadataStep({ type }: { type: 'exacc' | 'exacs' }) {
+  return type === 'exacc' ? <ExaccSection /> : <ExacsSection />;
 }

@@ -19,11 +19,11 @@
   box-sizing: border-box;
 }
 
-/* Oracle Alta UI typography: system font stack (Segoe UI, SF UI, Roboto) */
+/* Match the font stack used by the Studio pages and wizard. */
 html, body {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Oracle Sans', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color: var(--oracle-text);
@@ -46,7 +46,7 @@ a {
   text-decoration: none;
 }
 
-button {
+button, input, select, textarea {
   font-family: inherit;
 }
 
@@ -466,4 +466,47 @@ a:focus:not(:focus-visible) {
 @keyframes lz-flow-pulse { from { transform: scale(0.7); opacity: 0.5; } to { transform: scale(1.7); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   .lz-flow-pulse { animation: none; }
+}
+
+.platform-section {
+  border: 1px solid var(--oracle-border);
+  border-radius: 8px;
+  background: var(--oracle-white);
+  overflow: hidden;
+}
+
+.platform-section-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  color: var(--oracle-text);
+}
+
+.platform-section-summary::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  flex-shrink: 0;
+}
+
+.platform-section[open] > summary::before { transform: rotate(45deg); }
+.platform-section-summary::-webkit-details-marker { display: none; }
+.platform-section-summary:hover { background: #f8f7f4; }
+.platform-section-summary:focus-visible { outline: 2px solid var(--oracle-red-dark); outline-offset: -3px; }
+.platform-section-copy { display: grid; gap: 4px; min-width: 0; flex: 1; }
+.platform-section-title { font-size: 16px; font-weight: 800; }
+.platform-section-description, .platform-section-status { font-size: 12.5px; color: var(--oracle-text-muted); }
+.platform-section-status { font-weight: 600; flex-shrink: 0; }
+.platform-section-content { padding: 0 16px 16px; }
+
+@media (max-width: 520px) {
+  .platform-section-summary { flex-wrap: wrap; padding: 14px; }
+  .platform-section-copy { flex-basis: calc(100% - 24px); }
+  .platform-section-status { margin-left: 21px; }
+  .platform-section-content { padding: 0 10px 10px; }
 }

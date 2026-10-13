@@ -19,7 +19,7 @@ import { getHubKind } from '../../services/hubKinds';
 import { configuredVcnCidrs } from '../../services/exadata';
 import type { PlatformConfig, PlatformType, SharedPlatformConfig, Subnet } from '../../model/types';
 import {
-  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, ocvsDefaultParams, ocvsDefaultSubnets, okeDefaultParams, okeDefaultSubnets, okeProfileSubnets, platformEnvInstances, platformTypeMeta,
+  applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, ocvsDefaultParams, ocvsDefaultSubnets, okeDefaultParams, okeDefaultSubnets, okeProfileSubnets, platformEnvInstances, platformTypeMeta,
 } from '../../services/platforms';
 import { VcnEditor } from './HubNetworkStep';
 import { s } from './networkEditorStyles';
@@ -113,22 +113,6 @@ function SharedPlatformPanel({ platform, open, onToggle, onChange, onDelete }: {
         <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '10px 0' }}>
           <DeleteButton label={`Delete shared platform ${key}`} onClick={onDelete} />
         </div>
-
-        <label style={s.label} htmlFor={`shared-platform-${platform.id}-type`}>Platform type</label>
-        <select
-          id={`shared-platform-${platform.id}-type`}
-          style={{ ...s.select, marginBottom: 14 }}
-          value={isOcvs ? 'ocvs' : 'custom'}
-          onChange={(e) => {
-            const type = e.target.value as 'custom' | 'ocvs';
-            onChange(type === 'ocvs'
-              ? { type, key: platform.key.trim().length <= 3 ? platform.key : 'ocv', subnets: [], ocvsParams: platform.ocvsParams ?? ocvsDefaultParams() }
-              : { type, subnets: platform.subnets.length ? platform.subnets : [{ name: 'core', cidr: vcnCidr.replace(/\/\d+$/, '/24') }], ocvsParams: undefined });
-          }}
-        >
-          <option value="custom">Custom network</option>
-          <option value="ocvs">OCVS management cluster</option>
-        </select>
 
         <label style={s.label} htmlFor={`shared-platform-${platform.id}-key`}>Platform name</label>
         <input id={`shared-platform-${platform.id}-key`} style={s.input} value={key} placeholder="core" onChange={(e) => onChange({ key: e.target.value })} />
@@ -420,16 +404,21 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
   );
 }
 
-export default function PlatformTemplatesStep() {
+export default function PlatformTemplatesStep({ platformType, existingOnly = false }: { platformType: PlatformType; existingOnly?: boolean }) {
   const { model, setField } = useWizard();
   const kind = getHubKind(model.network.hubKind);
   const environments = model.environments.map((e, i) => ({ id: e.id, name: e.name.trim() || `env${i + 1}` }));
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [openSharedId, setOpenSharedId] = useState<string | null>(null);
-  const [newSharedType, setNewSharedType] = useState<'custom' | 'ocvs'>('custom');
-  const [newType, setNewType] = useState<PlatformType>('oke_simple');
+  const newType = platformType;
+  const newSharedType = platformType === 'ocvs' ? 'ocvs' : 'custom';
+  const sharedPlatforms = model.sharedPlatforms.filter((p) => (p.type ?? 'custom') === platformType);
+  const platforms = model.platforms.filter((p) => p.type === platformType);
   const [newName, setNewName] = useState('');
+  const [placement, setPlacement] = useState<'shared' | 'environment' | null>(() =>
+    platformType === 'oke_simple' || platformType === 'ocvs' ? null
+      : sharedPlatforms.length > 0 && platforms.length === 0 ? 'shared' : 'environment');
 
   function setPlatforms(next: PlatformConfig[]) { setField('platforms', next); }
   function setSharedPlatforms(next: SharedPlatformConfig[]) { setField('sharedPlatforms', next); }
@@ -472,15 +461,33 @@ export default function PlatformTemplatesStep() {
 
   return (
     <div style={s.col}>
-      <section style={s.panel}>
+      <fieldset style={{ border: 'none', margin: 0, padding: '8px 4px 4px' }}>
+        <legend style={{ ...s.label, marginBottom: 8 }}>Platform placement</legend>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
+          <label style={{ fontSize: 14, display: 'flex', alignItems: 'center', gap: 8, color: platformType === 'oke_simple' ? oracle.textMuted : oracle.text }}>
+            <input type="radio" name={`${platformType}-placement`} value="shared" checked={placement === 'shared'}
+              disabled={platformType === 'oke_simple'} onChange={() => setPlacement('shared')} />
+            Shared{sharedPlatforms.length > 0 ? ` (${sharedPlatforms.length})` : ''}
+          </label>
+          <label style={{ fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input type="radio" name={`${platformType}-placement`} value="environment" checked={placement === 'environment'}
+              onChange={() => setPlacement('environment')} />
+            Environment{platforms.length > 0 ? ` (${platforms.length})` : ''}
+          </label>
+        </div>
+        {platformType === 'oke_simple' && <p style={{ ...local.note, marginTop: 8, marginBottom: 0 }}>
+          OKE currently supports environment placement only. Shared OKE is not supported.
+        </p>}
+      </fieldset>
+      {placement === 'shared' && platformType !== 'oke_simple' && <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Shared Platforms</div>
           <div style={local.note}>Optional platforms for services shared by more than one environment. Add one only when the same service must be used across environments.</div>
-          {model.sharedPlatforms.length === 0 && (
+          {sharedPlatforms.length === 0 && (
             <div style={{ ...s.empty, borderRadius: 6, borderTop: `1px dashed ${oracle.border}`, marginBottom: 14 }}>No shared platforms. Add one only when a workload must be shared across environments.</div>
           )}
-          {model.sharedPlatforms.map((platform) => (
+          {sharedPlatforms.map((platform) => (
             <SharedPlatformPanel
               key={platform.id}
               platform={platform}
@@ -490,23 +497,16 @@ export default function PlatformTemplatesStep() {
               onDelete={() => setSharedPlatforms(model.sharedPlatforms.filter((candidate) => candidate.id !== platform.id))}
             />
           ))}
-          <div style={s.subCard}>
+          {!existingOnly && <div style={s.subCard}>
             <div style={s.subHead}>Add Shared Platform</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end' }}>
-              <div>
-                <label style={s.addLabel} htmlFor="new-shared-platform-type">Type</label>
-                <select id="new-shared-platform-type" style={s.select} value={newSharedType} onChange={(e) => setNewSharedType(e.target.value as 'custom' | 'ocvs')}>
-                  <option value="custom">Custom network</option>
-                  <option value="ocvs">OCVS management cluster</option>
-                </select>
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
               <button type="button" style={s.addBtn} onClick={addSharedPlatform}>Add Shared Platform</button>
             </div>
-          </div>
+          </div>}
         </div>
-      </section>
+      </section>}
 
-      <section style={s.panel}>
+      {placement === 'environment' && <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Environment Platforms</div>
@@ -514,13 +514,13 @@ export default function PlatformTemplatesStep() {
             Add a platform when a workload needs its own network, such as an OKE or OCVS platform. Each selected environment receives a separate platform network.
           </div>
 
-          {model.platforms.length === 0 && (
+          {platforms.length === 0 && (
             <div style={{ ...s.empty, borderRadius: 6, borderTop: `1px dashed ${oracle.border}`, marginBottom: 14 }}>
               No platforms yet — add one below.
             </div>
           )}
 
-          {model.platforms.map((p) => (
+          {platforms.map((p) => (
             <PlatformCard
               key={p.id}
               platform={p}
@@ -532,23 +532,13 @@ export default function PlatformTemplatesStep() {
             />
           ))}
 
-          <div style={s.subCard}>
+          {!existingOnly && <div style={s.subCard}>
             <div style={s.subHead}>Add platform</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 12, alignItems: 'end' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: 12, alignItems: 'end' }}>
               <div>
-                <label style={s.addLabel} htmlFor="new-platform-type">Type</label>
-                <select id="new-platform-type" style={s.select} value={newType} onChange={(e) => setNewType(e.target.value as PlatformType)}>
-                  {PLATFORM_TYPES.map((t) => (
-                    <option key={t.type} value={t.type} disabled={!t.deployable}>
-                      {t.label}{t.note ? ` (${t.note})` : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label style={s.addLabel} htmlFor="new-platform-name">Name</label>
+                <label style={s.addLabel} htmlFor={`new-${platformType}-name`}>Name</label>
                 <input
-                  id="new-platform-name"
+                  id={`new-${platformType}-name`}
                   style={s.rowInput}
                   placeholder={newType === 'oke_simple' ? 'oke' : newType === 'ocvs' ? 'ocv' : 'cus'}
                   value={newName}
@@ -559,9 +549,9 @@ export default function PlatformTemplatesStep() {
               </div>
               <button type="button" style={s.addBtn} onClick={addPlatform}>Add platform</button>
             </div>
-          </div>
+          </div>}
         </div>
-      </section>
+      </section>}
     </div>
   );
 }

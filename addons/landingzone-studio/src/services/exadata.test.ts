@@ -218,8 +218,8 @@ describe('Exadata configuration', () => {
         notification_emails: { default: ['ops@example.com'], split_environment_topics: true }, project_db_compartments: ['proj1'],
       } },
     });
-    expect(serializeConfig(model, 4)).not.toContain("type: 'exacc'");
-    expect(serializeConfig(model, 5)).toContain("type: 'exacc'");
+    expect(serializeConfig(model, 3)).not.toContain("type: 'exacc'");
+    expect(serializeConfig(model, 4)).toContain("type: 'exacc'");
   });
 
   it('emits shared EXACS infrastructure without a network and environment VMC networks', () => {

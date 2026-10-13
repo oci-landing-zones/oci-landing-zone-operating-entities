@@ -224,7 +224,7 @@ export interface LzModel {
   platforms: PlatformConfig[];
   /** Optional shared platforms outside all environments (step 4). */
   sharedPlatforms: SharedPlatformConfig[];
-  /** Optional Exadata extensions, configured in step 5. */
+  /** Optional Exadata extensions, configured in the Platforms step. */
   exadata: ExadataDesign;
 }
 

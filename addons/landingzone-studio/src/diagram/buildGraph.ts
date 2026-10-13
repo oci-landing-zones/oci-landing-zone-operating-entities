@@ -226,7 +226,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   // Platforms (step 4) build on the spoke layer: the shared platform row outside
   // the environments, and a platforms compartment inside each environment.
   const showPlatforms = upToStep >= 4 && hubImplemented;
-  const exadata = upToStep >= 5 ? exadataDiagramPlatforms(model) : {
+  const exadata = upToStep >= 4 ? exadataDiagramPlatforms(model) : {
     platforms: [], sharedPlatforms: [], sharedWithoutNetwork: [], environmentsWithoutNetwork: {},
     sharedChildren: {}, environmentChildren: {}, projectChildren: {},
   };
