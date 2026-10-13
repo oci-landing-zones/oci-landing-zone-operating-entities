@@ -48,16 +48,16 @@ export default function PlatformsStep() {
           Add a platform when a workload needs its own network or dedicated management. Dedicated compartments, IAM groups, policies, and events will be added to the landing zone to manage the platform.
         </p>
       </section>
-      <PlatformSection title="OKE" description="Kubernetes platforms per environment" status={oke.status} errors={oke.errors}>
+      <PlatformSection title="OKE" description="Kubernetes platforms" status={oke.status} errors={oke.errors}>
         <PlatformTemplatesStep platformType="oke_simple" />
       </PlatformSection>
-      <PlatformSection title="OCVS" description="Shared or environment VMware platforms" status={ocvs.status} errors={ocvs.errors}>
+      <PlatformSection title="OCVS" description="VMware platforms" status={ocvs.status} errors={ocvs.errors}>
         <PlatformTemplatesStep platformType="ocvs" />
       </PlatformSection>
-      <PlatformSection title="EXACC" description="Exadata Database Service on Cloud@Customer" status={exacc.status} errors={exacc.errors}>
+      <PlatformSection title="EXACC" description="Exadata Database Service on Cloud@Customer platforms" status={exacc.status} errors={exacc.errors}>
         <ExadataStep type="exacc" />
       </PlatformSection>
-      <PlatformSection title="EXACS" description="Exadata Database Service on Dedicated Infrastructure" status={exacs.status} errors={exacs.errors}>
+      <PlatformSection title="EXACS" description="Exadata Database Service on Dedicated Infrastructure platforms" status={exacs.status} errors={exacs.errors}>
         <ExadataStep type="exacs" />
       </PlatformSection>
       {hasCustom && <PlatformSection title="Existing custom networks" description="Retained from this saved design and included in exports. Review or remove them here." status="Retained">
