@@ -1,4 +1,4 @@
-// hub A staged outputs keep pre-network categories, backend placeholders, and drg priorities stable
+// Hub A's complete network retains OKE categories, resource placement, and DRG priorities.
 local multi = import 'gen/landing_zone_multi.jsonnet';
 local outputs = multi({
   region: 'eu-frankfurt-1',
@@ -42,24 +42,22 @@ local outputs = multi({
     },
   },
 });
-local network_pre = outputs['network_pre.json'];
 local network = outputs['network.json'];
-local pre_categories = network_pre.network_configuration.network_configuration_categories;
+local categories = network.network_configuration.network_configuration_categories;
 local statements =
-  pre_categories['0-shared'].non_vcn_specific_gateways.dynamic_routing_gateways['DRG-FRA-LZ-HUB-KEY']
+  categories['0-shared'].non_vcn_specific_gateways.dynamic_routing_gateways['DRG-FRA-LZ-HUB-KEY']
     .drg_route_distributions['DRGRD-FRA-LZ-HUB-KEY'].statements;
-local hub_vcn = pre_categories['0-shared'].vcns['VCN-FRA-LZ-HUB-KEY'];
+local hub_vcn = categories['0-shared'].vcns['VCN-FRA-LZ-HUB-KEY'];
 local clusters = outputs['oke_clusters.json'].oke_clusters_configuration.clusters;
 local node_pools = outputs['oke_workers.json'].oke_workers_configuration.node_pools;
 {
-  pre_categories: std.sort(std.objectFields(pre_categories)),
   final_categories: std.sort(std.objectFields(network.network_configuration.network_configuration_categories)),
   cluster_compartment_ids: {
     prod: clusters['CLR-FRA-LZ-PROD-OKE-KEY'].compartment_id,
     preprod: clusters['CLR-FRA-LZ-PREPROD-OKE-KEY'].compartment_id,
   },
   hub_l7_load_balancers_present:
-    std.objectHas(pre_categories['0-shared'].non_vcn_specific_gateways, 'l7_load_balancers'),
+    std.objectHas(categories['0-shared'].non_vcn_specific_gateways, 'l7_load_balancers'),
   hub_lb_subnet_present: std.objectHas(hub_vcn.subnets, 'SN-FRA-LZ-HUB-LB-KEY'),
   hub_lb_nsg_present: std.objectHas(hub_vcn.network_security_groups, 'NSG-FRA-LZ-HUB-LB-KEY'),
   node_pool_compartment_ids: {

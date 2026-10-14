@@ -24,7 +24,6 @@ function(config)
   }
   + cis_outputs
   // Conditional outputs
-  + (if result.network_pre != null then { 'network_pre.json': result.network_pre } else {})
   + (if std.objectHas(result, 'network_backends') && result.network_backends != null then { 'network_backends.json': result.network_backends } else {})
   // Extension outputs (from result.extra)
   + (if std.objectHas(result, 'extra') then { [key + '.json']: result.extra[key] for key in std.objectFields(result.extra) } else {})

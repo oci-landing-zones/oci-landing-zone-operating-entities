@@ -6,7 +6,7 @@ local extension_components = import 'lib/extension_components.libsonnet';
 
 {
   local standard_contribution_keys = [
-    'network_pre',
+    'network',
     'iam',
     'governance',
     'security_cis1',
@@ -14,6 +14,21 @@ local extension_components = import 'lib/extension_components.libsonnet';
     'observability_cis1',
     'observability_cis2',
   ],
+
+  local reserved_extra_keys = [
+    'network_pre',
+    'network_backends',
+    'security_cis1_pre',
+    'security_cis2_pre',
+    'observability_cis1_pre',
+    'observability_cis2_pre',
+  ],
+
+  local validate_contributions(value, label, has_network) =
+    local contributions = validation.returned_object(value, label);
+    assert has_network || !std.objectHas(contributions, 'network') :
+           '%s cannot contribute network without a networked platform' % label;
+    contributions,
 
   local merge_contribution(results, key) =
     std.foldl(
@@ -29,6 +44,8 @@ local extension_components = import 'lib/extension_components.libsonnet';
       function(acc, ext)
         std.foldl(
           function(next, key)
+            assert !std.member(reserved_extra_keys, key) :
+                   'Extension output "%s.json" is reserved for core configuration' % key;
             if std.objectHas(next, key) then next { [key]+: ext.contributions[key] }
             else next { [key]: ext.contributions[key] },
           [
@@ -45,9 +62,10 @@ local extension_components = import 'lib/extension_components.libsonnet';
   local aggregate_results(results) = [
     {
       type: extension_type,
-      contributions: validation.returned_object(
+      contributions: validate_contributions(
         definition.aggregate(type_results),
-        'Extension "%s" aggregate(results)' % extension_type
+        'Extension "%s" aggregate(results)' % extension_type,
+        std.length([result for result in type_results if result.metadata.has_network]) > 0
       ),
     }
     for extension_type in std.uniq(std.sort([result.type for result in results]))
@@ -145,15 +163,10 @@ local extension_components = import 'lib/extension_components.libsonnet';
     ),
 
   _normalize_metadata(ext_type, raw_ext_meta, pe)::
-    local has_legacy_requires_network = std.objectHas(raw_ext_meta, 'requires_network');
-    assert !has_legacy_requires_network || std.type(raw_ext_meta.requires_network) == 'boolean' :
-           'Extension "%s" metadata.requires_network must be a boolean' % ext_type;
     local has_platform_network =
       std.objectHas(pe.platform_config, 'network') && pe.platform_config.network != null;
     local declared_network_mode =
       if std.objectHas(raw_ext_meta, 'network_mode') then raw_ext_meta.network_mode
-      else if has_legacy_requires_network then
-        if raw_ext_meta.requires_network then 'required' else 'forbidden'
       else 'required';
     assert std.member(['required', 'forbidden', 'optional'], declared_network_mode) :
            'Extension "%s" metadata.network_mode must be one of: required, forbidden, optional; got %s' % [
@@ -167,14 +180,6 @@ local extension_components = import 'lib/extension_components.libsonnet';
       pe.scope.platform_name,
     ];
     assert declared_network_mode != 'forbidden' || !has_platform_network :
-           if has_legacy_requires_network && !raw_ext_meta.requires_network &&
-              !std.objectHas(raw_ext_meta, 'network_mode') then
-      'Extension "%s" for platform %s/%s does not accept platform.network because metadata.requires_network is false' % [
-        ext_type,
-        pe.scope.scope_name,
-        pe.scope.platform_name,
-      ]
-    else
       'Extension "%s" for platform %s/%s does not accept platform.network because metadata.network_mode is forbidden' % [
         ext_type,
         pe.scope.scope_name,
@@ -185,7 +190,6 @@ local extension_components = import 'lib/extension_components.libsonnet';
            'Extension "%s" must define metadata.default_subnets when network is used' % ext_type;
     raw_ext_meta {
       network_mode: declared_network_mode,
-      requires_network: declared_network_mode == 'required',
       has_network: resolves_network,
     },
 
@@ -277,12 +281,13 @@ local extension_components = import 'lib/extension_components.libsonnet';
           },
         };
         local resolved = self.resolve_entry(inputs { platform_entry: entry_with_summary });
-        local ext_contributions = validation.returned_object(
+        local ext_contributions = validate_contributions(
           resolved.definition.render(resolved.render_params),
-          'Extension "%s" render(params)' % resolved.type
+          'Extension "%s" render(params)' % resolved.type,
+          resolved.metadata.has_network
         );
-        assert !resolved.metadata.has_network || std.objectHas(ext_contributions, 'network_pre') :
-               'Extension "%s" is missing required contribution "network_pre"' % resolved.type;
+        assert !resolved.metadata.has_network || std.objectHas(ext_contributions, 'network') :
+               'Extension "%s" is missing required contribution "network"' % resolved.type;
         {
           type: resolved.type,
           definition: resolved.definition,

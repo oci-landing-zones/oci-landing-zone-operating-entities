@@ -89,23 +89,54 @@
                         "route_tables": {
                             "RT-FRA-LZ-HUB-INGRESS-KEY": {
                                 "display_name"                            : "rt-fra-lz-hub-ingress",
-                                "route_rules"                             : {}
+
+                                "route_rules": {
+                                    "rr-fra-internet": {
+                                        "description"                     : "Route to the Internet through Trust NLB and Firewalls",
+                                        "destination"                     : "0.0.0.0/0",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-TRUST-KEY"
+                                    }
+                                }
                             },
 
                             "RT-FRA-LZ-HUB-LB-KEY": {
                                 "display_name"                            : "rt-fra-lz-hub-lb",
-                                "route_rules"                             : {}
+
+                                "route_rules": {
+                                    "rr-fra-internet": {
+                                        "description"                     : "Route to the Internet through Untrust NLB and Firewalls",
+                                        "destination"                     : "0.0.0.0/0",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-UNTRUST-KEY"
+                                    }
+                                }
                             },
 
                             "RT-FRA-LZ-HUB-IGW-KEY": {
                                 "display_name"                            : "rt-fra-lz-hub-igw",
-                                "route_rules"                             : {}
+
+                                "route_rules": {
+                                    "rr-fra-igw-ingress": {
+                                        "description"                     : "Route to Public LoadBalancer's subnet through Untrust NLB and Firewalls",
+                                        "destination"                     : "10.0.2.0/24",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-UNTRUST-KEY"
+                                    }
+                                }
                             },
 
                             "RT-FRA-LZ-HUB-MGMT-KEY": {
                                 "display_name"                            : "rt-fra-lz-hub-mgmt",
 
                                 "route_rules": {
+                                    "rr-fra-internet": {
+                                        "description"                     : "Route to the Internet through Trust NLB and Firewalls",
+                                        "destination"                     : "0.0.0.0/0",
+                                        "destination_type"                : "CIDR_BLOCK",
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-TRUST-KEY"
+                                    },
+
                                     "rr-fra-sgw": {
                                         "description"                     : "Route to Oracle Services Network through Service GW",
                                         "destination"                     : "all-services",

@@ -8,7 +8,7 @@ local registry = {
       subnet_order: ['app', 'db'],
     },
     render(params):: {
-      network_pre: {
+      network: {
         fake_network: params.network.subnets,
       },
       iam: {},

@@ -27,10 +27,8 @@ local hub_builders = {
         if hub.post != null then hub.pre + hub.post
         else hub.pre,
 
-      [if hub.post != null then 'network_pre']: hub.pre,
-
-      [if hub.post != null && std.objectHas(hub, 'backends') then 'network_backends']:
-        hub.pre + hub.backends.build_placeholders(),
+      [if std.objectHas(hub, 'backends') then 'network_backends']:
+        self.network + hub.backends.build_placeholders(),
     },
 
   render_iam(config)::

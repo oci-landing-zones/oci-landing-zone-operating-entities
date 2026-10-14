@@ -193,7 +193,7 @@ local products = import '../exadb/products.libsonnet';
 
     {
       contributions: base_contributions + {
-        [if params.network != null then 'network_pre']: {
+        [if params.network != null then 'network']: {
           network_configuration+: {
             network_configuration_categories+: {
               [category_key]: build_network_category(),

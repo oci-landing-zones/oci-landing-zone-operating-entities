@@ -85,7 +85,7 @@ local products = import '../../exadb/products.libsonnet';
     local multi_stack_category(spec, drop_drg_routes=false) =
       local scope = spec.entry.scope;
       local exacs_category =
-        spec.result.contributions.network_pre.network_configuration.network_configuration_categories[
+        spec.result.contributions.network.network_configuration.network_configuration_categories[
           publication_network.category_key(scope)
         ];
       publication_network.network_category(

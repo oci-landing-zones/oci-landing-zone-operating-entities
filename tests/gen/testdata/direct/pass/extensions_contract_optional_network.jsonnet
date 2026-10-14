@@ -15,7 +15,7 @@ local registry = {
       subnet_order: ['db', 'backup'],
     },
     render(params):: {
-      [if params.network != null then 'network_pre']: {},
+      [if params.network != null then 'network']: {},
       [params.topology.platform_name]: {
         network_is_null: params.network == null,
         subnet_keys:

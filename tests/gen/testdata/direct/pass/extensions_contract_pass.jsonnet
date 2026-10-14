@@ -8,7 +8,7 @@ local registry = {
       subnet_order: ['app', 'db'],
     },
     render(params):: {
-      network_pre: {
+      network: {
         fake_network: {
           cidr: params.network.vcn,
           subnets: params.network.subnets,
@@ -40,7 +40,7 @@ local registry = {
       naming: naming('fra'),
       hub_vcn_cidr: '10.0.0.0/21',
       routed_vcn_entries: [],
-    }).network_pre.fake_network,
+    }).network.fake_network,
 
   explicit_extension_subnets_passthrough:
     extensions.resolve({
@@ -64,7 +64,7 @@ local registry = {
       naming: naming('fra'),
       hub_vcn_cidr: '10.0.0.0/21',
       routed_vcn_entries: [],
-    }).network_pre.fake_network,
+    }).network.fake_network,
 
   extension_owned_aggregate_contribution:
     extensions.resolve({

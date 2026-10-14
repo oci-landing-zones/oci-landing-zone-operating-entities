@@ -337,8 +337,6 @@ The generated file set commonly includes:
 | `security_cis*.json` | Security baseline. For CIS2, this also includes the shared security-compartment Vault and one encryption key in each OKE platform compartment. CIS1 omits OKE Vault and CMEK resources. |
 | `observability_cis*.json` | Observability baseline configuration. |
 
-Some hub models, including Hub A, also generate `network_pre.json`. This file is used for staged network deployment before the final `network.json`.
-
 Public frontend NSGs scale as one Hub network resource per opted-in OKE platform. Each NSG permits public TCP 80/443 and TCP egress only to its owning OKE VCN. The shared Hub IAM policy remains one seven-statement policy as platforms are added; a generated allowlist selects enabled source platforms and source-to-target platform tag comparison isolates public LB reconciliation and post-create NSG attachment. The network team owns NSG rules, tags, movement, deletion, and lifecycle. OKE receives only matching-tag membership permission in the Hub network compartment. Approval is cluster-to-NSG rather than Service-to-NSG, so the cluster may reuse an approved NSG on its other public LBs even if Kubernetes admission or RBAC is bypassed.
 
 For native OKE, the generated worker node pool includes `pods_subnet_id` and `pods_nsg_ids`.

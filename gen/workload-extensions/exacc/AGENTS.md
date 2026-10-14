@@ -15,9 +15,9 @@ Scope: this file covers `gen/workload-extensions/exacc/**` and the published Exa
 ## Extension Contract
 
 - Extension type is `exacc`.
-- ExaDB-C@C is networkless: `metadata.requires_network: false`.
+- ExaDB-C@C is networkless: `metadata.network_mode: 'forbidden'`.
 - ExaDB-C@C platforms must omit `platform.network`; the generic extension contract rejects a phantom network on networkless extensions.
-- ExaDB-C@C contributes IAM and observability only. It must not emit `network_pre`, `network`, subnet metadata, or platform VCN categories.
+- ExaDB-C@C contributes IAM and observability only. It must not emit `network`, subnet metadata, or platform VCN categories.
 - Config-mode IAM owns the nested platform root compartments. The ExaDB-C@C builder deep-merges child DB/infra compartments and tags into that nested tree.
 - Standalone multi-stack publication projects the nested config-mode IAM overlay into flat extension-only compartments with `parent_id` references.
 - Do not add native root families such as `exacc_configuration` or `exacs_configuration` unless the active Orchestrator contract proves those families exist.

@@ -1,37 +1,30 @@
 import { describe, expect, it } from 'vitest';
-import { deploymentStages } from './outputNames';
+import { deploymentStages, isCurrentOutputSet } from './outputNames';
 
 describe('deploymentStages', () => {
-  it('keeps pre and final root configuration families in separate ORM operations', () => {
+  it('uses one network file in both operations while keeping staged controls separate', () => {
     const stages = deploymentStages([
-      'iam.json', 'governance.json', 'network_pre.json', 'network.json',
+      'iam.json', 'governance.json', 'network.json',
       'security_cis1_pre.json', 'security_cis1.json',
       'observability_cis1_pre.json', 'observability_cis1.json',
+      'network_backends.json', 'oke_clusters.json',
     ]);
-    expect(stages[0].files).toEqual([
-      'iam.json', 'governance.json', 'network_pre.json',
+    expect([...stages[0].files].sort()).toEqual([
+      'iam.json', 'governance.json', 'network.json',
       'security_cis1_pre.json', 'observability_cis1_pre.json',
-    ]);
-    expect(stages[1].files).toEqual([
+    ].sort());
+    expect([...stages[1].files].sort()).toEqual([
       'iam.json', 'governance.json', 'network.json',
-      'security_cis1.json', 'observability_cis1.json',
-    ]);
-    expect(stages.every((stage) => !(stage.files.includes('network_pre.json') && stage.files.includes('network.json')))).toBe(true);
+      'security_cis1.json', 'observability_cis1.json', 'oke_clusters.json',
+    ].sort());
   });
+});
 
-  it('uses the final network in the initial Hub E operation and retains extension outputs for completion', () => {
-    const stages = deploymentStages([
-      'iam.json', 'governance.json', 'network.json',
-      'security_cis1_pre.json', 'security_cis1.json',
-      'observability_cis1_pre.json', 'observability_cis1.json',
-      'oke.json',
-    ]);
-    expect(stages[0].files).toContain('network.json');
-    expect(stages[1].files).toContain('oke.json');
-  });
-
-  it('does not put Hub C network_backends beside network.json', () => {
-    const stages = deploymentStages(['iam.json', 'governance.json', 'network_pre.json', 'network.json', 'network_backends.json']);
-    expect(stages.flatMap((stage) => stage.files)).not.toContain('network_backends.json');
+describe('isCurrentOutputSet', () => {
+  it('accepts current outputs and requires regeneration after design or network-format changes', () => {
+    const saved = { config: '{ cis_level: 2 }', files: { 'network.json': '{}' } };
+    expect(isCurrentOutputSet(saved, saved.config)).toBe(true);
+    expect(isCurrentOutputSet(saved, '{ cis_level: 1 }')).toBe(false);
+    expect(isCurrentOutputSet({ ...saved, files: { ...saved.files, 'network_pre.json': '{}' } }, saved.config)).toBe(false);
   });
 });

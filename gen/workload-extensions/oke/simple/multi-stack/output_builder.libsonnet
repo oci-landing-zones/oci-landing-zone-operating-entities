@@ -50,10 +50,10 @@ function(profile, env_name='prod', platform_name='oke') {
 	  local route_segments = scope.key_segments + ['PLATFORM', plat],
 	  local vcn_key = n.key('VCN', route_segments),
   local oke_category =
-    rendered_extension.contributions.network_pre.network_configuration.network_configuration_categories[category_key],
+    rendered_extension.contributions.network.network_configuration.network_configuration_categories[category_key],
   local frontend_nsg =
     if public_lb.public_load_balancer_enabled(resolved.render_params.platform_config) then
-      rendered_extension.contributions.network_pre.network_configuration
+      rendered_extension.contributions.network.network_configuration
         .network_configuration_categories['0-shared']
         .vcns[n.key('VCN', ['HUB'])]
         .network_security_groups

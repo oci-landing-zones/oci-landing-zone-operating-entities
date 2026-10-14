@@ -31,6 +31,8 @@
 In this model, the first operation is to deploy [One-OE](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/one-oe/runtime/one-stack), which establishes the foundation landing zone structure. Once this base is in place, the environment can be further extended with a Workload Extension (WE) that adds workload-specific resources and configurations. This makes the overall deployment model more modular, reusable, and easier to manage over time.
 
 In this asset, we assume that One-OE has already been deployed, and we focus on the WE ExaDB-D deployment.
+
+The ExaDB-D stack creates its VCN, and the base One-OE stack owns its DRG attachment. Deploy the network pre file to publish the VCN key, the hub-post file to create the attachment, then the final network file to add DRG-target subnet routes after the attachment is ready. See the [OCI attachment and route-rule sequence](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-create-attachment.htm). Integrated Blueprint Factory and single-stack output keep the VCN and hub integration in one state.
 &nbsp;
 
 <img src="../content/Multi.png" width="600" align="center">

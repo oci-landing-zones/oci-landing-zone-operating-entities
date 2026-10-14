@@ -22,7 +22,5 @@ local hub_c = build('hub_c');
   hub_a_final_target: route_target(hub_a.network),
   hub_b_final_target: route_target(hub_b.network),
   hub_c_final_target: route_target(hub_c.network),
-  hub_c_pre_target: route_target(hub_c.network_pre),
-  hub_c_staged_network_present: hub_c.network_pre != null,
   hub_c_backend_network_present: hub_c.network_backends != null,
 }
