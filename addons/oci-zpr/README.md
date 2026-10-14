@@ -105,7 +105,7 @@ Input configuration template for ZPR addon:
 
 #### Deploy with OCI Resource Manager (ORM)
 
-Click&nbsp; [<img src="../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.1.4.zip&zipUrlVariables={"input_config_files_urls":"https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/zpr-addon/addons/oci-zpr/oneoe_hub_b_zpr.json"})&nbsp; button and follow these steps:
+Click&nbsp; [<img src="../../commons/images/DeployToOCI.svg"  height="25" align="center">](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.2.0.zip&zipUrlVariables={"input_config_files_urls":"https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/zpr-addon/addons/oci-zpr/oneoe_hub_b_zpr.json"})&nbsp; button and follow these steps:
 
   1. Accept the terms and wait for the stack configuration to load.
   2. Set the working directory to “rms-facade”.
