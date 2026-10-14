@@ -9,7 +9,7 @@ extensions.resolve({
         default_subnets: { workers: '/24' },
       },
       render(params):: {
-        network_pre: {},
+        network: {},
       },
     },
   },

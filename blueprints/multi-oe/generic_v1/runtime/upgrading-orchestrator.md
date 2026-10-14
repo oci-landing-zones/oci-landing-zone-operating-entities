@@ -100,16 +100,16 @@ To clone the repository do:
 git clone git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git
 ```
 
-Cloning the latest version:
+Cloning the pinned release:
 ```
-git clone git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git
+git clone --branch v2.2.0 git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git
 ```
 
-For referring to a specific module version, append *ref=\<version\>* to the *source* attribute value. 
+For cloning a specific release, use `--branch <version>`. In a Terraform module source URL, use `?ref=<version>` instead.
 
 E.g.:
 ```
-git clone git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git?ref=v2.1.3
+git clone --branch v2.2.0 git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git
 ```
 
 Initialize:

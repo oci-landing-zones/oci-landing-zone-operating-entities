@@ -23,4 +23,4 @@ local result = lz({
 });
 
 // Force Network Firewall address-list evaluation.
-result.network_pre
+result.network

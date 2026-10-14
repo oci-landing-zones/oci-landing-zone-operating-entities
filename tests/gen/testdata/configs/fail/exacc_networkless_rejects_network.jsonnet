@@ -1,5 +1,5 @@
 // ExaCC is a networkless extension and must not accept a phantom platform VCN
-// error_contains: Extension "exacc" for platform shared/exacc does not accept platform.network because metadata.requires_network is false
+// error_contains: Extension "exacc" for platform shared/exacc does not accept platform.network because metadata.network_mode is forbidden
 {
   hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
   environments: { prod: {} },

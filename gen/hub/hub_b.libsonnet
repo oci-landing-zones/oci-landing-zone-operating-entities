@@ -27,8 +27,7 @@ function(hub_ctx)
   local bastion_ip = common.bastion_ip_from_mgmt(subnets.mgmt);
   local nfw_ip = common.nfw_ip_from_subnet(subnets.fw);
 
-  // Placeholder OCID string for post-deployment routes
-  local nfw_ocid = 'OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs...';
+  local nfw_key = n.key('NFW', ['HUB']);
   local hub_route_tables = common._route_tables_from_descriptors(n, [
     {
       key_segments: ['HUB', 'FW'],
@@ -181,13 +180,13 @@ function(hub_ctx)
                       [n.route_rule([n.region, 'internet'])]: common._route_via_id(
                         'Route to the Internet through the OCI Network Firewall',
                         '0.0.0.0/0',
-                        nfw_ocid
+                        nfw_key
                       ),
 
                       [n.route_rule(['vcn', n.region, 'hub', 'lb', 'sn'])]: common._route_via_id(
                         'Route to Public LB through the OCI Network Firewall',
                         subnets.lb,
-                        nfw_ocid
+                        nfw_key
                       ),
                     },
                   },
@@ -197,13 +196,13 @@ function(hub_ctx)
                       [n.route_rule([n.region, 'internet'])]: common._route_via_id(
                         'Route to the Internet through the OCI Network Firewall',
                         '0.0.0.0/0',
-                        nfw_ocid
+                        nfw_key
                       ),
                     },
                   },
 
                   [n.key('RT', ['HUB', 'NATGW'])]+: {
-                    route_rules: common._natgw_firewall_routes(n, subnets, nfw_ocid, 'OCI Network Firewall'),
+                    route_rules: common._natgw_firewall_routes(n, subnets, nfw_key, 'OCI Network Firewall'),
                   },
                 },
               },
@@ -230,6 +229,6 @@ function(hub_ctx)
 
     has_spoke_natgw: false,
 
-    post_route_entity_id: nfw_ocid,
+    post_route_entity_id: nfw_key,
     post_route_entity_desc: 'OCI Network Firewall',
   })

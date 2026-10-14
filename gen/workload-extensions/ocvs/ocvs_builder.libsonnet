@@ -22,7 +22,7 @@ local ocvs_network = import './ocvs_network.libsonnet';
     {
       metadata: metadata,
       contributions: {
-        network_pre: ocvs_network(ctx),
+        network: ocvs_network(ctx),
         iam: ocvs_iam(ctx),
         ocvs: ocvs_configuration(ctx),
       },

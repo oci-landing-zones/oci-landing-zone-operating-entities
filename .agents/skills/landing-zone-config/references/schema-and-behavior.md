@@ -204,7 +204,6 @@ For the selected `cis_level`, it also emits one security and one observability p
 
 Conditional outputs:
 
-- `network_pre.json` only for staged hubs that require pre-deployment output
 - `network_backends.json` only when backends are present in the orchestrated result
 - `<extra>.json` for each extension contribution returned in `result.extra`
 
@@ -213,5 +212,5 @@ Conditional outputs:
 1. Start from the smallest valid config.
 2. Add one environment or platform at a time.
 3. Run `bash gen/generate.sh --config <config_file> [output_dir]`.
-4. Validate `network.json` as the canonical final network artifact; expect `network_pre.json` only for staged hubs.
+4. Validate `network.json` as the canonical network artifact.
 5. When changing schema or extension assumptions, update tests or regression fixtures that cover Blueprint Factory config mode.

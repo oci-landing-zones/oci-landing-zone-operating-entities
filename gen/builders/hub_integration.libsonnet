@@ -113,7 +113,7 @@ function(params)
     else nsg_ingress_overlay(hub.lb_return_nsg_key, nsg_lb_spoke_return);
   local nsg_integration_overlays = nsg_fw_overlays + nsg_lb_overlay;
 
-  // --- 5. Post-Deploy Routes ---
+  // --- 5. Firewall Routes ---
   // Route rules through firewall IP for each local VCN and remote RPC CIDR.
   local post_route_tables =
     if std.objectHas(hub, 'post_route_tables') then hub.post_route_tables else [];
