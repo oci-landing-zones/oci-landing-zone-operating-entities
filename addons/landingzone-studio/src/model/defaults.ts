@@ -45,7 +45,7 @@ export function emptyLzModel(): LzModel {
       region: region?.id ?? 'eu-frankfurt-1',
       regionShortName: region?.shortName ?? 'fra',
       cisLevel: 2,
-      notifications: { useSingleRecipient: false, default: '', cloudguard: '', iam: '', network: '', security: '' },
+      notifications: { useSingleRecipient: true, default: '', cloudguard: '', iam: '', network: '', security: '' },
     },
     environments: [
       { id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) },

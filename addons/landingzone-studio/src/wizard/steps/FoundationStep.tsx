@@ -12,6 +12,7 @@ import { createModelId, envNetworkDefaults } from '../../model/defaults';
 import { configuredVcnCidrs } from '../../services/exadata';
 import { customDefaultSubnets } from '../../services/platforms';
 import { environmentPlatformCidr } from '../../services/oneOeCidrs';
+import { notificationEmailError } from '../../services/notificationEmails';
 import { oracle } from '../../theme';
 import {
   findRegion, getDefaultRegionForRealm, getRegionsForRealm, REALM_OPTIONS,
@@ -256,7 +257,14 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.body}>
           <div id="foundation-observability-title" style={s.title}>Observability</div>
           <div style={{ ...s.help, margin: '-8px 0 14px' }}>
-            Choose email recipients for the four One-OE notification topics. Separate multiple addresses with commas. If all fields are blank, generated files retain the published example address.
+            Notification email addresses are required. Use the same recipients for all four topics, or configure each topic separately. Separate multiple addresses with commas.
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: oracle.ink }}>
+              <input type="checkbox" checked={singleRecipient} onChange={(e) => setSingleRecipient(e.target.checked)} />
+              Use one email for all notifications
+            </label>
+            <div style={{ ...s.help, marginTop: 5 }}>Uses the same recipients for Cloud Guard, IAM, Network and Security.</div>
           </div>
           {!singleRecipient && <div>
             {([
@@ -269,25 +277,22 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
                 <div>
                   <label style={s.label} htmlFor={`lz-observability-${topic}`}>{label}</label>
                   <input id={`lz-observability-${topic}`} style={s.input} type="text" inputMode="email"
+                    required aria-invalid={!!notificationEmailError(f.notifications?.[topic])}
                     placeholder="team@example.com" value={f.notifications?.[topic] ?? ''}
-                    onChange={(e) => setNotification(topic, e.target.value)} aria-describedby={`lz-observability-${topic}-help`} />
+                    onChange={(e) => setNotification(topic, e.target.value)} aria-describedby={`lz-observability-${topic}-help${notificationEmailError(f.notifications?.[topic]) ? ` lz-observability-${topic}-error` : ''}`} />
+                  {notificationEmailError(f.notifications?.[topic]) && <div id={`lz-observability-${topic}-error`} style={s.error} role="alert">{notificationEmailError(f.notifications?.[topic])}</div>}
                 </div>
                 <div id={`lz-observability-${topic}-help`} style={s.help}>{topicHelp[topic]}</div>
               </div>
             ))}
           </div>}
-          <div style={{ borderTop: `1px solid ${oracle.border}`, paddingTop: 16, marginTop: 8 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: oracle.ink }}>
-              <input type="checkbox" checked={singleRecipient} onChange={(e) => setSingleRecipient(e.target.checked)} />
-              Use one email for all notifications
-            </label>
-            <div style={{ ...s.help, marginTop: 5 }}>Uses the same recipients for Cloud Guard, IAM, Network and Security.</div>
-          </div>
           {singleRecipient && <div style={{ ...s.field, marginTop: 16, marginBottom: 0 }}>
             <label style={s.label} htmlFor="lz-observability-default">Notification emails</label>
             <input id="lz-observability-default" style={s.input} type="text" inputMode="email"
+              required aria-invalid={!!notificationEmailError(f.notifications?.default)} aria-describedby={notificationEmailError(f.notifications?.default) ? 'lz-observability-default-error' : undefined}
               placeholder="ops@example.com" value={f.notifications?.default ?? ''}
               onChange={(e) => setNotification('default', e.target.value)} />
+            {notificationEmailError(f.notifications?.default) && <div id="lz-observability-default-error" style={s.error} role="alert">{notificationEmailError(f.notifications?.default)}</div>}
           </div>}
         </div>
       </section>

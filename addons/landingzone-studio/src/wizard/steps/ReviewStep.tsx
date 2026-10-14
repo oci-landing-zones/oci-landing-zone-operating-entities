@@ -26,6 +26,7 @@ import { downloadTextFile } from '../../export/download';
 import { validatePlatformContracts } from '../../services/platformValidation';
 import { validateExadataModel } from '../../services/exadata';
 import { exadataReadiness, platformReadiness } from '../../services/platformReadiness';
+import { validateNotificationEmails } from '../../services/notificationEmails';
 
 interface RunResult {
   config: string;
@@ -141,6 +142,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
   const exacs = exadataReadiness(model, 'exacs');
   const contractErrors = useMemo(() => [...new Set([
     ...validatePlatformContracts(model), ...validateExadataModel(model),
+    ...validateNotificationEmails(model.foundation.notifications),
     ...platformReadiness(model, 'oke_simple').errors, ...platformReadiness(model, 'ocvs').errors,
   ])], [model]);
   const stale = result !== null && !isCurrentOutputSet(result, configText);
@@ -252,7 +254,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
               type="button"
               style={busy ? { ...local.primary, ...local.primaryOff } : local.primary}
               onClick={generateAndDownload}
-              disabled={busy}
+              disabled={busy || contractErrors.length > 0}
             >
               {busy ? 'Preparing download…' : 'Download files'}
             </button>
