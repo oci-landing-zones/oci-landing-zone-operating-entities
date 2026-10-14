@@ -4,17 +4,24 @@
  * module eagerly bundles ~0.7 MB of vendored jsonnet.
  */
 
-/** The network artifacts in deployment order when both are emitted. */
-export const PRIMARY_OUTPUTS = ['network_pre.json', 'network.json'] as const;
+/** The canonical network artifact. */
+export const PRIMARY_OUTPUTS = ['network.json'] as const;
 
 /** Filename the wizard's own config is written under, inside the bundle. */
 export const CONFIG_FILENAME = 'config.jsonnet';
 
 /** What each surfaced artifact is for, so a reviewer knows which to deploy first. */
 export const OUTPUT_BLURB: Record<string, string> = {
-  'network_pre.json': 'Initial phase — creates the network before final-route dependencies are available.',
-  'network.json': 'Completion phase — replaces network_pre.json after required private IP OCIDs are available.',
+  'network.json': 'Creates the network and routing, resolving firewall and NLB targets from resource keys.',
 };
+
+/** Old staged-network bundles must be regenerated even when their config matches. */
+export function isCurrentOutputSet(output: { config: string; files: Record<string, string> } | null, config: string): boolean {
+  return output !== null
+    && output.config === config
+    && Object.hasOwn(output.files, 'network.json')
+    && !Object.hasOwn(output.files, 'network_pre.json');
+}
 
 export interface DeploymentStage {
   title: string;
@@ -29,9 +36,9 @@ const persistent = ['iam.json', 'governance.json'];
  * of the same root configuration family in one operation.
  */
 export function deploymentStages(availableFiles: string[]): DeploymentStage[] {
-  const available = new Set(availableFiles);
+  const available = new Set(availableFiles.filter((file) => file !== 'network_pre.json'));
   const keep = (files: string[]) => [...new Set(files.filter((file) => available.has(file)))];
-  const pre = availableFiles.filter((file) => file.endsWith('_pre.json'));
+  const pre = [...available].filter((file) => file.endsWith('_pre.json'));
   const finalCore = availableFiles.filter((file) =>
     (file === 'network.json' || file.startsWith('security_cis') || file.startsWith('observability_cis'))
     && !file.endsWith('_pre.json'),
@@ -48,14 +55,12 @@ export function deploymentStages(availableFiles: string[]): DeploymentStage[] {
   return [
     {
       title: '1. Create the landing zone',
-      description: available.has('network_pre.json')
-        ? 'Use this first set once. Files ending in _pre create resources before their final route targets exist.'
-        : 'Use this first set once. This hub does not need a preliminary network file.',
-      files: keep([...persistent, available.has('network_pre.json') ? 'network_pre.json' : 'network.json', ...pre]),
+      description: 'Create the network and routing together. Security and observability files ending in _pre establish prerequisites before their dependent resources exist.',
+      files: keep([...persistent, 'network.json', ...pre]),
     },
     {
-      title: '2. Complete routing and controls',
-      description: 'Update the same stack: replace every _pre file with its final counterpart, then plan and apply again.',
+      title: '2. Complete controls and workloads',
+      description: 'Update the same stack: retain the network file, replace each security and observability _pre file with its final counterpart, and add workload files. Plan and apply again.',
       files: keep([...persistent, ...finalCore, ...extensionFiles]),
     },
   ];

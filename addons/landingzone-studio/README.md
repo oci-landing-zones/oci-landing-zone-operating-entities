@@ -53,7 +53,7 @@ Studio currently provides a guided interface for the following repository-suppor
 | Platforms | Environment OKE (`oke_simple`), OCVS, and custom platforms; shared OCVS and custom platforms |
 | Outputs | Generated deployment ZIP, `config.jsonnet`, live diagram, and Draw.io export |
 
-Hub A, B, and C are staged network deployments. The downloaded package preserves the required `*_pre.json` and final files together. Before the final network phase, resolve the generated firewall or load-balancer private-IP-OCID placeholders as described in the review screen and the selected hub documentation.
+Hub A, B, and C use the final `network.json`; managed firewall and NLB route targets resolve by resource key. The package retains the security and observability pre/final files. Hub C still requires real third-party firewall backend targets in place of the generated external placeholders; see the [Hub C backend contract](../oci-hub-models/hub_c/readme.md#backend-targets).
 
 Studio intentionally does not replace the Landing Zone framework contract. A resource, topology, or behavior not supported by the generator must be handled as a separate manual post-deployment activity, with customer ownership for lifecycle, drift, and compliance review.
 
@@ -68,10 +68,12 @@ Before deployment:
 - Confirm region, realm, environment names, CIDRs, connectivity assumptions, and workload placement.
 - Confirm CIDRs do not overlap with OCI, on-premises, or other-cloud networks that require routed connectivity.
 - Review IAM, compartment, security, governance, and observability outputs.
-- Resolve every generated placeholder and follow the required staged network workflow.
+- Resolve every generated placeholder and follow the security and observability pre/final workflow.
 - Store source configuration and generated artifacts in a private, organization-controlled location.
 
 Use Terraform locally or from customer-controlled CI/CD where possible. If you use OCI Resource Manager, stage the artifacts in a private Object Storage bucket or approved private source repository controlled by your organization.
+
+Studio's **Deploy to OCI** link opens the Create Stack page with the latest released Orchestrator and the private Object Storage configuration source prefilled. Set the working directory to `rms-facade`, provide the bucket and current phase's file values, and review the plan before applying.
 
 For deployment details, use the [Terraform deployment guide](../../commons/content/terraform.md) or [OCI Resource Manager deployment guide](../../commons/content/orm.md).
 

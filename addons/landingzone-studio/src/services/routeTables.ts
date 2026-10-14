@@ -308,7 +308,7 @@ function buildOcvsRouteTables(model: LzModel): RouteTable[] {
   return tables;
 }
 
-/** Hub B's final routing phase: one OCI Network Firewall fronts every routed path. */
+/** Hub B routes inspected traffic through one OCI Network Firewall. */
 function buildHubBRouteTables(model: LzModel): RouteTable[] {
   const region = model.foundation.regionShortName.trim() || '<region>';
   const lb = hubSubnet(model, '-lb');
@@ -328,32 +328,29 @@ function buildHubBRouteTables(model: LzModel): RouteTable[] {
   }));
   const toDrg = () => envs.map((env) => drg(env.vcnCidr));
   const toFirewall = () => envs.map((env) => fw(env.vcnCidr, firewallIp, firewallName));
-  const finalNote = 'Final routing phase — OCI Network Firewall private-IP OCID required';
+  const routingNote = 'OCI Network Firewall route targets resolve from its generated resource key.';
   const tables: RouteTable[] = [];
 
-  // In network_pre the firewall and management tables use DRG routes. The final
-  // output adds the firewall private-IP routes below; these are the routes a
-  // deployed Hub B uses once the NFW exists.
   if (firewall) tables.push({
     id: 'rt-hub-fw', name: `rt-${region}-hub-fw`, kind: 'hub', columns: 'vcn', attachTo: firewall.id,
     rules: [nat('0.0.0.0/0'), ...toDrg()],
   });
   if (lb) tables.push({
     id: 'rt-hub-lb', name: `rt-${region}-hub-lb`, kind: 'hub', columns: 'vcn', attachTo: lb.id,
-    note: finalNote, rules: [igw('0.0.0.0/0'), ...toFirewall()],
+    note: routingNote, rules: [igw('0.0.0.0/0'), ...toFirewall()],
   });
   if (mgmt) tables.push({
     id: 'rt-hub-mgmt', name: `rt-${region}-hub-mgmt`, kind: 'hub', columns: 'vcn', attachTo: mgmt.id,
-    note: finalNote, rules: [fw('0.0.0.0/0', firewallIp, firewallName), ...toDrg(), sgw('gw-sgw')],
+    note: routingNote, rules: [fw('0.0.0.0/0', firewallIp, firewallName), ...toDrg(), sgw('gw-sgw')],
   });
   tables.push({
     id: 'rt-hub-ingress', name: `rt-${region}-hub-ingress`, kind: 'hub', columns: 'vcn', attachTo: 'attach-hub',
-    note: finalNote,
+    note: routingNote,
     rules: [fw('0.0.0.0/0', firewallIp, firewallName), ...(lb ? [fw(lb.cidr, firewallIp, firewallName)] : []), ...toFirewall()],
   });
   tables.push({
     id: 'rt-hub-natgw', name: `rt-${region}-hub-natgw`, kind: 'gateway', columns: 'vcn', attachTo: 'gw-natgw',
-    note: finalNote,
+    note: routingNote,
     rules: [mgmt, mon, dns].filter((s): s is { id: string; cidr: string } => s !== null).map((s) => fw(s.cidr, firewallIp, firewallName)),
   });
 
@@ -379,7 +376,7 @@ function buildHubBRouteTables(model: LzModel): RouteTable[] {
   return tables;
 }
 
-/** Hub C's final third-party-firewall topology, fronted by trust and untrust NLBs. */
+/** Hub C's third-party-firewall topology, fronted by trust and untrust NLBs. */
 function buildHubCRouteTables(model: LzModel): RouteTable[] {
   const region = model.foundation.regionShortName.trim() || '<region>';
   const untrust = hubSubnet(model, '-untrust');
@@ -397,12 +394,9 @@ function buildHubCRouteTables(model: LzModel): RouteTable[] {
   const toDrg = () => envs.map((env) => drg(env.vcnCidr));
   const trustNlb = (dest: string) => trust ? nlb(dest, 'Trust', trust.id) : drg(dest);
   const untrustNlb = (dest: string) => untrust ? nlb(dest, 'Untrust', untrust.id) : igw(dest);
-  const finalNote = 'Final routing phase — replace Trust/Untrust NLB private-IP OCID placeholders in network_backends.json';
+  const routingNote = 'NLB route targets resolve from resource keys. Prepare external firewall backend targets in network_backends.json before sending traffic.';
   const tables: RouteTable[] = [];
 
-  // network_pre establishes the DRG routes; network.json adds the NLB private-IP
-  // routes. The external firewall backend placeholders remain generator-owned in
-  // the separate network_backends.json output.
   if (untrust) tables.push({
     id: 'rt-hub-untrust', name: `rt-${region}-hub-untrust`, kind: 'hub', columns: 'vcn', attachTo: untrust.id,
     rules: [igw('0.0.0.0/0')],
@@ -413,19 +407,19 @@ function buildHubCRouteTables(model: LzModel): RouteTable[] {
   });
   if (lb) tables.push({
     id: 'rt-hub-lb', name: `rt-${region}-hub-lb`, kind: 'hub', columns: 'vcn', attachTo: lb.id,
-    note: finalNote, rules: [untrustNlb('0.0.0.0/0'), ...toDrg()],
+    note: routingNote, rules: [untrustNlb('0.0.0.0/0'), ...toDrg()],
   });
   if (mgmt) tables.push({
     id: 'rt-hub-mgmt', name: `rt-${region}-hub-mgmt`, kind: 'hub', columns: 'vcn', attachTo: mgmt.id,
-    note: finalNote, rules: [trustNlb('0.0.0.0/0'), ...toDrg(), sgw('gw-sgw')],
+    note: routingNote, rules: [trustNlb('0.0.0.0/0'), ...toDrg(), sgw('gw-sgw')],
   });
   if (lb) tables.push({
     id: 'rt-hub-igw', name: `rt-${region}-hub-igw`, kind: 'gateway', columns: 'vcn', attachTo: 'gw-igw',
-    note: finalNote, rules: [untrustNlb(lb.cidr)],
+    note: routingNote, rules: [untrustNlb(lb.cidr)],
   });
   tables.push({
     id: 'rt-hub-ingress', name: `rt-${region}-hub-ingress`, kind: 'hub', columns: 'vcn', attachTo: 'attach-hub',
-    note: finalNote, rules: [trustNlb('0.0.0.0/0'), ...envs.map((env) => trustNlb(env.vcnCidr))],
+    note: routingNote, rules: [trustNlb('0.0.0.0/0'), ...envs.map((env) => trustNlb(env.vcnCidr))],
   });
 
   tables.push({

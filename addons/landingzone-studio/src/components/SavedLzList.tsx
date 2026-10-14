@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { oracle } from '../theme';
 import { deleteLZ, duplicateLZ, getLZ, getOutputs, listLZs, type LzMeta } from '../services/lzStore';
 import { serializeConfig } from '../services/lzConfig';
-import { CONFIG_FILENAME } from '../generator/outputNames';
+import { CONFIG_FILENAME, isCurrentOutputSet } from '../generator/outputNames';
 import { bundleFilename, downloadBlob, zipTextFiles } from '../export/zip';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
@@ -72,7 +72,7 @@ function summaryChips(id: string): string[] {
 interface CardOutputs {
   fileCount: number;
   generatedAt: string;
-  /** The model has moved on since these were generated. */
+  /** The design changed or the output uses an older deployment contract. */
   stale: boolean;
   files: Record<string, string>;
   config: string;
@@ -86,7 +86,7 @@ function cardOutputs(id: string): CardOutputs | null {
   return {
     fileCount: Object.keys(saved.files).length,
     generatedAt: saved.generatedAt,
-    stale: rec ? serializeConfig(rec.model) !== saved.config : false,
+    stale: !rec || !isCurrentOutputSet(saved, serializeConfig(rec.model)),
     files: saved.files,
     config: saved.config,
   };
@@ -176,7 +176,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                     <div style={s.outHead}>
                       <span style={s.outTitle}>LZ config</span>
                       {out.stale
-                        ? <span style={s.staleTag} title="The design changed after this output was created — run step 5 again.">Stale</span>
+                        ? <span style={s.staleTag} title="The design or deployment format changed. Open step 5 to regenerate these files.">Stale</span>
                         : <span style={s.outMeta}>{formatTime(out.generatedAt)}</span>}
                     </div>
                     {!out.stale && (

@@ -6,9 +6,6 @@
  * The generator is upstream's own `gen/` jsonnet, evaluated by go-jsonnet compiled
  * to WebAssembly — the same computation `gen/generate.sh` runs on the command line,
  * just in the browser. Nothing here reimplements it, so the outputs are the outputs.
- *
- * Hub A's staged network artifacts and every supporting artifact always remain
- * together in the ZIP. Studio never presents a partial deployment as complete.
  */
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
@@ -21,7 +18,7 @@ import { getHubKind } from '../../services/hubKinds';
 import { getOutputs, saveOutputs } from '../../services/lzStore';
 // The generator drags in ~0.7 MB of vendored jsonnet, so it is imported on demand
 // inside `run()`. Only its names — a dependency-free module — are imported here.
-import { CONFIG_FILENAME, deploymentStages } from '../../generator/outputNames';
+import { CONFIG_FILENAME, deploymentStages, isCurrentOutputSet } from '../../generator/outputNames';
 import { bundleFilename, downloadBlob, zipTextFiles } from '../../export/zip';
 import { buildGraph } from '../../diagram/buildGraph';
 import { toDrawioXml } from '../../export/toDrawio';
@@ -69,7 +66,7 @@ const local: Record<string, CSSProperties> = {
 
 function expectedCoreFiles(cisLevel: 1 | 2): string[] {
   return [
-    'iam.json', 'governance.json', 'network_pre.json', 'network.json',
+    'iam.json', 'governance.json', 'network.json',
     `security_cis${cisLevel}_pre.json`, `security_cis${cisLevel}.json`,
     `observability_cis${cisLevel}_pre.json`, `observability_cis${cisLevel}.json`,
   ];
@@ -80,11 +77,11 @@ const RESOURCE_MANAGER_CREATE_STACK_GUIDE_URL = 'https://docs.oracle.com/en-us/i
 const RESOURCE_MANAGER_PLAN_GUIDE_URL = 'https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-plan.htm';
 const RESOURCE_MANAGER_APPLY_GUIDE_URL = 'https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-apply.htm';
 const LANDING_ZONE_ORCHESTRATOR_URL = 'https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator';
-const NETWORK_FIREWALL_IP_HELP_URL = 'https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/blob/master/commons/content/howto_identify_private_ip_ocid_network_firewall.md';
-
-function Placeholder({ children }: { children: string }) {
-  return <code className="required-value">&quot;{children}&quot;</code>;
-}
+const LANDING_ZONE_ORCHESTRATOR_RELEASE_URL = `${LANDING_ZONE_ORCHESTRATOR_URL}/releases/tag/v2.2.0`;
+const DEPLOY_TO_OCI_URL = `${RESOURCE_MANAGER_STACKS_URL}/create?${new URLSearchParams({
+  zipUrl: `${LANDING_ZONE_ORCHESTRATOR_URL}/archive/refs/tags/v2.2.0.zip`,
+  zipUrlVariables: JSON.stringify({ configuration_source: 'ocibucket' }),
+})}`;
 
 function Setting({ name, value }: { name: string; value?: string }) {
   return (
@@ -95,29 +92,12 @@ function Setting({ name, value }: { name: string; value?: string }) {
   );
 }
 
-function RouteCompletionGuide({ hubKind }: { hubKind: string }) {
-  if (hubKind === 'hub_a') {
+function HubDeploymentGuide({ hubKind }: { hubKind: string }) {
+  if (hubKind === 'hub_a' || hubKind === 'hub_b') {
     return (
       <div style={local.guide}>
-        <div style={local.guideTitle}>Before phase 2 — finish Hub A routing</div>
-        <ol style={local.ordered}>
-          <li>After phase 1 succeeds, copy the private IP OCID for each OCI Network Firewall. Use the OCID, not the IP address. <a className="guide-link" href={NETWORK_FIREWALL_IP_HELP_URL} target="_blank" rel="noreferrer">Find a Network Firewall private IP OCID ↗</a></li>
-          <li>In <code>network.json</code>, replace <Placeholder>DMZ OCI NFW PRIVATE IP OCID</Placeholder> and <Placeholder>Internal OCI NFW PRIVATE IP OCID</Placeholder>.</li>
-          <li>For phase 2, replace <code>network_pre.json</code> with <code>network.json</code> in the stack configuration. Never supply both files together.</li>
-        </ol>
-      </div>
-    );
-  }
-
-  if (hubKind === 'hub_b') {
-    return (
-      <div style={local.guide}>
-        <div style={local.guideTitle}>Before phase 2 — finish Hub B routing</div>
-        <ol style={local.ordered}>
-          <li>After phase 1 succeeds, copy the OCI Network Firewall private IP OCID. Use the OCID, not the IP address. <a className="guide-link" href={NETWORK_FIREWALL_IP_HELP_URL} target="_blank" rel="noreferrer">Find a Network Firewall private IP OCID ↗</a></li>
-          <li>In <code>network.json</code>, replace every <Placeholder>OCI NFW PRIVATE IP OCID</Placeholder> value.</li>
-          <li>For phase 2, replace <code>network_pre.json</code> with <code>network.json</code> in the stack configuration. Never supply both files together.</li>
-        </ol>
+        <div style={local.guideTitle}>Hub routing</div>
+        <p style={local.note}>The Orchestrator resolves OCI Network Firewall route targets from the resource keys in <code>network.json</code>. Retain this network file in both phases.</p>
       </div>
     );
   }
@@ -125,12 +105,12 @@ function RouteCompletionGuide({ hubKind }: { hubKind: string }) {
   if (hubKind === 'hub_c') {
     return (
       <div style={local.guide}>
-        <div style={local.guideTitle}>Before phase 2 — finish Hub C routing</div>
+        <div style={local.guideTitle}>Prepare Hub C firewall backends</div>
         <ol style={local.ordered}>
-          <li>After phase 1 succeeds, copy the private IP OCIDs for the trust and untrust Network Load Balancers.</li>
-          <li>Use <code>network.json</code> when the Network Load Balancers do not need third-party firewall backends. Replace <Placeholder>TRUST NLB PRIVATE IP OCID</Placeholder> and <Placeholder>UNTRUST NLB PRIVATE IP OCID</Placeholder>.</li>
-          <li>If third-party firewalls are part of this design, configure them outside Studio before phase 2, then use <code>network_backends.json</code> instead. Fill the trust and untrust NLB OCIDs and every <Placeholder>NETWORK FIREWALL-1/2 PRIVATE IP OCID</Placeholder> value.</li>
-          <li>For phase 2, replace <code>network_pre.json</code> with exactly one final network file: <code>network.json</code> or <code>network_backends.json</code>.</li>
+          <li>NLB route targets resolve from generated resource keys in <code>network.json</code>. Before sending traffic, configure the third-party firewall VMs outside Studio.</li>
+          <li>In <code>network_backends.json</code>, set each firewall backend <code>target_id</code> to a private-IP OCID, instance OCID, bare instance key, or qualified <code>instance.vnic</code> key.</li>
+          <li>A bare instance key targets the primary interface. It resolves through <code>instances_dependency</code> first; if absent there, it can resolve through the primary private-IP target map. For separate trust and untrust interfaces, use the appropriate qualified <code>instance.vnic</code> key or private-IP OCID.</li>
+          <li>Once the firewall backends are ready, update the same stack to use <code>network_backends.json</code> instead of <code>network.json</code>. Supply exactly one network file, then plan and apply.</li>
         </ol>
       </div>
     );
@@ -156,15 +136,12 @@ export default function ReviewStep({ designName }: { designName: string }) {
   useEffect(() => { currentConfig.current = configText; }, [configText]);
   const hub = getHubKind(model.network.hubKind);
   const contractErrors = useMemo(() => validatePlatformContracts(model), [model]);
-  const deployFiles = result
+  const stale = result !== null && !isCurrentOutputSet(result, configText);
+  const deployFiles = result && !stale
     ? Object.keys(result.files)
-    : expectedCoreFiles(model.foundation.cisLevel).filter((file) => model.network.hubKind !== 'hub_e' || file !== 'network_pre.json');
+    : expectedCoreFiles(model.foundation.cisLevel);
   const deployStages = deploymentStages(deployFiles);
   const [firstStage, ...remainingStages] = deployStages;
-
-  // Outputs are a snapshot. A model change forces a transparent rebuild before
-  // download, so stale files are never surfaced to the customer.
-  const stale = result !== null && result.config !== configText;
 
   function downloadResult(runResult: RunResult) {
     downloadBlob(
@@ -190,9 +167,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
       }
       return out;
     } catch (err) {
-      // Keep a previously generated snapshot for recovery. Its eligibility is
-      // still derived from the current config, so it cannot become downloadable
-      // merely because a later generation failed.
+      // Keep the previous snapshot; download eligibility still checks config and output format.
       setError(err instanceof Error ? err.message : String(err));
       return null;
     } finally {
@@ -201,7 +176,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
   }
 
   function downloadBundle() {
-    if (!result || result.config !== currentConfig.current) return;
+    if (!result || !isCurrentOutputSet(result, currentConfig.current)) return;
     downloadResult(result);
   }
 
@@ -216,7 +191,7 @@ export default function ReviewStep({ designName }: { designName: string }) {
       return;
     }
     const generated = await run();
-    if (generated && generated.config === currentConfig.current) downloadResult(generated);
+    if (generated && isCurrentOutputSet(generated, currentConfig.current)) downloadResult(generated);
   }
 
   function downloadDrawio() {
@@ -291,14 +266,14 @@ export default function ReviewStep({ designName }: { designName: string }) {
         <div style={s.body}>
           <div style={s.title}>Deploy with OCI Resource Manager</div>
           <div style={local.note}>
-            Resource Manager runs the <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator ↗</a>. The files from Studio are a separate configuration source for that stack. Use one stack for both phases; phase 2 updates its configuration source.
+            Resource Manager runs the <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_RELEASE_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator v2.2.0 ↗</a>. The files from Studio are a separate configuration source for that stack. Use one stack for both phases; phase 2 updates its security, observability, and workload files.
           </div>
           <div style={local.guide}>
             <div style={local.guideTitle}>Create and run the stack</div>
             <ol style={local.ordered}>
               <li>Unzip the download. Keep the generated files in a customer-controlled private Object Storage bucket or approved private GitHub repository. Do not mix them with published blueprint files.</li>
-              <li>Open <a className="guide-link" href={RESOURCE_MANAGER_STACKS_URL} target="_blank" rel="noreferrer">Resource Manager → Stacks ↗</a> and select <strong>Create stack</strong>. Use a pinned <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator release ↗</a> as the stack code, then set its working directory to <code>rms-facade</code>.</li>
-              <li>In the stack variables, set <Setting name="configuration_source" value="ocibucket" />. Then enter the bucket name in <Setting name="oci_configuration_bucket" /> and the current phase's file list in <Setting name="oci_configuration_objects" />. You can instead use an approved private GitHub source.</li>
+              <li>Open <a className="guide-link" href={DEPLOY_TO_OCI_URL} target="_blank" rel="noreferrer">Deploy to OCI ↗</a> for a prefilled <strong>Create Stack</strong> wizard using the Landing Zone Orchestrator and private Object Storage configuration source. Select <code>rms-facade</code> as the working directory.</li>
+              <li>In the stack variables, confirm <Setting name="configuration_source" value="ocibucket" />. Then enter the bucket name in <Setting name="oci_configuration_bucket" /> and the current phase's file list in <Setting name="oci_configuration_objects" />. You can instead use an approved private GitHub source.</li>
               <li>Select <strong>Create</strong> without running an apply. From the stack details page, select <strong>Plan</strong>, review the changes and policy impact, then select <strong>Apply</strong>. Wait for a successful apply before starting phase 2.</li>
             </ol>
           </div>
@@ -316,11 +291,11 @@ export default function ReviewStep({ designName }: { designName: string }) {
               <div>
                 <div style={local.phaseChangeTitle}>Important — update the configuration before phase 2</div>
                 <div>
-                  Files ending in <code>_pre</code> are only for phase 1. In phase 2, replace every pre file with its final file. Supplying both variants can create duplicate configuration families.
+                  Security and observability files ending in <code>_pre</code> are only for phase 1. In phase 2, replace them with their final files and retain the network file. Supplying both control variants can create duplicate configuration families.
                 </div>
               </div>
             </div>
-            <RouteCompletionGuide hubKind={model.network.hubKind} />
+            <HubDeploymentGuide hubKind={model.network.hubKind} />
             {remainingStages.map((deployment) => (
               <div key={deployment.title} style={local.deployCard}>
                 <div style={local.deployTitle}>{deployment.title}</div>

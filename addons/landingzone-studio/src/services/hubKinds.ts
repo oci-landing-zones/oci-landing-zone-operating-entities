@@ -53,7 +53,7 @@ export const HUB_KINDS: HubKindDef[] = [
   {
     id: 'hub_c',
     label: 'Hub C',
-    description: 'Third-party firewalls sit behind trust and untrust Network Load Balancers. After the first deployment phase, provide the private IP identifiers needed to complete routing.',
+    description: 'Third-party firewalls sit behind trust and untrust Network Load Balancers. Routing uses generated resource keys; prepare the external firewall backends before sending traffic.',
     implemented: true,
     defaultVcnCidr: '10.0.0.0/21',
     defaultSubnets: [

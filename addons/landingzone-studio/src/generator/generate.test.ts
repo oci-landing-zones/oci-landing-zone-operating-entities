@@ -94,19 +94,17 @@ describe('generator (go-jsonnet wasm)', () => {
   it('reproduces upstream\'s checked-in hub_a blueprints byte-for-byte', async () => {
     const files = await generateFromUpstreamDefaults('hub_a');
     expect(JSON.parse(files['network.json'])).toEqual(fixture('oneoe_network_hub_a.json'));
-    expect(JSON.parse(files['network_pre.json'])).toEqual(fixture('oneoe_network_hub_a_pre.json'));
   }, 60_000);
 
   it('emits the full artifact set for a default wizard model', async () => {
     const out = await generateOutputs(emptyLzModel());
-    expect(out.primary).toEqual(['network_pre.json', 'network.json']);
-    // Hub A stages its rollout, so both network files exist; the rest ride along.
+    expect(out.primary).toEqual(['network.json']);
     expect(out.secondary).toContain('iam.json');
     expect(out.secondary).toContain('governance.json');
     expect(out.secondary).toContain('security_cis2.json');
     expect(out.secondary).toContain('observability_cis2.json');
     expect(out.secondary).not.toContain('network.json');
-    expect(Object.keys(out.files).length).toBe(8);
+    expect(Object.keys(out.files).length).toBe(7);
     expect(out.config).toContain("kind: 'hub_a'");
 
     const net = JSON.parse(out.files['network.json']).network_configuration;
@@ -155,19 +153,7 @@ describe('generator (go-jsonnet wasm)', () => {
 
     expect(out.config).toContain(`kind: '${hubKind}'`);
     expect(out.files['network.json']).toBeDefined();
-    expect(out.files['network_pre.json']).toBeDefined();
     expectHubGeneratorContract(out.files, hubKind);
-  }, 60_000);
-
-  it('keeps Hub B pre-network DRG routes separate from final firewall routes', async () => {
-    const base = emptyLzModel();
-    const out = await generateOutputs({
-      ...base,
-      network: { ...base.network, hubKind: 'hub_b', ...hubKindDefaults('hub_b') },
-    });
-    expect(out.files['network_pre.json']).toContain('Route to the 0.0.0.0/0 through DRG');
-    expect(out.files['network.json']).toContain('OCI NFW PRIVATE IP OCID');
-    expect(out.files['network.json']).toContain('Route to Public LB through the OCI Network Firewall');
   }, 60_000);
 
   it('includes Hub C external-firewall backend placeholders in the complete output set', async () => {
@@ -176,7 +162,6 @@ describe('generator (go-jsonnet wasm)', () => {
       ...base,
       network: { ...base.network, hubKind: 'hub_c', ...hubKindDefaults('hub_c') },
     });
-    expect(out.files['network_pre.json']).toBeDefined();
     expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN TRUST SUBNET');
     expect(out.files['network_backends.json']).toContain('NETWORK FIREWALL-1 PRIVATE IP OCID IN UNTRUST SUBNET');
   }, 60_000);
@@ -221,7 +206,7 @@ describe('generator (go-jsonnet wasm)', () => {
     const out = await generateOutputs(model);
 
     expect(out.files['ocvs.json']).toBeDefined();
-    expect(out.files['network_pre.json']).toContain('PROVISIONING');
+    expect(out.files['network.json']).toContain('PROVISIONING');
     expect(out.config).toContain("type: 'ocvs'");
   }, 60_000);
 
@@ -237,7 +222,7 @@ describe('generator (go-jsonnet wasm)', () => {
     };
     const out = await generateOutputs(model);
     expect(out.files['ocvs.json']).toContain('CMP-LZ-SHARED-OCV-KEY');
-    expect(out.files['network_pre.json']).toContain('SN-FRA-LZ-SHARED-PLATFORM-OCV-PROVISIONING-KEY');
+    expect(out.files['network.json']).toContain('SN-FRA-LZ-SHARED-PLATFORM-OCV-PROVISIONING-KEY');
   }, 60_000);
 
   it('generates a Custom network-only platform without an unsupported extension', async () => {

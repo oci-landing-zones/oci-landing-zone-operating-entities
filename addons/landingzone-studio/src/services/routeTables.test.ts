@@ -100,7 +100,7 @@ describe('buildRouteTables', () => {
     expect(t.find((r) => r.id === 'rt-drg-spokes')!.rules).toContainEqual(expect.objectContaining({ destination: '10.0.128.0/21', flowTarget: 'attach-cmp-env-1' }));
   });
 
-  it('models Hub B final routes through its one OCI Network Firewall', () => {
+  it('models Hub B routes through its one OCI Network Firewall', () => {
     const base = emptyLzModel();
     const model = { ...base, network: { ...base.network, hubKind: 'hub_b' as const, ...hubKindDefaults('hub_b') } };
     const t = buildRouteTables(model);
@@ -108,7 +108,6 @@ describe('buildRouteTables', () => {
       expect.objectContaining({ destination: '0.0.0.0/0', nextHopKind: 'natgw' }),
       expect.objectContaining({ destination: '10.0.64.0/21', nextHopKind: 'drg' }),
     ]));
-    expect(t.find((r) => r.id === 'rt-hub-ingress')).toMatchObject({ note: expect.stringMatching(/Final routing phase/) });
     expect(t.find((r) => r.id === 'rt-hub-lb')!.rules[1]).toMatchObject({ destination: '10.0.64.0/21', nextHopKind: 'firewall', flowTarget: '10.0.1.10' });
     expect(t.find((r) => r.id === 'rt-hub-natgw')!.rules).toHaveLength(3);
   });
@@ -120,7 +119,6 @@ describe('buildRouteTables', () => {
     expect(t.find((r) => r.id === 'rt-hub-igw')!.rules[0]).toMatchObject({ nextHopKind: 'nlb', flowTarget: 'hub-vcn-sn-0' });
     expect(t.find((r) => r.id === 'rt-hub-ingress')!.rules[0]).toMatchObject({ nextHopKind: 'nlb', flowTarget: 'hub-vcn-sn-1' });
     expect(t.find((r) => r.id === 'rt-hub-trust')!.rules).toContainEqual(expect.objectContaining({ destination: '10.0.64.0/21', nextHopKind: 'drg' }));
-    expect(t.find((r) => r.id === 'rt-hub-lb')).toMatchObject({ note: expect.stringMatching(/network_backends\.json/) });
   });
 
   it('adds the generator-owned OCVS provisioning route table and service gateway', () => {
