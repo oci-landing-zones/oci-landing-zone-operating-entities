@@ -6,10 +6,10 @@ repository's root license.
 
 | Component | Version | License |
 | --- | --- | --- |
-| Go runtime and `wasm_exec.js` | 1.25.4 | BSD 3-Clause |
+| Go runtime and `wasm_exec.js` | 1.26.x | BSD 3-Clause |
 | github.com/google/go-jsonnet | 0.22.0 | Apache License 2.0 |
-| golang.org/x/crypto | 0.45.0 | BSD 3-Clause |
-| golang.org/x/sys | 0.38.0 | BSD 3-Clause |
+| golang.org/x/crypto | 0.57.0 | BSD 3-Clause |
+| golang.org/x/sys | 0.48.0 | BSD 3-Clause |
 | sigs.k8s.io/yaml, including goyaml.v2 | 1.4.0 | MIT, BSD, and Apache License 2.0 |
 
 Complete license text is distributed in this directory's `licenses/` folder.

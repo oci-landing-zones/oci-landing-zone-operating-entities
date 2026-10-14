@@ -25,6 +25,12 @@ local desc = import '../../descriptions.libsonnet';
 
   global_infra_group:: desc.group.product_global(self.product, 'infrastructure administration'),
 
+  environment_db_group(scope)::
+    desc.group.platform(scope.scope_long_title, self.product, 'database administration'),
+
+  environment_infra_group(scope)::
+    desc.group.platform(scope.scope_long_title, self.product, 'infrastructure administration'),
+
   project_group(scope, project_name)::
     desc.group.product_project(scope.scope_long_title, project_name, self.product, 'database administration'),
 
@@ -47,6 +53,27 @@ local desc = import '../../descriptions.libsonnet';
       'grp-lz-global-exacc-infra-admin and grp-lz-global-exacc-db-admin',
       'shared %s administration service access' % self.product,
       'the tenancy and Landing Zone'
+    ),
+
+  environment_infra_policy(scope)::
+    desc.policy.grants(
+      'grp-lz-%s-exacc-infra-admin' % std.asciiLower(scope.scope_name),
+      '%s infrastructure administration access' % self.product,
+      'the %s environment %s platform scope' % [scope.scope_long_title, self.product]
+    ),
+
+  environment_db_policy(scope)::
+    desc.policy.grants(
+      'grp-lz-%s-exacc-db-admin' % std.asciiLower(scope.scope_name),
+      '%s database administration access' % self.product,
+      'the %s environment %s platform scope' % [scope.scope_long_title, self.product]
+    ),
+
+  environment_generic_policy(scope)::
+    desc.policy.grants(
+      'the %s environment %s administration groups' % [scope.scope_long_title, self.product],
+      'shared administration service access',
+      'the %s environment' % scope.scope_long_title
     ),
 
   project_policy(scope, project_name)::

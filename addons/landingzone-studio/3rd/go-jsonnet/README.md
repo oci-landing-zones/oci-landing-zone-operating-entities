@@ -24,7 +24,7 @@ The importer regression and full-generator parity coverage live in
 
 | Component | Version |
 | --- | --- |
-| Go toolchain | Go 1.25 or newer |
+| Go toolchain | Go 1.26 or newer |
 | go-jsonnet | `v0.22.0` |
 | Binaryen `wasm-opt` | `131.0.0` |
 

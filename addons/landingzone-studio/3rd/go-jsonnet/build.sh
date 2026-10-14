@@ -12,8 +12,8 @@ mkdir -p "$GOMODCACHE"
 
 go_version="$(go env GOVERSION)"
 if [[ ! "$go_version" =~ ^go([0-9]+)\.([0-9]+)(\.[0-9]+)?$ ]] \
-  || (( BASH_REMATCH[1] < 1 || (BASH_REMATCH[1] == 1 && BASH_REMATCH[2] < 25) )); then
-  echo "go-jsonnet WASM requires Go 1.25 or newer; got $go_version" >&2
+  || (( BASH_REMATCH[1] < 1 || (BASH_REMATCH[1] == 1 && BASH_REMATCH[2] < 26) )); then
+  echo "go-jsonnet WASM requires Go 1.26 or newer; got $go_version" >&2
   exit 1
 fi
 
