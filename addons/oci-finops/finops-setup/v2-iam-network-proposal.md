@@ -12,7 +12,7 @@ Baseline: Operating Entities commit `c1e74ba`, the existing FinOps addon, and th
 | `grp-lz-finops-db-admins` | `pcy-lz-finops-db-admins` | Administer Autonomous Database, including lifecycle, backup, and private-endpoint operations. |
 | `grp-lz-finops-oac-admins` | `pcy-lz-finops-oac-admins` | Administer OAC instances and their private access channel; administer the OAC application through a separate application-role assignment. |
 
-FinOps admins have Bastion management permission in `cmp-finops`. All three groups can use existing Bastions and manage sessions in both `cmp-finops` and `cmp-lz-network`. Networking and shared Bastion administration stay with LZ administrators. Bastion creation/deletion also require network permissions, so those operations remain with LZ administrators.
+FinOps admins have Bastion management permission in `cmp-finops`. All three groups can use Bastions and manage restricted sessions only in `cmp-finops`; these policies grant no Bastion access in `cmp-lz-network`. Networking stays with LZ administrators. Bastion creation/deletion also require network permissions, so those operations remain with LZ administrators under the current network boundary.
 
 Use the existing One-OE identity domain, **`id_lz_common`**, and the target compartment **`cmp-landingzone:cmp-lz-platform:cmp-finops`**. Adapt these names to an existing deployment. Policy attachment can remain at tenancy root, consistent with the current runtime; each statement below explicitly limits its resource scope. Root attachment does not make a compartment-scoped statement tenancy-wide.
 
@@ -55,13 +55,11 @@ Map OAC administrators to **BI Service Administrator** inside OAC. This role als
 
 ### Common Bastion statements
 
-DB and OAC administrators use the following session block. For FinOps admins, replace only the first two statements with `manage bastion-family` in `cmp-finops`. Retain session-only access in shared networking for all three groups. Supporting VCN/subnet reads target shared networking; service VNIC reads target `cmp-finops`. The JSON uses `read virtual-network-family` in the network compartment to include the corresponding reads.
+DB and OAC administrators use the following session block. For FinOps admins, replace `use bastion` with `manage bastion` in the first statement; retain the separate restricted session statement. Supporting VCN/subnet reads target shared networking; service VNIC reads target `cmp-finops`. The JSON uses `read virtual-network-family` in the network compartment to include the corresponding reads.
 
 ```text
 Allow group 'id_lz_common'/'<GROUP>' to use bastion in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
-Allow group 'id_lz_common'/'<GROUP>' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
-Allow group 'id_lz_common'/'<GROUP>' to use bastion in compartment cmp-landingzone:cmp-lz-network
-Allow group 'id_lz_common'/'<GROUP>' to manage bastion-session in compartment cmp-landingzone:cmp-lz-network
+Allow group 'id_lz_common'/'<GROUP>' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops where ALL {target.bastion-session.type = 'port_forwarding', target.bastion-session.ip in ['10.0.24.0/26']}
 Allow group 'id_lz_common'/'<GROUP>' to read instances in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
 Allow group 'id_lz_common'/'<GROUP>' to read vcns in compartment cmp-landingzone:cmp-lz-network
 Allow group 'id_lz_common'/'<GROUP>' to read subnets in compartment cmp-landingzone:cmp-lz-network
@@ -69,7 +67,9 @@ Allow group 'id_lz_common'/'<GROUP>' to read vnic-attachments in compartment cmp
 Allow group 'id_lz_common'/'<GROUP>' to read vnics in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
 ```
 
-The supporting reads follow Oracle's `CreateSession` permission table. Use TCP port forwarding for ADB. Add `read instance-agent-plugins` only for Managed SSH to a Compute host. Session management is compartment-wide, not restricted to sessions created by the same user. Bastion allowlists, session expiry, and target NSGs provide additional controls. [Oracle: Bastion IAM](https://docs.oracle.com/en-us/iaas/Content/Bastion/Reference/bastionpolicyreference.htm).
+The supporting reads follow Oracle's `CreateSession` permission table. Session access covers qualifying sessions in `cmp-finops`, not only sessions created by the same user. The condition restricts the session type and destination IP range; it does not constrain Bastion creation to a VCN OCID. Update the range when adapting the FinOps VCN. Do not add unconditional session or `manage bastion-family` grants that bypass this condition. Review inherited policies and other group memberships as well. Oracle documents these conditions in its [Bastion session restriction example](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengsettingupbastion.htm).
+
+The Bastion belongs to `cmp-finops` and targets the FinOps VCN's infra subnet in `cmp-lz-network`. A Bastion is associated with one VCN; the subnet's compartment does not determine the Bastion's compartment. [Oracle: creating a Bastion](https://docs.oracle.com/en-us/iaas/Content/Bastion/Tasks/create-bastion.htm). Client allowlists, session expiry, and target NSGs provide additional controls. Managed SSH would require a reviewed change to the session restriction and the additional instance-agent-plugin read permission. [Oracle: Bastion IAM](https://docs.oracle.com/en-us/iaas/Content/Bastion/Reference/bastionpolicyreference.htm).
 
 ## 2. Developer access and service principals
 
@@ -88,9 +88,9 @@ Keep the business tags in `tgns-finops` separate from the One-OE `tagns-lz-role`
 
 ## 3. Agreed compartment boundary
 
-The **VCN, subnets, and both endpoint NSGs are in `cmp-lz-network`**. ADB, OAC, and Database Tools resources are in `cmp-finops`. Bastions can be consumed from either compartment. DB/OAC administrators use the shared networking through the dependencies below. This follows the existing addon's cross-compartment policy pattern while separating service responsibilities.
+The **VCN, subnets, and both endpoint NSGs are in `cmp-lz-network`**. ADB, OAC, Database Tools, and Bastion resources are in `cmp-finops`. These policies grant no access to Bastions in the network compartment. DB/OAC administrators use the shared networking through the dependencies below. This follows the existing addon's cross-compartment policy pattern while separating service responsibilities.
 
-FinOps admins receive read-only network access. They cannot change the shared VCNs, subnets, routing, security lists, DHCP options, NSGs, VNICs, or private IPs through these policies. LZ administrators own those resources. Oracle documents extra network permissions for Bastion creation/deletion; those dependencies are intentionally excluded, so `manage bastion-family` alone must not be presented as sufficient for those operations.
+FinOps admins receive read-only network access. They cannot change the shared VCNs, subnets, routing, security lists, DHCP options, NSGs, VNICs, or private IPs through these policies. LZ administrators own those resources. Oracle documents extra network permissions for Bastion creation/deletion; those dependencies are intentionally excluded, so `manage bastion` alone must not be presented as sufficient for those operations. Moving Bastion ownership to `cmp-finops` does not remove its shared-subnet dependencies. FinOps self-service Bastion creation/deletion remains unavailable under these grants; LZ administrators perform those operations.
 
 The DBA and OAC endpoint dependencies below remain service-specific. In particular, DBA private-IP/VNIC grants are compartment-wide and are not automatically isolated to FinOps endpoints. If that delegation is unsuitable in the target shared network compartment, LZ administrators must own the endpoint network operations or the resources must be isolated before deployment.
 

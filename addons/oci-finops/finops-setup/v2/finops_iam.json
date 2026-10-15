@@ -53,9 +53,8 @@
                     "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read analytics-instances in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read analytics-instance-work-requests in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read database-tools-family in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to manage bastion-family in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to use bastion in compartment cmp-landingzone:cmp-lz-network",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-network"
+                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to manage bastion in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
+                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops where ALL {target.bastion-session.type = 'port_forwarding', target.bastion-session.ip in ['10.0.24.0/26']}"
                 ]
             },
 
@@ -71,7 +70,7 @@
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to read vnics in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to inspect work-requests in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to use bastion in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
+                    "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops where ALL {target.bastion-session.type = 'port_forwarding', target.bastion-session.ip in ['10.0.24.0/26']}",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to manage autonomous-database-family in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to read database-tools-family in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to use database-tools-connections in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
@@ -80,9 +79,7 @@
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to use subnets in compartment cmp-landingzone:cmp-lz-network",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to use network-security-groups in compartment cmp-landingzone:cmp-lz-network",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to manage private-ips in compartment cmp-landingzone:cmp-lz-network",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to manage vnics in compartment cmp-landingzone:cmp-lz-network",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to use bastion in compartment cmp-landingzone:cmp-lz-network",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-network"
+                    "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to manage vnics in compartment cmp-landingzone:cmp-lz-network"
                 ]
             },
 
@@ -98,16 +95,14 @@
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to read vnics in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to inspect work-requests in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to use bastion in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
+                    "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops where ALL {target.bastion-session.type = 'port_forwarding', target.bastion-session.ip in ['10.0.24.0/26']}",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to manage analytics-instances in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to read analytics-instance-work-requests in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to manage vnics in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to use private-ips in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to use vcns in compartment cmp-landingzone:cmp-lz-network",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to use subnets in compartment cmp-landingzone:cmp-lz-network",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to use network-security-groups in compartment cmp-landingzone:cmp-lz-network",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to use bastion in compartment cmp-landingzone:cmp-lz-network",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-network"
+                    "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to use network-security-groups in compartment cmp-landingzone:cmp-lz-network"
                 ]
             }
         }

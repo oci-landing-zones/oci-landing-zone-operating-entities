@@ -39,9 +39,8 @@ class FinOpsIamBoundaries(unittest.TestCase):
     def test_operator_writes_are_limited_to_bastion_and_reporting(self):
         # A new use/manage grant must not silently authorize networking changes.
         allowed = {
-            ("manage", "bastion-family", FINOPS),
-            ("use", "bastion", NETWORK),
-            ("manage", "bastion-session", NETWORK),
+            ("manage", "bastion", FINOPS),
+            ("manage", "bastion-session", FINOPS),
             ("use", "database-tools-connections", FINOPS),
         }
         for grant in self.grants:
@@ -51,15 +50,36 @@ class FinOpsIamBoundaries(unittest.TestCase):
                     if grant["resource"] == "database-tools-connections":
                         self.assertRegex(grant["condition"] or "", r"^target\.resource\.id = '[^']+'$")
 
-    def test_shared_bastions_have_session_access_without_administration(self):
+    def test_bastion_permissions_stay_in_finops(self):
+        for grant in self.grants:
+            if grant["resource"].startswith("bastion"):
+                with self.subTest(grant=grant):
+                    self.assertEqual(grant["scope"], FINOPS)
+                    # The aggregate would bypass the separate session restriction.
+                    self.assertNotEqual(grant["resource"], "bastion-family")
+                    if grant["verb"] == "manage" and grant["resource"] == "bastion":
+                        self.assertEqual(grant["group"], "grp-lz-finops-admins")
+
+    def test_sessions_require_finops_destination_and_port_forwarding(self):
+        network = json.loads((CONFIG_DIR / "finops_network.json").read_text())
+        categories = network["network_configuration"]["network_configuration_categories"]
+        vcns = [vcn for category in categories.values() for vcn in category.get("vcns", {}).values()]
+        self.assertEqual(len(vcns), 1)
+        cidrs = ", ".join(f"'{cidr}'" for cidr in vcns[0]["cidr_blocks"])
+        expected = (
+            "ALL {target.bastion-session.type = 'port_forwarding', "
+            f"target.bastion-session.ip in [{cidrs}]" + "}"
+        )
         for group in GROUPS:
-            grants = [g for g in self.grants if g["group"] == group and g["scope"] == NETWORK]
+            grants = [g for g in self.grants if g["group"] == group and g["scope"] == FINOPS]
             with self.subTest(group=group):
                 capabilities = {(g["verb"], g["resource"]) for g in grants}
-                self.assertIn(("use", "bastion"), capabilities)
+                bastion_verb = "manage" if group == "grp-lz-finops-admins" else "use"
+                self.assertIn((bastion_verb, "bastion"), capabilities)
                 self.assertIn(("manage", "bastion-session"), capabilities)
-                self.assertNotIn(("manage", "bastion"), capabilities)
-                self.assertNotIn(("manage", "bastion-family"), capabilities)
+                for grant in grants:
+                    if grant["resource"] == "bastion-session" and grant["verb"] in {"use", "manage"}:
+                        self.assertEqual(grant["condition"], expected)
 
     def test_no_human_role_manages_shared_vcn_topology(self):
         infrastructure = {
