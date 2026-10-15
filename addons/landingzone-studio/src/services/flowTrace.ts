@@ -61,8 +61,52 @@ export interface FlowTrace {
   highlights: { tableId: string; rows: number[] }[];
 }
 
-/** Distinct per-flow colours, assigned in activation order. */
-export const FLOW_COLORS = ['#2196F3', '#FF9800', '#4CAF50', '#E91E63', '#9C27B0', '#00BCD4', '#8BC34A', '#FF5722'] as const;
+/**
+ * Per-flow colours, assigned in activation order and never cycled: blue, aqua,
+ * violet, magenta. The hues stay clear of the diagram's own red, amber and green,
+ * and the set was checked for colour-blind and normal-vision separation across
+ * every pair. Four is also the readable limit for paths on one diagram, so the
+ * picker caps active flows at this length.
+ */
+export const FLOW_COLORS = ['#2a78d6', '#1baf7a', '#4a3aa7', '#d03f86'] as const;
+
+/**
+ * "Show all flows" draws too many paths for one colour each, so colour encodes
+ * the traffic type instead — the same four validated hues.
+ */
+export const FLOW_KIND_COLORS: Record<FlowKind, string> = {
+  egress: '#2a78d6',
+  services: '#1baf7a',
+  'east-west': '#4a3aa7',
+  ingress: '#d03f86',
+};
+
+export const FLOW_KIND_LABELS: Record<FlowKind, string> = {
+  egress: 'Spoke → Internet',
+  ingress: 'Internet → Spoke',
+  'east-west': 'Spoke → spoke',
+  services: 'Spoke → OCI Services',
+};
+
+/**
+ * Every flow in the landing zone, traced from each environment's first endpoint:
+ * egress, ingress, east-west to every other environment, and OCI services.
+ */
+export function allFlowIds(model: LzModel): string[] {
+  const envs = model.environments.map((env) => ({
+    name: env.name.trim(),
+    role: env.network?.subnets?.[0]?.name.split('-').pop() ?? '',
+  })).filter((env) => env.name);
+  return envs.flatMap((env) => {
+    const pick = (id: string) => (env.role ? `${id}:${env.role}` : id);
+    return [
+      pick(`${env.name}:egress`),
+      pick(`${env.name}:ingress`),
+      ...envs.filter((other) => other.name !== env.name).map((other) => pick(`${env.name}>${other.name}:east-west`)),
+      pick(`${env.name}:services`),
+    ];
+  });
+}
 
 const fwIp = (cidr: string) => hostIpInSubnet(cidr, 10);
 const host32 = (cidr: string) => `${hostIpInSubnet(cidr, 10)}/32`;
@@ -180,6 +224,9 @@ function walk(
   let tableId = start.table;
   const dest = start.dest;
   let zone = start.zone;
+  // The DRG spoke table is shared by every spoke attachment, so its `attachTo`
+  // names only one of them. Remember the attachment the packet actually used.
+  let enteredVia: string | undefined;
 
   for (let guard = 0; guard < 16; guard++) {
     const table = topo.tableById.get(tableId);
@@ -188,7 +235,8 @@ function walk(
     if (!m) { acc.ok = false; return; }
     highlight(acc, tableId, m.i);
     const inspected = tableId === 'rt-hub-internal' || tableId === 'rt-hub-dmz' || tableId === 'rt-hub-fw';
-    const governingNode = guard === 0 && start.node ? start.node : table.attachTo;
+    const governingNode = guard === 0 && start.node ? start.node : enteredVia ?? table.attachTo;
+    enteredVia = undefined;
     acc.hops.push({
       seq: acc.hops.length + 1, node: governingNode, tableId, rowIndex: m.i, inspected,
       label: `${topo.human(governingNode)}: ${m.rule.destination} → ${m.rule.target}${inspected ? ' (inspect)' : ''}`,
@@ -200,6 +248,7 @@ function walk(
         const attach = zone === 'hub' ? 'attach-hub' : `attach-cmp-env-${zone}`;
         pushVisual(acc, attach);
         pushVisual(acc, 'drg');
+        enteredVia = attach;
         tableId = zone === 'hub' ? 'rt-drg-hub' : topo.envs[zone].drgTable;
         break;
       }
@@ -426,13 +475,19 @@ export function specFromId(model: LzModel, id: string, color: string): FlowSpec 
  * web/app/db/infra together — with sub-trace ids `<baseId>#<subnetIdx>` that all
  * share the base flow's colour. A distinct colour is assigned per base flow.
  */
-export function buildFlowTraces(model: LzModel, activeIds: string[]): FlowTrace[] {
+export function buildFlowTraces(model: LzModel, activeIds: string[], colorBy: 'flow' | 'kind' = 'flow'): FlowTrace[] {
   const out: FlowTrace[] = [];
   // `<env>:<kind>` = all endpoints; `<env>:<kind>:<role>` = a single endpoint.
   const allPicks = new Set(activeIds.filter((id) => id.split(':').length === 2));
-  activeIds.forEach((id, i) => {
-    const color = FLOW_COLORS[i % FLOW_COLORS.length];
+  // One colour per flow, shared by every endpoint picked for it.
+  const groups = [...new Set(activeIds.map((id) => id.split(':').slice(0, 2).join(':')))];
+  activeIds.forEach((id) => {
     const parts = id.split(':');
+    // Past the cap there is no distinguishable colour left; older saved selections are not drawn.
+    const color = colorBy === 'kind'
+      ? FLOW_KIND_COLORS[parts[1] as FlowKind]
+      : FLOW_COLORS[groups.indexOf(`${parts[0]}:${parts[1]}`)];
+    if (!color) return;
     const role = parts.length >= 3 ? parts[2] : undefined;
     // Skip a specific-endpoint pick that's already covered by its all-endpoints pick.
     if (role && allPicks.has(`${parts[0]}:${parts[1]}`)) return;

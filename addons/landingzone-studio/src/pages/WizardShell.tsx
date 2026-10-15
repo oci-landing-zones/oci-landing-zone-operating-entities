@@ -19,17 +19,21 @@ import EnvNetworkStep from '../wizard/steps/EnvNetworkStep';
 import PlatformTemplatesStep from '../wizard/steps/PlatformTemplatesStep';
 import ReviewStep from '../wizard/steps/ReviewStep';
 import { buildGraph } from '../diagram/buildGraph';
-import { buildFlowTraces } from '../services/flowTrace';
+import { allFlowIds, buildFlowTraces } from '../services/flowTrace';
+import { flowGroup } from '../diagram/flowOverlayGeometry';
 import LzDiagram from '../diagram/LzDiagram';
 import { serializeConfig } from '../services/lzConfig';
 import JsonViewer from '../components/JsonViewer';
 import ViewModeToggle, { type ViewMode } from '../components/ViewModeToggle';
 import FlowSidebar from '../components/FlowSidebar';
+import type { FlowFocus } from '../diagram/FlowOverlay';
 import TopBar from '../components/TopBar';
 import { oracle } from '../theme';
 import { EMPTY_DEBUG_SEQUENCE, registerDebugClick } from '../services/debugMode';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
+/** First step with spoke subnets — and therefore endpoints and traceable flows. */
+const FLOW_STEP = 3;
 
 const STEP_PROGRESS_LABELS: Record<number, string> = {
   1: 'Name your landing zone and select its region',
@@ -70,6 +74,7 @@ const layout = {
   stepPosition: { color: oracle.textMuted, fontSize: 12.5, fontWeight: 700, textAlign: 'center' } as React.CSSProperties,
   primary: { padding: '9px 16px', fontSize: 13, border: `1px solid ${oracle.redDark}`, borderRadius: 4, background: oracle.red, color: '#fff', cursor: 'pointer', fontWeight: 700 } as React.CSSProperties,
   secondary: { padding: '9px 14px', fontSize: 13, border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, background: oracle.surface, color: oracle.text, cursor: 'pointer', fontWeight: 600 } as React.CSSProperties,
+  flowBtn: { padding: '9px 14px', fontSize: 13, border: `1px solid ${oracle.red}`, borderRadius: 4, background: oracle.redTint, color: oracle.redDark, cursor: 'pointer', fontWeight: 700 } as React.CSSProperties,
 };
 
 function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
@@ -84,6 +89,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
   const [diagramCollapsed, setDiagramCollapsed] = React.useState(false);
   const [flowsCollapsed, setFlowsCollapsed] = React.useState(false);
   const [flowSteps, setFlowSteps] = React.useState<Record<string, number | null>>({});
+  const [flowFocus, setFlowFocus] = React.useState<FlowFocus | null>(null);
   const [viewMode, setViewMode] = React.useState<ViewMode>('split');
   const [debugMode, setDebugMode] = React.useState(false);
   const debugClicks = React.useRef(EMPTY_DEBUG_SEQUENCE);
@@ -117,22 +123,43 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
   const supportsFlowTracing = model.network.hubKind === 'hub_a' || model.network.hubKind === 'hub_b' || model.network.hubKind === 'hub_c' || model.network.hubKind === 'hub_e';
   const railActive = viewMode === 'split' && diagramCollapsed;
 
-  // The endpoints / route-table dots (and, later, flows) are a diagram-only-mode
-  // layer — in split and form modes the diagram stays a clean overview. The
-  // Review builds a separate step-5 structural graph for Draw.io export.
+  // The endpoints / route-table dots and flows are a diagram-only-mode layer — in
+  // split and form modes the diagram stays a clean overview. Endpoints live in the
+  // spoke subnets, so the layer starts at step 3 (Projects); earlier steps only
+  // point there. The Review builds a separate step-5 structural graph for Draw.io export.
   const diagramOnly = viewMode === 'diagram';
+  const flowStepReached = activeStep >= FLOW_STEP;
+  const flowLayer = diagramOnly && flowStepReached;
   const effectiveOpts = useMemo<DiagramOptions>(
     () => {
-      if (!diagramOnly) return { ...diagramOpts, showDots: false, showEndpoints: false, showFlows: false, activeFlows: [] };
-      const base = supportsFlowTracing ? diagramOpts : { ...diagramOpts, showFlows: false, activeFlows: [] };
-      return base;
+      if (!flowLayer) return { ...diagramOpts, showDots: false, showEndpoints: false, showFlows: false, activeFlows: [], allFlows: false, focusFlow: undefined };
+      if (!supportsFlowTracing) return { ...diagramOpts, showFlows: false, activeFlows: [], allFlows: false, focusFlow: undefined };
+      // A clicked flow only stays selected while it is still being traced.
+      const traced = diagramOpts.allFlows ? allFlowIds(model) : diagramOpts.activeFlows ?? [];
+      const focusFlow = traced.some((id) => flowGroup(id) === diagramOpts.focusFlow) ? diagramOpts.focusFlow : undefined;
+      return { ...diagramOpts, focusFlow };
     },
-    [diagramOnly, diagramOpts, supportsFlowTracing],
+    [flowLayer, diagramOpts, supportsFlowTracing, model],
   );
+  // Clicking a flow path (or its sidebar row in all-flows mode) selects it; clicking it again clears.
+  function selectFlow(group: string | null) {
+    setDiagramOpts((o) => ({ ...o, focusFlow: group && o.focusFlow !== group ? group : undefined }));
+    if (group) setFlowsCollapsed(false);
+  }
   // The docked flow picker rides alongside the diagram in diagram-only mode from
-  // Hub Network onward (same gate as the Show-flows button). `gridCols` widens the diagram
+  // Projects onward (same gate as the Show-flows button). `gridCols` widens the diagram
   // area into two columns to seat it (a thin rail when collapsed).
-  const flowsOpen = supportsFlowTracing && diagramOnly && activeStep >= 2 && !!effectiveOpts.showFlows;
+  const flowsOpen = supportsFlowTracing && flowLayer && !!effectiveOpts.showFlows;
+  // Split view has no room for the picker: one click switches to diagram-only
+  // with the picker open. Before step 3 the diagram points at step 3 instead.
+  function openFlows() {
+    setDiagramOpts((o) => ({ ...o, showFlows: true }));
+    setFlowsCollapsed(false);
+    setViewMode('diagram');
+  }
+  const flowHint = supportsFlowTracing && activeStep === 2
+    ? { label: 'Endpoints and traffic flows appear in step 3', action: 'Go to step 3 →', onClick: () => setActiveStep(FLOW_STEP) }
+    : undefined;
   const gridCols = viewMode === 'split'
     ? (diagramCollapsed ? '1fr 48px' : '1fr 1fr')
     : flowsOpen
@@ -142,16 +169,22 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
   // Flow traces drive the step-by-step hop list in the sidebar (the diagram reads
   // the same traces via buildGraph). Only meaningful in diagram-only mode.
   const flowTraces = useMemo(
-    () => (diagramOnly ? buildFlowTraces(model, effectiveOpts.activeFlows ?? []) : []),
-    [diagramOnly, model, effectiveOpts.activeFlows],
+    () => {
+      if (!diagramOnly) return [];
+      return effectiveOpts.allFlows
+        ? buildFlowTraces(model, allFlowIds(model), 'kind')
+        : buildFlowTraces(model, effectiveOpts.activeFlows ?? []);
+    },
+    [diagramOnly, model, effectiveOpts.activeFlows, effectiveOpts.allFlows],
   );
   // Manual packet stepping: null = auto-play, a number = that 0-based hop.
-  function onFlowStep(id: string, action: 'prev' | 'next' | 'play') {
+  function onFlowStep(id: string, action: 'prev' | 'next' | 'play' | 'goto', hop?: number) {
     const grp = (tid: string) => { const np = tid.split('#')[0].split(':'); return `${np[0]}:${np[1]}`; };
     const n = flowTraces.find((t) => grp(t.id) === id)?.hops.length ?? 0;
     setFlowSteps((prev) => {
       const cur = prev[id];
       const next = action === 'play' ? null
+        : action === 'goto' ? Math.max(0, Math.min(hop ?? 0, n - 1))
         : action === 'next' ? (cur == null ? 0 : Math.min(cur + 1, n - 1))
         : (cur == null ? 0 : Math.max(cur - 1, 0));
       return { ...prev, [id]: next };
@@ -273,14 +306,22 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
                 <div style={layout.diagramHeader}>
                   <div style={layout.diagramTitle}>Network Diagram</div>
                   {viewMode === 'split' && (
-                    <button type="button" style={layout.secondary} onClick={() => setDiagramCollapsed(true)} title="Collapse to the side">
-                      Collapse ›
-                    </button>
+                    <div style={layout.headerActions}>
+                      {supportsFlowTracing && flowStepReached && (
+                        <button type="button" style={layout.flowBtn} onClick={openFlows} title="Open the diagram full width with the flow picker">
+                          Trace traffic flows ⤢
+                        </button>
+                      )}
+                      <button type="button" style={layout.secondary} onClick={() => setDiagramCollapsed(true)} title="Collapse to the side">
+                        Collapse ›
+                      </button>
+                    </div>
                   )}
                 </div>
                 <div className="studio-diagram-canvas" style={diagramOnly ? { ...layout.diagramCanvas, height: 'calc(100vh - 185px)' } : layout.diagramCanvas}>
                   <ReactFlowProvider>
-                    <LzDiagram diagram={diagram} options={effectiveOpts} onOptionsChange={diagramOnly && activeStep >= 2 ? setDiagramOpts : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} />
+                    <LzDiagram diagram={diagram} options={effectiveOpts} onOptionsChange={flowLayer ? setDiagramOpts : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} flowHint={flowHint} flowFocus={flowsOpen ? flowFocus : null}
+                      onFlowSelect={flowsOpen ? selectFlow : undefined} onFlowHover={(group) => setFlowFocus(group ? { group } : null)} />
                   </ReactFlowProvider>
                 </div>
               </section>
@@ -300,6 +341,11 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
                   onChange={(next) => setDiagramOpts((o) => ({ ...o, activeFlows: next }))}
                   collapsed={flowsCollapsed}
                   onToggleCollapse={() => setFlowsCollapsed((c) => !c)}
+                  onFocusChange={setFlowFocus}
+                  allFlows={!!effectiveOpts.allFlows}
+                  onAllFlowsChange={(allFlows) => setDiagramOpts((o) => ({ ...o, allFlows, focusFlow: undefined }))}
+                  selected={effectiveOpts.focusFlow ?? null}
+                  onSelect={selectFlow}
                 />
               </div>
             )}

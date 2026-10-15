@@ -7,7 +7,7 @@
  * in here as the wizard grows.
  */
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import {
   ReactFlow,
   Background,
@@ -32,6 +32,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { SHIELD_SVG } from './shieldSvg';
+import FlowOverlay, { type FlowFocus } from './FlowOverlay';
 import { ROUTE_TABLE_SVG } from './routeTableSvg';
 import { IGW_SVG, NATGW_SVG, SGW_SVG, FIREWALL_SVG, LB_SVG, OSN_SVG, DRG_SVG, VM_SVG } from './icons';
 
@@ -43,7 +44,7 @@ const hiddenHandle: React.CSSProperties = { opacity: 0, width: 1, height: 1, min
 /** Lets nested node components open/close route tables without prop-drilling. */
 const RtContext = createContext<(ids: string[]) => void>(() => {});
 const CAPTION_COLORS = { green: '#1E7B2F', orange: '#C25425' } as const;
-import type { DiagramEdge, DiagramModel, DiagramNode, DiagramOptions } from '../model/types';
+import type { DiagramModel, DiagramNode, DiagramOptions } from '../model/types';
 import { oracle } from '../theme';
 
 function nodeStyle(node: DiagramNode): React.CSSProperties {
@@ -344,158 +345,6 @@ function FloatingEdge({ id, source, target, markerEnd, style, data }: EdgeProps)
 
 const edgeTypes: EdgeTypes = { floating: FloatingEdge };
 
-/** Rounded orthogonal polyline through precomputed (already right-angled) vertices.
- * buildGraph routes the flow through clean channels; here we just draw it with
- * softened corners so the packet animates smoothly along one continuous path. */
-function roundedPolyline(pts: { x: number; y: number }[], r = 7): string {
-  if (pts.length < 2) return '';
-  let d = `M${pts[0].x},${pts[0].y}`;
-  for (let i = 1; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1], p1 = pts[i], p2 = pts[i + 1];
-    const l1 = Math.hypot(p1.x - p0.x, p1.y - p0.y) || 1;
-    const l2 = Math.hypot(p2.x - p1.x, p2.y - p1.y) || 1;
-    const rr = Math.min(r, l1 / 2, l2 / 2);
-    const a = { x: p1.x - ((p1.x - p0.x) / l1) * rr, y: p1.y - ((p1.y - p0.y) / l1) * rr };
-    const b = { x: p1.x + ((p2.x - p1.x) / l2) * rr, y: p1.y + ((p2.y - p1.y) / l2) * rr };
-    d += ` L${a.x},${a.y} Q${p1.x},${p1.y} ${b.x},${b.y}`;
-  }
-  const last = pts[pts.length - 1];
-  d += ` L${last.x},${last.y}`;
-  return d;
-}
-
-/**
- * Moving packet for one flow path: a labelled source→dest pill. In auto mode it
- * loops along the path (SMIL animateMotion). In step mode it glides ALONG the
- * path between hops (getPointAtLength on a hidden path ref) — so it follows the
- * route instead of teleporting straight between nodes.
- */
-function FlowPacket({ path, color, label, step, frac, dur }: {
-  path: string;
-  color: string;
-  label: string;
-  step: number | null | undefined;
-  frac: number;
-  dur: string;
-}) {
-  const ref = useRef<SVGPathElement>(null);
-  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
-  const from = useRef(0);
-  const raf = useRef(0);
-  useEffect(() => {
-    if (step == null) { setPos(null); return; }
-    const el = ref.current;
-    if (!el) return;
-    const total = el.getTotalLength() || 1;
-    const target = Math.max(0, Math.min(1, frac)) * total;
-    const start = from.current;
-    let t0 = 0;
-    cancelAnimationFrame(raf.current);
-    const tick = (t: number) => {
-      if (!t0) t0 = t;
-      const k = Math.min(1, (t - t0) / 500);
-      const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; // ease-in-out
-      const p = el.getPointAtLength(start + (target - start) * e);
-      setPos({ x: p.x, y: p.y });
-      if (k < 1) raf.current = requestAnimationFrame(tick);
-      else from.current = target;
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [step, frac, path]);
-
-  const pillW = Math.max(30, label.length * 6.1 + 16);
-  const pill = (
-    <g>
-      <rect x={-pillW / 2} y={-10} width={pillW} height={20} rx={10} fill={color} stroke="#fff" strokeWidth={1.5} />
-      <text textAnchor="middle" dominantBaseline="central" fontSize={10} fontWeight={800} fill="#fff">{label}</text>
-    </g>
-  );
-  return (
-    <>
-      <path ref={ref} d={path} fill="none" stroke="none" />
-      {step == null ? (
-        <g>
-          <animateMotion dur={dur} repeatCount="indefinite" path={path} />
-          {pill}
-        </g>
-      ) : pos ? (
-        <g transform={`translate(${pos.x},${pos.y})`}>{pill}</g>
-      ) : null}
-    </>
-  );
-}
-
-/**
- * Flow overlay — an SVG layer drawn inside the viewport (so it pans/zooms with
- * the diagram). For each active flow it draws a continuous coloured path through
- * every hop node, numbered hop badges, and a packet that either auto-loops along
- * the path or, when the user drives it, sits on the current step's node.
- * `steps[flowId]`: null/undefined = auto-play; a number = that 0-based hop.
- */
-function FlowOverlay({ flowEdges, steps, width, height }: {
-  flowEdges: DiagramEdge[];
-  steps: Record<string, number | null | undefined>;
-  width: number;
-  height: number;
-}) {
-  return (
-    <svg width={Math.max(1, width)} height={Math.max(1, height)} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 2500 }}>
-      {flowEdges.map((e) => {
-        const pts = e.points ?? [];
-        if (pts.length < 2) return null;
-        const path = roundedPolyline(pts);
-        const color = e.color ?? '#2196F3';
-        const flowId = e.id.replace(/^flow-/, '');
-        // All endpoints of one flow kind share the same step state, keyed by the
-        // `<scope>:<kind>` group (works for both all-endpoint and single-endpoint picks).
-        const gp = flowId.split('#')[0].split(':');
-        const groupId = `${gp[0]}:${gp[1]}`;
-        const mId = `fa-${flowId.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
-        const badges = e.badges ?? [];
-        const step = steps[groupId];
-        const dur = `${Math.max(6, pts.length * 1.4).toFixed(1)}s`;
-        // Path-length fraction of each vertex, so a badge maps to a point ALONG the
-        // path (lets the stepped packet follow the route rather than teleport).
-        const cum = [0];
-        for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
-        const total = cum[cum.length - 1] || 1;
-        const fracOf = (p: { x: number; y: number }) => {
-          let bi = 0, bd = Infinity;
-          for (let i = 0; i < pts.length; i++) { const d = Math.hypot(pts[i].x - p.x, pts[i].y - p.y); if (d < bd) { bd = d; bi = i; } }
-          return cum[bi] / total;
-        };
-        const frac = step != null && badges[step] ? fracOf(badges[step]) : 0;
-        const seen = new Map<string, number>();
-        return (
-          <g key={e.id}>
-            <defs>
-              <marker id={mId} markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto">
-                <path d="M0,0 L9,4.5 L0,9 Z" fill={color} />
-              </marker>
-            </defs>
-            <path d={path} fill="none" stroke={color} strokeOpacity={0.14} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
-            <path d={path} fill="none" stroke={color} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" markerEnd={`url(#${mId})`} />
-            {/* every endpoint carries its own labelled source→dest pill */}
-            <FlowPacket path={path} color={color} label={e.label ?? ''} step={step} frac={frac} dur={dur} />
-            {badges.length > 0 && badges.map((b, i) => {
-              const k = seen.get(b.node) ?? 0;
-              seen.set(b.node, k + 1);
-              const active = step === i;
-              return (
-                <g key={`${b.node}-${i}`} transform={`translate(${b.x},${b.y - 18 - k * 24})`}>
-                  <circle r={active ? 11 : 9} fill={active ? '#fff' : color} stroke={color} strokeWidth={active ? 3 : 1.6} />
-                  <text textAnchor="middle" dominantBaseline="central" fontSize={active ? 11.5 : 10.5} fontWeight={800} fill={active ? color : '#fff'}>{b.seq}</text>
-                </g>
-              );
-            })}
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-
 function toReactFlow(diagram: DiagramModel): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = diagram.nodes.map((n) => {
     // Kinds with a custom node component draw their own label; the style is box-only.
@@ -596,6 +445,7 @@ const layerBtn: React.CSSProperties = {
   boxShadow: '0 1px 4px rgba(32,31,28,0.12)', cursor: 'pointer',
 };
 const layerBtnActive: React.CSSProperties = { background: oracle.red, border: `1px solid ${oracle.redDark}`, color: '#fff' };
+const hintBtn: React.CSSProperties = { ...layerBtn, display: 'flex', alignItems: 'center', gap: 10, border: `1px dashed ${oracle.borderStrong}` };
 
 /** Unified zoom/navigation bar: +  −  [live %] | presets | fit  reset. */
 function ZoomBar() {
@@ -620,7 +470,7 @@ function ZoomBar() {
   );
 }
 
-export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps, showFlowControl = true }: {
+export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps, showFlowControl = true, flowHint, flowFocus, onFlowSelect, onFlowHover }: {
   diagram: DiagramModel;
   options?: DiagramOptions;
   onOptionsChange?: (next: DiagramOptions) => void;
@@ -628,6 +478,13 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   flowSteps?: Record<string, number | null>;
   /** Whether the selected hub topology has a packet-flow adapter. */
   showFlowControl?: boolean;
+  /** Flow or hop hovered in the flow picker: fades the other flows. */
+  flowFocus?: FlowFocus | null;
+  /** Click a flow path to select it (again, or on empty canvas, to clear). */
+  onFlowSelect?: (group: string | null) => void;
+  onFlowHover?: (group: string | null) => void;
+  /** Shown instead of the layer buttons before endpoints exist: where to find them. */
+  flowHint?: { label: string; action: string; onClick: () => void };
 }) {
   const { nodes, edges } = useMemo(() => toReactFlow(diagram), [diagram]);
   const { fitView, setViewport } = useReactFlow();
@@ -742,6 +599,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       onNodeClick={onNodeClick}
+      onPaneClick={() => { if (options?.focusFlow) onFlowSelect?.(null); }}
       nodesDraggable={false}
       nodesConnectable={false}
       minZoom={0.2}
@@ -751,7 +609,8 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       <Background />
       {flowEdges.length > 0 && (
         <ViewportPortal>
-          <FlowOverlay flowEdges={flowEdges} steps={flowSteps ?? {}} width={region?.width ?? 2000} height={region?.height ?? 2000} />
+          <FlowOverlay flowEdges={flowEdges} steps={flowSteps ?? {}} width={region?.width ?? 2000} height={region?.height ?? 2000} focus={flowFocus} selected={options?.focusFlow ?? null} allFlows={!!options?.allFlows}
+            onSelect={onFlowSelect} onHover={onFlowHover} />
         </ViewportPortal>
       )}
       <MiniMap
@@ -790,6 +649,14 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
               {options?.showFlows ? 'Hide flows' : 'Show flows'}
             </button>
           </div>
+        </Panel>
+      )}
+      {!onOptionsChange && flowHint && (
+        <Panel position="top-right">
+          <button type="button" style={hintBtn} onClick={flowHint.onClick} title={flowHint.label}>
+            <span style={{ fontWeight: 600, color: oracle.textMuted }}>{flowHint.label}</span>
+            <span style={{ color: oracle.redDark }}>{flowHint.action}</span>
+          </button>
         </Panel>
       )}
     </ReactFlow>

@@ -459,3 +459,10 @@ a:focus:not(:focus-visible) {
     gap: 14px !important;
   }
 }
+
+/* Flow overlay motion: the current-hop pulse. */
+.lz-flow-pulse { transform-box: fill-box; transform-origin: center; animation: lz-flow-pulse 1.4s ease-out infinite; }
+@keyframes lz-flow-pulse { from { transform: scale(0.7); opacity: 0.5; } to { transform: scale(1.7); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .lz-flow-pulse { animation: none; }
+}

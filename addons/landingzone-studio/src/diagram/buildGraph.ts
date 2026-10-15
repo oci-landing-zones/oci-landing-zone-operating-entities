@@ -3,7 +3,8 @@ import { getHubKind } from '../services/hubKinds';
 import { envNetworkDefaults } from '../model/defaults';
 import { hostIpInSubnet } from '../services/cidr';
 import { buildRouteTables } from '../services/routeTables';
-import { buildFlowTraces } from '../services/flowTrace';
+import { allFlowIds, buildFlowTraces } from '../services/flowTrace';
+import { flowGroup } from './flowOverlayGeometry';
 import { ocvsDefaultSubnets, platformInEnv, platformSubnetsForEnv, platformVcnForEnv } from '../services/platforms';
 import { generatorNames } from '../services/generatorNaming';
 import { absoluteNodeRects, flowAnchorPoint, routeFlowGeometry } from './flowGeometry';
@@ -245,14 +246,19 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   // selecting one implies the endpoints + route-table layer: it auto-opens every
   // table the packet consults, highlights the matched rows, and draws an animated
   // coloured path along the hop sequence.
-  const activeFlows = showSpokes && supportsFlowTracing ? (opts.activeFlows ?? []) : [];
-  const flowTraces = activeFlows.length > 0 ? buildFlowTraces(model, activeFlows) : [];
+  // "Show all flows" traces every flow, coloured by traffic type (as in ONTV).
+  const activeFlows = showSpokes && supportsFlowTracing ? (opts.allFlows ? allFlowIds(model) : opts.activeFlows ?? []) : [];
+  const flowTraces = activeFlows.length > 0 ? buildFlowTraces(model, activeFlows, opts.allFlows ? 'kind' : 'flow') : [];
   const flowActive = flowTraces.length > 0;
+  // Route tables follow the clicked flow when there is one. With all flows shown
+  // and none clicked, no table is singled out — every table would qualify.
+  const focusTraces = opts.focusFlow ? flowTraces.filter((t) => flowGroup(t.id) === opts.focusFlow) : [];
+  const tableTraces = focusTraces.length ? focusTraces : opts.allFlows ? [] : flowTraces;
   const rtHighlight = new Map<string, number[]>();
   const flowTableIds = new Set<string>();
   const flowTableNodes = new Map<string, Set<string>>();
   const flowEndpointIds = new Set<string>();
-  for (const t of flowTraces) {
+  for (const t of tableTraces) {
     for (const h of t.highlights) {
       flowTableIds.add(h.tableId);
       rtHighlight.set(h.tableId, [...(rtHighlight.get(h.tableId) ?? []), ...h.rows]);
@@ -263,6 +269,9 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       governed.add(hop.node);
       flowTableNodes.set(hop.tableId, governed);
     }
+  }
+  // Every drawn flow shows its source and destination VMs.
+  for (const t of flowTraces) {
     for (const segment of t.segments) {
       if (/^cmp-env-\d+-vcn-sn-\d+$/.test(segment.from)) flowEndpointIds.add(segment.from);
       if (/^cmp-env-\d+-vcn-sn-\d+$/.test(segment.to)) flowEndpointIds.add(segment.to);
@@ -275,7 +284,8 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   // Flow selection identifies the relevant tables but does not force every one
   // open. The sidebar already explains the route; dots stay available for
   // on-demand inspection without shrinking the topology around many tables.
-  const openSet = new Set<string>(opts.openTables ?? []);
+  // A clicked flow opens its tables (showing only the rows it uses), as in ONTV.
+  const openSet = new Set<string>([...(opts.openTables ?? []), ...(focusTraces.length ? flowTableIds : [])]);
   const openTables = showDots ? allRouteTables.filter((t) => openSet.has(t.id)) : [];
   const showMidRT = openTables.some((t) => t.kind === 'hub');
   const showLeftRT = openTables.some((t) => t.kind === 'gateway' || t.kind === 'drg');
@@ -756,7 +766,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   for (const t of flowTraces) {
     const segs = t.segments.filter((s) => nodeIds.has(s.from) && nodeIds.has(s.to));
     if (segs.length === 0) continue;
-    const base = t.id.split('#')[0];
+    const base = t.id.split('#')[0].split(':').slice(0, 2).join(':');
     const waypoints = [segs[0].from, ...segs.map((s) => s.to)];
     // Keep endpoints and shared legs on their real resources. Artificially
     // shifting complete traces made packets float beside the subnet/DRG icons;
@@ -771,7 +781,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       ? t.hops
           .flatMap((h) => {
             const rect = absoluteRects.get(h.node);
-            return rect ? [{ node: h.node, seq: h.seq, ...flowAnchorPoint(rect) }] : [];
+            return rect ? [{ node: h.node, seq: h.seq, inspected: h.inspected, ...flowAnchorPoint(rect) }] : [];
           })
       : [];
     edges.push({
