@@ -90,11 +90,15 @@ By following these steps, you should be able to successfully deploy the FINOPS s
 > [!NOTE]
 > This solution has been tested with Autonomous Database 23ai version for the FOCUS 1.0 specification .
 
-## Step 4. UI Dashboard (Optional)
+## Step 4. Oracle Analytics Cloud Dashboard
 
-The FinOps addon ingests OCI FOCUS reports into an Autonomous Database, and users can optionally build a UI dashboard using tools like [Oracle APEX](https://docs.oracle.com/en/database/oracle/apex/24.2/index.html), [Oracle Analytics Cloud (OAC)](https://www.oracle.com/business-analytics/analytics-cloud.html), or any BI tool compatible with Oracle DB.
+Use [Oracle Analytics Cloud (OAC)](https://www.oracle.com/business-analytics/analytics-cloud.html) to present the FOCUS data ingested into Autonomous Database through FinOps dashboards and reports. Configure a [private access channel](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acoci/prerequisites-private-access-channel.html) to connect OAC Enterprise Edition to the private ADB endpoint, then create the database connection and reporting content in OAC.
+
+The private access channel provides outbound connectivity to ADB. Access to the OAC dashboard itself is configured separately through the OAC public or private endpoint and application roles.
+
+[Oracle APEX](https://docs.oracle.com/en/database/oracle/apex/24.2/index.html) and other BI tools compatible with Oracle DB remain alternatives for existing implementations.
 
 > **Tip:** Oracle APEX supports Generative AI to help you build apps and queries faster. [Learn more](https://docs.oracle.com/en/database/oracle/apex/24.2/htmdb/managing-generative-ai-in-apex.html)
 
 > [!NOTE]
-> This addon does not provision a dashboard. Visualization is left to the user's preference.
+> The current deployment files do not provision OAC or its dashboard content. Configure these separately as part of the FinOps solution setup.
