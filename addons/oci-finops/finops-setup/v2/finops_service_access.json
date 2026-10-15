@@ -1,0 +1,40 @@
+{
+    "identity_domain_dynamic_groups_configuration": {
+        "default_identity_domain_id"              : "COMMON-DOMAIN",
+
+        "dynamic_groups": {
+            "DG-LZ-FINOPS-ADB": {
+                "name"                            : "dg-lz-finops-adb",
+                "description"                     : "Autonomous Databases that ingest FinOps reports.",
+                "matching_rule"                   : "ALL {resource.type = 'autonomousdatabase', resource.compartment.id = '<FINOPS_COMPARTMENT_OCID>'}"
+            }
+        }
+    },
+
+    "policies_configuration": {
+        "enable_cis_benchmark_checks"             : false,
+
+        "supplied_policies": {
+            "PCY-LZ-FINOPS-ADB-RESOURCE-PRINCIPAL": {
+                "name"                            : "pcy-lz-finops-adb-rp",
+                "description"                     : "Allow FinOps Autonomous Databases to read OCI cost and usage reports.",
+                "compartment_id"                  : "TENANCY-ROOT",
+
+                "statements": [
+                    "define tenancy reporting as ocid1.tenancy.oc1..aaaaaaaaned4fkpkisbwjlr56u7cj63lf3wffbilvqknstgtvzub7vhqkggq",
+                    "endorse dynamic-group 'id_lz_common'/'dg-lz-finops-adb' to read objects in tenancy reporting"
+                ]
+            },
+
+            "PCY-LZ-FINOPS-REPORTING-ACCESS": {
+                "name"                            : "pcy-lz-finops-reporting-access",
+                "description"                     : "Allow FinOps operators to use the approved reporting connection.",
+                "compartment_id"                  : "TENANCY-ROOT",
+
+                "statements": [
+                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to use database-tools-connections in compartment cmp-landingzone:cmp-lz-platform:cmp-finops where target.resource.id = '<FINOPS_REPORTING_CONNECTION_OCID>'"
+                ]
+            }
+        }
+    }
+}

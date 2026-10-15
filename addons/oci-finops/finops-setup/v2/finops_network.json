@@ -1,0 +1,287 @@
+{
+    "network_configuration": {
+        "default_compartment_id"                               : "CMP-LZ-NETWORK-KEY",
+        "default_enable_cis_checks"                            : false,
+
+        "network_configuration_categories": {
+            "finops": {
+                "category_compartment_id"                      : "CMP-LZ-NETWORK-KEY",
+
+                "vcns": {
+                    "VCN-FRA-LZ-FINOPS-KEY": {
+                        "display_name"                         : "vcn-fra-lz-finops",
+                        "cidr_blocks"                          : ["10.0.24.0/26"],
+                        "dns_label"                            : "finops",
+
+                        "subnets": {
+                            "SN-FRA-LZ-FINOPS-OAC-KEY": {
+                                "display_name"                 : "sn-fra-lz-finops-oac",
+                                "cidr_block"                   : "10.0.24.0/28",
+                                "dns_label"                    : "finopsoac",
+                                "prohibit_public_ip_on_vnic"   : true,
+                                "route_table_key"              : "RT-FRA-LZ-FINOPS-KEY",
+                                "security_list_keys"           : ["SL-FRA-LZ-FINOPS-SERVICES-KEY"]
+                            },
+
+                            "SN-FRA-LZ-FINOPS-DB-KEY": {
+                                "display_name"                 : "sn-fra-lz-finops-db",
+                                "cidr_block"                   : "10.0.24.16/28",
+                                "dns_label"                    : "finopsdb",
+                                "prohibit_public_ip_on_vnic"   : true,
+                                "route_table_key"              : "RT-FRA-LZ-FINOPS-KEY",
+                                "security_list_keys"           : ["SL-FRA-LZ-FINOPS-SERVICES-KEY"]
+                            },
+
+                            "SN-FRA-LZ-FINOPS-INFRA-KEY": {
+                                "display_name"                 : "sn-fra-lz-finops-infra",
+                                "cidr_block"                   : "10.0.24.32/28",
+                                "dns_label"                    : "finopsinfra",
+                                "prohibit_public_ip_on_vnic"   : true,
+                                "route_table_key"              : "RT-FRA-LZ-FINOPS-KEY",
+                                "security_list_keys"           : ["SL-FRA-LZ-FINOPS-INFRA-KEY"]
+                            }
+                        },
+
+                        "route_tables": {
+                            "RT-FRA-LZ-FINOPS-KEY": {
+                                "display_name"                 : "rt-fra-lz-finops",
+
+                                "route_rules": {
+                                    "hub": {
+                                        "description"          : "Route through the Hub A DRG.",
+                                        "destination"          : "0.0.0.0/0",
+                                        "destination_type"     : "CIDR_BLOCK",
+                                        "network_entity_key"   : "DRG-FRA-LZ-HUB-KEY"
+                                    },
+
+                                    "oci_services": {
+                                        "description"          : "Route to regional Oracle services through the service gateway.",
+                                        "destination"          : "all-services",
+                                        "destination_type"     : "SERVICE_CIDR_BLOCK",
+                                        "network_entity_key"   : "SGW-FRA-LZ-FINOPS-KEY"
+                                    }
+                                }
+                            }
+                        },
+
+                        "default_security_list": {
+                            "ingress_rules"                    : [],
+                            "egress_rules"                     : []
+                        },
+
+                        "security_lists": {
+                            "SL-FRA-LZ-FINOPS-INFRA-KEY": {
+                                "display_name"                 : "sl-fra-lz-finops-infra",
+
+                                "ingress_rules": [
+                                    {
+                                        "description"          : "Path MTU discovery.",
+                                        "src"                  : "0.0.0.0/0",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "protocol"             : "ICMP",
+                                        "icmp_type"            : 3,
+                                        "icmp_code"            : 4,
+                                        "stateless"            : false
+                                    }
+                                ],
+
+                                "egress_rules": [
+                                    {
+                                        "description"          : "Access to Database Actions.",
+                                        "dst"                  : "10.0.24.16/28",
+                                        "dst_type"             : "CIDR_BLOCK",
+                                        "dst_port_min"         : 443,
+                                        "dst_port_max"         : 443,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    },
+                                    {
+                                        "description"          : "Database Tools and Bastion connections to Autonomous Database.",
+                                        "dst"                  : "10.0.24.16/28",
+                                        "dst_type"             : "CIDR_BLOCK",
+                                        "dst_port_min"         : 1522,
+                                        "dst_port_max"         : 1522,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    },
+                                    {
+                                        "description"          : "Access to the private OAC dashboard endpoint.",
+                                        "dst"                  : "10.0.24.0/28",
+                                        "dst_type"             : "CIDR_BLOCK",
+                                        "dst_port_min"         : 443,
+                                        "dst_port_max"         : 443,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    },
+                                    {
+                                        "description"          : "Access to regional Oracle services.",
+                                        "dst"                  : "all-services",
+                                        "dst_type"             : "SERVICE_CIDR_BLOCK",
+                                        "dst_port_min"         : 443,
+                                        "dst_port_max"         : 443,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    }
+                                ]
+                            },
+
+                            "SL-FRA-LZ-FINOPS-SERVICES-KEY": {
+                                "display_name"                 : "sl-fra-lz-finops-services",
+                                "egress_rules"                 : [],
+
+                                "ingress_rules": [
+                                    {
+                                        "description"          : "Path MTU discovery.",
+                                        "src"                  : "0.0.0.0/0",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "protocol"             : "ICMP",
+                                        "icmp_type"            : 3,
+                                        "icmp_code"            : 4,
+                                        "stateless"            : false
+                                    }
+                                ]
+                            }
+                        },
+
+                        "network_security_groups": {
+                            "NSG-FRA-LZ-FINOPS-ADB-KEY": {
+                                "display_name"                 : "nsg-fra-lz-finops-adb",
+
+                                "ingress_rules": {
+                                    "hub_mgmt_https": {
+                                        "description"          : "Private access to Database Actions.",
+                                        "src"                  : "10.0.3.0/24",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "dst_port_min"         : 443,
+                                        "dst_port_max"         : 443,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    },
+
+                                    "hub_mgmt_mtls": {
+                                        "description"          : "Private administration connections to Autonomous Database.",
+                                        "src"                  : "10.0.3.0/24",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "dst_port_min"         : 1522,
+                                        "dst_port_max"         : 1522,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    },
+
+                                    "infra_https": {
+                                        "description"          : "Private access to Database Actions.",
+                                        "src"                  : "10.0.24.32/28",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "dst_port_min"         : 443,
+                                        "dst_port_max"         : 443,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    },
+
+                                    "infra_mtls": {
+                                        "description"          : "Private administration connections to Autonomous Database.",
+                                        "src"                  : "10.0.24.32/28",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "dst_port_min"         : 1522,
+                                        "dst_port_max"         : 1522,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    },
+
+                                    "oac_mtls": {
+                                        "description"          : "OAC private access channel connections to Autonomous Database.",
+                                        "src"                  : "10.0.24.0/28",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "dst_port_min"         : 1522,
+                                        "dst_port_max"         : 1522,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "oci_services_https": {
+                                        "description"          : "Retrieve FOCUS reports from regional Object Storage.",
+                                        "dst"                  : "all-services",
+                                        "dst_type"             : "SERVICE_CIDR_BLOCK",
+                                        "dst_port_min"         : 443,
+                                        "dst_port_max"         : 443,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    }
+                                }
+                            },
+
+                            "NSG-FRA-LZ-FINOPS-OAC-KEY": {
+                                "display_name"                 : "nsg-fra-lz-finops-oac",
+
+                                "ingress_rules": {
+                                    "hub_mgmt_https": {
+                                        "description"          : "Private access to the OAC dashboard endpoint.",
+                                        "src"                  : "10.0.3.0/24",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "dst_port_min"         : 443,
+                                        "dst_port_max"         : 443,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    },
+
+                                    "infra_https": {
+                                        "description"          : "Private access to the OAC dashboard endpoint.",
+                                        "src"                  : "10.0.24.32/28",
+                                        "src_type"             : "CIDR_BLOCK",
+                                        "dst_port_min"         : 443,
+                                        "dst_port_max"         : 443,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    }
+                                },
+
+                                "egress_rules": {
+                                    "adb_mtls": {
+                                        "description"          : "OAC private access channel connections to Autonomous Database.",
+                                        "dst"                  : "NSG-FRA-LZ-FINOPS-ADB-KEY",
+                                        "dst_type"             : "NETWORK_SECURITY_GROUP",
+                                        "dst_port_min"         : 1522,
+                                        "dst_port_max"         : 1522,
+                                        "protocol"             : "TCP",
+                                        "stateless"            : false
+                                    }
+                                }
+                            }
+                        },
+
+                        "vcn_specific_gateways": {
+                            "service_gateways": {
+                                "SGW-FRA-LZ-FINOPS-KEY": {
+                                    "display_name"             : "sgw-fra-lz-finops",
+                                    "services"                 : "all-services"
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "non_vcn_specific_gateways": {
+                    "inject_into_existing_drgs": {
+                        "DRG-FRA-LZ-HUB-KEY": {
+                            "drg_id"                           : "DRG-FRA-LZ-HUB-KEY",
+
+                            "drg_attachments": {
+                                "DRGATT-FRA-LZ-FINOPS-KEY": {
+                                    "display_name"             : "drgatt-fra-lz-finops",
+                                    "drg_route_table_key"      : "DRGRT-FRA-LZ-SPOKES-KEY",
+
+                                    "network_details": {
+                                        "type"                 : "VCN",
+                                        "attached_resource_key": "VCN-FRA-LZ-FINOPS-KEY"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

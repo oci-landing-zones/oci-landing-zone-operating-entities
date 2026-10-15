@@ -35,7 +35,7 @@ The solution describes the end-to-end workflow by securely fetching FOCUS report
 
 | **Resource**              | **Description** |
 |---------------------------|------------------|
-| **IAM Groups**            | Separate FinOps operations, database administration, and OAC administration groups, with permissions scoped to the FinOps platform compartment. |
+| **IAM Groups**            | Separate FinOps operations, database administration, and OAC administration groups, with service permissions in the FinOps platform compartment and network dependencies in shared networking. |
 | **IAM Policies**          | Includes user policies to manage the FinOps platform and **resource principal** permissions that allow ADB to fetch FOCUS reports, all in a controlled and auditable way. |
 | **Autonomous Database (ADB)** | Central data store for the FinOps platform. Provisioned with a **private endpoint** inside the VCN, it directly ingests FOCUS reports and powers the visualization layer. |
 | **Oracle Analytics Cloud (OAC)** | Presents dashboards and reports on top of ADB for cost visibility, allocation, and analysis. A private access channel connects OAC to the private ADB endpoint. |
@@ -58,7 +58,9 @@ The FinOps tagging strategy complements the One-OE compartment hierarchy with co
 To get started with the OCI FinOps addon, it is recommended to start with an Oracle recommended Foundational Landing Zone such as a [CIS landing zone](https://github.com/oci-landing-zones/oci-cis-landingzone-quickstart), [OCI Core Landing Zone](https://github.com/oci-landing-zones/terraform-oci-core-landingzone) or [OCI Operating Entities Landing Zone](https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/blueprints/).  
 
 
-**Follow the step-by-step instructions** in the [`FinOps-Setup`](finops-setup) guide to deploy the FinOps Solution on top of **One-OE Landing Zone**. 
+**Follow the step-by-step instructions** in the [`FinOps-Setup`](finops-setup) guide to deploy the FinOps Solution on top of **One-OE Landing Zone**.
+
+For the V2 roles, private endpoint NSGs, optional infra subnet, and Hub A integration, use the [V2 IAM and networking configurations](finops-setup/v2/README.md).
 
 
 &nbsp;

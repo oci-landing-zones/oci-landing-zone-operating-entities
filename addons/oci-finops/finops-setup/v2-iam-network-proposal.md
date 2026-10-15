@@ -1,6 +1,6 @@
 # FinOps V2: IAM and network proposal
 
-**Status: proposed for review. No IAM, networking, Terraform, or SQL configuration has been changed.**
+**Status: IAM and network decisions incorporated in the [V2 configurations](v2/README.md). No tenancy deployment has been performed.**
 
 Baseline: Operating Entities commit `c1e74ba`, the existing FinOps addon, and the [One-OE Hub A runtime](../../../blueprints/one-oe/runtime/one-stack/oneoe_network_hub_a.json). The current runtime references Orchestrator **v2.2.0**. This proposal enhances the addon; it does not replace its FOCUS ingestion pipeline.
 
@@ -12,7 +12,7 @@ Baseline: Operating Entities commit `c1e74ba`, the existing FinOps addon, and th
 | `grp-lz-finops-db-admins` | `pcy-lz-finops-db-admins` | Administer Autonomous Database, including lifecycle, backup, and private-endpoint operations. |
 | `grp-lz-finops-oac-admins` | `pcy-lz-finops-oac-admins` | Administer OAC instances and their private access channel; administer the OAC application through a separate application-role assignment. |
 
-All three groups can operate sessions on a pre-created FinOps Bastion. They do not need permission to create or delete the Bastion service itself.
+FinOps admins create and delete Bastions in `cmp-finops`; all three groups manage their sessions. The shared network compartment supplies the VCN, subnets, and NSGs. The V2 policy includes the documented network dependencies for Bastion lifecycle, with the scope implications described below.
 
 Use the existing One-OE identity domain, **`id_lz_common`**, and the target compartment **`cmp-landingzone:cmp-lz-platform:cmp-finops`**. Adapt these names to an existing deployment. Policy attachment can remain at tenancy root, consistent with the current runtime; each statement below explicitly limits its resource scope. Root attachment does not make a compartment-scoped statement tenancy-wide.
 
@@ -40,7 +40,7 @@ Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to manage autonomous-databa
 
 This includes destructive database lifecycle operations, as expected for the DBA role. Add the private-endpoint dependencies in section 3 and the common Bastion block below. Database user administration remains a database privilege; the OCI policy does not establish a SQL login.
 
-If DBAs will use Console SQL Worksheet, give them `read database-tools-family` plus `use database-tools-connections` restricted to a **separate DBA connection OCID**, following the operations example. Connection/private-endpoint creation and credential provisioning can remain with the LZ deployment administrator. This avoids granting every DBA broad secret-management permissions merely to run SQL.
+For Console SQL Worksheet, DBAs receive `read database-tools-family` plus `use database-tools-connections` in `cmp-finops`, **without a connection OCID condition**. They can therefore use all connections in that compartment. Keep the operator connection restriction above to prevent operator use of a privileged DBA connection. Connection/private-endpoint creation and credential provisioning remain with the deployment administrator.
 
 ### OAC administration policy
 
@@ -55,14 +55,14 @@ Map OAC administrators to **BI Service Administrator** inside OAC. This role als
 
 ### Common Bastion statements
 
-Append this block to each of the three policies, replacing `<GROUP>` with its group name. It assumes the Bastion and its target networking are in `cmp-finops`; section 3 explains the shared-network alternative.
+DB and OAC administrators use the following session block. For FinOps admins, replace its first two statements with `manage bastion-family` and add the network permissions listed below. Supporting VCN/subnet reads target shared networking; service VNIC reads target `cmp-finops`. The JSON uses `read virtual-network-family` in the network compartment to include the corresponding reads.
 
 ```text
 Allow group 'id_lz_common'/'<GROUP>' to use bastion in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
 Allow group 'id_lz_common'/'<GROUP>' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
 Allow group 'id_lz_common'/'<GROUP>' to read instances in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
-Allow group 'id_lz_common'/'<GROUP>' to read vcns in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
-Allow group 'id_lz_common'/'<GROUP>' to read subnets in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
+Allow group 'id_lz_common'/'<GROUP>' to read vcns in compartment cmp-landingzone:cmp-lz-network
+Allow group 'id_lz_common'/'<GROUP>' to read subnets in compartment cmp-landingzone:cmp-lz-network
 Allow group 'id_lz_common'/'<GROUP>' to read vnic-attachments in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
 Allow group 'id_lz_common'/'<GROUP>' to read vnics in compartment cmp-landingzone:cmp-lz-platform:cmp-finops
 ```
@@ -84,29 +84,24 @@ Do not carry forward blanket `manage vaults`, `manage secret-family`, or `manage
 
 Keep the business tags in `tgns-finops` separate from the One-OE `tagns-lz-role` authorization tags. Financial ownership values must not unintentionally confer IAM administration rights.
 
-## 3. Resolve the compartment boundary before implementing JSON
+## 3. Agreed compartment boundary
 
-The current addon and the supplied architecture put the **VCN/subnets in shared networking**, while ADB, OAC, and the existing database NSG are in the **FinOps platform compartment**. A policy mentioning only `cmp-finops` cannot authorize use of a subnet owned by `cmp-lz-network`.
+The **VCN, subnets, and both endpoint NSGs are in `cmp-lz-network`**. ADB, OAC, Bastion, and Database Tools resources are in `cmp-finops`. DB/OAC administrators use the shared networking through the dependencies below. This follows the existing addon's cross-compartment policy pattern while separating service responsibilities.
 
-| Choice | Effect | Recommendation |
-|---|---|---|
-| Preserve the One-OE shared-network placement | Allow the specific network dependencies below in the owning shared-network compartment; keep ADB, OAC, connection, and Bastion permissions in `cmp-finops`. | Best match for the supplied architecture and the requested minimal changes, **if the network-scope exception is approved**. |
-| Enforce literal FinOps-only scope | Place the dedicated FinOps VCN, subnets, NSGs, Bastion, and Database Tools endpoint in `cmp-finops`. LZ network administrators retain ownership of shared hub/DRG configuration. | Satisfies the strict scope requirement but changes the current architecture. Do not move existing resources implicitly. |
-
-The exported architecture retains the supplied shared-network placement. Neither choice is implemented by this proposal.
+FinOps admins also receive the network permissions Oracle lists for Bastion creation/deletion: manage VCNs, subnets, route tables, security lists and DHCP options; use NSGs, VNICs and private IPs. These grants apply across the shared network compartment, not solely to the FinOps VCN. The decision to let FinOps admins own Bastion lifecycle therefore also grants meaningful shared-network administration. The DBA and OAC policies do not inherit those extra grants.
 
 ### Private-endpoint dependency statements
 
-Each row means `Allow group 'id_lz_common'/'<GROUP>' to <verb/resource> in compartment <owning compartment>`. Expand it after the placement decision; these are actual permissions, not new JSON fields.
+Each row means `Allow group 'id_lz_common'/'<GROUP>' to <verb/resource> in compartment <owning compartment>`. These dependencies are implemented in the V2 IAM file.
 
 | Group | Verb / resource | Owning compartment |
 |---|---|---|
 | DB administrators | `use vcns`; `use subnets`; `manage private-ips` | VCN/subnet compartment |
 | DB administrators | `manage vnics` | Both VCN and database compartments; one statement if colocated |
-| DB administrators | `use network-security-groups` | ADB NSG compartment |
+| DB administrators | `use network-security-groups` | Shared network compartment |
 | OAC administrators, for PAC | `read virtual-network-family`; `use subnets` | VCN/subnet compartment |
 | OAC administrators, for PAC | `manage vnics`; `use private-ips` | OAC instance compartment |
-| OAC administrators, for PAC | `use network-security-groups` | PAC NSG compartment |
+| OAC administrators, for PAC | `use network-security-groups` | Shared network compartment |
 | All three, for Bastion | Network reads from the common block | Actual VCN, subnet, and VNIC compartments |
 
 These follow [ADB private-endpoint permissions](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/private-endpoints-autonomous.html) and [OAC's limited PAC policy](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acoci/prerequisites-private-access-channel.html). Compartment-wide network grants can affect other networks in that compartment; they are not automatically restricted to the FinOps VCN.
@@ -117,12 +112,12 @@ Use the existing LZ discovery policies for Console compartment and identity-doma
 
 ## 4. Hub A routing changes
 
-The existing FinOps VCN is **`10.0.24.0/27`**, with two `/28` subnets. Preserve these addresses unless capacity or overlap checks require a change. Rename the app subnet's display name to identify its OAC purpose after approval.
+The V2 FinOps VCN is **`10.0.24.0/26`**. It preserves OAC at `10.0.24.0/28` and ADB at `10.0.24.16/28`, and adds optional infra at **`10.0.24.32/28`** for Bastion and Database Tools. The previous `/27` was fully occupied. The infra subnet is included in JSON, with explicit omission instructions, and is not added to the architecture drawing.
 
 | Finding in the existing addon | Proposed change | Reason |
 |---|---|---|
 | FinOps route table sends only `10.0.0.0/21` to DRG. | Follow Hub A: default route to DRG, regional Oracle services route to the local SGW. | Provides the hub path for approved nonlocal destinations while retaining the service route. |
-| Hub management table has PROD/PREPROD routes but no `10.0.24.0/27` route. | Add the FinOps prefix to the applicable hub route tables. | Hub management traffic otherwise follows the default NAT path rather than returning to FinOps. |
+| Hub management table has PROD/PREPROD routes but no `10.0.24.0/26` route. | Add the FinOps prefix to the applicable hub route tables. | Hub management traffic otherwise follows the default NAT path rather than returning to FinOps. |
 | Existing DRG configuration follows Hub E. | Attach FinOps to the Hub A spoke DRG route table; add FinOps to the hub import distribution. Retain the spoke default route through the hub. | Prevents a direct spoke import from bypassing the Hub A inspection path. |
 | Hub A tables enumerate existing spoke prefixes. | Add FinOps to the hub ingress, internal-firewall, NAT return, and management routes; include LB routes only if that path is used. | Preserves symmetric routing through the internal firewall for the selected traffic paths. |
 | The addon includes a complete hub and unrelated load-balancer backend examples. | Integrate FinOps with the existing Hub A by referencing its outputs/keys. | Avoids creating another hub or altering unrelated workloads. Preserve the previous Hub E reference when reorganizing examples. |
@@ -133,7 +128,7 @@ Hub A's local SGW route intentionally avoids the hub firewall for matching Oracl
 
 ### Dedicated endpoint NSGs
 
-Proposed names: **`nsg-<region>-lz-finops-adb`** and **`nsg-<region>-lz-finops-oac`**. Use stateful rules and the selected connection mode.
+Implemented NSGs: **`nsg-fra-lz-finops-adb`** and **`nsg-fra-lz-finops-oac`**. The template allows the dedicated OAC/infra subnet sources and Hub A management CIDR on the required ports; narrow the sources to endpoint IPs after provisioning. Infra has corresponding egress rules in its security list. All application rules are stateful.
 
 | NSG / direction | Source → destination | Port | Purpose |
 |---|---|---|---|
@@ -147,19 +142,16 @@ Proposed names: **`nsg-<region>-lz-finops-adb`** and **`nsg-<region>-lz-finops-o
 
 Oracle documents port 1522 for mTLS; TLS can use 1521 or 1522. Do not open both automatically. Port 443 is needed for Database Actions when that access is required. [Oracle: ADB network access](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/private-endpoints-autonomous.html).
 
-The current security list allows unrestricted egress, and the current database NSG allows TCP egress anywhere. Tightening only a new NSG will not restrict traffic already allowed by another applicable security rule. Review the combined rules and remove unnecessary broad egress and the inherited SSH ingress from these managed-service subnets as part of the approved network change. [Oracle: NSG and security-list interaction](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/networksecuritygroups.htm).
+The legacy security list allows unrestricted egress, and its database NSG allows TCP egress anywhere. The V2 configuration omits that broad egress and the inherited SSH ingress on managed-service subnets. When adapting an existing installation, review every attached security list and NSG: an older permissive rule can still allow traffic restricted by the new NSG. [Oracle: NSG and security-list interaction](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/networksecuritygroups.htm).
 
-PAC requires **OAC Enterprise Edition**, at least four available subnet IP addresses, and registration of the ADB private hostname/DNS zone. A private dashboard endpoint additionally needs client-side private DNS resolution and connectivity. Verify capacity for OAC, ADB, Bastion, and Database Tools before reserving endpoints in the two `/28` subnets. [Oracle: PAC prerequisites](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acoci/prerequisites-private-access-channel.html).
+PAC requires **OAC Enterprise Edition**, at least four available subnet IP addresses, and registration of the ADB private hostname/DNS zone. A private dashboard endpoint additionally needs client-side private DNS resolution and connectivity. Verify endpoint capacity across the OAC, ADB, and optional infra `/28` subnets before provisioning. [Oracle: PAC prerequisites](https://docs.oracle.com/en/cloud/paas/analytics-cloud/acoci/prerequisites-private-access-channel.html).
 
 ADB private ingress does not by itself force DBMS_CLOUD egress through the VCN. Operations should validate `ROUTE_OUTBOUND_CONNECTIONS = 'ENFORCE_PRIVATE_ENDPOINT'` for the selected database version and pipeline; Oracle recommends it to include DBMS_CLOUD outbound connections in private-endpoint enforcement. Confirm successful FOCUS ingestion before treating the SGW/NSG path as enforced. [Oracle: outbound connections from ADB private endpoints](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/private-endpoints-autonomous.html).
 
-## 5. Decisions and validation before JSON implementation
+## 5. Implementation and validation
 
-1. **Compartment placement:** shared-network dependencies as a documented exception, or dedicated networking inside `cmp-finops` for literal scope isolation.
-2. **OAC access:** private dashboard endpoint recommended for the LZ baseline; Enterprise Edition with PAC for ADB. Confirm dashboard audience connectivity before selecting a private endpoint.
-3. **Operator SQL privileges:** reporting access by default; confirm any pipeline-control operations. Use separate operator and DBA connections.
-4. **Network ownership:** LZ administrators provision networks, NSGs, Bastion, and developer connectivity; service administrators operate ADB/OAC with the scoped dependencies above.
+The [V2 configuration guide](v2/README.md) lists the dependency outputs, optional subnet handling, and exact Hub A return-route/import additions. The FinOps stack creates only its VCN and attachment; hub changes remain in the LZ stack that owns those resources. The existing Hub E example and SQL pipeline remain available.
 
-After approval, update JSON using the current One-OE domain-qualified groups, symbolic references, and dependency outputs. Preserve the existing ADB report-read endorsement. Treat changed Terraform resource keys and compartment ownership as migration decisions; review the plan for replacement before applying to an existing installation.
+The IAM template creates the agreed three groups and policies. A separate post-provisioning access file preserves the ADB report-read endorsement and restricts operators to their reporting connection. It requires the actual FinOps compartment and reporting connection OCIDs; the IAM module does not resolve symbolic keys inside dynamic-group matching rules. The guide explains separate-stack use and safe merging of policy maps, since the RMS facade does not deep-merge duplicate configuration blocks.
 
-Validation must include: configuration/schema checks against the pinned orchestrator; a plan with no unintended hub or workload replacement; role tests for allowed operations and denied access outside scope; separate operator/DBA SQL connections; OAC-to-ADB connectivity; Bastion forwarding; and forward/return routing through Hub A. The policies above are documentation-reviewed proposals, not a claim of live tenancy validation.
+JSON formatting and mocked Terraform plans are checked against Orchestrator v2.2.0. Live validation must still verify role permissions, Bastion lifecycle and sessions, operator/DBA connection separation, OAC-to-ADB connectivity, FOCUS ingestion, and Hub A forward/return routing. New resource keys and compartment ownership require state/migration review for an existing installation.
