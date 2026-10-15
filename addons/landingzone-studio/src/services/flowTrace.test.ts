@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildFlowTraces, specFromId, traceFlow, type FlowSpec } from './flowTrace';
+import { allFlowIds, buildFlowTraces, FLOW_KIND_COLORS, specFromId, traceFlow, type FlowSpec } from './flowTrace';
 import { emptyLzModel } from '../model/defaults';
 import { hubKindDefaults } from './hubKinds';
 
@@ -115,6 +115,34 @@ describe('flowTrace — walks the route tables per the validated OCI spec', () =
       'cmp-env-0-vcn-sn-0', 'cmp-env-0-vcn-sn-1', 'cmp-env-0-vcn-sn-2', 'cmp-env-0-vcn-sn-3',
     ]);
     expect(traces[4].hops[0].node).toBe('cmp-env-1-vcn-sn-0');
+  });
+
+  it('allFlowIds lists every flow from each environment\'s first endpoint', () => {
+    expect(allFlowIds(emptyLzModel())).toEqual([
+      'prod:egress:web', 'prod:ingress:web', 'prod>preprod:east-west:web', 'prod:services:web',
+      'preprod:egress:web', 'preprod:ingress:web', 'preprod>prod:east-west:web', 'preprod:services:web',
+    ]);
+  });
+
+  it('colours by traffic type in all-flows mode, so any number of flows stays legible', () => {
+    const model = emptyLzModel();
+    const traces = buildFlowTraces(model, allFlowIds(model), 'kind');
+    expect(traces).toHaveLength(8);
+    expect(traces.every((t) => t.ok)).toBe(true);
+    for (const t of traces) expect(t.color).toBe(FLOW_KIND_COLORS[t.kind]);
+  });
+
+  it('names the attachment the packet actually leaves through, not the shared DRG table owner', () => {
+    const [trace] = buildFlowTraces(emptyLzModel(), ['preprod:egress:web']);
+    expect(trace.hops[1].node).toBe('attach-cmp-env-1');
+    expect(trace.hops[1].label).toMatch(/^preprod attach: /);
+  });
+
+  it('buildFlowTraces keeps one colour when single endpoints of the same flow are picked', () => {
+    const traces = buildFlowTraces(emptyLzModel(), ['prod:egress:web', 'preprod:services', 'prod:egress:infra']);
+    const colourOf = (id: string) => traces.find((t) => t.id === id)?.color;
+    expect(colourOf('prod:egress:web#0')).toBe(colourOf('prod:egress:infra#3'));
+    expect(colourOf('prod:egress:web#0')).not.toBe(colourOf('preprod:services#0'));
   });
 
   it('Hub E traces local spoke egress and direct spoke-to-spoke routing', () => {

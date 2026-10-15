@@ -235,7 +235,7 @@ export interface DiagramEdge {
    * by buildGraph and consumed unchanged by the live and Draw.io renderers. */
   points?: { x: number; y: number }[];
   /** Flow overlay: numbered hop badges with their precomputed absolute centres. */
-  badges?: { node: string; seq: number; x: number; y: number }[];
+  badges?: { node: string; seq: number; x: number; y: number; inspected?: boolean }[];
   /** Fixed connection sides — pins endpoints to a specific border for clean routing. */
   sourceSide?: EdgeSide;
   targetSide?: EdgeSide;
@@ -268,4 +268,8 @@ export interface DiagramOptions {
   showFlows?: boolean;
   /** Selected flow ids — composite `<env>:<flowKind>` (e.g. "prod:egress"). */
   activeFlows?: string[];
+  /** Trace every flow at once, coloured by traffic type, instead of `activeFlows`. */
+  allFlows?: boolean;
+  /** The flow clicked on the diagram (`<env>:<flowKind>`): others dim, its route tables open. */
+  focusFlow?: string;
 }
