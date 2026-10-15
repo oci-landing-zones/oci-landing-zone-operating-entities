@@ -1,6 +1,6 @@
 # FinOps V2 IAM and networking
 
-These configurations add the FinOps platform to an existing One-OE Landing Zone using **Orchestrator v2.2.0**, IAM module **v0.3.5**, and networking module **v0.9.0**. The existing [Hub E deployment files](../README.md) remain available. The [IAM and network design](../v2-iam-network-proposal.md) explains the role boundaries and Oracle documentation behind them.
+These configurations add the FinOps platform to an existing One-OE Landing Zone using **Orchestrator v2.2.0**, IAM module **v0.3.5**, and networking module **v0.9.0**. The existing [Hub E deployment files](../README.md) remain available.
 
 ## Configuration files
 
