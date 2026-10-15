@@ -409,8 +409,12 @@ For example: A Fusion SaaS Production environment will contain all the users who
 In some cases the number of Fusion SaaS environment domains may not be 1:1 with the OCI domains.
 For example Fusion can have 3 environments Production, Test, Development but the OCI only has the Common domain. 
 
-For certain OCI services, like OIC in a PaaS4SaaS (Platform as a Service for Software as a Service) tenancy, the users may be in the Fusion SaaS domain
-https://docs.oracle.com/en/cloud/saas/applications-common/26c/oaext/provision-a-new-platform-as-a-service-into-a-fusion-identity-and-access-management-domain-.html
+For certain OCI services, like OIC in a PaaS4SaaS (Platform as a Service for Software as a Service) tenancy, the users may be in the Fusion SaaS domain [OIC in Fusion Apps Identity Domain](https://docs.oracle.com/en/cloud/saas/applications-common/26c/oaext/provision-a-new-platform-as-a-service-into-a-fusion-identity-and-access-management-domain-.html)
+
+In this case using the Fusion Applications identity domain offers OIC the following features:
+- All the Fusion Applications users are automatically available to be assigned to this integration instance.
+- Single Sign-On (SSO) is enabled beween Fusion Applications and Oracle Integrations.
+- You can configure Oracle Integration to call Fusion Applications APIs using OAuth.
 
 
 &nbsp;
