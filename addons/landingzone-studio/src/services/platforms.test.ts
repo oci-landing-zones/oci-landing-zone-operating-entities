@@ -38,7 +38,7 @@ describe('newPlatform', () => {
 
   it('seeds OCVS with generator-owned provisioning networking and an incomplete credential field', () => {
     const p = newPlatform('ocvs', []);
-    expect(p).toMatchObject({ id: 'ocv', type: 'ocvs', subnets: [] });
+    expect(p).toMatchObject({ id: 'ocv', type: 'ocvs', vcnCidr: '10.0.88.0/21', subnets: [] });
     expect(p.ocvsParams?.sshAuthorizedKeys).toBe('');
   });
 
@@ -124,6 +124,6 @@ describe('per-environment derivation', () => {
 
   it('derives the OCVS provisioning subnet for each environment VCN', () => {
     const p = newPlatform('ocvs', []);
-    expect(platformSubnetsForEnv(p, 'preprod', 1)).toEqual([{ name: 'provisioning', cidr: '10.0.88.0/25', locked: true }]);
+    expect(platformSubnetsForEnv(p, 'preprod', 1)).toEqual([{ name: 'provisioning', cidr: '10.0.96.0/25', locked: true }]);
   });
 });

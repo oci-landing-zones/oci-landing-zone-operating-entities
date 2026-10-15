@@ -270,6 +270,7 @@ local extension_components = import 'lib/extension_components.libsonnet';
           scope_config+: {
             extension_components: component_summary.extension_components,
             extension_shared_components: component_summary.extension_shared_components,
+            extension_shared_scopes: component_summary.extension_shared_scopes,
             extension_entry_components: component_summary.entry_components(entry),
             extension_entry_uses_publication_components:
               component_summary.entry_uses_publication_components(entry),

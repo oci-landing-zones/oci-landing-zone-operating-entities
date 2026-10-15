@@ -1,6 +1,8 @@
 import type { EnvNetworkConfig, LzModel, ProjectConfig } from './types';
 import { getDefaultRegionForRealm } from '../services/regions';
 import { hubKindDefaults } from '../services/hubKinds';
+import { formatIp, parseCidr, shiftCidr, totalIps } from '../services/cidr';
+import addressPlan from '../../../../gen/data/network-address-plan.json';
 
 export const LZ_MODEL_VERSION = '0.18.0';
 
@@ -13,14 +15,17 @@ export const ENV_SUBNET_ROLES = ['web', 'app', 'db', 'infra'] as const;
 export function envNetworkDefaults(index: number): EnvNetworkConfig {
   // Mirrors gen/defaults.libsonnet for prod/preprod and continues the same
   // non-overlapping /18 stride for environments added in Studio.
-  const block = 64 * (index + 1);
-  const secondOctet = Math.floor(block / 256);
-  const thirdOctet = block % 256;
+  const base = addressPlan.foundation.project_vcns.prod;
+  const vcnCidr = index === 1
+    ? addressPlan.foundation.project_vcns.preprod
+    : shiftCidr(base, index * addressPlan.allocation.project_environment_stride_ips) ?? base;
+  const start = parseCidr(vcnCidr)!.start;
+  const subnetPrefix = addressPlan.allocation.project_subnet_prefix;
   return {
-    vcnCidr: `10.${secondOctet}.${thirdOctet}.0/21`,
+    vcnCidr,
     subnets: ENV_SUBNET_ROLES.map((role, subnetIndex) => ({
       name: role,
-      cidr: `10.${secondOctet}.${thirdOctet + subnetIndex}.0/24`,
+      cidr: `${formatIp(start + subnetIndex * totalIps(subnetPrefix))}/${subnetPrefix}`,
     })),
   };
 }

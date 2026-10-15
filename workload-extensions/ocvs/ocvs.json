@@ -19,7 +19,7 @@
 
                 "networking": {
                     "subnet_id"                   : "SN-FRA-LZ-PROD-PLATFORM-OCVS-PROVISIONING-KEY",
-                    "vcn_cidr_block"              : "10.0.80.0/21",
+                    "vcn_cidr_block"              : "10.0.88.0/21",
                     "vcn_id"                      : "VCN-FRA-LZ-PROD-PLATFORM-OCVS-KEY",
 
                     "route_tables": {

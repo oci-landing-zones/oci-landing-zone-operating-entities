@@ -11,6 +11,63 @@ PUBLISHED = REPO_ROOT / "workload-extensions/exaxs/single-stack"
 
 
 class ExaxsGeneratorTests(unittest.TestCase):
+    def test_custom_platform_names_use_existing_compartment_paths(self) -> None:
+        for uc in (1, 2, 3):
+            with self.subTest(use_case=uc):
+                result = run_cmd([
+                    jsonnet_command(), "-J", str(REPO_ROOT), "-e",
+                    self._custom_platform_expression(uc) + "lz(config).iam",
+                ])
+                iam = json.loads(result.stdout)
+                root = iam["compartments_configuration"]["compartments"][
+                    "CMP-LANDINGZONE-KEY"
+                ]
+                paths = self._compartment_paths(root["children"]).values()
+                policies = iam["policies_configuration"]["supplied_policies"]
+                for key, policy in policies.items():
+                    if "EXAXS" not in key:
+                        continue
+                    for statement in policy["statements"]:
+                        path = statement.split(" in compartment ", 1)[1].split(" where ", 1)[0]
+                        self.assertIn(path, paths)
+                if uc == 2:
+                    statements = policies["PCY-LZ-PROD-EXAXS-INFRA-ADMIN-KEY"]["statements"]
+                    self.assertTrue(any(
+                        "use exascale-db-storage-vaults in compartment "
+                        "cmp-lz-platform:cmp-lz-shared-storage:cmp-lz-shared-storage-infra"
+                        in statement for statement in statements
+                    ))
+
+    def test_ambiguous_shared_vault_placement_is_rejected(self) -> None:
+        expression = self._custom_platform_expression(2) + """
+            lz(config { shared_platforms+: { extra: profile.shared_platforms.exaxs } }).iam
+        """
+        result = run_cmd(
+            [jsonnet_command(), "-J", str(REPO_ROOT), "-e", expression],
+            expect_success=False,
+        )
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("exaxs requires exactly one shared infrastructure scope", result.stderr)
+
+    @staticmethod
+    def _custom_platform_expression(uc: int) -> str:
+        return f"""
+            local profiles = import 'gen/workload-extensions/exaxs/published_profiles.libsonnet';
+            local lz = import 'gen/landing_zone.libsonnet';
+            local profile = profiles.uc{uc};
+            local config = profile {{
+                [if std.objectHas(profile, 'shared_platforms') then 'shared_platforms']:
+                    {{ storage: profile.shared_platforms.exaxs }},
+                environments: {{
+                    [env]: profile.environments[env] {{
+                        [if std.objectHas(profile.environments[env], 'platforms') then 'platforms']:
+                            {{ analytics: profile.environments[env].platforms.exaxs }},
+                    }}
+                    for env in std.objectFields(profile.environments)
+                }},
+            }};
+        """
+
     def test_published_single_stack_json_matches_jsonnet(self) -> None:
         sources = sorted(SOURCE.glob("*.jsonnet"))
         self.assertEqual(29, len(sources))
@@ -78,6 +135,38 @@ class ExaxsGeneratorTests(unittest.TestCase):
                     self.assertFalse(
                         any("autonomous" in event.lower() for event in rule["supplied_events"])
                     )
+
+    def test_dba_cluster_grants_exclude_infrastructure_updates(self) -> None:
+        for uc in (1, 2, 3):
+            with self.subTest(use_case=uc):
+                result = run_cmd([
+                    jsonnet_command(), "-J", str(REPO_ROOT), "-e",
+                    self._custom_platform_expression(uc) + "lz(config).iam",
+                ])
+                policies = json.loads(result.stdout)["policies_configuration"]["supplied_policies"]
+                dba_grants = []
+                infra_grants = []
+                for key, policy in policies.items():
+                    if "EXAXS" not in key:
+                        continue
+                    cluster_grants = [
+                        statement for statement in policy["statements"]
+                        if " exadb-vm-clusters in compartment " in statement
+                    ]
+                    if "DB-ADMIN" in key:
+                        dba_grants.extend(cluster_grants)
+                        self.assertTrue(any(" to manage db-homes " in s for s in policy["statements"]))
+                        self.assertTrue(any(" to manage databases " in s for s in policy["statements"]))
+                    elif "INFRA-ADMIN" in key:
+                        infra_grants.extend(cluster_grants)
+                self.assertTrue(dba_grants)
+                self.assertTrue(infra_grants)
+                for grant in dba_grants:
+                    self.assertIn(" to use exadb-vm-clusters ", grant)
+                    self.assertIn("where all{request.permission !='EXADB_VM_CLUSTER_UPDATE'}", grant)
+                for grant in infra_grants:
+                    self.assertIn(" to manage exadb-vm-clusters ", grant)
+                    self.assertNotIn(" where ", grant)
 
     @staticmethod
     def _published(name: str) -> dict:

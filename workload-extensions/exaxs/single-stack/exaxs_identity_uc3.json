@@ -401,7 +401,7 @@
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-preprod-exaxs-db-admin' to use exadb-vm-clusters in compartment cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-exaxs:cmp-lz-preprod-exaxs-db",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-exaxs-db-admin' to use exadb-vm-clusters in compartment cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-exaxs:cmp-lz-preprod-exaxs-db where all{request.permission !='EXADB_VM_CLUSTER_UPDATE'}",
                     "allow group 'id_lz_common'/'grp-lz-preprod-exaxs-db-admin' to manage db-homes in compartment cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-exaxs:cmp-lz-preprod-exaxs-db",
                     "allow group 'id_lz_common'/'grp-lz-preprod-exaxs-db-admin' to manage databases in compartment cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-exaxs:cmp-lz-preprod-exaxs-db",
                     "allow group 'id_lz_common'/'grp-lz-preprod-exaxs-db-admin' to manage pluggable-databases in compartment cmp-lz-preprod:cmp-lz-preprod-platform:cmp-lz-preprod-exaxs:cmp-lz-preprod-exaxs-db",
@@ -501,7 +501,7 @@
                 "compartment_id"                                               : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-prod-exaxs-db-admin' to use exadb-vm-clusters in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-exaxs:cmp-lz-prod-exaxs-db",
+                    "allow group 'id_lz_common'/'grp-lz-prod-exaxs-db-admin' to use exadb-vm-clusters in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-exaxs:cmp-lz-prod-exaxs-db where all{request.permission !='EXADB_VM_CLUSTER_UPDATE'}",
                     "allow group 'id_lz_common'/'grp-lz-prod-exaxs-db-admin' to manage db-homes in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-exaxs:cmp-lz-prod-exaxs-db",
                     "allow group 'id_lz_common'/'grp-lz-prod-exaxs-db-admin' to manage databases in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-exaxs:cmp-lz-prod-exaxs-db",
                     "allow group 'id_lz_common'/'grp-lz-prod-exaxs-db-admin' to manage pluggable-databases in compartment cmp-lz-prod:cmp-lz-prod-platform:cmp-lz-prod-exaxs:cmp-lz-prod-exaxs-db",

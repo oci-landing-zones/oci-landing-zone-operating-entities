@@ -1,3 +1,5 @@
+local address_plan = import '../../data/network-address-plan.json';
+local ranges = address_plan.platforms.exacs;
 local notification_emails = {
   default: ['exacs-platform-team@example.com'],
   db_workloads: ['exacs-db-team@example.com'],
@@ -27,11 +29,11 @@ local env_exacs_platform(projects, vcn, components=null) = exacs_extension(proje
 };
 
 local shared_exacs_platform(projects=null) = exacs_extension(projects, infra_and_db) + {
-  network: { vcn: '10.0.24.0/21' },
+  network: { vcn: ranges.shared },
 };
 
-local prod_exacs_vcn = '10.0.104.0/21';
-local preprod_exacs_vcn = '10.0.168.0/21';
+local prod_exacs_vcn = ranges.prod;
+local preprod_exacs_vcn = ranges.preprod;
 
 local base_prod_preprod_config(hub_kind) = {
   region: 'eu-frankfurt-1',
@@ -40,15 +42,15 @@ local base_prod_preprod_config(hub_kind) = {
   security_targets: ['prod'],
   hub: {
     kind: hub_kind,
-    network: { vcn: '10.0.0.0/21' },
+    network: { vcn: address_plan.foundation.hub_vcn },
   },
   environments: {
     prod: {
-      project_network: { network: { vcn: '10.0.64.0/21' } },
+      project_network: { network: { vcn: address_plan.foundation.project_vcns.prod } },
       projects: { proj1: {} },
     },
     preprod: {
-      project_network: { network: { vcn: '10.0.128.0/21' } },
+      project_network: { network: { vcn: address_plan.foundation.project_vcns.preprod } },
       projects: { proj1: {} },
     },
   },

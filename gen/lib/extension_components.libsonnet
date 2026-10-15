@@ -90,6 +90,16 @@ local collections = import 'collections.libsonnet';
       for ext_type in extension_types
     },
 
+    extension_shared_scopes: {
+      [ext_type]: [
+        entry.scope
+        for entry in extension_entries
+        if entry.platform_config.extension.type == ext_type &&
+           entry.scope.scope_type == 'shared'
+      ]
+      for ext_type in extension_types
+    },
+
     extension_shared_components: {
       [ext_type]: {
         infrastructure: std.length([

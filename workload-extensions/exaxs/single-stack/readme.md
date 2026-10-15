@@ -55,6 +55,8 @@ The table summarizes the generated prerequisite configuration. It does not descr
 
 ## **5. Publication Status**
 
+The DBA cluster grant follows the ExaDB-D exclusion pattern: `use exadb-vm-clusters` excludes `EXADB_VM_CLUSTER_UPDATE`. Oracle documents a single XS cluster-update permission, so this restricts all operations requiring it, including VM removal and compartment changes, rather than selected capacity attributes. Cluster updates, including cluster maintenance requiring that permission, belong to the Infra workflow. Validate Database Home, database, PDB, and backup workflows with the intended group memberships in the target tenancy; these files do not prove service-side authorization. See the [XS IAM reference](https://docs.oracle.com/en-us/iaas/exadb-xs/doc/exadb-xs-policy-details.html).
+
 The generated files establish the One-OE foundation and ExaDB-XS prerequisites. IAM policies include the documented VM Cluster dependencies on database, Vault, and network resources; `use exascale-db-storage-vaults` also permits Vault updates, so review that grant before deployment. Example email subscriptions and disabled alarms require operational values and thresholds. No ExaDB-XS Vault, VM Cluster, Database Home, database, backup, or Data Guard resource is created by this JSON set. Validate the selected region, OCI policies, resource ordering, and service limits before using the files with the Orchestrator. Return to the [ExaDB-XS overview](../readme.md) for the three design choices.
 
 &nbsp;

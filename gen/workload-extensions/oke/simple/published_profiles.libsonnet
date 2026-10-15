@@ -1,8 +1,14 @@
+local address_plan = import '../../../data/network-address-plan.json';
 local kubernetes_version = 'v1.35.2';
 local services_cidr = '10.96.0.0/16';
 local api_endpoint_allowed_cidrs = ['10.0.1.0/24'];
 local oke_platform = {
-  network: { vcn: '10.0.80.0/20' },
+  network: {
+    vcn: '%s/%d' % [
+      std.split(address_plan.platforms.oke_simple.prod, '/')[0],
+      address_plan.allocation.oke_auto_small_prefix,
+    ],
+  },
   extension: {
     type: 'oke_simple',
     params: {
@@ -24,7 +30,7 @@ local hub_e_prod_oke_base_config = {
   security_targets: ['prod'],
   hub: {
     kind: 'hub_e',
-    network: { vcn: '10.0.0.0/21' },
+    network: { vcn: address_plan.foundation.hub_vcn },
   },
   environments: {
     prod: {

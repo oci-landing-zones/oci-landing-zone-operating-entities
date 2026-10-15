@@ -137,6 +137,10 @@ Update this diagram when any of these change:
 - the responsibility split between normalization, orchestration, and output fan-out
 - the output emission pattern
 
+## Common Address Plan
+
+`gen/data/network-address-plan.json` owns reference network CIDRs, deliberate future platform reservations, and Studio allocation settings. Published profiles and Studio must import this catalog instead of duplicating those defaults. Explicit customer config remains authoritative. Reservations do not imply network creation or extension support. Keep the [reference table](../addons/oci-lz-blueprint-factory/network-address-plan.md) synchronized. OKE `/21` reservations do not change automatic `small` `/20` sizing. Studio's Jsonnet virtual filesystem must include imported JSON data as well as Jsonnet libraries.
+
 ## Published Profiles
 
 - `config` means a canonical input object passed into `landing_zone.libsonnet`.

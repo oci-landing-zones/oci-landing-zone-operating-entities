@@ -59,6 +59,7 @@ describe('virtualFs', () => {
     expect(files[entry]).toBeDefined();
     expect(files[defaults]).toBeDefined();
     expect(files['workload-extensions/oke/simple/oke_network_resources.libsonnet']).toBeDefined();
+    expect(JSON.parse(files['data/network-address-plan.json']).platforms.exaxs.shared).toBe('10.0.32.0/21');
   });
 });
 

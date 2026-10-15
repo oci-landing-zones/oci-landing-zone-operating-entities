@@ -78,7 +78,7 @@
 
                                     "rr-fra-vcn-prod-platform-ocvs": {
                                         "description"                            : "Route to VCN Prod OCVS through DRG",
-                                        "destination"                            : "10.0.80.0/21",
+                                        "destination"                            : "10.0.88.0/21",
                                         "destination_type"                       : "CIDR_BLOCK",
                                         "network_entity_key"                     : "DRG-FRA-LZ-HUB-KEY"
                                     }
@@ -105,7 +105,7 @@
 
                                     "rr-fra-vcn-prod-platform-ocvs": {
                                         "description"                            : "Route to VCN Prod OCVS through DRG",
-                                        "destination"                            : "10.0.80.0/21",
+                                        "destination"                            : "10.0.88.0/21",
                                         "destination_type"                       : "CIDR_BLOCK",
                                         "network_entity_key"                     : "DRG-FRA-LZ-HUB-KEY"
                                     }
@@ -481,7 +481,7 @@
                 "vcns": {
                     "VCN-FRA-LZ-PROD-PLATFORM-OCVS-KEY": {
                         "display_name"                                           : "vcn-fra-lz-prod-ocvs",
-                        "cidr_blocks"                                            : ["10.0.80.0/21"],
+                        "cidr_blocks"                                            : ["10.0.88.0/21"],
                         "dns_label"                                              : "vcnfralzpocvs",
                         "block_nat_traffic"                                      : false,
                         "is_attach_drg"                                          : false,
@@ -492,7 +492,7 @@
                         "subnets": {
                             "SN-FRA-LZ-PROD-PLATFORM-OCVS-PROVISIONING-KEY": {
                                 "display_name"                                   : "sn-fra-lz-prod-ocvs-provisioning",
-                                "cidr_block"                                     : "10.0.80.0/25",
+                                "cidr_block"                                     : "10.0.88.0/25",
                                 "dns_label"                                      : "snpplatocvsprov",
                                 "dhcp_options_key"                               : "default_dhcp_options",
                                 "prohibit_internet_ingress"                      : true,
@@ -725,7 +725,7 @@
                                     },
                                     {
                                         "description"                            : "ICMP type 3",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ICMP",
                                         "icmp_type"                              : 3,
@@ -768,7 +768,7 @@
                                 "ingress_rules": {
                                     "vcn": {
                                         "description"                            : "Allow all ingress from the OCVS VCN CIDR",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ALL",
                                         "stateless"                              : false
@@ -792,7 +792,7 @@
                                 "ingress_rules": {
                                     "vcn": {
                                         "description"                            : "Allow all ingress from the OCVS VCN CIDR",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ALL",
                                         "stateless"                              : false
@@ -816,7 +816,7 @@
                                 "ingress_rules": {
                                     "vcn": {
                                         "description"                            : "Allow all ingress from the OCVS VCN CIDR",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ALL",
                                         "stateless"                              : false
@@ -840,7 +840,7 @@
                                 "ingress_rules": {
                                     "vcn": {
                                         "description"                            : "Allow all ingress from the OCVS VCN CIDR",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ALL",
                                         "stateless"                              : false
@@ -864,7 +864,7 @@
                                 "ingress_rules": {
                                     "vcn": {
                                         "description"                            : "Allow all ingress from the OCVS VCN CIDR",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ALL",
                                         "stateless"                              : false
@@ -888,7 +888,7 @@
                                 "ingress_rules": {
                                     "vcn": {
                                         "description"                            : "Allow all ingress from the OCVS VCN CIDR",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ALL",
                                         "stateless"                              : false
@@ -912,7 +912,7 @@
                                 "ingress_rules": {
                                     "vcn": {
                                         "description"                            : "Allow all ingress from the OCVS VCN CIDR",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ALL",
                                         "stateless"                              : false
@@ -936,7 +936,7 @@
                                 "ingress_rules": {
                                     "vcn": {
                                         "description"                            : "Allow all ingress from the OCVS VCN CIDR",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ALL",
                                         "stateless"                              : false
@@ -960,7 +960,7 @@
                                 "ingress_rules": {
                                     "vcn": {
                                         "description"                            : "Allow all ingress from the OCVS VCN CIDR",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ALL",
                                         "stateless"                              : false
@@ -984,7 +984,7 @@
                                 "ingress_rules": {
                                     "vcn": {
                                         "description"                            : "Allow all ingress from the OCVS VCN CIDR",
-                                        "src"                                    : "10.0.80.0/21",
+                                        "src"                                    : "10.0.88.0/21",
                                         "src_type"                               : "CIDR_BLOCK",
                                         "protocol"                               : "ALL",
                                         "stateless"                              : false

@@ -14,4 +14,5 @@
 - ExaDB-XS does not emit Autonomous VM Clusters, Autonomous Databases, ExaDB-D infrastructure, or project database compartments.
 - The emitted JSON establishes Landing Zone prerequisites, including compartment, IAM, network, Events, Alarms, and Notification configuration. It does not create Storage Vaults, VM Clusters, Database Homes, or databases.
 - OCI IAM permits `use exascale-db-storage-vaults` to update Vaults as well as satisfy the VM Cluster dependency. Review that grant and the full cluster operation workflow before deployment.
+- DBA `use exadb-vm-clusters` grants exclude `EXADB_VM_CLUSTER_UPDATE` through `request.permission` conditions, following the ExaCS exclusion pattern. XS documents a single cluster-update permission, so cluster updates and VM removal remain with Infra; do not invent ExaCS-style per-attribute XS permissions. Validate dependent database operations in the target tenancy before deployment.
 - The alarm examples are disabled and notification addresses are placeholders until reviewed for a target tenancy.

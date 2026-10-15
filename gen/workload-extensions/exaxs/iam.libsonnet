@@ -22,18 +22,33 @@
     local principal(group) = "'id_lz_common'/'%s'" % group;
     local policy(group, verb, resource, path) =
       'allow group %s to %s %s in compartment %s' % [principal(group), verb, resource, path];
+    // XS exposes one cluster-update permission rather than ExaCS's per-attribute permissions.
+    local db_vmcluster_excluded_permissions = ['EXADB_VM_CLUSTER_UPDATE'];
+    local policy_excluding_permissions(group, verb, resource, path, permissions) =
+      policy(group, verb, resource, path) + ' where all{%s}' % std.join(', ', [
+        "request.permission !='%s'" % permission
+        for permission in permissions
+      ]);
     // These policies are attached to cmp-landingzone, so paths start at its children.
-    local shared_root = 'cmp-lz-platform:cmp-lz-shared-exaxs';
-    local platform_root =
-      if shared then shared_root
-      else 'cmp-lz-%s:cmp-lz-%s-platform:%s' % [env, env, scope.compartment_name];
+    local relative_path(path) = std.join(':', std.split(path, ':')[1:]);
+    local shared_scopes =
+      if std.objectHas(scope_config, 'extension_shared_scopes') &&
+         std.objectHas(scope_config.extension_shared_scopes, 'exaxs') then
+        scope_config.extension_shared_scopes.exaxs
+      else [];
+    local shared_infrastructure_scope =
+      assert std.length(shared_scopes) == 1 :
+             'exaxs requires exactly one shared infrastructure scope for environment VM Clusters';
+      shared_scopes[0];
+    local platform_root = relative_path(scope.compartment_path);
     local vault_path =
       if shared || !shared_components.infrastructure then '%s:%s-infra' % [platform_root, scope.compartment_name]
-      else '%s:cmp-lz-shared-exaxs-infra' % shared_root;
+      else '%s:%s-infra' % [
+        relative_path(shared_infrastructure_scope.compartment_path),
+        shared_infrastructure_scope.compartment_name,
+      ];
     local db_path = '%s:%s-db' % [platform_root, scope.compartment_name];
-    local network_path =
-      if shared then 'cmp-lz-network'
-      else 'cmp-lz-%s:cmp-lz-%s-network' % [env, env];
+    local network_path = relative_path(scope.network_compartment_path);
     local network_dependencies(group) = [
       policy(group, 'use', 'vnics', network_path),
       policy(group, 'use', 'subnets', network_path),
@@ -51,7 +66,10 @@
         policy(infra_group, 'use', 'exascale-db-storage-vaults', vault_path),
       ]) + network_dependencies(infra_group) else []);
     local db_statements = if components.database then [
-      policy(db_group, 'use', 'exadb-vm-clusters', db_path),
+      policy_excluding_permissions(
+        db_group, 'use', 'exadb-vm-clusters', db_path,
+        db_vmcluster_excluded_permissions
+      ),
       policy(db_group, 'manage', 'db-homes', db_path),
       policy(db_group, 'manage', 'databases', db_path),
       policy(db_group, 'manage', 'pluggable-databases', db_path),

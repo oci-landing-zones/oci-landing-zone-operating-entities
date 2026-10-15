@@ -97,6 +97,8 @@ Example shape:
 
 Not every configuration needs every block. A hub-only Landing Zone may omit environments, while a larger design may add environments, platforms, projects, and workload extensions. `project_network` is optional and supports both shared and project-dedicated subnet allocations. Prefer shared subnets for address efficiency; dedicated allocation does not provide IAM isolation. See the [Blueprint Factory Configuration Reference](./blueprint-factory-configuration-reference.md#4-project-network) for the complete contract and routing implications.
 
+The [common network address plan](./network-address-plan.md) records platform reservations and the defaults shared with Landing Zone Studio. Its source is `gen/data/network-address-plan.json`; OKE automatic sizing remains `/20`.
+
 The [examples](./examples) folder contains small and medium-size config files that can be used as starting points for common Blueprint Factory scenarios.
 
 | Example | Shows |

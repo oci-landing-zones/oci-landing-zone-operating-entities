@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "foundation": {
+    "hub_vcn": "10.0.0.0/21",
+    "project_vcns": {
+      "prod": "10.0.64.0/21",
+      "preprod": "10.0.128.0/21"
+    }
+  },
+  "platforms": {
+    "ebs": {
+      "dev": "10.1.72.0/21",
+      "uat": "10.1.136.0/21"
+    },
+    "exacs": {
+      "shared": "10.0.24.0/21",
+      "prod": "10.0.104.0/21",
+      "preprod": "10.0.168.0/21"
+    },
+    "exaxs": {
+      "shared": "10.0.32.0/21",
+      "prod": "10.0.112.0/21",
+      "preprod": "10.0.176.0/21"
+    },
+    "ocvs": {
+      "prod": "10.0.88.0/21",
+      "preprod": "10.0.152.0/21",
+      "dev": "10.1.88.0/21",
+      "uat": "10.1.152.0/21"
+    },
+    "oke_simple": {
+      "prod": "10.0.80.0/21",
+      "preprod": "10.0.144.0/21",
+      "dev": "10.1.80.0/21",
+      "uat": "10.1.144.0/21"
+    }
+  },
+  "hub_reservations": {
+    "ebs_platform": "10.0.8.0/21",
+    "oke_platform": "10.0.16.0/21"
+  },
+  "allocation": {
+    "oke_auto_small_prefix": 20,
+    "project_environment_stride_ips": 16384,
+    "project_subnet_prefix": 24,
+    "studio_platform_base_vcn": "10.0.80.0/21",
+    "studio_platform_instance_stride_ips": 16384,
+    "shared_platform_pool": "10.170.0.0/16",
+    "shared_platform_prefix": 21
+  }
+}

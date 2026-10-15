@@ -203,13 +203,13 @@ describe('serializeConfig', () => {
       sharedPlatforms: [{ id: 'shared-ocv', key: 'ocv', type: 'ocvs', vcnCidr: '10.170.0.0/21', subnets: [], ocvsParams: settings }],
     });
     const c = buildConfig(m);
-    expect(c.environments.prod.platforms.ocv).toMatchObject({ network: { vcn: '10.0.80.0/21' }, extension: { type: 'ocvs' } });
+    expect(c.environments.prod.platforms.ocv).toMatchObject({ network: { vcn: '10.0.88.0/21' }, extension: { type: 'ocvs' } });
     expect(c.environments.prod.platforms.ocv.network.subnets).toBeUndefined();
     expect(c.shared_platforms.ocv).toMatchObject({ network: { vcn: '10.170.0.0/21' }, extension: { type: 'ocvs' } });
     expect(c.shared_platforms.ocv.network.subnets).toBeUndefined();
     const text = serializeConfig(m, 4);
     expect(text).toContain("extension: { type: 'ocvs'");
-    expect(text).not.toContain("provisioning: '10.0.80.0/25'");
+    expect(text).not.toContain("provisioning: '10.0.88.0/25'");
   });
 
   it('serialises Custom as a valid network-only platform without an extension', () => {

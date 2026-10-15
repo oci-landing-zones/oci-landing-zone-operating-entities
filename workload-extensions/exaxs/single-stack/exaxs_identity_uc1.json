@@ -323,7 +323,7 @@
                 "compartment_id"                                       : "CMP-LANDINGZONE-KEY",
 
                 "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-global-exaxs-db-admin' to use exadb-vm-clusters in compartment cmp-lz-platform:cmp-lz-shared-exaxs:cmp-lz-shared-exaxs-db",
+                    "allow group 'id_lz_common'/'grp-lz-global-exaxs-db-admin' to use exadb-vm-clusters in compartment cmp-lz-platform:cmp-lz-shared-exaxs:cmp-lz-shared-exaxs-db where all{request.permission !='EXADB_VM_CLUSTER_UPDATE'}",
                     "allow group 'id_lz_common'/'grp-lz-global-exaxs-db-admin' to manage db-homes in compartment cmp-lz-platform:cmp-lz-shared-exaxs:cmp-lz-shared-exaxs-db",
                     "allow group 'id_lz_common'/'grp-lz-global-exaxs-db-admin' to manage databases in compartment cmp-lz-platform:cmp-lz-shared-exaxs:cmp-lz-shared-exaxs-db",
                     "allow group 'id_lz_common'/'grp-lz-global-exaxs-db-admin' to manage pluggable-databases in compartment cmp-lz-platform:cmp-lz-shared-exaxs:cmp-lz-shared-exaxs-db",

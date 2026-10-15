@@ -27,6 +27,8 @@ Studio complements the [OCI LZ Blueprint Factory](../oci-lz-blueprint-factory/RE
 
 &nbsp;
 
+Studio and Blueprint Factory share the [common network address plan](../oci-lz-blueprint-factory/network-address-plan.md), sourced from `gen/data/network-address-plan.json`. It supplies initial network defaults and allocation settings. Reservations do not renumber saved designs or automatically map named environments; OKE retains its automatic `/20` profile.
+
 ## 2. Design workflow
 
 Studio keeps one canonical Landing Zone model while you work. The wizard, JSON configuration, live network diagram, packet-flow trace, downloadable Draw.io diagram, and generated deployment files all derive from that same model.

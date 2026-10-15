@@ -92,14 +92,14 @@
 
                                     "rr-fra-vcn-preprod-platform-exaxs": {
                                         "description"                              : "Route to VCN PreProd EXAXS through DRG",
-                                        "destination"                              : "10.0.168.0/21",
+                                        "destination"                              : "10.0.176.0/21",
                                         "destination_type"                         : "CIDR_BLOCK",
                                         "network_entity_key"                       : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
                                     "rr-fra-vcn-prod-platform-exaxs": {
                                         "description"                              : "Route to VCN Prod EXAXS through DRG",
-                                        "destination"                              : "10.0.104.0/21",
+                                        "destination"                              : "10.0.112.0/21",
                                         "destination_type"                         : "CIDR_BLOCK",
                                         "network_entity_key"                       : "DRG-FRA-LZ-HUB-KEY"
                                     }
@@ -140,14 +140,14 @@
 
                                     "rr-fra-vcn-preprod-platform-exaxs": {
                                         "description"                              : "Route to VCN PreProd EXAXS through DRG",
-                                        "destination"                              : "10.0.168.0/21",
+                                        "destination"                              : "10.0.176.0/21",
                                         "destination_type"                         : "CIDR_BLOCK",
                                         "network_entity_key"                       : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
                                     "rr-fra-vcn-prod-platform-exaxs": {
                                         "description"                              : "Route to VCN Prod EXAXS through DRG",
-                                        "destination"                              : "10.0.104.0/21",
+                                        "destination"                              : "10.0.112.0/21",
                                         "destination_type"                         : "CIDR_BLOCK",
                                         "network_entity_key"                       : "DRG-FRA-LZ-HUB-KEY"
                                     }
@@ -708,14 +708,14 @@
 
                                     "rr-fra-vcn-preprod-platform-exaxs": {
                                         "description"                              : "Route to VCN PreProd EXAXS through DRG",
-                                        "destination"                              : "10.0.168.0/21",
+                                        "destination"                              : "10.0.176.0/21",
                                         "destination_type"                         : "CIDR_BLOCK",
                                         "network_entity_key"                       : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
                                     "rr-fra-vcn-prod-platform-exaxs": {
                                         "description"                              : "Route to VCN Prod EXAXS through DRG",
-                                        "destination"                              : "10.0.104.0/21",
+                                        "destination"                              : "10.0.112.0/21",
                                         "destination_type"                         : "CIDR_BLOCK",
                                         "network_entity_key"                       : "DRG-FRA-LZ-HUB-KEY"
                                     }
@@ -1016,14 +1016,14 @@
 
                                     "rr-fra-vcn-preprod-platform-exaxs": {
                                         "description"                              : "Route to VCN PreProd EXAXS through DRG",
-                                        "destination"                              : "10.0.168.0/21",
+                                        "destination"                              : "10.0.176.0/21",
                                         "destination_type"                         : "CIDR_BLOCK",
                                         "network_entity_key"                       : "DRG-FRA-LZ-HUB-KEY"
                                     },
 
                                     "rr-fra-vcn-prod-platform-exaxs": {
                                         "description"                              : "Route to VCN Prod EXAXS through DRG",
-                                        "destination"                              : "10.0.104.0/21",
+                                        "destination"                              : "10.0.112.0/21",
                                         "destination_type"                         : "CIDR_BLOCK",
                                         "network_entity_key"                       : "DRG-FRA-LZ-HUB-KEY"
                                     }
@@ -1235,7 +1235,7 @@
                 "vcns": {
                     "VCN-FRA-LZ-PREPROD-PLATFORM-EXAXS-KEY": {
                         "display_name"                                             : "vcn-fra-lz-preprod-exaxs",
-                        "cidr_blocks"                                              : ["10.0.168.0/21"],
+                        "cidr_blocks"                                              : ["10.0.176.0/21"],
                         "dns_label"                                                : "vcnfralzppexaxs",
                         "block_nat_traffic"                                        : false,
                         "is_attach_drg"                                            : false,
@@ -1247,7 +1247,7 @@
                         "subnets": {
                             "SN-FRA-LZ-PREPROD-PLATFORM-EXAXS-DB-KEY": {
                                 "display_name"                                     : "sn-fra-lz-preprod-exaxs-db",
-                                "cidr_block"                                       : "10.0.168.0/24",
+                                "cidr_block"                                       : "10.0.176.0/24",
                                 "dns_label"                                        : "snfrappexaxsdb",
                                 "dhcp_options_key"                                 : "default_dhcp_options",
                                 "prohibit_internet_ingress"                        : true,
@@ -1258,7 +1258,7 @@
 
                             "SN-FRA-LZ-PREPROD-PLATFORM-EXAXS-BACKUP-KEY": {
                                 "display_name"                                     : "sn-fra-lz-preprod-exaxs-backup",
-                                "cidr_block"                                       : "10.0.169.0/24",
+                                "cidr_block"                                       : "10.0.177.0/24",
                                 "dns_label"                                        : "snfrappexaxsbck",
                                 "dhcp_options_key"                                 : "default_dhcp_options",
                                 "prohibit_internet_ingress"                        : true,
@@ -1310,7 +1310,7 @@
 
                                     "rr-fra-vcn-prod-platform-exaxs": {
                                         "description"                              : "Route to VCN Prod EXAXS through DRG",
-                                        "destination"                              : "10.0.104.0/21",
+                                        "destination"                              : "10.0.112.0/21",
                                         "destination_type"                         : "CIDR_BLOCK",
                                         "network_entity_key"                       : "DRG-FRA-LZ-HUB-KEY"
                                     }
@@ -1339,7 +1339,7 @@
                                     },
                                     {
                                         "description"                              : "ICMP type 3",
-                                        "src"                                      : "10.0.168.0/21",
+                                        "src"                                      : "10.0.176.0/21",
                                         "src_type"                                 : "CIDR_BLOCK",
                                         "protocol"                                 : "ICMP",
                                         "icmp_type"                                : 3,
@@ -1400,7 +1400,7 @@
                 "vcns": {
                     "VCN-FRA-LZ-PROD-PLATFORM-EXAXS-KEY": {
                         "display_name"                                             : "vcn-fra-lz-prod-exaxs",
-                        "cidr_blocks"                                              : ["10.0.104.0/21"],
+                        "cidr_blocks"                                              : ["10.0.112.0/21"],
                         "dns_label"                                                : "vcnfralzpexaxs",
                         "block_nat_traffic"                                        : false,
                         "is_attach_drg"                                            : false,
@@ -1412,7 +1412,7 @@
                         "subnets": {
                             "SN-FRA-LZ-PROD-PLATFORM-EXAXS-DB-KEY": {
                                 "display_name"                                     : "sn-fra-lz-prod-exaxs-db",
-                                "cidr_block"                                       : "10.0.104.0/24",
+                                "cidr_block"                                       : "10.0.112.0/24",
                                 "dns_label"                                        : "snfrapexaxsdb",
                                 "dhcp_options_key"                                 : "default_dhcp_options",
                                 "prohibit_internet_ingress"                        : true,
@@ -1423,7 +1423,7 @@
 
                             "SN-FRA-LZ-PROD-PLATFORM-EXAXS-BACKUP-KEY": {
                                 "display_name"                                     : "sn-fra-lz-prod-exaxs-backup",
-                                "cidr_block"                                       : "10.0.105.0/24",
+                                "cidr_block"                                       : "10.0.113.0/24",
                                 "dns_label"                                        : "snfrapexaxsbck",
                                 "dhcp_options_key"                                 : "default_dhcp_options",
                                 "prohibit_internet_ingress"                        : true,
@@ -1475,7 +1475,7 @@
 
                                     "rr-fra-vcn-preprod-platform-exaxs": {
                                         "description"                              : "Route to VCN PreProd EXAXS through DRG",
-                                        "destination"                              : "10.0.168.0/21",
+                                        "destination"                              : "10.0.176.0/21",
                                         "destination_type"                         : "CIDR_BLOCK",
                                         "network_entity_key"                       : "DRG-FRA-LZ-HUB-KEY"
                                     }
@@ -1504,7 +1504,7 @@
                                     },
                                     {
                                         "description"                              : "ICMP type 3",
-                                        "src"                                      : "10.0.104.0/21",
+                                        "src"                                      : "10.0.112.0/21",
                                         "src_type"                                 : "CIDR_BLOCK",
                                         "protocol"                                 : "ICMP",
                                         "icmp_type"                                : 3,

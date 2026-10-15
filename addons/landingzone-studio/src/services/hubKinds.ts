@@ -8,6 +8,7 @@
  */
 
 import type { HubKind, Subnet } from '../model/types';
+import addressPlan from '../../../../gen/data/network-address-plan.json';
 
 export interface HubKindDef {
   id: HubKind;
@@ -26,7 +27,7 @@ export const HUB_KINDS: HubKindDef[] = [
     description:
       'Two OCI Network Firewalls separate inbound inspection from outbound and east-west inspection. Choose this when stronger traffic isolation justifies the additional firewall cost.',
     implemented: true,
-    defaultVcnCidr: '10.0.0.0/21',
+    defaultVcnCidr: addressPlan.foundation.hub_vcn,
     defaultSubnets: [
       { name: 'fw-dmz', cidr: '10.0.0.0/24' },
       { name: 'lb', cidr: '10.0.1.0/24' },
@@ -41,7 +42,7 @@ export const HUB_KINDS: HubKindDef[] = [
     label: 'Hub B',
     description: 'One OCI Network Firewall inspects inbound, outbound, and east-west traffic. This reduces cost while keeping centralized inspection.',
     implemented: true,
-    defaultVcnCidr: '10.0.0.0/21',
+    defaultVcnCidr: addressPlan.foundation.hub_vcn,
     defaultSubnets: [
       { name: 'lb', cidr: '10.0.0.0/24' },
       { name: 'fw', cidr: '10.0.1.0/24' },
@@ -55,7 +56,7 @@ export const HUB_KINDS: HubKindDef[] = [
     label: 'Hub C',
     description: 'Third-party firewalls sit behind trust and untrust Network Load Balancers. After the first deployment phase, provide the private IP identifiers needed to complete routing.',
     implemented: true,
-    defaultVcnCidr: '10.0.0.0/21',
+    defaultVcnCidr: addressPlan.foundation.hub_vcn,
     defaultSubnets: [
       { name: 'untrust', cidr: '10.0.0.0/24' },
       { name: 'trust', cidr: '10.0.1.0/24' },
@@ -70,7 +71,7 @@ export const HUB_KINDS: HubKindDef[] = [
     label: 'Hub E',
     description: 'No firewall is deployed. Traffic routes directly through the DRG; use this only when the reduced cost and simplicity are worth giving up centralized inspection.',
     implemented: true,
-    defaultVcnCidr: '10.0.0.0/21',
+    defaultVcnCidr: addressPlan.foundation.hub_vcn,
     defaultSubnets: [
       { name: 'lb', cidr: '10.0.0.0/24' },
       { name: 'mgmt', cidr: '10.0.1.0/24' },

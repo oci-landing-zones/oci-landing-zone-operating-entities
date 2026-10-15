@@ -1,3 +1,4 @@
+local address_plan = import '../../data/network-address-plan.json';
 local notification_emails = {
   default: ['exacc-platform-team@example.com'],
   db_workloads: ['exacc-db-team@example.com'],
@@ -29,7 +30,7 @@ local exacc_no_network_base = {
   security_targets: ['prod'],
   hub: {
     kind: 'hub_e',
-    network: { vcn: '10.0.0.0/21' },
+    network: { vcn: address_plan.foundation.hub_vcn },
   },
   environments: {
     prod: {

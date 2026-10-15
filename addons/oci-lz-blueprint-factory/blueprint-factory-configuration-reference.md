@@ -4,6 +4,8 @@ This reference describes the configuration accepted by the OCI LZ Blueprint Fact
 
 The Blueprint Factory accepts JSON and Jsonnet input. Jsonnet is available for advanced reuse and composition; it does not change the supported Blueprint Factory configuration elements.
 
+See the [common network address plan](./network-address-plan.md) for repository reference CIDRs and reservations. Explicit configuration CIDRs override reference defaults; reservations do not automatically create networks.
+
 ## Table of Contents
 
 [1. Region and Security Settings](#1-region-and-security-settings)<br>

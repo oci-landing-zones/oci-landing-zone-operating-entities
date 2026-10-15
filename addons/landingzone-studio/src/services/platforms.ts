@@ -15,6 +15,7 @@
 
 import type { PlatformConfig, PlatformType, OkePlatformParams, OcvsPlatformParams, SharedPlatformConfig, Subnet } from '../model/types';
 import { firstFreeBlock, formatIp, parseCidr, shiftCidr, totalIps } from './cidr';
+import addressPlan from '../../../../gen/data/network-address-plan.json';
 
 export interface PlatformTypeMeta {
   type: PlatformType;
@@ -37,17 +38,17 @@ export function platformTypeMeta(type: PlatformType): PlatformTypeMeta {
 }
 
 /** Base block the first environment platform lives in (clear of the step-2 spokes). */
-export const PLATFORM_BASE_VCN = '10.0.80.0/21';
+export const PLATFORM_BASE_VCN = addressPlan.allocation.studio_platform_base_vcn;
 /** Block the shared platform's VCN defaults to. */
-export const SHARED_PLATFORM_VCN = '10.170.0.0/21';
-export const SHARED_PLATFORM_ALLOCATION = '10.170.0.0/16';
+export const SHARED_PLATFORM_ALLOCATION = addressPlan.allocation.shared_platform_pool;
+export const SHARED_PLATFORM_VCN = `${formatIp(parseCidr(SHARED_PLATFORM_ALLOCATION)!.start)}/${addressPlan.allocation.shared_platform_prefix}`;
 
 /**
  * The shared platform's starting subnet. It needs at least one: the generator
  * refuses a platform VCN with an empty subnet map.
  */
 export function sharedPlatformDefaultSubnets(): Subnet[] {
-  return [{ name: 'core', cidr: '10.170.0.0/24' }];
+  return customDefaultSubnets(SHARED_PLATFORM_VCN);
 }
 
 /** A network-only platform must explicitly declare at least one subnet. */
@@ -74,7 +75,7 @@ export function okeDefaultSubnets(baseVcn: string): Subnet[] {
   ];
 }
 
-const OKE_PROFILE_PREFIX = { small: 20, medium: 18, large: 16 } as const;
+const OKE_PROFILE_PREFIX = { small: addressPlan.allocation.oke_auto_small_prefix, medium: 18, large: 16 } as const;
 const OKE_PROFILE_SUBNETS = {
   small: { 'control-plane': 29, 'int-lb': 26, workers: 23, pods: 21, fss: 26 },
   medium: { 'control-plane': 29, 'int-lb': 25, workers: 22, pods: 19, fss: 25 },
@@ -170,13 +171,15 @@ export function newPlatform(type: PlatformType, existing: PlatformConfig[]): Pla
   const id = nextPlatformId(type, existing);
   // Give each platform a generous stride so its per-env /21 shifts never overlap
   // another platform's window (16 384 = a /18, i.e. 8 × /21 blocks).
-  const baseVcn = shiftCidr(PLATFORM_BASE_VCN, existing.length * 16384) ?? PLATFORM_BASE_VCN;
+  const referenceVcn = type === 'ocvs' ? addressPlan.platforms.ocvs.prod
+    : type === 'oke_simple' ? addressPlan.platforms.oke_simple.prod : PLATFORM_BASE_VCN;
+  const baseVcn = shiftCidr(referenceVcn, existing.length * addressPlan.allocation.studio_platform_instance_stride_ips) ?? referenceVcn;
   const common = { id, key: id, type, environments: 'all' as const, vcnCidr: baseVcn };
   if (type === 'oke_simple') {
     // The canonical extension default is the generator-owned small profile, not
     // a Studio-maintained manual subnet map. Keep `subnets` absent so Jsonnet
     // owns allocation, while `platformSubnetsForEnv` previews it for the diagram.
-    const vcnCidr = `${baseVcn.split('/')[0]}/20`;
+    const vcnCidr = `${baseVcn.split('/')[0]}/${OKE_PROFILE_PREFIX.small}`;
     return { ...common, vcnCidr, subnets: [], okeParams: { ...okeDefaultParams(), clusterSize: 'small' } };
   }
   if (type === 'ocvs') return { ...common, subnets: [], ocvsParams: ocvsDefaultParams() };
@@ -202,7 +205,7 @@ export function newSharedPlatform(
   const vcnCidr = firstFreeBlock(
     SHARED_PLATFORM_ALLOCATION,
     [...occupiedCidrs, ...existing.map((platform) => platform.vcnCidr)],
-    21,
+    addressPlan.allocation.shared_platform_prefix,
   ) ?? SHARED_PLATFORM_VCN;
   const idStem = `shared-${key}`;
   let id = idStem;

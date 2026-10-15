@@ -1,12 +1,13 @@
+local address_plan = import '../../data/network-address-plan.json';
 {
   prod_hub_e: {
     config: {
-      hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
+      hub: { kind: 'hub_e', network: { vcn: address_plan.foundation.hub_vcn } },
       environments: {
         prod: {
           platforms: {
             ocvs: {
-              network: { vcn: '10.0.80.0/21' },
+              network: { vcn: address_plan.platforms.ocvs.prod },
               extension: {
                 type: 'ocvs',
                 params: {
