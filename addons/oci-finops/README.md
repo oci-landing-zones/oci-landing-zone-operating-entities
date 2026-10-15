@@ -40,7 +40,7 @@ The solution describes the end-to-end workflow by securely fetching FOCUS report
 | **Autonomous Database (ADB)** | Central data store for the FinOps platform. Provisioned with a **private endpoint** inside the VCN, it directly ingests FOCUS reports and powers the visualization layer. |
 | **Oracle Analytics Cloud (OAC)** | Presents dashboards and reports on top of ADB for cost visibility, allocation, and analysis. A private access channel connects OAC to the private ADB endpoint. |
 | **VCN & Subnets**         | A dedicated **Virtual Cloud Network** with private subnets for ADB and OAC connectivity, integrated with the One-OE network topology. Network security groups control access to the FinOps endpoints. |
-| **Tags (Optional)**       | A dedicated **`tgns-finops`** defined-tag namespace: **BusinessUnit** identifies the business owner, **CostCentre** the financial allocation code, **Owner** the responsible owner's email, **platform** the service or workload, **environment** the environment, and **Projects** the project name. |
+| **Tags**                  | A dedicated **`tgns-finops`** defined-tag namespace: **BusinessUnit** identifies the business owner, **CostCentre** the financial allocation code, **Owner** the responsible owner's email, **platform** the service or workload, **environment** the environment, and **Projects** the project name. |
 | **Object Storage Bucket (Optional)** | Collects FOCUS reports exported from other cloud providers for ingestion into the FinOps database. Provider exports and ingestion mappings must be configured for the selected FOCUS versions. |
 
 &nbsp;
