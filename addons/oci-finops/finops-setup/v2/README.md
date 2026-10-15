@@ -10,17 +10,19 @@ These configurations add the FinOps platform to an existing One-OE Landing Zone 
 | [finops_network.json](finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
 | [finops_service_access.json](finops_service_access.json) | After provisioning, enable the ADB report-reading principal and the FinOps operators' approved Database Tools connection. Replace both OCID placeholders before using this file. |
 
-The configurations prepare infrastructure and access. Operations provisions ADB, OAC, its private access channel (PAC), Database Tools connections and credentials, and dashboard content. FinOps admins can then create a Bastion in `cmp-finops` using the infra subnet.
+The configurations prepare infrastructure and access. Operations provisions ADB, OAC, its private access channel (PAC), Database Tools connections and credentials, and dashboard content. LZ administrators provision the Bastion and its network dependencies. All three FinOps groups can use Bastions in the shared network and FinOps compartments.
 
 ## Roles and compartment scope
 
 | Group | FinOps compartment | Shared network compartment |
 |---|---|---|
-| `grp-lz-finops-admins` | Read ADB/OAC and Database Tools; use the approved reporting connection; create/delete Bastions and manage sessions. | Read networking; manage VCNs, subnets, route tables, security lists and DHCP options; use NSGs, VNICs and private IPs for Bastion lifecycle. |
-| `grp-lz-finops-db-admins` | Manage Autonomous Database and its VNICs; read Database Tools and use connections; manage Bastion sessions. | Read networking; use VCNs/subnets/NSGs; manage private IPs and VNICs for ADB private endpoints. |
-| `grp-lz-finops-oac-admins` | Manage OAC instances/PAC and VNICs; use private IPs; manage Bastion sessions. | Read networking and use VCNs/subnets/NSGs. |
+| `grp-lz-finops-admins` | Read ADB/OAC and Database Tools; use the approved reporting connection; manage Bastion resources and sessions, subject to the network dependency boundary below. | Read networking; use existing Bastions and manage sessions. |
+| `grp-lz-finops-db-admins` | Manage Autonomous Database and its VNICs; read Database Tools and use connections; manage Bastion sessions. | Read networking; use VCNs/subnets/NSGs; manage private IPs and VNICs for ADB private endpoints; use Bastions and manage sessions. |
+| `grp-lz-finops-oac-admins` | Manage OAC instances/PAC and VNICs; use private IPs; manage Bastion sessions. | Read networking and use VCNs/subnets/NSGs; use Bastions and manage sessions. |
 
-All service permissions target `cmp-landingzone:cmp-lz-platform:cmp-finops`. Network dependencies target `cmp-landingzone:cmp-lz-network`. The FinOps admins' network grants follow Oracle's documented Bastion creation/deletion dependencies and can affect other networks in that shared compartment; they are **not restricted to the FinOps VCN**. DB and OAC groups do not receive Bastion service lifecycle permissions. [Oracle: Bastion IAM](https://docs.oracle.com/en-us/iaas/Content/Bastion/Reference/bastionpolicyreference.htm).
+ADB/OAC and Database Tools permissions target `cmp-landingzone:cmp-lz-platform:cmp-finops`. All groups have Bastion session access in that compartment and `cmp-landingzone:cmp-lz-network`. FinOps admins receive **read-only network access**, with no VCN, subnet, routing, security-list, DHCP, NSG, VNIC, or private-IP write grants. Shared Bastion administration stays with LZ administrators; FinOps admins manage Bastion resources only in `cmp-finops`.
+
+**Bastion lifecycle boundary:** `manage bastion-family` provides Bastion permissions, but Oracle documents additional network permissions for creation and deletion. These templates intentionally do not grant those dependencies to FinOps admins. LZ administrators perform creation/deletion; FinOps admins can operate existing FinOps Bastions and sessions. Do not expand shared-network permissions to make those lifecycle operations succeed. The session grants in shared networking are compartment-wide; if that compartment hosts unrelated Bastions, constrain access to designated Bastions before deployment. [Oracle: Bastion IAM](https://docs.oracle.com/en-us/iaas/Content/Bastion/Reference/bastionpolicyreference.htm).
 
 **A DBA connection OCID is not required in the human policy.** DBAs can use any Database Tools connection in `cmp-finops`. Operators use a specific reporting connection so they cannot use a privileged DBA connection. Database permissions come from each connection's database account. Use resource principal runtime identity and grant each connection principal access only to its credential secret; this prerequisite is configured with the connection, outside these templates. [Oracle: connection permissions](https://docs.oracle.com/en-us/iaas/database-tools/doc/oracle-database-connections.html).
 
@@ -108,8 +110,16 @@ For a single stack, move the FinOps attachment into the existing DRG's `drg_atta
 
 ## Validation and migration
 
+Run the static IAM boundary regression checks from the repository root:
+
+```sh
+python3 -m unittest discover -s addons/oci-finops/finops-setup/v2/tests -v
+```
+
+These checks reject FinOps operator network writes, shared Bastion administration, and VCN topology management grants. They also check session access in shared networking and keep operator Database Tools access restricted to a specific connection.
+
 Validation completed with two mocked Terraform plans against Orchestrator v2.2.0: the infrastructure configuration and the service-access configuration with mock OCIDs. The plans checked the three groups, one FinOps VCN, three subnets, two NSGs, and the attachment to the existing spoke DRG route table. JSON formatting, CIDR containment/overlap, local references, and role boundaries were also checked.
 
 The V2 files use new resource keys and current One-OE names. They are not an automatic in-place migration of the older `lzp` deployment. For an existing installation, reconcile resource ownership and Terraform state before applying; do not deploy both examples into the same address space.
 
-Validate the adapted configuration and inspect the plan for unintended replacements, missing dependencies, and unresolved placeholders. Then test Bastion creation/deletion as a FinOps admin, sessions as each role, DBA connection access, denial of privileged connections to operators, OAC-to-ADB connectivity, FOCUS ingestion, and hub forward/return routing. Mocked plans verify configuration wiring, not live OCI IAM enforcement or network connectivity.
+Validate the adapted configuration and inspect the plan for unintended replacements, missing dependencies, and unresolved placeholders. Then verify that FinOps admins cannot modify shared networking or administer shared Bastions, test LZ-admin Bastion creation/deletion and sessions as each role in both compartments, DBA connection access, denial of privileged connections to operators, OAC-to-ADB connectivity, FOCUS ingestion, and hub forward/return routing. Mocked plans verify configuration wiring, not live OCI IAM enforcement or network connectivity.
