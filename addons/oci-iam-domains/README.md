@@ -41,6 +41,10 @@ OCI provides built-in resource isolation and governance capabilities through sev
 A well-designed tenancy landing zone should include the design of these constructs.
 In this add-on, we will focus specifically on the design of the **Identity Domains**
 
+<p align="center">
+  <img src="images/iam-architecture-overview.png" alt="IAM Architecture Overview" width="1000">
+</p>
+
 &nbsp;
 ## 2. Blueprint Mapping
 
@@ -382,7 +386,12 @@ These names apply to the standard One-OE Common-domain configuration. Environmen
 &nbsp;
 ## 5. Fusion SaaS Domains
 
+<p align="center">
+  <img src="images/fusion-saas-domains-overview.png" alt="Fusion SaaS Domains Overview" width="1000">
+</p>
+
 ### 5.1. Fusion SaaS Overview
+
 In a tenancy where Fusion SaaS applications will be deployed often the activation of the SaaS environments is the first deployment to the tenancy [Activation Guidance](https://docs.oracle.com/en-us/iaas/Content/applications-manager/activate-applications.htm) 
 
 If Fusion SaaS activation creates the new OCI tenancy, and the person entered as the first administrator is created in the tenancy’s Default identity domain with OCI **Administrators** group.
