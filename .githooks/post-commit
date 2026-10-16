@@ -1,2 +1,6 @@
 #!/bin/sh
+# oci-landing-zone repository hook
+if [ "$(git branch --show-current)" = "content" ]; then
+  exit 0
+fi
 git update-index -g
