@@ -412,7 +412,7 @@ OCI Console → My Applications → Fusion Applications → select environment �
 
 ### 5.3. Fusion SaaS Domains and OCI Domains
 
-In many cases the Fusion SaaS environment domains and OCI Secondary domains will be maintained separate user populations as the functions are usually different.
+In many cases the Fusion SaaS environment domains and OCI Secondary domains will be maintained as separate user populations as the functions are usually different.
 For example: A Fusion SaaS Production environment will contain all the users who have access to login and use the Fusion application whilst the OCI Production domain is for the user population who have access to create, modify and view the OCI PaaS and IaaS services.
 
 In some cases the number of Fusion SaaS environment domains may not be 1:1 with the OCI domains.
