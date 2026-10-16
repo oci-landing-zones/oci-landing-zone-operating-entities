@@ -16,8 +16,8 @@
   - [4.1. Federation Overview](#41-federation-overview)<br>
   - [4.2. Default Domain](#42-default-domain)<br>
   - [4.3. Secondary Domain Federation](#43-secondary-domain-federation)<br>
-- - [4.4. IAM Groups and External Identity Provisioning](#44-iam-groups-and-external-identity-provisioning)<br>
-- - [4.5. Federation Steps](#45-federation-steps)<br>
+  - [4.4. IAM Groups and External Identity Provisioning](#44-iam-groups-and-external-identity-provisioning)<br>
+  - [4.5. Federation Steps](#45-federation-steps)<br>
 - [5. Fusion SaaS Domains](#5-fusion-saas-domains)<br>
   - [5.1. Fusion SaaS Overview](#51-fusion-saas-overview)<br>
   - [5.2. Fusion SaaS Domain](#52-fusion-saas-domain)<br>
