@@ -1,5 +1,10 @@
 #!/bin/bash
+# oci-landing-zone repository hook
 set -eou pipefail
+
+if [ "$(git branch --show-current)" = "content" ]; then
+  exit 0
+fi
 
 # Resolve gen directory relative to the repo root, not the hook location
 REPO_ROOT=$(git rev-parse --show-toplevel)

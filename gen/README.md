@@ -4,6 +4,8 @@ The `gen/` Jsonnet implementation powers the [Blueprint Factory](../addons/oci-l
 
 Run `bash gen/generate.sh` the first time you work on the generator. It sets up the repo hooks, checks that a Jsonnet renderer is installed, and regenerates the checked-in outputs.
 
+Regular clones, submodules, and linked Git worktrees are supported. Hook paths are resolved through Git; an existing `core.hooksPath` is preserved so a custom dispatcher can invoke the repository hooks. Repository-owned installed hooks are updated; an unrelated hook in Git's default hook directory is preserved and reported as a conflict. Both hooks check the current branch every time they run and return immediately on the exact `content` branch, including when installed before switching branches. Explicitly running the generator still generates files on that branch.
+
 ## Documentation Map
 
 - [`../AGENTS.md`](../AGENTS.md): repo-specific workflow rules and generator guardrails.
