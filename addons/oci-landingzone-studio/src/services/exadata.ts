@@ -1,4 +1,4 @@
-import type { ExadataNotifications, LzModel, PlatformConfig, SharedPlatformConfig, Subnet } from '../model/types';
+import type { ExadataDesign, ExadataNotifications, LzModel, PlatformConfig, SharedPlatformConfig, Subnet } from '../model/types';
 import { formatIp, overlaps, parseCidr } from './cidr';
 import { platformEnvInstances } from './platforms';
 import { additionalEnvironmentCidr, oneOeEnvironmentCidrs } from './oneOeCidrs';
@@ -12,6 +12,21 @@ export interface ExadataPlatformEntry {
 const INFRA_ONLY = { infrastructure: true, database: false };
 const DB_ONLY = { infrastructure: false, database: true };
 const INFRA_AND_DB = { infrastructure: true, database: true };
+
+export function addExadataPlatform(model: LzModel, type: 'exacc' | 'exacs', shared: boolean): ExadataDesign {
+  const value = model.exadata[type];
+  if (value.enabled) return model.exadata;
+  const placement = shared ? 'shared' : 'per_environment';
+  const wasShared = type === 'exacc' ? model.exadata.exacc.shared : model.exadata.exacs.infrastructure === 'shared';
+  const database = shared && wasShared ? value.database ?? (value.environments.length ? 'per_environment' : 'shared') : placement;
+  const environments = shared || value.environments.length ? value.environments : model.environments.map((env) => env.id);
+  return {
+    ...model.exadata,
+    [type]: type === 'exacc'
+      ? { ...model.exadata.exacc, enabled: true, shared, database, environments }
+      : { ...model.exadata.exacs, enabled: true, infrastructure: placement, database, environments },
+  };
+}
 
 function recipients(input: string | undefined): string[] {
   return (input ?? '').split(/[\n,;]/).map((value) => value.trim()).filter(Boolean);

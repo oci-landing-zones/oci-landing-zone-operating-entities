@@ -8,11 +8,11 @@ export const LZ_MODEL_VERSION = '0.20.0';
 
 export function defaultExadata(): ExadataDesign {
   return {
-    exacc: { enabled: false, shared: true, database: 'shared', service: 'none', environments: [], projectDb: {}, notifications: { default: '', projectEmails: {} } },
+    exacc: { enabled: false, shared: true, database: 'shared', service: 'none', environments: [], projectDb: {}, notifications: { useSingleRecipient: true, default: '', projectEmails: {} } },
     exacs: {
       enabled: false, infrastructure: 'shared', database: 'shared', service: 'none',
       environments: [], sharedVcnCidr: SHARED_EXACS_CIDR, environmentVcnCidrs: {},
-      projectDb: {}, notifications: { default: '', projectEmails: {} },
+      projectDb: {}, notifications: { useSingleRecipient: true, default: '', projectEmails: {} },
     },
   };
 }

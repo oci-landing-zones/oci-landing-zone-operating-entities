@@ -4,12 +4,15 @@ import type { ExaccDesign, ExacsDesign, ExadataNotifications } from '../../model
 import { oracle } from '../../theme';
 import { exadataEntries, exadataProjectTopicEnvironments } from '../../services/exadata';
 
+type PlatformPlacement = 'shared' | 'environment';
+
 const styles: Record<string, CSSProperties> = {
   card: { border: `1px solid ${oracle.border}`, borderTop: `3px solid ${oracle.red}`, borderRadius: 8, background: oracle.surface, padding: 20 },
   title: { fontSize: 16, fontWeight: 800, color: oracle.ink, marginBottom: 4 },
   hint: { fontSize: 12.5, color: oracle.textMuted, lineHeight: 1.55, marginBottom: 16 },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginTop: 14 },
   field: { display: 'grid', gap: 5, fontSize: 12.5, fontWeight: 700, color: oracle.text },
+  value: { fontSize: 13, fontWeight: 400 },
   input: { minWidth: 0, width: '100%', padding: '9px 10px', border: `1px solid ${oracle.borderStrong}`, borderRadius: 5, background: oracle.surface, color: oracle.text, fontSize: 13 },
   option: { display: 'flex', gap: 9, alignItems: 'center', fontSize: 13, color: oracle.text, lineHeight: 1.4 },
   group: { border: `1px solid ${oracle.border}`, borderRadius: 6, padding: 13, marginTop: 14 },
@@ -18,26 +21,35 @@ const styles: Record<string, CSSProperties> = {
   warning: { border: `1px solid ${oracle.red}`, background: oracle.redTint, color: oracle.redDark, padding: '10px 12px', borderRadius: 6, fontSize: 12.5, lineHeight: 1.5 },
 };
 
-function NotificationFields({ value, onChange, prefix, useCase, projectEnvironments, environmentEnvironments }: {
+function NotificationFields({ value, onChange, prefix, useCase, placement, projectEnvironments, environmentEnvironments }: {
   value: ExadataNotifications;
   onChange: (next: ExadataNotifications) => void;
   prefix: string;
   useCase: 1 | 2 | 3;
+  placement: PlatformPlacement;
   projectEnvironments: Array<{ id: string; name: string }>;
   environmentEnvironments: Array<{ id: string; name: string }>;
 }) {
   const exacs = prefix === 'exacs';
+  const linkedEnvironment = useCase === 2 && placement === 'environment';
   const singleRecipient = value.useSingleRecipient ?? Boolean(value.default);
+  if (linkedEnvironment && singleRecipient) return <fieldset style={styles.group}>
+    <legend style={styles.legend}>Notification recipients</legend>
+    <p style={styles.hint}>Uses the email configured in Shared Platforms for all {prefix.toUpperCase()} notifications.{exacs ? ' ExaCS network events and alarms use the One-OE Network recipient in Foundation.' : ''}</p>
+    <div style={styles.value}>{value.default || 'Set notification emails in Shared Platforms.'}</div>
+  </fieldset>;
   const infraEvents = exacs ? (useCase === 1 ? 63 : 36) : (useCase === 1 ? 46 : 32);
   const environmentInfraEvents = exacs ? (useCase === 2 ? 27 : 48) : (useCase === 2 ? 14 : 31);
   const fields: Array<{ key: 'dbWorkloads' | 'infraWorkloads'; label: string; help: string; visible: boolean }> = [
     { key: 'dbWorkloads', label: 'Shared DBA team emails', help: '57 database events (backups, DB homes, restore, maintenance). 3 database/cluster alarm definitions are disabled by default.', visible: useCase === 1 },
-    { key: 'infraWorkloads', label: 'Shared infrastructure team emails', help: `${infraEvents} events for operator access${useCase === 1 ? ', Exadata infrastructure, and VMC/AVMC' : ' and Exadata infrastructure'}. ${useCase === 1 ? '4 VMC alarm definitions are disabled by default.' : 'This infrastructure-only scope has no VMC alarms.'}`, visible: useCase !== 3 },
+    { key: 'infraWorkloads', label: 'Shared infrastructure team emails', help: `${infraEvents} events for operator access${useCase === 1 ? ', Exadata infrastructure, and VMC/AVMC' : ' and Exadata infrastructure'}. ${useCase === 1 ? '4 VMC alarm definitions are disabled by default.' : 'This infrastructure-only scope has no VMC alarms.'}`, visible: useCase !== 3 && !linkedEnvironment },
   ];
   return (
     <fieldset style={styles.group}>
       <legend style={styles.legend}>Notification recipients</legend>
-      <div style={styles.hint}>Separate multiple addresses with commas. Fill each visible topic, or use one email for all Exadata notifications.{exacs ? ' ExaCS network events and alarms use the One-OE Network recipient in Foundation.' : ''}</div>
+      <div style={styles.hint}>Separate multiple addresses with commas. {linkedEnvironment
+        ? 'Configure recipients for the selected environments. Shared infrastructure recipients and the option to use one email are managed in Shared Platforms.'
+        : 'Fill each visible topic, or use one email for all Exadata notifications.'}{exacs ? ' ExaCS network events and alarms use the One-OE Network recipient in Foundation.' : ''}</div>
       {!singleRecipient && <div style={styles.grid}>
         {fields.filter(({ visible }) => visible).map(({ key, label, help }) => (
           <label key={key} style={styles.field} htmlFor={`${prefix}-${key}`}>
@@ -76,10 +88,11 @@ function NotificationFields({ value, onChange, prefix, useCase, projectEnvironme
           </label>
         ))}
       </div>}
-      <label style={{ ...styles.option, marginTop: 18, fontWeight: 700 }}>
+      {!linkedEnvironment && <label style={{ ...styles.option, marginTop: 18, fontWeight: 700 }}>
         <input type="checkbox" checked={singleRecipient} onChange={(event) => onChange({ ...value, useSingleRecipient: event.target.checked })} />
         Use one email for all notifications
-      </label>
+      </label>}
+      {useCase === 2 && placement === 'shared' && <p style={{ ...styles.hint, marginTop: 10 }}>The single-email option applies to both shared infrastructure and linked environment platforms. Configure per-topic environment recipients in Environment Platforms.</p>}
       {singleRecipient && <label style={{ ...styles.field, marginTop: 14 }} htmlFor={`${prefix}-default`}>
         Notification emails *
         <input id={`${prefix}-default`} type="text" style={styles.input} value={value.default}
@@ -206,38 +219,27 @@ function ProjectChoices({ type, selected, onChange, environments }: {
   );
 }
 
-function ExaccSection() {
+function ExaccSection({ placement }: { placement: PlatformPlacement }) {
   const { model, setField } = useWizard();
   const value = model.exadata.exacc;
   const update = (patch: Partial<ExaccDesign>) => setField('exadata.exacc', { ...value, ...patch });
   const database = value.database ?? (!value.shared || value.environments.length ? 'per_environment' : 'shared');
   const useCase = value.shared ? (database === 'shared' ? 1 : 2) : 3;
+  const databaseHere = placement === 'environment' || useCase === 1;
+  const linkedEnvironment = placement === 'environment' && useCase === 2;
   const service = value.service ?? ((value.autonomous ?? Object.values(value.projectDb).some((ids) => ids.length > 0)) ? 'both' : 'vmc');
   const autonomous = service === 'autonomous' || service === 'both';
   return (
     <section style={styles.card} aria-labelledby="exacc-heading">
       <h2 id="exacc-heading" style={styles.title}>ExaDB-C@C (EXACC)</h2>
       <p style={styles.hint}>Adds Exadata Cloud@Customer compartments, IAM, and observability. This extension does not create a VCN or subnets.</p>
-      <label style={styles.option}>
-        <input type="checkbox" checked={value.enabled} onChange={(event) => update({
-          enabled: event.target.checked,
-        })} />
-        Include EXACC in this landing zone
-      </label>
       {value.enabled && <>
         <div style={styles.grid}>
-          <label style={styles.field} htmlFor="exacc-infrastructure">
-            Infrastructure placement
-            <select id="exacc-infrastructure" style={styles.input} value={value.shared ? 'shared' : 'per_environment'}
-              onChange={(event) => update({ shared: event.target.value === 'shared',
-                database: event.target.value === 'per_environment' ? 'per_environment' : database,
-                environments: event.target.value === 'per_environment' && !value.environments.length
-                  ? model.environments.map((env) => env.id) : value.environments })}>
-              <option value="shared">Shared across environments</option>
-              <option value="per_environment">Dedicated per environment</option>
-            </select>
-          </label>
-          <label style={styles.field} htmlFor="exacc-database">
+          <div style={styles.field}>
+            {linkedEnvironment ? 'Infrastructure source' : 'Infrastructure placement'}
+            <span style={styles.value}>{linkedEnvironment ? 'Shared Platforms' : value.shared ? 'Shared across environments' : 'Dedicated per environment'}</span>
+          </div>
+          {placement === 'shared' ? <label style={styles.field} htmlFor="exacc-database">
             VMC placement
             <select id="exacc-database" style={styles.input} value={database} onChange={(event) => update({
               database: event.target.value as ExaccDesign['database'],
@@ -247,52 +249,47 @@ function ExaccSection() {
               {value.shared && <option value="shared">Shared with infrastructure</option>}
               <option value="per_environment">Dedicated per environment</option>
             </select>
-          </label>
+          </label> : <div style={styles.field}>
+            VMC placement
+            <span style={styles.value}>Dedicated per environment</span>
+          </div>}
         </div>
+        {placement === 'environment' && value.shared && <p style={{ ...styles.hint, marginTop: 12 }}>Infrastructure is managed in Shared Platforms.</p>}
         <UseCaseSummary type="EXACC" selected={useCase} />
-        {database === 'per_environment' && <EnvironmentChoices selected={value.environments}
+        {!databaseHere && <p style={{ ...styles.hint, marginTop: 12 }}>Configure VMC/AVMC services, environments, and Autonomous project tiers in Environment Platforms.</p>}
+        {databaseHere && database === 'per_environment' && <EnvironmentChoices selected={value.environments}
           onChange={(environments) => update({ environments })} legend="Environments with VMC placement" />}
-        <DatabaseServiceChoices service={service} onChange={(next) => update({ service: next,
-          projectDb: next === 'autonomous' || next === 'both' ? value.projectDb : {} })} />
-        {autonomous && <ProjectChoices type="EXACC" selected={value.projectDb} onChange={(projectDb) => update({ projectDb })}
+        {databaseHere && <DatabaseServiceChoices service={service} onChange={(next) => update({ service: next,
+          projectDb: next === 'autonomous' || next === 'both' ? value.projectDb : {} })} />}
+        {databaseHere && autonomous && <ProjectChoices type="EXACC" selected={value.projectDb} onChange={(projectDb) => update({ projectDb })}
           environments={useCase === 1 ? model.environments.map((env) => env.id) : value.environments} />}
         <NotificationFields prefix="exacc" value={value.notifications} onChange={(notifications) => update({ notifications })}
-          useCase={useCase} projectEnvironments={exadataProjectTopicEnvironments(model, 'exacc', useCase, autonomous)}
-          environmentEnvironments={useCase === 1 ? [] : model.environments.filter((env) => value.environments.includes(env.id))} />
+          useCase={useCase} placement={placement} projectEnvironments={databaseHere ? exadataProjectTopicEnvironments(model, 'exacc', useCase, autonomous) : []}
+          environmentEnvironments={placement === 'environment' ? model.environments.filter((env) => value.environments.includes(env.id)) : []} />
       </>}
     </section>
   );
 }
 
-function ExacsSection() {
+function ExacsSection({ placement }: { placement: PlatformPlacement }) {
   const { model, setField } = useWizard();
   const value = model.exadata.exacs;
   const update = (patch: Partial<ExacsDesign>) => setField('exadata.exacs', { ...value, ...patch });
   const useCase = value.infrastructure === 'per_environment' ? 3 : value.database === 'per_environment' ? 2 : 1;
+  const databaseHere = placement === 'environment' || useCase === 1;
+  const linkedEnvironment = placement === 'environment' && useCase === 2;
   const projectEnvs = useCase === 1 ? model.environments.map((env) => env.id) : value.environments;
   return (
     <section style={styles.card} aria-labelledby="exacs-heading">
       <h2 id="exacs-heading" style={styles.title}>ExaDB-D / ExaCS (EXACS)</h2>
-      <p style={styles.hint}>Choose where Exadata infrastructure and AVMC/VMC database networks live. A shared infrastructure-only platform has no network; each AVMC/VMC placement needs a VCN with generated db and backup subnets.</p>
-      <label style={styles.option}>
-        <input type="checkbox" checked={value.enabled} onChange={(event) => update({ enabled: event.target.checked })} />
-        Include EXACS in this landing zone
-      </label>
+      <p style={styles.hint}>Infrastructure placement follows the platform panel. A shared infrastructure-only platform has no network; each AVMC/VMC placement needs a VCN with generated db and backup subnets.</p>
       {value.enabled && <>
         <div style={styles.grid}>
-          <label style={styles.field} htmlFor="exacs-infrastructure">
-            Exadata infrastructure
-            <select id="exacs-infrastructure" style={styles.input} value={value.infrastructure} onChange={(event) => {
-              const infrastructure = event.target.value as ExacsDesign['infrastructure'];
-              update({ infrastructure,
-                database: infrastructure === 'per_environment' ? 'per_environment' : value.database,
-                environments: infrastructure === 'per_environment' && !value.environments.length ? model.environments.map((env) => env.id) : value.environments });
-            }}>
-              <option value="shared">Shared across environments</option>
-              <option value="per_environment">Dedicated per environment</option>
-            </select>
-          </label>
-          <label style={styles.field} htmlFor="exacs-database">
+          <div style={styles.field}>
+            {linkedEnvironment ? 'Infrastructure source' : 'Exadata infrastructure'}
+            <span style={styles.value}>{linkedEnvironment ? 'Shared Platforms' : value.infrastructure === 'shared' ? 'Shared across environments' : 'Dedicated per environment'}</span>
+          </div>
+          {placement === 'shared' ? <label style={styles.field} htmlFor="exacs-database">
             VMC placement
             <select id="exacs-database" style={styles.input} value={value.database} onChange={(event) => {
               const database = event.target.value as ExacsDesign['database'];
@@ -302,12 +299,17 @@ function ExacsSection() {
               {value.infrastructure === 'shared' && <option value="shared">Shared with infrastructure</option>}
               <option value="per_environment">Dedicated per environment</option>
             </select>
-          </label>
+          </label> : <div style={styles.field}>
+            VMC placement
+            <span style={styles.value}>Dedicated per environment</span>
+          </div>}
         </div>
+        {placement === 'environment' && value.infrastructure === 'shared' && <p style={{ ...styles.hint, marginTop: 12 }}>Infrastructure is managed in Shared Platforms.</p>}
         <UseCaseSummary type="EXACS" selected={useCase} />
-        <DatabaseServiceChoices service={value.service} onChange={(next) => update({ service: next,
-          projectDb: next === 'autonomous' || next === 'both' ? value.projectDb : {} })} />
-        {useCase === 1 ? (
+        {!databaseHere && <p style={{ ...styles.hint, marginTop: 12 }}>Shared infrastructure has no network. Configure VMC/AVMC services, environments, networks, and Autonomous project tiers in Environment Platforms.</p>}
+        {databaseHere && <DatabaseServiceChoices service={value.service} onChange={(next) => update({ service: next,
+          projectDb: next === 'autonomous' || next === 'both' ? value.projectDb : {} })} />}
+        {databaseHere && (useCase === 1 ? (
           <div style={styles.grid}>
             <label style={styles.field} htmlFor="exacs-shared-vcn">Shared AVMC/VMC VCN CIDR
               <input id="exacs-shared-vcn" style={styles.input} value={value.sharedVcnCidr}
@@ -327,18 +329,17 @@ function ExacsSection() {
               </label>
             ))}
           </div>
-          {useCase === 2 && <p style={{ ...styles.hint, marginTop: 10 }}>Shared infrastructure is compartment-only. No CIDR is reserved for it.</p>}
-        </>}
-        {(value.service === 'autonomous' || value.service === 'both') && <ProjectChoices type="EXACS" selected={value.projectDb} onChange={(projectDb) => update({ projectDb })}
+        </>)}
+        {databaseHere && (value.service === 'autonomous' || value.service === 'both') && <ProjectChoices type="EXACS" selected={value.projectDb} onChange={(projectDb) => update({ projectDb })}
           environments={projectEnvs} />}
         <NotificationFields prefix="exacs" value={value.notifications} onChange={(notifications) => update({ notifications })}
-          useCase={useCase} projectEnvironments={exadataProjectTopicEnvironments(model, 'exacs', useCase, value.service === 'autonomous' || value.service === 'both')}
-          environmentEnvironments={useCase === 1 ? [] : model.environments.filter((env) => value.environments.includes(env.id))} />
+          useCase={useCase} placement={placement} projectEnvironments={databaseHere ? exadataProjectTopicEnvironments(model, 'exacs', useCase, value.service === 'autonomous' || value.service === 'both') : []}
+          environmentEnvironments={placement === 'environment' ? model.environments.filter((env) => value.environments.includes(env.id)) : []} />
       </>}
     </section>
   );
 }
 
-export default function ExadataStep({ type }: { type: 'exacc' | 'exacs' }) {
-  return type === 'exacc' ? <ExaccSection /> : <ExacsSection />;
+export default function ExadataStep({ type, placement }: { type: 'exacc' | 'exacs'; placement: PlatformPlacement }) {
+  return type === 'exacc' ? <ExaccSection placement={placement} /> : <ExacsSection placement={placement} />;
 }

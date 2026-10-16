@@ -1,9 +1,54 @@
 import { describe, expect, it } from 'vitest';
 import { emptyLzModel } from '../model/defaults';
 import { buildConfig, serializeConfig } from './lzConfig';
-import { validateExadataModel } from './exadata';
+import { addExadataPlatform, validateExadataModel } from './exadata';
 
 describe('Exadata configuration', () => {
+  it.each(['exacc', 'exacs'] as const)('removes all %s scopes and restores a saved hybrid configuration when re-added', (type) => {
+    const model = emptyLzModel();
+    model.exadata = addExadataPlatform(model, type, true);
+    model.exadata[type].database = 'per_environment';
+    model.exadata[type].environments = ['environment-2'];
+    model.exadata[type].service = 'vmc';
+    model.exadata[type].notifications.default = 'ops@example.com';
+    const before = buildConfig(model);
+    model.exadata[type].enabled = false;
+    const removed = buildConfig(model);
+    expect(removed.shared_platforms[type]).toBeUndefined();
+    for (const environment of Object.values(removed.environments)) expect(environment.platforms?.[type]).toBeUndefined();
+    model.exadata = addExadataPlatform(model, type, true);
+    expect(buildConfig(model)).toEqual(before);
+  });
+
+  it.each([
+    { type: 'exacc', shared: true }, { type: 'exacc', shared: false },
+    { type: 'exacs', shared: true }, { type: 'exacs', shared: false },
+  ] as const)('adds $type with shared=$shared through its existing deployment contract', ({ type, shared }) => {
+    const model = emptyLzModel();
+    model.exadata = addExadataPlatform(model, type, shared);
+    expect(model.exadata[type].enabled).toBe(true);
+    const config = buildConfig(model);
+    const entry = shared ? config.shared_platforms[type] : config.environments.prod.platforms[type];
+    expect(entry.extension?.type).toBe(type);
+    if (type === 'exacc') expect(entry.network).toBeUndefined();
+    else expect(entry.network?.vcn).toBeTruthy();
+    if (!shared) expect(model.exadata[type].environments).toEqual(model.environments.map((env) => env.id));
+    expect(addExadataPlatform(model, type, !shared)).toBe(model.exadata);
+  });
+
+  it('retains saved Exadata settings and environment selections when added again', () => {
+    const model = emptyLzModel();
+    model.exadata.exacs.service = 'vmc';
+    model.exadata.exacs.environments = ['environment-2'];
+    model.exadata.exacs.notifications.default = 'dba@example.com';
+    const next = addExadataPlatform(model, 'exacs', false);
+    expect(next.exacs.service).toBe('vmc');
+    expect(next.exacs.environments).toEqual(['environment-2']);
+    expect(next.exacs.notifications.default).toBe('dba@example.com');
+    expect(next.exacc).toBe(model.exadata.exacc);
+    expect(model.exadata.exacs.enabled).toBe(false);
+  });
+
   it('starts with both extensions disabled', () => {
     const model = emptyLzModel();
     expect(model.exadata.exacc.enabled).toBe(false);

@@ -16,15 +16,25 @@ import { useState, type CSSProperties } from 'react';
 import { useWizard } from '../wizardContext';
 import { oracle } from '../../theme';
 import { getHubKind } from '../../services/hubKinds';
-import { configuredVcnCidrs } from '../../services/exadata';
+import { addExadataPlatform, configuredVcnCidrs } from '../../services/exadata';
+import { exadataReadiness } from '../../services/platformReadiness';
 import type { PlatformConfig, PlatformType, SharedPlatformConfig, Subnet } from '../../model/types';
 import {
-  applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, ocvsDefaultParams, ocvsDefaultSubnets, okeDefaultParams, okeDefaultSubnets, okeProfileSubnets, platformEnvInstances, platformTypeMeta,
+  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, ocvsDefaultParams, ocvsDefaultSubnets, okeDefaultParams, okeDefaultSubnets, okeProfileSubnets, platformEnvInstances, platformTypeMeta,
 } from '../../services/platforms';
 import { VcnEditor } from './HubNetworkStep';
 import { s } from './networkEditorStyles';
 import DeleteButton from '../../components/DeleteButton';
 import Switch from '../../components/Switch';
+import ExadataStep from './ExadataStep';
+
+type ExadataType = 'exacc' | 'exacs';
+type AddPlatformType = PlatformType | ExadataType;
+const EXADATA_TYPES: ExadataType[] = ['exacc', 'exacs'];
+
+function isExadataType(type: AddPlatformType): type is ExadataType {
+  return type === 'exacc' || type === 'exacs';
+}
 
 const local: Record<string, CSSProperties> = {
   chip:       { padding: '5px 12px', fontSize: 12.5, fontWeight: 700, border: `1px solid ${oracle.borderStrong}`, borderRadius: 999, background: oracle.surface, color: oracle.text, cursor: 'pointer' },
@@ -113,6 +123,22 @@ function SharedPlatformPanel({ platform, open, onToggle, onChange, onDelete }: {
         <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '10px 0' }}>
           <DeleteButton label={`Delete shared platform ${key}`} onClick={onDelete} />
         </div>
+
+        <label style={s.label} htmlFor={`shared-platform-${platform.id}-type`}>Platform type</label>
+        <select
+          id={`shared-platform-${platform.id}-type`}
+          style={{ ...s.select, marginBottom: 14 }}
+          value={isOcvs ? 'ocvs' : 'custom'}
+          onChange={(e) => {
+            const type = e.target.value as 'custom' | 'ocvs';
+            onChange(type === 'ocvs'
+              ? { type, key: platform.key.trim().length <= 3 ? platform.key : 'ocv', subnets: [], ocvsParams: platform.ocvsParams ?? ocvsDefaultParams() }
+              : { type, subnets: platform.subnets.length ? platform.subnets : [{ name: 'core', cidr: vcnCidr.replace(/\/\d+$/, '/24') }], ocvsParams: undefined });
+          }}
+        >
+          <option value="custom">Custom network</option>
+          <option value="ocvs">OCVS management cluster</option>
+        </select>
 
         <label style={s.label} htmlFor={`shared-platform-${platform.id}-key`}>Platform name</label>
         <input id={`shared-platform-${platform.id}-key`} style={s.input} value={key} placeholder="core" onChange={(e) => onChange({ key: e.target.value })} />
@@ -404,21 +430,59 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
   );
 }
 
-export default function PlatformTemplatesStep({ platformType, existingOnly = false }: { platformType: PlatformType; existingOnly?: boolean }) {
+export default function PlatformTemplatesStep() {
   const { model, setField } = useWizard();
   const kind = getHubKind(model.network.hubKind);
   const environments = model.environments.map((e, i) => ({ id: e.id, name: e.name.trim() || `env${i + 1}` }));
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [openSharedId, setOpenSharedId] = useState<string | null>(null);
-  const newType = platformType;
-  const newSharedType = platformType === 'ocvs' ? 'ocvs' : 'custom';
-  const sharedPlatforms = model.sharedPlatforms.filter((p) => (p.type ?? 'custom') === platformType);
-  const platforms = model.platforms.filter((p) => p.type === platformType);
+  const [newSharedType, setNewSharedType] = useState<Exclude<AddPlatformType, 'oke_simple'>>('custom');
+  const [newType, setNewType] = useState<AddPlatformType>('oke_simple');
   const [newName, setNewName] = useState('');
-  const [placement, setPlacement] = useState<'shared' | 'environment' | null>(() =>
-    platformType === 'oke_simple' || platformType === 'ocvs' ? null
-      : sharedPlatforms.length > 0 && platforms.length === 0 ? 'shared' : 'environment');
+  const [openExadata, setOpenExadata] = useState<string | null>(null);
+  const sharedExadata = EXADATA_TYPES.filter((type) => model.exadata[type].enabled
+    && (type === 'exacc' ? model.exadata.exacc.shared : model.exadata.exacs.infrastructure === 'shared'));
+  const environmentExadata = EXADATA_TYPES.filter((type) => model.exadata[type].enabled
+    && (!sharedExadata.includes(type) || model.exadata[type].database === 'per_environment'
+      || (type === 'exacc' && model.exadata.exacc.database === undefined && model.exadata.exacc.environments.length > 0)));
+  const sharedTypeAdded = isExadataType(newSharedType) && model.exadata[newSharedType].enabled;
+  const environmentTypeAdded = isExadataType(newType) && model.exadata[newType].enabled;
+
+  function addExadata(type: ExadataType, shared: boolean) {
+    setField('exadata', addExadataPlatform(model, type, shared));
+    setOpenExadata(`${shared ? 'shared' : 'environment'}:${type}`);
+  }
+
+  function renderExadata(type: ExadataType, placement: 'shared' | 'environment') {
+    const id = `${placement}:${type}`;
+    const open = openExadata === id;
+    const { status, errors } = exadataReadiness(model, type);
+    return (
+      <div key={type} style={local.card}>
+        <div style={{ display: 'flex', alignItems: 'center', paddingRight: 12, background: oracle.surfaceAlt }}>
+          <button type="button" style={{ ...local.cardHead, flex: 1, minWidth: 0 }} onClick={() => setOpenExadata(open ? null : id)} aria-expanded={open} aria-label={`${type.toUpperCase()} ${placement} platform`}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span>{open ? '▾' : '▸'}</span>
+              <span style={local.cardName}>{type.toUpperCase()}</span>
+            </span>
+            <span style={{ ...local.fieldHint, color: errors.length ? oracle.redDark : oracle.textMuted }}>{status}</span>
+          </button>
+          <DeleteButton label={`Delete ${type.toUpperCase()} platform from landing zone`} onClick={() => {
+            setField(`exadata.${type}.enabled`, false);
+            setOpenExadata(null);
+          }} />
+        </div>
+        {open && <div style={local.cardBody}>
+          {errors.length > 0 && <details style={{ padding: '10px 4px', fontSize: 13 }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Review {errors.length} issues across {type.toUpperCase()} platforms</summary>
+            <ul style={{ margin: '8px 0', paddingLeft: 20 }}>{errors.map((error) => <li key={error}>{error}</li>)}</ul>
+          </details>}
+          <ExadataStep type={type} placement={placement} />
+        </div>}
+      </div>
+    );
+  }
 
   function setPlatforms(next: PlatformConfig[]) { setField('platforms', next); }
   function setSharedPlatforms(next: SharedPlatformConfig[]) { setField('sharedPlatforms', next); }
@@ -426,6 +490,10 @@ export default function PlatformTemplatesStep({ platformType, existingOnly = fal
     setSharedPlatforms(model.sharedPlatforms.map((platform) => platform.id === id ? { ...platform, ...patch } : platform));
   }
   function addSharedPlatform() {
+    if (isExadataType(newSharedType)) {
+      addExadata(newSharedType, true);
+      return;
+    }
     const occupied = configuredVcnCidrs(model);
     const platform = newSharedPlatform(newSharedType, model.sharedPlatforms, occupied);
     setSharedPlatforms([...model.sharedPlatforms, platform]);
@@ -437,6 +505,10 @@ export default function PlatformTemplatesStep({ platformType, existingOnly = fal
   }
   function delPlatform(id: string) { setPlatforms(model.platforms.filter((p) => p.id !== id)); }
   function addPlatform() {
+    if (isExadataType(newType)) {
+      addExadata(newType, false);
+      return;
+    }
     const created = newPlatform(newType, model.platforms, environments, configuredVcnCidrs(model));
     const platform = { ...created, key: newName.trim() || created.key };
     setPlatforms([...model.platforms, platform]);
@@ -461,33 +533,15 @@ export default function PlatformTemplatesStep({ platformType, existingOnly = fal
 
   return (
     <div style={s.col}>
-      <fieldset style={{ border: 'none', margin: 0, padding: '8px 4px 4px' }}>
-        <legend style={{ ...s.label, marginBottom: 8 }}>Platform placement</legend>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
-          <label style={{ fontSize: 14, display: 'flex', alignItems: 'center', gap: 8, color: platformType === 'oke_simple' ? oracle.textMuted : oracle.text }}>
-            <input type="radio" name={`${platformType}-placement`} value="shared" checked={placement === 'shared'}
-              disabled={platformType === 'oke_simple'} onChange={() => setPlacement('shared')} />
-            Shared{sharedPlatforms.length > 0 ? ` (${sharedPlatforms.length})` : ''}
-          </label>
-          <label style={{ fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input type="radio" name={`${platformType}-placement`} value="environment" checked={placement === 'environment'}
-              onChange={() => setPlacement('environment')} />
-            Environment{platforms.length > 0 ? ` (${platforms.length})` : ''}
-          </label>
-        </div>
-        {platformType === 'oke_simple' && <p style={{ ...local.note, marginTop: 8, marginBottom: 0 }}>
-          OKE currently supports environment placement only. Shared OKE is not supported.
-        </p>}
-      </fieldset>
-      {placement === 'shared' && platformType !== 'oke_simple' && <section style={s.panel}>
+      <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Shared Platforms</div>
           <div style={local.note}>Optional platforms for services shared by more than one environment. Add one only when the same service must be used across environments.</div>
-          {sharedPlatforms.length === 0 && (
+          {model.sharedPlatforms.length === 0 && sharedExadata.length === 0 && (
             <div style={{ ...s.empty, borderRadius: 6, borderTop: `1px dashed ${oracle.border}`, marginBottom: 14 }}>No shared platforms. Add one only when a workload must be shared across environments.</div>
           )}
-          {sharedPlatforms.map((platform) => (
+          {model.sharedPlatforms.map((platform) => (
             <SharedPlatformPanel
               key={platform.id}
               platform={platform}
@@ -497,30 +551,39 @@ export default function PlatformTemplatesStep({ platformType, existingOnly = fal
               onDelete={() => setSharedPlatforms(model.sharedPlatforms.filter((candidate) => candidate.id !== platform.id))}
             />
           ))}
-          {!existingOnly && <div style={s.subCard}>
+          {sharedExadata.map((type) => renderExadata(type, 'shared'))}
+          <div style={s.subCard}>
             <div style={s.subHead}>Add Shared Platform</div>
-            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-              <button type="button" style={s.addBtn} onClick={addSharedPlatform}>Add Shared Platform</button>
+            <div className="platform-add-row" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end' }}>
+              <div>
+                <label style={s.addLabel} htmlFor="new-shared-platform-type">Type</label>
+                <select id="new-shared-platform-type" style={s.select} value={newSharedType} onChange={(e) => setNewSharedType(e.target.value as Exclude<AddPlatformType, 'oke_simple'>)}>
+                  <option value="custom">Custom network</option>
+                  <option value="ocvs">OCVS management cluster</option>
+                  {EXADATA_TYPES.map((type) => <option key={type} value={type} disabled={model.exadata[type].enabled}>{type.toUpperCase()}{model.exadata[type].enabled ? ' (added)' : ''}</option>)}
+                </select>
+              </div>
+              <button type="button" style={sharedTypeAdded ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn} disabled={sharedTypeAdded} onClick={addSharedPlatform}>Add Shared Platform</button>
             </div>
-          </div>}
+          </div>
         </div>
-      </section>}
+      </section>
 
-      {placement === 'environment' && <section style={s.panel}>
+      <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Environment Platforms</div>
           <div style={local.note}>
-            Add a platform when a workload needs its own network, such as an OKE or OCVS platform. Each selected environment receives a separate platform network.
+            Add OKE, OCVS, or Custom for a separate platform network in each selected environment. EXACC adds networkless compartments; EXACS creates networks where AVMC/VMCs are placed.
           </div>
 
-          {platforms.length === 0 && (
+          {model.platforms.length === 0 && environmentExadata.length === 0 && (
             <div style={{ ...s.empty, borderRadius: 6, borderTop: `1px dashed ${oracle.border}`, marginBottom: 14 }}>
               No platforms yet — add one below.
             </div>
           )}
 
-          {platforms.map((p) => (
+          {model.platforms.map((p) => (
             <PlatformCard
               key={p.id}
               platform={p}
@@ -531,14 +594,26 @@ export default function PlatformTemplatesStep({ platformType, existingOnly = fal
               onDelete={() => delPlatform(p.id)}
             />
           ))}
+          {environmentExadata.map((type) => renderExadata(type, 'environment'))}
 
-          {!existingOnly && <div style={s.subCard}>
+          <div style={s.subCard}>
             <div style={s.subHead}>Add platform</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: 12, alignItems: 'end' }}>
+            <div className="platform-add-row" style={{ display: 'grid', gridTemplateColumns: isExadataType(newType) ? '1fr auto' : '1fr 1fr auto', gap: 12, alignItems: 'end' }}>
               <div>
-                <label style={s.addLabel} htmlFor={`new-${platformType}-name`}>Name</label>
+                <label style={s.addLabel} htmlFor="new-platform-type">Type</label>
+                <select id="new-platform-type" style={s.select} value={newType} onChange={(e) => setNewType(e.target.value as AddPlatformType)}>
+                  {PLATFORM_TYPES.map((t) => (
+                    <option key={t.type} value={t.type} disabled={!t.deployable}>
+                      {t.label}{t.note ? ` (${t.note})` : ''}
+                    </option>
+                  ))}
+                  {EXADATA_TYPES.map((type) => <option key={type} value={type} disabled={model.exadata[type].enabled}>{type.toUpperCase()}{model.exadata[type].enabled ? ' (added)' : ''}</option>)}
+                </select>
+              </div>
+              {!isExadataType(newType) && <div>
+                <label style={s.addLabel} htmlFor="new-platform-name">Name</label>
                 <input
-                  id={`new-${platformType}-name`}
+                  id="new-platform-name"
                   style={s.rowInput}
                   placeholder={newType === 'oke_simple' ? 'oke' : newType === 'ocvs' ? 'ocv' : 'cus'}
                   value={newName}
@@ -546,12 +621,12 @@ export default function PlatformTemplatesStep({ platformType, existingOnly = fal
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') addPlatform(); }}
                 />
-              </div>
-              <button type="button" style={s.addBtn} onClick={addPlatform}>Add platform</button>
+              </div>}
+              <button type="button" style={environmentTypeAdded ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn} disabled={environmentTypeAdded} onClick={addPlatform}>Add platform</button>
             </div>
-          </div>}
+          </div>
         </div>
-      </section>}
+      </section>
     </div>
   );
 }
