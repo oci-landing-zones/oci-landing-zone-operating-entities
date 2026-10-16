@@ -33,7 +33,7 @@ describe('saved model versioning', () => {
   });
   it('accepts the current contract unchanged', () => {
     const current = emptyLzModel();
-    expect(normalizeModel(current)).toBe(current);
+    expect(normalizeModel(current)).toEqual(current);
   });
 
   it('resets older, partial, or malformed records to the latest model', () => {

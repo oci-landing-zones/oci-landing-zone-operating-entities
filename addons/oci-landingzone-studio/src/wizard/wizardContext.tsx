@@ -20,6 +20,7 @@ import React, {
 } from 'react';
 import type { LzModel } from '../model/types';
 import { emptyLzModel } from '../model/defaults';
+import { reconcileExadata } from '../services/exadata';
 
 interface WizardState {
   model: LzModel;
@@ -48,7 +49,7 @@ function setNested<T>(obj: T, path: string, value: unknown): T {
 function reducer(state: WizardState, action: WizardAction): WizardState {
   switch (action.type) {
     case 'SET_FIELD':
-      return { ...state, model: setNested(state.model, action.path, action.value) };
+      return { ...state, model: reconcileExadata(setNested(state.model, action.path, action.value)) };
     case 'RESET':
       return { model: emptyLzModel() };
     default:
@@ -69,7 +70,7 @@ export function WizardProvider({
   onChange,
   children,
 }: React.PropsWithChildren<{ initialModel: LzModel; onChange?: (model: LzModel) => void }>) {
-  const [state, dispatch] = useReducer(reducer, undefined, () => ({ model: initialModel }));
+  const [state, dispatch] = useReducer(reducer, undefined, () => ({ model: reconcileExadata(initialModel) }));
 
   // Report changes through onChange, skipping the initial mount so opening an LZ
   // doesn't immediately re-save it.

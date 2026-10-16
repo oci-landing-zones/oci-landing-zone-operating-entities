@@ -106,7 +106,7 @@ function(config, n, realm_constants, topo)
 
   local placeholder_email = 'email.address@example.com';
   local notification_emails =
-    if std.objectHas(config, 'notification_emails') then config.notification_emails else {};
+    if std.objectHas(config, 'notification_emails') && config.notification_emails != null then config.notification_emails else {};
   local topic_recipients(topic) =
     if std.objectHas(notification_emails, topic) then notification_emails[topic]
     else if std.objectHas(notification_emails, 'default') then notification_emails.default

@@ -3,6 +3,7 @@ import { getDefaultRegionForRealm } from '../services/regions';
 import { hubKindDefaults } from '../services/hubKinds';
 import { additionalEnvironmentCidr, oneOeEnvironmentCidrs, SHARED_EXACS_CIDR } from '../services/oneOeCidrs';
 import { formatIp, parseCidr } from '../services/cidr';
+import { reconcileExadata } from '../services/exadata';
 
 export const LZ_MODEL_VERSION = '0.20.0';
 
@@ -153,5 +154,5 @@ export function normalizeModel(stored: unknown): LzModel {
     || candidate.environments.some((env) => !env.id)
     || candidate.projects.some((project) => !project.id)
   ) return emptyLzModel();
-  return candidate as LzModel;
+  return reconcileExadata(candidate as LzModel);
 }

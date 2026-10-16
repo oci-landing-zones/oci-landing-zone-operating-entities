@@ -30,8 +30,9 @@ local exadb_events = import './events.libsonnet';
     );
     local has_environment_platform_topic =
       scope.scope_type == 'environment' &&
-      std.objectHas(scope_config, 'extension_entry_uses_publication_components') &&
-      scope_config.extension_entry_uses_publication_components &&
+      (split_environment_topics ||
+       (std.objectHas(scope_config, 'extension_entry_uses_publication_components') &&
+        scope_config.extension_entry_uses_publication_components)) &&
       (components.infrastructure || components.database);
     local project_environment_names = [
       env_name

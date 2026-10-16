@@ -1,9 +1,105 @@
 import { describe, expect, it } from 'vitest';
-import { emptyLzModel } from '../model/defaults';
+import { emptyLzModel, envNetworkDefaults, normalizeModel } from '../model/defaults';
+import { newPlatform } from './platforms';
 import { buildConfig, serializeConfig } from './lzConfig';
-import { addExadataPlatform, validateExadataModel } from './exadata';
+import { addExadataPlatform, exadataEntries, reconcileExadata, validateExadataModel } from './exadata';
 
 describe('Exadata configuration', () => {
+  it('pins new and saved ExaCS networks before another platform is removed', () => {
+    const model = emptyLzModel();
+    model.environments = [{ id: 'sandbox', name: 'sandbox', securityZone: false, network: envNetworkDefaults(0, 'sandbox') }];
+    model.platforms = [newPlatform('custom', [], model.environments, [model.environments[0].network.vcnCidr])];
+    model.exadata = addExadataPlatform(model, 'exacs', false);
+    const cidr = exadataEntries(model).environments.sandbox.exacs.network!.vcn;
+    expect(cidr).toBe('10.1.208.0/21');
+    expect(model.exadata.exacs.environmentVcnCidrs.sandbox).toBe(cidr);
+    const loaded = [true, false].map((enabled) => {
+      const stored = structuredClone(model);
+      stored.exadata.exacs.environmentVcnCidrs = {};
+      stored.exadata.exacs.enabled = enabled;
+      return normalizeModel(stored);
+    });
+    for (const design of [model, ...loaded]) {
+      design.platforms = [];
+      design.exadata = addExadataPlatform(design, 'exacs', false);
+      expect(exadataEntries(design).environments.sandbox.exacs.network!.vcn).toBe(cidr);
+    }
+  });
+
+  it('keeps a legacy EXACC hybrid design hybrid after its last selected environment is removed', () => {
+    const model = emptyLzModel();
+    model.exadata.exacc = { ...model.exadata.exacc, enabled: true, database: undefined,
+      environments: ['environment-1'], service: 'vmc', notifications: { default: 'ops@example.com' } };
+    model.environments = model.environments.slice(1);
+    const next = reconcileExadata(model);
+    expect(next.exadata.exacc.database).toBe('per_environment');
+    expect(exadataEntries(next).shared.exacc.publication_components).toEqual({ infrastructure: true, database: false });
+    expect(validateExadataModel(next)).toEqual(['EXACC needs at least one environment for dedicated placement.']);
+  });
+
+  it.each(['exacc', 'exacs'] as const)('cleans removed %s environment references without changing the remaining settings', (type) => {
+    const model = emptyLzModel();
+    model.exadata = addExadataPlatform(model, type, false);
+    const design = model.exadata[type];
+    design.service = 'both';
+    design.notifications.default = 'ops@example.com';
+    design.projectDb = { 'environment-1': ['project-1'], 'environment-2': ['project-1'] };
+    design.notifications.projectEmails = { 'environment-1': 'old@example.com', 'environment-2': 'keep@example.com' };
+    design.notifications.environmentInfraEmails = { ...design.notifications.projectEmails };
+    design.notifications.environmentDbEmails = { ...design.notifications.projectEmails };
+    model.exadata.exacs.environmentVcnCidrs = { 'environment-1': '10.200.0.0/21', 'environment-2': '10.201.0.0/21' };
+    model.environments = model.environments.slice(1);
+    const next = reconcileExadata(model);
+    expect(next.exadata[type].environments).toEqual(['environment-2']);
+    expect(next.exadata[type].projectDb).toEqual({ 'environment-2': ['project-1'] });
+    for (const field of ['projectEmails', 'environmentInfraEmails', 'environmentDbEmails'] as const) {
+      expect(next.exadata[type].notifications[field]).toEqual({ 'environment-2': 'keep@example.com' });
+    }
+    expect(next.exadata.exacs.environmentVcnCidrs).toEqual({ 'environment-2': '10.201.0.0/21' });
+    expect(validateExadataModel(next)).toEqual([]);
+    expect(model.exadata[type].environments).toHaveLength(2);
+  });
+
+  it.each(['exacc', 'exacs'] as const)('cleans %s project tiers after project removal or placement changes', (type) => {
+    const model = emptyLzModel();
+    model.exadata = addExadataPlatform(model, type, false);
+    model.exadata[type].service = 'autonomous';
+    model.exadata[type].notifications.default = 'ops@example.com';
+    model.exadata[type].projectDb = { 'environment-1': ['project-1'], 'environment-2': ['project-1'] };
+    model.projects[0].environments = ['environment-2'];
+    const moved = reconcileExadata(model);
+    expect(moved.exadata[type].projectDb).toEqual({ 'environment-2': ['project-1'] });
+    expect(validateExadataModel(moved)).toEqual([]);
+    const deleted = reconcileExadata({ ...moved, projects: [] });
+    expect(deleted.exadata[type].projectDb).toEqual({});
+    expect(validateExadataModel(deleted)).toEqual([]);
+    moved.exadata[type].environments = ['environment-1'];
+    expect(reconcileExadata(moved).exadata[type].projectDb).toEqual({});
+  });
+
+  it.each(['exacc', 'exacs'] as const)('rejects malformed %s recipients in each active notification scope', (type) => {
+    const model = emptyLzModel();
+    model.exadata = addExadataPlatform(model, type, true);
+    const design = model.exadata[type];
+    design.service = 'autonomous';
+    design.notifications.default = 'garbage';
+    expect(validateExadataModel(model).some((error) => error.includes('valid email'))).toBe(true);
+    design.notifications = { useSingleRecipient: false, default: 'ignored', dbWorkloads: 'garbage', infraWorkloads: 'bad@',
+      projectEmails: { 'environment-1': 'also-invalid' } };
+    design.projectDb = { 'environment-1': ['project-1'] };
+    expect(validateExadataModel(model).filter((error) => error.includes('valid email'))).toHaveLength(3);
+    design.database = 'per_environment';
+    design.environments = ['environment-1'];
+    design.notifications.infraWorkloads = 'shared@example.com';
+    design.notifications.projectEmails!['environment-1'] = 'projects@example.com';
+    design.notifications.environmentInfraEmails = { 'environment-1': 'bad' };
+    design.notifications.environmentDbEmails = { 'environment-1': 'also-bad' };
+    expect(validateExadataModel(model).filter((error) => error.includes('valid email'))).toHaveLength(2);
+    design.notifications.environmentInfraEmails['environment-1'] = 'infra@example.com';
+    design.notifications.environmentDbEmails['environment-1'] = 'db@example.com';
+    expect(validateExadataModel(model)).toEqual([]);
+  });
+
   it.each(['exacc', 'exacs'] as const)('removes all %s scopes and restores a saved hybrid configuration when re-added', (type) => {
     const model = emptyLzModel();
     model.exadata = addExadataPlatform(model, type, true);

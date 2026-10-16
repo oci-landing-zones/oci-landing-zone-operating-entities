@@ -2,6 +2,7 @@ import type { ExadataDesign, ExadataNotifications, LzModel, PlatformConfig, Shar
 import { formatIp, overlaps, parseCidr } from './cidr';
 import { platformEnvInstances } from './platforms';
 import { additionalEnvironmentCidr, oneOeEnvironmentCidrs } from './oneOeCidrs';
+import { notificationEmailError } from './notificationEmails';
 
 export interface ExadataPlatformEntry {
   network?: { vcn: string };
@@ -20,12 +21,56 @@ export function addExadataPlatform(model: LzModel, type: 'exacc' | 'exacs', shar
   const wasShared = type === 'exacc' ? model.exadata.exacc.shared : model.exadata.exacs.infrastructure === 'shared';
   const database = shared && wasShared ? value.database ?? (value.environments.length ? 'per_environment' : 'shared') : placement;
   const environments = shared || value.environments.length ? value.environments : model.environments.map((env) => env.id);
-  return {
+  const next = {
     ...model.exadata,
     [type]: type === 'exacc'
       ? { ...model.exadata.exacc, enabled: true, shared, database, environments }
       : { ...model.exadata.exacs, enabled: true, infrastructure: placement, database, environments },
   };
+  if (type === 'exacs') next.exacs = reconcileExadata({ ...model, exadata: next }).exadata.exacs;
+  return next;
+}
+
+/** Keep Exadata references valid and retain assigned networks across unrelated edits. */
+export function reconcileExadata(model: LzModel): LzModel {
+  const environmentIds = new Set(model.environments.map((env) => env.id));
+  const projects = new Map(model.projects.map((project) => [project.id, project]));
+  const keepEnvironments = <T,>(values: Record<string, T>) => Object.fromEntries(
+    Object.entries(values).filter(([id]) => environmentIds.has(id)),
+  );
+  const clean = <T extends ExadataDesign['exacc'] | ExadataDesign['exacs']>(design: T, sharedDatabase: boolean) => {
+    const environments = design.environments.filter((id) => environmentIds.has(id));
+    const notifications = { ...design.notifications };
+    for (const field of ['projectEmails', 'environmentInfraEmails', 'environmentDbEmails'] as const) {
+      if (notifications[field]) notifications[field] = keepEnvironments(notifications[field]);
+    }
+    const projectDb = Object.fromEntries(Object.entries(design.projectDb).flatMap(([envId, ids]) => {
+      if (!environmentIds.has(envId) || (!sharedDatabase && !environments.includes(envId))) return [];
+      const selected = ids.filter((id) => {
+        const project = projects.get(id);
+        return project && (project.environments === 'all' || project.environments.includes(envId));
+      });
+      return selected.length ? [[envId, selected]] : [];
+    }));
+    return { ...design, environments, notifications, projectDb };
+  };
+  const { exacc, exacs } = model.exadata;
+  const exaccDatabase = exacc.database ?? (!exacc.shared || exacc.environments.length ? 'per_environment' : 'shared');
+  const next = { ...model, exadata: {
+    exacc: { ...clean(exacc, exacc.shared && exaccDatabase === 'shared'), database: exaccDatabase },
+    exacs: { ...clean(exacs, exacs.infrastructure === 'shared' && exacs.database === 'shared'),
+      environmentVcnCidrs: keepEnvironments(exacs.environmentVcnCidrs) },
+  } };
+  if (exacs.database === 'per_environment' || exacs.infrastructure === 'per_environment') {
+    const retained = { ...next, exadata: { ...next.exadata, exacs: { ...next.exadata.exacs, enabled: true } } };
+    for (const [id, platforms] of Object.entries(exadataEntries(retained).environments)) {
+      const cidr = platforms.exacs?.network?.vcn;
+      if (cidr !== undefined && next.exadata.exacs.environmentVcnCidrs[id] === undefined) {
+        next.exadata.exacs.environmentVcnCidrs[id] = cidr;
+      }
+    }
+  }
+  return next;
 }
 
 function recipients(input: string | undefined): string[] {
@@ -291,14 +336,19 @@ export function validateExadataModel(model: LzModel): string[] {
     ];
     const projectTopicEnvironments = exadataProjectTopicEnvironments(model, type, useCase, autonomous);
     const environmentTopicEnvironments = useCase === 1 ? [] : model.environments.filter((env) => design.environments.includes(env.id));
+    const checkRecipient = (value: string | undefined, label: string) => {
+      if (!recipients(value).length) errors.push(`${type.toUpperCase()} needs ${label} notification recipients.`);
+      else {
+        const error = notificationEmailError(value);
+        if (error) errors.push(`${type.toUpperCase()} ${label}: ${error}`);
+      }
+    };
     if (design.notifications.useSingleRecipient ?? Boolean(design.notifications.default)) {
-      if (!recipients(design.notifications.default).length) errors.push(`${type.toUpperCase()} needs a default notification recipient.`);
+      checkRecipient(design.notifications.default, 'default');
     } else {
       for (const env of environmentTopicEnvironments) {
-        if (!recipients(design.notifications.environmentInfraEmails?.[env.id]).length)
-          errors.push(`${type.toUpperCase()} needs ${env.name} infrastructure notification recipients.`);
-        if (!recipients(design.notifications.environmentDbEmails?.[env.id]).length)
-          errors.push(`${type.toUpperCase()} needs ${env.name} DBA notification recipients.`);
+        checkRecipient(design.notifications.environmentInfraEmails?.[env.id], `${env.name} infrastructure`);
+        checkRecipient(design.notifications.environmentDbEmails?.[env.id], `${env.name} DBA`);
       }
       for (const [field, label] of [
         ['dbWorkloads', 'shared database workload'],
@@ -307,13 +357,10 @@ export function validateExadataModel(model: LzModel): string[] {
       ] as const) {
         if (field === 'projects' && projectTopicEnvironments.length && design.notifications.projectEmails) {
           for (const env of projectTopicEnvironments) {
-            if (!recipients(design.notifications.projectEmails[env.id]).length) {
-              errors.push(`${type.toUpperCase()} needs ${env.name} project-topic notification recipients.`);
-            }
+            checkRecipient(design.notifications.projectEmails[env.id], `${env.name} project-topic`);
           }
-        } else if (topicFields.includes(field) && !(field === 'projects' && !projectTopicEnvironments.length)
-          && !recipients(design.notifications[field]).length) {
-          errors.push(`${type.toUpperCase()} needs ${label} notification recipients.`);
+        } else if (topicFields.includes(field) && !(field === 'projects' && !projectTopicEnvironments.length)) {
+          checkRecipient(design.notifications[field], label);
         }
       }
     }
