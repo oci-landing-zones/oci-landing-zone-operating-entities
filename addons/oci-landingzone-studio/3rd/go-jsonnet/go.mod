@@ -1,4 +1,4 @@
-module landing-zone-studio-jsonnet-wasm
+module oci-landingzone-studio-jsonnet-wasm
 
 go 1.26.0
 

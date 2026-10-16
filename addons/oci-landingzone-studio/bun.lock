@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "landing-zone-studio",
+      "name": "oci-landingzone-studio",
       "dependencies": {
         "@xyflow/react": "^12.11.0",
         "fflate": "^0.8.3",

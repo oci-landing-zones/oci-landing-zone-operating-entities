@@ -23,5 +23,5 @@ if [[ -x "$wasm_opt" && -s libjsonnet.wasm && -f .runtime-build-fingerprint ]] \
   exit 0
 fi
 
-echo "Preparing the Landing Zone Studio Jsonnet runtime..."
+echo "Preparing the OCI Landing Zone Studio Jsonnet runtime..."
 bash "$runtime_dir/build.sh"

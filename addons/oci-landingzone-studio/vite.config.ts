@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 
 const GITHUB_PAGES_BASE = '/oci-landing-zone-operating-entities/';
 
-// Landing Zone Studio Vite config.
+// OCI Landing Zone Studio Vite config.
 //   - dev server binds 0.0.0.0 so LAN hosts can hit it
 //   - github-pages mode builds for this repository's project-site path
 //   - vitest scans src for *.test.{ts,tsx}

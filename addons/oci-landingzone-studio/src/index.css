@@ -129,7 +129,7 @@ a:focus:not(:focus-visible) {
   outline: none;
 }
 
-/* Landing Zone Studio responsive layout */
+/* OCI Landing Zone Studio responsive layout */
 .studio-stepper {
   overflow-x: auto;
   padding-bottom: 2px;

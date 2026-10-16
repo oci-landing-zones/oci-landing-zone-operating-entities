@@ -1,5 +1,5 @@
 {
-    "name"                           : "landing-zone-studio",
+    "name"                           : "oci-landingzone-studio",
     "type"                           : "module",
     "private"                        : true,
     "version"                        : "0.1.0",

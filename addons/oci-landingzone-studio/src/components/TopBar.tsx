@@ -45,7 +45,7 @@ export default function TopBar({ center, right, onEmptySpaceClick }: {
         <span style={css.word}>OCI</span>
       </Link>
       <span style={css.divider} />
-      <span style={css.sub}>Landing Zone Studio</span>
+      <span style={css.sub}>OCI Landing Zone Studio</span>
       <span
         className="studio-topbar-debug-space"
         style={css.debugSpace}

@@ -1,5 +1,5 @@
 /**
- * App.tsx — Landing Zone Studio router for the statically hosted browser application.
+ * App.tsx — OCI Landing Zone Studio router for the statically hosted browser application.
  */
 
 import React from 'react';

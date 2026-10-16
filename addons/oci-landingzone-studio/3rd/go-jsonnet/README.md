@@ -43,7 +43,7 @@ inputs change, including the installed Go or Binaryen version.
 Install the addon dependencies, then generate the optimized runtime locally:
 
 ```bash
-cd addons/landingzone-studio
+cd addons/oci-landingzone-studio
 bun install
 bun run build:wasm
 ```

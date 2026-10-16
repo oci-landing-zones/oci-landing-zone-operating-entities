@@ -34,7 +34,7 @@ export default function Hero({ onNew, compact = false }: { onNew: () => void; co
   return (
     <div style={compact ? styles.heroCompact : styles.hero}>
       <span style={styles.eyebrow}>OCI Landing Zone</span>
-      <div style={compact ? styles.titleCompact : styles.title}>Landing Zone Studio</div>
+      <div style={compact ? styles.titleCompact : styles.title}>OCI Landing Zone Studio</div>
       {!compact && (
         <div style={styles.sub}>
           Plan an OCI Landing Zone step by step. Check the network as you make decisions, then download the
