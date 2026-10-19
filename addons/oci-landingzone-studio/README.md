@@ -1,6 +1,8 @@
 # **[OCI Landing Zone Studio](#)**
 ## **An OCI Open LZ [Addon](#) for visual Landing Zone design**
 
+**[Open OCI Landing Zone Studio](https://oci-landing-zones.github.io/oci-landing-zone-operating-entities/)** in your browser. No installation or server is required. All design data and generated files remain stored locally in your browser profile.
+
 &nbsp;
 
 **Table of Contents**
