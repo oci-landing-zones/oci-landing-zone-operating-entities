@@ -139,14 +139,57 @@
                 "description"                                  : "Tenancy-scoped IAM administration access group."
             },
 
-            "GRP-SECURITY-ADMIN-KEY": {
-                "name"                                         : "grp-security-admin",
-                "description"                                  : "Tenancy-scoped security service administration access group."
-            },
-
             "GRP-LZ-NETWORK-ADMIN-KEY": {
                 "name"                                         : "grp-lz-network-admin",
                 "description"                                  : "Landing Zone shared network administration access group."
+            },
+
+            "GRP-LZ-PREPROD-IAM-ADMIN-KEY": {
+                "name"                                         : "grp-lz-preprod-iam-admin",
+                "description"                                  : "Landing Zone PreProduction environment IAM administration access group.",
+                "identity_domain_id"                           : "PREPROD-DOMAIN"
+            },
+
+            "GRP-LZ-PREPROD-NETWORK-ADMIN-KEY": {
+                "name"                                         : "grp-lz-preprod-network-admin",
+                "description"                                  : "Landing Zone PreProduction environment network administration access group.",
+                "identity_domain_id"                           : "PREPROD-DOMAIN"
+            },
+
+            "GRP-LZ-PREPROD-PROJ1-ADMIN-KEY": {
+                "name"                                         : "grp-lz-preprod-proj1-admin",
+                "description"                                  : "Landing Zone PreProduction environment, Project 1 administration access group.",
+                "identity_domain_id"                           : "PREPROD-DOMAIN"
+            },
+
+            "GRP-LZ-PREPROD-SECURITY-ADMIN-KEY": {
+                "name"                                         : "grp-lz-preprod-security-admin",
+                "description"                                  : "Landing Zone PreProduction environment security administration access group.",
+                "identity_domain_id"                           : "PREPROD-DOMAIN"
+            },
+
+            "GRP-LZ-PROD-IAM-ADMIN-KEY": {
+                "name"                                         : "grp-lz-prod-iam-admin",
+                "description"                                  : "Landing Zone Production environment IAM administration access group.",
+                "identity_domain_id"                           : "PROD-DOMAIN"
+            },
+
+            "GRP-LZ-PROD-NETWORK-ADMIN-KEY": {
+                "name"                                         : "grp-lz-prod-network-admin",
+                "description"                                  : "Landing Zone Production environment network administration access group.",
+                "identity_domain_id"                           : "PROD-DOMAIN"
+            },
+
+            "GRP-LZ-PROD-PROJ1-ADMIN-KEY": {
+                "name"                                         : "grp-lz-prod-proj1-admin",
+                "description"                                  : "Landing Zone Production environment, Project 1 administration access group.",
+                "identity_domain_id"                           : "PROD-DOMAIN"
+            },
+
+            "GRP-LZ-PROD-SECURITY-ADMIN-KEY": {
+                "name"                                         : "grp-lz-prod-security-admin",
+                "description"                                  : "Landing Zone Production environment security administration access group.",
+                "identity_domain_id"                           : "PROD-DOMAIN"
             },
 
             "GRP-LZ-SECURITY-ADMIN-KEY": {
@@ -154,52 +197,9 @@
                 "description"                                  : "Landing Zone shared security administration access group."
             },
 
-            "GRP-LZ-PROD-IAM-ADMIN-KEY": {
-                "identity_domain_id"                           : "PROD-DOMAIN",
-                "name"                                         : "grp-lz-prod-iam-admin",
-                "description"                                  : "Landing Zone Production environment IAM administration access group."
-            },
-
-            "GRP-LZ-PROD-NETWORK-ADMIN-KEY": {
-                "identity_domain_id"                           : "PROD-DOMAIN",
-                "name"                                         : "grp-lz-prod-network-admin",
-                "description"                                  : "Landing Zone Production environment network administration access group."
-            },
-
-            "GRP-LZ-PROD-PROJ1-ADMIN-KEY": {
-                "identity_domain_id"                           : "PROD-DOMAIN",
-                "name"                                         : "grp-lz-prod-proj1-admin",
-                "description"                                  : "Landing Zone Production environment, Project 1 administration access group."
-            },
-
-            "GRP-LZ-PROD-SECURITY-ADMIN-KEY": {
-                "identity_domain_id"                           : "PROD-DOMAIN",
-                "name"                                         : "grp-lz-prod-security-admin",
-                "description"                                  : "Landing Zone Production environment security administration access group."
-            },
-
-            "GRP-LZ-PREPROD-IAM-ADMIN-KEY": {
-                "identity_domain_id"                           : "PREPROD-DOMAIN",
-                "name"                                         : "grp-lz-preprod-iam-admin",
-                "description"                                  : "Landing Zone PreProduction environment IAM administration access group."
-            },
-
-            "GRP-LZ-PREPROD-NETWORK-ADMIN-KEY": {
-                "identity_domain_id"                           : "PREPROD-DOMAIN",
-                "name"                                         : "grp-lz-preprod-network-admin",
-                "description"                                  : "Landing Zone PreProduction environment network administration access group."
-            },
-
-            "GRP-LZ-PREPROD-PROJ1-ADMIN-KEY": {
-                "identity_domain_id"                           : "PREPROD-DOMAIN",
-                "name"                                         : "grp-lz-preprod-proj1-admin",
-                "description"                                  : "Landing Zone PreProduction environment, Project 1 administration access group."
-            },
-
-            "GRP-LZ-PREPROD-SECURITY-ADMIN-KEY": {
-                "identity_domain_id"                           : "PREPROD-DOMAIN",
-                "name"                                         : "grp-lz-preprod-security-admin",
-                "description"                                  : "Landing Zone PreProduction environment security administration access group."
+            "GRP-SECURITY-ADMIN-KEY": {
+                "name"                                         : "grp-security-admin",
+                "description"                                  : "Tenancy-scoped security service administration access group."
             }
         }
     },
@@ -226,9 +226,10 @@
                 "license_type"                                 : "free",
                 "replica_region"                               : null
             },
-            "PROD-DOMAIN": {
-                "display_name"                                 : "id_lz_prod",
-                "description"                                  : "One-OE LZ Prod Identity Domain",
+
+            "PREPROD-DOMAIN": {
+                "display_name"                                 : "id_lz_preprod",
+                "description"                                  : "One-OE LZ PreProd Identity Domain",
                 "compartment_id"                               : null,
                 "admin_email"                                  : null,
                 "admin_first_name"                             : null,
@@ -242,9 +243,10 @@
                 "license_type"                                 : "free",
                 "replica_region"                               : null
             },
-            "PREPROD-DOMAIN": {
-                "display_name"                                 : "id_lz_preprod",
-                "description"                                  : "One-OE LZ PreProd Identity Domain",
+
+            "PROD-DOMAIN": {
+                "display_name"                                 : "id_lz_prod",
+                "description"                                  : "One-OE LZ Prod Identity Domain",
                 "compartment_id"                               : null,
                 "admin_email"                                  : null,
                 "admin_first_name"                             : null,
@@ -346,89 +348,6 @@
                 ]
             },
 
-            "PCY-SECURITY-ADMIN-KEY": {
-                "name"                                         : "pcy-security-admin",
-                "description"                                  : "Grants grp-security-admin security service administration access in the tenancy.",
-                "compartment_id"                               : "TENANCY-ROOT",
-
-                "statements": [
-                    "allow group 'id_lz_common'/'grp-security-admin' to manage cloudevents-rules in tenancy",
-                    "allow group 'id_lz_common'/'grp-security-admin' to manage cloud-guard-family in tenancy",
-                    "allow group 'id_lz_common'/'grp-security-admin' to read tenancies in tenancy"
-                ]
-            },
-
-            "PCY-SERVICES-ADMIN-KEY": {
-                "name"                                         : "pcy-services-admin",
-                "description"                                  : "Grants supported OCI services required Landing Zone service access in the tenancy.",
-                "compartment_id"                               : "TENANCY-ROOT",
-
-                "statements": [
-                    "allow service cloudguard to manage cloudevents-rules in tenancy where target.rule.type='managed'",
-                    "allow service cloudguard to read tenancies in tenancy",
-                    "allow service cloudguard to read all-resources in tenancy",
-                    "allow service cloudguard to use network-security-groups in tenancy",
-                    "allow any-user to { WLP_BOM_READ, WLP_CONFIG_READ } in tenancy where all { request.principal.id = target.agent.id, request.principal.type = 'workloadprotectionagent'}",
-                    "endorse any-user to { WLP_LOG_CREATE, WLP_METRICS_CREATE, WLP_ADHOC_QUERY_READ, WLP_ADHOC_RESULTS_CREATE } in any-tenancy where all { request.principal.id = target.agent.id, request.principal.type = 'workloadprotectionagent' }",
-                    "allow service vulnerability-scanning-service to manage instances in tenancy",
-                    "allow service vulnerability-scanning-service to read compartments in tenancy",
-                    "allow service vulnerability-scanning-service to read repos in tenancy",
-                    "allow service vulnerability-scanning-service to read vnics in tenancy",
-                    "allow service vulnerability-scanning-service to read vnic-attachments in tenancy",
-                    "allow service osmh to read instances in tenancy",
-                    "allow service blockstorage, oke, streaming, Fssoc1Prod, objectstorage-eu-frankfurt-1 to use keys in tenancy"
-                ]
-            },
-
-            "PCY-LZ-SECURITY-ADMIN-KEY": {
-                "name"                                         : "pcy-lz-security-admin",
-                "description"                                  : "Grants grp-lz-security-admin security administration access in Landing Zone child compartments tagged for security administration.",
-                "compartment_id"                               : "CMP-LANDINGZONE-KEY",
-
-                "statements": [
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-namespaces in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-defaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage repos in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read app-catalog-listing in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-images in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to inspect buckets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage instance-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage volume-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage object-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage file-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage serviceconnectors in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage streams in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage functions-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage waas-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage security-zone in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage vss-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage bastion-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-agent-plugins in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use key-delegate in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use subnets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use network-security-groups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage private-ips in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage operator-control-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
-                ]
-            },
-
             "PCY-LZ-NETWORK-ADMIN-KEY": {
                 "name"                                         : "pcy-lz-network-admin",
                 "description"                                  : "Grants grp-lz-network-admin network administration access in Landing Zone child compartments tagged for network administration.",
@@ -476,55 +395,6 @@
                     "allow group 'id_lz_preprod'/'grp-lz-preprod-iam-admin' to inspect groups in tenancy where target.resource.domain.name = 'id_lz_preprod'",
                     "allow group 'id_lz_preprod'/'grp-lz-preprod-iam-admin' to manage groups in tenancy where all {target.resource.domain.name = 'id_lz_preprod', target.group.name != 'Administrators'}",
                     "allow group 'id_lz_preprod'/'grp-lz-preprod-iam-admin' to manage dynamic-groups in tenancy where target.resource.domain.name = 'id_lz_preprod'"
-                ]
-            },
-
-            "PCY-LZ-PREPROD-SECURITY-ADMIN-KEY": {
-                "name"                                         : "pcy-lz-preprod-security-admin",
-                "description"                                  : "Grants grp-lz-preprod-security-admin security administration access in Landing Zone child compartments tagged for security administration.",
-                "compartment_id"                               : "CMP-LZ-PREPROD-KEY",
-
-                "statements": [
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage tag-namespaces in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage tag-defaults in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage repos in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read audit-events in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read app-catalog-listing in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read instance-images in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to inspect buckets in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read all-resources in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage instance-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage volume-family in compartment cmp-lz-preprod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage object-family in compartment cmp-lz-preprod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage file-family in compartment cmp-lz-preprod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage vaults in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage keys in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage secret-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage logging-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage serviceconnectors in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage streams in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage ons-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage functions-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage waas-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage security-zone in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage orm-stacks in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage orm-jobs in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage orm-config-source-providers in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage vss-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read work-requests in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage bastion-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read instance-agent-plugins in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage cloudevents-rules in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage alarms in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage metrics in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to use key-delegate in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read virtual-network-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to use subnets in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to use network-security-groups in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to use vnics in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage private-ips in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read keys in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage operator-control-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ]
             },
 
@@ -633,6 +503,55 @@
                 ]
             },
 
+            "PCY-LZ-PREPROD-SECURITY-ADMIN-KEY": {
+                "name"                                         : "pcy-lz-preprod-security-admin",
+                "description"                                  : "Grants grp-lz-preprod-security-admin security administration access in Landing Zone child compartments tagged for security administration.",
+                "compartment_id"                               : "CMP-LZ-PREPROD-KEY",
+
+                "statements": [
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage tag-namespaces in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage tag-defaults in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage repos in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read audit-events in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read app-catalog-listing in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read instance-images in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to inspect buckets in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read all-resources in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage instance-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage volume-family in compartment cmp-lz-preprod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage object-family in compartment cmp-lz-preprod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage file-family in compartment cmp-lz-preprod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage vaults in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage keys in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage secret-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage logging-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage serviceconnectors in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage streams in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage ons-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage functions-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage waas-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage security-zone in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage orm-stacks in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage orm-jobs in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage orm-config-source-providers in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage vss-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read work-requests in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage bastion-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read instance-agent-plugins in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage cloudevents-rules in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage alarms in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage metrics in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to use key-delegate in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read virtual-network-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to use subnets in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to use network-security-groups in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to use vnics in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage private-ips in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to read keys in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_preprod'/'grp-lz-preprod-security-admin' to manage operator-control-family in compartment cmp-lz-preprod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
+                ]
+            },
+
             "PCY-LZ-PROD-IAM-ADMIN-KEY": {
                 "name"                                         : "pcy-lz-prod-iam-admin",
                 "description"                                  : "Grants grp-lz-prod-iam-admin IAM administration access in the tenancy.",
@@ -643,55 +562,6 @@
                     "allow group 'id_lz_prod'/'grp-lz-prod-iam-admin' to inspect groups in tenancy where target.resource.domain.name = 'id_lz_prod'",
                     "allow group 'id_lz_prod'/'grp-lz-prod-iam-admin' to manage groups in tenancy where all {target.resource.domain.name = 'id_lz_prod', target.group.name != 'Administrators'}",
                     "allow group 'id_lz_prod'/'grp-lz-prod-iam-admin' to manage dynamic-groups in tenancy where target.resource.domain.name = 'id_lz_prod'"
-                ]
-            },
-
-            "PCY-LZ-PROD-SECURITY-ADMIN-KEY": {
-                "name"                                         : "pcy-lz-prod-security-admin",
-                "description"                                  : "Grants grp-lz-prod-security-admin security administration access in Landing Zone child compartments tagged for security administration.",
-                "compartment_id"                               : "CMP-LZ-PROD-KEY",
-
-                "statements": [
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage tag-namespaces in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage tag-defaults in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage repos in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read audit-events in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read app-catalog-listing in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read instance-images in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to inspect buckets in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read all-resources in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage instance-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage volume-family in compartment cmp-lz-prod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage object-family in compartment cmp-lz-prod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage file-family in compartment cmp-lz-prod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage vaults in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage keys in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage secret-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage logging-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage serviceconnectors in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage streams in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage ons-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage functions-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage waas-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage security-zone in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage orm-stacks in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage orm-jobs in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage orm-config-source-providers in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage vss-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read work-requests in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage bastion-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read instance-agent-plugins in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage cloudevents-rules in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage alarms in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage metrics in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to use key-delegate in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read virtual-network-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to use subnets in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to use network-security-groups in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to use vnics in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage private-ips in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read keys in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
-                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage operator-control-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ]
             },
 
@@ -798,8 +668,139 @@
                     "allow group 'id_lz_prod'/'grp-lz-prod-proj1-admin' to use bastion in compartment cmp-lz-prod-security",
                     "allow group 'id_lz_prod'/'grp-lz-prod-proj1-admin' to read logging-family in compartment cmp-lz-prod-security"
                 ]
-            }
+            },
 
+            "PCY-LZ-PROD-SECURITY-ADMIN-KEY": {
+                "name"                                         : "pcy-lz-prod-security-admin",
+                "description"                                  : "Grants grp-lz-prod-security-admin security administration access in Landing Zone child compartments tagged for security administration.",
+                "compartment_id"                               : "CMP-LZ-PROD-KEY",
+
+                "statements": [
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage tag-namespaces in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage tag-defaults in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage repos in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read audit-events in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read app-catalog-listing in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read instance-images in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to inspect buckets in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read all-resources in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage instance-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage volume-family in compartment cmp-lz-prod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage object-family in compartment cmp-lz-prod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage file-family in compartment cmp-lz-prod where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage vaults in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage keys in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage secret-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage logging-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage serviceconnectors in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage streams in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage ons-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage functions-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage waas-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage security-zone in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage orm-stacks in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage orm-jobs in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage orm-config-source-providers in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage vss-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read work-requests in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage bastion-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read instance-agent-plugins in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage cloudevents-rules in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage alarms in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage metrics in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to use key-delegate in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read virtual-network-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to use subnets in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to use network-security-groups in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to use vnics in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage private-ips in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to read keys in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_prod'/'grp-lz-prod-security-admin' to manage operator-control-family in compartment cmp-lz-prod where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
+                ]
+            },
+
+            "PCY-LZ-SECURITY-ADMIN-KEY": {
+                "name"                                         : "pcy-lz-security-admin",
+                "description"                                  : "Grants grp-lz-security-admin security administration access in Landing Zone child compartments tagged for security administration.",
+                "compartment_id"                               : "CMP-LANDINGZONE-KEY",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-namespaces in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage tag-defaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage repos in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read audit-events in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read app-catalog-listing in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-images in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to inspect buckets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage instance-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage volume-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage object-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage file-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'FILE_SYSTEM_DELETE', request.permission != 'MOUNT_TARGET_DELETE', request.permission != 'EXPORT_SET_DELETE', request.permission != 'FILE_SYSTEM_DELETE_SNAPSHOT', request.permission != 'FILE_SYSTEM_NFSv3_UNEXPORT'}",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage secret-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage serviceconnectors in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage streams in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage ons-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage functions-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage waas-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage security-zone in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-stacks in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-jobs in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage orm-config-source-providers in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage vss-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read work-requests in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage bastion-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-agent-plugins in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage cloudevents-rules in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage alarms in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage metrics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use key-delegate in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read virtual-network-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use subnets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use network-security-groups in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to use vnics in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage private-ips in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read keys in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-network-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to manage operator-control-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
+                ]
+            },
+
+            "PCY-SECURITY-ADMIN-KEY": {
+                "name"                                         : "pcy-security-admin",
+                "description"                                  : "Grants grp-security-admin security service administration access in the tenancy.",
+                "compartment_id"                               : "TENANCY-ROOT",
+
+                "statements": [
+                    "allow group 'id_lz_common'/'grp-security-admin' to manage cloudevents-rules in tenancy",
+                    "allow group 'id_lz_common'/'grp-security-admin' to manage cloud-guard-family in tenancy",
+                    "allow group 'id_lz_common'/'grp-security-admin' to read tenancies in tenancy"
+                ]
+            },
+
+            "PCY-SERVICES-ADMIN-KEY": {
+                "name"                                         : "pcy-services-admin",
+                "description"                                  : "Grants supported OCI services required Landing Zone service access in the tenancy.",
+                "compartment_id"                               : "TENANCY-ROOT",
+
+                "statements": [
+                    "allow service cloudguard to manage cloudevents-rules in tenancy where target.rule.type='managed'",
+                    "allow service cloudguard to read tenancies in tenancy",
+                    "allow service cloudguard to read all-resources in tenancy",
+                    "allow service cloudguard to use network-security-groups in tenancy",
+                    "allow any-user to { WLP_BOM_READ, WLP_CONFIG_READ } in tenancy where all { request.principal.id = target.agent.id, request.principal.type = 'workloadprotectionagent'}",
+                    "endorse any-user to { WLP_LOG_CREATE, WLP_METRICS_CREATE, WLP_ADHOC_QUERY_READ, WLP_ADHOC_RESULTS_CREATE } in any-tenancy where all { request.principal.id = target.agent.id, request.principal.type = 'workloadprotectionagent' }",
+                    "allow service vulnerability-scanning-service to manage instances in tenancy",
+                    "allow service vulnerability-scanning-service to read compartments in tenancy",
+                    "allow service vulnerability-scanning-service to read repos in tenancy",
+                    "allow service vulnerability-scanning-service to read vnics in tenancy",
+                    "allow service vulnerability-scanning-service to read vnic-attachments in tenancy",
+                    "allow service osmh to read instances in tenancy",
+                    "allow service blockstorage, oke, streaming, Fssoc1Prod, objectstorage-eu-frankfurt-1 to use keys in tenancy"
+                ]
+            }
         }
     }
 }
