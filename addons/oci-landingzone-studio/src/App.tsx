@@ -4,7 +4,6 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Disclaimer, { DISCLAIMER_KEY, DISCLAIMER_VERSION } from './components/Disclaimer';
 import { getRouterBasename } from './services/pagesBase';
 import './index.css';
 
@@ -52,30 +51,17 @@ class AppErrorBoundary extends React.Component<React.PropsWithChildren, ErrorBou
 }
 
 export default function App() {
-  const [accepted, setAccepted] = React.useState<boolean>(() => {
-    try { return window.localStorage.getItem(DISCLAIMER_KEY) === DISCLAIMER_VERSION; } catch { return false; }
-  });
-
-  function acceptDisclaimer() {
-    try { window.localStorage.setItem(DISCLAIMER_KEY, DISCLAIMER_VERSION); } catch { /* ignore quota */ }
-    setAccepted(true);
-  }
-
   return (
     <AppErrorBoundary>
-      {accepted ? (
-        <Router basename={getRouterBasename(import.meta.env.BASE_URL)}>
-          <React.Suspense fallback={routeFallback}>
-            <Routes>
-              <Route path="/"       element={<Dashboard />} />
-              <Route path="/lz/:id" element={<WizardShell />} />
-              <Route path="*"       element={<Navigate to="/" replace />} />
-            </Routes>
-          </React.Suspense>
-        </Router>
-      ) : (
-        <Disclaimer onAccept={acceptDisclaimer} />
-      )}
+      <Router basename={getRouterBasename(import.meta.env.BASE_URL)}>
+        <React.Suspense fallback={routeFallback}>
+          <Routes>
+            <Route path="/"       element={<Dashboard />} />
+            <Route path="/lz/:id" element={<WizardShell />} />
+            <Route path="*"       element={<Navigate to="/" replace />} />
+          </Routes>
+        </React.Suspense>
+      </Router>
     </AppErrorBoundary>
   );
 }

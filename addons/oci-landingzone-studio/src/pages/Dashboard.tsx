@@ -8,7 +8,7 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import Hero from '../components/Hero';
-import DisclaimerNote from '../components/DisclaimerNote';
+import LicenseNotice from '../components/LicenseNotice';
 import SavedLzList from '../components/SavedLzList';
 import { oracle } from '../theme';
 import { createLZ, listLZs } from '../services/lzStore';
@@ -53,7 +53,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <DisclaimerNote />
+      <LicenseNotice />
     </div>
   );
 }
