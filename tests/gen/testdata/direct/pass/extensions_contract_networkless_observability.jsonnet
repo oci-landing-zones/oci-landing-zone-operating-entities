@@ -1,10 +1,10 @@
-// networkless extensions can omit network, skip network_pre, and merge observability
+// Networkless extensions merge IAM and observability without network contributions.
 local extensions = import 'gen/extensions.libsonnet';
 
 local registry = {
   no_network_obs: {
     metadata(params):: {
-      requires_network: false,
+      network_mode: 'forbidden',
     },
     render(params):: {
       iam: { marker: { identity: true } },
@@ -38,7 +38,8 @@ local state = extensions.resolve({
 
 {
   iam_marker: state.iam.marker.identity,
-  network_pre_empty: state.network_pre == {},
+  network_empty: state.network == {},
+  network_metadata: state.results[0].metadata,
   observability_cis1_marker: state.observability_cis1.marker.obs1,
   observability_cis2_marker: state.observability_cis2.marker.obs2,
 }

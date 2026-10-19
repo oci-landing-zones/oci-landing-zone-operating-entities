@@ -53,12 +53,12 @@ Do not use this skill as the first response to an open-ended customer request su
 | Shared project subnets | Omitted generates default `web`, `app`, `db`, `infra`; `{}` emits none; a non-empty map is exact and suppresses all implicit defaults. |
 | Dedicated project subnets | Use `projects.<project>.subnets`; they require `project_network`, must not overlap any shared/dedicated subnet, and remain in the environment `NETWORK` compartment. |
 | Shared vs dedicated | Recommend shared subnets by default for address efficiency. Dedicated subnets provide separate project CIDR allocation, not IAM isolation; access is governed at the environment network compartment. Same-subnet traffic is controlled by NSGs/security lists, not the hub firewall. |
-| Project subnet routing | Omit `project_network.subnet_routing` for `vcn`; use `hub` with firewalled Hub A, B, or C. Hub C requires its normal staged backend replacement; Hub E is rejected. |
+| Project subnet routing | Omit `project_network.subnet_routing` for `vcn`; use `hub` with firewalled Hub A, B, or C. Hub C requires real firewall backend targets; Hub E is rejected. |
 | Platform subnets | Platforms need explicit subnets unless they also declare an extension that provides subnet metadata. |
 | Realm | `realm` is optional and defaults to `oc1`, including when explicitly set to `null`; supported config realms are `oc1` and `oc19`. |
 | CIS level | `cis_level` is optional and technically defaults to `2`, but customer-use discovery must obtain an explicit CIS1/CIS2 choice. CIS2 is recommended and adds CMEK dependencies for applicable resources; set `1` for the less complex CIS1 output set. |
 | Extensions | Extension `type` must be registered in `gen/landing_zone.libsonnet`. |
-| Config-mode network outputs | `network.json` is canonical final output; `network_pre.json` appears only for staged hubs. |
+| Config-mode network outputs | `network.json` is the canonical network output for every hub. |
 | RPC config | Model each Landing Zone in a separate source config and each requested connection under top-level `remote_peering_connections`; read `gen/addons/oci-x-rpc/AGENTS.md`, derive local VCNs dynamically, and collect per-connection role, peer region, reviewed remote CIDRs, requestor peer reference, cross-tenancy peer tenancy OCID, and the foreign requestor group OCID only for acceptors. |
 | Artifact placement | Ask for both the config file location and the output directory before creating customer artifacts; do not default them into `tests/`. |
 | Unsupported resources | Do not add unsupported config keys or fake extension types. Generate only supported prerequisites, then document the unsupported resource as manual post-deployment configuration. |
@@ -92,7 +92,7 @@ Do not use this skill as the first response to an open-ended customer request su
 - Run `bash gen/generate.sh --config <config_file> [output_dir]` for normal Blueprint Factory generation.
 - When validating a customer config, point generation at a separate output directory such as a temp directory or customer-approved working directory rather than a repo test fixture path.
 - If you need raw multi-output behavior without formatting, run `jsonnet --multi <output_dir>/ --tla-code-file config=<config_file> gen/landing_zone_multi.jsonnet`.
-- Compare generated files with the expected output set from `gen/landing_zone_multi.jsonnet`: `network.json`, `iam.json`, `governance.json`, and the selected `security_cis*` / `observability_cis*` files are emitted; `network_pre.json` appears only for staged hubs, and `network_backends.json` plus extension outputs remain conditional.
+- Compare generated files with the expected output set from `gen/landing_zone_multi.jsonnet`: `network.json`, `iam.json`, `governance.json`, and the selected `security_cis*` / `observability_cis*` files are emitted; `network_backends.json` plus extension outputs remain conditional.
 - For RPC graphs, verify every acceptor edge omits `peer_id`/`peer_key`, every requestor edge contains the reviewed peer reference, all network outputs contain the expected per-edge RPC routes and DRG surfaces, and only cross-tenancy configs add RPC IAM policies.
 
 ## References

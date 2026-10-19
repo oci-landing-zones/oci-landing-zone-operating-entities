@@ -25,7 +25,7 @@ The extension covers three ExaDB-D Use Cases (UCs):
 2. **Use Case 2 (UC2): Hybrid ExaDB-D Platform**: Shared infrastructure with dedicated VMCs/AVMCs per environment.
 3. **Use Case 3 (UC3): Dedicated ExaDB-D Platform**: Fully dedicated infrastructure and VMCs/AVMCs per environment.
 
-Published generated artifacts currently support Use Case 1 (UC1), the shared model. Use Case 2 (UC2), the hybrid model, and Use Case 3 (UC3), the dedicated model, are retained as design guidance and require the [Blueprint Factory](../../addons/oci-lz-blueprint-factory/README.md) before use.
+Published generated artifacts currently support Use Case 1 (UC1), Use Case 2 (UC2), and Use Case 3 (UC3) for both single-stack and multi-stack deployment.
 
 If you have not reviewed it yet, we recommend checking the [ExaDB-D use cases section](./exacs_use_cases/readme.md) to better understand the available scenarios and identify the one that best fits your needs.
 
@@ -35,11 +35,36 @@ If you have not reviewed it yet, we recommend checking the [ExaDB-D use cases se
 
 &nbsp;
 
-| When to use it / Use Case  | POC or one-shot reference deployment | Extension of an existing Landing Zone or Modular IaC Model. |
-|---|---|---|
-| Use Case 1 (UC1): Shared ExaDB-D Platform<br><br><img src="../exacc/content/uc1.png" width="220"> | Use when deploying a new One-OE Hub E foundation and the shared ExaDB-D platform together in one deployable set. Published Use Case 1 artifacts are available in the [single-stack](./single-stack/readme.md) folder and include the Hub E network configuration. | Use when extending an existing One-OE landing zone with the shared ExaDB-D platform. Published Use Case 1 artifacts are available in the [multi-stack](./multi-stack/readme.md) folder. Choose the Hub A or Hub E network and hub-post files according to the hub used by the existing One-OE deployment. |
-| Use Case 2 (UC2): Hybrid ExaDB-D Platform<br><br><img src="../exacc/content/uc2.png" width="220"> | [Blueprint Factory required](../../addons/oci-lz-blueprint-factory/README.md) | [Blueprint Factory required](../../addons/oci-lz-blueprint-factory/README.md) |
-| Use Case 3 (UC3): Dedicated ExaDB-D Platform<br><br><img src="../exacc/content/uc3.png" width="220"> | [Blueprint Factory required](../../addons/oci-lz-blueprint-factory/README.md) | [Blueprint Factory required](../../addons/oci-lz-blueprint-factory/README.md) |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="34%">When to use it / Use Case</th>
+      <th width="33%">Single-stack<br>POC or one-shot reference deployment</th>
+      <th width="33%">Multi-stack<br>Extension of an existing Landing Zone or Modular IaC Model</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="34%">Use Case 1 (UC1): Shared ExaDB-D Platform<br><br><img src="./content/exacs_use_case_1.png" width="220"></td>
+      <td width="33%">Use when deploying a new One-OE Hub E foundation and the shared ExaDB-D platform together in one deployable set. Published Use Case 1 artifacts are available in the <a href="./single-stack/readme.md">single-stack</a> folder and include the Hub E network configuration.</td>
+      <td width="33%">Use when extending an existing One-OE landing zone with the shared ExaDB-D platform. Published Use Case 1 artifacts are available in the <a href="./multi-stack/readme.md">multi-stack</a> folder. Choose the Hub A or Hub E network and hub-post files according to the hub used by the existing One-OE deployment.</td>
+    </tr>
+    <tr>
+      <td width="34%">Use Case 2 (UC2): Hybrid ExaDB-D Platform<br><br><img src="./content/exacs_use_case_2.png" width="220"></td>
+      <td width="33%">Use when deploying a new One-OE Hub E foundation with shared ExaDB-D infrastructure and environment-specific VMCs/AVMCs. Published Use Case 2 artifacts are available in the <a href="./single-stack/readme.md">single-stack</a> folder and include the Hub E network configuration.</td>
+      <td width="33%">Use when extending an existing One-OE landing zone with shared ExaDB-D infrastructure and dedicated environment-level database platform scopes. Published Use Case 2 artifacts are available in the <a href="./multi-stack/readme.md">multi-stack</a> folder. Choose the Hub A or Hub E network and hub-post files according to the hub used by the existing One-OE deployment.</td>
+    </tr>
+    <tr>
+      <td width="34%">Use Case 3 (UC3): Dedicated ExaDB-D Platform<br><br><img src="./content/exacs_use_case_3.png" width="220"></td>
+      <td width="33%">Use when deploying a new One-OE Hub E foundation where each environment has its own ExaDB-D infrastructure and VMCs/AVMCs. Published Use Case 3 artifacts are available in the <a href="./single-stack/readme.md">single-stack</a> folder and include the Hub E network configuration.</td>
+      <td width="33%">Use when extending an existing One-OE landing zone with fully environment-dedicated ExaDB-D platform scopes. Published Use Case 3 artifacts are available in the <a href="./multi-stack/readme.md">multi-stack</a> folder. Choose the Hub A or Hub E network and hub-post files according to the hub used by the existing One-OE deployment.</td>
+    </tr>
+  </tbody>
+</table>
+
+&nbsp;
+
+> **Note:** The published deployment options include only the hub variants documented in the blueprint artifacts. If you need to use a different hub, create custom configuration files by running the Factory blueprint and use the generated files for deployment instead of the published examples.
 
 &nbsp;
 

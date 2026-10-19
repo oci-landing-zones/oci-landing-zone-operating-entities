@@ -139,8 +139,8 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
            network_entity_key: ctx.ngw_key,
          },
        } else if ctx.has_hub && !overlay_output then {
-         [n.route_rule([n.region, 'default'])]: {
-           description: 'Default route to internet through DRG',
+         [n.route_rule([n.region, 'drg'])]: {
+           description: 'Route to the 0.0.0.0/0 through DRG',
            destination: '0.0.0.0/0',
            destination_type: 'CIDR_BLOCK',
            network_entity_key: ctx.drg_key,

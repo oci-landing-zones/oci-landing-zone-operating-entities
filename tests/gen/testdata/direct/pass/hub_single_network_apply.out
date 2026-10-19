@@ -1,0 +1,18 @@
+{
+  "hub_c_backend_routes_match": true,
+  "published_hub_c_backend_routes_match": true,
+  "route_targets": {
+    "hub_a": [
+      "NFW-IAD-LZ-HUB-DMZ-KEY",
+      "NFW-IAD-LZ-HUB-INT-KEY"
+    ],
+    "hub_b": [
+      "NFW-IAD-LZ-HUB-KEY"
+    ],
+    "hub_c": [
+      "NLB-IAD-LZ-HUB-TRUST-KEY",
+      "NLB-IAD-LZ-HUB-UNTRUST-KEY"
+    ],
+    "hub_e": []
+  }
+}

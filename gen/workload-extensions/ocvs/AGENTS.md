@@ -20,4 +20,4 @@ This file covers `gen/workload-extensions/ocvs/**` and published OCVS snapshots/
 - Supported OCVS platform VCN prefixes are `/24`, `/23`, `/22`, and `/21`.
 - The generated provisioning subnet uses the first segment of the OCVS platform VCN after four additional prefix bits: `/28`, `/27`, `/26`, or `/25` respectively.
 - The downstream OCVS module creates VLANs from the same cluster network CIDR. The generator emits the provisioning subnet, route tables, and network security groups referenced by the OCVS payload.
-- Direct OCVS deployment is contract-validated with `terraform-oci-modules-orchestrator` v2.1.3. Revalidate when changing the generated OCVS payload, dependency keys, or orchestrator ref.
+- Direct OCVS deployment uses the latest released `terraform-oci-modules-orchestrator`. Revalidate when changing the generated OCVS payload, dependency keys, or orchestrator ref.

@@ -17,13 +17,6 @@
     "preprod": "CMP-LZ-PREPROD-OKE-KEY",
     "prod": "CMP-LZ-PROD-OKE-KEY"
   },
-  "pre_categories": [
-    "0-shared",
-    "1-prod",
-    "2-preprod",
-    "preprod-platform-oke",
-    "prod-platform-oke"
-  ],
   "route_statement_priorities": {
     "preprod": 20,
     "preprod_oke": 40,

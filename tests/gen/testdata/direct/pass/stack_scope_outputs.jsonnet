@@ -15,7 +15,6 @@ local regional = generate(defaults.hub_c {
 local expected_regional = [
   'network.json',
   'network_backends.json',
-  'network_pre.json',
   'observability_cis2.json',
   'observability_cis2_pre.json',
   'security_cis2.json',

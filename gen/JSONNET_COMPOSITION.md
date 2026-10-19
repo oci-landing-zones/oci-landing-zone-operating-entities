@@ -160,26 +160,25 @@ That is a useful reading rule for this codebase:
 
 This repository relies heavily on object composition with `+` and `+:`.
 
-For example, `assembled_network_pre` is assembled from hub output, hub integration, extension network fragments, and generated spoke/platform categories:
+For example, `network_base` is assembled from hub output, hub integration, extension network fragments, and generated spoke/platform categories:
 
 ```jsonnet
-local assembled_network_pre = hub.pre + hub_integration_pre + extension_network_pre {
+local network_base = hub.pre + hub_integration_pre + extension_network + {
   network_configuration+: {
     network_configuration_categories+: spoke_categories + network_only_categories,
   },
 };
 ```
 
-The canonical final `assembled_network` is then built by layering staged post overlays when present:
+The canonical final `assembled_network` is then built by layering routing overlays when present. Hub `pre`/`post` and extension `contributions.network` are internal composition fragments:
 
 ```jsonnet
 local assembled_network =
-  if hub.post != null then assembled_network_pre + hub.post + hub_integration_post
-  else assembled_network_pre;
+  if hub.post != null then network_base + hub.post + hub_integration_post
+  else network_base;
 
 {
   network: assembled_network,
-  network_pre: if hub.post != null then assembled_network_pre else null,
 }
 ```
 
@@ -192,16 +191,14 @@ Read `landing_zone.libsonnet` as the merge owner.
 
 ### Standard Outputs And Extension `extra` Outputs Are Different Channels
 
-Standard result fields have fixed names such as `network`, `network_pre`, `iam`, `security_cis1`, `security_cis2`, `observability_cis1`, `observability_cis2`, and `governance`.
+Standard result fields have fixed names such as `network`, `iam`, `security_cis1`, `security_cis2`, `observability_cis1`, `observability_cis2`, and `governance`.
 Config-mode filename fan-out still maps from those standard fields, but `landing_zone_multi.jsonnet` emits only the `security_cis*` and `observability_cis*` files selected by normalized `config.cis_level`.
 
 Extensions can contribute standard fragments into those same domains. Extensions declare network behavior with `metadata.network_mode`:
 
-- `required`: `platform.network` must exist; the resolver validates or auto-allocates extension subnets and requires a `network_pre` contribution.
+- `required`: `platform.network` must exist; the resolver validates or auto-allocates extension subnets and requires a `network` contribution.
 - `forbidden`: `platform.network` must be omitted; the extension skips network routing/subnet inputs while still contributing domains such as IAM or observability.
 - `optional`: `platform.network` may exist or be omitted; when present it behaves like `required`, and when absent it behaves like `forbidden`.
-
-Legacy `metadata.requires_network: true|false` remains supported and maps to `required` or `forbidden`.
 
 Generic extension outputs that belong in config mode stay under `result.extra`, then `landing_zone_multi.jsonnet` turns them into files dynamically:
 
@@ -236,17 +233,16 @@ Read it in five moves:
 4. The orchestrator builds the selected hub, derives spoke/platform integration overlays, and merges builder and extension contributions into one result object.
 5. The entrypoint projects only `.network`, so this file emits one view of the shared result object instead of assembling its own network JSON.
 
-The key assembly lines inside `landing_zone.libsonnet` build `assembled_network_pre`, then `assembled_network`, then publish canonical/optional network outputs:
+The key assembly lines inside `landing_zone.libsonnet` build the internal `network_base`, then `assembled_network`, then publish the canonical network output:
 
 ```jsonnet
-local assembled_network_pre = ...;
+local network_base = ...;
 local assembled_network =
-  if hub.post != null then assembled_network_pre + hub.post + hub_integration_post
-  else assembled_network_pre;
+  if hub.post != null then network_base + hub.post + hub_integration_post
+  else network_base;
 
 {
   network: assembled_network,
-  network_pre: if hub.post != null then assembled_network_pre else null,
 }
 ```
 

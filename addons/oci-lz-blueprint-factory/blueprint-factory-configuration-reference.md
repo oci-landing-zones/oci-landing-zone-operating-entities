@@ -130,6 +130,7 @@ This small shape creates the shared landing-zone domains plus the `dev` environm
 | `cis_level` | number or string | No | `2` | CIS level to emit: `1` or `2`. |
 | `stack_scope` | `complete` or `regional` | No | `complete` | Declares which resource domains this source config owns. |
 | `security_targets` | array of strings | No | All environments | Environment names that receive Security Zone targeting. |
+| `notification_emails` | object of email arrays | No | Published example address | One-OE Cloud Guard, IAM, Network, and Security topic recipients. |
 
 *`region` and `region_short_name` must be supplied together or omitted together. Explicit `null` values are treated as omitted.
 
@@ -140,6 +141,15 @@ This small shape creates the shared landing-zone domains plus the `dev` environm
 For regional DR, keep the home and DR sources independent. The complete home config explicitly defines an acceptor under `remote_peering_connections`; the regional DR config explicitly defines the requester. Generate each source independently with `--config`.
 
 For CIS2, the regional stack does not own or modify the primary Vault, key, IAM, Cloud Guard, or Security Zone configuration. Configure and review the replicated Vault/key and any required regional service permissions as home-owned or manual DR prerequisites.
+
+`notification_emails` accepts `default`, `cloudguard`, `iam`, `network`, and `security`. Each supplied value is a non-empty array of email addresses. A topic-specific list replaces `default` for that topic. If neither is supplied, that topic retains the published `email.address@example.com` example subscriber. The `network` topic also receives network events and alarms in ExaCS designs; ExaDB-C@C does not create a network topic.
+
+```jsonnet
+notification_emails: {
+  default: ['ops@example.com'],
+  network: ['network-ops@example.com'],
+},
+```
 
 ## 2. Hub
 
@@ -200,7 +210,7 @@ environments: {
 
 A non-empty shared-subnet map is authoritative: the factory emits exactly those entries and does not add standard subnets around them. Every subnet CIDR must be canonical, contained by the project VCN, and non-overlapping.
 
-`subnet_routing: 'vcn'` retains OCI local routing. `hub` routes traffic between different subnets through the generated firewall path and is supported with Hub A, Hub B, and Hub C. Hub E rejects `hub` because it has no firewall. Hub C retains its normal staged deployment and requires real firewall targets in place of the generated non-working backend placeholders.
+`subnet_routing: 'vcn'` retains OCI local routing. `hub` routes traffic between different subnets through the generated firewall path and is supported with Hub A, Hub B, and Hub C. Hub E rejects `hub` because it has no firewall. Hub C requires real firewall targets in place of the generated non-working backend placeholders. NLB backends support VM primary and qualified secondary-interface keys in NLB backend `target_id`; see the [Hub C backend contract](/addons/oci-hub-models/hub_c/readme.md#backend-targets).
 
 ## 5. Projects
 
@@ -308,7 +318,7 @@ Generate into a separate directory and review every emitted file before deployme
 bash gen/generate.sh --config path/to/config.jsonnet generated
 ```
 
-The factory always emits `network.json`, `iam.json`, `governance.json`, and the security and observability pair for the selected CIS level. It emits `network_pre.json` only when the selected hub needs staged network deployment. `network_backends.json` and extension-specific files are emitted only when the selected configuration needs them.
+The factory always emits `network.json`, `iam.json`, `governance.json`, and the security and observability pair for the selected CIS level. `network_backends.json` and extension-specific files are emitted only when the selected configuration needs them.
 
 ## References
 

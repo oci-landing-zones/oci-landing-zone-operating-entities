@@ -11,7 +11,7 @@
   - [4. Deployment model](#4-deployment-model)
     - [4.0. Prerequisite: Deploy the One-OE blueprint](#40-prerequisite-deploy-the-one-oe-blueprint)
     - [4.1. Deploy the One-OE DR extension](#41-deploy-the-one-oe-dr-extension)
-      - [4.1.1. Complete staged hub networking](#411-complete-staged-hub-networking)
+      - [4.1.1. Deploy complete hub networking](#411-deploy-complete-hub-networking)
       - [4.1.2. Complete staged observability](#412-complete-staged-observability)
       - [4.1.3. Configure Service Connector bucket replication](#413-configure-service-connector-bucket-replication)
     - [4.2. Deploy inter-region RPC within the same tenancy](#42-deploy-inter-region-rpc-within-the-same-tenancy)
@@ -65,7 +65,7 @@ The [`runtime`](./runtime/) directory contains the published Frankfurt/Amsterdam
 
 For cross-region DR, manage each target region as an independent deployment unit. Use a distinct OCI Resource Manager stack or Terraform state/workspace per region so that regional network and observability resources can be planned, applied, and operated independently.
 
-The complete-scope home directory contains the normal complete Blueprint Factory output set, with the acceptor in its canonical network files. The regional-scope DR directory contains only regional network, VSS, and observability outputs, with the requester in its canonical network files. Regional scope rejects platforms and workload extensions until their complete-stack prerequisites can be projected safely. Hub A, Hub B, and Hub C continue to use `network_pre.json` for the ordinary firewall staging process; there are no RPC-specific replacement files.
+The complete-scope home directory contains the normal complete Blueprint Factory output set, with the acceptor in its canonical network files. The regional-scope DR directory contains only regional network, VSS, and observability outputs, with the requester in its canonical network files. Regional scope rejects platforms and workload extensions until their complete-stack prerequisites can be projected safely. Hub A, Hub B, and Hub C each deploy complete networking from `network.json` using Orchestrator v2.2.0 resource-key routing. Hub C also emits `network_backends.json` for designs with third-party firewall backends.
 
 IAM compartments, identity resources, tenancy-wide governance, Cloud Guard, Security Zones, and the primary Vault remain home-owned and are omitted from the generated DR directory.
 
@@ -84,10 +84,10 @@ Copy the acceptor-bearing `network_output.json` and, for CIS2, exactly one `keys
 
 When deploying the published Frankfurt/Amsterdam preset with ORM, follow these steps:
 
-1. Update the home stack with the matching `oneoe_bcdr_home_network_hub_*.json` sequence so it creates the RPC acceptor, then save its `network_output.json`.
+1. Update the home stack with the matching complete `oneoe_bcdr_home_network_hub_*.json` file so it creates the RPC acceptor, then save its `network_output.json`.
 2. Replicate the required One-OE output dependency files from a home-region Object Storage bucket to a DR-region bucket. This is separate from the replication described in [Configure Service Connector bucket replication](#413-configure-service-connector-bucket-replication).
 3. Stage the reviewed generated DR files in a customer-controlled private Object Storage bucket or approved private Git source, then create the DR stack in `eu-amsterdam-1` (Netherlands Northwest, Amsterdam).
-4. Set the working directory to `rms-facade`.
+4. Use the pinned [Orchestrator v2.2.0](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/tree/v2.2.0) source and set the working directory to `rms-facade`.
 5. Set the stack name you prefer.
 6. Set the Terraform version to 1.5.x. Click Next.
 7. Review the selected generated JSON configuration files and confirm that they match the intended hub and CIS level. Click Next.
@@ -97,11 +97,11 @@ When deploying the published Frankfurt/Amsterdam preset with ORM, follow these s
 11. Run Plan and review the proposed regional network and observability changes before applying.
 12. After approving the plan, run Apply to create the initial regional resources.
 
-#### 4.1.1. Complete staged hub networking
+#### 4.1.1. Deploy complete hub networking
 
-Hub A and Hub B initially deploy their matching home or DR `*_pre.json` network file. After the referenced hub resources are created and their private IP OCIDs have been reviewed, update the same regional stack or Terraform state with its matching final file. Home files use the `oneoe_bcdr_home_network_*` prefix; DR files use `oneoe_bcdr_network_*`.
+Hub A and Hub B deploy their matching complete home or DR network file in one network apply. Managed firewall route targets use resource keys resolved by Orchestrator v2.2.0. Home files use the `oneoe_bcdr_home_network_*` prefix; DR files use `oneoe_bcdr_network_*`.
 
-Hub C follows the same staged process. Use `oneoe_bcdr_network_hub_c.json` after updating the standard hub resource references, or `oneoe_bcdr_network_hub_c_backends.json` when the design uses third-party firewall backend resources.
+Hub C follows the same complete-network process. Use `oneoe_bcdr_network_hub_c.json` for the standard design, or `oneoe_bcdr_network_hub_c_backends.json` when the design uses third-party firewall backend resources. Replace the example backend IP addresses and private-IP OCIDs with the reviewed firewall endpoints before deploying the backend variant.
 
 `oneoe_bcdr_security.json` deploys [Vulnerability Scanning Service (VSS)](https://docs.oracle.com/en-us/iaas/Content/scanning/using/overview.htm) recipes and targets in the DR region. It is included in the initial BCDR stack and does not need a staged replacement.
 
@@ -127,10 +127,10 @@ owns the acceptor in `home/network.json` (or the matching published `oneoe_bcdr_
 `dr/network.json` (or the matching published `oneoe_bcdr_network_*` file). No additional cross-tenancy IAM or governance configuration
 is required.
 
-1. Apply the home stack through its normal staged-network sequence.
-2. Save the home network output after the applicable network stage creates the acceptor.
+1. Apply the home stack with its complete network file.
+2. Save the home network output after it creates the acceptor.
 3. Make that output available to the DR stack as its network dependency.
-4. Apply the DR stack through its normal staged-network sequence; its requester resolves the peer from the home dependency.
+4. Apply the DR stack with its complete network file; its requester resolves the peer from the home dependency.
 5. Verify that the RPC is connected, advertised routes are limited to the reviewed CIDRs, and the firewall policy allows only required protocols and ports.
 
 When adding DR to an existing config-generated home stack, retain `stack_scope: "complete"` and add the explicit acceptor. Define the requester in the independent `stack_scope: "regional"` DR source. Generate each config with `--config` and update the existing home stack with its canonical network files. Replicate the updated dependency output before deploying the DR stack. For CIS2, complete the separately reviewed Vault/key replication and regional service permissions. Do not combine the two regions in one Terraform state.

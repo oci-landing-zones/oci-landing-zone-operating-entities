@@ -95,35 +95,35 @@
                                         "description"                     : "Route to the Internet through Trust NLB and Firewalls",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-TRUST-KEY"
                                     },
 
                                     "rr-fra-prod-projects": {
                                         "description"                     : "Route to VCN Prod Projects through Trust NLB and Firewalls",
                                         "destination"                     : "10.0.64.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-TRUST-KEY"
                                     },
 
                                     "rr-fra-preprod-projects": {
                                         "description"                     : "Route to VCN PreProd Projects through Trust NLB and Firewalls",
                                         "destination"                     : "10.0.128.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-TRUST-KEY"
                                     },
 
                                     "rr-fra-rpc-dr-1": {
                                         "description"                     : "Route to RPC dr CIDR 10.0.192.0/21 through Trust NLB and Firewalls",
                                         "destination"                     : "10.0.192.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-TRUST-KEY"
                                     },
 
                                     "rr-fra-rpc-dr-2": {
                                         "description"                     : "Route to RPC dr CIDR 10.0.200.0/21 through Trust NLB and Firewalls",
                                         "destination"                     : "10.0.200.0/21",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-TRUST-KEY"
                                     }
                                 }
                             },
@@ -136,7 +136,7 @@
                                         "description"                     : "Route to the Internet through Untrust NLB and Firewalls",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "UNTRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljtgvl..."
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-UNTRUST-KEY"
                                     },
 
                                     "rr-fra-prod-projects": {
@@ -177,7 +177,7 @@
                                         "description"                     : "Route to Public LoadBalancer's subnet through Untrust NLB and Firewalls",
                                         "destination"                     : "10.0.2.0/24",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "UNTRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljtgvl..."
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-UNTRUST-KEY"
                                     }
                                 }
                             },
@@ -190,7 +190,7 @@
                                         "description"                     : "Route to the Internet through Trust NLB and Firewalls",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k..."
+                                        "network_entity_id"               : "NLB-FRA-LZ-HUB-TRUST-KEY"
                                     },
 
                                     "rr-fra-prod-projects": {

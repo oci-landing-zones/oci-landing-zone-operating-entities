@@ -1,12 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-SCRIPT_FOLDER=$(dirname "${BASH_SOURCE[0]}")
+SCRIPT_FOLDER=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 HOOKS_SOURCE_DIR="$SCRIPT_FOLDER/../.githooks"
-HOOKS_TARGET_DIR="$SCRIPT_FOLDER/../.git/hooks"
 
-# Check if we're in a Git repository
-if [ ! -d "$SCRIPT_FOLDER/../.git" ]; then
+if ! git -C "$SCRIPT_FOLDER/.." rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "Error: This is not a Git repository."
   exit 1
 fi
@@ -16,34 +14,6 @@ if [ ! -d "$HOOKS_SOURCE_DIR" ]; then
   echo "Error: Hooks source directory '$HOOKS_SOURCE_DIR' not found."
   exit 1
 fi
-
-# Create target hooks directory if it doesn't exist
-mkdir -p "$HOOKS_TARGET_DIR"
-
-# Process each hook file. Keep installed hooks in sync with the tracked
-# .githooks scripts so local developers do not keep stale hook behavior.
-for hook in "$HOOKS_SOURCE_DIR"/*; do
-  hook_name=$(basename "$hook")
-
-  if [ ! -f "$hook" ]; then
-    continue
-  fi
-
-  target_hook="$HOOKS_TARGET_DIR/$hook_name"
-
-  if [ ! -f "$target_hook" ]; then
-    cp "$hook" "$target_hook"
-    chmod +x "$target_hook"
-    echo "Installed git hook: $hook_name"
-  elif ! cmp -s "$hook" "$target_hook"; then
-    cp "$hook" "$target_hook"
-    chmod +x "$target_hook"
-    echo "Updated git hook: $hook_name"
-  elif [ ! -x "$target_hook" ]; then
-    chmod +x "$target_hook"
-    echo "Made git hook executable: $hook_name"
-  fi
-done
 
 # Select Jsonnet renderer. Local developer runs prefer jrsonnet when installed
 # because it is much faster. CI/CD must use canonical jsonnet so we keep
@@ -82,6 +52,40 @@ if ! command -v python3 &>/dev/null; then
   echo "  brew install python3" >&2
   echo "  apt-get install python3" >&2
   exit 1
+fi
+
+if ! git -C "$SCRIPT_FOLDER/.." config --get core.hooksPath >/dev/null; then
+  HOOKS_TARGET_DIR=$(git -C "$SCRIPT_FOLDER/.." rev-parse --path-format=absolute --git-path hooks)
+  for hook in "$HOOKS_SOURCE_DIR"/*; do
+    [ -f "$hook" ] || continue
+    hook_name=${hook##*/}
+    target_hook="$HOOKS_TARGET_DIR/$hook_name"
+    if [ -e "$target_hook" ] || [ -L "$target_hook" ]; then
+      if [ -L "$target_hook" ] || [ ! -f "$target_hook" ]; then
+        echo "Error: Existing custom hook must be preserved: $target_hook" >&2
+        exit 1
+      fi
+      if ! cmp -s "$hook" "$target_hook" && ! grep -Fxq '# oci-landing-zone repository hook' "$target_hook"; then
+        # Recognize repository hooks installed before ownership markers were added.
+        installed_blob=$(git -C "$SCRIPT_FOLDER/.." hash-object "$target_hook")
+        case "$hook_name:$installed_blob" in
+          pre-commit:0239fd56c63a4493ff4821810adf73c0a89ba2a0|post-commit:917569bb410897dc7320767766c94fc1419452d9) ;;
+          *) echo "Error: Existing custom hook must be preserved: $target_hook" >&2; exit 1 ;;
+        esac
+      fi
+    fi
+  done
+  mkdir -p "$HOOKS_TARGET_DIR"
+  for hook in "$HOOKS_SOURCE_DIR"/*; do
+    [ -f "$hook" ] || continue
+    hook_name=${hook##*/}
+    target_hook="$HOOKS_TARGET_DIR/$hook_name"
+    if [ ! -f "$target_hook" ] || ! cmp -s "$hook" "$target_hook"; then
+      cp "$hook" "$target_hook"
+      echo "Updated git hook: $hook_name"
+    fi
+    [ -x "$target_hook" ] || chmod +x "$target_hook"
+  done
 fi
 
 # Set the input and output directories

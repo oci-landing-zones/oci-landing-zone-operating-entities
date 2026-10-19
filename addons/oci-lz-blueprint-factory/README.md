@@ -202,7 +202,7 @@ observability pair selected by `cis_level` (`2` by default):
 - `security_cis1.json` or `security_cis2.json`
 - `observability_cis1.json` or `observability_cis2.json`
 
-Some configurations emit `*_pre.json` files, such as `network_pre.json` or `observability_*_pre.json`. These files support staged deployments where some resources need to exist before dependent resources are configured.
+Security and observability include `*_pre.json` files where resources must exist before dependent controls are configured.
 
 See the [Generator README](/gen/README.md) for local setup and command details.
 

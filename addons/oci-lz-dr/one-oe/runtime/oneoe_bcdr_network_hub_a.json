@@ -149,7 +149,7 @@
                                         "description"                       : "Route to lb subnet in Hub VCN through DMZ OCI Network Firewall",
                                         "destination"                       : "10.0.193.0/24",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "DMZ OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.vrdnynvr..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-DMZ-KEY"
                                     }
                                 }
                             },
@@ -162,35 +162,35 @@
                                         "description"                       : "Route to the Internet through the Internal OCI Network Firewall",
                                         "destination"                       : "0.0.0.0/0",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-ams-prod-projects": {
                                         "description"                       : "Route to VCN Prod Projects through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.200.0/21",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-ams-rpc-home-1": {
                                         "description"                       : "Route to RPC home CIDR 10.0.0.0/21 through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.0.0/21",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-ams-rpc-home-2": {
                                         "description"                       : "Route to RPC home CIDR 10.0.64.0/21 through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.64.0/21",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-ams-rpc-home-3": {
                                         "description"                       : "Route to RPC home CIDR 10.0.128.0/21 through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.128.0/21",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     }
                                 }
                             },
@@ -203,7 +203,7 @@
                                         "description"                       : "Route to the Internet through the DMZ Firewall",
                                         "destination"                       : "0.0.0.0/0",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "DMZ OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.vrdnynvr..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-DMZ-KEY"
                                     },
 
                                     "rr-ams-prod-projects": {
@@ -244,7 +244,7 @@
                                         "description"                       : "Route to the Internet through the Internal OCI Network Firewall",
                                         "destination"                       : "0.0.0.0/0",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-ams-prod-projects": {
@@ -292,49 +292,49 @@
                                         "description"                       : "Route to VCN Prod Projects through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.200.0/21",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-ams-rpc-home-1": {
                                         "description"                       : "Route to RPC home CIDR 10.0.0.0/21 through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.0.0/21",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-ams-rpc-home-2": {
                                         "description"                       : "Route to RPC home CIDR 10.0.64.0/21 through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.64.0/21",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-ams-rpc-home-3": {
                                         "description"                       : "Route to RPC home CIDR 10.0.128.0/21 through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.128.0/21",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-vcn-ams-hub-dns-sn": {
                                         "description"                       : "Route to dns subnet in Hub VCN through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.197.0/24",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-vcn-ams-hub-mgmt-sn": {
                                         "description"                       : "Route to mgmt subnet in Hub VCN through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.195.0/24",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-vcn-ams-hub-mon-sn": {
                                         "description"                       : "Route to mon subnet in Hub VCN through Internal OCI Network Firewall",
                                         "destination"                       : "10.0.196.0/24",
                                         "destination_type"                  : "CIDR_BLOCK",
-                                        "network_entity_id"                 : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"                 : "NFW-AMS-LZ-HUB-INT-KEY"
                                     }
                                 }
                             }

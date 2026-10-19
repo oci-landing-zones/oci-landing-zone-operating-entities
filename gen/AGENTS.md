@@ -92,7 +92,7 @@ flowchart TD
     D --> H["landing_zone_multi.jsonnet wrapper"]
     H --> I["Normalize config via config.libsonnet<br/>and auto-fill subnets when omitted"]
     I --> J["Compose full landing zone via landing_zone.libsonnet"]
-    J --> K["Fan out named files<br/>network.json, iam.json, ...<br/>optional network_pre.json for staged hubs"]
+    J --> K["Fan out named files<br/>network.json, iam.json, ...<br/>selected CIS security/observability pairs"]
 
     F --> L["Shared composition core"]
     J --> L
@@ -242,7 +242,7 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
 
 Config normalization (`config.libsonnet`) treats `region` and `region_short_name` as a pair: either provide both or omit both. When both are omitted (or both are explicitly `null`), they default to `eu-frankfurt-1` and `fra`. `realm` defaults to `oc1` (including when explicitly set to `null`) and must be one of the realms in `constants.libsonnet`. `cis_level` defaults to `2` and must be `1` or `2`; config mode emits only the selected CIS security and observability file pair. `stack_scope` defaults to `complete` and accepts `complete` or `regional`; it declares resource ownership in the source config. `security_targets` is optional; if omitted, topology defaults it to all defined environments in semantic order. Repo-owned published profiles pin `security_targets` explicitly when they need behavior narrower than the config-mode default. Hub and extension subnet defaults use `auto_subnets()`. For project-network shared subnets, omission auto-generates `web`, `app`, `db`, and `infra`; an explicit empty map emits none; a non-empty map is authoritative.
 
-Plain platforms still require `platform.network`. Extension-backed platforms follow the registered extension's `metadata.network_mode`: `required` means `platform.network` must exist, `forbidden` means it must be omitted, and `optional` means the same extension can emit network when `platform.network` exists or non-network domains when it is absent. Legacy `metadata.requires_network: true|false` remains supported and maps to `required` or `forbidden`.
+Plain platforms still require `platform.network`. Extension-backed platforms follow the registered extension's `metadata.network_mode`: `required` means `platform.network` must exist, `forbidden` means it must be omitted, and `optional` means the same extension can emit network when `platform.network` exists or non-network domains when it is absent.
 
 When debugging how generated JSON is applied at deploy time, inspect the downstream deployer contract in `terraform-oci-modules-orchestrator` in addition to this repo. `gen/` defines what this repository emits; the orchestrator defines how those generated configs are consumed. For published OKE investigations, use the exact orchestrator tag referenced by the published OKE docs rather than `HEAD`.
 
@@ -277,16 +277,16 @@ Each hub builder in `hub/` is a function with this signature:
 
 ```
 function(hub_ctx) -> {
-  pre:                 object,      // network_configuration for pre-deploy
-  post:                object|null, // network_configuration for post-deploy (null if no firewall)
+  pre:                 object,      // base network composition fragment
+  post:                object|null, // routing completion overlay (null if no firewall)
   spoke_route_tables:  [string],    // RT keys that need spoke CIDR routes via DRG
-  post_route_tables:   [string],    // RT keys that need spoke CIDR routes via firewall IP
+  post_route_tables:   [string],    // RT keys that need spoke CIDR routes via firewall target
   fw_nsg_key:          string|null, // NSG key for firewall ingress rules (null if no FW)
   spoke_ingress_nsg_keys: [string], // NSGs that receive generated ingress rules for every routed VCN
   lb_return_nsg_key:   string|null, // stateless LB NSG that receives generated backend return-flow rules
   has_spoke_natgw:     bool,        // whether spokes get NAT GW + direct peer routes
-  post_route_entity_id:   string,   // (if firewall) OCID placeholder for post-deploy routes
-  post_route_entity_desc: string,   // human description of the post-deploy route target
+  post_route_entity_id:   string,   // (if firewall) naming-derived NFW/NLB resource key
+  post_route_entity_desc: string,   // human description of the routing target
 }
 ```
 
@@ -313,13 +313,12 @@ Extensions live in `workload-extensions/` and are registered in `landing_zone.li
 ```
 {
   metadata(params):: {
-    network_mode: 'required'|'forbidden'|'optional', // optional, defaults to legacy requires_network or required
-    requires_network: true|false, // legacy optional alias for required/forbidden
+    network_mode: 'required'|'forbidden'|'optional', // optional, defaults to required
     default_subnets,              // required when network is used
     subnet_order,                 // optional when network is used
   }
   render(params):: {
-    network_pre,        // required when network is used
+    network,            // required when network is used
     iam,                // optional standard contribution
     security_cis1,      // optional standard contribution
     security_cis2,      // optional standard contribution
@@ -339,17 +338,18 @@ params.routing        -- routing context for extension route rules:
 ```
 
 Contract phases:
-- `metadata(params)`: returns extension requirements. Extensions should prefer `network_mode`:
-  - `required`: platform must include `network`; the resolver validates or auto-allocates extension subnets and requires a `network_pre` contribution.
+- `metadata(params)`: returns extension requirements. Extensions declare `network_mode`:
+  - `required`: platform must include `network`; the resolver validates or auto-allocates extension subnets and requires a `network` contribution.
   - `forbidden`: platform must omit `network`; the extension contributes non-network domains only.
-  - `optional`: platform may include or omit `network`; when included, the resolver validates or auto-allocates subnets and requires `network_pre`; when omitted, the extension can still emit IAM, observability, or other non-network contributions.
-  Legacy `requires_network: true|false` remains supported and maps to `required` or `forbidden`.
+  - `optional`: platform may include or omit `network`; when included, the resolver validates or auto-allocates subnets and requires `network`; when omitted, the extension can still emit IAM, observability, or other non-network contributions.
 - `render(params)`: returns contributions keyed by domain:
-  - `network_pre`: merged into `network_configuration_categories` for networked extensions
+  - `network`: merged into `network_configuration_categories` for networked extensions
   - `iam`: merged into IAM output
   - `security_cis1`, `security_cis2`: merged into both pre and final security outputs so extension prerequisites exist before extension resources are deployed
   - `observability_cis1`, `observability_cis2`: merged into observability outputs
   - Any other generic key (e.g. `oke_clusters`, `oke_workers`): collected into `result.extra`
+
+Network contributions require a networked platform; aggregate network contributions require at least one networked instance. Extra outputs cannot use core pre-file names or `network_backends`.
 
 Generic extension contracts must not change emitted artifact sets based on repo publication mode. If a published family needs additional projections, create a dedicated adapter next to the published entrypoints and keep profile-local configs free of publication flags.
 
@@ -398,7 +398,7 @@ Keep extension-specific placement and parameter semantics in the extension's own
 Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes formatted JSON output to the repo root (mirroring the directory structure). Generic entry points may import `defaults.libsonnet` for reusable baselines, while published entry points import their local `profiles.libsonnet`. Published entry points either call `landing_zone.libsonnet` directly or select a single result field from a local profile output builder.
 
 **Config mode** (`bash gen/generate.sh --config my_config.libsonnet [output_dir]`):
-Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json`, `iam.json`, `governance.json`, and only the selected CIS security/observability files for every config. `cis_level` defaults to `2`, so omitted `cis_level` emits `security_cis2*.json` and `observability_cis2*.json`; `cis_level: 1` emits the CIS1 pairs instead. Staged hubs also emit `network_pre.json`, Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs.
+Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json`, `iam.json`, `governance.json`, and only the selected CIS security/observability files for every config. `cis_level` defaults to `2`, so omitted `cis_level` emits `security_cis2*.json` and `observability_cis2*.json`; `cis_level: 1` emits the CIS1 pairs instead. Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs.
 
 Regional DR uses ordinary config mode twice. The complete home source explicitly defines the X-RPC acceptor. The regional DR source explicitly defines the requester and uses `stack_scope: 'regional'`. Generate each source independently into a different output directory and deploy it with a separate stack or state. Regional scope emits only regional network, VSS, and observability outputs. IAM, governance, Cloud Guard, Security Zones, primary Vault resources, platforms, shared platforms, workload extensions, and cross-tenancy RPCs remain excluded.
 
@@ -406,12 +406,12 @@ For customer-use artifact placement and deployment defaults, follow root `AGENTS
 
 Config mode validates required fields during normalization. `config.environments` is optional and defaults to an empty object for a shared-services and hub-only Landing Zone. When provided, it must be an object.
 
-## 10. Network Artifact Phases
+## 10. Network Artifacts And Internal Composition
 
-- **Final network artifact** (`network` -> `network.json`): canonical deployable network configuration.
-- **Pre-deployment artifact** (`network_pre` -> `network_pre.json`): only for staged hubs.
-- **Staged completion**: final `network` layers post-deploy hub fragment and hub integration post overlay onto `network_pre`.
-- **Hub E** emits only final `network`.
+- **Final network artifact** (`network` -> `network.json`): canonical deployable network configuration for every hub. Managed NFW/NLB route targets use naming-derived resource keys.
+- **Internal composition**: OKE, OCVS, and networked ExaCS extensions contribute resources through `contributions.network`. These contributions and hub `pre`/`post` fragments are merged into final `network`.
+- **Security and observability**: pre/final outputs retain their existing contracts.
+- **Published ExaCS multi-stack exception**: its publication adapter still emits separate spoke-network pre/final files because the extension stack creates the VCN and the base stack creates its DRG attachment. See the [ExaCS multi-stack guide](../workload-extensions/exacs/multi-stack/readme.md).
 
 ## 11. Platform Topology Rules
 

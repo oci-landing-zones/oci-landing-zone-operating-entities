@@ -70,9 +70,8 @@ function(hub_ctx)
   local subnets = hub_config.network.subnets;
   local bastion_ip = common.bastion_ip_from_mgmt(subnets.mgmt);
 
-  // Placeholder OCID strings for post-deployment routes
-  local untrust_nlb_ocid = 'UNTRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljtgvl...';
-  local trust_nlb_ocid = 'TRUST NLB PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljt53k...';
+  local untrust_nlb_key = n.key('NLB', ['HUB', 'UNTRUST']);
+  local trust_nlb_key = n.key('NLB', ['HUB', 'TRUST']);
   local hub_route_tables = common._route_tables_from_descriptors(n, [
     {
       key_segments: ['HUB', 'IGW'],
@@ -278,7 +277,7 @@ function(hub_ctx)
                       [n.route_rule([n.region, 'igw', 'ingress'])]: common._route_via_id(
                         "Route to Public LoadBalancer's subnet through Untrust NLB and Firewalls",
                         subnets.lb,
-                        untrust_nlb_ocid
+                        untrust_nlb_key
                       ),
                     },
                   },
@@ -288,7 +287,7 @@ function(hub_ctx)
                       [n.route_rule([n.region, 'internet'])]: common._route_via_id(
                         'Route to the Internet through Trust NLB and Firewalls',
                         '0.0.0.0/0',
-                        trust_nlb_ocid
+                        trust_nlb_key
                       ),
                     },
                   },
@@ -298,7 +297,7 @@ function(hub_ctx)
                       [n.route_rule([n.region, 'internet'])]: common._route_via_id(
                         'Route to the Internet through Untrust NLB and Firewalls',
                         '0.0.0.0/0',
-                        untrust_nlb_ocid
+                        untrust_nlb_key
                       ),
                     },
                   },
@@ -308,7 +307,7 @@ function(hub_ctx)
                       [n.route_rule([n.region, 'internet'])]: common._route_via_id(
                         'Route to the Internet through Trust NLB and Firewalls',
                         '0.0.0.0/0',
-                        trust_nlb_ocid
+                        trust_nlb_key
                       ),
                     },
                   },
@@ -339,7 +338,7 @@ function(hub_ctx)
 
     has_spoke_natgw: false,
 
-    post_route_entity_id: trust_nlb_ocid,
+    post_route_entity_id: trust_nlb_key,
     post_route_entity_desc: 'Trust NLB and Firewalls',
 
     // NLB backend builder for third-party firewall integration

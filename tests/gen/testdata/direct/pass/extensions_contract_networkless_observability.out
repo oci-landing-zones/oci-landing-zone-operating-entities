@@ -1,6 +1,11 @@
 {
   "iam_marker": true,
-  "network_pre_empty": true,
+  "network_empty": true,
+  "network_metadata": {
+    "has_network": false,
+    "network_mode": "forbidden",
+    "resolved_subnets": null
+  },
   "observability_cis1_marker": true,
   "observability_cis2_marker": true
 }

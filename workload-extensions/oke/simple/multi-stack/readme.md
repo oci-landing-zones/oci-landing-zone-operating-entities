@@ -124,7 +124,7 @@ This is the preferred customer path because it keeps the deployable files under 
    ```bash
    git clone https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator.git
    cd terraform-oci-modules-orchestrator
-   git checkout tags/v2.1.1
+   git checkout tags/v2.2.0
    ```
 
 2. **Copy Configuration Files**

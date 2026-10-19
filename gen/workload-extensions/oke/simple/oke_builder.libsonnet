@@ -150,7 +150,7 @@ local oke_context = import './oke_context.libsonnet';
       contributions: {
         oke_workers: oke_workers(ctx),
         oke_clusters: oke_clusters(ctx),
-        network_pre: oke_network(ctx),
+        network: oke_network(ctx),
         iam: oke_iam(ctx),
         security_cis2: if ctx.cis_level == 2 then oke_security(ctx) else {},
       },

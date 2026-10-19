@@ -7,7 +7,7 @@ local products = import '../exadb/products.libsonnet';
 
 {
   metadata(params):: {
-    requires_network: false,
+    network_mode: 'forbidden',
   },
 
   render(params)::

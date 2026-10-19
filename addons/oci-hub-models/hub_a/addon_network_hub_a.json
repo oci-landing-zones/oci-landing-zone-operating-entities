@@ -95,7 +95,7 @@
                                         "description"                     : "Route to the Internet through the Internal OCI Network Firewall",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"               : "NFW-FRA-LZ-HUB-INT-KEY"
                                     }
                                 }
                             },
@@ -108,7 +108,7 @@
                                         "description"                     : "Route to the Internet through the DMZ Firewall",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "DMZ OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.vrdnynvr..."
+                                        "network_entity_id"               : "NFW-FRA-LZ-HUB-DMZ-KEY"
                                     }
                                 }
                             },
@@ -147,21 +147,21 @@
                                         "description"                     : "Route to mgmt subnet in Hub VCN through Internal OCI Network Firewall",
                                         "destination"                     : "10.0.3.0/24",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"               : "NFW-FRA-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-vcn-fra-hub-mon-sn": {
                                         "description"                     : "Route to mon subnet in Hub VCN through Internal OCI Network Firewall",
                                         "destination"                     : "10.0.4.0/24",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"               : "NFW-FRA-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-vcn-fra-hub-dns-sn": {
                                         "description"                     : "Route to dns subnet in Hub VCN through Internal OCI Network Firewall",
                                         "destination"                     : "10.0.5.0/24",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"               : "NFW-FRA-LZ-HUB-INT-KEY"
                                     }
                                 }
                             },
@@ -174,7 +174,7 @@
                                         "description"                     : "Route to lb subnet in Hub VCN through DMZ OCI Network Firewall",
                                         "destination"                     : "10.0.1.0/24",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "DMZ OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.vrdnynvr..."
+                                        "network_entity_id"               : "NFW-FRA-LZ-HUB-DMZ-KEY"
                                     }
                                 }
                             },
@@ -187,7 +187,7 @@
                                         "description"                     : "Route to the Internet through the Internal OCI Network Firewall",
                                         "destination"                     : "0.0.0.0/0",
                                         "destination_type"                : "CIDR_BLOCK",
-                                        "network_entity_id"               : "Internal OCI NFW PRIVATE IP OCID, e.g. ocid1.privateip.oc1.eu-frankfurt-1.abtheljs..."
+                                        "network_entity_id"               : "NFW-FRA-LZ-HUB-INT-KEY"
                                     },
 
                                     "rr-fra-sgw": {

@@ -3,11 +3,8 @@
 // Takes a raw config, normalizes it, builds the hub, generates spoke VCNs
 // for each environment with project_network, and composes the output.
 //
-// function(raw_config) → { network, network_pre, network_backends? }
+// function(raw_config) → { network, network_backends?, ... }
 //
-// Task 8: Config normalization, hub dispatch, spoke VCN generation, per-project NSGs.
-// Task 9: DRG attachments, route injection into hub, NFW NSG rules, post-deploy routes.
-// Task 10: Platform/extension VCNs (OKE, etc.)
 local governance_builder = import 'builders/governance.libsonnet';
 local hub_integration_builder = import 'builders/hub_integration.libsonnet';
 local iam_builder = import 'builders/iam.libsonnet';
@@ -130,7 +127,7 @@ function(raw_config)
     routed_vcn_entries: all_routed_cidr_entries,
     hub_has_spoke_natgw: hub.has_spoke_natgw,
   });
-  local extension_network_pre = extension_state.network_pre;
+  local extension_network = extension_state.network;
   local extension_iam = extension_state.iam;
   local extension_governance = extension_state.governance;
   local extension_security_cis1 = extension_state.security_cis1;
@@ -144,14 +141,14 @@ function(raw_config)
   // --- Build security, observability, governance ---
   local security = security_builder(config, n, realm, topo);
   local observability = observability_builder(config, n, realm, topo);
-  local assembled_network_pre = hub.pre + hub_integration_pre + extension_network_pre + {
+  local network_base = hub.pre + hub_integration_pre + extension_network + {
     network_configuration+: {
       network_configuration_categories+: spoke_network.categories + network_only_categories,
     },
   };
   local assembled_network =
-    if hub.post != null then assembled_network_pre + hub.post + hub_integration_post
-    else assembled_network_pre;
+    if hub.post != null then network_base + hub.post + hub_integration_post
+    else network_base;
 
   // --- Compose output ---
   {
@@ -162,12 +159,9 @@ function(raw_config)
     // Canonical network output: final deployable artifact for all hub types.
     network: assembled_network,
 
-    // Optional staged precursor output: only for hubs with post overlays.
-    network_pre: if hub.post != null then assembled_network_pre else null,
-
     // Hub C backends: full network config with NLB backend configuration.
     network_backends:
-      if hub.post != null && std.objectHas(hub, 'backends') then
+      if std.objectHas(hub, 'backends') then
         assembled_network + hub.backends.build_placeholders()
       else null,
 

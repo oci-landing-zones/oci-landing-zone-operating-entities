@@ -15,18 +15,17 @@ Scope: this file covers `gen/workload-extensions/exacc/**` and the published Exa
 ## Extension Contract
 
 - Extension type is `exacc`.
-- ExaDB-C@C is networkless: `metadata.requires_network: false`.
+- ExaDB-C@C is networkless: `metadata.network_mode: 'forbidden'`.
 - ExaDB-C@C platforms must omit `platform.network`; the generic extension contract rejects a phantom network on networkless extensions.
-- ExaDB-C@C contributes IAM and observability only. It must not emit `network_pre`, `network`, subnet metadata, or platform VCN categories.
+- ExaDB-C@C contributes IAM and observability only. It must not emit `network`, subnet metadata, or platform VCN categories.
 - Config-mode IAM owns the nested platform root compartments. The ExaDB-C@C builder deep-merges child DB/infra compartments and tags into that nested tree.
 - Standalone multi-stack publication projects the nested config-mode IAM overlay into flat extension-only compartments with `parent_id` references.
 - Do not add native root families such as `exacc_configuration` or `exacs_configuration` unless the active Orchestrator contract proves those families exist.
 
 ## Use-Case Support
 
-- UC1 is the native published template-backed ExaDB-C@C use case in this repo.
-- UC2 and UC3 are use-case models only unless dedicated source templates and generator fixtures exist in this repo.
-- If UC2, UC3, or a custom combination is requested, stop before deployable artifact changes unless the matching templates and tests are present. Capture design notes or requirements instead of relabeling UC1 output.
+- UC1, UC2, and UC3 are native published template-backed ExaDB-C@C use cases in this repo.
+- If a custom combination is requested, stop before deployable artifact changes unless the matching templates and tests are present. Capture design notes or requirements instead of relabeling an existing UC output.
 - Existing deployed landing zones should use the multi-stack extension-only publication shape unless the user explicitly asks to change the foundation.
 - Fresh foundation plus ExaDB-C@C publication uses the single-stack shape emitted by the local published adapters. Do not mix stack families unless the active Orchestrator merge behavior and top-level family collisions have been checked.
 
@@ -44,6 +43,9 @@ Scope: this file covers `gen/workload-extensions/exacc/**` and the published Exa
 - `db_workloads`
 - `infra_workloads`
 - `projects`
+- `projects_by_environment` (environment name to recipient array, overriding `projects`)
+- `environment_infra` and `environment_db` (environment name to recipient array)
+- `split_environment_topics` (boolean; separates infrastructure and DBA topics in environment placements)
 
 Unknown keys are rejected. Recipient arrays must be non-empty arrays of non-empty strings. The generator does not validate email address syntax.
 

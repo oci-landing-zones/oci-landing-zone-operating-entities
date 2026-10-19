@@ -19,10 +19,11 @@ For authenticating against the OCI tenancy terraform execute the following [inst
 git clone git@github.com:oci-landing-zones/oci-landing-zone-operating-entities.git
 ```
 ### **3 Clone the orchestrator Git repo to your Machine**
-Cloning the latest version:
+Clone the latest released Orchestrator version:
 ```
-git clone git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git
+git clone --branch v2.2.0 git@github.com:oci-landing-zones/terraform-oci-modules-orchestrator.git
 ```
+Use Terraform and OCI Terraform Provider versions supported by the selected release.
 ###  **4 Change the Directory to the Terraform Orchestrator Module**
 Change the directory to the *terraform-oci-landing-zones-orchestrator* Terraform orchestrator module.
 ### **5 Run ```terraform init```**

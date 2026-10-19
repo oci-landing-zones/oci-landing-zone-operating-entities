@@ -141,7 +141,7 @@ Environment names and counts are customer-defined. The generator derives local r
 
 Hub selection follows the customer's One-OE design and is configured independently for each Landing Zone. Hub A and Hub B use OCI Network Firewall, Hub C supports third-party network firewalls through trust and untrust Network Load Balancers, and Hub E provides direct DRG routing without a firewall. Hub E should be selected only for PoC, lab, or explicitly accepted no-firewall scenarios. The X-RPC generator applies the appropriate routing for the selected hub model.
 
-For Hub C, the Blueprint Factory generates the hub network, required subnets, Network Load Balancers, DRG integration, X-RPC routing, and `network_backends.json`. The customer deploys and configures the third-party firewall appliances, such as Fortinet or Palo Alto, and supplies their private IP OCIDs to complete the Network Load Balancer backend configuration.
+For Hub C, the Blueprint Factory generates the hub network, required subnets, Network Load Balancers, DRG integration, X-RPC routing, and `network_backends.json`. The customer deploys and configures the third-party firewall appliances, such as Fortinet or Palo Alto, and supplies real targets to complete the Network Load Balancer backend configuration. NLB backends also accept VM primary and qualified secondary-interface keys when compute is supplied in the same stack or through dependencies; see the [Hub C backend contract](../../oci-hub-models/hub_c/readme.md#backend-targets).
 
 The generator adds RPC route tables, route distributions, attachments, import statements, and route rules. Firewall policies must separately permit the approved X-RPC traffic.
 
@@ -149,7 +149,7 @@ The generator adds RPC route tables, route distributions, attachments, import st
 
 Generation produces the core One-OE configuration files: `governance.json`, `iam.json`, `network.json`, the selected `security_cis1.json` or `security_cis2.json`, and the corresponding `observability_cis1.json` or `observability_cis2.json`.
 
-For staged deployments, generation also produces `network_pre.json`, the selected `security_cis1_pre.json` or `security_cis2_pre.json`, and the corresponding `observability_cis1_pre.json` or `observability_cis2_pre.json`. Hub C deployments can additionally produce `network_backends.json`, and registered extensions can add their own `.json` output files.
+Generation also produces the selected `security_cis1_pre.json` or `security_cis2_pre.json`, and the corresponding `observability_cis1_pre.json` or `observability_cis2_pre.json`. Hub C deployments can additionally produce `network_backends.json`, and registered extensions can add their own `.json` output files.
 
 Review all generated files before deployment. Keep the source configurations and generated output directories separate.
 

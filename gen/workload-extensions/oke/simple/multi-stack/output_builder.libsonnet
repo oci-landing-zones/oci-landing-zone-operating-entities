@@ -12,7 +12,11 @@ function(profile, env_name='prod', platform_name='oke') {
   local n = ctx.n,
   local platform_entry = ctx.env_platform_entry(env_name, platform_name),
   local resolved = extensions.resolve_entry(
-    ctx.extension_resolve_entry_inputs({ oke_simple: oke_builder }, platform_entry)
+    ctx.extension_resolve_entry_inputs(
+      { oke_simple: oke_builder },
+      platform_entry,
+      cis1_config.hub.kind == 'hub_e'
+    )
   ),
   local rendered_extension = oke_builder.render(resolved.render_params),
   local aggregated = oke_builder.aggregate([{
@@ -22,7 +26,11 @@ function(profile, env_name='prod', platform_name='oke') {
   local iam_ctx = render_context.from_raw_config(iam_cis2_config),
   local iam_platform_entry = iam_ctx.env_platform_entry(env_name, platform_name),
   local iam_resolved = extensions.resolve_entry(
-    iam_ctx.extension_resolve_entry_inputs({ oke_simple: oke_builder }, iam_platform_entry)
+    iam_ctx.extension_resolve_entry_inputs(
+      { oke_simple: oke_builder },
+      iam_platform_entry,
+      iam_cis2_config.hub.kind == 'hub_e'
+    )
   ),
   local iam_rendered_extension = oke_builder.render(iam_resolved.render_params),
   local iam_aggregated = oke_builder.aggregate([{
@@ -42,10 +50,10 @@ function(profile, env_name='prod', platform_name='oke') {
 	  local route_segments = scope.key_segments + ['PLATFORM', plat],
 	  local vcn_key = n.key('VCN', route_segments),
   local oke_category =
-    rendered_extension.contributions.network_pre.network_configuration.network_configuration_categories[category_key],
+    rendered_extension.contributions.network.network_configuration.network_configuration_categories[category_key],
   local frontend_nsg =
     if public_lb.public_load_balancer_enabled(resolved.render_params.platform_config) then
-      rendered_extension.contributions.network_pre.network_configuration
+      rendered_extension.contributions.network.network_configuration
         .network_configuration_categories['0-shared']
         .vcns[n.key('VCN', ['HUB'])]
         .network_security_groups
