@@ -69,8 +69,6 @@ The complete-scope home directory contains the normal complete Blueprint Factory
 
 IAM compartments, identity resources, tenancy-wide governance, Cloud Guard, and Security Zones remain home-owned and are omitted from the generated DR directory. CIS2 regional security files deploy Vaults and keys in the DR region, including selected extension keys.
 
-The [runtime catalog](./runtime/README.md) lists the published regional reference files and their deployment phases.
-
 > [!IMPORTANT]
 > **CIS Level 2:** deploy the generated regional security prerequisites before dependent buckets and workloads. The regional stack creates its own Vaults and keys; it does not create IAM policies from Vault key grant blocks. The complete home config must include `dr_region` and the IAM required by all selected regional extensions. Fresh regional keys do not replicate existing encryption material or secrets. Workloads that require original key material need a separate, reviewed [Vault and key replication](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/replicatingvaults.htm) design.
 
