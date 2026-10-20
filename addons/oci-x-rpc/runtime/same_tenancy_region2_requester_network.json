@@ -791,20 +791,8 @@
                                     "is_ecmp_enabled"                           : false,
 
                                     "route_rules": {
-                                        "DRGRT-AMS-LZ-RPC-TENANCY1-LOCAL-CIDR-1": {
-                                            "destination"                       : "10.1.0.0/21",
-                                            "destination_type"                  : "CIDR_BLOCK",
-                                            "next_hop_drg_attachment_key"       : "DRGATT-AMS-LZ-HUB-VCN-KEY"
-                                        },
-
-                                        "DRGRT-AMS-LZ-RPC-TENANCY1-LOCAL-CIDR-2": {
-                                            "destination"                       : "10.1.64.0/21",
-                                            "destination_type"                  : "CIDR_BLOCK",
-                                            "next_hop_drg_attachment_key"       : "DRGATT-AMS-LZ-HUB-VCN-KEY"
-                                        },
-
-                                        "DRGRT-AMS-LZ-RPC-TENANCY1-LOCAL-CIDR-3": {
-                                            "destination"                       : "10.1.128.0/21",
+                                        "DRGRT-AMS-LZ-RPC-TENANCY1-STATIC-ROUTE": {
+                                            "destination"                       : "0.0.0.0/0",
                                             "destination_type"                  : "CIDR_BLOCK",
                                             "next_hop_drg_attachment_key"       : "DRGATT-AMS-LZ-HUB-VCN-KEY"
                                         }

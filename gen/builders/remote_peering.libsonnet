@@ -5,7 +5,6 @@
 //
 // params.naming: naming object
 // params.connections: normalized top-level remote_peering_connections map
-// params.hub_vcn_cidr: local hub VCN CIDR
 // params.local_vcn_entries: routed local VCN entries from platforms.libsonnet
 // params.hub_has_spoke_natgw: true for Hub E direct routing, false for firewall hubs
 
@@ -23,8 +22,6 @@ function(params)
   local connection_names = std.objectFields(connections);
   local drg_key = n.key('DRG', ['HUB']);
   local hub_vcn_attachment_key = n.key('DRGATT', ['HUB', 'VCN']);
-  local default_local_cidrs =
-    [params.hub_vcn_cidr] + [entry.vcn for entry in local_vcn_entries];
 
   local has_prefix(value, prefix) =
     std.substr(value, 0, std.length(prefix)) == prefix;
@@ -166,22 +163,6 @@ function(params)
       for entry in entries
     } else {};
 
-  // Firewall hubs accept RPC traffic only for local VCN CIDRs. This prevents
-  // an RPC attachment from becoming an implicit transit path to another RPC.
-  local local_route_rules(entry) =
-    {
-      ['DRGRT-%s-LZ-RPC-%s-LOCAL-CIDR-%d' % [
-        std.asciiUpper(n.region),
-        std.asciiUpper(entry.name_segment),
-        i + 1,
-      ]]: {
-        destination: default_local_cidrs[i],
-        destination_type: 'CIDR_BLOCK',
-        next_hop_drg_attachment_key: hub_vcn_attachment_key,
-      }
-      for i in std.range(0, std.length(default_local_cidrs) - 1)
-    };
-
   local rpc_route_tables = {
     [entry.drg_route_table_key]:
       if hub_has_spoke_natgw then {
@@ -192,7 +173,16 @@ function(params)
       } else {
         display_name: entry.drg_route_table_display_name,
         is_ecmp_enabled: false,
-        route_rules: local_route_rules(entry),
+        route_rules: {
+          ['DRGRT-%s-LZ-RPC-%s-STATIC-ROUTE' % [
+            std.asciiUpper(n.region),
+            std.asciiUpper(entry.name_segment),
+          ]]: {
+            destination: '0.0.0.0/0',
+            destination_type: 'CIDR_BLOCK',
+            next_hop_drg_attachment_key: hub_vcn_attachment_key,
+          },
+        },
       }
     for entry in entries
   };

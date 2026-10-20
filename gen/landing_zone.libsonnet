@@ -59,7 +59,6 @@ function(raw_config)
   local remote_peering = remote_peering_builder({
     naming: n,
     connections: remote_peering_connections,
-    hub_vcn_cidr: hub_vcn_cidr,
     local_vcn_entries: all_vcn_entries,
     hub_has_spoke_natgw: config.hub.kind == 'hub_e',
   });

@@ -96,15 +96,6 @@ local firewall_hub_checks(result, region, remote_cidr) =
     rpc_attachment.value.drg_route_table_key
   ];
   local rpc_route_rules = std.objectValues(rpc_route_table.route_rules);
-  local hub_vcn_keys = std.objectFields(shared(result).vcns);
-  local local_vcn_cidrs = std.flattenArrays([
-    vcn.cidr_blocks
-    for category in std.objectValues(
-      result.network.network_configuration.network_configuration_categories
-    )
-    if std.objectHas(category, 'vcns')
-    for vcn in std.objectValues(category.vcns)
-  ]);
   local rpc_imports = std.flattenArrays([
     [
       statement
@@ -116,20 +107,12 @@ local firewall_hub_checks(result, region, remote_cidr) =
   ]);
   [
     {
-      name: '%s RPC route table does not use the common firewall-hub path' % region,
-      ok:
-        std.set([rule.destination for rule in rpc_route_rules]) ==
-        std.set(local_vcn_cidrs) &&
-        std.length([
-          rule
-          for rule in rpc_route_rules
-          if rule.destination_type == 'CIDR_BLOCK' &&
-             std.member(
-               hub_vcn_keys,
-               hub_drg.drg_attachments[rule.next_hop_drg_attachment_key]
-                 .network_details.attached_resource_key
-             )
-        ]) == std.length(rpc_route_rules),
+      name: '%s RPC route table does not send all destinations through the hub' % region,
+      ok: rpc_route_rules == [{
+        destination: '0.0.0.0/0',
+        destination_type: 'CIDR_BLOCK',
+        next_hop_drg_attachment_key: 'DRGATT-%s-LZ-HUB-VCN-KEY' % region,
+      }],
     },
     {
       name: '%s RPC attachment is not imported into the hub distribution' % region,

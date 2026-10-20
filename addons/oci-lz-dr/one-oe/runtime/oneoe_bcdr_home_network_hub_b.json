@@ -748,20 +748,8 @@
                                     "is_ecmp_enabled"                     : false,
 
                                     "route_rules": {
-                                        "DRGRT-FRA-LZ-RPC-DR-LOCAL-CIDR-1": {
-                                            "destination"                 : "10.0.0.0/21",
-                                            "destination_type"            : "CIDR_BLOCK",
-                                            "next_hop_drg_attachment_key" : "DRGATT-FRA-LZ-HUB-VCN-KEY"
-                                        },
-
-                                        "DRGRT-FRA-LZ-RPC-DR-LOCAL-CIDR-2": {
-                                            "destination"                 : "10.0.64.0/21",
-                                            "destination_type"            : "CIDR_BLOCK",
-                                            "next_hop_drg_attachment_key" : "DRGATT-FRA-LZ-HUB-VCN-KEY"
-                                        },
-
-                                        "DRGRT-FRA-LZ-RPC-DR-LOCAL-CIDR-3": {
-                                            "destination"                 : "10.0.128.0/21",
+                                        "DRGRT-FRA-LZ-RPC-DR-STATIC-ROUTE": {
+                                            "destination"                 : "0.0.0.0/0",
                                             "destination_type"            : "CIDR_BLOCK",
                                             "next_hop_drg_attachment_key" : "DRGATT-FRA-LZ-HUB-VCN-KEY"
                                         }
