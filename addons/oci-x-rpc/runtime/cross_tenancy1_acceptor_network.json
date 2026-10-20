@@ -887,7 +887,7 @@
                                             "priority"                          : 30,
 
                                             "match_criteria": {
-                                                "match_type"                    : "DRG_ATTACHMENT_TYPE",
+                                                "match_type"                    : "DRG_ATTACHMENT_ID",
                                                 "attachment_type"               : "REMOTE_PEERING_CONNECTION",
                                                 "drg_attachment_key"            : "DRGATT-FRA-LZ-HUB-RPC-TENANCY2-KEY"
                                             }

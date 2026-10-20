@@ -153,6 +153,7 @@ function(raw_config)
   {
     // Normalized config-mode selector used by landing_zone_multi.jsonnet.
     cis_level: config.cis_level,
+    stack_scope: config.stack_scope,
 
     // Canonical network output: final deployable artifact for all hub types.
     network: assembled_network,

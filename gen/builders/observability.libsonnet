@@ -415,10 +415,55 @@ function(config, n, realm_constants, topo)
   local cis2_pre = base + cis2_bucket_override;
   local cis2 = base + logging_configuration + cis2_bucket_override;
 
+  local without_home_region_events(observability) = {
+    [key]: observability[key]
+    for key in std.objectFields(observability)
+    if key != 'home_region_events_configuration'
+  };
+  local regional_observability(observability, cis_number) =
+    if config.stack_scope != 'regional' then observability else
+    local cis_level = std.toString(cis_number);
+    local bucket_key = n.key('BKT', ['SERVICE-CONNECTOR']);
+    local bucket_name = n.display('bkt', ['service-connector']);
+    local regional = without_home_region_events(observability);
+    local unused_topic_keys = [
+      n.key_global('NOTT', ['CLOUDGUARD']),
+      n.key_global('NOTT', ['IAM']),
+    ];
+    regional + {
+      alarms_configuration+: {
+        alarms: {
+          [key]: regional.alarms_configuration.alarms[key]
+          for key in std.objectFields(regional.alarms_configuration.alarms)
+          if regional.alarms_configuration.alarms[key].supplied_alarm.namespace !=
+             'oci_service_connector_hub'
+        },
+      },
+      notifications_configuration+: {
+        topics: {
+          [key]: regional.notifications_configuration.topics[key]
+          for key in std.objectFields(regional.notifications_configuration.topics)
+          if !std.member(unused_topic_keys, key)
+        },
+      },
+      service_connectors_configuration+: {
+        buckets: {
+          [bucket_key]: {
+            name: bucket_name,
+            compartment_id: 'CMP-LZ-SECURITY-KEY',
+            cis_level: cis_level,
+          } + if cis_number == 2 then {
+            kms_key_id: 'KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY',
+          } else {},
+        },
+        service_connectors: {},
+      },
+    };
+
   // Return all four variants
   {
-    cis1_pre: cis1_pre,
-    cis1: cis1,
-    cis2_pre: cis2_pre,
-    cis2: cis2,
+    cis1_pre: regional_observability(cis1_pre, 1),
+    cis1: regional_observability(cis1, 1),
+    cis2_pre: regional_observability(cis2_pre, 2),
+    cis2: regional_observability(cis2, 2),
   }

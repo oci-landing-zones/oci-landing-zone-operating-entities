@@ -48,7 +48,8 @@ If the selected published path, Blueprint Factory, or workload extension does no
 ## Discovery Reminders
 
 - Always default to `One-OE`; do not ask who operates the landing zone or ask the customer to choose a landing zone family.
-- Ask in root `AGENTS.md` order: One-OE baseline, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, CIDRs, then the explicit CIS-level choice.
+- After establishing the One-OE baseline, ask: **Do you want to deploy a Disaster Recovery (DR) region?** If yes, ask for the home region first and the DR region next, one question at a time. Set `dr_region` on the complete home config for the DR Object Storage grant; the regional config has its own region metadata. The published Frankfurt/Amsterdam pair is an example. Explain that CIS2 deploys Vaults and keys in both regions, while matching compartment, governance, and extension IAM prerequisites stay home-owned.
+- Ask in root `AGENTS.md` order: One-OE baseline, DR decision, region and optional realm, environments, workloads, firewall, hub model, network-producing extension scope and sizing before CIDR allocation, CIDRs, then the explicit CIS-level choice.
 - Ask for the target OCI region early. Explain that realm defaults to `oc1` public cloud when omitted, and ask for realm only when a non-public or sovereign deployment may apply, such as `oc19` EU Sovereign Cloud.
 - Explain each decision in customer language before using repo terms such as `One-OE`, `Hub A`, `platform`, `project`, or `project_network`.
 - During network-scope sizing, ask whether project workloads can use shared subnets or require project-dedicated subnet allocations. Recommend shared subnets unless separate CIDR allocation or lifecycle management is required: shared subnets use address space more efficiently, while dedicated subnets commonly leave capacity stranded in lightly used per-project ranges.

@@ -46,6 +46,7 @@ The source configuration for the Blueprint Factory is a JSON document. JSON keep
 A typical configuration describes the target Landing Zone in a few top-level blocks:
 
 - **Region metadata**: the OCI region and short region label used by the naming convention.
+- **Stack scope**: whether the source owns the complete Landing Zone domains or only supported regional resources.
 - **Hub**: the selected hub model and hub network range.
 - **Environments**: environment-specific networks, projects, platforms, and workload extensions.
 - **Extension parameters**: workload-specific settings, such as OKE or Exadata options, when an extension is part of the design.
@@ -57,6 +58,7 @@ Example shape:
 {
   "region": "eu-frankfurt-1",
   "region_short_name": "fra",
+  "stack_scope": "complete",
   "hub": {
     "kind": "hub_b",
     "network": {
@@ -108,6 +110,7 @@ The [examples](./examples) folder contains small and medium-size config files th
 | [Shared ExaCS with Autonomous DB tiers](./examples/04-shared-exacs-autonomous.json) | Shared ExaCS platform and project DB tiers across environments. |
 | [Cross-tenancy RPC acceptor](./examples/05-xrpc-cross-tenancy-acceptor.json) | Tenancy 1 acceptor with dynamic environment routing and cross-tenancy Admit policy. |
 | [Cross-tenancy RPC requester](./examples/06-xrpc-cross-tenancy-requester.json) | Tenancy 2 requester with peer RPC reference and cross-tenancy Allow/Endorse policy. |
+| [One-OE regional DR pair](./examples/oneoe-dr/) | Independently generated home acceptor and regional DR requester configurations. |
 
 Generate any example from the repository root:
 

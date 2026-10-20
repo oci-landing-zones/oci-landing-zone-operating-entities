@@ -21,6 +21,7 @@ Regular clones, submodules, and linked Git worktrees are supported. Hook paths a
 - Raw config-mode fan-out and debugging: `jsonnet --multi <output_dir>/ --tla-code-file config=<config_file> gen/landing_zone_multi.jsonnet`
 
 Config-mode network artifacts use one canonical final file: `network.json`. Managed NFW/NLB route targets use resource keys.
+Generate a regional DR design as two independent configs. The complete home config owns the RPC acceptor and sets `dr_region` for the DR Object Storage key-use grant; the regional DR config owns the RPC requester. Run `--config` once for each source and use separate output directories. Regional scope supports platforms and registered workload extensions and emits their workload, network, security, and observability contributions. CIS2 creates regional Vaults and keys. Shared IAM and governance prerequisites must already exist in the complete home stack; cross-tenancy RPCs remain rejected in regional scope.
 Config-mode security and observability artifacts follow `cis_level`: omit it for the default CIS level 2 files, or set `cis_level: 1` to emit the CIS level 1 file pair instead.
 Config-mode extension outputs are emitted as additional files from `result.extra`; for example, OKE emits `oke_clusters.json` and `oke_workers.json`.
 If you set `hub.network.subnets` explicitly, provide the full canonical subnet set for that hub kind; partial hub subnet overrides are rejected during normalization.

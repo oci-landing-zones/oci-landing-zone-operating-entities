@@ -127,20 +127,28 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Explain briefly that this guidance uses the current One-OE baseline, then move to the region question.
    - Do not assume the customer should start from a workload extension before the One-OE baseline is established.
 
-2. **Region and realm**
+2. **Disaster recovery (One-OE)**
+   - Immediately after establishing the One-OE baseline, ask: **Do you want to deploy a Disaster Recovery (DR) region?**
+   - If the customer answers no, continue with the region and realm decision.
+   - If the customer answers yes, collect the home and DR regions separately during the region decision below. Explain that each region has its own stack and regional resources, while shared IAM and governance stay home-owned.
+   - Treat the published Frankfurt/Amsterdam pair as an example. Do not assume its regions, environment scope, or CIDRs fit the customer's design.
+
+3. **Region and realm**
    - Determine the OCI region where the landing zone will be deployed.
+   - When DR is selected, ask for the home region first, then ask which different OCI region will host DR. Confirm both belong to the selected realm. Do not infer the DR region from a published example.
+   - Set `dr_region` on the complete home config to authorize the DR Object Storage service in home-owned IAM. Set the regional DR config's own `region` and `region_short_name` to the selected DR region.
    - Explain that the region is the deployment location, such as `eu-frankfurt-1`, while the realm is the isolated OCI cloud boundary, such as `oc1` for public cloud or `oc19` for EU Sovereign Cloud.
    - Default the realm to `oc1` if the customer does not provide one.
    - Ask for the realm explicitly only when the customer mentions sovereign, government, dedicated, isolated, Alloy, or another non-public OCI deployment, or when the selected region maps to a non-`oc1` realm.
    - If the customer does not know the realm, help infer it from the selected region only after checking repository or official OCI region/realm data.
    - For Blueprint Factory config mode, keep `region` and `region_short_name` paired; omit `realm` or set it to `oc1` for public-cloud deployments, and set it explicitly for non-`oc1` deployments.
 
-3. **Environment count and names**
+4. **Environment count and names**
    - Determine how many environments the landing zone needs and what they are called.
    - Ask which environments are needed, using examples such as development, test, preproduction, and production when helpful.
    - Keep the environment names explicit. Do not assume only `prod` and `preprod` unless the customer confirms the standard One-OE shape fits.
 
-4. **Application and workload structure**
+5. **Application and workload structure**
    - Determine which applications or workloads are going to run in the landing zone.
    - OKE can itself be the workload or platform the customer is asking for.
    - Ask what will run on top of OKE and whether any other non-OKE workloads must also be part of the landing zone.
@@ -150,7 +158,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Do not treat an application as a single OCI service such as one VM or one Oracle Function.
    - Treat an application as a business workload that is commonly composed of multiple services that together solve a business need.
 
-5. **Firewall requirement**
+6. **Firewall requirement**
    - Determine whether the landing zone must include a firewall.
    - Ask this in customer language: whether the deployment is production and whether inspected or tightly controlled traffic flow is required.
    - Explain that a firewall-based design is recommended for both production and non-production, but it is mandatory for production.
@@ -158,7 +166,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Any production deployment must be treated as firewall-required.
    - Do not recommend a no-firewall hub for production use.
 
-6. **Hub model selection**
+7. **Hub model selection**
    - Choose the hub model only after the firewall requirement is known.
    - Do not ask the customer to pick `Hub A`, `Hub B`, `Hub C`, or `Hub E` by label alone.
    - After the firewall need is known, explain the relevant hub options in plain language, recommend the best fit, and only then confirm the hub family.
@@ -168,7 +176,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Recommend a no-firewall hub only when the customer explicitly accepts the tradeoff, or when the request is clearly PoC, lab, or cost/simplicity driven.
    - Reserve `Hub E` for PoC, lab, or explicitly non-production cases where a no-firewall design is acceptable.
 
-7. **Extension and network scope sizing**
+8. **Extension and network scope sizing**
    - Determine which applications, platforms, and workload extensions will need network resources or other CIDR-bearing ranges before proposing concrete CIDRs or asking the customer for final CIDR values.
    - For network-producing workload extensions, identify every VCN/subnet-producing or CIDR-bearing scope the selected path will actually emit, including hub VCNs, spoke VCNs, platform VCNs, extension VCNs, Kubernetes service CIDRs, Kubernetes pod ranges, or any other routed or internal ranges defined by the selected extension contract.
    - Use the selected workload extension's local guide under `gen/workload-extensions/*/AGENTS.md` to decide which placement, component, and sizing questions must be answered before CIDR allocation.
@@ -178,7 +186,7 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - Do not reserve CIDRs for unchosen extension placement branches. Allocate only for the network scopes the selected design will emit, plus deliberate future reserves that are explained to the customer.
    - If a selected extension or placement scope is networkless, infrastructure-only, or otherwise forbidden from emitting network resources, do not assign it a VCN or subnet CIDR.
 
-8. **CIDR allocation**
+9. **CIDR allocation**
    - Determine the concrete OCI CIDR plan for the hub, spoke, platform, and selected workload-extension networks before giving deployment or config guidance.
    - Explain CIDRs as the network ranges reserved for OCI VCNs and subnets before asking the customer for numbers.
    - CIDR allocations are difficult to change later. Before recommending a split, explain the reasoning behind each block size, which network scope it serves, which sizing input drove it, and where intentional reserve space is left.
@@ -192,14 +200,15 @@ The list below defines the decision order. It is not a customer-facing bulk ques
    - If the customer has not defined CIDRs yet, help them decide the allocation first.
    - If repository behavior and official OCI documentation appear inconsistent for OKE networking, say so and verify with official OCI docs before advising.
 
-9. **CIS benchmark level**
+10. **CIS benchmark level**
    - Determine whether the generated landing zone should use CIS Level 1 or CIS Level 2 before recommending deployment artifacts or creating the final Blueprint Factory config.
    - Explain both choices in customer language. CIS Level 1 provides the less complex baseline. CIS Level 2 is the recommended security posture and enables stricter controls, but the generated CIS2 path also requires customer-managed encryption keys for applicable resources.
    - Explain that CIS2 CMEKs add deployment and operational dependencies such as Vault and key provisioning, IAM grants, resource-to-key ordering, key availability, rotation, recovery, and workload configuration. For OKE, CIS2 uses CMEKs for Kubernetes secrets and worker boot volumes, while CIS1 omits those generated OKE CMEK references.
+   - For DR, explain that CIS2 creates Vaults and keys in each region. The complete home stack must already provision the compartments, governance, and extension IAM needed by both regions. Workload key or secret replication is separate from creating these regional encryption resources.
    - Ask the customer to choose explicitly; do not silently select CIS2 merely because it is the Blueprint Factory default. If the customer chooses CIS1, explain that they are accepting a less restrictive posture in exchange for lower deployment and workload-lifecycle complexity.
    - Map the decision to top-level `cis_level: 1` or `cis_level: 2` in Blueprint Factory config mode.
 
-Only after these nine decisions are known may the agent continue with:
+Only after these ten decisions are known may the agent continue with:
 
 - recommending the standard published path versus the Blueprint Factory
 - explaining OKE deployment options such as single-stack, multi-stack, or Blueprint Factory `oke_simple`
