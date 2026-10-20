@@ -100,7 +100,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
 
   // Load the complete generation chunk and boot Jsonnet after the first paint.
   // Generate shares its singleton promise, so an in-flight warm-up also removes
-  // duplicate work without delaying the dashboard or disclaimer.
+  // duplicate work without delaying the dashboard.
   React.useEffect(() => {
     const warm = () => {
       void import('../generator/generate')

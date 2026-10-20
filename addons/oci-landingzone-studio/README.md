@@ -105,7 +105,7 @@ Studio runs entirely in the browser. It does not request OCI credentials, deploy
 
 Use a browser profile controlled by the intended operator, and do not enter secrets into Studio. A downloaded ZIP remains usable if browser storage is unavailable, but the design may not be retained locally. Treat exported files as sensitive deployment artifacts and store them accordingly.
 
-The first visit displays a disclaimer that must be accepted before using the tool. This does not replace your organization's architecture, security, compliance, or deployment approvals.
+Studio displays a UPL license notice at the bottom of the dashboard. Your organization's architecture, security, compliance, and deployment approvals still apply.
 
 &nbsp;
 
