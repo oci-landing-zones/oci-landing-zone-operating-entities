@@ -309,7 +309,8 @@
                     "allow group 'id_lz_common'/'grp-lz-network-admin' to use bastion in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-network-admin' to use bastion-session in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-network-admin' to use vaults in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to read logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-network-admin' to manage network-security-groups in compartment cmp-landingzone"
                 ]
             },
 
@@ -325,7 +326,7 @@
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read audit-events in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read work-requests in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to read instance-agent-plugins in compartment cmp-lz-preprod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use network-security-groups in compartment cmp-lz-preprod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage network-security-groups in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use load-balancers in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use vnics in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to use key-delegate in compartment cmp-lz-preprod-proj1",
@@ -393,7 +394,7 @@
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read audit-events in compartment cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read work-requests in compartment cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to read instance-agent-plugins in compartment cmp-lz-prod-proj1",
-                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use network-security-groups in compartment cmp-lz-prod-proj1",
+                    "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage network-security-groups in compartment cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use load-balancers in compartment cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use vnics in compartment cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to use key-delegate in compartment cmp-lz-prod-proj1",
@@ -462,7 +463,7 @@
                     "allow group 'id_lz_common'/'grp-lz-security-admin' to read app-catalog-listing in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-security-admin' to read instance-images in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-security-admin' to inspect buckets in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
-                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read all-resources in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
+                    "allow group 'id_lz_common'/'grp-lz-security-admin' to read all-resources in compartment cmp-landingzone",
                     "allow group 'id_lz_common'/'grp-lz-security-admin' to manage instance-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))",
                     "allow group 'id_lz_common'/'grp-lz-security-admin' to manage volume-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'VOLUME_BACKUP_DELETE', request.permission != 'VOLUME_DELETE', request.permission != 'BOOT_VOLUME_BACKUP_DELETE'}",
                     "allow group 'id_lz_common'/'grp-lz-security-admin' to manage object-family in compartment cmp-landingzone where all{sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin')), request.permission != 'OBJECT_DELETE', request.permission != 'BUCKET_DELETE'}",
@@ -506,7 +507,8 @@
                 "statements": [
                     "allow group 'id_lz_common'/'grp-security-admin' to manage cloudevents-rules in tenancy",
                     "allow group 'id_lz_common'/'grp-security-admin' to manage cloud-guard-family in tenancy",
-                    "allow group 'id_lz_common'/'grp-security-admin' to read tenancies in tenancy"
+                    "allow group 'id_lz_common'/'grp-security-admin' to read tenancies in tenancy",
+                    "allow group 'id_lz_common'/'grp-security-admin' to use tag-namespaces in tenancy"
                 ]
             },
 
