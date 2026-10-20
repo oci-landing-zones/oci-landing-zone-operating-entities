@@ -122,44 +122,6 @@ Use the examples as readable patterns. Replace region, hub model, environment na
 
 The RPC examples form a Hub A acceptor and Hub B requester pair. Generate and review both sides separately. Deploy the acceptor side first, collect its RPC OCID, replace the requester's `peer_id` placeholder, and then generate or deploy the requester side. Environment names and counts are examples only; the factory derives routing from whatever network-producing environments and platforms each customer config defines. See the [X-RPC Blueprint Factory guide](../oci-x-rpc/runtime/x-rpc-blueprint-factory.md) for the complete role, IAM, routing, and generation contract.
 
-Generate each explicit One-OE DR deployment unit independently:
-
-```bash
-bash gen/generate.sh --config \
-  addons/oci-lz-blueprint-factory/examples/oneoe-dr/home.json \
-  generated/oneoe-dr/home
-
-bash gen/generate.sh --config \
-  addons/oci-lz-blueprint-factory/examples/oneoe-dr/dr.json \
-  generated/oneoe-dr/dr
-```
-
-Deploy `generated/oneoe-dr/home/` and `generated/oneoe-dr/dr/` with different OCI Resource Manager stacks or Terraform states. The home source config declares `stack_scope: "complete"` and explicitly defines the acceptor. The DR source config declares `stack_scope: "regional"` and explicitly defines the requester. The published production DR guidance uses the firewalled Hub A, Hub B, and Hub C models; Hub E remains a supported Blueprint Factory hub but is not advertised for production DR.
-
-Both source configs use the shared `remote_peering_connections` contract and contain their reviewed peer CIDRs and regions. The requester refers to the acceptor by its dependency key or reviewed RPC OCID. No DR-specific RPC schema or RPC-specific replacement file is generated.
-
-```text
-generated/oneoe-dr/
-├── home/
-│   ├── network.json       # final network, including the acceptor
-│   ├── iam.json
-│   ├── governance.json
-│   └── ...
-└── dr/
-    ├── network.json       # final network, including the requester
-    ├── security_cis2_pre.json # regional Vault/key and scanning prerequisites
-    ├── security_cis2.json
-    ├── observability_cis2_pre.json
-    ├── observability_cis2.json
-    └── ...
-```
-
-Apply the home IAM and network configuration and save the compartment output and network output containing the acceptor. Make them available to the DR stack as compartment and network dependencies. Apply the regional security prerequisites before dependent buckets and workloads. Finally, verify the RPC lifecycle state, routes, and firewall policy in both directions. Hub A, Hub B, and Hub C use their complete `network.json` with Orchestrator v2.2.0 resource-key routing.
-
-The home directory contains the complete home-owned output set. The DR directory contains regional network, security, observability, and selected workload-extension files. Environment and shared platforms retain their normal extension placement contracts. CIS2 regional security creates DR-local Vaults and keys. IAM, governance, Cloud Guard, Security Zones, and home-region events stay home-owned; the complete home stack must cover the selected regional platforms and capabilities.
-
-When adding DR to an existing config-generated home region, retain `stack_scope: "complete"`, set `dr_region` to the selected DR region, and add the acceptor entry. Define the requester and required platforms in the new `stack_scope: "regional"` source with its own region metadata. Generate both independently, update home IAM and networking, and replicate the updated compartment and network dependency outputs before deploying the DR stack. Keep home and DR in separate stacks or Terraform states. Workload key or secret replication is separate from creating the regional CIS2 encryption resources.
-
 &nbsp;
 
 ## 4. Generation Workflow
@@ -169,15 +131,6 @@ The factory flow starts with a source configuration and produces a generated fil
 ```bash
 bash gen/generate.sh --config <config_file> [output_dir]
 ```
-
-For a regional DR pair, generate the complete home and regional DR sources independently:
-
-```bash
-bash gen/generate.sh --config <home_config> <home_output_dir>
-bash gen/generate.sh --config <dr_config> <dr_output_dir>
-```
-
-The two config runs publish a complete home package and a regional-only DR package. Each package contains one canonical final network configuration; the acceptor and requester are part of those normal files.
 
 At a high level, the factory:
 

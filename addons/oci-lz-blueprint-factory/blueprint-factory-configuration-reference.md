@@ -137,15 +137,7 @@ This small shape creates the shared landing-zone domains plus the `dev` environm
 
 `security_targets` can contain only names defined under `environments`. Omit it to apply the default targeting to every configured environment.
 
-`stack_scope: 'complete'` owns the normal complete Landing Zone output set, including IAM and governance. `stack_scope: 'regional'` emits network, regional security and observability, and workload-extension files. It supports environment platforms, shared platforms, and registered extensions under their normal placement and network contracts. It omits IAM, governance, Cloud Guard, Security Zones, and home-region events. Cross-tenancy RPCs remain excluded from regional scope.
-
-For regional DR, keep the home and DR sources independent. The complete home config explicitly defines an acceptor under `remote_peering_connections`; the regional DR config explicitly defines the requester. Generate each source independently with `--config`.
-
-Set `dr_region` on the complete home config to the selected DR region. This adds the DR Object Storage service to the home-owned key-use policy; it does not generate a second region automatically. The DR source uses its own paired `region` and `region_short_name`.
-
-The complete home stack must provision the compartments, governance, and extension IAM required by every regional platform, including enabled capabilities and the chosen CIS level. Supply its `compartments_output.json` as a regional dependency. Regional stacks do not recreate those shared resources.
-
-For CIS2, the regional security pre/final files create Vaults and keys in the DR region, including the OKE key used for Kubernetes secrets and worker boot volumes. Apply the regional security prerequisites before dependent workloads. Vault key grant blocks are omitted because IAM stays home-owned. These new regional keys do not replicate existing encryption material or secrets; workload recovery that requires that material needs a separate replication design.
+`stack_scope: 'regional'` emits regional network, security, observability, and workload-extension files, including CIS2 Vaults and keys. Shared IAM and governance remain in the complete stack. See the [One-OE DR guide](../oci-lz-dr/one-oe/README.md) for deployment requirements.
 
 `notification_emails` accepts `default`, `cloudguard`, `iam`, `network`, and `security`. Each supplied value is a non-empty array of email addresses. A topic-specific list replaces `default` for that topic. If neither is supplied, that topic retains the published `email.address@example.com` example subscriber. The `network` topic also receives network events and alarms in ExaCS designs; ExaDB-C@C does not create a network topic.
 
