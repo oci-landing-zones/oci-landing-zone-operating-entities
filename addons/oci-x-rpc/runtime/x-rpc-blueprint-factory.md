@@ -145,8 +145,6 @@ For Hub C, the Blueprint Factory generates the hub network, required subnets, Ne
 
 The generator adds RPC route tables, route distributions, attachments, import statements, and route rules. Firewall policies must separately permit the approved X-RPC traffic.
 
-For Hub A, Hub B, and Hub C, each RPC attachment route table sends `0.0.0.0/0` to the hub VCN attachment so all incoming RPC destinations follow the hub/firewall path.
-
 ## Generated Output
 
 Generation produces the core One-OE configuration files: `governance.json`, `iam.json`, `network.json`, the selected `security_cis1.json` or `security_cis2.json`, and the corresponding `observability_cis1.json` or `observability_cis2.json`.
