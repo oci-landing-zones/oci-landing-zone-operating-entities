@@ -3,6 +3,7 @@
     "region"                    : "eu-frankfurt-1",
     "region_short_name"         : "fra",
     "cis_level"                 : 2,
+    "dr_region"                 : "eu-amsterdam-1",
     "stack_scope"               : "complete",
 
     "hub": {

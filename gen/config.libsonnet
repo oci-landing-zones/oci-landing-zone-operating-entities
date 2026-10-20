@@ -181,6 +181,16 @@ local validation = import 'lib/validation.libsonnet';
     local region_short_name =
       if has_region_short_name then config.region_short_name
       else 'fra';
+    local dr_region = optional_non_empty_string(config, 'dr_region', 'config.dr_region');
+    assert dr_region == null || (
+      std.length(std.split(dr_region, '-')) >= 3 &&
+      collections.all([
+        std.member('abcdefghijklmnopqrstuvwxyz0123456789-', character)
+        for character in std.stringChars(dr_region)
+      ])
+    ) : 'config.dr_region must be an OCI region identifier';
+    assert dr_region == null || dr_region != region :
+           'config.dr_region must differ from config.region';
     local realm =
       if std.objectHas(config, 'realm') && config.realm != null then config.realm
       else 'oc1';
@@ -414,17 +424,6 @@ local validation = import 'lib/validation.libsonnet';
       [p_name]: norm_platform(config.shared_platforms[p_name], p_name)
       for p_name in std.objectFields(config.shared_platforms)
     } else {};
-    local regional_platform_envs = [
-      env_name
-      for env_name in std.objectFields(norm_envs)
-      if std.objectHas(norm_envs[env_name], 'platforms') &&
-         std.length(std.objectFields(norm_envs[env_name].platforms)) > 0
-    ];
-    assert stack_scope != 'regional' || std.length(regional_platform_envs) == 0 :
-           'config.stack_scope regional does not support platforms or extensions until their complete-stack prerequisites can be projected: %s' %
-           regional_platform_envs[0];
-    assert stack_scope != 'regional' || std.length(std.objectFields(norm_shared)) == 0 :
-           'config.stack_scope regional does not support shared_platforms until their complete-stack prerequisites can be projected';
     local env_vcn_entries = std.flattenArrays([
       local env = norm_envs[env_name];
       (if std.objectHas(env, 'project_network') then [
@@ -481,6 +480,7 @@ local validation = import 'lib/validation.libsonnet';
       realm: realm,
       cis_level: cis_level,
       stack_scope: stack_scope,
+      dr_region: dr_region,
       [if notification_emails != null then 'notification_emails']: notification_emails,
       hub+: {
         network+: { subnets: hub_subnets },

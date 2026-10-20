@@ -141,25 +141,24 @@ Both source configs use the shared `remote_peering_connections` contract and con
 ```text
 generated/oneoe-dr/
 ├── home/
-│   ├── network_pre.json   # staged hubs only
 │   ├── network.json       # final network, including the acceptor
 │   ├── iam.json
 │   ├── governance.json
 │   └── ...
 └── dr/
-    ├── network_pre.json   # staged hubs only
     ├── network.json       # final network, including the requester
-    ├── security_cis2.json # regional VSS only for this CIS2 example
+    ├── security_cis2_pre.json # regional Vault/key and scanning prerequisites
+    ├── security_cis2.json
     ├── observability_cis2_pre.json
     ├── observability_cis2.json
     └── ...
 ```
 
-Apply the home stack through its required network stages and save the network output containing the acceptor. Make that output available to the DR stack as `network_dependency`, then apply the DR stack through its required stages. Finally, verify the RPC lifecycle state, routes, and firewall policy in both directions. Hub A, Hub B, and Hub C still use the ordinary `network_pre.json` staging step before their final `network.json`; RPC does not introduce another staging filename.
+Apply the home IAM and network configuration and save the compartment output and network output containing the acceptor. Make them available to the DR stack as compartment and network dependencies. Apply the regional security prerequisites before dependent buckets and workloads. Finally, verify the RPC lifecycle state, routes, and firewall policy in both directions. Hub A, Hub B, and Hub C use their complete `network.json` with Orchestrator v2.2.0 resource-key routing.
 
-The home directory contains the complete home-owned output set. The DR directory is deliberately projected to regional network, VSS, and observability outputs. It omits IAM, governance, Cloud Guard, Security Zones, primary Vault resources, platforms, and workload extensions so those home-owned resources and their prerequisites cannot be claimed by the DR state.
+The home directory contains the complete home-owned output set. The DR directory contains regional network, security, observability, and selected workload-extension files. Environment and shared platforms retain their normal extension placement contracts. CIS2 regional security creates DR-local Vaults and keys. IAM, governance, Cloud Guard, Security Zones, and home-region events stay home-owned; the complete home stack must cover the selected regional platforms and capabilities.
 
-When adding DR to an existing config-generated home region, retain `stack_scope: "complete"` and add the acceptor entry. Define the requester in the new `stack_scope: "regional"` source. Generate both independently, update the existing home stack, and replicate its updated network dependency output before deploying the DR stack. Keep home and DR in separate stacks or Terraform states. For CIS2, treat the replicated Vault/key and required regional service permissions as separately reviewed prerequisites.
+When adding DR to an existing config-generated home region, retain `stack_scope: "complete"`, set `dr_region` to the selected DR region, and add the acceptor entry. Define the requester and required platforms in the new `stack_scope: "regional"` source with its own region metadata. Generate both independently, update home IAM and networking, and replicate the updated compartment and network dependency outputs before deploying the DR stack. Keep home and DR in separate stacks or Terraform states. Workload key or secret replication is separate from creating the regional CIS2 encryption resources.
 
 &nbsp;
 

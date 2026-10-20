@@ -1,11 +1,12 @@
 // DR-only regional services retain their operational and security behavior.
 // contains: "vulnerability_scanning_is_strict_and_linked": true
 // contains: "observability_is_regional_and_encrypted": true
+// contains: "regional_vault_and_bucket_key_are_linked": true
 local observability =
   import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis2.jsonnet';
 local observability_pre =
   import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_observability_cis2_pre.jsonnet';
-local security = import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_security.jsonnet';
+local security = import 'gen/addons/oci-lz-dr/one-oe/runtime/oneoe_bcdr_security_cis2.jsonnet';
 
 local scanning = security.scanning_configuration;
 local recipes = std.objectFields(scanning.host_recipes);
@@ -17,6 +18,14 @@ local alarms = std.objectValues(observability.alarms_configuration.alarms);
 local topic_keys = std.objectFields(observability.notifications_configuration.topics);
 
 {
+  regional_vault_and_bucket_key_are_linked:
+    std.objectHas(security.vaults_configuration.keys, buckets[0].kms_key_id) &&
+    std.objectHas(
+      security.vaults_configuration.vaults,
+      security.vaults_configuration.keys[buckets[0].kms_key_id].vault_key
+    ) &&
+    !std.objectHas(security, 'cloud_guard_configuration') &&
+    !std.objectHas(security, 'security_zones_configuration'),
   vulnerability_scanning_is_strict_and_linked:
     std.length(recipes) == 1 &&
     std.length(targets) == 1 &&

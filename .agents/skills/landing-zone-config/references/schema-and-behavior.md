@@ -35,6 +35,7 @@ Required by `gen/config.libsonnet`:
 Optional but important:
 
 - `stack_scope`, defaulting to `complete`; supported values are `complete` and `regional`
+- `dr_region`, optional and distinct from `region`; adds the selected DR Object Storage principal to complete home IAM
 - `region`, defaulting to `eu-frankfurt-1`
 - `region_short_name`, defaulting to `fra`
 - `realm`, defaulting to `oc1` (including when explicitly `null`); supported values are `oc1` and `oc19`
@@ -185,11 +186,7 @@ See `gen/addons/oci-x-rpc/AGENTS.md` for role mapping, routing behavior, and dep
 
 ## Output Model
 
-`gen/landing_zone_multi.jsonnet` always emits:
-
-- `network.json`
-- `iam.json`
-- `governance.json`
+`gen/landing_zone_multi.jsonnet` always emits `network.json`. Complete scope also emits `iam.json` and `governance.json`. Regional scope supports platforms and registered extensions while relying on the complete home stack for matching compartments, governance, and IAM. Regional CIS2 security files create DR-local Vaults and keys and omit grant blocks that would create IAM policies. Cloud Guard, Security Zones, and home-region events remain home-owned.
 
 For the selected `cis_level`, it also emits one security and one observability pair. Omitted `cis_level` defaults to level 2:
 

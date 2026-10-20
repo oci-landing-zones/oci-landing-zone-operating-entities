@@ -18,6 +18,7 @@ local expected_regional = [
   'observability_cis2.json',
   'observability_cis2_pre.json',
   'security_cis2.json',
+  'security_cis2_pre.json',
 ];
 
 {
@@ -27,7 +28,7 @@ local expected_regional = [
     std.sort(std.objectFields(regional)) == std.sort(expected_regional) &&
     !std.objectHas(regional['security_cis2.json'], 'cloud_guard_configuration') &&
     !std.objectHas(regional['security_cis2.json'], 'security_zones_configuration') &&
-    !std.objectHas(regional['security_cis2.json'], 'vaults_configuration') &&
+    std.objectHas(regional['security_cis2.json'], 'vaults_configuration') &&
     !std.objectHas(
       regional['observability_cis2.json'],
       'home_region_events_configuration'

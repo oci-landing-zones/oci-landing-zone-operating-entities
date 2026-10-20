@@ -209,6 +209,7 @@ A landing zone config is a Jsonnet object passed to `landing_zone.libsonnet`:
   realm: 'oc1' | 'oc19',                // optional, defaults to 'oc1'
   cis_level: 1 | 2,                     // optional, defaults to 2; config-mode emits only this CIS level
   stack_scope: 'complete' | 'regional', // optional, defaults to complete
+  dr_region: 'eu-amsterdam-1',         // optional: DR Object Storage principal in home IAM
   security_targets: ['prod'],          // optional, defaults to all environments in config mode
   hub: {
     kind: 'hub_a' | 'hub_b' | 'hub_c' | 'hub_e',
@@ -398,9 +399,11 @@ Keep extension-specific placement and parameter semantics in the extension's own
 Walks all `.jsonnet` entry points under `gen/`, evaluates each one, and writes formatted JSON output to the repo root (mirroring the directory structure). Generic entry points may import `defaults.libsonnet` for reusable baselines, while published entry points import their local `profiles.libsonnet`. Published entry points either call `landing_zone.libsonnet` directly or select a single result field from a local profile output builder.
 
 **Config mode** (`bash gen/generate.sh --config my_config.libsonnet [output_dir]`):
-Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json`, `iam.json`, `governance.json`, and only the selected CIS security/observability files for every config. `cis_level` defaults to `2`, so omitted `cis_level` emits `security_cis2*.json` and `observability_cis2*.json`; `cis_level: 1` emits the CIS1 pairs instead. Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs.
+Evaluates `landing_zone_multi.jsonnet` with a user-supplied config file. Produces `network.json` and the selected CIS security/observability pairs. Complete scope also emits `iam.json` and `governance.json`. `cis_level` defaults to `2`, so omitted `cis_level` emits `security_cis2*.json` and `observability_cis2*.json`; `cis_level: 1` emits the CIS1 pairs instead. Hub C may also emit `network_backends.json`, and extensions may emit additional extra-derived outputs in either scope.
 
-Regional DR uses ordinary config mode twice. The complete home source explicitly defines the X-RPC acceptor. The regional DR source explicitly defines the requester and uses `stack_scope: 'regional'`. Generate each source independently into a different output directory and deploy it with a separate stack or state. Regional scope emits only regional network, VSS, and observability outputs. IAM, governance, Cloud Guard, Security Zones, primary Vault resources, platforms, shared platforms, workload extensions, and cross-tenancy RPCs remain excluded.
+Regional DR uses ordinary config mode twice. The complete home source defines the X-RPC acceptor and `dr_region` for the DR Object Storage key-use grant. The regional DR source defines the requester and uses `stack_scope: 'regional'`. Generate each source independently into a different output directory and deploy it with a separate stack or state. Regional scope supports platforms and registered extensions and retains their extra outputs and regional security contributions. CIS2 security pre/final files create DR-local Vaults and keys; Vault grant blocks are removed because their downstream module creates home-region IAM policies. The complete home stack owns all matching compartment, governance, and extension IAM prerequisites. IAM, governance, Cloud Guard, Security Zones, home-region events, and cross-tenancy RPCs remain excluded from regional output.
+
+Regional base observability filtering belongs in `builders/observability.libsonnet` before extension contributions are merged, so extension-owned alarms, topics, and other observability resources are retained. `landing_zone_multi.jsonnet` owns scope-aware output selection and removes home-owned security fields after extension security contributions are merged.
 
 For customer-use artifact placement and deployment defaults, follow root `AGENTS.md`. This generator guide defines emitted files and generator behavior only.
 

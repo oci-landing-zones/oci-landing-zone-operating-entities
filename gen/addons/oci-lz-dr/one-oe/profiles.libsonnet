@@ -1,6 +1,7 @@
 local home_base = {
   region: 'eu-frankfurt-1',
   region_short_name: 'fra',
+  dr_region: 'eu-amsterdam-1',
   realm: 'oc1',
   cis_level: 2,
   stack_scope: 'complete',

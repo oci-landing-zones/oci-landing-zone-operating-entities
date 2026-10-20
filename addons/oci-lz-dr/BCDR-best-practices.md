@@ -63,7 +63,7 @@ The **home region** is especially important because IAM and tenancy-wide governa
 | **Limits, quotas, and capacity reservations** | Regional or tenancy-scoped, depending on the service | Tenancy administrator and service owner | Must be reviewed before failover so the DR region has enough capacity for recovery operations. |
 | **Terraform state or OCI Resource Manager stacks** | Regional deployment unit | Platform operations | Keep separate state or stacks per region so each DR region can be planned, applied, and recovered independently. |
 
-For CIS Level 2 Vault replication, the home-owned IAM policy must authorize the Vault service to manage the replicated vault. Prefer a reviewed compartment-scoped statement for the security compartment rather than a tenancy-wide grant, and verify that the selected vault reports `isVaultReplicable` before creating the replica.
+CIS Level 2 regional generation creates DR-local Vaults and keys. Set `dr_region` on the complete home config for the DR Object Storage key-use grant. Workload recovery that requires existing encryption material or secrets needs a separate replication design. If Vault replication is selected for that purpose, authorize it through a reviewed home-owned IAM policy and verify `isVaultReplicable` before creating the replica.
 
 &nbsp;
 

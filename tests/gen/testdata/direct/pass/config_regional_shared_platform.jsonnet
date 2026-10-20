@@ -1,5 +1,6 @@
-// regional stacks reject shared platforms whose tenancy-wide prerequisites are not projected
-// error_contains: config.stack_scope regional does not support shared_platforms
+// regional stacks normalize shared network platforms
+// contains: "stack_scope": "regional"
+// contains: "shared_platforms": {
 local config = import 'gen/config.libsonnet';
 
 config.normalize({

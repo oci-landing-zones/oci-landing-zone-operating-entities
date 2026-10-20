@@ -36,7 +36,7 @@ For a One-OE cross-region DR extension, the deployment scope is limited to:
 - **Network**: regional VCN, DRG, routing, gateways, subnets, and other network resources required by the selected DR pattern.
 - **Inter-region connectivity**: Remote Peering Connection (RPC) resources and the associated DRG attachments and routes. Blueprint Factory composes these resources into each region's canonical `network.json` by using the shared RPC model. Follow [Deploy inter-region RPC within the same tenancy](#42-deploy-inter-region-rpc-within-the-same-tenancy). Use the [OCI Remote Peering Connections add-on](../../oci-x-rpc/README.md) for complete same-tenancy and cross-tenancy guidance.
 - **Observability**: regional events, alarms, logs, topics, subscriptions, and monitoring resources required to operate and validate the DR environment.
-- **Regional security**: the Vulnerability Scanning Service (VSS) configuration is deployed by this add-on. Tenancy-wide security and governance resources, such as Cloud Guard and Security Zones, remain managed by the One-OE blueprint from the home region and are not redeployed in the DR region.
+- **Regional security**: this add-on deploys Vulnerability Scanning Service (VSS) recipes and targets, plus DR-local Vaults and keys for CIS2. IAM, governance, Cloud Guard, and Security Zones remain home-owned.
 
 ## 4. Deployment model
 
@@ -59,20 +59,20 @@ This is a multi-stack deployment. First, deploy or update the One-OE home stack 
 
 Before deploying, ensure that the DR configuration uses the same hub model as the home-region One-OE deployment, and select the CIS level required by the DR design.
 
-Use the [OCI LZ Blueprint Factory](../../oci-lz-blueprint-factory/README.md) to generate the two source configs independently. The home source declares `stack_scope: "complete"` and an X-RPC acceptor; the DR source declares `stack_scope: "regional"` and the corresponding requester. Each config explicitly lists its reviewed remote CIDRs and peer region.
+Use the [OCI LZ Blueprint Factory](../../oci-lz-blueprint-factory/README.md) to generate the two source configs independently. Collect the home and DR regions explicitly. The home source declares `stack_scope: "complete"`, sets `dr_region` to authorize the DR Object Storage service, and owns the X-RPC acceptor. The DR source declares `stack_scope: "regional"`, its own region metadata, and the corresponding requester. Each config explicitly lists its reviewed remote CIDRs and peer region.
 
 The [`runtime`](./runtime/) directory contains the published Frankfurt/Amsterdam regional reference artifacts. Generate the canonical two-region working set from the reviewed pair of source configs; do not mix generated files with these published snapshots.
 
 For cross-region DR, manage each target region as an independent deployment unit. Use a distinct OCI Resource Manager stack or Terraform state/workspace per region so that regional network and observability resources can be planned, applied, and operated independently.
 
-The complete-scope home directory contains the normal complete Blueprint Factory output set, with the acceptor in its canonical network files. The regional-scope DR directory contains only regional network, VSS, and observability outputs, with the requester in its canonical network files. Regional scope rejects platforms and workload extensions until their complete-stack prerequisites can be projected safely. Hub A, Hub B, and Hub C each deploy complete networking from `network.json` using Orchestrator v2.2.0 resource-key routing. Hub C also emits `network_backends.json` for designs with third-party firewall backends.
+The complete-scope home directory contains the normal complete Blueprint Factory output set, with the acceptor in its canonical network files. The regional-scope DR directory contains regional network, security, observability, and selected workload-extension files, with the requester in its canonical network files. Platforms and registered extensions follow their normal placement contracts. The complete home stack must provision every required compartment, governance resource, and extension IAM policy before regional deployment. Hub A, Hub B, and Hub C each deploy complete networking from `network.json` using Orchestrator v2.2.0 resource-key routing. Hub C also emits `network_backends.json` for designs with third-party firewall backends.
 
-IAM compartments, identity resources, tenancy-wide governance, Cloud Guard, Security Zones, and the primary Vault remain home-owned and are omitted from the generated DR directory.
+IAM compartments, identity resources, tenancy-wide governance, Cloud Guard, and Security Zones remain home-owned and are omitted from the generated DR directory. CIS2 regional security files deploy Vaults and keys in the DR region, including selected extension keys.
 
 The [runtime catalog](./runtime/README.md) lists the published regional reference files and their deployment phases.
 
 > [!IMPORTANT]
-> **CIS Level 2 — Manual post-deployment configuration required:** the regional config cannot modify the home-owned Vault, key policy, or IAM. Before creating the DR bucket, replicate the Vault/key and configure the reviewed permissions required by the DR-region Object Storage service. Verify `isVaultReplicable` and ensure a reviewed home-owned IAM policy allows the Vault service to manage vaults in the security compartment, for example `Allow service keymanagementservice to manage vaults in compartment cmp-landingzone:cmp-lz-security`. Keep this least-privilege compartment scope unless the tenancy's reviewed policy standard requires a broader scope. See [Replicating Vaults and Keys](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/replicatingvaults.htm).
+> **CIS Level 2:** deploy the generated regional security prerequisites before dependent buckets and workloads. The regional stack creates its own Vaults and keys; it does not create IAM policies from Vault key grant blocks. The complete home config must include `dr_region` and the IAM required by all selected regional extensions. Fresh regional keys do not replicate existing encryption material or secrets. Workloads that require original key material need a separate, reviewed [Vault and key replication](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/replicatingvaults.htm) design.
 
 <img src="../images/orm_deployment_dr_region.png" width="700" alt="OCI Resource Manager BCDR stack in Amsterdam using an Object Storage bucket for replicated One-OE dependency files">
 
@@ -80,11 +80,11 @@ The [runtime catalog](./runtime/README.md) lists the published regional referenc
 
 The DR-region BCDR stack reads the replicated One-OE output dependency files from Object Storage and does not save a new output file.
 
-Copy the acceptor-bearing `network_output.json` and, for CIS2, exactly one `keys_output.json` from the home stack to the DR dependency bucket. Include those objects in `url_dependency_source_oci_objects`. The orchestrator's `rms-facade` derives its dependencies from their top-level blocks. Do not provide duplicate dependency documents containing the same top-level block.
+Copy the home `compartments_output.json` and acceptor-bearing `network_output.json` to the DR dependency bucket. Include those objects in `url_dependency_source_oci_objects`. CIS2 uses the keys created by the regional security configuration. The orchestrator's `rms-facade` derives its dependencies from their top-level blocks. Do not provide duplicate dependency documents containing the same top-level block.
 
 When deploying the published Frankfurt/Amsterdam preset with ORM, follow these steps:
 
-1. Update the home stack with the matching complete `oneoe_bcdr_home_network_hub_*.json` file so it creates the RPC acceptor, then save its `network_output.json`.
+1. Update the home stack with `oneoe_bcdr_home_iam.json` and the matching complete `oneoe_bcdr_home_network_hub_*.json` file so it authorizes DR Object Storage and creates the RPC acceptor. Save its compartment and network dependency outputs.
 2. Replicate the required One-OE output dependency files from a home-region Object Storage bucket to a DR-region bucket. This is separate from the replication described in [Configure Service Connector bucket replication](#413-configure-service-connector-bucket-replication).
 3. Stage the reviewed generated DR files in a customer-controlled private Object Storage bucket or approved private Git source, then create the DR stack in `eu-amsterdam-1` (Netherlands Northwest, Amsterdam).
 4. Use the pinned [Orchestrator v2.2.0](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/tree/v2.2.0) source and set the working directory to `rms-facade`.
@@ -103,9 +103,9 @@ Hub A and Hub B deploy their matching complete home or DR network file in one ne
 
 Hub C follows the same complete-network process. Use `oneoe_bcdr_network_hub_c.json` for the standard design, or `oneoe_bcdr_network_hub_c_backends.json` when the design uses third-party firewall backend resources. Replace the example backend IP addresses and private-IP OCIDs with the reviewed firewall endpoints before deploying the backend variant.
 
-`oneoe_bcdr_security.json` deploys [Vulnerability Scanning Service (VSS)](https://docs.oracle.com/en-us/iaas/Content/scanning/using/overview.htm) recipes and targets in the DR region. It is included in the initial BCDR stack and does not need a staged replacement.
+Select `oneoe_bcdr_security_cis1.json` for regional [Vulnerability Scanning Service (VSS)](https://docs.oracle.com/en-us/iaas/Content/scanning/using/overview.htm) recipes and targets, or `oneoe_bcdr_security_cis2.json` to also deploy the regional Vault and bucket encryption key. Include the selected file in the initial BCDR stack; these published security files do not need a staged replacement. Config-generated extension deployments also emit security pre/final files so prerequisites can be applied before workloads.
 
-Security Zones are not redeployed in the DR region. The One-OE blueprint already associates the shared tenancy-wide compartment hierarchy with its Security Zones; OCI does not allow a compartment to belong to multiple Security Zones. Cloud Guard remains managed by the home-region blueprint. Vaults are regional: for CIS Level 2, manually replicate the Vault and its encryption key to the DR region before deployment, as noted in the deployment table. This add-on does not create that replica.
+Security Zones are not redeployed in the DR region. The One-OE blueprint already associates the shared tenancy-wide compartment hierarchy with its Security Zones; OCI does not allow a compartment to belong to multiple Security Zones. Cloud Guard remains managed by the home-region blueprint. Vaults and encryption keys are regional resources and are created in the DR stack for CIS2.
 
 #### 4.1.2. Complete staged observability
 
@@ -133,7 +133,7 @@ is required.
 4. Apply the DR stack with its complete network file; its requester resolves the peer from the home dependency.
 5. Verify that the RPC is connected, advertised routes are limited to the reviewed CIDRs, and the firewall policy allows only required protocols and ports.
 
-When adding DR to an existing config-generated home stack, retain `stack_scope: "complete"` and add the explicit acceptor. Define the requester in the independent `stack_scope: "regional"` DR source. Generate each config with `--config` and update the existing home stack with its canonical network files. Replicate the updated dependency output before deploying the DR stack. For CIS2, complete the separately reviewed Vault/key replication and regional service permissions. Do not combine the two regions in one Terraform state.
+When adding DR to an existing config-generated home stack, retain `stack_scope: "complete"`, set `dr_region`, and add the explicit acceptor. Ensure the complete home config covers every regional platform's compartment, governance, and extension IAM requirements. Define the requester and selected extensions in the independent `stack_scope: "regional"` DR source. Generate both configs and update the home IAM and network before deploying the DR stack. Replicate the updated compartment and network dependency outputs. CIS2 regional security creates the DR Vaults and keys. Do not combine the two regions in one Terraform state.
 
 ## License
 

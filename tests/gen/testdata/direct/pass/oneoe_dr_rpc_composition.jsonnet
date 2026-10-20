@@ -32,7 +32,7 @@ local dr_rpcs = rpc_entries(dr['network.json']);
     std.objectHas(home, 'governance.json') &&
     !std.objectHas(dr, 'iam.json') &&
     !std.objectHas(dr, 'governance.json') &&
-    !std.objectHas(dr['security_cis2.json'], 'vaults_configuration') &&
+    std.objectHas(dr['security_cis2.json'], 'vaults_configuration') &&
     !std.objectHas(dr['security_cis2.json'], 'security_zones_configuration'),
   explicit_rpc_roles:
     std.length(home_rpcs) == 1 &&

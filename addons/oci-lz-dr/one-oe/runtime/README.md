@@ -12,6 +12,7 @@ The committed home network files contain the Frankfurt acceptor and the matching
 
 | JSON file | Purpose | Deployment use |
 |---|---|---|
+| `oneoe_bcdr_home_iam.json` | Complete home IAM with the Amsterdam Object Storage key-use grant. | Update home IAM before deploying DR. |
 | `oneoe_bcdr_home_network_hub_a.json` | Complete FRA Hub A network with the RPC acceptor. | Apply to the home stack before deploying DR. |
 | `oneoe_bcdr_home_network_hub_b.json` | Complete FRA Hub B network with the RPC acceptor. | Apply to the home stack before deploying DR. |
 | `oneoe_bcdr_home_network_hub_c.json` | Complete FRA Hub C network with the RPC acceptor. | Apply to the home stack for the standard design. |
@@ -24,4 +25,5 @@ The committed home network files contain the Frankfurt acceptor and the matching
 | `oneoe_bcdr_observability_cis1.json` | Final CIS Level 1 AMS observability configuration, including flow logs. | Replaces `oneoe_bcdr_observability_cis1_pre.json` after final network configuration. |
 | `oneoe_bcdr_observability_cis2_pre.json` | Initial CIS Level 2 AMS observability configuration. | Use during initial deployment before final hub networking. |
 | `oneoe_bcdr_observability_cis2.json` | Final CIS Level 2 AMS observability configuration, including flow logs. | Replaces `oneoe_bcdr_observability_cis2_pre.json` after final network configuration. |
-| `oneoe_bcdr_security.json` | Regional AMS Vulnerability Scanning Service (VSS) recipes and targets. | Include in the initial BCDR stack; it has no staged replacement. |
+| `oneoe_bcdr_security_cis1.json` | Regional AMS VSS recipes and targets for CIS1. | Include in the initial CIS1 BCDR stack. |
+| `oneoe_bcdr_security_cis2.json` | Regional AMS VSS, Vault, and bucket encryption key for CIS2. | Include in the initial CIS2 BCDR stack before dependent resources. |

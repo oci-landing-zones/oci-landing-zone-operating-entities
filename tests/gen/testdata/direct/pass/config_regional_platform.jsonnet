@@ -1,5 +1,6 @@
-// regional stacks reject extensions whose tenancy-wide prerequisites are not projected
-// error_contains: config.stack_scope regional does not support platforms or extensions
+// regional stacks normalize environment platform extensions
+// contains: "stack_scope": "regional"
+// contains: "type": "oke_simple"
 local config = import 'gen/config.libsonnet';
 
 config.normalize({

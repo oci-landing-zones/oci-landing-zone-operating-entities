@@ -36,7 +36,10 @@ function(ctx)
 
   // Service policy: realm-aware FSS and Object Storage service identifiers.
   local fss_service = ctx.realm_constants.service_identifiers.fss;
-  local obj_service = ctx.realm_constants.service_identifiers.objectstorage(config.region);
+  local key_services = ['blockstorage', 'oke', 'streaming', fss_service] + [
+    ctx.realm_constants.service_identifiers.objectstorage(region)
+    for region in [config.region] + (if config.dr_region != null then [config.dr_region] else [])
+  ];
   local usage_report_tenancy_ocid =
     if std.objectHas(ctx.realm_constants, 'usage_report_tenancy_ocid') then
       ctx.realm_constants.usage_report_tenancy_ocid
@@ -249,7 +252,7 @@ function(ctx)
           'allow service vulnerability-scanning-service to read vnics in tenancy',
           'allow service vulnerability-scanning-service to read vnic-attachments in tenancy',
           'allow service osmh to read instances in tenancy',
-          'allow service blockstorage, oke, streaming, %s, %s to use keys in tenancy' % [fss_service, obj_service],
+          'allow service %s to use keys in tenancy' % std.join(', ', key_services),
         ],
       },
     },
