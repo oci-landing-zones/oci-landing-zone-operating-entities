@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
-  createLZ, defaultLzName, deleteLZ, duplicateLZ, getLZ, listLZs, renameLZ, saveLZ, saveOutputs,
+  createLZ, defaultLzName, deleteLZ, duplicateLZ, getLZ, listLZs, renameLZ, saveLZ, saveOutputs, saveDisasterRecoveryLZ, getOutputs,
 } from './lzStore';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
+import { createDrDraft } from './disasterRecoveryDesign';
+import { drDesignFingerprint, isCurrentDrOutputSet } from './disasterRecoverySavedDesign';
 
 function memoryStorage() {
   const map = new Map<string, string>();
@@ -26,6 +28,65 @@ beforeEach(() => {
 });
 
 describe('lzStore', () => {
+  it('saves a separate Home + DR + RPC design without changing its Home source', () => {
+    const home = createSaved('Home source');
+    const draft = { ...createDrDraft(home.model), region: 'eu-amsterdam-1', rpcEnabled: true };
+    const saved = saveDisasterRecoveryLZ({ name: 'Home source · Home + DR + RPC', model: home.model, draft, sourceLabel: 'Saved Landing Zone' });
+    expect(saved.ok).toBe(true);
+    expect(saved.record?.id).not.toBe(home.id);
+    expect(getLZ(saved.record!.id)?.disasterRecovery).toEqual({ draft, sourceLabel: 'Saved Landing Zone' });
+    expect(getLZ(home.id)?.disasterRecovery).toBeUndefined();
+    expect(listLZs()).toHaveLength(2);
+  });
+
+  it('updates and duplicates a combined design without losing DR selections or outputs', () => {
+    const model = emptyLzModel();
+    const draft = { ...createDrDraft(model), region: 'eu-amsterdam-1', rpcEnabled: true };
+    const created = saveDisasterRecoveryLZ({ name: 'Combined', model, draft, sourceLabel: 'Imported config.jsonnet' }).record!;
+    const changed = { ...draft, rpcEnabled: false, region: 'af-johannesburg-1' };
+    expect(saveDisasterRecoveryLZ({ id: created.id, name: created.name, model, draft: changed, sourceLabel: 'Imported config.jsonnet' }).ok).toBe(true);
+    expect(listLZs()).toHaveLength(1);
+    expect(getLZ(created.id)?.disasterRecovery?.draft).toEqual(changed);
+    saveOutputs(created.id, { config: 'snapshot', files: { 'DR/network.json': '{}' } });
+    const copy = duplicateLZ(created.id).record!;
+    expect(copy.disasterRecovery?.draft).toEqual(changed);
+    expect(getOutputs(copy.id)?.files).toEqual({ 'DR/network.json': '{}' });
+  });
+
+  it('rolls back a DR update when the dashboard index cannot be written', () => {
+    const model = emptyLzModel();
+    const draft = createDrDraft(model);
+    const created = saveDisasterRecoveryLZ({ name: 'Combined', model, draft, sourceLabel: 'Saved Landing Zone' }).record!;
+    const previous = getLZ(created.id);
+    const storage = window.localStorage;
+    const write = storage.setItem.bind(storage);
+    storage.setItem = (key, value) => { if (key === 'lzng.lz.index') throw new Error('quota'); write(key, value); };
+    expect(saveDisasterRecoveryLZ({ id: created.id, name: 'Changed', model, draft: { ...draft, rpcEnabled: true }, sourceLabel: 'Saved Landing Zone' }).ok).toBe(false);
+    expect(getLZ(created.id)).toEqual(previous);
+    expect(listLZs()[0].name).toBe('Combined');
+  });
+
+  it('retains regional artifacts across reopen and marks them stale after a DR change', () => {
+    const model = emptyLzModel();
+    const draft = { ...createDrDraft(model), region: 'eu-amsterdam-1', rpcEnabled: true };
+    const created = saveDisasterRecoveryLZ({ name: 'Combined', model, draft, sourceLabel: 'Saved Landing Zone' }).record!;
+    const files = { 'Home/config.jsonnet': '{}', 'Home/network.json': '{}', 'DR/config.jsonnet': '{}', 'DR/network.json': '{}', 'Home-original/config.jsonnet': '{}' };
+    expect(saveOutputs(created.id, { config: drDesignFingerprint(model, draft), files }).ok).toBe(true);
+    expect(isCurrentDrOutputSet(getLZ(created.id)!, getOutputs(created.id)!)).toBe(true);
+    expect(getOutputs(created.id)?.files).toEqual(files);
+    saveDisasterRecoveryLZ({ id: created.id, name: 'Combined', model, draft: { ...draft, rpcEnabled: false }, sourceLabel: 'Saved Landing Zone' });
+    expect(isCurrentDrOutputSet(getLZ(created.id)!, getOutputs(created.id)!)).toBe(false);
+  });
+  it('retains descriptions when saving, reopening and duplicating a design', () => {
+    const saved = createSaved('Description test');
+    saved.model.foundation.description = 'Finance production\nPrivate workloads';
+    expect(saveLZ(saved.id, saved.model).ok).toBe(true);
+    expect(getLZ(saved.id)?.model.foundation.description).toBe('Finance production\nPrivate workloads');
+    const copied = duplicateLZ(saved.id);
+    expect(copied.ok).toBe(true);
+    const duplicate = listLZs().find((record) => record.id !== saved.id)!;
+    expect(getLZ(duplicate.id)?.model.foundation.description).toBe('Finance production\nPrivate workloads');
+  });
   it('creates browser-local date names from an injected clock', () => {
     const clock = new Date(2026, 7, 3, 9, 7, 42);
     const created = createLZ(undefined, emptyLzModel(), clock);

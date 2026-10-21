@@ -18,6 +18,7 @@
 import { gzipSync, gunzipSync, strFromU8, strToU8 } from 'fflate';
 import type { LzModel } from '../model/types';
 import { emptyLzModel, normalizeModel } from '../model/defaults';
+import type { DrDesignDraft } from './disasterRecoveryDesign';
 
 // Keep this namespace stable across the product rename so saved browser designs
 // remain available without introducing a pre-release migration solely for branding.
@@ -34,6 +35,7 @@ export interface LzMeta {
 
 export interface LzRecord extends LzMeta {
   model: LzModel;
+  disasterRecovery?: { draft: DrDesignDraft; sourceLabel: string };
 }
 
 export interface StoreResult {
@@ -148,6 +150,27 @@ export function saveLZ(id: string, model: LzModel): StoreResult {
   return indexed;
 }
 
+/** Store a combined design separately from its original Home source. */
+export function saveDisasterRecoveryLZ(input: { id?: string; name: string; model: LzModel; draft: DrDesignDraft; sourceLabel: string }): CreateLzResult {
+  const existing = input.id ? getLZ(input.id) : null;
+  if (input.id && !existing) return { ok: false, message: 'This Landing Zone is no longer available in browser storage.' };
+  const ts = now();
+  const record: LzRecord = {
+    id: existing?.id ?? newId(), name: input.name.trim(), createdAt: existing?.createdAt ?? ts, updatedAt: ts,
+    model: input.model, disasterRecovery: { draft: input.draft, sourceLabel: input.sourceLabel },
+  };
+  if (!record.name) return { ok: false, message: 'Landing Zone name cannot be empty.' };
+  try { window.localStorage.setItem(recordKey(record.id), JSON.stringify(record)); }
+  catch { return { ok: false, message: STORAGE_FAILURE }; }
+  const indexed = upsertMeta({ id: record.id, name: record.name, createdAt: record.createdAt, updatedAt: record.updatedAt });
+  if (indexed.ok) return { ok: true, record };
+  try {
+    if (existing) window.localStorage.setItem(recordKey(record.id), JSON.stringify(existing));
+    else window.localStorage.removeItem(recordKey(record.id));
+  } catch { /* Preserve the original storage error. */ }
+  return indexed;
+}
+
 export function renameLZ(id: string, name: string): StoreResult {
   const trimmed = name.trim();
   if (!trimmed) return { ok: false, message: 'Landing Zone name cannot be empty.' };
@@ -168,7 +191,9 @@ export function renameLZ(id: string, name: string): StoreResult {
 export function duplicateLZ(id: string): CreateLzResult {
   const source = getLZ(id);
   if (!source) return { ok: false, message: 'This Landing Zone is no longer available in browser storage.' };
-  const created = createLZ(`Copy of ${source.name}`, source.model);
+  const created = source.disasterRecovery
+    ? saveDisasterRecoveryLZ({ name: `Copy of ${source.name}`, model: source.model, ...source.disasterRecovery })
+    : createLZ(`Copy of ${source.name}`, source.model);
   if (!created.ok || !created.record) return created;
   // The copy has an identical model, so the source's artifacts still describe it.
   const outputs = getOutputs(id);

@@ -156,6 +156,13 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
             <div style={{ ...s.help, marginTop: 5 }}>Stored in this browser and used for download filenames. It does not change OCI resource names.</div>
             {nameError && <div id="saved-lz-name-error" role="alert" style={s.error}>{nameError}</div>}
           </div>
+          <div style={s.field}>
+            <label style={s.label} htmlFor="lz-description">Description</label>
+            <textarea id="lz-description" value={f.description ?? ''} onChange={(event) => setFoundation({ description: event.target.value })}
+              rows={3} maxLength={1000} placeholder="Describe what makes this Landing Zone design different."
+              aria-describedby="lz-description-help" style={{ ...s.input, resize: 'vertical', minHeight: 88 }} />
+            <div id="lz-description-help" style={{ ...s.help, marginTop: 5 }}>Shown below the design name on the dashboard. Stored in this browser.</div>
+          </div>
           <div style={s.twoCol} className="foundation-two-col">
             <div>
               <label style={s.label} htmlFor="lz-realm">Realm</label>

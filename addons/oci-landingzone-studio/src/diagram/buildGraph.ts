@@ -72,13 +72,9 @@ const PROJ_W = 184;        // a generated project-compartment name without clipp
 const PROJ_H = 42;
 const PROJ_GAP_V = 12;     // vertical gap between stacked project blocks
 const ENV_COMP_W = PAD * 2 + NET_COMP_W + PROJ_GAP + PROJ_COMP_W;
-// Platforms (step 4): a gray compartment to the right of the projects one,
-// holding one VCN per platform that applies to the environment — each platform
-// is network-bearing (a VCN with its own subnets), unlike the network-less
-// project blocks. A shared-platform row sits in the left column (outside envs).
-// Platform compartments sit directly under the network compartment in the same
-// column, so they take its exact width and the VCNs line up edge to edge.
-const PLAT_COMP_W = NET_COMP_W;
+// Platform VCNs stay in the environment network compartment. Their management
+// compartments stack below projects in the right column.
+const PLAT_COMP_W = PROJ_COMP_W;
 const PLAT_VCN_GAP = 16;   // vertical gap between stacked platform VCNs
 const nestedHeight = (count: number) => count
   ? TITLE + PAD + count * PROJ_H + (count - 1) * PROJ_GAP_V + PAD
@@ -212,7 +208,11 @@ function decorateHubSubnet(name: string, cidr: string, regionTok: string): Subne
  * `upToStep` limits the diagram to what the wizard has reached — on step 1 the
  * compartments render as plain rows; the network nesting appears from step 2.
  */
-export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOptions = {}): DiagramModel {
+export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOptions = {}, projection?: {
+  exadata?: ReturnType<typeof exadataDiagramPlatforms>;
+  projectEnvironmentIds?: string[];
+  environmentLayout?: Record<string, { networkHeight: number; platformTop: number }>;
+}): DiagramModel {
   // Placeholder hub kinds (b/c) aren't specified yet — the network layer
   // stays hidden until an implemented hub kind is selected.
   const hubImplemented = getHubKind(model.network.hubKind)?.implemented ?? false;
@@ -226,7 +226,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   // Platforms (step 4) build on the spoke layer: the shared platform row outside
   // the environments, and a platforms compartment inside each environment.
   const showPlatforms = upToStep >= 4 && hubImplemented;
-  const exadata = upToStep >= 4 ? exadataDiagramPlatforms(model) : {
+  const exadata = upToStep >= 4 ? projection?.exadata ?? exadataDiagramPlatforms(model) : {
     platforms: [], sharedPlatforms: [], sharedWithoutNetwork: [], environmentsWithoutNetwork: {},
     sharedChildren: {}, environmentChildren: {}, projectChildren: {},
   };
@@ -321,7 +321,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   const platformVcnCount = showPlatforms
     ? model.environments.reduce((sum, e) => sum + platforms.filter((p) => platformInEnv(p, e.id)).length, 0)
     : 0;
-  const numAttach = 1 + (showSpokes ? model.environments.length : 0) + platformVcnCount + sharedInstances.length;
+  const numAttach = 1 + (showSpokes ? model.environments.filter((env) => !projection?.projectEnvironmentIds || projection.projectEnvironmentIds.includes(env.id)).length : 0) + platformVcnCount + sharedInstances.length;
   const stackH = numAttach * ATTACH_H + (numAttach - 1) * ATTACH_GAP_V;
   // The DRG icon is centred in the cluster; padding both sides by its caption
   // height keeps the "DRG" label clear of the compartment border (it otherwise
@@ -346,6 +346,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
 
   // ---- environments (right column), stored per-environment spoke networks
   const envs = model.environments.map((e, i) => {
+    const hasProjectNetwork = !projection?.projectEnvironmentIds || projection.projectEnvironmentIds.includes(e.id);
     const name = e.name.trim() || `env${i + 1}`;
     // Stale in-memory records may predate Environment.network — fall back to defaults.
     const net = e.network ?? envNetworkDefaults(i);
@@ -354,7 +355,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       const nodeId = `cmp-env-${i}-vcn-sn-${subnetIndex}`;
       return showAllEndpoints || flowEndpointIds.has(nodeId) ? withEndpoint(spec, name) : spec;
     });
-    const vcnH = vcnHeight(subnets);
+    const vcnH = hasProjectNetwork ? vcnHeight(subnets) : 0;
     // Projects that land in this environment ('all' or an explicit list).
     const projectRows = showSpokes
       ? model.projects
@@ -365,7 +366,9 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     const projStackH = projectRows.length > 0
       ? projectRows.reduce((sum, row) => sum + nestedHeight(row.children.length), 0) + (projectRows.length - 1) * PROJ_GAP_V
       : 0;
-    const projCompH = TITLE + PAD + projStackH + PAD;
+    const projCompH = Math.max(TITLE + PAD + projStackH + PAD, TITLE + PAD + vcnH);
+    const projectRowHeights = projectRows.map((row) => nestedHeight(row.children.length) +
+      (projCompH - TITLE - 2 * PAD - projStackH) / projectRows.length);
     // Platforms that land in this environment — each is a VCN with its own subnets,
     // derived (or overridden) for this environment.
     const platformInstances = showPlatforms
@@ -391,7 +394,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     const platStackH = platformInstances.length > 0
       ? platformInstances.reduce((h, pl) => h + pl.vcnH, 0) + (platformInstances.length - 1) * PLAT_VCN_GAP
       : 0;
-    const netH = TITLE + PAD + vcnH + (platformInstances.length ? PLAT_VCN_GAP + platStackH : 0) + PAD;
+    const netH = Math.max(TITLE + PAD + vcnH + (platformInstances.length ? (hasProjectNetwork ? PLAT_VCN_GAP : 0) + platStackH : 0) + PAD, projection?.environmentLayout?.[e.id]?.networkHeight ?? 0);
     const noNetworkPlatforms = exadata.environmentsWithoutNetwork[e.id] ?? [];
     const platformRows = [
       ...platformInstances.map((instance) => ({ key: instance.name, height: nestedHeight(exadata.environmentChildren[e.id]?.[instance.name]?.length ?? 0) })),
@@ -402,7 +405,12 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       ? TITLE + PAD + platformRows.reduce((sum, row) => sum + row.height, 0) + (platformCompCount - 1) * PROJ_GAP_V + PAD
       : COMP_H;
     const hasPlatforms = platformCompCount > 0;
-    const leftColH = netH + COMP_GAP + platCompH;
+    const platformCompTop = Math.max(
+      TITLE + PAD + projCompH + COMP_GAP,
+      platformInstances.length ? 2 * (TITLE + PAD) + vcnH + (hasProjectNetwork ? PLAT_VCN_GAP : 0) : 0,
+      projection?.environmentLayout?.[e.id]?.platformTop ?? 0,
+    );
+    const rightColH = platformCompTop - TITLE - PAD + platCompH;
     return {
       id: `cmp-env-${i}`,
       sourceId: e.id,
@@ -417,19 +425,19 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       sgwName: generatorNames.environmentGateway(regionTok, name, 'sgw'),
       attachName: generatorNames.environmentAttachment(regionTok, name),
       projectRows,
+      projectRowHeights,
       projCompH,
       platformInstances,
       noNetworkPlatforms,
       platformRows,
       platCompH,
+      platformCompTop,
       hasPlatforms,
-      // The env compartment wraps whichever is taller: the left column (network +
-      // any platforms stacked below it) or the projects column.
-      compH: showSpokes ? wrapHeight(Math.max(leftColH, projCompH)) : COMP_H,
+      hasProjectNetwork,
+      compH: showSpokes ? wrapHeight(Math.max(netH, rightColH)) : COMP_H,
     };
   });
-  // The env column width is unchanged by platforms — they stack under the network
-  // compartment in the left column, they don't add a third column.
+  // Project and platform compartments share the right column beside the networks.
   const envCompW = showSpokes ? ENV_COMP_W : COMP_W;
   const rightH = envs.length > 0
     ? envs.reduce((sum, env) => sum + env.compH, 0) + (envs.length - 1) * COMP_GAP
@@ -536,7 +544,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     const gutterItems: { id: string; label: string; vcn: string }[] = [];
     if (showSpokes) {
       for (const env of envs) {
-        gutterItems.push({ id: `attach-${env.id}`, label: env.attachName, vcn: `${env.id}-vcn` });
+        if (env.hasProjectNetwork) gutterItems.push({ id: `attach-${env.id}`, label: env.attachName, vcn: `${env.id}-vcn` });
         env.platformInstances.forEach((pl, k) => {
           gutterItems.push({ id: `attach-${env.id}-plat-${k}`, label: pl.attachLabel, vcn: `${env.id}-plat-${k}` });
         });
@@ -629,8 +637,8 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     envY = compTop + env.compH + COMP_GAP;
     if (!showSpokes) return;
     nodes.push({ id: `${env.id}-network`, kind: 'compartment', tone: 'yellow', container: true, label: env.netLabel, parentId: env.id, x: PAD, y: TITLE + PAD, width: NET_COMP_W, height: env.netH });
-    const placed = pushVcn(nodes, `${env.id}-vcn`, `${env.id}-network`, env.vcnLabel, env.subnets);
-    let platformY = TITLE + PAD + env.vcnH + PLAT_VCN_GAP;
+    const placed = env.hasProjectNetwork ? pushVcn(nodes, `${env.id}-vcn`, `${env.id}-network`, env.vcnLabel, env.subnets) : [];
+    let platformY = TITLE + PAD + env.vcnH + (env.hasProjectNetwork ? PLAT_VCN_GAP : 0);
     env.platformInstances.forEach((pl, k) => {
       const platformVcnId = `${env.id}-plat-${k}`;
       const platformPlaced = pushVcn(nodes, platformVcnId, `${env.id}-network`, pl.vcnLabel, pl.subnetSpecs, PAD, platformY);
@@ -662,10 +670,10 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       ? placed[placed.length - 1].y + placed[placed.length - 1].height / 2
       : env.vcnH * 0.7;
     const sgwY = Math.max(VCN_TITLE + 2, Math.min(anchor - GW_H / 2, env.vcnH - GW_H - 2));
-    nodes.push({ id: `${env.id}-sgw`, kind: 'gateway', icon: 'sgw', label: env.sgwName, parentId: `${env.id}-vcn`, x: GW_X, y: sgwY, width: GW_W, height: GW_H });
+    if (env.hasProjectNetwork) nodes.push({ id: `${env.id}-sgw`, kind: 'gateway', icon: 'sgw', label: env.sgwName, parentId: `${env.id}-vcn`, x: GW_X, y: sgwY, width: GW_W, height: GW_H });
     // Hub E gives every spoke its own NAT gateway, so internet egress stays
     // local rather than being hair-pinned through a hub firewall.
-    if (model.network.hubKind === 'hub_e') {
+    if (model.network.hubKind === 'hub_e' && env.hasProjectNetwork) {
       nodes.push({
         id: `${env.id}-natgw`, kind: 'gateway', icon: 'natgw', label: generatorNames.environmentGateway(regionTok, env.name, 'ngw'), parentId: `${env.id}-vcn`,
         x: GW_X, y: Math.max(VCN_TITLE + 2, (placed[0]?.y ?? VCN_TITLE) - 12), width: GW_W, height: GW_H,
@@ -682,12 +690,12 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     env.projectRows.forEach((project, k) => {
       const projectId = `${env.id}-proj-${k}`;
       const projectLabel = generatorNames.environmentProjectCompartment(env.name, project.name);
-      const projectHeight = nestedHeight(project.children.length);
+      const projectHeight = env.projectRowHeights[k];
       nodes.push({
         id: projectId, kind: 'project', container: project.children.length > 0 || undefined,
         label: projectLabel, parentId: `${env.id}-projects`,
         x: (PROJ_COMP_W - PROJ_W) / 2,
-        y: TITLE + PAD + rowOffset(env.projectRows.map((row) => nestedHeight(row.children.length)), k),
+        y: TITLE + PAD + rowOffset(env.projectRowHeights, k),
         width: PROJ_W, height: projectHeight,
       });
       project.children.forEach((type, index) => nodes.push({
@@ -701,7 +709,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     nodes.push({
       id: `${env.id}-platforms`, kind: 'compartment', tone: 'gray', container: env.hasPlatforms || undefined,
       label: generatorNames.environmentChildCompartment(env.name, 'platform'), parentId: env.id,
-      x: PAD, y: TITLE + PAD + env.netH + COMP_GAP, width: PLAT_COMP_W, height: env.platCompH,
+      x: PAD + NET_COMP_W + PROJ_GAP, y: env.platformCompTop, width: PLAT_COMP_W, height: env.platCompH,
     });
     env.platformInstances.forEach((pl, k) => {
       const id = `${env.id}-platform-comp-${k}`;

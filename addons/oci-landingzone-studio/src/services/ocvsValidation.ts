@@ -30,6 +30,12 @@ function validateParams(params: OcvsPlatformParams | undefined, errors: string[]
   if (params.workloadNetworkCidr && !parseCidr(params.workloadNetworkCidr)) errors.push('OCVS workload network CIDR must be a valid IPv4 CIDR.');
 }
 
+export function validateOcvsParams(params: OcvsPlatformParams | undefined): string[] {
+  const errors: string[] = [];
+  validateParams(params, errors);
+  return errors;
+}
+
 function validateNetwork(vcnCidr: string, subnets: { name: string }[], errors: string[]) {
   const cidr = parseCidr(vcnCidr);
   if (!cidr || !OCVS_PREFIXES.has(cidr.prefix)) {

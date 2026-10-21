@@ -12,6 +12,8 @@ import LicenseNotice from '../components/LicenseNotice';
 import SavedLzList from '../components/SavedLzList';
 import { oracle } from '../theme';
 import { createLZ, listLZs } from '../services/lzStore';
+import ImportLandingZoneDialog from '../components/ImportLandingZoneDialog';
+import DisasterRecoverySourceDialog from '../components/DisasterRecoverySourceDialog';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 
@@ -26,6 +28,9 @@ export default function Dashboard() {
   // build has to bring the full-size Hero back.
   const [count, setCount] = useState(() => listLZs().length);
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [showImport, setShowImport] = useState(false);
+  const [showDrSource, setShowDrSource] = useState(false);
+  const [savedRevision, setSavedRevision] = useState(0);
   const hasRecords = count > 0;
   const onCountChange = useCallback((n: number) => setCount(n), []);
 
@@ -43,13 +48,17 @@ export default function Dashboard() {
       <TopBar />
       {/* The intro band always sits at the top; it shrinks to a slim header once
           there are saved builds to list below it. */}
-      <Hero onNew={handleNew} compact={hasRecords} />
+      <Hero onNew={handleNew} onImport={() => setShowImport(true)} onAddDr={() => setShowDrSource(true)} compact={hasRecords} />
+      {showImport && <ImportLandingZoneDialog onClose={() => setShowImport(false)} onImported={(id) => navigate(`/lz/${id}`)} />}
+      {showDrSource && <DisasterRecoverySourceDialog onClose={() => setShowDrSource(false)} onSaved={(_id, warning) => {
+        setStorageError(warning ?? null); setCount(listLZs().length); setSavedRevision((revision) => revision + 1);
+      }} />}
 
       {storageError && <div role="alert" style={{ ...s.page, paddingTop: 12, paddingBottom: 0, color: '#9f1d1d' }}>{storageError}</div>}
 
       {hasRecords && (
         <div style={s.page}>
-          <SavedLzList onCountChange={onCountChange} />
+          <SavedLzList key={savedRevision} onCountChange={onCountChange} />
         </div>
       )}
 

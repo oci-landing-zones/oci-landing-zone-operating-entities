@@ -10,10 +10,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oracle } from '../theme';
-import { deleteLZ, duplicateLZ, getLZ, getOutputs, listLZs, type LzMeta } from '../services/lzStore';
+import { deleteLZ, duplicateLZ, getLZ, getOutputs, listLZs, saveOutputs, type LzMeta } from '../services/lzStore';
 import { serializeConfig } from '../services/lzConfig';
 import { CONFIG_FILENAME, isCurrentOutputSet } from '../generator/outputNames';
 import { bundleFilename, downloadBlob, zipTextFiles } from '../export/zip';
+import { downloadTextFile } from '../export/download';
+import DisasterRecoverySourceDialog from './DisasterRecoverySourceDialog';
+import { drRegionOptions } from '../services/disasterRecoveryDesign';
+import { drDesignFingerprint, isCurrentDrOutputSet } from '../services/disasterRecoverySavedDesign';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 
@@ -62,7 +66,11 @@ function summaryChips(id: string): string[] {
   const projects = (m.projects ?? []).length;
   const platforms = (m.platforms ?? []).length;
   const chips: string[] = [];
-  if (region) chips.push(region);
+  if (region) chips.push(rec.disasterRecovery ? `Home: ${region}` : region);
+  if (rec.disasterRecovery) {
+    const draft = rec.disasterRecovery.draft;
+    chips.push(`DR: ${drRegionOptions(m).find((item) => item.id === draft.region)?.shortName ?? draft.region}`);
+  }
   chips.push(`${envs} env${envs === 1 ? '' : 's'}`);
   chips.push(`${projects} project${projects === 1 ? '' : 's'}`);
   if (platforms > 0) chips.push(`${platforms} platform${platforms === 1 ? '' : 's'}`);
@@ -70,6 +78,7 @@ function summaryChips(id: string): string[] {
 }
 
 interface CardOutputs {
+  combined: boolean;
   fileCount: number;
   generatedAt: string;
   /** The design changed or the output uses an older deployment contract. */
@@ -84,9 +93,10 @@ function cardOutputs(id: string): CardOutputs | null {
   if (!saved) return null;
   const rec = getLZ(id);
   return {
+    combined: !!rec?.disasterRecovery,
     fileCount: Object.keys(saved.files).length,
     generatedAt: saved.generatedAt,
-    stale: !rec || !isCurrentOutputSet(saved, serializeConfig(rec.model)),
+    stale: !rec || (rec.disasterRecovery ? !isCurrentDrOutputSet(rec, saved) : !isCurrentOutputSet(saved, serializeConfig(rec.model))),
     files: saved.files,
     config: saved.config,
   };
@@ -104,6 +114,8 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
   const navigate = useNavigate();
   const [records, setRecords] = useState<LzMeta[]>(() => listLZs());
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [openedDrId, setOpenedDrId] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<{ id: string; scope: 'Home' | 'DR' } | null>(null);
 
   const reload = () => setRecords(listLZs());
   useEffect(() => { onCountChange?.(records.length); }, [records.length, onCountChange]);
@@ -119,6 +131,35 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
     for (const r of records) map[r.id] = cardOutputs(r.id);
     return map;
   }, [records]);
+  const descriptions = useMemo(() => Object.fromEntries(records.map((record) => [record.id, getLZ(record.id)?.model.foundation.description?.trim() ?? ''])), [records]);
+  const combinedDesigns = useMemo(() => new Set(records.filter((record) => getLZ(record.id)?.disasterRecovery).map((record) => record.id)), [records]);
+
+  async function downloadRegionalConfig(id: string, scope: 'Home' | 'DR') {
+    if (downloading) return;
+    const record = getLZ(id);
+    if (!record?.disasterRecovery) { setStorageError('This Home and DR design is no longer available.'); return; }
+    setDownloading({ id, scope });
+    setStorageError(null);
+    try {
+      const saved = getOutputs(id);
+      let files = saved && isCurrentDrOutputSet(record, saved) ? saved.files : null;
+      let warning: string | null = null;
+      if (!files) {
+        const { generateDrFileBundle } = await import('../services/disasterRecoveryGeneration');
+        const fingerprint = drDesignFingerprint(record.model, record.disasterRecovery.draft);
+        files = { ...(saved?.config === fingerprint ? saved.files : {}), ...await generateDrFileBundle(record.model, record.disasterRecovery.draft) };
+        const persisted = saveOutputs(id, { config: fingerprint, files });
+        if (!persisted.ok) warning = 'The configuration was downloaded, but its files could not be retained in browser storage.';
+        reload();
+      }
+      const regionalFiles = Object.fromEntries(Object.entries(files)
+        .filter(([path]) => path.startsWith(`${scope}/`) || path === 'README.txt')
+        .map(([path, body]) => [path.replace(`${scope}/`, ''), body]));
+      downloadBlob(bundleFilename(`${record.name}-${scope.toLowerCase()}`), zipTextFiles(regionalFiles));
+      setStorageError(warning);
+    } catch (error) { setStorageError(error instanceof Error ? error.message : 'Could not generate the regional configuration. Open the design to review it.'); }
+    finally { setDownloading(null); }
+  }
 
   function handleDuplicate(id: string) {
     const result = duplicateLZ(id);
@@ -142,6 +183,21 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
     reload();
   }
 
+  async function handleDownloadDiagram(id: string, name: string) {
+    const record = getLZ(id);
+    if (!record) { setStorageError('This Landing Zone is no longer available in browser storage.'); return; }
+    try {
+      const { toDrawioXml } = await import('../export/toDrawio');
+      const diagram = record.disasterRecovery
+        ? (await import('../services/disasterRecoveryDiagram')).buildDrComparisonDiagram(record.model, record.disasterRecovery.draft)
+        : (await import('../diagram/buildGraph')).buildGraph(record.model, 5, {});
+      downloadTextFile(bundleFilename(name).replace(/-lz-outputs\.zip$/, '.drawio'), toDrawioXml(diagram), 'application/xml');
+      setStorageError(null);
+    } catch {
+      setStorageError('Could not export the diagram. Open this Landing Zone and review its design.');
+    }
+  }
+
   return (
     <>
       <div style={s.sectionHead}>
@@ -155,6 +211,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
           const isCurrent = r.id === currentId;
           const chips = summaries[r.id] ?? [];
           const out = outputs[r.id];
+          const combined = combinedDesigns.has(r.id);
           return (
             <div key={r.id} style={isCurrent ? { ...s.card, ...s.cardCurrent } : s.card}>
               <div style={s.accent} />
@@ -163,6 +220,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                   <span style={s.name}>{r.name}</span>
                   {isCurrent && <span style={s.badge}>This one</span>}
                 </div>
+                {descriptions[r.id] && <p style={{ margin: '0 0 12px', fontSize: 13, lineHeight: 1.5, color: oracle.textMuted, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{descriptions[r.id]}</p>}
                 {chips.length > 0 && (
                   <div style={s.summaryRow}>
                     {chips.map((c) => <span key={c} style={s.chip}>{c}</span>)}
@@ -170,36 +228,45 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                 )}
                 <div style={s.meta}>Edited {formatTime(r.updatedAt)}</div>
 
-                {/* A saved snapshot is downloadable only as its complete ZIP. */}
-                {out && (
-                  <div style={s.outBox}>
+                {/* Config downloads retain the generated snapshot; diagrams use the saved design. */}
+                <div style={s.outBox}>
+                  {out && (
                     <div style={s.outHead}>
                       <span style={s.outTitle}>LZ config</span>
                       {out.stale
                         ? <span style={s.staleTag} title="The design or deployment format changed. Open step 5 to regenerate these files.">Stale</span>
                         : <span style={s.outMeta}>{formatTime(out.generatedAt)}</span>}
                     </div>
-                    {!out.stale && (
-                      <div style={s.outRow}>
-                        <button
+                  )}
+                  <div style={s.outRow}>
+                    {combined && <>
+                      <button type="button" style={{ ...s.zipBtn, opacity: downloading?.id === r.id && downloading.scope === 'Home' ? 0.5 : 1 }} disabled={!!downloading}
+                        title="Download the Home stack configuration" onClick={() => void downloadRegionalConfig(r.id, 'Home')}>Download LZ config</button>
+                      <button type="button" style={{ ...s.zipBtn, opacity: downloading?.id === r.id && downloading.scope === 'DR' ? 0.5 : 1 }} disabled={!!downloading}
+                        title="Download the DR stack configuration" onClick={() => void downloadRegionalConfig(r.id, 'DR')}>Download LZ DR config</button>
+                    </>}
+                    {!combined && out && !out.stale && (
+                      <button
                         type="button"
                         style={s.zipBtn}
-                        title={`${out.fileCount} outputs + ${CONFIG_FILENAME}`}
+                        title={out.combined ? `${out.fileCount} files for Home and DR` : `${out.fileCount} outputs + ${CONFIG_FILENAME}`}
                         onClick={() => downloadBlob(
                           bundleFilename(r.name),
-                          zipTextFiles({ [CONFIG_FILENAME]: out.config, ...out.files }),
+                          zipTextFiles(out.combined ? out.files : { [CONFIG_FILENAME]: out.config, ...out.files }),
                         )}
                       >
-                        Download LZ config
+                        {out.combined ? 'Download Home + DR config' : 'Download LZ config'}
                       </button>
-                      </div>
                     )}
+                    <button type="button" style={s.zipBtn} title="Download the saved design as an editable .drawio diagram" onClick={() => void handleDownloadDiagram(r.id, r.name)}>
+                      Download draw.io
+                    </button>
                   </div>
-                )}
+                </div>
               </div>
               <div style={s.actions}>
                 {!isCurrent && (
-                  <button type="button" style={s.open} onClick={() => navigate(`/lz/${r.id}`)}>Open</button>
+                  <button type="button" style={s.open} onClick={() => getLZ(r.id)?.disasterRecovery ? setOpenedDrId(r.id) : navigate(`/lz/${r.id}`)}>Open</button>
                 )}
                 <button type="button" style={s.btn} onClick={() => handleDuplicate(r.id)}>Duplicate</button>
                 <button type="button" style={s.danger} onClick={() => handleDelete(r.id, r.name)}>Delete</button>
@@ -208,6 +275,8 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
           );
         })}
       </div>
+      {openedDrId && <DisasterRecoverySourceDialog initialDesignId={openedDrId} onClose={() => setOpenedDrId(null)}
+        onSaved={(_id, warning) => { setStorageError(warning ?? null); reload(); }} />}
     </>
   );
 }

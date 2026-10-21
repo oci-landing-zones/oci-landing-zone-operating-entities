@@ -14,7 +14,7 @@
  */
 
 import type { PlatformConfig, PlatformType, OkePlatformParams, OcvsPlatformParams, SharedPlatformConfig, Subnet } from '../model/types';
-import { firstFreeBlock, formatIp, parseCidr, shiftCidr, totalIps } from './cidr';
+import { firstFreeBlock, formatIp, normalizeCidr, parseCidr, shiftCidr, totalIps } from './cidr';
 import { environmentPlatformCidr, OPTIONAL_SHARED_CIDR } from './oneOeCidrs';
 
 export interface PlatformTypeMeta {
@@ -128,6 +128,19 @@ export function okeDefaultParams(): OkePlatformParams {
   };
 }
 
+/** A profile change replaces the automatic address plan as one atomic edit. */
+export function okeNetworkProfilePatch(platform: PlatformConfig, size: OkePlatformParams['clusterSize']): Partial<PlatformConfig> {
+  const okeParams = { ...platform.okeParams ?? okeDefaultParams(), clusterSize: size };
+  if (size) {
+    const vcnCidr = normalizeCidr(`${platform.vcnCidr.split('/')[0]}/${OKE_PROFILE_PREFIX[size]}`) ?? platform.vcnCidr;
+    return { okeParams, vcnCidr, subnets: [], overrides: {} };
+  }
+  const manual = (vcn: string) => okeDefaultSubnets(vcn).filter((sn) => okeParams.cniType === 'native' || sn.name !== 'pods');
+  return { okeParams, subnets: manual(platform.vcnCidr), overrides: Object.fromEntries(
+    Object.entries(platform.overrides ?? {}).map(([id, override]) => [id, { ...override, subnets: manual(override.vcnCidr ?? platform.vcnCidr) }]),
+  ) };
+}
+
 /** OCVS requires a public key; keep it blank until the operator provides one. */
 export function ocvsDefaultParams(): OcvsPlatformParams {
   return {
@@ -200,7 +213,6 @@ export function applyPlatformPatch(platform: PlatformConfig, patch: Partial<Plat
   environments: Array<{ id: string; name: string }>, occupied: string[],
 ): PlatformConfig {
   const next = { ...platform, ...patch };
-  if (next.type === 'oke_simple') return next;
   const overrides = { ...next.overrides };
   const firstId = environments[0]?.id;
   if (firstId && overrides[firstId] && (patch.vcnCidr !== undefined || patch.subnets !== undefined)) {
@@ -209,7 +221,7 @@ export function applyPlatformPatch(platform: PlatformConfig, patch: Partial<Plat
       ...(patch.subnets !== undefined ? { subnets: patch.subnets } : {}),
     };
   }
-  if (patch.environments !== undefined) {
+  if (next.type !== 'oke_simple' && patch.environments !== undefined) {
     const used = [...occupied];
     for (const env of environments) {
       if (!platformInEnv(next, env.id) || overrides[env.id]) continue;

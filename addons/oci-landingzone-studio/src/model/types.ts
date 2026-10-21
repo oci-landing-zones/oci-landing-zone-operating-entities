@@ -10,6 +10,8 @@
  */
 
 export interface FoundationConfig {
+  /** Browser-only note for distinguishing saved designs; not a generator input. */
+  description?: string;
   realm: string;           // e.g. oc1
   region: string;          // region identifier, e.g. eu-frankfurt-1
   regionShortName: string; // three-letter region key, e.g. fra
@@ -169,6 +171,8 @@ export interface ExadataNotifications {
   /** Omitted in older drafts; a populated default implies the single-recipient mode. */
   useSingleRecipient?: boolean;
   default: string;
+  /** Preserve an imported split-topic fallback independently of environment order. */
+  fallbackDefault?: { recipients: string[]; source: string };
   dbWorkloads?: string;
   infraWorkloads?: string;
   environmentInfraEmails?: Record<string, string>;

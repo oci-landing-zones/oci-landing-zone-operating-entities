@@ -72,7 +72,7 @@ function projectsForEnv(model: LzModel, envId: string): string[] {
     .filter(Boolean);
 }
 
-function ocvsExtension(p: NonNullable<PlatformConfig['ocvsParams']>): NonNullable<PlatformConfigEntry['extension']> {
+export function ocvsExtension(p: NonNullable<PlatformConfig['ocvsParams']>): NonNullable<PlatformConfigEntry['extension']> {
   return {
     type: 'ocvs',
     params: {
@@ -89,6 +89,24 @@ function ocvsExtension(p: NonNullable<PlatformConfig['ocvsParams']>): NonNullabl
         initial_host_shape_name: p.initialHostShapeName,
         workload_network_cidr: p.workloadNetworkCidr,
       },
+    },
+  };
+}
+
+export function okeExtension(p: NonNullable<PlatformConfig['okeParams']>): NonNullable<PlatformConfigEntry['extension']> {
+  return {
+    type: 'oke_simple',
+    params: {
+      kubernetes_version: p.kubernetesVersion,
+      services_cidr: p.servicesCidr,
+      api_endpoint_allowed_cidrs: p.apiAllowedCidrs,
+      worker_image: p.workerImage,
+      worker_boot_volume_size: p.workerBootVolumeSize,
+      cni_type: p.cniType,
+      ...(p.clusterSize ? { cluster_size: p.clusterSize } : {}),
+      ...(p.podsCidr ? { pods_cidr: p.podsCidr } : {}),
+      create_fss: p.createFss,
+      public_load_balancer: p.publicLoadBalancer,
     },
   };
 }
@@ -110,21 +128,7 @@ function platformEntryFor(platform: PlatformConfig, envId: string, index: number
     const p = platform.okeParams;
     return {
       network,
-      extension: {
-        type: 'oke_simple',
-        params: {
-          kubernetes_version: p.kubernetesVersion,
-          services_cidr: p.servicesCidr,
-          api_endpoint_allowed_cidrs: p.apiAllowedCidrs,
-          worker_image: p.workerImage,
-          worker_boot_volume_size: p.workerBootVolumeSize,
-          cni_type: p.cniType,
-          ...(p.clusterSize ? { cluster_size: p.clusterSize } : {}),
-          ...(p.podsCidr ? { pods_cidr: p.podsCidr } : {}),
-          create_fss: p.createFss,
-          public_load_balancer: p.publicLoadBalancer,
-        },
-      },
+      extension: okeExtension(p),
     };
   }
   if (platform.type === 'ocvs' && platform.ocvsParams) {

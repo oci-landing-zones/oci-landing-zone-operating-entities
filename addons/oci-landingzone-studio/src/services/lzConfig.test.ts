@@ -13,6 +13,12 @@ function env(name: string, securityZone: boolean, index: number): Environment {
 }
 
 describe('buildConfig', () => {
+  it('keeps the local design description out of deployable configuration', () => {
+    const original = emptyLzModel();
+    const described = structuredClone(original);
+    described.foundation.description = 'Production baseline with the finance workloads';
+    expect(serializeConfig(described)).toBe(serializeConfig(original));
+  });
   it('maps One-OE notification recipients to a default and topic overrides', () => {
     const base = emptyLzModel();
     const configured = model({

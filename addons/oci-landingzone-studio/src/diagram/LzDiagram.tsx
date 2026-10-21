@@ -470,8 +470,9 @@ function ZoomBar() {
   );
 }
 
-export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps, showFlowControl = true, flowHint, flowFocus, onFlowSelect, onFlowHover }: {
+export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps, showFlowControl = true, flowHint, flowFocus, onFlowSelect, onFlowHover, minZoom = 0.2 }: {
   diagram: DiagramModel;
+  minZoom?: number;
   options?: DiagramOptions;
   onOptionsChange?: (next: DiagramOptions) => void;
   /** Per-flow packet step: null/absent = auto-play, a number = that 0-based hop. */
@@ -583,13 +584,13 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
     // opens and changes the pane width in the same render.
     const timer = window.setTimeout(() => {
       if (flowBounds) {
-        const viewport = getViewportForBounds(flowBounds, paneWidth, paneHeight, 0.2, 1, 0.16);
+        const viewport = getViewportForBounds(flowBounds, paneWidth, paneHeight, minZoom, 1, 0.16);
         setViewport(viewport, { duration: 350 });
       }
       else fitView({ padding: 0.28, duration: 250 });
     }, 60);
     return () => window.clearTimeout(timer);
-  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, paneWidth, paneHeight, setViewport, fitView]);
+  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, paneWidth, paneHeight, setViewport, fitView, minZoom]);
 
   return (
     <RtContext.Provider value={toggleTables}>
@@ -602,7 +603,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       onPaneClick={() => { if (options?.focusFlow) onFlowSelect?.(null); }}
       nodesDraggable={false}
       nodesConnectable={false}
-      minZoom={0.2}
+      minZoom={minZoom}
       maxZoom={4}
       proOptions={{ hideAttribution: true }}
     >

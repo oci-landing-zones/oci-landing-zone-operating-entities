@@ -79,6 +79,13 @@ function recipients(input: string | undefined): string[] {
 
 type ExadataTopic = 'dbWorkloads' | 'infraWorkloads' | 'projects';
 
+/** A preserved import fallback expires as soon as its visible recipients change. */
+export function exadataNotificationSource(input: ExadataNotifications): string {
+  const sortedMap = (value: Record<string, string> | undefined) => Object.entries(value ?? {}).sort(([a], [b]) => a.localeCompare(b));
+  return JSON.stringify([input.default, input.dbWorkloads ?? '', input.infraWorkloads ?? '', input.projects ?? '',
+    sortedMap(input.projectEmails), sortedMap(input.environmentInfraEmails), sortedMap(input.environmentDbEmails)]);
+}
+
 function notificationEmails(input: ExadataNotifications, allowed: ExadataTopic[], projectEnvironments: Array<{ id: string; name: string }>,
   environmentEnvironments: Array<{ id: string; name: string }> = []): Record<string, unknown> {
   const split = environmentEnvironments.length > 0;
@@ -95,7 +102,8 @@ function notificationEmails(input: ExadataNotifications, allowed: ExadataTopic[]
   const firstInfraEmail = Object.values(infraEmails)[0] as string[] | undefined;
   const firstDbEmail = Object.values(dbEmails)[0] as string[] | undefined;
   const result: Record<string, unknown> = {
-    default: allowed.map((field) => recipients(input[field])).find((values) => values.length > 0)
+    default: (input.fallbackDefault?.source === exadataNotificationSource(input) ? input.fallbackDefault.recipients : undefined)
+      ?? allowed.map((field) => recipients(input[field])).find((values) => values.length > 0)
       ?? firstInfraEmail ?? firstDbEmail ?? firstProjectEmail ?? [],
   };
   for (const [field, key] of [

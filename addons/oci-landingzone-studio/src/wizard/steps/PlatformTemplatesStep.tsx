@@ -20,13 +20,14 @@ import { addExadataPlatform, configuredVcnCidrs } from '../../services/exadata';
 import { exadataReadiness } from '../../services/platformReadiness';
 import type { PlatformConfig, PlatformType, SharedPlatformConfig, Subnet } from '../../model/types';
 import {
-  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, ocvsDefaultParams, ocvsDefaultSubnets, okeDefaultParams, okeDefaultSubnets, okeProfileSubnets, platformEnvInstances, platformTypeMeta,
+  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, ocvsDefaultParams, ocvsDefaultSubnets, okeDefaultParams, okeProfileSubnets, platformEnvInstances, platformTypeMeta,
 } from '../../services/platforms';
 import { VcnEditor } from './HubNetworkStep';
 import { s } from './networkEditorStyles';
 import DeleteButton from '../../components/DeleteButton';
-import Switch from '../../components/Switch';
+import OkeSettingsFields from '../../components/OkeSettingsFields';
 import ExadataStep from './ExadataStep';
+import OcvsSettingsFields from '../../components/OcvsSettingsFields';
 
 type ExadataType = 'exacc' | 'exacs';
 type AddPlatformType = PlatformType | ExadataType;
@@ -67,32 +68,6 @@ const local: Record<string, CSSProperties> = {
   prefixInput:{ flex: 1, border: 'none', outline: 'none', padding: '8px 10px', fontSize: 14, background: 'transparent', color: oracle.text, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
   fieldHint:  { fontSize: 11.5, color: oracle.textMuted, marginTop: 4 },
 };
-
-/** The currently supported one-SDDC OCVS input contract. */
-function OcvsSettingsFields({ id, value, onChange }: {
-  id: string;
-  value: ReturnType<typeof ocvsDefaultParams>;
-  onChange: (patch: Partial<ReturnType<typeof ocvsDefaultParams>>) => void;
-}) {
-  return (
-    <div style={s.subCard}>
-      <div style={s.subHead}>OCVS management cluster</div>
-      <div style={local.note}>One platform creates one SDDC management cluster. An SSH public key is required. HCX is not included in this deployment package.</div>
-      <div style={local.okeGrid}>
-        <div><label style={s.addLabel} htmlFor={`${id}-ssh`}>SSH public key</label><input id={`${id}-ssh`} style={s.rowInput} value={value.sshAuthorizedKeys} onChange={(e) => onChange({ sshAuthorizedKeys: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-sddc`}>SDDC name</label><input id={`${id}-sddc`} style={s.rowInput} value={value.sddcDisplayName} onChange={(e) => onChange({ sddcDisplayName: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-cluster`}>Cluster name</label><input id={`${id}-cluster`} style={s.rowInput} value={value.clusterDisplayName} onChange={(e) => onChange({ clusterDisplayName: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-hosts`}>ESXi hosts</label><input id={`${id}-hosts`} type="number" min="1" style={s.rowInput} value={value.esxiHostsCount} onChange={(e) => onChange({ esxiHostsCount: Number(e.target.value) })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-vmware`}>VMware version</label><input id={`${id}-vmware`} style={s.rowInput} value={value.vmwareSoftwareVersion} onChange={(e) => onChange({ vmwareSoftwareVersion: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-ad`}>Availability domain</label><input id={`${id}-ad`} style={s.rowInput} value={value.computeAvailabilityDomain} onChange={(e) => onChange({ computeAvailabilityDomain: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-vsphere`}>vSphere type</label><input id={`${id}-vsphere`} style={s.rowInput} value={value.vsphereType} onChange={(e) => onChange({ vsphereType: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-ocpu`}>Initial host OCPUs</label><input id={`${id}-ocpu`} type="number" min="1" style={s.rowInput} value={value.initialHostOcpuCount} onChange={(e) => onChange({ initialHostOcpuCount: Number(e.target.value) })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-shape`}>Initial host shape</label><input id={`${id}-shape`} style={s.rowInput} value={value.initialHostShapeName} onChange={(e) => onChange({ initialHostShapeName: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-workload`}>Workload network CIDR</label><input id={`${id}-workload`} style={s.rowInput} value={value.workloadNetworkCidr} onChange={(e) => onChange({ workloadNetworkCidr: e.target.value })} /></div>
-      </div>
-    </div>
-  );
-}
 
 /** One optional shared platform card. */
 function SharedPlatformPanel({ platform, open, onToggle, onChange, onDelete }: {
@@ -295,7 +270,6 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
   const isOcvs = platform.type === 'ocvs';
   const oke = platform.okeParams ?? okeDefaultParams();
   const ocvs = platform.ocvsParams ?? ocvsDefaultParams();
-  function setOke(patch: Partial<typeof oke>) { onPlatform({ okeParams: { ...oke, ...patch } }); }
   function setOcvs(patch: Partial<typeof ocvs>) { onPlatform({ ocvsParams: { ...ocvs, ...patch } }); }
 
   return (
@@ -327,64 +301,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
             <div style={local.fieldHint}>Used to create consistent names for this platform's compartment, network, gateway, and DRG attachment.</div>
           </div>
 
-          {isOke && (
-            <div style={s.subCard}>
-              <div style={s.subHead}>OKE settings</div>
-              <div className="oke-settings-grid" style={local.okeGrid}>
-                <div style={local.group}>
-                  <div style={local.groupTitle}>Cluster</div>
-                  <div className="oke-fields-grid" style={local.settingsFields}>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-k8s`}>Kubernetes version</label><input id={`${platform.id}-k8s`} style={s.rowInput} value={oke.kubernetesVersion} onChange={(e) => setOke({ kubernetesVersion: e.target.value })} /></div>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-api`}>API endpoint allowed CIDRs</label><input id={`${platform.id}-api`} style={s.rowInput} value={oke.apiAllowedCidrs.join(', ')} onChange={(e) => setOke({ apiAllowedCidrs: e.target.value.split(',').map((x) => x.trim()).filter(Boolean) })} /></div>
-                  </div>
-                </div>
-                <div style={local.group}>
-                  <div style={local.groupTitle}>Networking</div>
-                  <div className="oke-fields-grid" style={local.settingsFields}>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-svc`}>Services CIDR</label><input id={`${platform.id}-svc`} style={s.rowInput} value={oke.servicesCidr} onChange={(e) => setOke({ servicesCidr: e.target.value })} /></div>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-cni`}>Pod networking</label><select id={`${platform.id}-cni`} style={s.select} value={oke.cniType} onChange={(e) => {
-                      const cniType = e.target.value as 'native' | 'overlay';
-                      if (cniType === 'overlay') onPlatform({ subnets: platform.subnets.filter((sn) => sn.name !== 'pods') });
-                      setOke({ cniType, ...(cniType === 'overlay' && !oke.podsCidr ? { podsCidr: '10.244.0.0/16' } : {}) });
-                    }}><option value="native">Native VCN</option><option value="overlay">Overlay (Flannel)</option></select></div>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-size`}>Network profile</label><select id={`${platform.id}-size`} style={s.select} value={oke.clusterSize ?? 'manual'} onChange={(e) => {
-                      const size = e.target.value === 'manual' ? undefined : e.target.value as 'small' | 'medium' | 'large';
-                      if (!size) {
-                        onPlatform({ subnets: okeDefaultSubnets(platform.vcnCidr).filter((sn) => oke.cniType === 'native' || sn.name !== 'pods') });
-                        setOke({ clusterSize: undefined });
-                        return;
-                      }
-                      const prefix = size === 'small' ? 20 : size === 'medium' ? 18 : 16;
-                      onPlatform({ subnets: [], vcnCidr: `${platform.vcnCidr.split('/')[0]}/${prefix}` });
-                      setOke({ clusterSize: size });
-                    }}><option value="manual">Manual subnets</option><option value="small">Small (/20)</option><option value="medium">Medium (/18)</option><option value="large">Large (/16)</option></select></div>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-pods`}>Pod CIDR</label><input id={`${platform.id}-pods`} style={s.rowInput} placeholder={oke.cniType === 'overlay' ? '10.244.0.0/16' : 'Optional for native'} value={oke.podsCidr ?? ''} onChange={(e) => setOke({ podsCidr: e.target.value || undefined })} /></div>
-                  </div>
-                </div>
-                <div style={local.group}>
-                  <div style={local.groupTitle}>Workers</div>
-                  <div className="oke-fields-grid" style={local.settingsFields}>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-img`}>Worker image selector</label><input id={`${platform.id}-img`} style={s.rowInput} value={oke.workerImage} onChange={(e) => setOke({ workerImage: e.target.value })} /></div>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-boot`}>Worker boot volume (GB)</label><input id={`${platform.id}-boot`} type="number" min="50" max="32768" style={s.rowInput} value={oke.workerBootVolumeSize} onChange={(e) => setOke({ workerBootVolumeSize: Number(e.target.value) })} /></div>
-                  </div>
-                </div>
-                <div className="oke-features-group" style={{ ...local.group, gridColumn: '1 / -1' }}>
-                  <div style={local.groupTitle}>Optional features</div>
-                  <div className="oke-feature-grid" style={local.featureGrid}>
-                    <div style={{ ...local.switchRow, borderTop: 'none', paddingTop: 0 }}>
-                      <div style={local.switchCopy}><strong>Allow public load balancers</strong><div style={{ ...local.fieldHint, lineHeight: 1.5, marginTop: 5 }}>Creates the Hub frontend networking and IAM prerequisites. OCI creates a load balancer only when a Kubernetes Service requests one.</div></div>
-                      <Switch checked={oke.publicLoadBalancer} onChange={(checked) => setOke({ publicLoadBalancer: checked })} ariaLabel="Allow public load balancers" />
-                    </div>
-                    <div style={{ ...local.switchRow, borderTop: 'none', paddingTop: 0 }}>
-                      <div style={local.switchCopy}><strong>Enable File Storage support</strong><div style={{ ...local.fieldHint, lineHeight: 1.5, marginTop: 5 }}>Creates FSS networking and IAM prerequisites—not file systems, mount targets, or Kubernetes storage objects.</div></div>
-                      <Switch checked={oke.createFss} onChange={(checked) => setOke({ createFss: checked })} ariaLabel="Enable File Storage support" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {oke.clusterSize && <div style={local.fieldHint}>This network profile sets the subnet layout. To define subnets yourself, select Manual subnets.</div>}
-            </div>
-          )}
+          {isOke && <OkeSettingsFields platform={platform} onPlatform={onPlatform} />}
 
           {isOcvs && <OcvsSettingsFields id={`${platform.id}-ocvs`} value={ocvs} onChange={setOcvs} />}
 
