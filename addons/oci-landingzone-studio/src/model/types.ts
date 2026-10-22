@@ -10,6 +10,12 @@
  */
 
 export interface FoundationConfig {
+  stackScope?: 'complete' | 'regional';
+  /** Regional stacks reuse tenancy-level prerequisites from this Home region. */
+  homeRegion?: string;
+  homePrerequisitesConfirmed?: boolean;
+  /** Complete stacks grant DR Object Storage access to their encryption keys. */
+  drRegion?: string;
   /** Browser-only note for distinguishing saved designs; not a generator input. */
   description?: string;
   realm: string;           // e.g. oc1
@@ -37,6 +43,7 @@ export interface EnvNetworkConfig {
 }
 
 export interface Environment {
+  projectNetworkEnabled?: boolean;
   /** Stable browser identity; editable names never serve as relationships. */
   id: string;
   name: string;            // e.g. prod
@@ -217,6 +224,7 @@ export interface ExadataDesign {
 }
 
 export interface LzModel {
+  remotePeeringConnections?: RemotePeeringConnection[];
   /** Schema version of this canonical object. */
   version: string;
   foundation: FoundationConfig;
@@ -230,6 +238,17 @@ export interface LzModel {
   sharedPlatforms: SharedPlatformConfig[];
   /** Optional Exadata extensions, configured in the Platforms step. */
   exadata: ExadataDesign;
+}
+
+export interface RemotePeeringConnection {
+  id: string;
+  name: string;
+  role: 'acceptor' | 'requester';
+  remoteCidrs: string[];
+  peerRegionName: string;
+  peerId?: string;
+  peerTenancyOcid?: string;
+  requestorGroupOcid?: string;
 }
 
 /**

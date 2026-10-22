@@ -17,8 +17,9 @@
 
 import type { LzModel } from '../model/types';
 import { hostIpInSubnet } from './cidr';
-import { platformInEnv, platformVcnForEnv } from './platforms';
+import { platformInEnv, platformSubnetsForEnv, platformVcnForEnv } from './platforms';
 import { generatorNames } from './generatorNaming';
+import { exadataDiagramPlatforms } from './exadata';
 
 export type NextHopKind = 'igw' | 'natgw' | 'sgw' | 'drg' | 'firewall' | 'nlb' | 'attachment' | 'local';
 
@@ -71,12 +72,59 @@ function hubSubnet(model: LzModel, suffix: string): { id: string; cidr: string }
   return i >= 0 ? { id: `hub-vcn-sn-${i}`, cidr: model.network.subnets[i].cidr } : null;
 }
 
-export function buildRouteTables(model: LzModel): RouteTable[] {
+export function buildRouteTables(source: LzModel): RouteTable[] {
+  const exadata = exadataDiagramPlatforms(source);
+  const model = { ...source, platforms: [...source.platforms, ...exadata.platforms], sharedPlatforms: [...source.sharedPlatforms, ...exadata.sharedPlatforms] };
   const hubTables = model.network.hubKind === 'hub_b' ? buildHubBRouteTables(model)
     : model.network.hubKind === 'hub_c' ? buildHubCRouteTables(model)
       : model.network.hubKind === 'hub_e' ? buildHubERouteTables(model)
         : buildHubARouteTables(model);
-  return [...canonicalizeCoreRouteTables(model, hubTables), ...buildOcvsRouteTables(model)];
+  const tables = [...canonicalizeCoreRouteTables(model, hubTables), ...buildOcvsRouteTables(model), ...buildPlatformRouteTables(model)];
+  const region = model.foundation.regionShortName.trim() || '<region>';
+  const direct = model.network.hubKind === 'hub_e';
+  const platformCidrs = coreSpokeAttachments(model, region)
+    .filter((entry) => !/^attach-cmp-env-\d+$/.test(entry.id)).map((entry) => entry.cidr);
+  addHubCidrRoutes(model, tables, platformCidrs);
+  if (direct) for (const table of tables.filter((entry) => entry.id.startsWith('rt-ssn-'))) {
+    table.rules.push(...platformCidrs.map((cidr) => drg(cidr)));
+  }
+  for (const connection of model.remotePeeringConnections ?? []) {
+    const name = connection.name.trim().replaceAll('_', '-');
+    const node = `rpc-${connection.id}`;
+    const remoteRules = connection.remoteCidrs.map((cidr) => ({ ...attach(cidr, `drgatt-${region}-lz-hub-rpc-${name}`, node), targetType: 'RPC Attachment' }));
+    addHubCidrRoutes(model, tables, connection.remoteCidrs);
+    for (const table of tables) {
+      if (table.id === 'rt-drg-hub' || (direct && table.id === 'rt-drg-spokes')) table.rules.push(...remoteRules);
+      else if (direct && table.id.startsWith('rt-ssn-')) table.rules.push(...connection.remoteCidrs.map((cidr) => drg(cidr)));
+    }
+    tables.push({ id: `rt-rpc-${connection.id}`, name: `drgrt-${region}-lz-rpc-${name}`, kind: 'drg', columns: 'drg', attachTo: node,
+      rules: direct ? [attach(model.network.hubVcnCidr, generatorNames.hubAttachment(region), 'attach-hub'), ...coreSpokeAttachments(model, region).map((entry) => attach(entry.cidr, entry.name, entry.id))]
+        : [{ ...attach('0.0.0.0/0', generatorNames.hubAttachment(region), 'attach-hub'), routeType: 'Static' }],
+    });
+  }
+  return tables;
+}
+
+function addHubCidrRoutes(model: LzModel, tables: RouteTable[], cidrs: string[]) {
+  const directTables = {
+    hub_a: ['rt-hub-lb', 'rt-hub-internal', 'rt-hub-mgmt'],
+    hub_b: ['rt-hub-fw', 'rt-hub-mgmt'],
+    hub_c: ['rt-hub-lb', 'rt-hub-trust', 'rt-hub-mgmt'],
+    hub_e: ['rt-hub-lb', 'rt-hub-mgmt'],
+  }[model.network.hubKind];
+  const inspectedTables: string[] = {
+    hub_a: ['rt-hub-ingress', 'rt-hub-natgw'],
+    hub_b: ['rt-hub-ingress', 'rt-hub-natgw', 'rt-hub-lb'],
+    hub_c: ['rt-hub-ingress'],
+    hub_e: [],
+  }[model.network.hubKind];
+  const inspection = tables.find((table) => table.id === 'rt-hub-ingress')?.rules[0];
+  for (const table of tables) {
+    if (directTables.includes(table.id)) table.rules.push(...cidrs.map((cidr) => drg(cidr)));
+    else if (inspection && inspectedTables.includes(table.id)) {
+      table.rules.push(...cidrs.map((cidr) => ({ ...inspection, destination: cidr, matchCidr: cidr })));
+    }
+  }
 }
 
 /** Expose the route-table resources Jsonnet emits, while retaining stable IDs for tracing. */
@@ -111,11 +159,11 @@ function canonicalizeCoreRouteTables(model: LzModel, raw: RouteTable[]): RouteTa
     rules: spokeAttachments.map((entry) => attach(entry.cidr, entry.name, entry.id)),
   });
 
-  const spokeDrg = raw.filter((table) => table.id.startsWith('rt-drg-') && table.id !== 'rt-drg-hub');
-  if (spokeAttachments.length > 0 && spokeDrg.length > 0) normalized.push({
-    ...spokeDrg[0],
+  if (spokeAttachments.length > 0) normalized.push({
     id: 'rt-drg-spokes',
     name: `drgrt-${region}-lz-spokes`,
+    kind: 'drg',
+    columns: 'drg',
     attachTo: spokeAttachments[0].id,
     ...(spokeAttachments.length > 1 ? { attachExtra: spokeAttachments.slice(1).map((entry) => entry.id) } : {}),
     rules: model.network.hubKind === 'hub_e'
@@ -123,10 +171,10 @@ function canonicalizeCoreRouteTables(model: LzModel, raw: RouteTable[]): RouteTa
           attach(model.network.hubVcnCidr, generatorNames.hubAttachment(region), 'attach-hub'),
           ...spokeAttachments.map((entry) => attach(entry.cidr, entry.name, entry.id)),
         ]
-      : spokeDrg[0].rules,
+      : [{ ...attach('0.0.0.0/0', generatorNames.hubAttachment(region), 'attach-hub'), routeType: 'Static' }],
     note: model.network.hubKind === 'hub_e'
       ? 'Dynamic routes imported from the hub and spoke/platform VCN attachments'
-      : spokeDrg[0].note,
+      : undefined,
   });
 
   model.environments.forEach((env, envIndex) => {
@@ -149,7 +197,7 @@ function coreSpokeAttachments(model: LzModel, region: string): { id: string; nam
   const entries: { id: string; name: string; cidr: string }[] = [];
   model.environments.forEach((env, envIndex) => {
     const envName = env.name.trim() || `env${envIndex + 1}`;
-    entries.push({
+    if (env.projectNetworkEnabled !== false) entries.push({
       id: `attach-cmp-env-${envIndex}`,
       name: generatorNames.environmentAttachment(region, envName),
       cidr: env.network.vcnCidr,
@@ -198,11 +246,11 @@ function buildHubARouteTables(model: LzModel): RouteTable[] {
   const envs = model.environments.map((env, e) => ({
     e,
     name: env.name.trim() || `env${e + 1}`,
-    vcnCidr: env.network.vcnCidr,
+    vcnCidr: env.projectNetworkEnabled === false ? '' : env.network.vcnCidr,
     subnets: env.network.subnets,
     attach: `attach-cmp-env-${e}`,
     attachName: generatorNames.environmentAttachment(region, env.name.trim() || `env${e + 1}`),
-  }));
+  })).filter((env) => env.vcnCidr);
   const envVcnsToDrg = (): RouteRule[] => envs.map((env) => drg(env.vcnCidr));
   const envVcnsToFw = (): RouteRule[] => envs.map((env) => fw(env.vcnCidr, intIp, intName));
 
@@ -267,11 +315,8 @@ function buildHubARouteTables(model: LzModel): RouteTable[] {
 function buildOcvsRouteTables(model: LzModel): RouteTable[] {
   const region = model.foundation.regionShortName.trim() || '<region>';
   const routedVcns = [
-    ...model.environments.map((env) => env.network.vcnCidr),
-    ...model.platforms.flatMap((platform) => model.environments.flatMap((env, index) =>
-      platformInEnv(platform, env.id) ? [platformVcnForEnv(platform, env.id, index)] : [],
-    )),
-    ...model.sharedPlatforms.map((platform) => platform.vcnCidr),
+    ...coreSpokeAttachments(model, region).map((entry) => entry.cidr),
+    ...(model.remotePeeringConnections ?? []).flatMap((connection) => connection.remoteCidrs),
   ];
   const tables: RouteTable[] = [];
   model.platforms.forEach((platform) => {
@@ -308,6 +353,59 @@ function buildOcvsRouteTables(model: LzModel): RouteTable[] {
   return tables;
 }
 
+function buildPlatformRouteTables(model: LzModel): RouteTable[] {
+  const region = model.foundation.regionShortName.trim() || '<region>';
+  const direct = model.network.hubKind === 'hub_e';
+  const peers = [
+    ...coreSpokeAttachments(model, region).map((entry) => entry.cidr),
+    ...(model.remotePeeringConnections ?? []).flatMap((connection) => connection.remoteCidrs),
+  ];
+  const instances = [
+    ...model.environments.flatMap((env, envIndex) => model.platforms.filter((platform) => platformInEnv(platform, env.id)).map((platform, slot) => ({
+      type: platform.type,
+      id: `rt-platform-${envIndex}-${slot}`,
+      name: `rt-${region}-lz-${env.name.trim() || `env${envIndex + 1}`}-${platform.key.trim() || platform.type}`,
+      node: `cmp-env-${envIndex}-plat-${slot}`,
+      sgw: `cmp-env-${envIndex}-plat-${slot}-sgw`,
+      nat: `cmp-env-${envIndex}-plat-${slot}-natgw`,
+      vcn: platformVcnForEnv(platform, env.id, envIndex),
+      subnets: platformSubnetsForEnv(platform, env.id, envIndex),
+    }))),
+    ...model.sharedPlatforms.map((platform, index) => ({
+      type: platform.type ?? 'custom',
+      id: `rt-platform-shared-${index}`,
+      name: `rt-${region}-lz-shared-${platform.key.trim() || platform.type || 'platform'}`,
+      node: `shared-plat-vcn-${index}`,
+      sgw: `shared-plat-sgw-${index}`,
+      nat: `shared-plat-natgw-${index}`,
+      vcn: platform.vcnCidr,
+      subnets: platform.subnets,
+    })),
+  ];
+  return instances.flatMap((instance): RouteTable[] => {
+    if (instance.type === 'ocvs' || instance.subnets.length === 0) return [];
+    const rules = [
+      direct ? nat('0.0.0.0/0', instance.nat) : drg('0.0.0.0/0'),
+      ...(direct || instance.type === 'oke_simple'
+        ? [drg(model.network.hubVcnCidr), ...peers.filter((cidr) => cidr !== instance.vcn).map((cidr) => drg(cidr))] : []),
+      sgw(instance.sgw),
+    ];
+    if (instance.type === 'custom') return [{
+      id: `${instance.id}-generic`, name: `${instance.name}-generic`, kind: 'spoke', columns: 'vcn',
+      attachTo: `${instance.node}-sn-0`,
+      attachExtra: instance.subnets.slice(1).map((_, index) => `${instance.node}-sn-${index + 1}`), rules,
+    }];
+    return instance.subnets.map((subnet, index) => {
+      const suffix = subnet.name === 'control-plane' ? 'cp' : subnet.name;
+      return {
+        id: `${instance.id}-${suffix}`, name: `${instance.name}-${suffix}`, kind: 'spoke', columns: 'vcn',
+        attachTo: `${instance.node}-sn-${index}`,
+        rules: subnet.name === 'fss' ? [sgw(instance.sgw)] : rules,
+      };
+    });
+  });
+}
+
 /** Hub B routes inspected traffic through one OCI Network Firewall. */
 function buildHubBRouteTables(model: LzModel): RouteTable[] {
   const region = model.foundation.regionShortName.trim() || '<region>';
@@ -321,11 +419,11 @@ function buildHubBRouteTables(model: LzModel): RouteTable[] {
   const envs = model.environments.map((env, e) => ({
     e,
     name: env.name.trim() || `env${e + 1}`,
-    vcnCidr: env.network.vcnCidr,
+    vcnCidr: env.projectNetworkEnabled === false ? '' : env.network.vcnCidr,
     subnets: env.network.subnets,
     attach: `attach-cmp-env-${e}`,
     attachName: generatorNames.environmentAttachment(region, env.name.trim() || `env${e + 1}`),
-  }));
+  })).filter((env) => env.vcnCidr);
   const toDrg = () => envs.map((env) => drg(env.vcnCidr));
   const toFirewall = () => envs.map((env) => fw(env.vcnCidr, firewallIp, firewallName));
   const routingNote = 'OCI Network Firewall route targets resolve from its generated resource key.';
@@ -386,11 +484,11 @@ function buildHubCRouteTables(model: LzModel): RouteTable[] {
   const envs = model.environments.map((env, e) => ({
     e,
     name: env.name.trim() || `env${e + 1}`,
-    vcnCidr: env.network.vcnCidr,
+    vcnCidr: env.projectNetworkEnabled === false ? '' : env.network.vcnCidr,
     subnets: env.network.subnets,
     attach: `attach-cmp-env-${e}`,
     attachName: generatorNames.environmentAttachment(region, env.name.trim() || `env${e + 1}`),
-  }));
+  })).filter((env) => env.vcnCidr);
   const toDrg = () => envs.map((env) => drg(env.vcnCidr));
   const trustNlb = (dest: string) => trust ? nlb(dest, 'Trust', trust.id) : drg(dest);
   const untrustNlb = (dest: string) => untrust ? nlb(dest, 'Untrust', untrust.id) : igw(dest);
@@ -456,11 +554,11 @@ function buildHubERouteTables(model: LzModel): RouteTable[] {
   const envs = model.environments.map((env, e) => ({
     e,
     name: env.name.trim() || `env${e + 1}`,
-    vcnCidr: env.network.vcnCidr,
+    vcnCidr: env.projectNetworkEnabled === false ? '' : env.network.vcnCidr,
     subnets: env.network.subnets,
     attach: `attach-cmp-env-${e}`,
     attachName: generatorNames.environmentAttachment(region, env.name.trim() || `env${e + 1}`),
-  }));
+  })).filter((env) => env.vcnCidr);
   const hubCidr = model.network.hubVcnCidr;
   const envVcns = envs.map((env) => drg(env.vcnCidr));
   const tables: RouteTable[] = [];

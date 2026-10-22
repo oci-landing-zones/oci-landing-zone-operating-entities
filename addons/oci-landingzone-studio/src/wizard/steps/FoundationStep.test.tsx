@@ -12,6 +12,33 @@ function render(model: LzModel) {
 }
 
 describe('observability fields', () => {
+  it('offers deployment type without a description or DR starting-point field', () => {
+    const complete = render(emptyLzModel());
+    expect(complete).toContain('id="lz-deployment-type"');
+    expect(complete).toContain('Complete deployment');
+    expect(complete).not.toContain('id="lz-dr-source"');
+    expect(complete).not.toContain('Description');
+    const model = emptyLzModel();
+    model.foundation.stackScope = 'regional';
+    const regional = render(model);
+    expect(regional).toContain('Home region');
+    expect(regional).not.toContain('id="lz-dr-source"');
+    expect(regional).not.toContain('Apply starting point');
+    expect(regional).not.toContain('Description');
+  });
+  it('shows DR prerequisites and hides Home-owned controls', () => {
+    const model = emptyLzModel();
+    model.foundation.stackScope = 'regional';
+    model.foundation.notifications!.useSingleRecipient = false;
+    model.environments = [];
+    const html = render(model);
+    expect(html).toContain('Home region');
+    expect(html).toContain('Home stack owns matching compartments');
+    expect(html).toContain('Environments are optional');
+    expect(html).not.toContain('id="lz-observability-cloudguard"');
+    expect(html).not.toContain('id="lz-observability-iam"');
+    expect(html).toContain('id="lz-observability-network"');
+  });
   it('starts with the shared recipient checked and a required email field', () => {
     const html = render(emptyLzModel());
     expect(html).toMatch(/type="checkbox"[^>]*checked/);

@@ -40,12 +40,21 @@ export interface PlatformConfigEntry {
 
 /** One environment in the config — its spoke network, projects, and platforms. */
 export interface EnvConfigEntry {
-  project_network: { network: { vcn: string; subnets: Record<string, string> } };
+  project_network?: { network: { vcn: string; subnets: Record<string, string> } };
   projects: Record<string, Record<string, never>>;
   platforms: Record<string, PlatformConfigEntry>;
 }
 
 export interface LzConfig {
+  stack_scope?: 'complete' | 'regional';
+  dr_region?: string;
+  remote_peering_connections?: Record<string, {
+    remote_cidrs: string[];
+    peer_region_name: string;
+    peer_id?: string;
+    peer_tenancy_ocid?: string;
+    requestor_group_ocid?: string;
+  }>;
   realm: string;
   region: string;
   region_short_name: string;
@@ -184,6 +193,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
       projects,
       platforms,
     };
+    if (env.projectNetworkEnabled === false) delete environments[name].project_network;
   });
 
   const shared_platforms: LzConfig['shared_platforms'] = {};
@@ -212,6 +222,15 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
   }
 
   return {
+    ...(f.stackScope ? { stack_scope: f.stackScope } : {}),
+    ...(f.stackScope !== 'regional' && f.drRegion ? { dr_region: f.drRegion } : {}),
+    ...((model.remotePeeringConnections?.length ?? 0) ? { remote_peering_connections: Object.fromEntries(model.remotePeeringConnections!.map((connection) => [connection.name.trim(), {
+      remote_cidrs: connection.remoteCidrs.map((cidr) => cidr.trim()),
+      peer_region_name: connection.peerRegionName,
+      ...(connection.role === 'requester' ? { peer_id: connection.peerId?.trim() } : {}),
+      ...(connection.peerTenancyOcid?.trim() ? { peer_tenancy_ocid: connection.peerTenancyOcid.trim() } : {}),
+      ...(connection.role === 'acceptor' && connection.requestorGroupOcid?.trim() ? { requestor_group_ocid: connection.requestorGroupOcid.trim() } : {}),
+    }])) } : {}),
     realm: f.realm,
     region: f.region,
     region_short_name: f.regionShortName,
@@ -291,8 +310,8 @@ function jsonnetValue(v: unknown): string {
 
 /** Lines for one environment entry (step 3): its spoke network + projects (+ platforms at step 4). */
 function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: boolean): string[] {
-  const net = entry.project_network.network;
-  const subEntries = Object.entries(net.subnets).map(([k, v]) => `${key(k)}: ${quote(v)}`);
+  const net = entry.project_network?.network;
+  const subEntries = Object.entries(net?.subnets ?? {}).map(([k, v]) => `${key(k)}: ${quote(v)}`);
   const subnetLines = subEntries.length === 0
     ? ['          subnets: {},']
     : ['          subnets: {', ...pairLines(subEntries, '            '), '          },'];
@@ -306,12 +325,12 @@ function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: bo
       : ['      platforms: {', ...platformKeys.flatMap((p) => platformEntryLines(p, entry.platforms[p])), '      },'];
   return [
     `    ${key(name)}: {`,
-    '      project_network: {',
+    ...(net ? ['      project_network: {',
     '        network: {',
-    `          vcn: ${quote(net.vcn)},`,
+    `          vcn: ${quote(net!.vcn)},`,
     ...subnetLines,
     '        },',
-    '      },',
+    '      },'] : []),
     projectsLine,
     ...platformsLines,
     '    },',
@@ -392,8 +411,11 @@ export function serializeConfig(model: LzModel, upToStep = Infinity): string {
     `  region: ${quote(c.region)},`,
     `  region_short_name: ${quote(c.region_short_name)},`,
     `  cis_level: ${c.cis_level},`,
+    ...(c.stack_scope ? [`  stack_scope: ${quote(c.stack_scope)},`] : []),
+    ...(c.dr_region ? [`  dr_region: ${quote(c.dr_region)},`] : []),
     ...(c.notification_emails ? [`  notification_emails: ${jsonnetValue(c.notification_emails)},`] : []),
     ...hubBlock,
+    ...(c.remote_peering_connections ? [`  remote_peering_connections: ${jsonnetValue(c.remote_peering_connections)},`] : []),
     ...environmentsBlock,
     ...sharedPlatformsBlock,
     `  security_targets: ${securityTargets},`,

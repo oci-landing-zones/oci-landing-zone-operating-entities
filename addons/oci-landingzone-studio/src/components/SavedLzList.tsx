@@ -10,12 +10,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oracle } from '../theme';
-import { deleteLZ, duplicateLZ, getLZ, getOutputs, listLZs, saveOutputs, type LzMeta } from '../services/lzStore';
+import { deleteLZ, duplicateLZ, getLZ, getOutputs, listLZs, saveOutputs, restoreCombinedDesign, type LzMeta } from '../services/lzStore';
 import { serializeConfig } from '../services/lzConfig';
 import { CONFIG_FILENAME, isCurrentOutputSet } from '../generator/outputNames';
 import { bundleFilename, downloadBlob, zipTextFiles } from '../export/zip';
-import { downloadTextFile } from '../export/download';
-import DisasterRecoverySourceDialog from './DisasterRecoverySourceDialog';
 import { drRegionOptions } from '../services/disasterRecoveryDesign';
 import { drDesignFingerprint, isCurrentDrOutputSet } from '../services/disasterRecoverySavedDesign';
 
@@ -114,7 +112,6 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
   const navigate = useNavigate();
   const [records, setRecords] = useState<LzMeta[]>(() => listLZs());
   const [storageError, setStorageError] = useState<string | null>(null);
-  const [openedDrId, setOpenedDrId] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<{ id: string; scope: 'Home' | 'DR' } | null>(null);
 
   const reload = () => setRecords(listLZs());
@@ -183,21 +180,6 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
     reload();
   }
 
-  async function handleDownloadDiagram(id: string, name: string) {
-    const record = getLZ(id);
-    if (!record) { setStorageError('This Landing Zone is no longer available in browser storage.'); return; }
-    try {
-      const { toDrawioXml } = await import('../export/toDrawio');
-      const diagram = record.disasterRecovery
-        ? (await import('../services/disasterRecoveryDiagram')).buildDrComparisonDiagram(record.model, record.disasterRecovery.draft)
-        : (await import('../diagram/buildGraph')).buildGraph(record.model, 5, {});
-      downloadTextFile(bundleFilename(name).replace(/-lz-outputs\.zip$/, '.drawio'), toDrawioXml(diagram), 'application/xml');
-      setStorageError(null);
-    } catch {
-      setStorageError('Could not export the diagram. Open this Landing Zone and review its design.');
-    }
-  }
-
   return (
     <>
       <div style={s.sectionHead}>
@@ -218,6 +200,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
               <div style={s.body}>
                 <div style={s.nameRow}>
                   <span style={s.name}>{r.name}</span>
+                  {(combined || getLZ(r.id)?.model.foundation.stackScope === 'regional') && <span style={s.badge}>DR</span>}
                   {isCurrent && <span style={s.badge}>This one</span>}
                 </div>
                 {descriptions[r.id] && <p style={{ margin: '0 0 12px', fontSize: 13, lineHeight: 1.5, color: oracle.textMuted, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{descriptions[r.id]}</p>}
@@ -228,8 +211,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                 )}
                 <div style={s.meta}>Edited {formatTime(r.updatedAt)}</div>
 
-                {/* Config downloads retain the generated snapshot; diagrams use the saved design. */}
-                <div style={s.outBox}>
+                {(combined || out) && <div style={s.outBox}>
                   {out && (
                     <div style={s.outHead}>
                       <span style={s.outTitle}>LZ config</span>
@@ -258,15 +240,18 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                         {out.combined ? 'Download Home + DR config' : 'Download LZ config'}
                       </button>
                     )}
-                    <button type="button" style={s.zipBtn} title="Download the saved design as an editable .drawio diagram" onClick={() => void handleDownloadDiagram(r.id, r.name)}>
-                      Download draw.io
-                    </button>
                   </div>
-                </div>
+                </div>}
               </div>
               <div style={s.actions}>
+                {getLZ(r.id)?.previousCombinedDesign && <button type="button" style={s.btn} onClick={() => {
+                  if (!window.confirm('Restore the original Home + DR design? This replaces the current regional edits. Duplicate this design first if you want to keep both.')) return;
+                  const restored = restoreCombinedDesign(r.id);
+                  setStorageError(restored.ok ? null : restored.message ?? 'Could not restore the original design.');
+                  reload();
+                }}>Restore original Home + DR</button>}
                 {!isCurrent && (
-                  <button type="button" style={s.open} onClick={() => getLZ(r.id)?.disasterRecovery ? setOpenedDrId(r.id) : navigate(`/lz/${r.id}`)}>Open</button>
+                  <button type="button" style={s.open} onClick={() => navigate(`/lz/${r.id}`)}>Open</button>
                 )}
                 <button type="button" style={s.btn} onClick={() => handleDuplicate(r.id)}>Duplicate</button>
                 <button type="button" style={s.danger} onClick={() => handleDelete(r.id, r.name)}>Delete</button>
@@ -275,8 +260,6 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
           );
         })}
       </div>
-      {openedDrId && <DisasterRecoverySourceDialog initialDesignId={openedDrId} onClose={() => setOpenedDrId(null)}
-        onSaved={(_id, warning) => { setStorageError(warning ?? null); reload(); }} />}
     </>
   );
 }

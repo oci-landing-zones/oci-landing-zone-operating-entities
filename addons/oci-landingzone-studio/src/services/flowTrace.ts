@@ -93,7 +93,7 @@ export const FLOW_KIND_LABELS: Record<FlowKind, string> = {
  * egress, ingress, east-west to every other environment, and OCI services.
  */
 export function allFlowIds(model: LzModel): string[] {
-  const envs = model.environments.map((env) => ({
+  const envs = model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env) => ({
     name: env.name.trim(),
     role: env.network?.subnets?.[0]?.name.split('-').pop() ?? '',
   })).filter((env) => env.name);

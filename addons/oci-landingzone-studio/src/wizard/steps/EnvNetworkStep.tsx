@@ -233,7 +233,7 @@ export default function EnvNetworkStep() {
 
   return (
     <div style={s.col}>
-      <ProjectsPanel projects={model.projects} envs={envs} onChange={(next) => setField('projects', next)} />
+      {envs.length > 0 && <ProjectsPanel projects={model.projects} envs={envs} onChange={(next) => setField('projects', next)} />}
 
       <section style={s.panel}>
         <div style={s.accent} />
@@ -242,7 +242,7 @@ export default function EnvNetworkStep() {
           <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>Set the private network range for each environment. Keep these ranges separate from each other and from any connected network.</div>
           {model.environments.length === 0 ? (
             <div style={{ ...s.empty, borderTop: `1px dashed ${oracle.border}`, borderRadius: 6 }}>
-              No environments yet — add them in step 1, then their spoke networks appear here.
+              Hub and shared services only. Continue to Platforms to add shared services, or add environments in Foundation.
             </div>
           ) : (
             <div className="environment-network-list">
@@ -270,6 +270,12 @@ export default function EnvNetworkStep() {
                     </button>
                     {open && (
                       <div className="environment-network-body">
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 44, fontSize: 13 }}>
+                          <input type="checkbox" checked={env.projectNetworkEnabled !== false} onChange={(event) => setField('environments', model.environments.map((item, index) => index === i ? { ...item, projectNetworkEnabled: event.target.checked,
+                            network: event.target.checked && !item.network.vcnCidr ? envNetworkDefaults(i, item.name) : item.network } : item))} />
+                          Include a Projects VCN
+                        </label>
+                        {env.projectNetworkEnabled === false ? <p style={s.help}>This environment uses platform networks only. Its compartments and projects remain available.</p> : <>
                         <div className="environment-network-generated">
                           <span>VCN name</span>
                           <code>{generatorNames.environmentVcn(region, envName)}</code>
@@ -283,6 +289,7 @@ export default function EnvNetworkStep() {
                           emptyNote="No subnets in this environment — add one below."
                           onApply={(patch) => patchEnvNetwork(i, patch)}
                         />
+                        </>}
                       </div>
                     )}
                   </div>

@@ -17,6 +17,15 @@ beforeEach(() => {
 });
 
 describe('saved combined Landing Zone cards', () => {
+  it('labels a regional design and keeps diagram download in Review only', () => {
+    const model = emptyLzModel();
+    model.foundation.stackScope = 'regional';
+    createLZ('Regional', model);
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    expect(html).toContain('>DR<');
+    expect(html).not.toContain('DR LZ');
+    expect(html).not.toContain('Download draw.io');
+  });
   it('shows both regions and separate downloads without a redundant topology badge', () => {
     const model = emptyLzModel();
     const draft = { ...createDrDraft(model), region: 'eu-amsterdam-1', rpcEnabled: true };

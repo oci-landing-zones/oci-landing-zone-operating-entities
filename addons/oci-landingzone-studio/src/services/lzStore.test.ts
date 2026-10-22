@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
-  createLZ, defaultLzName, deleteLZ, duplicateLZ, getLZ, listLZs, renameLZ, saveLZ, saveOutputs, saveDisasterRecoveryLZ, getOutputs,
+  createLZ, defaultLzName, deleteLZ, duplicateLZ, getLZ, listLZs, renameLZ, saveLZ, saveOutputs, saveDisasterRecoveryLZ, getOutputs, restoreCombinedDesign,
 } from './lzStore';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { createDrDraft } from './disasterRecoveryDesign';
@@ -28,6 +28,22 @@ beforeEach(() => {
 });
 
 describe('lzStore', () => {
+  it('retains and restores the original combined source after regional edits and duplication', () => {
+    const home = emptyLzModel();
+    const draft = { ...createDrDraft(home), region: 'eu-amsterdam-1' };
+    const combined = saveDisasterRecoveryLZ({ name: 'Combined', model: home, draft, sourceLabel: 'Saved Home' }).record!;
+    const regional = structuredClone(home);
+    regional.foundation.stackScope = 'regional';
+    regional.foundation.region = 'eu-amsterdam-1';
+    expect(saveLZ(combined.id, regional).ok).toBe(true);
+    expect(getLZ(combined.id)?.previousCombinedDesign).toEqual({ home, draft, sourceLabel: 'Saved Home' });
+    const copy = duplicateLZ(combined.id).record!;
+    expect(copy.previousCombinedDesign).toEqual(getLZ(combined.id)?.previousCombinedDesign);
+    expect(restoreCombinedDesign(copy.id).ok).toBe(true);
+    expect(getLZ(copy.id)?.disasterRecovery?.draft).toEqual(draft);
+    expect(getLZ(copy.id)?.model).toEqual(home);
+    expect(getLZ(combined.id)?.model).toEqual(regional);
+  });
   it('saves a separate Home + DR + RPC design without changing its Home source', () => {
     const home = createSaved('Home source');
     const draft = { ...createDrDraft(home.model), region: 'eu-amsterdam-1', rpcEnabled: true };

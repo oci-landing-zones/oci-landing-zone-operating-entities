@@ -60,6 +60,10 @@ export function emptyLzModel(): LzModel {
   };
 }
 
+export function newLzModel(): LzModel {
+  return { ...emptyLzModel(), environments: [], projects: [] };
+}
+
 /**
  * Studio has not been released, so only the current model contract is accepted.
  * Older or malformed browser records are intentionally reset instead of carrying

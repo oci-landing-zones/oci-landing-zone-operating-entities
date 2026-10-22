@@ -120,7 +120,7 @@ function restoreExadata(model: LzModel, type: 'exacc' | 'exacs', shared: ObjectV
   const candidate = shared[type] === undefined ? undefined : object(shared[type], `shared_platforms.${type}`);
   const sharedEntry = candidate && isExadata(candidate, type) ? candidate : undefined;
   const entries = model.environments.flatMap((env) => {
-    const platforms = object(object(envs[env.name], `environments.${env.name}`).platforms, `environments.${env.name}.platforms`);
+    const platforms = object(object(envs[env.name], `environments.${env.name}`).platforms ?? {}, `environments.${env.name}.platforms`);
     if (platforms[type] === undefined) return [];
     const entry = object(platforms[type], `environments.${env.name}.platforms.${type}`);
     return isExadata(entry, type) ? [{ env, entry }] : [];
@@ -196,12 +196,27 @@ function restoreExadata(model: LzModel, type: 'exacc' | 'exacs', shared: ObjectV
 export function importConfig(value: unknown): ImportedConfig {
   const config = object(value, 'config');
   const model = emptyLzModel();
-  const cisLevel = number(config.cis_level, 'cis_level');
+  const cisLevel = number(config.cis_level ?? 2, 'cis_level');
   if (cisLevel !== 1 && cisLevel !== 2) invalid('cis_level');
   model.foundation = {
+    ...model.foundation,
     realm: text(config.realm, 'realm'), region: text(config.region, 'region'),
     regionShortName: text(config.region_short_name, 'region_short_name'), cisLevel,
   };
+  if (config.stack_scope !== undefined) model.foundation.stackScope = choice(config.stack_scope, ['complete', 'regional'] as const, 'stack_scope');
+  if (config.dr_region !== undefined) model.foundation.drRegion = text(config.dr_region, 'dr_region');
+  if (config.remote_peering_connections !== undefined) model.remotePeeringConnections = Object.entries(object(config.remote_peering_connections, 'remote_peering_connections')).map(([name, value], index) => {
+    const path = `remote_peering_connections.${name}`;
+    const connection = object(value, path);
+    return {
+      id: `rpc-${index + 1}`, name, role: connection.peer_id === undefined ? 'acceptor' as const : 'requester' as const,
+      remoteCidrs: strings(connection.remote_cidrs, `${path}.remote_cidrs`),
+      peerRegionName: text(connection.peer_region_name ?? config.region, `${path}.peer_region_name`),
+      ...(connection.peer_id === undefined ? {} : { peerId: text(connection.peer_id, `${path}.peer_id`) }),
+      ...(connection.peer_tenancy_ocid === undefined ? {} : { peerTenancyOcid: text(connection.peer_tenancy_ocid, `${path}.peer_tenancy_ocid`) }),
+      ...(connection.requestor_group_ocid === undefined ? {} : { requestorGroupOcid: text(connection.requestor_group_ocid, `${path}.requestor_group_ocid`) }),
+    };
+  });
   if (config.notification_emails !== undefined) {
     const emails = object(config.notification_emails, 'notification_emails');
     const recipients = (topic: string) => emails[topic] === undefined ? '' : strings(emails[topic], `notification_emails.${topic}`).join(', ');
@@ -214,19 +229,21 @@ export function importConfig(value: unknown): ImportedConfig {
   const hubKind = choice<HubKind>(hub.kind, ['hub_a', 'hub_b', 'hub_c', 'hub_e'], 'hub.kind');
   const hubNetwork = network(hub.network, 'hub.network');
   model.network = { hubKind, hubVcnCidr: hubNetwork.vcnCidr, subnets: hubNetwork.subnets };
-  const envs = object(config.environments, 'environments');
-  const securityTargets = strings(config.security_targets, 'security_targets');
+  const envs = object(config.environments === undefined ? {} : config.environments, 'environments');
+  const securityTargets = strings(config.security_targets ?? Object.keys(envs), 'security_targets');
   model.environments = Object.entries(envs).map(([name, value], index) => {
     const env = object(value, `environments.${name}`);
-    const projectNetwork = object(env.project_network, `environments.${name}.project_network`);
-    return { id: `environment-${index + 1}`, name, securityZone: securityTargets.includes(name), network: network(projectNetwork.network, `environments.${name}.project_network.network`) };
+    const projectNetwork = env.project_network === undefined ? undefined : object(env.project_network, `environments.${name}.project_network`);
+    return { id: `environment-${index + 1}`, name, securityZone: securityTargets.includes(name),
+      ...(projectNetwork ? {} : { projectNetworkEnabled: false }),
+      network: projectNetwork ? network(projectNetwork.network, `environments.${name}.project_network.network`) : { vcnCidr: '', subnets: [] } };
   });
   model.projects = [];
   model.platforms = [];
   model.sharedPlatforms = [];
   for (const env of model.environments) {
     const entry = object(envs[env.name], `environments.${env.name}`);
-    for (const name of Object.keys(object(entry.projects, `environments.${env.name}.projects`))) {
+    for (const name of Object.keys(object(entry.projects ?? {}, `environments.${env.name}.projects`))) {
       let project = model.projects.find((p) => p.name === name);
       if (!project) {
         project = { id: `project-${model.projects.length + 1}`, name, environments: [] };
@@ -234,7 +251,7 @@ export function importConfig(value: unknown): ImportedConfig {
       }
       (project.environments as string[]).push(env.id);
     }
-    for (const [key, value] of Object.entries(object(entry.platforms, `environments.${env.name}.platforms`))) {
+    for (const [key, value] of Object.entries(object(entry.platforms ?? {}, `environments.${env.name}.platforms`))) {
       const path = `environments.${env.name}.platforms.${key}`;
       const data = object(value, path);
       if (isExadata(data, key)) continue;
@@ -257,9 +274,14 @@ export function importConfig(value: unknown): ImportedConfig {
     model.sharedPlatforms.push({ ...restored, type: restored.type });
   }
   const warnings: string[] = [];
+  if (config.notification_emails === undefined) warnings.push('This export has no notification recipients. Enter them in Foundation before generating a new package.');
+  if (model.foundation.stackScope === 'regional') warnings.push('Choose the Home region and confirm its prerequisites in Foundation before generating this DR stack.');
   restoreExadata(model, 'exacc', shared, envs, warnings);
   restoreExadata(model, 'exacs', shared, envs, warnings);
-  const expected = { ...config, shared_platforms: config.shared_platforms ?? {} };
+  const expected = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {
+    const env = object(value, `environments.${name}`);
+    return [name, { ...env, projects: env.projects ?? {}, platforms: env.platforms ?? {} }];
+  })), security_targets: config.security_targets ?? Object.keys(envs), shared_platforms: config.shared_platforms ?? {} };
   const diff = difference(expected, buildConfig(model));
   if (diff) invalid(diff);
   return { model, warnings };

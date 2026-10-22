@@ -27,6 +27,8 @@ import { validatePlatformContracts } from '../../services/platformValidation';
 import { validateExadataModel } from '../../services/exadata';
 import { exadataReadiness, platformReadiness } from '../../services/platformReadiness';
 import { validateNotificationEmails } from '../../services/notificationEmails';
+import { validateRemotePeering } from '../../services/remotePeering';
+import { validateRegionalDeployment } from '../../services/regionalDeployment';
 
 interface RunResult {
   config: string;
@@ -67,9 +69,9 @@ const local: Record<string, CSSProperties> = {
   phaseChangeTitle: { fontWeight: 800, color: oracle.redDark },
 };
 
-function expectedCoreFiles(cisLevel: 1 | 2): string[] {
+function expectedCoreFiles(cisLevel: 1 | 2, regional: boolean): string[] {
   return [
-    'iam.json', 'governance.json', 'network.json',
+    ...(regional ? [] : ['iam.json', 'governance.json']), 'network.json',
     `security_cis${cisLevel}_pre.json`, `security_cis${cisLevel}.json`,
     `observability_cis${cisLevel}_pre.json`, `observability_cis${cisLevel}.json`,
   ];
@@ -124,6 +126,7 @@ function HubDeploymentGuide({ hubKind }: { hubKind: string }) {
 
 export default function ReviewStep({ designName }: { designName: string }) {
   const { model } = useWizard();
+  const regional = model.foundation.stackScope === 'regional';
   const { id } = useParams();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -142,13 +145,14 @@ export default function ReviewStep({ designName }: { designName: string }) {
   const exacs = exadataReadiness(model, 'exacs');
   const contractErrors = useMemo(() => [...new Set([
     ...validatePlatformContracts(model), ...validateExadataModel(model),
-    ...validateNotificationEmails(model.foundation.notifications),
+    ...validateNotificationEmails(model.foundation.notifications, regional),
+    ...validateRemotePeering(model), ...validateRegionalDeployment(model),
     ...platformReadiness(model, 'oke_simple').errors, ...platformReadiness(model, 'ocvs').errors,
-  ])], [model]);
+  ])], [model, regional]);
   const stale = result !== null && !isCurrentOutputSet(result, configText);
   const deployFiles = result && !stale
     ? Object.keys(result.files)
-    : expectedCoreFiles(model.foundation.cisLevel);
+    : expectedCoreFiles(model.foundation.cisLevel, regional);
   const deployStages = deploymentStages(deployFiles);
   const [firstStage, ...remainingStages] = deployStages;
 
@@ -218,8 +222,11 @@ export default function ReviewStep({ designName }: { designName: string }) {
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Review your landing zone</div>
+          {regional && <p style={local.note}><strong>DR regional stack.</strong> Deploy Home first, with this DR region selected for the Object Storage key-use grant. Supply the Home compartments output and any required network dependencies to a separate DR stack/state. Matching platform and extension IAM prerequisites must already exist in Home. IAM, governance, Cloud Guard and Security Zones are excluded from this download.</p>}
+          {!!model.remotePeeringConnections?.length && <p style={local.note}><strong>X-RPC:</strong> deploy each acceptor first. Supply its RPC OCID or network dependency output to the requester. Review remote CIDRs, learned routes and firewall policies on both sides before allowing traffic.</p>}
           <div className="review-summary-grid" style={local.sumGrid}>
             {[
+              ['Deployment', regional ? 'Disaster Recovery' : 'Complete'],
               ['Region', model.foundation.region],
               ['Realm', model.foundation.realm],
               ['CIS benchmark', `Level ${model.foundation.cisLevel}`],

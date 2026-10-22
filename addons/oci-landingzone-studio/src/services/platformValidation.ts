@@ -20,6 +20,13 @@ function requiredKeys(keys: string[], scope: string): string[] {
   return keys.some((key) => !key.trim()) ? [`Every ${scope} needs a non-empty config key.`] : [];
 }
 
+function duplicatePlacedKeys(entries: { name: string; environments: 'all' | string[] }[], scope: string): string[] {
+  return entries.flatMap((entry, index) => entries.slice(0, index).some((other) =>
+    entry.name.trim().toLowerCase() === other.name.trim().toLowerCase()
+    && (entry.environments === 'all' || other.environments === 'all' || entry.environments.some((id) => other.environments.includes(id))))
+    ? [`Duplicate ${scope} config key: ${entry.name.trim()}.`] : []);
+}
+
 function subnetKeyErrors(subnets: { name: string }[], scope: string): string[] {
   return [
     ...requiredKeys(subnets.map((subnet) => subnet.name), `${scope} subnet`),
@@ -33,8 +40,8 @@ export function validatePlatformContracts(model: LzModel): string[] {
     ...requiredKeys(model.environments.map((environment) => environment.name), 'environment'),
     ...duplicateKeys(model.environments.map((environment) => environment.name), 'environment'),
     ...requiredKeys(model.projects.map((project) => project.name), 'project'),
-    ...duplicateKeys(model.projects.map((project) => project.name), 'project'),
-    ...duplicateKeys(model.platforms.map((platform) => platform.key), 'environment platform'),
+    ...duplicatePlacedKeys(model.projects, 'project'),
+    ...duplicatePlacedKeys(model.platforms.map((platform) => ({ name: platform.key, environments: platform.environments })), 'environment platform'),
     ...duplicateKeys(model.sharedPlatforms.map((platform) => platform.key), 'shared platform'),
     ...subnetKeyErrors(model.network.subnets, 'hub'),
   ];
@@ -42,6 +49,7 @@ export function validatePlatformContracts(model: LzModel): string[] {
   if (environmentIds.size !== model.environments.length) errors.push('Environment identities must be unique.');
   if (new Set(model.projects.map((project) => project.id)).size !== model.projects.length) errors.push('Project identities must be unique.');
   for (const environment of model.environments) {
+    if (environment.projectNetworkEnabled === false) continue;
     errors.push(...subnetKeyErrors(environment.network.subnets, `${environment.name.trim() || environment.id} environment`));
   }
   for (const project of model.projects) {
@@ -72,7 +80,7 @@ export function validatePlatformContracts(model: LzModel): string[] {
 
   const ranges: NamedCidr[] = [
     { name: 'Hub VCN', cidr: model.network.hubVcnCidr },
-    ...model.environments.map((env, index) => ({ name: `${env.name.trim() || `environment ${index + 1}`} project VCN`, cidr: env.network.vcnCidr })),
+    ...model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env, index) => ({ name: `${env.name.trim() || `environment ${index + 1}`} project VCN`, cidr: env.network.vcnCidr })),
     ...model.sharedPlatforms.map((platform) => ({ name: `shared platform ${platform.key || platform.id}`, cidr: platform.vcnCidr })),
     ...model.platforms.flatMap((platform) => platformEnvInstances(platform, model.environments).map((instance) => ({
       name: `${instance.name} platform ${platform.key || platform.id}`,

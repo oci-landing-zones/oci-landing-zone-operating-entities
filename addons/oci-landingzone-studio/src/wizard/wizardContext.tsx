@@ -19,8 +19,9 @@ import React, {
   useRef,
 } from 'react';
 import type { LzModel } from '../model/types';
-import { emptyLzModel } from '../model/defaults';
+import { newLzModel } from '../model/defaults';
 import { reconcileExadata } from '../services/exadata';
+import { createRegionalModel } from '../services/regionalDeployment';
 
 interface WizardState {
   model: LzModel;
@@ -51,7 +52,7 @@ function reducer(state: WizardState, action: WizardAction): WizardState {
     case 'SET_FIELD':
       return { ...state, model: reconcileExadata(setNested(state.model, action.path, action.value)) };
     case 'RESET':
-      return { model: emptyLzModel() };
+      return { model: state.model.foundation.stackScope === 'regional' ? createRegionalModel() : newLzModel() };
     default:
       return state;
   }

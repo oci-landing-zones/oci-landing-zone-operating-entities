@@ -43,7 +43,7 @@ export function validateOkeModel(model: LzModel): string[] {
   const errors = model.platforms.flatMap(validateOkePlatform);
   const routedVcns = [
     model.network.hubVcnCidr,
-    ...model.environments.map((env) => env.network.vcnCidr),
+    ...model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env) => env.network.vcnCidr),
     ...model.platforms.flatMap((platform) => model.environments.flatMap((env, index) =>
       platformInEnv(platform, env.id) ? [platformVcnForEnv(platform, env.id, index)] : [],
     )),

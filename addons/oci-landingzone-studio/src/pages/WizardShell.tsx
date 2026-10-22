@@ -11,6 +11,7 @@ import { ReactFlowProvider } from '@xyflow/react';
 import { WizardProvider, useWizard } from '../wizard/wizardContext';
 import { getLZ, renameLZ, saveLZ } from '../services/lzStore';
 import { normalizeModel } from '../model/defaults';
+import { legacyRegionalModel } from '../services/regionalDeployment';
 import type { DiagramOptions, LzModel } from '../model/types';
 import WizardStepper, { WIZARD_STEPS } from '../wizard/WizardStepper';
 import FoundationStep from '../wizard/steps/FoundationStep';
@@ -120,7 +121,8 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
 
   const showForm = viewMode === 'split' || viewMode === 'form';
   const showDiagram = viewMode === 'split' || viewMode === 'diagram';
-  const supportsFlowTracing = model.network.hubKind === 'hub_a' || model.network.hubKind === 'hub_b' || model.network.hubKind === 'hub_c' || model.network.hubKind === 'hub_e';
+  const supportsFlowTracing = model.environments.some((env) => env.projectNetworkEnabled !== false && env.network.subnets.length > 0)
+    && ['hub_a', 'hub_b', 'hub_c', 'hub_e'].includes(model.network.hubKind);
   const railActive = viewMode === 'split' && diagramCollapsed;
 
   // The endpoints / route-table dots and flows are a diagram-only-mode layer — in
@@ -330,7 +332,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState }: {
             {flowsOpen && (
               <div className="studio-flow-sidebar" style={{ height: 'calc(100vh - 185px)' }}>
                 <FlowSidebar
-                  environments={model.environments.map((e, i) => ({
+                  environments={model.environments.filter((env) => env.projectNetworkEnabled !== false).map((e, i) => ({
                     name: e.name.trim() || `env${i + 1}`,
                     roles: (e.network?.subnets ?? []).map((sn) => sn.name.split('-').pop() || ''),
                   }))}
@@ -412,5 +414,15 @@ export default function WizardShell() {
   const record = id ? getLZ(id) : null;
   if (!record) return <Navigate to="/" replace />;
   // key by id so the provider re-initialises cleanly when switching LZs.
-  return <WizardEditor key={record.id} id={record.id} initialName={record.name} initialModel={normalizeModel(record.model)} />;
+  let model: LzModel;
+  try { model = record.disasterRecovery ? legacyRegionalModel(record.model, record.disasterRecovery.draft) : normalizeModel(record.model); }
+  catch (error) {
+    return <main style={{ padding: 32, fontFamily: FONT, color: oracle.text, background: oracle.surface }}>
+      <h1>This saved DR design needs review</h1>
+      <p role="alert">{error instanceof Error ? error.message : 'This combined design cannot be represented by the standard editor.'}</p>
+      <p>The original Home and DR source and its existing downloads remain saved. Return home to download its files before creating a new regional design.</p>
+      <a href={import.meta.env.BASE_URL}>Return to Landing Zones</a>
+    </main>;
+  }
+  return <WizardEditor key={record.id} id={record.id} initialName={record.name} initialModel={model} />;
 }

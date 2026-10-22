@@ -4,6 +4,18 @@ import { newPlatform, newSharedPlatform } from './platforms';
 import { validatePlatformContracts } from './platformValidation';
 
 describe('validatePlatformContracts', () => {
+  it('accepts the same platform and project keys in disjoint environments', () => {
+    const model = emptyLzModel();
+    const first = newPlatform('custom', [], model.environments);
+    model.platforms = [
+      { ...first, environments: [model.environments[0].id] },
+      { ...newPlatform('custom', [first], model.environments), key: first.key, environments: [model.environments[1].id] },
+    ];
+    model.projects = model.environments.map((env, index) => ({ id: `project-${index}`, name: 'app', environments: [env.id] }));
+    expect(validatePlatformContracts(model)).toEqual([]);
+    model.platforms[1].environments = 'all';
+    expect(validatePlatformContracts(model)).toContain(`Duplicate environment platform config key: ${first.key}.`);
+  });
   it('accepts independent environment and shared platform ranges', () => {
     const base = emptyLzModel();
     const shared = newSharedPlatform('custom', []);

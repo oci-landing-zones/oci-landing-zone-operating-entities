@@ -9,6 +9,7 @@
 import React, { useState } from 'react';
 import { useWizard } from '../wizardContext';
 import DeleteButton from '../../components/DeleteButton';
+import RemotePeeringEditor from '../../components/RemotePeeringEditor';
 import { oracle } from '../../theme';
 import { HUB_KINDS, getHubKind, hubKindDefaults } from '../../services/hubKinds';
 import {
@@ -452,6 +453,7 @@ export default function HubNetworkStep() {
           )}
         </div>
       </section>
+      <RemotePeeringEditor />
     </div>
   );
 }

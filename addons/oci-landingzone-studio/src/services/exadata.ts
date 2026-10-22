@@ -213,7 +213,7 @@ export function exadataEntries(model: LzModel): {
     }
     if (useCase !== 1) {
       const occupied = [
-        model.network.hubVcnCidr, ...model.environments.map((env) => env.network.vcnCidr),
+        model.network.hubVcnCidr, ...model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env) => env.network.vcnCidr),
         ...model.sharedPlatforms.map((platform) => platform.vcnCidr),
         ...model.platforms.flatMap((platform) => platformEnvInstances(platform, model.environments).map((instance) => instance.vcnCidr)),
         ...Object.values(exacs.environmentVcnCidrs),
@@ -244,12 +244,12 @@ export function configuredVcnCidrs(model: LzModel): string[] {
   const entries = exadataEntries(model);
   return [
     model.network.hubVcnCidr,
-    ...model.environments.map((env) => env.network.vcnCidr),
+    ...model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env) => env.network.vcnCidr),
     ...model.sharedPlatforms.map((platform) => platform.vcnCidr),
     ...model.platforms.flatMap((platform) => platformEnvInstances(platform, model.environments).map((instance) => instance.vcnCidr)),
     ...Object.values(entries.shared).flatMap((entry) => entry.network ? [entry.network.vcn] : []),
     ...Object.values(entries.environments).flatMap((platforms) => Object.values(platforms).flatMap((entry) => entry.network ? [entry.network.vcn] : [])),
-  ];
+  ].filter(Boolean);
 }
 
 /** The generator auto-allocates ExaCS's db and backup /24s in this order. */
@@ -420,7 +420,7 @@ export function validateExadataModel(model: LzModel): string[] {
   }
   const ranges = [
     { name: 'hub', cidr: model.network.hubVcnCidr },
-    ...model.environments.map((env) => ({ name: `${env.name} project`, cidr: env.network.vcnCidr })),
+    ...model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env) => ({ name: `${env.name} project`, cidr: env.network.vcnCidr })),
     ...model.sharedPlatforms.map((platform) => ({ name: `shared ${platform.key}`, cidr: platform.vcnCidr })),
     ...model.platforms.flatMap((platform) => platformEnvInstances(platform, model.environments).map((instance) => ({ name: `${instance.name} ${platform.key}`, cidr: instance.vcnCidr }))),
   ];

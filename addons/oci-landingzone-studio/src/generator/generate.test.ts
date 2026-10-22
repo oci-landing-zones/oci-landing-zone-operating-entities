@@ -9,6 +9,9 @@ import { newPlatform, newSharedPlatform } from '../services/platforms';
 import { getHubKind, hubKindDefaults } from '../services/hubKinds';
 import { generatorNames } from '../services/generatorNaming';
 import type { HubKind, LzModel } from '../model/types';
+import { createRegionalModel } from '../services/regionalDeployment';
+import { buildRouteTables } from '../services/routeTables';
+import { buildGraph } from '../diagram/buildGraph';
 
 /** The browser fetches the engine over HTTP; under vitest we read it off disk. */
 beforeAll(() => {
@@ -63,6 +66,50 @@ describe('virtualFs', () => {
 });
 
 describe('generator (go-jsonnet wasm)', () => {
+  it('generates complete cross-tenancy acceptor and requester IAM from Studio RPC inputs', async () => {
+    const model = emptyLzModel();
+    model.environments = []; model.projects = [];
+    model.remotePeeringConnections = [
+      { id: 'accept', name: 'accept', role: 'acceptor', peerRegionName: 'eu-amsterdam-1', remoteCidrs: ['10.4.0.0/21'], peerTenancyOcid: 'ocid1.tenancy.oc1..requester', requestorGroupOcid: 'ocid1.group.oc1..networkadmin' },
+      { id: 'request', name: 'request', role: 'requester', peerRegionName: 'eu-paris-1', remoteCidrs: ['10.5.0.0/21'], peerId: 'RPC-PEER-KEY', peerTenancyOcid: 'ocid1.tenancy.oc1..acceptor' },
+    ];
+    const out = await generateOutputs(model);
+    expect(out.files['iam.json']).toContain('ocid1.tenancy.oc1..requester');
+    expect(out.files['iam.json']).toContain('ocid1.group.oc1..networkadmin');
+    expect(out.files['iam.json']).toContain('ocid1.tenancy.oc1..acceptor');
+    expect(out.files['network.json']).toContain('RPC-PEER-KEY');
+  }, 60_000);
+  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('generates %s regional DR with X-RPC and no environments', async (hubKind) => {
+    const model = createRegionalModel();
+    model.network = { hubKind, ...hubKindDefaults(hubKind) };
+    Object.assign(model.foundation, { homeRegion: 'eu-frankfurt-1', region: 'eu-amsterdam-1', regionShortName: 'ams', homePrerequisitesConfirmed: true });
+    model.remotePeeringConnections = [{ id: 'home', name: 'home', role: 'requester', remoteCidrs: ['10.3.0.0/21'], peerRegionName: 'eu-frankfurt-1', peerId: 'RPC-HOME-KEY' }];
+    const out = await generateOutputs(model);
+    expect(out.files['iam.json']).toBeUndefined();
+    expect(out.files['governance.json']).toBeUndefined();
+    expect(out.files['security_cis2_pre.json']).toContain('vaults');
+    const security = JSON.stringify(JSON.parse(out.files['security_cis2.json']));
+    expect(security).not.toContain('security_zones');
+    expect(security).not.toContain('cloud_guard');
+    const objects = collectObjects(JSON.parse(out.files['network.json']));
+    expect(objects.some((object) => object.peer_key === 'RPC-HOME-KEY')).toBe(true);
+    expect(objects.some((object) => object.type === 'REMOTE_PEERING_CONNECTION')).toBe(true);
+    const rpcTable = objects.find((object) => object.display_name === 'drgrt-ams-lz-rpc-home')!;
+    const diagramTable = buildRouteTables(model).find((table) => table.id === 'rt-rpc-home')!;
+    expect(diagramTable.name).toBe(rpcTable.display_name);
+    expect(diagramTable.rules.some((rule) => rule.destination === '0.0.0.0/0')).toBe(hubKind !== 'hub_e');
+    expect(buildGraph(model, 5).nodes.some((node) => node.id === 'rpc-home')).toBe(true);
+  }, 60_000);
+  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('generates %s without environments', async (hubKind) => {
+    const model = emptyLzModel();
+    model.environments = [];
+    model.projects = [];
+    model.network = { hubKind, ...hubKindDefaults(hubKind) };
+    const out = await generateOutputs(model);
+    expect(out.files['network.json']).toContain('0-shared');
+    expect(out.files['iam.json']).toBeDefined();
+    expect(out.config).toContain('environments: {}');
+  }, 60_000);
   it('keeps canonical identities for repeated and same-named relative imports', async () => {
     const files = {
       'main.jsonnet': `

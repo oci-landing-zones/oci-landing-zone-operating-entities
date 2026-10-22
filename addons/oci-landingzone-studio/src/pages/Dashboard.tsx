@@ -12,8 +12,8 @@ import LicenseNotice from '../components/LicenseNotice';
 import SavedLzList from '../components/SavedLzList';
 import { oracle } from '../theme';
 import { createLZ, listLZs } from '../services/lzStore';
+import { newLzModel } from '../model/defaults';
 import ImportLandingZoneDialog from '../components/ImportLandingZoneDialog';
-import DisasterRecoverySourceDialog from '../components/DisasterRecoverySourceDialog';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 
@@ -27,20 +27,15 @@ export default function Dashboard() {
   // Seeded from the store, then kept in step with the list — deleting the last
   // build has to bring the full-size Hero back.
   const [count, setCount] = useState(() => listLZs().length);
-  const [storageError, setStorageError] = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);
-  const [showDrSource, setShowDrSource] = useState(false);
-  const [savedRevision, setSavedRevision] = useState(0);
+  const [storageError, setStorageError] = useState<string | null>(null);
   const hasRecords = count > 0;
   const onCountChange = useCallback((n: number) => setCount(n), []);
 
   function handleNew() {
-    const created = createLZ();
-    if (!created.ok || !created.record) {
-      setStorageError(created.message ?? 'Could not create the Landing Zone.');
-      return;
-    }
-    navigate(`/lz/${created.record.id}`);
+    const result = createLZ(undefined, newLzModel());
+    if (!result.ok || !result.record) { setStorageError(result.message ?? 'Could not create the Landing Zone.'); return; }
+    navigate(`/lz/${result.record.id}`);
   }
 
   return (
@@ -48,17 +43,14 @@ export default function Dashboard() {
       <TopBar />
       {/* The intro band always sits at the top; it shrinks to a slim header once
           there are saved builds to list below it. */}
-      <Hero onNew={handleNew} onImport={() => setShowImport(true)} onAddDr={() => setShowDrSource(true)} compact={hasRecords} />
+      <Hero onNew={handleNew} onImport={() => setShowImport(true)} compact={hasRecords} />
       {showImport && <ImportLandingZoneDialog onClose={() => setShowImport(false)} onImported={(id) => navigate(`/lz/${id}`)} />}
-      {showDrSource && <DisasterRecoverySourceDialog onClose={() => setShowDrSource(false)} onSaved={(_id, warning) => {
-        setStorageError(warning ?? null); setCount(listLZs().length); setSavedRevision((revision) => revision + 1);
-      }} />}
+      {storageError && <p role="alert" style={{ ...s.page, color: oracle.redDark }}>{storageError}</p>}
 
-      {storageError && <div role="alert" style={{ ...s.page, paddingTop: 12, paddingBottom: 0, color: '#9f1d1d' }}>{storageError}</div>}
 
       {hasRecords && (
         <div style={s.page}>
-          <SavedLzList key={savedRevision} onCountChange={onCountChange} />
+          <SavedLzList onCountChange={onCountChange} />
         </div>
       )}
 

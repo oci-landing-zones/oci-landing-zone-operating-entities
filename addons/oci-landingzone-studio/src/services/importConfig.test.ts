@@ -141,7 +141,7 @@ describe('Studio config import', () => {
   });
 
   it('rejects unsupported fields and extensions with the configuration path', () => {
-    expect(() => importConfig({ ...buildConfig(emptyLzModel()), dr_region: 'eu-amsterdam-1' })).toThrow(/dr_region/);
+    expect(() => importConfig({ ...buildConfig(emptyLzModel()), unsupported: true })).toThrow(/unsupported/);
     const config = buildConfig(emptyLzModel());
     config.shared_platforms.extra = { extension: { type: 'unknown' } };
     expect(() => importConfig(config)).toThrow(/shared_platforms.extra/);

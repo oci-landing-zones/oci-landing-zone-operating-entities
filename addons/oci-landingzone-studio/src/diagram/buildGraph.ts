@@ -321,7 +321,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   const platformVcnCount = showPlatforms
     ? model.environments.reduce((sum, e) => sum + platforms.filter((p) => platformInEnv(p, e.id)).length, 0)
     : 0;
-  const numAttach = 1 + (showSpokes ? model.environments.filter((env) => !projection?.projectEnvironmentIds || projection.projectEnvironmentIds.includes(env.id)).length : 0) + platformVcnCount + sharedInstances.length;
+  const numAttach = 1 + (showSpokes ? model.environments.filter((env) => env.projectNetworkEnabled !== false && (!projection?.projectEnvironmentIds || projection.projectEnvironmentIds.includes(env.id))).length : 0) + platformVcnCount + sharedInstances.length;
   const stackH = numAttach * ATTACH_H + (numAttach - 1) * ATTACH_GAP_V;
   // The DRG icon is centred in the cluster; padding both sides by its caption
   // height keeps the "DRG" label clear of the compartment border (it otherwise
@@ -346,7 +346,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
 
   // ---- environments (right column), stored per-environment spoke networks
   const envs = model.environments.map((e, i) => {
-    const hasProjectNetwork = !projection?.projectEnvironmentIds || projection.projectEnvironmentIds.includes(e.id);
+    const hasProjectNetwork = e.projectNetworkEnabled !== false && (!projection?.projectEnvironmentIds || projection.projectEnvironmentIds.includes(e.id));
     const name = e.name.trim() || `env${i + 1}`;
     // Stale in-memory records may predate Environment.network — fall back to defaults.
     const net = e.network ?? envNetworkDefaults(i);
@@ -416,7 +416,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       sourceId: e.id,
       name,
       label: generatorNames.environmentCompartment(name),
-      secure: e.securityZone,
+      secure: model.foundation.stackScope !== 'regional' && e.securityZone,
       netLabel: generatorNames.environmentChildCompartment(name, 'network'),
       vcnLabel: `${generatorNames.environmentVcn(regionTok, name)}\n${net.vcnCidr}`,
       subnets,
@@ -474,7 +474,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   const nodes: DiagramNode[] = [
     { id: 'region', kind: 'region', label: region ? `OCI Region · ${region}` : 'OCI Region', x: 0, y: 0, width: regWidth, height: regHeight },
     { id: 'tenancy', kind: 'tenancy', label: 'OCI Tenancy', parentId: 'region', x: PAD, y: innerTop, width: tenWidth, height: tenHeight },
-    { id: 'landingzone', kind: 'landingzone', secure: true, container: true, label: generatorNames.landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
+    { id: 'landingzone', kind: 'landingzone', secure: f.stackScope !== 'regional', container: true, label: generatorNames.landingZone, parentId: 'tenancy', x: PAD, y: innerTop, width: lzWidth, height: lzHeight },
   ];
   const edges: DiagramEdge[] = [];
   const pushExadataChildren = (parentId: string, parentLabel: string, parentWidth: number, children: Array<'db' | 'infra'>) => {
@@ -487,7 +487,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   };
 
   // network compartment › hub VCN › gateways + hub subnets (step 2+, implemented hub kinds only)
-  nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', secure: true, container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
+  nodes.push({ id: 'cmp-network', kind: 'compartment', tone: 'yellow', secure: f.stackScope !== 'regional', container: showHub || undefined, label: generatorNames.networkCompartment, parentId: 'landingzone', x: leftX, y: innerTop + leftOffset, width: netCompW, height: netCompH });
   if (showHub) {
     const placed = pushVcn(nodes, 'hub-vcn', 'cmp-network', hubVcnLabel, hubSubnets);
     // Gateways use the rail inside the hub VCN: IGW by the first subnet,
@@ -737,6 +737,22 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       pushExadataChildren(id, label, PLAT_COMP_W - 2 * PAD, children);
     });
   });
+
+  if (showHub && model.remotePeeringConnections?.length) {
+    const lz = nodes.find((node) => node.id === 'landingzone')!;
+    const start = lz.height;
+    let bottom = start;
+    for (const connection of model.remotePeeringConnections) {
+      const height = 64 + connection.remoteCidrs.length * 18;
+      nodes.push({ id: `rpc-${connection.id}`, kind: 'attachment', parentId: 'landingzone',
+        label: `X-RPC ${connection.name || 'Unnamed'} (${connection.role})\nPeer: ${connection.peerRegionName || 'Region pending'}\n${connection.remoteCidrs.join('\n')}`,
+        x: PAD, y: bottom, width: 380, height });
+      edges.push({ id: `e-rpc-${connection.id}`, source: 'drg', target: `rpc-${connection.id}` });
+      bottom += height + PAD;
+    }
+    const growth = bottom - start;
+    for (const node of nodes.filter((node) => ['landingzone', 'tenancy', 'region'].includes(node.id))) node.height += growth;
+  }
 
   // Route-table dots + opened tables. Every table gets a small clickable dot on
   // its element (subnet / gateway / attachment / DRG); clicking the dot opens the

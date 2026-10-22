@@ -29,6 +29,7 @@ const s: Record<string, React.CSSProperties> = {
   title:   { fontSize: 15, fontWeight: 700, marginBottom: 16, color: oracle.ink },
   help:    { fontSize: 12.5, lineHeight: 1.5, color: oracle.textMuted },
   twoCol:  { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 },
+  locationGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14, marginBottom: 14 },
   topicRow: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.15fr)', gap: 16, alignItems: 'start', padding: '14px 0', borderTop: `1px solid ${oracle.border}` },
   label:   { display: 'block', fontSize: 12, color: oracle.textMuted, fontWeight: 700, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.3 },
   input:   { width: '100%', boxSizing: 'border-box', padding: '9px 11px', border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, fontSize: 14, background: oracle.surface, color: oracle.text, fontFamily: FONT },
@@ -61,6 +62,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
 }) {
   const { model, setField } = useWizard();
   const f = model.foundation;
+  const regional = f.stackScope === 'regional';
   const singleRecipient = f.notifications?.useSingleRecipient ?? Boolean(f.notifications?.default);
   const envs = model.environments;
 
@@ -71,6 +73,11 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
 
   function setFoundation(patch: Partial<FoundationConfig>) {
     setField('foundation', { ...f, ...patch });
+  }
+  function setDeploymentType(stackScope: 'complete' | 'regional') {
+    const region = stackScope === 'complete' && !f.region ? getDefaultRegionForRealm(f.realm) : undefined;
+    setFoundation({ stackScope, homePrerequisitesConfirmed: false,
+      ...(region ? { region: region.id, regionShortName: region.shortName } : {}) });
   }
   function setNotification(topic: keyof OneOeNotifications, value: string) {
     setFoundation({ notifications: {
@@ -88,11 +95,13 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
   }
   function onRealm(realm: string) {
     const def = getDefaultRegionForRealm(realm);
-    setFoundation({ realm, region: def?.id ?? '', regionShortName: def?.shortName ?? '' });
+    setFoundation({ realm, region: regional ? '' : def?.id ?? '', regionShortName: regional ? '' : def?.shortName ?? '',
+      homeRegion: undefined, drRegion: undefined, homePrerequisitesConfirmed: false });
   }
   function onRegion(region: string) {
     const r = findRegion(f.realm, region);
-    setFoundation({ region, regionShortName: r?.shortName ?? f.regionShortName });
+    setFoundation({ region, regionShortName: r?.shortName ?? '', homePrerequisitesConfirmed: false,
+      ...(region === f.drRegion ? { drRegion: undefined } : {}) });
   }
 
   function setEnvs(next: Environment[]) { setField('environments', next); }
@@ -141,6 +150,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.accent} />
         <div style={s.body}>
           <div style={s.title}>Foundation</div>
+          <p style={s.help}>{regional ? 'Disaster Recovery: regional resources only. Compartments, IAM, governance, Cloud Guard and Security Zones stay with Home.' : 'Complete deployment: tenancy prerequisites and regional resources.'}</p>
           <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>Set the OCI location, security baseline, and environments for this landing zone.</div>
           <div style={s.field}>
             <label style={s.label} htmlFor="saved-lz-name">Design name</label>
@@ -156,13 +166,6 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
             <div style={{ ...s.help, marginTop: 5 }}>Stored in this browser and used for download filenames. It does not change OCI resource names.</div>
             {nameError && <div id="saved-lz-name-error" role="alert" style={s.error}>{nameError}</div>}
           </div>
-          <div style={s.field}>
-            <label style={s.label} htmlFor="lz-description">Description</label>
-            <textarea id="lz-description" value={f.description ?? ''} onChange={(event) => setFoundation({ description: event.target.value })}
-              rows={3} maxLength={1000} placeholder="Describe what makes this Landing Zone design different."
-              aria-describedby="lz-description-help" style={{ ...s.input, resize: 'vertical', minHeight: 88 }} />
-            <div id="lz-description-help" style={{ ...s.help, marginTop: 5 }}>Shown below the design name on the dashboard. Stored in this browser.</div>
-          </div>
           <div style={s.twoCol} className="foundation-two-col">
             <div>
               <label style={s.label} htmlFor="lz-realm">Realm</label>
@@ -170,27 +173,6 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
                 {REALM_OPTIONS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
               </select>
               <div id="lz-realm-help" style={{ ...s.help, marginTop: 5 }}>Use OC1 for commercial OCI. Select another realm only when your tenancy uses a sovereign or isolated cloud.</div>
-            </div>
-            <div>
-              <label style={s.label} htmlFor="lz-region">Region</label>
-              <select id="lz-region" style={s.select} value={f.region} onChange={(e) => onRegion(e.target.value)}>
-                {regionOptions.map((r) => (
-                  <option key={r.id} value={r.id}>{r.id} ({r.shortName.toUpperCase()})</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div style={{ ...s.twoCol, marginTop: 14 }} className="foundation-two-col">
-            <div>
-              <label style={s.label} htmlFor="lz-region-short">Region short name</label>
-              <input
-                id="lz-region-short"
-                style={s.input}
-                value={f.regionShortName}
-                readOnly
-                aria-describedby="lz-region-short-help"
-              />
-              <div id="lz-region-short-help" style={{ ...s.help, marginTop: 5 }}>Derived from the selected OCI region and included in OCI resource names.</div>
             </div>
             <div>
               <label style={s.label} htmlFor="lz-cis-level">CIS benchmark level</label>
@@ -204,9 +186,42 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
                 <option value={2}>Level 2 — CMEK required</option>
                 <option value={1}>Level 1 — foundational security</option>
               </select>
-              <div id="lz-cis-level-help" style={{ ...s.help, marginTop: 5 }}>Level 2 requires customer-managed encryption keys (CMEK) for resources protected by Security Zones. Level 1 provides the foundational controls.</div>
+              <div id="lz-cis-level-help" style={{ ...s.help, marginTop: 5 }}>{regional ? 'Level 2 creates DR-local Vaults and encryption keys. Security Zones and tenancy controls remain Home-owned.' : 'Level 2 requires customer-managed encryption keys (CMEK) for resources protected by Security Zones. Level 1 provides the foundational controls.'}</div>
             </div>
           </div>
+          <div style={{ ...s.locationGrid, marginTop: 14 }} className="foundation-location-grid">
+            <div>
+              <label style={s.label} htmlFor="lz-region">{regional ? 'DR region' : 'Region'}</label>
+              <select id="lz-region" style={s.select} value={f.region} onChange={(e) => onRegion(e.target.value)}>
+                {regional && <option value="">Choose a DR region</option>}
+                {regionOptions.filter((region) => !regional || region.id !== f.homeRegion).map((r) => (
+                  <option key={r.id} value={r.id}>{r.id}</option>
+                ))}
+              </select>
+              <div style={{ ...s.help, marginTop: 5 }}>Region short name: {f.regionShortName || 'Select a region'}</div>
+            </div>
+            <div>
+              <label style={s.label} htmlFor="lz-deployment-type">Deployment type</label>
+              <select id="lz-deployment-type" style={s.select} value={f.stackScope ?? 'complete'} onChange={(event) => setDeploymentType(event.target.value as 'complete' | 'regional')}>
+                <option value="complete">Complete</option>
+                <option value="regional">DR</option>
+              </select>
+            </div>
+            <div>
+              <label style={s.label} htmlFor={regional ? 'lz-home-region' : 'lz-dr-region'}>{regional ? 'Home region' : 'DR region (optional)'}</label>
+              {regional ? <select id="lz-home-region" style={s.select} value={f.homeRegion ?? ''} onChange={(event) => setFoundation({ homeRegion: event.target.value, homePrerequisitesConfirmed: false })}>
+                <option value="">Choose the Home region</option>
+                {regionOptions.filter((region) => region.id !== f.region).map((region) => <option key={region.id} value={region.id}>{region.id}</option>)}
+              </select> : <select id="lz-dr-region" style={s.select} value={f.drRegion ?? ''} onChange={(event) => setFoundation({ drRegion: event.target.value || undefined })}>
+                <option value="">No DR region</option>
+                {regionOptions.filter((region) => region.id !== f.region).map((region) => <option key={region.id} value={region.id}>{region.id}</option>)}
+              </select>}
+            </div>
+          </div>
+          {regional ? <label style={{ display: 'flex', gap: 8, alignItems: 'start', marginTop: 12, lineHeight: 1.5, fontSize: 13 }}>
+            <input type="checkbox" checked={!!f.homePrerequisitesConfirmed} onChange={(event) => setFoundation({ homePrerequisitesConfirmed: event.target.checked })} />
+            The Home stack owns matching compartments, project and platform IAM, and governance. I will supply its dependency outputs to the DR stack.
+          </label> : <p style={s.help}>The optional DR region grants DR Object Storage access to Home encryption keys. Configure X-RPC in Hub Network when the regions need connectivity.</p>}
         </div>
       </section>
 
@@ -215,15 +230,15 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.body}>
           <div style={s.title}>Environments</div>
           <div style={{ ...s.help, margin: '-8px 0 14px' }}>
-            An environment is an isolated stage of your workload, such as development or production. A Security Zone applies stricter OCI controls; confirm it permits every service you plan to use.
+            {regional ? 'Include only the environments needed for DR. Matching compartments and their controls must exist in Home.' : 'An environment is an isolated stage of your workload, such as development or production. A Security Zone applies stricter OCI controls; confirm it permits every service you plan to use.'}
           </div>
 
           <div style={s.tableHead} className="foundation-environment-grid">
             <span>Name</span>
-            <span>Security zone</span>
+            <span>{regional ? 'Home controls' : 'Security zone'}</span>
             <span>Actions</span>
           </div>
-          {envs.length === 0 && <div style={s.empty}>No environments yet — add one below.</div>}
+          {envs.length === 0 && <div style={s.empty}>Hub and shared services only. Environments are optional.</div>}
           {envs.map((env, i) => (
             <div key={i} style={s.row} className="foundation-environment-grid">
               <input
@@ -232,12 +247,12 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
                 value={env.name}
                 onChange={(e) => updateEnv(i, { name: e.target.value })}
               />
-              <Switch
+              {regional ? <span style={s.help}>Home-owned</span> : <Switch
                 checked={env.securityZone}
                 onChange={(v) => updateEnv(i, { securityZone: v })}
                 label={env.securityZone ? 'On' : 'Off'}
                 ariaLabel={`Security zone for ${env.name || `environment ${i + 1}`}`}
-              />
+              />}
               <DeleteButton label={`Delete environment ${env.name || i + 1}`} onClick={() => deleteEnv(i)} />
             </div>
           ))}
@@ -253,7 +268,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') addEnv(); }}
             />
-            <Switch checked={newSecure} onChange={setNewSecure} label={newSecure ? 'On' : 'Off'} ariaLabel="Security zone for new environment" />
+            {regional ? <span style={s.help}>Home-owned</span> : <Switch checked={newSecure} onChange={setNewSecure} label={newSecure ? 'On' : 'Off'} ariaLabel="Security zone for new environment" />}
             <button type="button" style={s.addBtn} onClick={addEnv}>Add</button>
           </div>
         </div>
@@ -264,14 +279,14 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
         <div style={s.body}>
           <div id="foundation-observability-title" style={s.title}>Observability</div>
           <div style={{ ...s.help, margin: '-8px 0 14px' }}>
-            Notification email addresses are required. Use the same recipients for all four topics, or configure each topic separately. Separate multiple addresses with commas.
+            Notification email addresses are required. Use shared recipients or configure each topic separately. Separate multiple addresses with commas.
           </div>
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: oracle.ink }}>
               <input type="checkbox" checked={singleRecipient} onChange={(e) => setSingleRecipient(e.target.checked)} />
               Use one email for all notifications
             </label>
-            <div style={{ ...s.help, marginTop: 5 }}>Uses the same recipients for Cloud Guard, IAM, Network and Security.</div>
+            <div style={{ ...s.help, marginTop: 5 }}>{regional ? 'Uses the same recipients for regional Network and Security notifications.' : 'Uses the same recipients for Cloud Guard, IAM, Network and Security.'}</div>
           </div>
           {!singleRecipient && <div>
             {([
@@ -279,7 +294,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
               ['iam', 'IAM events'],
               ['network', 'Network events and alarms'],
               ['security', 'Security events and alarms'],
-            ] as const).map(([topic, label]) => (
+            ] as const).filter(([topic]) => !regional || topic === 'network' || topic === 'security').map(([topic, label]) => (
               <div key={topic} style={s.topicRow} className="foundation-observability-row">
                 <div>
                   <label style={s.label} htmlFor={`lz-observability-${topic}`}>{label}</label>

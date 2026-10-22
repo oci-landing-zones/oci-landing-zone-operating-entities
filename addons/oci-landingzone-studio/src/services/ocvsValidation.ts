@@ -71,7 +71,7 @@ export function validateOcvsModel(model: LzModel): string[] {
   ];
   const vcns = [
     { id: 'hub', cidr: model.network.hubVcnCidr },
-    ...model.environments.map((env, index) => ({ id: `env:${index}`, cidr: env.network.vcnCidr })),
+    ...model.environments.flatMap((env, index) => env.projectNetworkEnabled !== false ? [{ id: `env:${index}`, cidr: env.network.vcnCidr }] : []),
     ...model.platforms.flatMap((platform, platformIndex) => model.environments.flatMap((env, envIndex) =>
       platformInEnv(platform, env.id) ? [{ id: `platform:${platformIndex}:${envIndex}`, cidr: platformVcnForEnv(platform, env.id, envIndex) }] : [],
     )),

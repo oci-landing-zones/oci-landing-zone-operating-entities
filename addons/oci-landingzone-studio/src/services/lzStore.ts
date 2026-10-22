@@ -36,6 +36,7 @@ export interface LzMeta {
 export interface LzRecord extends LzMeta {
   model: LzModel;
   disasterRecovery?: { draft: DrDesignDraft; sourceLabel: string };
+  previousCombinedDesign?: { home: LzModel; draft: DrDesignDraft; sourceLabel: string };
 }
 
 export interface StoreResult {
@@ -139,6 +140,10 @@ export function saveLZ(id: string, model: LzModel): StoreResult {
   const existing = getLZ(id);
   if (!existing) return { ok: false, message: 'This Landing Zone is no longer available in browser storage.' };
   const updated: LzRecord = { ...existing, model, updatedAt: now() };
+  if (existing.disasterRecovery && model.foundation.stackScope === 'regional') {
+    updated.previousCombinedDesign = { home: existing.model, ...existing.disasterRecovery };
+    delete updated.disasterRecovery;
+  }
   try {
     window.localStorage.setItem(recordKey(id), JSON.stringify(updated));
   } catch {
@@ -195,12 +200,27 @@ export function duplicateLZ(id: string): CreateLzResult {
     ? saveDisasterRecoveryLZ({ name: `Copy of ${source.name}`, model: source.model, ...source.disasterRecovery })
     : createLZ(`Copy of ${source.name}`, source.model);
   if (!created.ok || !created.record) return created;
+  if (source.previousCombinedDesign) {
+    created.record.previousCombinedDesign = source.previousCombinedDesign;
+    try { window.localStorage.setItem(recordKey(created.record.id), JSON.stringify(created.record)); }
+    catch {
+      deleteLZ(created.record.id);
+      return { ok: false, message: 'Could not retain the original Home and DR source in this copy.' };
+    }
+  }
   // The copy has an identical model, so the source's artifacts still describe it.
   const outputs = getOutputs(id);
   if (outputs && !saveOutputs(created.record.id, { config: outputs.config, files: outputs.files }).ok) {
     return { ...created, message: 'The Landing Zone copy was created, but its output ZIP could not be saved.' };
   }
   return created;
+}
+
+export function restoreCombinedDesign(id: string): StoreResult {
+  const record = getLZ(id);
+  const original = record?.previousCombinedDesign;
+  if (!record || !original) return { ok: false, message: 'The original combined design is no longer available.' };
+  return saveDisasterRecoveryLZ({ id, name: record.name, model: original.home, draft: original.draft, sourceLabel: original.sourceLabel });
 }
 
 export function deleteLZ(id: string): StoreResult {
