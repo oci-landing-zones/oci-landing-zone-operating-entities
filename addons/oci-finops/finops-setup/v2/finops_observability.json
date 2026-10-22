@@ -1,0 +1,18 @@
+{
+    "notifications_configuration": {
+        "default_compartment_id": "CMP-FINOPS-KEY",
+        "topics": {
+            "NOTT-LZ-FINOPS-KEY": {
+                "name": "nott-lz-finops",
+                "description": "Topic for FinOps platform operational notifications.",
+                "compartment_id": "CMP-FINOPS-KEY",
+                "subscriptions": [
+                     {
+                        "protocol"                          : "EMAIL",
+                        "values"                            : ["email.address@example.com"]
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -22,9 +22,35 @@ These configurations add the FinOps platform to an existing One-OE Landing Zone 
 |---|---|
 | [finops_iam.json](v2/finops_iam.json) | Create `cmp-finops` under the existing shared platform compartment, two groups in `id_lz_common`, and their policies. |
 | [finops_network.json](v2/finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
+| [finops_governance.json](v2/finops_governance.json) | Create the active `tagns-lz-cost-governance` namespace and its six defined tags at tenancy root, following One-OE naming. |
+| [finops_observability.json](v2/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
 | [finops_service_access.json](v2/finops_service_access.json) | After provisioning, enable the ADB report-reading principal. Replace the compartment OCID placeholder before using this file. |
 
+Include `finops_governance.json` in the FinOps stack inputs. It defines the active namespace `tagns-lz-cost-governance` (`TAGNS-LZ-COST-GOVERNANCE-KEY`) and the tags `tag-lz-cost-center`, `tag-lz-application`, `tag-lz-environment`, `tag-lz-owner`, `tag-lz-business-unit`, and `tag-lz-project`, with corresponding `TAG-LZ-...-KEY` identifiers. Values are free text, with no tag defaults or automatic assignment to resources; OCI cost-tracking flags are disabled. If the namespace already exists, reconcile its Terraform ownership before applying. For a combined stack, merge this namespace into the existing `tags_configuration.namespaces` map rather than supplying duplicate top-level configuration blocks.
+
+**FOCUS installer compatibility:** Use a version of `finops-focus-platform` that supports the six One-OE cost governance tags (commit `ffe4956` or later). Its tag catalog installer checks the existing `tagns-lz-cost-governance` namespace and the six tags above; it does not create OCI tags. Apply this governance configuration before running the tag catalog installer.
+
 The configurations prepare infrastructure and access. Operations provisions ADB, OAC, its private access channel (PAC), Database Tools connections and credentials, and dashboard content. LZ administrators provision the Bastion in `cmp-finops`, targeting the FinOps VCN's infra subnet in `cmp-lz-network`. Both FinOps groups have session access only in `cmp-finops`.
+
+### Configure the FinOps notification email before deployment
+
+Terraform creates the `nott-lz-finops` topic and its configured subscriptions. Complete these steps before installing the FOCUS shared core:
+
+1. In your deployment copy of [finops_observability.json](v2/finops_observability.json), set `notifications_configuration.topics.NOTT-LZ-FINOPS-KEY.subscriptions` to the intended recipients. Replace any example or existing email address with your own operational mailbox; do not deploy another installation's recipient. For example:
+
+   ```json
+   "subscriptions": [
+       {
+           "protocol": "EMAIL",
+           "values": ["finops-team@example.com"]
+       }
+   ]
+   ```
+
+2. Add `finops_observability.json` to the stack inputs while preserving existing IAM, network, and governance inputs. A separate stack must receive `CMP-FINOPS-KEY` through compartment dependencies. Apply the ADB dynamic group's `ONS_TOPIC_PUBLISH` grant from `finops_service_access.json` in `cmp-finops`; creating the topic alone does not authorize publishing.
+3. Validate the configuration, review the Terraform plan for the expected topic and email subscriptions, then apply it. OCI sends a confirmation email to each configured recipient.
+4. Open the OCI confirmation email and confirm each subscription. Verify that its state is `ACTIVE` before continuing; Terraform creation alone does not confirm an email subscription. An empty `subscriptions` list creates only the topic and does not provide email delivery.
+5. Supply the deployed topic OCID when the FOCUS shared core installer requests it. To change recipients later, update the deployment configuration, review and apply a new Terraform plan, and confirm each new subscription.
 
 ### Roles and compartment scope
 

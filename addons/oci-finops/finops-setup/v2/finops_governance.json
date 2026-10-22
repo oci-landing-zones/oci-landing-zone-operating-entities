@@ -1,0 +1,50 @@
+{
+    "tags_configuration": {
+        "default_compartment_id": "TENANCY-ROOT",
+        "namespaces": {
+            "TAGNS-LZ-COST-GOVERNANCE-KEY": {
+                "name": "tagns-lz-cost-governance",
+                "description": "Cost governance tags for FinOps reporting.",
+                "is_retired": false,
+                "tags": {
+                    "TAG-LZ-COST-CENTER-KEY": {
+                        "name": "tag-lz-cost-center",
+                        "description": "Cost center responsible for the resource.",
+                        "is_cost_tracking": false,
+                        "is_retired": false
+                    },
+                    "TAG-LZ-APPLICATION-KEY": {
+                        "name": "tag-lz-application",
+                        "description": "Business application associated with the resource.",
+                        "is_cost_tracking": false,
+                        "is_retired": false
+                    },
+                    "TAG-LZ-ENVIRONMENT-KEY": {
+                        "name": "tag-lz-environment",
+                        "description": "Deployment environment associated with the resource.",
+                        "is_cost_tracking": false,
+                        "is_retired": false
+                    },
+                    "TAG-LZ-OWNER-KEY": {
+                        "name": "tag-lz-owner",
+                        "description": "Person or team accountable for the resource.",
+                        "is_cost_tracking": false,
+                        "is_retired": false
+                    },
+                    "TAG-LZ-BUSINESS-UNIT-KEY": {
+                        "name": "tag-lz-business-unit",
+                        "description": "Business unit responsible for the resource.",
+                        "is_cost_tracking": false,
+                        "is_retired": false
+                    },
+                    "TAG-LZ-PROJECT-KEY": {
+                        "name": "tag-lz-project",
+                        "description": "Project associated with the resource.",
+                        "is_cost_tracking": false,
+                        "is_retired": false
+                    }
+                }
+            }
+        }
+    }
+}
