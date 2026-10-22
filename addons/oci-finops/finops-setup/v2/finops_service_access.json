@@ -24,16 +24,6 @@
                     "define tenancy reporting as ocid1.tenancy.oc1..aaaaaaaaned4fkpkisbwjlr56u7cj63lf3wffbilvqknstgtvzub7vhqkggq",
                     "endorse dynamic-group 'id_lz_common'/'dg-lz-finops-adb' to read objects in tenancy reporting"
                 ]
-            },
-
-            "PCY-LZ-FINOPS-REPORTING-ACCESS": {
-                "name"                            : "pcy-lz-finops-reporting-access",
-                "description"                     : "Allow FinOps operators to use the approved reporting connection.",
-                "compartment_id"                  : "TENANCY-ROOT",
-
-                "statements": [
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to use database-tools-connections in compartment cmp-landingzone:cmp-lz-platform:cmp-finops where target.resource.id = '<FINOPS_REPORTING_CONNECTION_OCID>'"
-                ]
             }
         }
     }

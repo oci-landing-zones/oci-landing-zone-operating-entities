@@ -17,11 +17,6 @@
         "ignore_external_membership_updates": true,
 
         "groups": {
-            "GRP-LZ-FINOPS-ADMINS": {
-                "name"                      : "grp-lz-finops-admins",
-                "description"               : "FinOps operations and Bastion administration."
-            },
-
             "GRP-LZ-FINOPS-DB-ADMINS": {
                 "name"                      : "grp-lz-finops-db-admins",
                 "description"               : "Autonomous Database administration and database connectivity."
@@ -38,26 +33,6 @@
         "enable_cis_benchmark_checks"       : false,
 
         "supplied_policies": {
-            "PCY-LZ-FINOPS-ADMINS": {
-                "name"                      : "pcy-lz-finops-admins",
-                "description"               : "FinOps operations and Bastion administration.",
-                "compartment_id"            : "TENANCY-ROOT",
-
-                "statements": [
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read virtual-network-family in compartment cmp-landingzone:cmp-lz-network",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read instances in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read vnic-attachments in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read vnics in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to inspect work-requests in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read autonomous-database-family in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read analytics-instances in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read analytics-instance-work-requests in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to read database-tools-family in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to manage bastion in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops where ALL {target.bastion-session.type = 'port_forwarding', target.bastion-session.ip in ['10.0.24.0/26']}"
-                ]
-            },
-
             "PCY-LZ-FINOPS-DB-ADMINS": {
                 "name"                      : "pcy-lz-finops-db-admins",
                 "description"               : "Autonomous Database administration and database connectivity.",
@@ -67,9 +42,9 @@
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to read virtual-network-family in compartment cmp-landingzone:cmp-lz-network",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to read instances in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to read vnic-attachments in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
-                    "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to read vnics in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to inspect work-requests in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to use bastion in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
+                    "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to read bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops where ALL {target.bastion-session.type = 'port_forwarding', target.bastion-session.ip in ['10.0.24.0/26']}",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to manage autonomous-database-family in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-db-admins' to read database-tools-family in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
@@ -95,6 +70,7 @@
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to read vnics in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to inspect work-requests in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to use bastion in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
+                    "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to read bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to manage bastion-session in compartment cmp-landingzone:cmp-lz-platform:cmp-finops where ALL {target.bastion-session.type = 'port_forwarding', target.bastion-session.ip in ['10.0.24.0/26']}",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to manage analytics-instances in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
                     "Allow group 'id_lz_common'/'grp-lz-finops-oac-admins' to read analytics-instance-work-requests in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",

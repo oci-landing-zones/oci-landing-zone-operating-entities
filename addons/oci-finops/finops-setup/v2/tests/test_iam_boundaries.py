@@ -9,7 +9,7 @@ import unittest
 CONFIG_DIR = Path(__file__).resolve().parents[1]
 FINOPS = "compartment cmp-landingzone:cmp-lz-platform:cmp-finops"
 NETWORK = "compartment cmp-landingzone:cmp-lz-network"
-GROUPS = {"grp-lz-finops-admins", "grp-lz-finops-db-admins", "grp-lz-finops-oac-admins"}
+GROUPS = {"grp-lz-finops-db-admins", "grp-lz-finops-oac-admins"}
 STATEMENT = re.compile(
     r"Allow group (?P<principal>\S+) to (?P<verb>inspect|read|use|manage) "
     r"(?P<resource>[\w-]+) in (?P<scope>.*?)(?: where (?P<condition>.*))?$",
@@ -33,22 +33,15 @@ class FinOpsIamBoundaries(unittest.TestCase):
                         raise AssertionError(f"Unrecognized group policy: {statement}")
                     grant = match.groupdict()
                     grant["group"] = grant.pop("principal").split("/")[-1].strip("'")
-                    if grant["group"] in GROUPS:
-                        cls.grants.append(grant)
+                    cls.grants.append(grant)
 
-    def test_operator_writes_are_limited_to_bastion_and_reporting(self):
-        # A new use/manage grant must not silently authorize networking changes.
-        allowed = {
-            ("manage", "bastion", FINOPS),
-            ("manage", "bastion-session", FINOPS),
-            ("use", "database-tools-connections", FINOPS),
-        }
+    def test_only_db_and_oac_admin_groups_are_defined_and_referenced(self):
+        config = json.loads((CONFIG_DIR / "finops_iam.json").read_text())
+        groups = config["identity_domain_groups_configuration"]["groups"]
+        self.assertEqual({group["name"] for group in groups.values()}, GROUPS)
         for grant in self.grants:
-            if grant["group"] == "grp-lz-finops-admins" and grant["verb"] in {"use", "manage"}:
-                with self.subTest(grant=grant):
-                    self.assertIn((grant["verb"], grant["resource"], grant["scope"]), allowed)
-                    if grant["resource"] == "database-tools-connections":
-                        self.assertRegex(grant["condition"] or "", r"^target\.resource\.id = '[^']+'$")
+            with self.subTest(grant=grant):
+                self.assertIn(grant["group"], GROUPS)
 
     def test_bastion_permissions_stay_in_finops(self):
         for grant in self.grants:
@@ -57,8 +50,8 @@ class FinOpsIamBoundaries(unittest.TestCase):
                     self.assertEqual(grant["scope"], FINOPS)
                     # The aggregate would bypass the separate session restriction.
                     self.assertNotEqual(grant["resource"], "bastion-family")
-                    if grant["verb"] == "manage" and grant["resource"] == "bastion":
-                        self.assertEqual(grant["group"], "grp-lz-finops-admins")
+                    if grant["resource"] == "bastion":
+                        self.assertEqual(grant["verb"], "use")
 
     def test_sessions_require_finops_destination_and_port_forwarding(self):
         network = json.loads((CONFIG_DIR / "finops_network.json").read_text())
@@ -74,12 +67,24 @@ class FinOpsIamBoundaries(unittest.TestCase):
             grants = [g for g in self.grants if g["group"] == group and g["scope"] == FINOPS]
             with self.subTest(group=group):
                 capabilities = {(g["verb"], g["resource"]) for g in grants}
-                bastion_verb = "manage" if group == "grp-lz-finops-admins" else "use"
-                self.assertIn((bastion_verb, "bastion"), capabilities)
+                self.assertIn(("use", "bastion"), capabilities)
                 self.assertIn(("manage", "bastion-session"), capabilities)
                 for grant in grants:
                     if grant["resource"] == "bastion-session" and grant["verb"] in {"use", "manage"}:
                         self.assertEqual(grant["condition"], expected)
+
+    def test_session_listing_and_details_do_not_require_destination_attributes(self):
+        # ListSessions has no individual target IP/type to satisfy create conditions.
+        for group in GROUPS:
+            with self.subTest(group=group):
+                self.assertTrue(any(
+                    grant["group"] == group
+                    and grant["scope"] == FINOPS
+                    and grant["resource"] == "bastion-session"
+                    and grant["verb"] in {"read", "use", "manage"}
+                    and grant["condition"] is None
+                    for grant in self.grants
+                ), "Missing session read access independent of target IP/type")
 
     def test_no_human_role_manages_shared_vcn_topology(self):
         infrastructure = {
