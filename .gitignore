@@ -10,3 +10,9 @@ __pycache__/
 **/*.old
 **/*.backup
 __pycache__
+
+# Landing Zone Studio: local dependencies and build outputs
+/addons/oci-landingzone-studio/node_modules/
+/addons/oci-landingzone-studio/dist/
+/addons/oci-landingzone-studio/3rd/go-jsonnet/libjsonnet.wasm
+/addons/oci-landingzone-studio/3rd/go-jsonnet/.runtime-build-fingerprint
