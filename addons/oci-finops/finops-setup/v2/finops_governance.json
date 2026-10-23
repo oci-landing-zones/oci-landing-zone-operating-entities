@@ -11,37 +11,77 @@
                         "name": "tag-lz-cost-center",
                         "description": "Cost center responsible for the resource.",
                         "is_cost_tracking": false,
-                        "is_retired": false
+                        "is_retired": false,
+                        "valid_values": [
+                            "none",
+                            "CC12345"
+                        ]
                     },
-                    "TAG-LZ-APPLICATION-KEY": {
-                        "name": "tag-lz-application",
-                        "description": "Business application associated with the resource.",
+                    "TAG-LZ-PLATFORM-KEY": {
+                        "name": "tag-lz-platform",
+                        "description": "Platform associated with the resource.",
                         "is_cost_tracking": false,
-                        "is_retired": false
+                        "is_retired": false,
+                        "valid_values": [
+                            "none",
+                            "oke",
+                            "ocvs",
+                            "exacs",
+                            "exacc",
+                            "ebs",
+                            "hpc",
+                            "finops",
+                            "ai-services"
+                        ]
                     },
                     "TAG-LZ-ENVIRONMENT-KEY": {
                         "name": "tag-lz-environment",
                         "description": "Deployment environment associated with the resource.",
                         "is_cost_tracking": false,
-                        "is_retired": false
+                        "is_retired": false,
+                        "valid_values": [
+                            "none",
+                            "shared",
+                            "prod",
+                            "preprod",
+                            "dev",
+                            "uat",
+                            "staging",
+                            "test"
+                        ]
                     },
                     "TAG-LZ-OWNER-KEY": {
                         "name": "tag-lz-owner",
                         "description": "Person or team accountable for the resource.",
                         "is_cost_tracking": false,
-                        "is_retired": false
+                        "is_retired": false,
+                        "valid_values": [
+                            "none",
+                            "email.address@example.com"
+                        ]
                     },
                     "TAG-LZ-BUSINESS-UNIT-KEY": {
                         "name": "tag-lz-business-unit",
                         "description": "Business unit responsible for the resource.",
                         "is_cost_tracking": false,
-                        "is_retired": false
+                        "is_retired": false,
+                        "valid_values": [
+                            "none",
+                            "IT",
+                            "Finance",
+                            "Digital",
+                            "Retail"
+                        ]
                     },
                     "TAG-LZ-PROJECT-KEY": {
                         "name": "tag-lz-project",
                         "description": "Project associated with the resource.",
                         "is_cost_tracking": false,
-                        "is_retired": false
+                        "is_retired": false,
+                        "valid_values": [
+                            "none",
+                            "proj1"
+                        ]
                     }
                 }
             }

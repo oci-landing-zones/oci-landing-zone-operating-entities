@@ -23,7 +23,8 @@
                 "statements": [
                     "define tenancy reporting as ocid1.tenancy.oc1..aaaaaaaaned4fkpkisbwjlr56u7cj63lf3wffbilvqknstgtvzub7vhqkggq",
                     "endorse dynamic-group 'id_lz_common'/'dg-lz-finops-adb' to read objects in tenancy reporting",
-                    "Allow dynamic-group 'id_lz_common'/'dg-lz-finops-adb' to {ONS_TOPIC_PUBLISH} in compartment cmp-landingzone:cmp-lz-platform:cmp-finops"
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-finops-adb' to {ONS_TOPIC_PUBLISH} in compartment cmp-landingzone:cmp-lz-platform:cmp-finops",
+                    "Allow dynamic-group 'id_lz_common'/'dg-lz-finops-adb' to inspect tag-namespaces in tenancy"
                 ]
             }
         }
