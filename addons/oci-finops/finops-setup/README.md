@@ -20,11 +20,11 @@ These configurations add the FinOps platform to an existing One-OE Landing Zone 
 
 | File | Purpose |
 |---|---|
-| [finops_iam.json](v2/finops_iam.json) | Create `cmp-finops` under the existing shared platform compartment, two groups in `id_lz_common`, and their policies. |
-| [finops_network.json](v2/finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
-| [finops_governance.json](v2/finops_governance.json) | Create the active `tagns-lz-cost-governance` namespace and its six defined tags at tenancy root, following One-OE naming. |
-| [finops_observability.json](v2/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
-| [finops_service_access.json](v2/finops_service_access.json) | After provisioning, enable the ADB report-reading principal and tag-metadata access. Replace the compartment OCID placeholder before using this file. |
+| [finops_iam.json](deployment/finops_iam.json) | Create `cmp-finops` under the existing shared platform compartment, two groups in `id_lz_common`, and their policies. |
+| [finops_network.json](deployment/finops_network.json) | Create the FinOps VCN, private OAC/ADB/infra subnets, service gateway, security lists, two NSGs, and an attachment to the existing Hub A DRG. |
+| [finops_governance.json](deployment/finops_governance.json) | Create the active `tagns-lz-cost-governance` namespace and its six defined tags at tenancy root, following One-OE naming. |
+| [finops_observability.json](deployment/finops_observability.json) | Create the `nott-lz-finops` Notifications topic in `cmp-finops` for platform operational messages. |
+| [finops_service_access.json](deployment/finops_service_access.json) | After provisioning, enable the ADB report-reading principal and tag-metadata access. Replace the compartment OCID placeholder before using this file. |
 
 Include `finops_governance.json` in the FinOps stack inputs. It defines the active namespace `tagns-lz-cost-governance` (`TAGNS-LZ-COST-GOVERNANCE-KEY`) and the tags `tag-lz-cost-center`, `tag-lz-platform`, `tag-lz-environment`, `tag-lz-owner`, `tag-lz-business-unit`, and `tag-lz-project`, with corresponding `TAG-LZ-...-KEY` identifiers. Each tag restricts assignments to its `valid_values` list, including the literal string `none`. The example values must be adapted to the customer's catalog. No tag defaults or automatic assignment to resources are configured; OCI cost-tracking flags are disabled. If the namespace already exists, reconcile its Terraform ownership before applying. For a combined stack, merge this namespace into the existing `tags_configuration.namespaces` map rather than supplying duplicate top-level configuration blocks.
 
@@ -36,7 +36,7 @@ The configurations prepare infrastructure and access. Operations provisions ADB,
 
 Terraform creates the `nott-lz-finops` topic and its configured subscriptions. Complete these steps before installing the FOCUS shared core:
 
-1. In your deployment copy of [finops_observability.json](v2/finops_observability.json), set `notifications_configuration.topics.NOTT-LZ-FINOPS-KEY.subscriptions` to the intended recipients. Replace any example or existing email address with your own operational mailbox; do not deploy another installation's recipient. For example:
+1. In your deployment copy of [finops_observability.json](deployment/finops_observability.json), set `notifications_configuration.topics.NOTT-LZ-FINOPS-KEY.subscriptions` to the intended recipients. Replace any example or existing email address with your own operational mailbox; do not deploy another installation's recipient. For example:
 
    ```json
    "subscriptions": [
@@ -75,7 +75,7 @@ For OAC private dashboard endpoint creation/changes, have LZ network administrat
 
 ### Workload setup helpers
 
-The [Terraform ADB example](v2/terraform/README.md) and [SQL ingestion scripts](v2/sql/) are retained as workload setup helpers. They are separate from the V2 IAM/network infrastructure stack. Use the V2 compartment, subnet, and NSG outputs when configuring ADB, and keep `create_policy = false` to reuse the service-access configuration. Review and adapt the SQL scripts before execution; they are not run by the infrastructure stack.
+The [Terraform ADB example](deployment/terraform/README.md) and [SQL ingestion scripts](deployment/sql/) are retained as workload setup helpers. They are separate from the V2 IAM/network infrastructure stack. Use the V2 compartment, subnet, and NSG outputs when configuring ADB, and keep `create_policy = false` to reuse the service-access configuration. Review and adapt the SQL scripts before execution; they are not run by the infrastructure stack.
 
 ### Existing One-OE dependencies
 
@@ -94,7 +94,7 @@ Use `finops_iam.json` and `finops_network.json` together for the infrastructure 
 
 After `cmp-finops` exists, replace `<FINOPS_COMPARTMENT_OCID>` in `finops_service_access.json`. The IAM module does not substitute symbolic compartment keys inside dynamic-group matching-rule strings. Apply this file through a separate service-access stack using the same identity-domain dependency, or merge its policy entries and dynamic-group configuration into the infrastructure IAM file. Do not replace the infrastructure stack's entire input list with this smaller file: that would remove resources from its configuration.
 
-Configure each Database Tools connection's resource principal and credential-secret permissions before testing DBA SQL access. The ADB dynamic group is a separate principal for the preserved OCI report-read endorsement. Enable the database resource principal using [`sql/admin.sql`](v2/sql/admin.sql), then adapt and run [`sql/finopsuser.sql`](v2/sql/finopsuser.sql) as the FinOps database user to configure report ingestion.
+Configure each Database Tools connection's resource principal and credential-secret permissions before testing DBA SQL access. The ADB dynamic group is a separate principal for the preserved OCI report-read endorsement. Enable the database resource principal using [`sql/admin.sql`](deployment/sql/admin.sql), then adapt and run [`sql/finopsuser.sql`](deployment/sql/finopsuser.sql) as the FinOps database user to configure report ingestion.
 
 ### Private network and optional infra subnet
 
@@ -160,7 +160,7 @@ For a single stack, move the FinOps attachment into the existing DRG's `drg_atta
 Run the static IAM boundary regression checks from the repository root:
 
 ```sh
-python3 -m unittest discover -s addons/oci-finops/finops-setup/v2/tests -v
+python3 -m unittest discover -s addons/oci-finops/finops-setup/deployment/tests -v
 ```
 
 These checks require exactly the DB and OAC administrator groups and reject policies referring to other human groups. They also reject Bastion grants outside `cmp-finops`, Bastion lifecycle management, and VCN topology management grants. Session destinations must match the FinOps VCN, and aggregate Bastion grants cannot bypass the session conditions.
@@ -182,7 +182,7 @@ You can run the Terraform script directly using **OCI Cloud Shell** for convenie
 
 
 - **Using Terraform**  
-Use the example [Terraform script](/addons/oci-finops/finops-setup/v2/terraform/) provided in this repository to deploy the Autonomous Data Warehouse (ADW).
+Use the example [Terraform script](/addons/oci-finops/finops-setup/deployment/terraform/) provided in this repository to deploy the Autonomous Data Warehouse (ADW).
 Refer the [ADB documentation](https://docs.oracle.com/en/cloud/paas/autonomous-database/index.html) for more details.
 
 - **Using the OCI Console**  
@@ -203,11 +203,11 @@ Connect to the ADW using [SQL worksheet](https://docs.oracle.com/en-us/iaas/data
 [Resource Principal](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/resource-principal.html) is used to give access for the autonomous database. 
 
 
-Run the following SQL scripts [admin.sql](/addons/oci-finops/finops-setup/v2/sql/admin.sql) using the ADMIN user.
+Run the following SQL scripts [admin.sql](/addons/oci-finops/finops-setup/deployment/sql/admin.sql) using the ADMIN user.
 
 ### Step 3.3: Run SQL Scripts as FINOPS User
 
-Run the SQL scripts provided in [finopsuser.sql](/addons/oci-finops/finops-setup/v2/sql/finopsuser.sql) using the newly created FINOPS user:
+Run the SQL scripts provided in [finopsuser.sql](/addons/oci-finops/finops-setup/deployment/sql/finopsuser.sql) using the newly created FINOPS user:
 
 [DBMS_CLOUD_PIPELINE](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/autonomous-pipeline.html) is used to load data from objectstorage into the autonomous database. 
 
