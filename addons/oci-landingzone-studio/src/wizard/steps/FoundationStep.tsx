@@ -198,15 +198,15 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
           </div>
           <div style={{ ...s.field, marginTop: 14 }}>
             <div className="studio-info-heading"><label style={s.label} htmlFor="lz-deployment-type">Deployment type</label>
-              <InfoButton title="Deployment type"><p><strong>Complete</strong> creates the tenancy foundations and regional resources.</p><p><strong>DR</strong> creates regional recovery resources using the compartments, IAM and governance from your Home Region. Use matching environment names. Review lists the required Home Region dependency outputs.</p><p>Changing this field keeps the inputs already in your design. It does not deploy or copy running resources.</p></InfoButton>
+              <InfoButton title="Deployment type"><p><strong>Home Region</strong> creates compartments, IAM and governance, along with resources in the selected region.</p><p><strong>DR</strong> creates recovery resources in another region and reuses the Home Region's compartments, IAM and governance. Use matching environment names. Review lists the required Home Region dependency outputs.</p><p>Changing this field keeps the inputs already in your design. It does not deploy or copy running resources.</p></InfoButton>
             </div>
             <select id="lz-deployment-type" value={f.stackScope ?? 'complete'} disabled={!!homeSource} onChange={(event) => setDeploymentType(event.target.value as 'complete' | 'regional')} aria-describedby="lz-deployment-type-help">
-              <option value="complete">Complete</option>
+              <option value="complete">Home Region</option>
               <option value="regional">DR</option>
             </select>
             <div id="lz-deployment-type-help" style={{ ...s.help, marginTop: 6 }}>{regional
               ? 'DR creates recovery resources in another region. It reuses the compartments, IAM and governance from your Home Region deployment.'
-              : 'Complete creates tenancy foundations, including IAM and governance, plus the resources in your selected region.'}</div>
+              : 'Home Region creates compartments, IAM and governance, plus resources in the selected region.'}</div>
           </div>
           <div style={s.locationGrid} className="foundation-location-grid">
             <div>

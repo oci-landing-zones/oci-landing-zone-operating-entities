@@ -190,7 +190,7 @@ export function createLZ(name?: string, model: LzModel = emptyLzModel(), clock: 
 
 export function createDrLZ(homeId: string): CreateLzResult {
   const home = readHomeRecord(homeId);
-  if (!home) return { ok: false, message: 'Choose an available complete Landing Zone with valid environments as the Home source.' };
+  if (!home) return { ok: false, message: 'Choose an available Home Region design with valid environments as the Home source.' };
   const model = structuredClone(home.model);
   const region = findRegion(model.foundation.realm, model.foundation.drRegion ?? '');
   model.foundation = { ...model.foundation, stackScope: 'regional', homeRegion: home.model.foundation.region,
@@ -205,7 +205,7 @@ export function saveLZ(id: string, model: LzModel): StoreResult {
   const existing = getLZ(id);
   if (!stored || !existing) return { ok: false, message: 'This Landing Zone is no longer available in browser storage.' };
   const home = linkedHomeRecord(existing);
-  if (existing.homeLzId && !home) return { ok: false, message: 'The linked Home Landing Zone is unavailable or is no longer a complete deployment. This DR design was not changed.' };
+  if (existing.homeLzId && !home) return { ok: false, message: 'The linked Home Region design is unavailable or no longer uses the Home Region deployment type. This DR design was not changed.' };
   const updated: LzRecord = { ...existing, model: home ? syncDrEnvironments(model, home.model) : model, updatedAt: now() };
   if (existing.disasterRecovery) {
     updated.previousCombinedDesign = { home: existing.model, ...existing.disasterRecovery };

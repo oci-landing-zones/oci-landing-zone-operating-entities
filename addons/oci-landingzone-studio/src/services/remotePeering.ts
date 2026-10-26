@@ -29,7 +29,7 @@ export function remotePeeringIssues(model: LzModel): RemotePeeringIssue[] {
     if (!findRegion(model.foundation.realm, connection.peerRegionName)) add('peerRegionName', 'choose a peer region in the same realm.');
     if (connection.role === 'requester' && !connection.peerId?.trim()) add('peerId', 'enter the acceptor RPC OCID or dependency key.');
     if (connection.role === 'requester' && connection.peerId?.startsWith('ocid1.') && !connection.peerId.startsWith('ocid1.remotepeeringconnection.')) add('peerId', 'the peer OCID must identify a remote peering connection.');
-    if (model.foundation.stackScope === 'regional' && connection.peerTenancyOcid?.trim()) add('peerTenancyOcid', 'regional DR supports same-tenancy peering only. Cross-tenancy IAM must be owned by a complete stack.');
+    if (model.foundation.stackScope === 'regional' && connection.peerTenancyOcid?.trim()) add('peerTenancyOcid', 'DR supports same-tenancy peering only. Cross-tenancy IAM must be managed in a Home Region deployment.');
     if (connection.peerTenancyOcid?.trim() && !connection.peerTenancyOcid.startsWith('ocid1.tenancy.')) add('peerTenancyOcid', 'enter a valid peer tenancy OCID.');
     if (connection.peerTenancyOcid?.trim() && connection.role === 'acceptor' && !connection.requestorGroupOcid?.startsWith('ocid1.group.')) add('requestorGroupOcid', 'enter the foreign requester group OCID.');
     if (connection.requestorGroupOcid?.trim() && (!connection.peerTenancyOcid?.trim() || connection.role !== 'acceptor')) add('requestorGroupOcid', 'a foreign requester group applies only to a cross-tenancy acceptor.');

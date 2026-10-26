@@ -215,7 +215,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
           {!!model.remotePeeringConnections?.length && <p style={local.note}><strong>RPC:</strong> deploy each acceptor first. Supply its RPC OCID or network dependency output to the requester. Review remote CIDRs, learned routes and firewall policies on both sides before allowing traffic.</p>}
           <dl className="review-summary-grid" style={local.sumGrid}>
             {[
-              ['Deployment', regional ? 'Disaster Recovery' : 'Complete'],
+              ['Deployment', regional ? 'DR' : 'Home Region'],
               ['Region', model.foundation.region],
               ['CIS benchmark', `Level ${model.foundation.cisLevel}`],
               ['Hub', hub?.label ?? model.network.hubKind],

@@ -77,7 +77,9 @@ describe('observability fields', () => {
   it('offers deployment type without a description or DR starting-point field', () => {
     const complete = render(emptyLzModel());
     expect(complete).toContain('id="lz-deployment-type"');
-    expect(complete).toContain('Complete creates tenancy foundations');
+    expect(complete).toMatch(/<option value="complete"[^>]*>Home Region<\/option>/);
+    expect(complete).toMatch(/<option value="regional"[^>]*>DR<\/option>/);
+    expect(complete).toContain('Home Region creates compartments, IAM and governance');
     expect(complete).not.toContain('id="lz-dr-source"');
     expect(complete).not.toContain('Description');
     const model = emptyLzModel();
