@@ -111,6 +111,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
 
   route_tables(ctx, overlay_output=false)::
     local n = ctx.n;
+    local has_drg_default = ctx.has_hub && !overlay_output && !ctx.use_local_natgw;
     local peer_routes = if ctx.routing != null && std.objectHas(ctx.routing, 'peers') then ctx.routing.peers else {};
     local drg_route_rules =
       (if ctx.has_hub then {
@@ -138,7 +139,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
            destination_type: 'CIDR_BLOCK',
            network_entity_key: ctx.ngw_key,
          },
-       } else if ctx.has_hub && !overlay_output then {
+       } else if has_drg_default then {
          [n.route_rule([n.region, 'drg'])]: {
            description: 'Route to the 0.0.0.0/0 through DRG',
            destination: '0.0.0.0/0',
@@ -146,7 +147,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
            network_entity_key: ctx.drg_key,
          },
        } else {})
-      + drg_route_rules
+      + (if has_drg_default then {} else drg_route_rules)
       + {
         [n.route_rule([n.region, 'sgw'])]: {
           description: 'Route for OCI services',
