@@ -67,7 +67,7 @@ Names are matched without case sensitivity. Shared ExaCS starts at `10.0.24.0/21
 
 Other environment names share the `10.1.192.0/18` pool. Each new Projects, Custom, or environment ExaCS VCN consumes a separate free `/21` block from its eight available blocks. `10.1.0.0/18` remains unallocated by these defaults. An exhausted pool leaves the CIDR empty and requires a manual allocation before generation.
 
-OKE keeps its existing allocation: the first platform starts at `10.0.80.0/20` for the `small` profile, with the existing per-platform and per-environment shifts. Studio checks configured networks for overlaps; reservations alone do not guarantee a deployable combination.
+The first OKE platform starts at `10.0.80.0/20` for the `small` profile. Changing an OKE network profile checks every selected environment against configured VCNs and allocates free, aligned blocks within the same private address range when needed. Each allocation is saved per environment. If no block is available, its CIDR remains empty for correction instead of overlapping another network. Review the resulting address plan, including networks outside Studio; reservations alone do not guarantee a deployable combination.
 
 The diagram grows with the wizard. In diagram-only view, Studio can show route tables, example endpoints, and packet paths for supported traffic flows. This gives network and security reviewers a way to inspect the intended path before deployment.
 

@@ -1,3 +1,5 @@
+import { overlaps, parseCidr } from "./cidr";
+
 import { describe, expect, it } from 'vitest';
 import {
   PLATFORM_TYPES, applyPlatformPatch, newPlatform, newSharedPlatform, okeDefaultSubnets, okeNetworkProfilePatch,
@@ -140,5 +142,52 @@ describe('per-environment derivation', () => {
   it('only yields instances for the environments the platform targets', () => {
     const p = { ...newPlatform('custom', []), environments: ['prod', 'dev'] };
     expect(platformEnvInstances(p, ENVS).map((x) => x.name)).toEqual(['prod', 'dev']);
+  });
+});
+
+describe('OKE profile resizing avoids configured networks', () => {
+  const occupied = ['10.0.0.0/21', '10.0.64.0/21', '10.0.128.0/21', '10.0.192.0/18'];
+
+  it.each(['medium', 'large'] as const)('allocates distinct %s VCNs clear of hub, projects and other platforms', (size) => {
+    const original = newPlatform('oke_simple', []);
+    const oldNetworks = platformEnvInstances(original, ENVS).map((p) => p.vcnCidr);
+    const updated = applyPlatformPatch(original, okeNetworkProfilePatch(original, size), ENVS, [...occupied, ...oldNetworks]);
+    const instances = platformEnvInstances(updated, ENVS);
+    expect(instances).toHaveLength(3);
+    const all = [...occupied];
+    for (const instance of instances) {
+      expect(parseCidr(instance.vcnCidr)?.prefix).toBe(size === 'medium' ? 18 : 16);
+      expect(all.some((cidr) => overlaps(cidr, instance.vcnCidr))).toBe(false);
+      expect(instance.subnets.length).toBeGreaterThan(0);
+      all.push(instance.vcnCidr);
+    }
+    expect(original.vcnCidr).toBe('10.0.80.0/20');
+  });
+
+  it('repairs an already overlapping medium profile and only allocates selected environments', () => {
+    const original = { ...newPlatform('oke_simple', []), environments: ['prod'], vcnCidr: '10.0.64.0/18' };
+    const updated = applyPlatformPatch(original, okeNetworkProfilePatch(original, 'medium'), ENVS, [...occupied, original.vcnCidr]);
+    expect(platformEnvInstances(updated, ENVS).map((p) => p.vcnCidr)).toEqual(['10.1.0.0/18']);
+    expect(Object.keys(updated.overrides!)).toEqual(['prod']);
+  });
+
+  it('preserves a nonconflicting resized range and stays stable when reapplied', () => {
+    const original = { ...newPlatform('oke_simple', []), environments: ['prod'], vcnCidr: '10.140.0.0/20' };
+    const updated = applyPlatformPatch(original, okeNetworkProfilePatch(original, 'medium'), ENVS, [...occupied, original.vcnCidr]);
+    expect(updated.vcnCidr).toBe('10.140.0.0/18');
+    expect(applyPlatformPatch(updated, okeNetworkProfilePatch(updated, 'medium'), ENVS, [...occupied, updated.vcnCidr])).toEqual(updated);
+  });
+
+  it('does not release another resource with the same CIDR', () => {
+    const original = { ...newPlatform('oke_simple', []), environments: ['prod'] };
+    const updated = applyPlatformPatch(original, okeNetworkProfilePatch(original, 'small'), ENVS, [original.vcnCidr, original.vcnCidr]);
+    expect(overlaps(updated.vcnCidr, original.vcnCidr)).toBe(false);
+  });
+
+  it('leaves an exhausted private range empty rather than allocating overlapping addresses', () => {
+    const original = { ...newPlatform('oke_simple', []), environments: ['prod'], vcnCidr: '192.168.80.0/20' };
+    const updated = applyPlatformPatch(original, okeNetworkProfilePatch(original, 'large'), ENVS, ['192.168.0.0/16', original.vcnCidr]);
+    expect(updated.vcnCidr).toBe('');
+    expect(platformEnvInstances(updated, ENVS)[0].vcnCidr).toBe('');
   });
 });

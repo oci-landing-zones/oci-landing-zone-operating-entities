@@ -185,14 +185,12 @@ function PerEnvTable({ platform, environments, onPlatform }: {
                 <td style={local.genTd}>
                   {inst.vcnCidr}
                   <FieldError id={`platform-${platform.id}-${inst.id}-conflict`} error={conflicts[`platform:${platform.id}:${inst.id}`]} />
-                  {inst.overridden && <span style={local.overrideTag}>override</span>}
+                  {inst.overridden && !profileOwned && <span style={local.overrideTag}>override</span>}
                 </td>
                 <td style={local.genTd}>{inst.subnets.length === 0 ? 'auto' : `${inst.subnets.length} subnet${inst.subnets.length === 1 ? '' : 's'}`}</td>
                 <td style={{ ...local.genTd, textAlign: 'right' }}>
                   {profileOwned ? (
-                    inst.overridden
-                      ? <button type="button" style={{ ...local.linkBtn, color: oracle.red }} onClick={() => resetOverride(inst.id)}>Reset stale override</button>
-                      : <span style={local.fieldHint}>Automatic</span>
+                    <span style={local.fieldHint}>Automatic</span>
                   ) : (
                     <>
                       <button type="button" style={local.linkBtn} onClick={() => setEditEnv(editEnv === inst.id ? null : inst.id)}>

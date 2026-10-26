@@ -5,7 +5,8 @@ import { evaluate, setAssetLoader } from './jsonnetVm';
 import { GeneratorError, generateFromUpstreamDefaults, generateOutputs } from './generate';
 import { buildVirtualFs } from './virtualFs';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
-import { newPlatform, newSharedPlatform } from '../services/platforms';
+import { applyPlatformPatch, newPlatform, newSharedPlatform, okeNetworkProfilePatch, platformEnvInstances } from '../services/platforms';
+import { configuredVcnCidrs } from '../services/exadata';
 import { getHubKind, hubKindDefaults } from '../services/hubKinds';
 import { generatorNames } from '../services/generatorNaming';
 import type { HubKind, LzModel } from '../model/types';
@@ -440,3 +441,15 @@ describe('generator (go-jsonnet wasm)', () => {
     await expect(generateOutputs(model)).rejects.toThrow(GeneratorError);
   }, 60_000);
 });
+
+it.each(['medium', 'large'] as const)('generates OKE %s after resizing alongside default project networks', async (size) => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  model.platforms = [platform];
+  model.platforms = [applyPlatformPatch(platform, okeNetworkProfilePatch(platform, size), model.environments, configuredVcnCidrs(model))];
+  const out = await generateOutputs(model);
+  for (const instance of platformEnvInstances(model.platforms[0], model.environments)) {
+    expect(out.files['network.json']).toContain(instance.vcnCidr);
+  }
+  expect(Object.keys(out.files).some((file) => file.includes('oke'))).toBe(true);
+}, 60_000);

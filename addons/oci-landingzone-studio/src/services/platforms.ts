@@ -14,7 +14,7 @@
  */
 
 import type { PlatformConfig, PlatformType, OkePlatformParams, SharedPlatformConfig, Subnet } from '../model/types';
-import { firstFreeBlock, formatIp, normalizeCidr, parseCidr, shiftCidr, totalIps } from './cidr';
+import { BASE_RANGES, baseRangeOf, firstFreeBlock, formatIp, normalizeCidr, overlaps, parseCidr, shiftCidr, totalIps } from './cidr';
 import { environmentPlatformCidr, OPTIONAL_SHARED_CIDR } from './oneOeCidrs';
 
 export interface PlatformTypeMeta {
@@ -196,6 +196,29 @@ export function applyPlatformPatch(platform: PlatformConfig, patch: Partial<Plat
   environments: Array<{ id: string; name: string }>, occupied: string[],
 ): PlatformConfig {
   const next = { ...platform, ...patch };
+  if (next.type === 'oke_simple' && patch.okeParams?.clusterSize && patch.vcnCidr !== undefined) {
+    // Release only this platform's old allocations. Equal CIDRs owned by other
+    // resources must remain occupied, including when repairing an invalid design.
+    const used = [...occupied];
+    for (const instance of platformEnvInstances(platform, environments)) {
+      const index = used.indexOf(instance.vcnCidr);
+      if (index >= 0) used.splice(index, 1);
+    }
+    used.push(next.okeParams!.servicesCidr);
+    if (next.okeParams!.cniType === 'overlay' && next.okeParams!.podsCidr) used.push(next.okeParams!.podsCidr);
+    const prefix = OKE_PROFILE_PREFIX[patch.okeParams.clusterSize];
+    const overrides: NonNullable<PlatformConfig['overrides']> = {};
+    for (const instance of platformEnvInstances(next, environments)) {
+      const range = BASE_RANGES.find((r) => r.id === baseRangeOf(instance.vcnCidr));
+      const available = range && !used.some((cidr) => overlaps(instance.vcnCidr, cidr));
+      const vcnCidr = available ? instance.vcnCidr : range ? firstFreeBlock(range.cidr, used, prefix) ?? '' : '';
+      overrides[instance.id] = { vcnCidr };
+      if (vcnCidr) used.push(vcnCidr);
+    }
+    // Pin each selected environment so subsequent index shifts cannot undo the
+    // allocation. An exhausted range remains empty for normal input validation.
+    return { ...next, vcnCidr: Object.values(overrides)[0]?.vcnCidr ?? next.vcnCidr, overrides };
+  }
   const overrides = { ...next.overrides };
   const firstId = environments[0]?.id;
   if (firstId && overrides[firstId] && patch.overrides === undefined && (patch.vcnCidr !== undefined || patch.subnets !== undefined)) {
