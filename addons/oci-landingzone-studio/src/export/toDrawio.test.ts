@@ -4,8 +4,32 @@ import { buildGraph } from '../diagram/buildGraph';
 import { emptyLzModel } from '../model/defaults';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
 import type { DiagramModel, LzModel } from '../model/types';
+import { associationDisplaySegments, flowDisplayPoints, structuralEdgePoints } from '../diagram/displayGeometry';
+import { absoluteNodeRects } from '../diagram/flowGeometry';
+import { generatedRouteTables } from '../services/routingFixtures.testSupport';
+import { resourceGroupLayout, resourceGroupSvg } from '../diagram/resourceGroups';
+import { ATTACHMENT_LABEL, DRG_CAPTION } from '../diagram/layoutPolicy';
 
 describe('toDrawioXml', () => {
+  it('embeds the exact resource block shown on the website at the model position and extent', () => {
+    const resourceItems = [{ key: 'added-by-generator', name: 'new-generated-resource<&>' }];
+    const width = 180;
+    const height = resourceGroupLayout('events', resourceItems, width).height;
+    const group: DiagramModel['nodes'][number] = {
+      id: 'generated-events', kind: 'resourcegroup', label: 'Events', resourceKind: 'events', resourceItems,
+      x: 16, y: 50, width, height, parentId: 'security',
+    };
+    const diagram: DiagramModel = { nodes: [
+      { id: 'security', kind: 'compartment', label: 'Generated security compartment', x: 0, y: 0, width: 220, height: height + 80 }, group,
+    ], edges: [] };
+    const xml = toDrawioXml(diagram);
+    const encoded = xml.match(/id="generated-events"[^>]*image=data:image\/svg\+xml,([^;]+);/)?.[1];
+    expect(encoded).toBeDefined();
+    expect(decodeURIComponent(encoded!)).toBe(resourceGroupSvg('events', resourceItems, width));
+    expect(xml).toContain(`x="16" y="50" width="180" height="${height}"`);
+    expect(xml).toMatch(/id="generated-events"[^>]*parent="security"/);
+  });
+
   function valueAttributes(xml: string): string[] {
     const values = [...xml.matchAll(/\bvalue="([^"]*)"/g)].map((match) => match[1]);
     expect(values).toHaveLength(xml.match(/\bvalue="/g)?.length ?? 0);
@@ -29,8 +53,9 @@ describe('toDrawioXml', () => {
     expect(xml).toMatch(/id="landingzone"[^>]*parent="tenancy"/);
     expect(xml).toMatch(/id="cmp-network"[^>]*parent="landingzone"/);
     // shared compartments are yellow, environment compartments green
-    expect(xml).toContain('#FCF3CF');
+    expect(xml).toContain('#FAF8D6');
     expect(xml).toContain('#E3F3E3');
+    expect(xml).toContain('#FCF9BD');
   });
 
   it('adds a Security Zone shield image to secure compartments only', () => {
@@ -57,7 +82,9 @@ describe('toDrawioXml', () => {
     expect(xml).toMatch(/id="gw-igw"[^>]*parent="hub-vcn"/);
     expect(xml).toMatch(/id="gw-natgw"/);
     expect(xml).toMatch(/id="gw-sgw"/);
-    expect(xml).toContain('igw-fra-lz-hub');
+    expect(xml).toContain('Internet&#10;Gateway');
+    expect(xml).toMatch(/id="gw-igw-icon"[^]*?<mxGeometry x="21" y="0" width="34" height="34"/);
+    expect(xml).toMatch(/id="gw-igw-label"[^]*?<mxGeometry x="0" y="35" width="76" height="25"/);
     // firewall icons in the two fw subnets + LB icon, with captions
     expect(xml).toContain('id="hub-vcn-sn-0-icon"');
     expect(xml).toContain('nfw-fra-lz-hub-dmz');
@@ -72,6 +99,9 @@ describe('toDrawioXml', () => {
     const xml = toDrawioXml(buildGraph(emptyLzModel(), 3)); // spoke VCNs + their attachments appear in step 3
     // single DRG inside the network compartment
     expect(xml).toMatch(/id="drg"[^>]*parent="cmp-network"/);
+    const drgCell = xml.match(/id="drg"[^>]+/)?.[0] ?? '';
+    expect(drgCell).toContain(`fontSize=${DRG_CAPTION.fontSize};fontFamily=${DRG_CAPTION.fontFamily};`);
+    expect(drgCell).toContain(`spacingTop=${DRG_CAPTION.gap};`);
     // one OSN glyph per VCN (1 hub + 2 env)
     const osnCells = xml.match(/id="[^"]*-osn"/g) ?? [];
     expect(osnCells).toHaveLength(3);
@@ -80,13 +110,22 @@ describe('toDrawioXml', () => {
     expect(xml).toMatch(/id="attach-cmp-env-0"[^>]*parent="cmp-network"/);
     expect(xml).toContain('drgatt-fra-lz-hub');
     expect(xml).toContain('drgatt-fra-lz-prod-proj');
-    // VCN → attach → DRG edges, no arrowheads
+    const attachmentCell = xml.match(/id="attach-cmp-env-0"[^>]+/)?.[0] ?? '';
+    expect(attachmentCell).toContain(`fontSize=${ATTACHMENT_LABEL.fontSize};`);
+    expect(attachmentCell).toContain(`fontFamily=${ATTACHMENT_LABEL.fontFamily};`);
+    expect(attachmentCell).toContain(`spacingLeft=${ATTACHMENT_LABEL.sidePadding};spacingRight=${ATTACHMENT_LABEL.sidePadding};`);
+    // VCN → attach → DRG connections have endpoint dots and square corners.
     expect(xml).toContain('source="hub-vcn" target="attach-hub"');
     expect(xml).toContain('source="attach-hub" target="drg"');
     expect(xml.match(/id="e-attach-hub-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.25;');
     expect(xml.match(/id="e-attach-cmp-env-0-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.5;');
     expect(xml.match(/id="e-attach-cmp-env-1-drg"[^>]+/)?.[0]).toContain('entryX=1;entryY=0.75;');
-    expect(xml).toContain('endArrow=none;');
+    for (const edge of buildGraph(emptyLzModel(), 3).edges) {
+      const cell = xml.match(new RegExp(`id="${edge.id}"[^>]+`))?.[0] ?? '';
+      expect(cell).toContain('endArrow=oval;startArrow=oval;');
+      expect(cell).toContain('startFill=1;endFill=1;');
+    }
+    expect(xml.match(/id="e-attach-hub-drg"[^>]+/)?.[0]).toContain('rounded=0;');
     // every environment VCN gets its own Service Gateway
     expect(xml).toMatch(/id="cmp-env-0-sgw"[^>]*parent="cmp-env-0-vcn"/);
   });
@@ -119,7 +158,13 @@ describe('toDrawioXml', () => {
     const projectContainer = xml.match(/<mxCell id="cmp-env-0-projects"[^>]+>/)?.[0] ?? '';
     const projectCompartment = xml.match(/<mxCell id="cmp-env-0-proj-0"[^>]+>/)?.[0] ?? '';
     expect(projectContainer).toContain('rounded=0;');
+    expect(projectContainer).toContain('fillColor=#F5F3F1;');
     expect(projectCompartment).toContain('rounded=0;');
+    expect(projectCompartment).toContain('fillColor=#ECEAE8;');
+    expect(xml.match(/id="cmp-platform"[^>]+/)?.[0]).toContain('fillColor=#FAF8D6;');
+    expect(xml.match(/id="cmp-platform"[^>]+/)?.[0]).toContain('fontColor=#3f4750;');
+    expect(xml.match(/id="cmp-env-0-platforms"[^>]+/)?.[0]).toContain('fillColor=#999999;');
+    expect(xml.match(/id="cmp-env-0-platforms"[^>]+/)?.[0]).toContain('fontColor=#ffffff;');
     // none of this before step 3
     expect(toDrawioXml(buildGraph(emptyLzModel(), 2))).not.toContain('-projects"');
   });
@@ -145,7 +190,10 @@ describe('toDrawioXml', () => {
 
   it('maps an animated edge to draw.io flowAnimation', () => {
     const diagram: DiagramModel = {
-      nodes: [],
+      nodes: [
+        { id: 'a', kind: 'subnet', label: 'source', x: 0, y: 0, width: 100, height: 50 },
+        { id: 'b', kind: 'subnet', label: 'destination', x: 200, y: 0, width: 100, height: 50 },
+      ],
       edges: [{ id: 'e1', source: 'a', target: 'b', label: 'flow', animated: true }],
     };
     const xml = toDrawioXml(diagram);
@@ -155,15 +203,134 @@ describe('toDrawioXml', () => {
     expect(xml).toContain('target="b"');
   });
 
-  it('exports one fixed obstacle-aware polyline instead of rerouting every flow hop', () => {
-    const graph = buildGraph(emptyLzModel(), 3, { activeFlows: ['prod:egress:web'] });
+  it('exports association rails by resource kind with their exact stored bends', () => {
+    const diagram: DiagramModel = {
+      nodes: [
+        { id: 'region', kind: 'region', label: 'Region', x: 0, y: 0, width: 1000, height: 1000 },
+        { id: 'processing-port', kind: 'rtdot', label: '', x: 300, y: 80, width: 16, height: 16 },
+        { id: 'second-port', kind: 'rtdot', label: '', x: 300, y: 120, width: 16, height: 16 },
+        { id: 'table', kind: 'routetable', label: 'Generated route table', x: 20, y: 20, width: 200, height: 120 },
+      ],
+      edges: [
+        { id: 'association', source: 'processing-port', target: 'table',
+          points: [{ x: 300, y: 88 }, { x: 250, y: 88 }, { x: 250, y: 60 }, { x: 220, y: 60 }] },
+        { id: 'second-association', source: 'second-port', target: 'table',
+          points: [{ x: 300, y: 128 }, { x: 250, y: 128 }, { x: 250, y: 60 }, { x: 220, y: 60 }] },
+      ],
+    };
+    const xml = toDrawioXml(diagram);
+    const cell = xml.match(/<mxCell id="association"[^]*?<\/mxCell>/)?.[0] ?? '';
+    expect(cell).toContain('dashed=1;dashPattern=5 4;');
+    expect(cell).toContain('endArrow=none;startArrow=none;');
+    expect(cell).toContain('<mxPoint x="320" y="138" as="sourcePoint"');
+    expect(cell).toContain('<mxPoint x="270" y="138" />');
+    expect(cell).toContain('<mxPoint x="270" y="110" />');
+    expect(cell).toContain('<mxPoint x="240" y="110" as="targetPoint"');
+    const second = xml.match(/<mxCell id="second-association"[^]*?<\/mxCell>/)?.[0] ?? '';
+    expect(second).toContain('<mxPoint x="270" y="138" as="targetPoint"');
+    expect(second).not.toContain('<mxPoint x="240" y="110"');
+    expect(xml.match(/<mxPoint x="270" y="110" \/>/g)).toHaveLength(1);
+  });
+
+  it('exports one fixed obstacle-aware polyline instead of rerouting every flow hop', async () => {
+    const model = emptyLzModel();
+    const graph = buildGraph(model, 3, { activeFlows: ['prod:egress:web'] }, undefined, await generatedRouteTables(model));
     const xml = toDrawioXml(graph);
     expect(xml.match(/id="flow-prod:egress:web#0"/g)).toHaveLength(1);
     expect(xml).not.toContain('id="flow-prod:egress:web#0-0"');
     expect(xml).toContain('edgeStyle=none;orthogonal=1;');
+    expect(xml.match(/id="flow-prod:egress:web#0"[^>]+/)?.[0]).toContain('rounded=0;');
+    expect(xml.match(/id="flow-prod:egress:web#0"[^>]+/)?.[0]).toContain('endArrow=block;startArrow=none;');
     expect(xml).toContain('as="sourcePoint"');
     expect(xml).toContain('as="targetPoint"');
     expect(xml).toContain('<Array as="points">');
+  });
+
+  it('preserves every route-table row without permanently lighting the union of traversed rules', async () => {
+    const model = emptyLzModel();
+    const graph = buildGraph(model, 3, { activeFlows: ['prod:egress:web'] }, undefined, await generatedRouteTables(model));
+    const table = graph.nodes.find((node) => node.id === 'RT-FRA-LZ-HUB-FW-INT-KEY')!;
+    expect(table.rtHighlight?.length).toBeGreaterThan(0);
+    const xml = toDrawioXml(graph);
+    const cell = xml.match(/id="RT-FRA-LZ-HUB-FW-INT-KEY"[^>]+/)?.[0] ?? '';
+    expect(cell).not.toContain('background:#fff3c4');
+    expect(cell.match(/&lt;tr/g)).toHaveLength(table.rtRows!.length + 1);
+    expect(xml.match(/id="e-RT-FRA-LZ-HUB-FW-INT-KEY"[^>]+/)?.[0]).toContain('endArrow=none;');
+  });
+
+  it('exports canonical flow points and pinned attachment bends without lane offsets', async () => {
+    const model = emptyLzModel();
+    const graph = buildGraph(model, 3, { activeFlows: ['prod:egress:web', 'preprod:egress:web'] }, undefined, await generatedRouteTables(model));
+    const xml = toDrawioXml(graph);
+    const region = graph.nodes.find((node) => node.id === 'region')!;
+    const dx = Math.max(20, Math.round((850 - region.width) / 2));
+    const dy = Math.max(20, Math.round((1100 - region.height) / 2));
+    const flows = graph.edges.filter((edge) => edge.animated && edge.points?.length);
+    const flow = flows[0];
+    const displayed = flowDisplayPoints(flow);
+    expect(displayed).toBe(flow.points);
+    const flowCell = xml.match(new RegExp(`<mxCell id="${flow.id}"[^]*?</mxCell>`))?.[0] ?? '';
+    expect(flowCell).toContain(`<mxPoint x="${displayed[0].x + dx}" y="${displayed[0].y + dy}" as="sourcePoint"`);
+    const associations = associationDisplaySegments(graph.nodes, graph.edges);
+    for (const edge of graph.edges.filter((edge) => !edge.waypoints)) {
+      const segments = associations.get(edge.id) ?? [structuralEdgePoints(edge, absoluteNodeRects(graph.nodes))];
+      for (const [index, points] of segments.entries()) {
+        const id = index ? `${edge.id}-segment-${index}` : edge.id;
+        const cell = xml.match(new RegExp(`<mxCell id="${id}"[^]*?</mxCell>`))?.[0] ?? '';
+        expect(cell).toContain(`<mxPoint x="${points[0].x + dx}" y="${points[0].y + dy}" as="sourcePoint"`);
+        expect(cell).toContain(`<mxPoint x="${points.at(-1)!.x + dx}" y="${points.at(-1)!.y + dy}" as="targetPoint"`);
+        points.slice(1, -1).forEach((point) => expect(cell).toContain(`<mxPoint x="${point.x + dx}" y="${point.y + dy}" />`));
+      }
+    }
+  });
+
+  it('exports visible flow annotations and public subnet badges with all-flow detail following focus', async () => {
+    const model = emptyLzModel();
+    const graph = buildGraph(model, 3, { activeFlows: ['prod:egress:web'] }, undefined, await generatedRouteTables(model));
+    const detailed = toDrawioXml(graph);
+    expect(detailed).toContain('id="flow-prod:egress:web#0-start"');
+    expect(detailed).toContain('id="flow-prod:egress:web#0-mark-0"');
+    expect(detailed).toContain('id="flow-prod:egress:web#0-hop-1"');
+    expect(detailed).toContain('id="flow-prod:egress:web#0-label"');
+    expect(detailed).toContain('id="hub-vcn-sn-0-public"');
+    const overview = toDrawioXml({ ...graph, display: { allFlows: true } });
+    expect(overview).not.toContain('id="flow-prod:egress:web#0-label"');
+    expect(overview).not.toContain('id="flow-prod:egress:web#0-hop-1"');
+    const focused = toDrawioXml({ ...graph, display: { allFlows: true, focusFlow: 'prod:egress' } });
+    expect(focused).toContain('id="flow-prod:egress:web#0-label"');
+    expect(focused).toContain('id="flow-prod:egress:web#0-hop-1"');
+  });
+
+  it('centres routing hop badges on their dots without resource slot offsets', () => {
+    const graph: DiagramModel = {
+      nodes: [
+        { id: 'region', kind: 'region', label: 'Region', x: 0, y: 0, width: 1000, height: 1200 },
+        { id: 'dot-hub', kind: 'rtdot', label: '', x: 123, y: 456, width: 8, height: 8 },
+      ],
+      edges: [{
+        id: 'flow-prod:egress#0', source: 'drg', target: 'hub', animated: true,
+        waypoints: ['drg', 'hub', 'hub'], points: [{ x: 127, y: 200 }, { x: 127, y: 460 }, { x: 200, y: 460 }, { x: 127, y: 460 }],
+        visits: [
+          { node: 'drg', pointIndex: 0, distance: 0, anchorId: 'drg' },
+          { node: 'hub', pointIndex: 1, distance: 260, anchorId: 'dot-hub' },
+          { node: 'hub', pointIndex: 3, distance: 406, anchorId: 'dot-hub' },
+        ],
+        flowHops: [
+          { node: 'drg', seq: 1, visitIndex: 0 },
+          { node: 'hub', seq: 2, visitIndex: 1, tableId: 'rt-hub', ruleId: 'outbound' },
+          { node: 'hub', seq: 3, visitIndex: 2, tableId: 'rt-hub', ruleId: 'return' },
+        ],
+      }],
+    };
+    const xml = toDrawioXml(graph);
+    const centre = (id: string) => {
+      const cell = xml.match(new RegExp(`<mxCell id="${id}"[^]*?</mxCell>`))?.[0] ?? '';
+      const geometry = cell.match(/<mxGeometry x="([^"]+)" y="([^"]+)" width="([^"]+)" height="([^"]+)"/)!;
+      return [Number(geometry[1]) + Number(geometry[3]) / 2, Number(geometry[2]) + Number(geometry[4]) / 2];
+    };
+    expect(centre('flow-prod:egress#0-hop-2')).toEqual(centre('dot-hub'));
+    expect(centre('flow-prod:egress#0-hop-3')).toEqual(centre('dot-hub'));
+    expect(centre('flow-prod:egress#0-hop-1')).toEqual([147, 220]);
   });
 
   it('escapes XML-significant characters in labels', () => {
@@ -177,13 +344,14 @@ describe('toDrawioXml', () => {
     expect(xml).not.toContain('A & B <co>');
   });
 
-  it('keeps open route-table HTML inside a well-formed XML attribute', () => {
-    const xml = toDrawioXml(buildGraph(emptyLzModel(), 3, {
+  it('keeps open route-table HTML inside a well-formed XML attribute', async () => {
+    const model = emptyLzModel();
+    const xml = toDrawioXml(buildGraph(model, 3, {
       showDots: true,
       showEndpoints: true,
-      openTables: ['rt-hub-lb'],
-    }));
-    expect(xml).toContain('id="rt-hub-lb"');
+      openTables: ['RT-FRA-LZ-HUB-LB-KEY'],
+    }, undefined, await generatedRouteTables(model)));
+    expect(xml).toContain('id="RT-FRA-LZ-HUB-LB-KEY"');
     expect(xml).toContain('&lt;table');
     expect(valueAttributes(xml).every((value) => !value.includes('<'))).toBe(true);
   });

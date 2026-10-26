@@ -1,18 +1,12 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { HubKind, LzModel } from '../model/types';
 import { emptyLzModel } from '../model/defaults';
-import { generateOutputs } from '../generator/generate';
-import { setAssetLoader } from '../generator/jsonnetVm';
+import { generateNetwork } from '../generator/network';
 import { allFlowIds, buildFlowTraces } from './flowTrace';
 import { hubKindDefaults } from './hubKinds';
 import { customDefaultSubnets, newPlatform, newSharedPlatform } from './platforms';
 import { buildRouteTables } from './routeTables';
-
-beforeAll(() => {
-  setAssetLoader(async () => ({ wasmBinary: readFileSync(resolve('3rd/go-jsonnet/libjsonnet.wasm')) }));
-});
+import { generatedRouteTables } from './routingFixtures.testSupport';
 
 function peeredModel(hubKind: HubKind): LzModel {
   const model = emptyLzModel();
@@ -27,16 +21,17 @@ function peeredModel(hubKind: HubKind): LzModel {
 function withPlatforms(model: LzModel): LzModel {
   const custom = newPlatform('custom', []);
   const oke = newPlatform('oke_simple', []);
-  const ocvs = newPlatform('ocvs', []);
-  const sharedOcvs = newSharedPlatform('ocvs', []);
+  const extra = newPlatform('custom', [custom]);
+  const shared = newSharedPlatform('custom', []);
+  const extraShared = newSharedPlatform('custom', [shared]);
   model.platforms = [
     { ...custom, key: 'cus', vcnCidr: '10.1.0.0/21', subnets: customDefaultSubnets('10.1.0.0/21'), overrides: undefined },
     { ...oke, key: 'oke', vcnCidr: '10.2.0.0/20', okeParams: { ...oke.okeParams!, createFss: true }, overrides: undefined },
-    { ...ocvs, key: 'ocv', vcnCidr: '10.3.0.0/21', ocvsParams: { ...ocvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' }, overrides: undefined },
+    { ...extra, key: 'aux', vcnCidr: '10.3.0.0/21', subnets: customDefaultSubnets('10.3.0.0/21'), overrides: undefined },
   ];
   model.sharedPlatforms = [
-    { ...newSharedPlatform('custom', []), key: 'cus', vcnCidr: '10.4.0.0/21', subnets: customDefaultSubnets('10.4.0.0/21') },
-    { ...sharedOcvs, key: 'sdc', vcnCidr: '10.4.8.0/21', ocvsParams: { ...sharedOcvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' } },
+    { ...shared, key: 'cus', vcnCidr: '10.4.0.0/21', subnets: customDefaultSubnets('10.4.0.0/21') },
+    { ...extraShared, key: 'aux', vcnCidr: '10.4.8.0/21', subnets: customDefaultSubnets('10.4.8.0/21') },
   ];
   return model;
 }
@@ -51,6 +46,8 @@ type Resource = {
   subnet_id?: string;
   cidr_block?: string;
   cidr_blocks?: string[];
+  subnets?: Record<string, Resource>;
+  destination_type?: string;
   import_drg_route_distribution_key?: string;
   statements?: Record<string, { match_criteria: { drg_attachment_key: string } }>;
   network_details?: { type: string; attached_resource_key: string };
@@ -67,102 +64,88 @@ function resourcesIn(value: unknown, resources = new Map<string, Resource>()): M
   return resources;
 }
 
-describe('X-RPC route preview', () => {
-  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('matches generated remote routes and incoming RPC tables for %s', async (hubKind) => {
+describe('canonical X-RPC routing', () => {
+  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('retains every generated %s rule and its actual target with platforms and RPCs', async (hubKind) => {
     const model = withPlatforms(peeredModel(hubKind));
     model.exadata.exacs = { ...model.exadata.exacs, enabled: true, service: 'vmc', database: 'per_environment',
       environments: model.environments.map((env) => env.id), notifications: { default: 'dba@example.com' },
       environmentVcnCidrs: { 'environment-1': '10.5.0.0/21', 'environment-2': '10.5.8.0/21' } };
-    const { files } = await generateOutputs(model);
-    const resources = resourcesIn(JSON.parse(files['network.json']));
-    const generatedTables = [...resources.values()].filter((entry) => entry.display_name?.startsWith('rt-') && entry.route_rules);
-    const tables = buildRouteTables(model);
-    const remoteCidrs = model.remotePeeringConnections!.flatMap((connection) => connection.remoteCidrs);
-    const isRemote = (rule: { destination?: string }) => remoteCidrs.includes(rule.destination ?? '');
-    const remoteTargets = (table: Resource) => Object.values(table.route_rules!).filter(isRemote).map((rule) => {
-      const key = (rule.network_entity_key ?? rule.network_entity_id)!;
-      if (key.startsWith('DRG-')) return `${rule.destination}:drg:drg`;
-      const target = resources.get(key)!;
-      if (key.startsWith('NFW-')) return `${rule.destination}:firewall:${target.ipv4address}`;
-      const subnet = resources.get(target.subnet_id!)!;
-      return `${rule.destination}:nlb:hub-vcn-sn-${model.network.subnets.findIndex((entry) => entry.cidr === subnet.cidr_block)}`;
-    }).sort();
-
-    for (const table of tables.filter((entry) => entry.columns === 'vcn')) {
-      const generated = generatedTables.find((entry) => entry.display_name === table.name);
-      expect(generated, table.name).toBeDefined();
-      expect(table.rules.filter(isRemote).map((rule) => `${rule.destination}:${rule.nextHopKind}:${rule.flowTarget}`).sort(), table.name)
-        .toEqual(remoteTargets(generated!));
+    const network = await generateNetwork(model);
+    const resources = resourcesIn(network);
+    const tables = buildRouteTables(model, network);
+    const actualTables = [...resources.entries()].filter(([, resource]) => resource.display_name && resource.route_rules);
+    expect(tables.map((table) => table.id).sort()).toEqual(actualTables.map(([key]) => key).sort());
+    for (const table of tables) {
+      const generated = resources.get(table.sourceKey)!;
+      const configured = table.rules.filter((rule) => rule.provenance === 'configured');
+      expect(configured.map((rule) => rule.id).sort()).toEqual(Object.keys(generated.route_rules!).sort());
+      for (const rule of configured) {
+        const raw = generated.route_rules![rule.id];
+        expect(rule.destination).toBe(raw.destination_type === 'SERVICE_CIDR_BLOCK' ? 'OSN Services' : raw.destination);
+        expect(rule.targetKey).toBe(raw.next_hop_drg_attachment_key ?? raw.network_entity_key ?? raw.network_entity_id);
+      }
     }
-    const generatedRemoteTables = generatedTables.filter((table) => remoteTargets(table).length > 0
-      && (!/-(?:ocv|sdc)-/.test(table.display_name!) || table.display_name!.endsWith('-provisioning')));
-    expect(tables.filter((table) => table.columns === 'vcn' && table.rules.some(isRemote)).map((table) => table.name).sort())
-      .toEqual(generatedRemoteTables.map((table) => table.display_name).sort());
-
     for (const connection of model.remotePeeringConnections!) {
-      const preview = tables.find((table) => table.id === `rt-rpc-${connection.id}`)!;
-      const generated = [...resources.values()].find((entry) => entry.display_name === preview.name)!;
-      const imported = generated.import_drg_route_distribution_key;
-      const expected = imported
-        ? Object.values(resources.get(imported)!.statements!).flatMap(({ match_criteria }) => {
+      const rpc = tables.find((table) => table.associations.some((owner) => owner.kind === 'rpc-attachment' && owner.nodeId === 'rpc-' + connection.id))!;
+      expect(rpc).toBeDefined();
+      expect(rpc.columns).toBe('drg');
+      const generated = resources.get(rpc.sourceKey)!;
+      if (hubKind === 'hub_e') {
+        expect(rpc.importDistributionKey).toBe(generated.import_drg_route_distribution_key);
+        expect(rpc.rules.every((rule) => rule.provenance === 'derived-import')).toBe(true);
+        const distribution = resources.get(generated.import_drg_route_distribution_key!)!;
+        const expected = Object.values(distribution.statements!).flatMap(({ match_criteria }) => {
           const attachment = resources.get(match_criteria.drg_attachment_key)!;
-          const vcn = resources.get(attachment.network_details!.attached_resource_key)!;
-          return vcn.cidr_blocks!.map((cidr) => `${cidr}:${attachment.display_name}:Dynamic`);
-        })
-        : Object.values(generated.route_rules!).map((rule) => `${rule.destination}:${resources.get(rule.next_hop_drg_attachment_key!)!.display_name}:Static`);
-      expect(preview.rules.map((rule) => `${rule.destination}:${rule.target}:${rule.routeType}`).sort()).toEqual(expected.sort());
-      const outbound = tables.find((table) => table.id === 'rt-drg-hub')!.rules.filter((rule) => rule.flowTarget === `rpc-${connection.id}`);
-      expect(outbound.map((rule) => rule.destination)).toEqual(connection.remoteCidrs);
-      expect(outbound.every((rule) => rule.targetType === 'RPC Attachment' && rule.routeType === 'Dynamic')).toBe(true);
-      expect(tables.find((table) => table.id === 'rt-drg-spokes')!.rules.filter((rule) => rule.flowTarget === `rpc-${connection.id}`).map((rule) => rule.destination))
-        .toEqual(hubKind === 'hub_e' ? connection.remoteCidrs : []);
+          return Object.values(resources.get(attachment.network_details!.attached_resource_key)!.subnets!)
+            .map((subnet) => subnet.cidr_block);
+        });
+        expect(rpc.rules.map((rule) => rule.destination).sort()).toEqual(expected.sort());
+      } else {
+        expect(rpc.rules).toEqual([expect.objectContaining({ provenance: 'configured', destination: '0.0.0.0/0', flowTarget: 'attach-hub' })]);
+      }
+      const hub = tables.find((table) => table.associations.some((owner) => owner.nodeId === 'attach-hub' && owner.kind === 'drg-attachment'))!;
+      const expected = hub.rules.filter((rule) => rule.flowTarget === 'rpc-' + connection.id);
+      expect(expected.map((rule) => rule.destination).sort()).toEqual([...connection.remoteCidrs].sort());
+      expect(expected.every((rule) => rule.provenance === 'expected-remote' && rule.targetType === 'RPC Attachment')).toBe(true);
     }
   }, 60_000);
 
-  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('retains platform routes without project networks in %s', (hubKind) => {
+  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('keeps real platform attachment associations without Projects VCNs in %s', async (hubKind) => {
     const model = withPlatforms(peeredModel(hubKind));
     model.environments.forEach((env) => { env.projectNetworkEnabled = false; });
-    const tables = buildRouteTables(model);
-    const spokes = tables.find((table) => table.id === 'rt-drg-spokes')!;
-    expect(spokes).toBeDefined();
-    expect([spokes.attachTo, ...(spokes.attachExtra ?? [])]).toEqual([
+    const tables = await generatedRouteTables(model);
+    const spokes = tables.find((table) => table.name === 'drgrt-fra-lz-spokes')!;
+    expect(spokes.associations.map((owner) => owner.nodeId).sort()).toEqual([
       'attach-cmp-env-0-plat-0', 'attach-cmp-env-0-plat-1', 'attach-cmp-env-0-plat-2',
       'attach-cmp-env-1-plat-0', 'attach-cmp-env-1-plat-1', 'attach-cmp-env-1-plat-2', 'attach-shared-0', 'attach-shared-1',
-    ]);
-    expect(tables.some((table) => table.id.startsWith('rt-ssn-'))).toBe(false);
-    const removedCidrs = model.environments.map((env) => env.network.vcnCidr);
-    expect(tables.flatMap((table) => table.rules).some((rule) => removedCidrs.includes(rule.destination))).toBe(false);
-  });
-
-  it('retains a shared platform attachment with no environments', () => {
-    const model = peeredModel('hub_e');
-    model.environments = [];
-    model.sharedPlatforms = [newSharedPlatform('custom', [])];
-    const tables = buildRouteTables(model);
-    expect(tables.find((table) => table.id === 'rt-drg-spokes')!.attachTo).toBe('attach-shared-0');
-    expect(tables.find((table) => table.id === 'rt-rpc-home')!.rules).toContainEqual(expect.objectContaining({ flowTarget: 'attach-shared-0' }));
-  });
+    ].sort());
+    expect(tables.some((table) => table.name.includes('-proj-generic'))).toBe(false);
+    expect(tables.flatMap((table) => table.associations).some((owner) => /^cmp-env-\d+-vcn-sn-/.test(owner.nodeId))).toBe(false);
+  }, 60_000);
 
   it('imports the shared ExaCS VCN with no environments', async () => {
     const model = peeredModel('hub_e');
     model.environments = [];
     model.projects = [];
     model.exadata.exacs = { ...model.exadata.exacs, enabled: true, service: 'vmc', notifications: { default: 'dba@example.com' } };
-    const { files } = await generateOutputs(model);
-    const resources = resourcesIn(JSON.parse(files['network.json']));
-    const generated = [...resources.values()].find((entry) => entry.display_name === 'drgrt-fra-lz-rpc-home-region')!;
-    const distribution = resources.get(generated.import_drg_route_distribution_key!)!;
-    const imported = Object.values(distribution.statements!).map(({ match_criteria }) => resources.get(match_criteria.drg_attachment_key)!.display_name);
-    const tables = buildRouteTables(model);
-    expect(tables.find((table) => table.id === 'rt-rpc-home')!.rules.map((rule) => rule.target).sort()).toEqual(imported.sort());
-    expect(tables.find((table) => table.id === 'rt-drg-spokes')!.attachTo).toBe('attach-shared-0');
+    const tables = await generatedRouteTables(model);
+    expect(tables.find((table) => table.name === 'drgrt-fra-lz-spokes')!.associations)
+      .toEqual([{ nodeId: 'attach-shared-0', kind: 'drg-attachment' }]);
+    expect(tables.find((table) => table.name === 'drgrt-fra-lz-rpc-home-region')!.rules)
+      .toContainEqual(expect.objectContaining({ flowTarget: 'attach-shared-0', provenance: 'derived-import' }));
     expect(tables.find((table) => table.name === 'rt-fra-lz-shared-exacs-generic')!.rules)
-      .toContainEqual(expect.objectContaining({ destination: '10.90.0.0/21', nextHopKind: 'drg' }));
+      .toContainEqual(expect.objectContaining({ destination: '10.90.0.0/21', nextHopKind: 'drg', provenance: 'configured' }));
   }, 60_000);
 
-  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('preserves local flow traces after adding RPCs in %s', (hubKind) => {
+  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('keeps local flow decisions unchanged after adding RPCs in %s', async (hubKind) => {
     const model = peeredModel(hubKind);
     const local = { ...model, remotePeeringConnections: [] };
-    expect(buildFlowTraces(model, allFlowIds(model))).toEqual(buildFlowTraces(local, allFlowIds(local)));
-  });
+    const peeredTables = await generatedRouteTables(model);
+    const localTables = await generatedRouteTables(local);
+    const decisions = (source: LzModel, tables: ReturnType<typeof buildRouteTables>) =>
+      buildFlowTraces(source, allFlowIds(source), 'kind', tables).map((trace) => ({
+        id: trace.id, ok: trace.ok, hops: trace.hops.map((hop) => ({ node: hop.node, tableId: hop.tableId, ruleId: hop.ruleId })),
+      }));
+    expect(decisions(model, peeredTables)).toEqual(decisions(local, localTables));
+  }, 60_000);
 });

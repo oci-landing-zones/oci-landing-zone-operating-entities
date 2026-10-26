@@ -17,6 +17,29 @@ beforeEach(() => {
 });
 
 describe('saved combined Landing Zone cards', () => {
+  it('offers Create DR only for complete designs and removes Duplicate from all cards', () => {
+    createLZ('Home', emptyLzModel());
+    const regional = emptyLzModel();
+    regional.foundation.stackScope = 'regional';
+    createLZ('DR', regional);
+    const home = emptyLzModel();
+    saveDisasterRecoveryLZ({ name: 'Legacy combined', model: home, draft: createDrDraft(home), sourceLabel: 'Saved Landing Zone' });
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
+    expect(html.match(/>Create DR<\/button>/g)).toHaveLength(1);
+    expect(html).toMatch(/<button[^>]*min-height:44px[^>]*>Create DR<\/button>/);
+    expect(html).not.toContain('Duplicate');
+    expect(html.match(/>Open<\/button>/g)).toHaveLength(3);
+    expect(html.match(/>Delete<\/button>/g)).toHaveLength(3);
+  });
+
+  it('keeps Create DR available on the current complete design without reopening it', () => {
+    const saved = createLZ('Current Home', emptyLzModel()).record!;
+    const html = renderToStaticMarkup(<MemoryRouter><SavedLzList currentId={saved.id} /></MemoryRouter>);
+    expect(html).toContain('>Create DR</button>');
+    expect(html).not.toContain('>Open</button>');
+    expect(html).toContain('>Delete</button>');
+  });
+
   it('labels a regional design and keeps diagram download in Review only', () => {
     const model = emptyLzModel();
     model.foundation.stackScope = 'regional';

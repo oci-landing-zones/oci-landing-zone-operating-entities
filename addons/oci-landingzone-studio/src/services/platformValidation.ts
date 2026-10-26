@@ -1,8 +1,8 @@
 import type { LzModel } from '../model/types';
-import { overlaps } from './cidr';
-import { platformEnvInstances } from './platforms';
+import { overlaps, validateSubnetCidr, validateVcnCidr } from './cidr';
+import { placementsOverlap, platformEnvInstances } from './platforms';
 
-interface NamedCidr { name: string; cidr: string }
+interface NamedCidr { name: string; cidr: string; subnets: { name: string; cidr: string }[] }
 
 function duplicateKeys(keys: string[], scope: string): string[] {
   const seen = new Set<string>();
@@ -23,7 +23,7 @@ function requiredKeys(keys: string[], scope: string): string[] {
 function duplicatePlacedKeys(entries: { name: string; environments: 'all' | string[] }[], scope: string): string[] {
   return entries.flatMap((entry, index) => entries.slice(0, index).some((other) =>
     entry.name.trim().toLowerCase() === other.name.trim().toLowerCase()
-    && (entry.environments === 'all' || other.environments === 'all' || entry.environments.some((id) => other.environments.includes(id))))
+    && placementsOverlap(entry.environments, other.environments))
     ? [`Duplicate ${scope} config key: ${entry.name.trim()}.`] : []);
 }
 
@@ -58,6 +58,7 @@ export function validatePlatformContracts(model: LzModel): string[] {
     }
   }
   for (const platform of model.platforms) {
+    if (!['oke_simple', 'custom'].includes(platform.type)) errors.push(`Unsupported platform type: ${platform.type}.`);
     if (!platform.key.trim()) errors.push('Every environment platform needs a non-empty config key.');
     if (platform.key.trim().length > 3) {
       errors.push(`Environment platform ${platform.key.trim()} config key must be 3 characters or less for OCI Network Firewall names.`);
@@ -74,19 +75,29 @@ export function validatePlatformContracts(model: LzModel): string[] {
     }
   }
   for (const platform of model.sharedPlatforms) {
+    if (platform.type !== undefined && platform.type !== 'custom') errors.push(`Unsupported shared platform type: ${platform.type}.`);
     if (!platform.key.trim()) errors.push('Every shared platform needs a non-empty config key.');
     errors.push(...subnetKeyErrors(platform.subnets, `${platform.key.trim() || platform.id} shared platform`));
   }
 
   const ranges: NamedCidr[] = [
-    { name: 'Hub VCN', cidr: model.network.hubVcnCidr },
-    ...model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env, index) => ({ name: `${env.name.trim() || `environment ${index + 1}`} project VCN`, cidr: env.network.vcnCidr })),
-    ...model.sharedPlatforms.map((platform) => ({ name: `shared platform ${platform.key || platform.id}`, cidr: platform.vcnCidr })),
+    { name: 'Hub VCN', cidr: model.network.hubVcnCidr, subnets: model.network.subnets },
+    ...model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env, index) => ({ name: `${env.name.trim() || `environment ${index + 1}`} project VCN`, cidr: env.network.vcnCidr, subnets: env.network.subnets })),
+    ...model.sharedPlatforms.map((platform) => ({ name: `shared platform ${platform.key || platform.id}`, cidr: platform.vcnCidr, subnets: platform.subnets })),
     ...model.platforms.flatMap((platform) => platformEnvInstances(platform, model.environments).map((instance) => ({
       name: `${instance.name} platform ${platform.key || platform.id}`,
       cidr: instance.vcnCidr,
+      subnets: instance.subnets,
     }))),
   ];
+  for (const range of ranges) {
+    const vcnError = validateVcnCidr(range.cidr);
+    if (vcnError) errors.push(`${range.name}: ${vcnError}.`);
+    range.subnets.forEach((subnet, index) => {
+      const error = validateSubnetCidr(subnet.cidr, range.cidr, range.subnets.filter((_, other) => index !== other));
+      if (error) errors.push(`${range.name} subnet ${subnet.name}: ${error}.`);
+    });
+  }
   for (let left = 0; left < ranges.length; left += 1) {
     for (let right = left + 1; right < ranges.length; right += 1) {
       const a = ranges[left];

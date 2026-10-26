@@ -48,7 +48,7 @@ describe('flowChoices', () => {
       { id: 'prod:ingress', label: 'Internet → Spoke', sub: 'ingress' },
       { id: 'prod>preprod:east-west', label: 'Spoke → preprod', sub: 'east-west' },
       { id: 'prod>dev:east-west', label: 'Spoke → dev', sub: 'east-west' },
-      { id: 'prod:services', label: 'Spoke → OCI Services', sub: 'SGW' },
+      { id: 'prod:services', label: 'Spoke → OCI Services', sub: 'Service Gateway' },
     ]);
   });
 

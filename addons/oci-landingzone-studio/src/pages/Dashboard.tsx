@@ -12,8 +12,8 @@ import LicenseNotice from '../components/LicenseNotice';
 import SavedLzList from '../components/SavedLzList';
 import { oracle } from '../theme';
 import { createLZ, listLZs } from '../services/lzStore';
-import { newLzModel } from '../model/defaults';
 import ImportLandingZoneDialog from '../components/ImportLandingZoneDialog';
+import { ErrorNotice } from '../components/FieldError';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 
@@ -33,7 +33,7 @@ export default function Dashboard() {
   const onCountChange = useCallback((n: number) => setCount(n), []);
 
   function handleNew() {
-    const result = createLZ(undefined, newLzModel());
+    const result = createLZ();
     if (!result.ok || !result.record) { setStorageError(result.message ?? 'Could not create the Landing Zone.'); return; }
     navigate(`/lz/${result.record.id}`);
   }
@@ -45,7 +45,7 @@ export default function Dashboard() {
           there are saved builds to list below it. */}
       <Hero onNew={handleNew} onImport={() => setShowImport(true)} compact={hasRecords} />
       {showImport && <ImportLandingZoneDialog onClose={() => setShowImport(false)} onImported={(id) => navigate(`/lz/${id}`)} />}
-      {storageError && <p role="alert" style={{ ...s.page, color: oracle.redDark }}>{storageError}</p>}
+      {storageError && <div style={s.page}><ErrorNotice>{storageError}</ErrorNotice></div>}
 
 
       {hasRecords && (

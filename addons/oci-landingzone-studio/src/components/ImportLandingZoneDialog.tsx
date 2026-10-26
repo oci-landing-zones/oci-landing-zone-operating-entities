@@ -3,6 +3,8 @@ import { importConfigFile } from '../services/configImportFile';
 import type { ImportedConfig } from '../services/importConfig';
 import { createLZ } from '../services/lzStore';
 import { oracle } from '../theme';
+import { ErrorNotice } from './FieldError';
+import ValidatedInput from './ValidatedInput';
 
 const button: React.CSSProperties = {
   padding: '11px 20px', font: 'inherit', fontSize: 14, fontWeight: 700,
@@ -69,7 +71,7 @@ export default function ImportLandingZoneDialog({ onClose, onImported }: { onClo
       style={{ boxSizing: 'border-box', width: 620, maxWidth: 'calc(100% - 32px)', maxHeight: 'calc(100% - 48px)', padding: 24,
         color: oracle.text, background: oracle.surface, border: `1px solid ${oracle.border}`, borderRadius: 10, font: 'inherit' }}>
       <style>{'.studio-import-dialog::backdrop { background: rgba(32, 31, 28, 0.48); }'}</style>
-      <h2 id="import-lz-title" style={{ margin: '0 0 16px', fontSize: 22 }}>Import existing Landing Zone</h2>
+      <h2 id="import-lz-title" style={{ margin: '0 0 16px', fontSize: 22 }}>Import</h2>
       <div id="import-lz-description" style={{ fontSize: 15, lineHeight: 1.6 }}>
         <p style={{ margin: '0 0 12px' }}>To import a previous Landing Zone design, extract its ZIP file and select <strong>config.jsonnet</strong>.</p>
         <p style={{ margin: '0 0 20px', color: oracle.textMuted }}>Studio will restore it as a new editable design. Existing designs will be kept. Your file stays in this browser.</p>
@@ -81,7 +83,7 @@ export default function ImportLandingZoneDialog({ onClose, onImported }: { onClo
       </button>
       <p style={{ margin: '10px 0 0', color: oracle.textMuted, fontSize: 13 }}>Standalone Studio exports only · .jsonnet · Maximum 1 MB</p>
       {importing && <p role="status">Reading config.jsonnet locally…</p>}
-      {error && <p role="alert" style={{ color: '#9f1d1d', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap', fontSize: 14 }}>{error}</p>}
+      {error && <ErrorNotice title={pending ? 'Could not save the imported design' : 'Could not import this file'}>{error}</ErrorNotice>}
       {pending ? (
         <form onSubmit={confirmImport}>
           <div style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${oracle.border}`, lineHeight: 1.6 }}>
@@ -90,7 +92,7 @@ export default function ImportLandingZoneDialog({ onClose, onImported }: { onClo
               {pending.model.foundation.region} · Hub {pending.model.network.hubKind.slice(-1).toUpperCase()} · CIS Level {pending.model.foundation.cisLevel} · {pending.model.environments.length} environments
             </p>
             <label htmlFor="import-lz-name" style={{ display: 'block', fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Landing Zone name</label>
-            <input ref={nameInput} id="import-lz-name" value={name} onChange={(event) => setName(event.target.value)} required maxLength={120}
+            <ValidatedInput ref={nameInput} id="import-lz-name" error={!name.trim() ? 'Enter a name for this design.' : null} value={name} onChange={(event) => setName(event.target.value)} required maxLength={120}
               style={{ boxSizing: 'border-box', width: '100%', padding: '10px 12px', font: 'inherit', color: oracle.text,
                 background: oracle.appBg, border: `1px solid ${oracle.border}`, borderRadius: 4 }} />
             {pending.warnings.map((warning) => <p key={warning} style={{ fontSize: 14 }}>{warning}</p>)}

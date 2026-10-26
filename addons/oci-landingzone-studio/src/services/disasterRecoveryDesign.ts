@@ -1,4 +1,4 @@
-import type { EnvNetworkConfig, HubKind, LzModel, OkePlatformParams, OcvsPlatformParams, NetworkConfig, OneOeNotifications, Subnet } from '../model/types';
+import type { EnvNetworkConfig, HubKind, LzModel, OkePlatformParams, NetworkConfig, OneOeNotifications, Subnet } from '../model/types';
 import { hubKindDefaults } from './hubKinds';
 import { firstFreeBlock, overlaps, parseCidr, shiftCidr } from './cidr';
 import { configuredVcnCidrs, exadataEntries } from './exadata';
@@ -23,7 +23,6 @@ export interface DrDesignDraft {
   notifications?: OneOeNotifications;
   platformVcnCidrs?: Record<string, string>;
   platformOkeParams?: Record<string, OkePlatformParams>;
-  platformOcvsParams?: Record<string, OcvsPlatformParams>;
   platformSubnets?: Record<string, Subnet[]>;
   platformNotificationEmails?: Record<string, Record<string, string>>;
 }
@@ -45,18 +44,12 @@ export function defaultDrPlatformCidrs(model: LzModel, draft?: DrDesignDraft): R
     result[id] = cidr;
     if (cidr) occupied.push(cidr);
   };
-  for (const platform of model.platforms.filter((platform) => platform.type === 'ocvs')) {
-    for (const env of platformEnvInstances(platform, model.environments)) {
-      allocate(`platform:${platform.id}:${env.id}`, ['prod', 'pro', 'production'].includes(env.name.trim().toLowerCase()) ? oneOeEnvironmentCidrs('dr')!.ocvs : ['preprod', 'preproduction'].includes(env.name.trim().toLowerCase()) ? '10.0.248.0/21' : undefined);
-    }
-  }
   for (const platform of model.platforms.filter((platform) => platform.type === 'oke_simple')) {
     for (const env of platformEnvInstances(platform, model.environments)) {
       const name = env.name.trim().toLowerCase();
       allocate(`platform:${platform.id}:${env.id}`, ['prod', 'pro', 'production'].includes(name) ? oneOeEnvironmentCidrs('dr')!.oke : ['preprod', 'preproduction'].includes(name) ? '10.0.248.0/21' : undefined, 21);
     }
   }
-  for (const platform of model.sharedPlatforms.filter((platform) => platform.type === 'ocvs')) allocate(`shared:${platform.id}`);
   return result;
 }
 
@@ -90,13 +83,13 @@ export function drNetworkOptions(model: LzModel): { projects: DrNetworkOption[];
   }));
   const platforms: DrNetworkOption[] = model.sharedPlatforms.map((platform) => ({
     id: `shared:${platform.id}`, name: platform.key || 'Unnamed platform', scope: 'Shared',
-    type: platform.type === 'ocvs' ? 'OCVS' : 'Custom', vcnCidr: platform.vcnCidr,
+    type: 'Custom', vcnCidr: platform.vcnCidr,
     available: Boolean(platform.key.trim() && platform.vcnCidr.trim()),
   }));
   for (const platform of model.platforms) {
     for (const env of platformEnvInstances(platform, model.environments)) platforms.push({
       id: `platform:${platform.id}:${env.id}`, name: platform.key || 'Unnamed platform', scope: env.name,
-      type: platform.type === 'oke_simple' ? 'OKE' : platform.type === 'ocvs' ? 'OCVS' : 'Custom',
+      type: platform.type === 'oke_simple' ? 'OKE' : 'Custom',
       environmentId: env.id,
       vcnCidr: env.vcnCidr, available: Boolean(platform.key.trim() && env.vcnCidr.trim()),
     });

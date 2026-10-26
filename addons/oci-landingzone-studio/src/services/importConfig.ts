@@ -1,8 +1,7 @@
 /** Reconstruct only configurations that Studio can edit without losing values. */
 import { emptyLzModel } from '../model/defaults';
-import type { ExadataNotifications, HubKind, LzModel, OcvsPlatformParams, OkePlatformParams, PlatformConfig, Subnet } from '../model/types';
+import type { ExadataNotifications, HubKind, LzModel, OkePlatformParams, PlatformConfig, Subnet } from '../model/types';
 import { buildConfig } from './lzConfig';
-import { ocvsDefaultSubnets } from './platforms';
 import { exadataNotificationSource } from './exadata';
 
 type ObjectValue = Record<string, unknown>;
@@ -63,30 +62,14 @@ function okeParams(params: ObjectValue, path: string): OkePlatformParams {
     ...(params.pods_cidr === undefined ? {} : { podsCidr: text(params.pods_cidr, `${path}.pods_cidr`) }),
   };
 }
-function ocvsParams(params: ObjectValue, path: string): OcvsPlatformParams {
-  const cluster = object(params.cluster, `${path}.cluster`);
-  return {
-    sshAuthorizedKeys: text(params.ssh_authorized_keys, `${path}.ssh_authorized_keys`),
-    sddcDisplayName: text(cluster.sddc_display_name, `${path}.cluster.sddc_display_name`),
-    clusterDisplayName: text(cluster.cluster_display_name, `${path}.cluster.cluster_display_name`),
-    vmwareSoftwareVersion: text(cluster.vmware_software_version, `${path}.cluster.vmware_software_version`),
-    computeAvailabilityDomain: text(cluster.compute_availability_domain, `${path}.cluster.compute_availability_domain`),
-    esxiHostsCount: number(cluster.esxi_hosts_count, `${path}.cluster.esxi_hosts_count`),
-    vsphereType: text(cluster.vsphere_type, `${path}.cluster.vsphere_type`),
-    initialHostOcpuCount: number(cluster.initial_host_ocpu_count, `${path}.cluster.initial_host_ocpu_count`),
-    initialHostShapeName: text(cluster.initial_host_shape_name, `${path}.cluster.initial_host_shape_name`),
-    workloadNetworkCidr: text(cluster.workload_network_cidr, `${path}.cluster.workload_network_cidr`),
-  };
-}
 function platform(value: ObjectValue, key: string, path: string, id: string): Omit<PlatformConfig, 'environments'> {
   const ext = value.extension === undefined ? undefined : object(value.extension, `${path}.extension`);
-  const type = ext ? choice(ext.type, ['oke_simple', 'ocvs'] as const, `${path}.extension.type`) : 'custom';
+  const type = ext ? choice(ext.type, ['oke_simple'] as const, `${path}.extension.type`) : 'custom';
   const net = network(value.network, `${path}.network`);
   const params = ext ? object(ext.params, `${path}.extension.params`) : {};
   return {
     id, key, type, ...net,
     ...(type === 'oke_simple' ? { okeParams: okeParams(params, `${path}.extension.params`), subnets: net.subnets.map((sn) => ({ ...sn, locked: ['int-lb', 'control-plane', 'workers', 'pods', 'fss'].includes(sn.name) })) } : {}),
-    ...(type === 'ocvs' ? { ocvsParams: ocvsParams(params, `${path}.extension.params`), subnets: ocvsDefaultSubnets(net.vcnCidr) } : {}),
   };
 }
 
@@ -257,7 +240,7 @@ export function importConfig(value: unknown): ImportedConfig {
       if (isExadata(data, key)) continue;
       const restored = platform(data, key, path, `platform-${model.platforms.length + 1}`);
       const existing = model.platforms.find((p) => p.key === key && p.type === restored.type
-        && !difference(p.okeParams, restored.okeParams) && !difference(p.ocvsParams, restored.ocvsParams));
+        && !difference(p.okeParams, restored.okeParams));
       if (existing) {
         (existing.environments as string[]).push(env.id);
         existing.overrides![env.id] = { vcnCidr: restored.vcnCidr, subnets: restored.subnets };
@@ -275,7 +258,7 @@ export function importConfig(value: unknown): ImportedConfig {
   }
   const warnings: string[] = [];
   if (config.notification_emails === undefined) warnings.push('This export has no notification recipients. Enter them in Foundation before generating a new package.');
-  if (model.foundation.stackScope === 'regional') warnings.push('Choose the Home region and confirm its prerequisites in Foundation before generating this DR stack.');
+  if (model.foundation.stackScope === 'regional') warnings.push('Choose the Home Region in Foundation and review its dependencies in Review before deploying this DR stack.');
   restoreExadata(model, 'exacc', shared, envs, warnings);
   restoreExadata(model, 'exacs', shared, envs, warnings);
   const expected = { ...config, cis_level: config.cis_level ?? 2, environments: Object.fromEntries(Object.entries(envs).map(([name, value]) => {

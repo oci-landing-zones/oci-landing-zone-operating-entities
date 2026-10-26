@@ -31,17 +31,24 @@ describe('Studio config import', () => {
     expect(imported.projects.find((p) => p.name === 'App One')?.environments).toHaveLength(1);
   });
 
-  it('restores custom, OKE and OCVS parameters and per-environment networks', async () => {
+  it('restores custom and OKE parameters and per-environment networks', async () => {
     const model = emptyLzModel();
-    for (const type of ['custom', 'oke_simple', 'ocvs'] as const) model.platforms.push(newPlatform(type, model.platforms, model.environments));
+    for (const type of ['custom', 'oke_simple'] as const) model.platforms.push(newPlatform(type, model.platforms, model.environments));
     model.platforms[1].okeParams!.cniType = 'overlay';
     model.platforms[1].okeParams!.podsCidr = '172.20.0.0/16';
     model.platforms[1].okeParams!.apiAllowedCidrs = ['192.168.2.0/24', '192.168.1.0/24'];
-    model.platforms[2].ocvsParams!.sshAuthorizedKeys = 'ssh-rsa EXAMPLE';
-    model.sharedPlatforms.push(newSharedPlatform('custom', []), newSharedPlatform('ocvs', []));
+    model.sharedPlatforms.push(newSharedPlatform('custom', []));
     const { model: imported } = await roundTrip(model);
     expect(imported.platforms.some((p) => p.okeParams?.podsCidr === '172.20.0.0/16')).toBe(true);
-    expect(imported.sharedPlatforms.map((p) => p.type).sort()).toEqual(['custom', 'ocvs']);
+    expect(imported.sharedPlatforms.map((p) => p.type)).toEqual(['custom']);
+  });
+
+  it.each(['environment', 'shared'])('rejects unsupported OCVS extensions in the %s scope', (scope) => {
+    const config = buildConfig(emptyLzModel());
+    const entry = { network: { vcn: '10.200.0.0/21' }, extension: { type: 'ocvs', params: {} } };
+    if (scope === 'shared') config.shared_platforms = { vmw: entry };
+    else config.environments.prod.platforms = { vmw: entry };
+    expect(() => importConfig(config)).toThrow(/extension\.type.*unsupported/);
   });
 
   it('preserves manual OKE subnet maps and differing parameters under the same key', async () => {

@@ -35,19 +35,6 @@ describe('legacy regional design conversion', () => {
     expect(home).toEqual(before);
   });
 
-  it('preserves independent OCVS settings for each selected environment and shared platform', () => {
-    const { home, draft } = design();
-    const platform = newPlatform('ocvs', [], home.environments);
-    platform.ocvsParams!.sshAuthorizedKeys = 'ssh-rsa AAAAHOME studio@example';
-    home.platforms = [platform];
-    home.sharedPlatforms = [{ id: 'shared-ocvs', key: 'ocv', type: 'ocvs', vcnCidr: '10.40.0.0/22', subnets: [], ocvsParams: { ...platform.ocvsParams! } }];
-    draft.platformIds = [...home.environments.map((env) => `platform:${platform.id}:${env.id}`), 'shared:shared-ocvs'];
-    draft.platformVcnCidrs = Object.fromEntries(draft.platformIds.map((id, index) => [id, `10.${20 + index}.0.0/22`]));
-    draft.platformOcvsParams = Object.fromEntries(draft.platformIds.map((id, index) => [id, { ...platform.ocvsParams!, sddcDisplayName: `DR-${index}`, esxiHostsCount: 4 + index }]));
-    const model = legacyRegionalModel(home, draft);
-    expect(new Set(model.platforms.map((item) => item.id)).size).toBe(2);
-    expect(buildConfig(model)).toEqual({ ...buildDrFileConfigs(home, draft).dr, security_targets: [] });
-  });
 
   it('keeps independent OKE settings and manual subnet edits without reusing platform identities', () => {
     const { home, draft } = design();
@@ -152,15 +139,6 @@ describe('legacy regional design conversion', () => {
     expect(buildConfig(model)).toEqual({ ...buildDrFileConfigs(home, draft).dr, security_targets: [] });
   });
 
-  it('refuses custom OCVS subnet maps instead of dropping them', () => {
-    const { home, draft } = design();
-    const platform = newPlatform('ocvs', [], home.environments);
-    home.platforms = [platform];
-    const id = `platform:${platform.id}:${home.environments[0].id}`;
-    draft.platformIds = [id];
-    draft.platformSubnets = { [id]: [{ name: 'custom', cidr: '10.20.0.0/24' }] };
-    expect(() => legacyRegionalModel(home, draft)).toThrow(/OCVS.*subnet/);
-  });
 
   it.each(['subnets', 'publication', 'notifications'])('rejects unrepresentable Exadata %s without changing the source', (setting) => {
     const { home, draft } = design();

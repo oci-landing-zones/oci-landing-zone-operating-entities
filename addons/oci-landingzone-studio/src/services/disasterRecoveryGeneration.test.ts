@@ -73,44 +73,7 @@ describe('DR file generation', () => {
     expect(JSON.parse(files['DR/config.jsonnet']).environments.prod.platforms.exacs.network.vcn).toBe('10.0.240.0/21');
   }, 30000);
 
-  it('generates the edited OCVS DR VCN and its automatic provisioning subnet', async () => {
-    const { model, draft } = design();
-    const platform = newPlatform('ocvs', [], model.environments);
-    platform.environments = [model.environments[0].id];
-    platform.ocvsParams!.sshAuthorizedKeys = 'ssh-rsa AAAATEST studio@example';
-    model.platforms = [platform];
-    const id = `platform:${platform.id}:${model.environments[0].id}`;
-    draft.platformIds = [id];
-    draft.platformVcnCidrs = { [id]: '10.12.0.0/22' };
-    const files = await generateDrFileBundle(model, draft);
-    const config = JSON.parse(files['DR/config.jsonnet']);
-    expect(config.environments.prod.platforms[platform.key].network).toEqual({ vcn: '10.12.0.0/22' });
-    expect(files['DR/network.json']).toContain('10.12.0.0/22');
-    expect(files['DR/network.json']).toContain('10.12.0.0/26');
-    expect(files['DR/ocvs.json']).toContain('10.12.0.0/22');
-  }, 30000);
 
-  it('uses independent DR OCVS cluster settings and preserves the Home cluster', async () => {
-    const { model, draft } = design();
-    const platform = newPlatform('ocvs', [], model.environments);
-    platform.environments = [model.environments[0].id];
-    platform.ocvsParams!.sshAuthorizedKeys = 'ssh-rsa AAAAHOME studio@example';
-    model.platforms = [platform];
-    const id = `platform:${platform.id}:${model.environments[0].id}`;
-    draft.platformIds = [id];
-    draft.platformOcvsParams = { [id]: { ...platform.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAADR studio@example', sddcDisplayName: 'DR-SDDC', clusterDisplayName: 'DR-cluster', esxiHostsCount: 4, initialHostOcpuCount: 32, workloadNetworkCidr: '172.20.0.0/24' } };
-    const configs = buildDrFileConfigs(model, draft);
-    expect(configs.home.environments.prod.platforms[platform.key].extension?.params).not.toEqual(configs.dr.environments.prod.platforms[platform.key].extension?.params);
-    const files = await generateDrFileBundle(model, draft);
-    expect(files['DR/ocvs.json']).toContain('DR-SDDC');
-    expect(files['DR/ocvs.json']).toContain('DR-cluster');
-    expect(files['DR/ocvs.json']).toContain('AAAADR');
-    expect(files['DR/ocvs.json']).toContain('172.20.0.0/24');
-    expect(files['Home/ocvs.json']).not.toContain('DR-SDDC');
-    expect(platform.ocvsParams!.sshAuthorizedKeys).toContain('AAAAHOME');
-    draft.platformOcvsParams[id].esxiHostsCount = 0;
-    expect(() => buildDrFileConfigs(model, draft)).toThrow(/host count/i);
-  }, 30000);
 
   it('generates independently edited OKE DR cluster and manual /21 networking', async () => {
     const { model, draft } = design();

@@ -7,7 +7,6 @@ import { importConfig } from './importConfig';
 import { newPlatform } from './platforms';
 import { validateOkeModel } from './okeValidation';
 import { validateExadataModel } from './exadata';
-import { validateOcvsModel } from './ocvsValidation';
 import { validatePlatformContracts } from './platformValidation';
 
 describe('regional designs in the standard model', () => {
@@ -35,10 +34,9 @@ describe('regional designs in the standard model', () => {
     expect(buildConfig(model).environments.prod.project_network).toBeUndefined();
     expect(validateExadataModel(model)).toEqual([]);
     expect(validateOkeModel(model)).toEqual([]);
-    expect(validateOcvsModel(model)).toEqual([]);
     expect(validatePlatformContracts(model)).toEqual([]);
   });
-  it('starts blank without environments and requires Home prerequisites', () => {
+  it('starts blank without environments and requires distinct Home and DR regions', () => {
     const model = createRegionalModel();
     expect(model.environments).toEqual([]);
     expect(model.projects).toEqual([]);
@@ -46,8 +44,8 @@ describe('regional designs in the standard model', () => {
     expect(model.sharedPlatforms).toEqual([]);
     expect(model.remotePeeringConnections).toEqual([]);
     expect(buildConfig(model).stack_scope).toBe('regional');
-    expect(validateRegionalDeployment(model)).toHaveLength(3);
-    Object.assign(model.foundation, { region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1', homePrerequisitesConfirmed: true });
+    expect(validateRegionalDeployment(model)).toHaveLength(2);
+    Object.assign(model.foundation, { region: 'eu-amsterdam-1', regionShortName: 'ams', homeRegion: 'eu-frankfurt-1' });
     expect(validateRegionalDeployment(model)).toEqual([]);
   });
   it('requires a Home acceptor reference when a requester is configured', () => {

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildConfig, serializeConfig } from './lzConfig';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { newPlatform, newSharedPlatform } from './platforms';
+import { validatePlatformContracts } from './platformValidation';
 import type { Environment, LzModel, PlatformConfig } from '../model/types';
 
 function model(over: Partial<LzModel> = {}): LzModel {
@@ -216,22 +217,13 @@ describe('serializeConfig', () => {
     expect(c.environments.production.platforms.oke).toBeDefined();
   });
 
-  it('serialises OCVS as a generator-owned provisioning network in environment and shared scopes', () => {
-    const ocvs = newPlatform('ocvs', []);
-    const settings = { ...ocvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' };
-    const m = model({
-      environments: [env('prod', true, 0)],
-      platforms: [{ ...ocvs, ocvsParams: settings }],
-      sharedPlatforms: [{ id: 'shared-ocv', key: 'ocv', type: 'ocvs', vcnCidr: '10.170.0.0/21', subnets: [], ocvsParams: settings }],
-    });
-    const c = buildConfig(m);
-    expect(c.environments.prod.platforms.ocv).toMatchObject({ network: { vcn: '10.0.88.0/21' }, extension: { type: 'ocvs' } });
-    expect(c.environments.prod.platforms.ocv.network?.subnets).toBeUndefined();
-    expect(c.shared_platforms.ocv).toMatchObject({ network: { vcn: '10.170.0.0/21' }, extension: { type: 'ocvs' } });
-    expect(c.shared_platforms.ocv.network?.subnets).toBeUndefined();
-    const text = serializeConfig(m, 4);
-    expect(text).toContain("extension: { type: 'ocvs'");
-    expect(text).not.toContain("provisioning: '10.0.88.0/25'");
+
+  it('retains unsupported shared runtime types so they cannot silently become Custom', () => {
+    const shared = newSharedPlatform('custom', []);
+    const m = model({ sharedPlatforms: [JSON.parse(JSON.stringify({ ...shared, type: 'unsupported' }))] });
+    expect(buildConfig(m).shared_platforms[shared.key].extension).toEqual({ type: 'unsupported' });
+    expect(serializeConfig(m)).toContain("extension: { type: 'unsupported', params:");
+    expect(validatePlatformContracts(m)).toContain('Unsupported shared platform type: unsupported.');
   });
 
   it('serialises Custom as a valid network-only platform without an extension', () => {

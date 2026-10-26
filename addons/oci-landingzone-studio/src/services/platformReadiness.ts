@@ -1,7 +1,6 @@
 import type { LzModel, PlatformType } from '../model/types';
 import { validateExadataModel } from './exadata';
 import { validateOkeModel } from './okeValidation';
-import { validateOcvsModel } from './ocvsValidation';
 import { validatePlatformContracts } from './platformValidation';
 import { platformInEnv } from './platforms';
 
@@ -30,7 +29,6 @@ export function platformReadiness(model: LzModel, type: PlatformType): PlatformR
     }
   }
   if (type === 'oke_simple') errors.push(...validateOkeModel(model));
-  if (type === 'ocvs') errors.push(...validateOcvsModel(model));
   return readiness(platforms.length + sharedPlatforms.length > 0, errors);
 }
 

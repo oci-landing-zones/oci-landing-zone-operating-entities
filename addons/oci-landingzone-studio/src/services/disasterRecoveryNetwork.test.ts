@@ -1,16 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { emptyLzModel } from '../model/defaults';
 import { createDrDraft, createDrHubNetwork } from './disasterRecoveryDesign';
-import { drEnvironmentNetworkError, drExacsNetworkError, drOcvsNetworkError, rebaseDrEnvironmentNetwork } from './disasterRecoveryNetwork';
+import { drEnvironmentNetworkError, drExacsNetworkError, rebaseDrEnvironmentNetwork } from './disasterRecoveryNetwork';
 
 describe('DR environment CIDR editing', () => {
-  it('allows supported OCVS sizes and rejects overlaps and noncanonical VCNs', () => {
-    const model = emptyLzModel();
-    const id = 'platform:ocvs:prod';
-    const draft = { ...createDrDraft(model), hubNetwork: createDrHubNetwork('hub_a'), platformIds: [id, 'other'], platformVcnCidrs: { other: '10.0.240.0/21' } };
-    for (const cidr of ['10.0.224.0/22', '10.0.224.0/21', '10.0.224.0/23', '10.0.224.0/24']) expect(drOcvsNetworkError(model, draft, id, cidr)).toBeNull();
-    for (const cidr of ['invalid', '10.0.224.0/20', '10.0.224.0/25', '10.0.225.0/22', '10.0.64.0/21', '10.0.192.0/21', '10.0.200.0/21', '10.0.240.0/21']) expect(drOcvsNetworkError(model, draft, id, cidr)).not.toBeNull();
-  });
   it('validates EXACS spoke edits against required subnet size and other regional networks', () => {
     const model = emptyLzModel();
     const id = `extension:environment:${model.environments[0].id}:exacs`;

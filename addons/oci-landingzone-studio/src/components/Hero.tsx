@@ -57,7 +57,7 @@ export default function Hero({ onNew, onImport, compact = false }: {
             <path d="M14 2h4l4 4v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-3M14 2H8a2 2 0 0 0-2 2v3M18 2v4h4" />
             <path d="M2 12h12M10 8l4 4-4 4" />
           </svg>
-          Import existing Landing Zone
+          Import
         </button>
       </div>
 

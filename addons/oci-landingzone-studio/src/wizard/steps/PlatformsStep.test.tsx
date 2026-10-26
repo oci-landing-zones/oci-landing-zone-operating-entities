@@ -19,14 +19,15 @@ describe('platform selection and readiness', () => {
     const environment = markup.match(/<select id="new-platform-type"[^>]*>(.*?)<\/select>/)?.[1];
     expect(shared).toBeDefined();
     expect(shared).toContain('value="custom"');
-    expect(shared).toContain('value="ocvs"');
+    expect(shared).not.toContain('value="ocvs"');
     expect(shared).toContain('value="exacc"');
     expect(shared).toContain('value="exacs"');
     expect(shared).not.toContain('value="oke_simple"');
     expect(environment).toBeDefined();
-    for (const type of ['oke_simple', 'ocvs', 'custom', 'exacc', 'exacs']) expect(environment).toContain(`value="${type}"`);
-    expect(markup).toContain('Shared Platforms');
-    expect(markup).toContain('Environment Platforms');
+    for (const type of ['oke_simple', 'custom', 'exacc', 'exacs']) expect(environment).toContain(`value="${type}"`);
+    expect(environment).not.toContain('value="ocvs"');
+    expect(markup).toContain('Shared platforms');
+    expect(markup).toContain('Environment platforms');
     expect(markup).not.toContain('Platform placement');
   });
   it('only shows Exadata cards after they have been added', () => {
@@ -42,7 +43,7 @@ describe('platform selection and readiness', () => {
     model.exadata.exacs.enabled = true;
     model.exadata.exacs.infrastructure = 'per_environment';
     const before = buildConfig(model);
-    const [shared, environment] = render(model).split('Environment Platforms');
+    const [shared, environment] = render(model).split(/<h2[^>]*>Environment platforms<\/h2>/);
     expect(shared).toContain('aria-expanded="false"');
     expect(shared).toContain('>EXACC</span>');
     expect(shared).not.toContain('>EXACS</span>');
@@ -56,7 +57,7 @@ describe('platform selection and readiness', () => {
     model.exadata[type].database = 'per_environment';
     model.exadata[type].environments = ['environment-1'];
     const before = buildConfig(model);
-    const [shared, environment] = render(model).split('Environment Platforms');
+    const [shared, environment] = render(model).split(/<h2[^>]*>Environment platforms<\/h2>/);
     expect(shared).toContain(`>${type.toUpperCase()}</span>`);
     expect(environment).toContain(`>${type.toUpperCase()}</span>`);
     expect(buildConfig(model)).toEqual(before);
@@ -66,7 +67,7 @@ describe('platform selection and readiness', () => {
     model.exadata[type].enabled = true;
     model.exadata[type].database = 'per_environment';
     model.exadata[type].environments = ['environment-1'];
-    const [shared, environment] = render(model).split('Environment Platforms');
+    const [shared, environment] = render(model).split(/<h2[^>]*>Environment platforms<\/h2>/);
     expect(shared).toContain(`aria-label="Delete ${type.toUpperCase()} platform from landing zone"`);
     expect(environment).toContain(`aria-label="Delete ${type.toUpperCase()} platform from landing zone"`);
   });
@@ -77,12 +78,6 @@ describe('platform selection and readiness', () => {
     expect(render(model)).not.toMatch(/<details class="platform-section"[^>]*\bopen(?:=|[ >])/);
     expect(render(emptyLzModel())).not.toMatch(/<details class="platform-section"[^>]*\bopen(?:=|[ >])/);
     expect(render(model)).not.toContain('aria-expanded="true"');
-  });
-  it('marks a newly added OCVS with no SSH public key as needing attention', () => {
-    const model = emptyLzModel();
-    model.platforms = [newPlatform('ocvs', [], model.environments)];
-    expect(platformReadiness(model, 'ocvs').status).toBe('Needs attention');
-    expect(platformReadiness(model, 'ocvs').errors.join('\n')).toContain('SSH public key');
   });
   it('does not mark OKE without an environment as configured', () => {
     const model = emptyLzModel();
@@ -106,19 +101,11 @@ describe('platform selection and readiness', () => {
     model.platforms = [newPlatform('custom', [], model.environments)];
     const before = buildConfig(model);
     const markup = render(model);
-    expect(markup).toContain('Shared Platforms');
-    expect(markup).toContain('Environment Platforms');
+    expect(markup).toContain('Shared platforms');
+    expect(markup).toContain('Environment platforms');
     expect(markup).toContain(model.sharedPlatforms[0].key);
     expect(markup).toContain(model.platforms[0].key);
     expect(buildConfig(model)).toEqual(before);
-  });
-  it('checks shared OCVS credentials too', () => {
-    const model = emptyLzModel();
-    model.sharedPlatforms = [newSharedPlatform('ocvs', [])];
-    expect(platformReadiness(model, 'ocvs').status).toBe('Needs attention');
-    model.sharedPlatforms[0].ocvsParams!.sshAuthorizedKeys = 'ssh-rsa AAAATEST studio@example';
-    expect(platformReadiness(model, 'ocvs').status).toBe('Configured');
-    expect(platformReadiness(model, 'ocvs').errors).toEqual([]);
   });
   it('marks complete EXACC as configured', () => {
     const model = emptyLzModel();
@@ -132,16 +119,15 @@ describe('platform selection and readiness', () => {
     const platform = newSharedPlatform('custom', []);
     delete platform.type;
     model.sharedPlatforms = [platform];
-    expect(render(model)).toContain('Shared Platforms');
+    expect(render(model)).toContain('Shared platforms');
     expect(render(model)).toContain(platform.key);
   });
-  it('flags duplicate keys across OKE and OCVS in both statuses', () => {
+  it('flags duplicate keys across OKE and custom platforms in both statuses', () => {
     const model = emptyLzModel();
-    const ocvs = newPlatform('ocvs', [], model.environments);
-    ocvs.key = 'oke';
-    ocvs.ocvsParams!.sshAuthorizedKeys = 'ssh-rsa AAAATEST studio@example';
-    model.platforms = [newPlatform('oke_simple', []), ocvs];
-    for (const type of ['oke_simple', 'ocvs'] as const) {
+    const custom = newPlatform('custom', [], model.environments);
+    custom.key = 'oke';
+    model.platforms = [newPlatform('oke_simple', []), custom];
+    for (const type of ['oke_simple', 'custom'] as const) {
       expect(platformReadiness(model, type).errors).toContain('Duplicate environment platform config key: oke.');
     }
   });

@@ -1,7 +1,6 @@
 import { drOkeErrors, drOkePlatform } from './disasterRecoveryOke';
-import { validateOcvsParams } from './ocvsValidation';
 import type { LzModel } from '../model/types';
-import { buildConfig, okeExtension, ocvsExtension, type EnvConfigEntry, type LzConfig, type PlatformConfigEntry } from './lzConfig';
+import { buildConfig, okeExtension, type EnvConfigEntry, type LzConfig, type PlatformConfigEntry } from './lzConfig';
 import { defaultDrPlatformCidrs, drRegionOptions, type DrDesignDraft } from './disasterRecoveryDesign';
 import { normalizeCidr, overlaps, validateSubnetCidr, validateVcnCidr } from './cidr';
 import { notificationEmailError, validateNotificationEmails } from './notificationEmails';
@@ -81,12 +80,6 @@ export function buildDrFileConfigs(model: LzModel, draft: DrDesignDraft): { home
       if (errors.length) throw new Error(`${id}: ${errors.join(' ')}`);
       entry.network = { vcn: platform.vcnCidr, ...(platform.okeParams?.clusterSize ? {} : { subnets: Object.fromEntries(platform.subnets.map((subnet) => [subnet.name, subnet.cidr])) }) };
       entry.extension = okeExtension(platform.okeParams!);
-    }
-    const ocvsParams = draft.platformOcvsParams?.[id];
-    if (entry.extension?.type === 'ocvs' && ocvsParams) {
-      const errors = validateOcvsParams(ocvsParams);
-      if (errors.length) throw new Error(`${id}: ${errors.join(' ')}`);
-      entry.extension = ocvsExtension(ocvsParams);
     }
     const params = entry.extension?.params;
     if (params) {

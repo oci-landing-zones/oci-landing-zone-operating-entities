@@ -81,27 +81,6 @@ function projectsForEnv(model: LzModel, envId: string): string[] {
     .filter(Boolean);
 }
 
-export function ocvsExtension(p: NonNullable<PlatformConfig['ocvsParams']>): NonNullable<PlatformConfigEntry['extension']> {
-  return {
-    type: 'ocvs',
-    params: {
-      ssh_authorized_keys: p.sshAuthorizedKeys,
-      cluster: {
-        sddc_display_name: p.sddcDisplayName,
-        cluster_display_name: p.clusterDisplayName,
-        vmware_software_version: p.vmwareSoftwareVersion,
-        is_hcx_enabled: false,
-        compute_availability_domain: p.computeAvailabilityDomain,
-        esxi_hosts_count: p.esxiHostsCount,
-        vsphere_type: p.vsphereType,
-        initial_host_ocpu_count: p.initialHostOcpuCount,
-        initial_host_shape_name: p.initialHostShapeName,
-        workload_network_cidr: p.workloadNetworkCidr,
-      },
-    },
-  };
-}
-
 export function okeExtension(p: NonNullable<PlatformConfig['okeParams']>): NonNullable<PlatformConfigEntry['extension']> {
   return {
     type: 'oke_simple',
@@ -128,7 +107,7 @@ function platformEntryFor(platform: PlatformConfig, envId: string, index: number
     if (!k) continue;
     subnets[k] = sn.cidr.trim();
   }
-  const profileOwnedSubnets = (platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize) || platform.type === 'ocvs';
+  const profileOwnedSubnets = platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize;
   const network = {
     vcn: platformVcnForEnv(platform, envId, index).trim(),
     ...(profileOwnedSubnets ? {} : { subnets }),
@@ -138,12 +117,6 @@ function platformEntryFor(platform: PlatformConfig, envId: string, index: number
     return {
       network,
       extension: okeExtension(p),
-    };
-  }
-  if (platform.type === 'ocvs' && platform.ocvsParams) {
-    return {
-      network,
-      extension: ocvsExtension(platform.ocvsParams),
     };
   }
   // `custom` is a UI label for a plain platform network, not a registered
@@ -206,11 +179,8 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
       const k = sn.name.trim();
       if (k) sharedSubnets[k] = sn.cidr.trim();
     }
-    if (platform.type === 'ocvs' && platform.ocvsParams) {
-      shared_platforms[sharedName] = { network: { vcn: sharedVcn }, extension: ocvsExtension(platform.ocvsParams) };
-    } else {
-      shared_platforms[sharedName] = { network: { vcn: sharedVcn, subnets: sharedSubnets } };
-    }
+    shared_platforms[sharedName] = { network: { vcn: sharedVcn, subnets: sharedSubnets },
+      ...(platform.type !== undefined && platform.type !== 'custom' ? { extension: { type: platform.type } } : {}) };
   }
   Object.assign(shared_platforms, exadata.shared);
 

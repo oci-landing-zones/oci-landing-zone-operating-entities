@@ -4,6 +4,8 @@ import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { hubKindDefaults } from '../services/hubKinds';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
 import type { Environment, LzModel } from '../model/types';
+import { generatedRouteTables } from '../services/routingFixtures.testSupport';
+import { buildFlowTraces } from '../services/flowTrace';
 import { absoluteNodeRects, flowAnchorPoint, type FlowPoint, type FlowRect } from './flowGeometry';
 
 function env(name: string, securityZone: boolean, index: number): Environment {
@@ -33,6 +35,15 @@ function crossesInterior(from: FlowPoint, to: FlowPoint, rect: FlowRect): boolea
 }
 
 describe('generator-aligned graph', () => {
+  it('uses the normalized custom region key for VCN names and firewall captions', () => {
+    const model = emptyLzModel();
+    model.foundation.regionShortName = ' FR2 ';
+    const graph = buildGraph(model, 3);
+    expect(graph.nodes.find((node) => node.id === 'hub-vcn')?.label).toBe('vcn-fr2-lz-hub\n10.0.0.0/21');
+    expect(graph.nodes.filter((node) => node.icon === 'firewall').map((node) => node.caption)).toEqual(['nfw-fr2-lz-hub-dmz', 'nfw-fr2-lz-hub-int']);
+    expect(model.foundation.regionShortName).toBe(' FR2 ');
+  });
+
   it('shows EXACC as compartment-only and EXACS AVMC/VMC as a network in the unified Platforms step', () => {
     const model = emptyLzModel();
     model.exadata.exacc = { enabled: true, shared: true, environments: ['environment-1'], projectDb: {}, notifications: { default: 'ops@example.com' } };
@@ -97,7 +108,7 @@ describe('generator-aligned graph', () => {
     expect(graph.nodes.find((node) => node.id === 'landingzone')?.label).toBe('cmp-landingzone');
     expect(graph.nodes.find((node) => node.id === 'cmp-network')).toMatchObject({ label: 'cmp-lz-network', tone: 'yellow' });
     expect(graph.nodes.find((node) => node.id === 'cmp-security')).toMatchObject({ label: 'cmp-lz-security', tone: 'yellow' });
-    expect(graph.nodes.find((node) => node.id === 'cmp-platform')).toMatchObject({ label: 'cmp-lz-platform', tone: 'yellow' });
+    expect(graph.nodes.find((node) => node.id === 'cmp-platform')).toMatchObject({ label: 'cmp-lz-platform', tone: 'yellow', compartmentScope: 'shared' });
   });
 
   it('shows cmp-lz-platform from Foundation onward with no default shared children', () => {
@@ -161,53 +172,74 @@ describe('generator-aligned graph', () => {
     expect(graph.nodes.filter((node) => node.parentId === 'cmp-env-0-plat-0' && node.kind === 'subnet').map((node) => node.label.split('\n')[0])).toEqual([
       'sn-fra-lz-prod-oke-pods', 'sn-fra-lz-prod-oke-workers', 'sn-fra-lz-prod-oke-lb', 'sn-fra-lz-prod-oke-cp',
     ]);
-    expect(graph.nodes.find((node) => node.id === 'cmp-env-0-plat-0-sgw')?.label).toBe('sgw-fra-lz-prod-oke');
+    expect(graph.nodes.find((node) => node.id === 'cmp-env-0-plat-0-sgw')?.label).toBe('Service\nGateway');
     expect(graph.edges).toContainEqual(expect.objectContaining({ source: 'cmp-env-0-plat-0', target: 'attach-cmp-env-0-plat-0' }));
     expect(graph.edges).toContainEqual(expect.objectContaining({ source: 'attach-cmp-env-0-plat-0', target: 'drg' }));
   });
 
-  it('shows Hub E local NAT only for platform contracts that generate it', () => {
+  it('shows Hub E local NAT for Custom and OKE platforms', () => {
     const base = emptyLzModel();
     const custom = newPlatform('custom', []);
-    const ocvs = newPlatform('ocvs', [custom]);
+    const oke = newPlatform('oke_simple', [custom]);
     const model: LzModel = {
       ...base,
       network: { hubKind: 'hub_e', ...hubKindDefaults('hub_e') },
-      platforms: [custom, ocvs],
+      platforms: [custom, oke],
     };
     const graph = buildGraph(model, 4);
     expect(graph.nodes.some((node) => node.id === 'cmp-env-0-plat-0-natgw')).toBe(true);
-    expect(graph.nodes.some((node) => node.id === 'cmp-env-0-plat-1-natgw')).toBe(false);
+    expect(graph.nodes.some((node) => node.id === 'cmp-env-0-plat-1-natgw')).toBe(true);
     expect(graph.nodes.some((node) => node.id === 'cmp-env-0-plat-1-sgw')).toBe(true);
+  });
+
+  it('aligns the Hub E NAT gateway with management without overlapping the service gateway', () => {
+    const model = emptyLzModel();
+    model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+    const graph = buildGraph(model, 3);
+    const nat = graph.nodes.find((node) => node.id === 'gw-natgw')!;
+    const mgmt = graph.nodes.find((node) => node.id === 'hub-vcn-sn-1')!;
+    const sgw = graph.nodes.find((node) => node.id === 'gw-sgw')!;
+    expect(nat.y + nat.height / 2).toBe(mgmt.y + mgmt.height / 2);
+    expect(nat.y + nat.height).toBeLessThanOrEqual(sgw.y);
+    expect(graph.nodes.filter((node) => node.icon === 'firewall')).toEqual([]);
+  });
+
+  it('does not invent a hub load balancer when OKE suppresses it in the generator', () => {
+    const model = emptyLzModel();
+    model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+    model.platforms = [newPlatform('oke_simple', [], model.environments)];
+    const graph = buildGraph(model, 4);
+    expect(graph.nodes.find((node) => node.id === 'hub-vcn-sn-0')?.icon).toBeUndefined();
+    expect(graph.nodes.find((node) => node.id === 'hub-vcn-sn-0')?.publicSubnet).toBe(true);
   });
 
   it('places multiple shared compartments under platform and VCNs under network with attachments', () => {
     const first = newSharedPlatform('custom', []);
-    const second = newSharedPlatform('ocvs', [first]);
+    const second = newSharedPlatform('custom', [first]);
     const model: LzModel = { ...emptyLzModel(), sharedPlatforms: [first, second] };
     const graph = buildGraph(model, 4);
     expect(graph.nodes.find((node) => node.id === 'cmp-shared-platform-0')).toMatchObject({ label: 'cmp-lz-shared-core', parentId: 'cmp-platform' });
-    expect(graph.nodes.find((node) => node.id === 'cmp-shared-platform-1')).toMatchObject({ label: 'cmp-lz-shared-ocv', parentId: 'cmp-platform' });
+    expect(graph.nodes.find((node) => node.id === 'cmp-shared-platform-1')).toMatchObject({ label: 'cmp-lz-shared-cor2', parentId: 'cmp-platform' });
     expect(graph.nodes.find((node) => node.id === 'shared-plat-vcn-0')).toMatchObject({ label: 'vcn-fra-lz-shared-core\n10.0.32.0/21', parentId: 'cmp-network' });
-    expect(graph.nodes.find((node) => node.id === 'shared-plat-vcn-1')).toMatchObject({ label: 'vcn-fra-lz-shared-ocv\n10.0.40.0/21', parentId: 'cmp-network' });
+    expect(graph.nodes.find((node) => node.id === 'shared-plat-vcn-1')).toMatchObject({ label: 'vcn-fra-lz-shared-cor2\n10.0.40.0/21', parentId: 'cmp-network' });
     expect(graph.nodes.find((node) => node.id === 'attach-shared-0')?.label).toBe('drgatt-fra-lz-shared-core');
-    expect(graph.nodes.find((node) => node.id === 'attach-shared-1')?.label).toBe('drgatt-fra-lz-shared-ocv');
+    expect(graph.nodes.find((node) => node.id === 'attach-shared-1')?.label).toBe('drgatt-fra-lz-shared-cor2');
     expect(graph.edges).toContainEqual(expect.objectContaining({ source: 'shared-plat-vcn-1', target: 'attach-shared-1' }));
     expect(graph.edges).toContainEqual(expect.objectContaining({ source: 'attach-shared-1', target: 'drg' }));
   });
 
-  it('shows the generator-owned Hub E NAT gateway for shared Custom platforms only', () => {
+  it('shows a Hub E NAT gateway for each shared Custom platform', () => {
     const custom = newSharedPlatform('custom', []);
-    const ocvs = newSharedPlatform('ocvs', [custom]);
+    const second = newSharedPlatform('custom', [custom]);
     const base = emptyLzModel();
     const graph = buildGraph({
       ...base,
       network: { hubKind: 'hub_e', ...hubKindDefaults('hub_e') },
-      sharedPlatforms: [custom, ocvs],
+      sharedPlatforms: [custom, second],
     }, 4);
-    expect(graph.nodes.find((node) => node.id === 'shared-plat-natgw-0')?.label).toBe('ngw-fra-lz-shared-core');
+    expect(graph.nodes.find((node) => node.id === 'shared-plat-natgw-0')?.label).toBe('NAT\nGateway');
     expect(graph.nodes.find((node) => node.id === 'shared-plat-natgw-0')?.parentId).toBe('shared-plat-vcn-0');
-    expect(graph.nodes.some((node) => node.id === 'shared-plat-natgw-1')).toBe(false);
+    expect(graph.nodes.some((node) => node.id === 'shared-plat-natgw-1')).toBe(true);
   });
 
   it('keeps all structural nodes inside their parents', () => {
@@ -240,40 +272,159 @@ describe('generator-aligned graph', () => {
     }
   });
 
-  it('preserves route-table and packet-flow layers in diagram-only mode', () => {
-    const dotted = buildGraph(emptyLzModel(), 3, { showDots: true });
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('keeps %s gateways on compact VCN boundaries with readable service labels', (kind) => {
+    const model = emptyLzModel();
+    model.network = { hubKind: kind, ...hubKindDefaults(kind) };
+    model.platforms = [newPlatform('oke_simple', [], model.environments), newPlatform('custom', [], model.environments)];
+    model.sharedPlatforms = [newSharedPlatform('custom', [])];
+    const before = structuredClone(model);
+    const graph = buildGraph(model, 4, { showEndpoints: true });
+    const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+    for (const gateway of graph.nodes.filter((node) => node.kind === 'gateway')) {
+      const vcn = nodes.get(gateway.parentId!)!;
+      const network = nodes.get(vcn.parentId!)!;
+      expect(gateway.x + gateway.width / 2, gateway.id).toBe(0);
+      expect(vcn.x).toBe(46);
+      expect(vcn.x + gateway.x, `${gateway.id} compartment inset`).toBeGreaterThanOrEqual(8);
+      expect(vcn.x + vcn.width).toBeLessThanOrEqual(network.width);
+      expect(gateway.label).toBe({ igw: 'Internet\nGateway', natgw: 'NAT\nGateway', sgw: 'Service\nGateway' }[gateway.icon as 'igw' | 'natgw' | 'sgw']);
+      const subnets = graph.nodes.filter((node) => node.parentId === vcn.id && node.kind === 'subnet');
+      subnets.forEach((subnet) => {
+        expect(subnet.x).toBeGreaterThanOrEqual(gateway.x + gateway.width + 8);
+        expect(subnet.width).toBe(300);
+        expect(vcn.width - subnet.x - subnet.width - 10).toBeGreaterThanOrEqual(6);
+        expect(subnet.label.split('\n')).toHaveLength(2);
+      });
+      expect(vcn.width).toBeLessThan(372);
+    }
+    expect(graph.nodes.find((node) => node.id === 'cmp-env-0-vcn-sn-0')).toMatchObject({
+      label: 'sn-fra-lz-prod-web\n10.0.64.0/24', endpointName: 'vm-prod-web',
+    });
+    expect(model).toEqual(before);
+  });
+
+  it('sizes project compartments to their content even when network endpoints grow', () => {
+    const model = emptyLzModel();
+    const normal = buildGraph(model, 4);
+    const expanded = buildGraph(model, 4, { showEndpoints: true });
+    for (const graph of [normal, expanded]) {
+      const project = graph.nodes.find((node) => node.id === 'cmp-env-0-proj-0')!;
+      const projects = graph.nodes.find((node) => node.id === 'cmp-env-0-projects')!;
+      const platform = graph.nodes.find((node) => node.id === 'cmp-env-0-platforms')!;
+      expect(project.height).toBe(42);
+      expect(projects.height).toBe(project.y + project.height + 16);
+      expect(projects.tone).toBe('projects');
+      expect(platform.tone).toBe('platform');
+      expect(platform.y).toBe(projects.y + projects.height + 12);
+    }
+  });
+
+  it('preserves route-table and packet-flow layers in diagram-only mode', async () => {
+    const model = emptyLzModel();
+    const tables = await generatedRouteTables(model);
+    const dotted = buildGraph(model, 3, { showDots: true }, undefined, tables);
     expect(dotted.nodes.some((node) => node.kind === 'rtdot')).toBe(true);
-    const traced = buildGraph(emptyLzModel(), 3, {
+    const traced = buildGraph(model, 3, {
       showDots: true, showEndpoints: true,
       activeFlows: ['prod:egress'],
-    });
+    }, undefined, tables);
     expect(traced.edges.some((edge) => edge.animated)).toBe(true);
   });
 
-  it('keeps an active flow focused on its endpoints and consulted table attachment points', () => {
-    const graph = buildGraph(emptyLzModel(), 3, { activeFlows: ['prod:egress:web'] });
+  it('keeps an active flow focused on its endpoints while displaying the complete routing configuration', async () => {
+    const model = emptyLzModel();
+    const tables = await generatedRouteTables(model);
+    const graph = buildGraph(model, 3, { activeFlows: ['prod:egress:web'] }, undefined, tables);
     expect(graph.nodes.filter((node) => node.endpointName).map((node) => node.id)).toEqual(['cmp-env-0-vcn-sn-0']);
-    expect(graph.nodes.filter((node) => node.kind === 'routetable')).toHaveLength(0);
-    expect(graph.nodes.filter((node) => node.kind === 'rtdot').map((node) => node.rtDotTableId).sort()).toEqual([
-      'rt-drg-spokes', 'rt-hub-ingress', 'rt-hub-internal', 'rt-ssn-0',
-    ]);
+    expect(graph.nodes.filter((node) => node.kind === 'routetable')).toHaveLength(tables.length);
 
     const flow = graph.edges.find((edge) => edge.id === 'flow-prod:egress:web#0')!;
     expect(flow.points?.[0]).toEqual(flowAnchor(graph, 'cmp-env-0-vcn-sn-0'));
     expect(flow.points?.at(-1)).toEqual(flowAnchor(graph, 'gw-natgw'));
   });
 
-  it('opens a consulted route table only on request and keeps all of its real attachment points', () => {
-    const graph = buildGraph(emptyLzModel(), 3, {
+  it('keeps all shared route-table attachment points visible during a flow', async () => {
+    const model = emptyLzModel();
+    const tables = await generatedRouteTables(model);
+    const spokeTable = tables.find((table) => table.associations.some((association) => association.nodeId === 'attach-cmp-env-0' && association.kind === 'drg-attachment'))!;
+    const graph = buildGraph(model, 3, {
       activeFlows: ['prod:egress:web'],
-      openTables: ['rt-drg-spokes'],
-    });
-    expect(graph.nodes.find((node) => node.id === 'rt-drg-spokes')).toBeDefined();
-    expect(graph.nodes.filter((node) => node.kind === 'rtdot' && node.rtDotTableId === 'rt-drg-spokes')).toHaveLength(2);
+      openTables: [spokeTable.id],
+    }, undefined, tables);
+    expect(graph.nodes.find((node) => node.id === spokeTable.id)).toBeDefined();
+    expect(graph.nodes.filter((node) => node.kind === 'rtdot' && node.rtDotTableId === spokeTable.id)).toHaveLength(spokeTable.associations.length);
   });
 
-  it('keeps all-endpoint flow branches anchored to their actual subnet centres', () => {
-    const graph = buildGraph(emptyLzModel(), 3, { activeFlows: ['prod:egress'] });
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)(
+    'shows every %s route table, full rules, and all governed attachments in flow mode',
+    async (kind) => {
+      const model = emptyLzModel();
+      model.network = { hubKind: kind, ...hubKindDefaults(kind) };
+      const activeFlows = ['prod:egress:web'];
+      const expected = await generatedRouteTables(model);
+      const graph = buildGraph(model, 4, { showFlows: true, activeFlows }, undefined, expected);
+      const tables = graph.nodes.filter((node) => node.kind === 'routetable');
+      const trace = buildFlowTraces(model, activeFlows, 'flow', expected)[0];
+      expect(tables.map((table) => table.id).sort()).toEqual(expected.map((table) => table.id).sort());
+      for (const table of expected) {
+        const node = tables.find((entry) => entry.id === table.id)!;
+        expect(node.rtRows, table.id).toEqual(table.rules.map(({ id, destination, targetType, target, routeType }) => ({ id, destination, targetType, target, routeType })));
+        expect(node.rtHighlight, table.id).toEqual(trace.highlights.find((entry) => entry.tableId === table.id)?.rows ?? []);
+        const dots = graph.nodes.filter((entry) => entry.kind === 'rtdot' && entry.rtDotTableId === table.id);
+        expect(dots, table.id).toHaveLength(table.associations.length);
+        for (const dot of dots) expect(graph.edges.some((edge) => edge.source === dot.id && edge.target === table.id), dot.id).toBe(true);
+      }
+      const rects = absoluteNodeRects(graph.nodes);
+      for (const table of tables) {
+        const rect = rects.get(table.id)!;
+        for (const other of graph.nodes.filter((node) => ['vcn', 'routetable', 'project', 'subnet', 'attachment', 'drg'].includes(node.kind) && node.id !== table.id)) {
+          const target = rects.get(other.id)!;
+          const overlaps = rect.x < target.x + target.width && rect.x + rect.width > target.x && rect.y < target.y + target.height && rect.y + rect.height > target.y;
+          expect(overlaps, `${table.id} overlaps ${other.id}`).toBe(false);
+        }
+      }
+    },
+  );
+
+  it('shows platform tables beside their actual environment or shared VCN and links every subnet', async () => {
+    const model = {
+      ...emptyLzModel(),
+      platforms: [newPlatform('custom', [])],
+      sharedPlatforms: [newSharedPlatform('custom', [])],
+    };
+    const tables = await generatedRouteTables(model);
+    const graph = buildGraph(model, 4, { showFlows: true }, undefined, tables);
+    expect(graph.nodes.filter((node) => node.kind === 'routetable').map((node) => node.id).sort()).toEqual(tables.map((table) => table.id).sort());
+    for (const table of tables.filter((entry) => entry.associations.some((association) => association.kind === 'subnet' && (association.nodeId.includes('-plat-') || association.nodeId.startsWith('shared-plat-'))))) {
+      const node = graph.nodes.find((entry) => entry.id === table.id)!;
+      expect(node.rtRows).toHaveLength(table.rules.length);
+      expect(graph.edges.filter((edge) => edge.target === table.id)).toHaveLength(table.associations.length);
+      const dot = graph.nodes.find((entry) => entry.id === `dot-${table.id}`)!;
+      const rect = absoluteNodeRects(graph.nodes).get(table.associations[0].nodeId)!;
+      const landingzone = absoluteNodeRects(graph.nodes).get('landingzone')!;
+      expect(dot.x + landingzone.x + dot.width / 2).toBe(rect.x + rect.width);
+      expect(dot.y + landingzone.y + dot.height / 2).toBe(rect.y + rect.height / 2);
+    }
+  });
+
+  it('shows every route table before a flow is selected, then changes highlights without hiding tables', async () => {
+    const model = emptyLzModel();
+    const inventory = await generatedRouteTables(model);
+    const plain = buildGraph(model, 3, { showFlows: true }, undefined, inventory);
+    const all = buildGraph(model, 3, { allFlows: true }, undefined, inventory);
+    const focused = buildGraph(model, 3, { allFlows: true, focusFlow: 'prod:services' }, undefined, inventory);
+    const tables = (graph: ReturnType<typeof buildGraph>) => graph.nodes.filter((node) => node.kind === 'routetable');
+    expect(tables(plain)).toHaveLength(inventory.length);
+    expect(tables(plain).every((node) => node.rtHighlight?.length === 0)).toBe(true);
+    expect(tables(all).some((node) => !!node.rtHighlight?.length)).toBe(true);
+    expect(tables(focused).map((node) => node.id)).toEqual(tables(all).map((node) => node.id));
+    const serviceTrace = buildFlowTraces(model, ['prod:services'], 'flow', inventory)[0];
+    expect(tables(focused).filter((node) => node.rtHighlight?.length).map((node) => node.id).sort()).toEqual(serviceTrace.highlights.map((entry) => entry.tableId).sort());
+  });
+
+  it('keeps all-endpoint flow branches anchored to their actual subnet centres', async () => {
+    const model = emptyLzModel();
+    const graph = buildGraph(model, 3, { activeFlows: ['prod:egress'] }, undefined, await generatedRouteTables(model));
     const flows = graph.edges.filter((edge) => edge.id.startsWith('flow-prod:egress#'));
     expect(flows).toHaveLength(4);
     flows.forEach((flow, index) => {
@@ -283,12 +434,13 @@ describe('generator-aligned graph', () => {
 
   it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)(
     'routes every %s flow through its logical resources without crossing unrelated leaf resources',
-    (kind) => {
+    async (kind) => {
       const base = emptyLzModel();
       const model: LzModel = { ...base, network: { hubKind: kind, ...hubKindDefaults(kind) } };
       const leafKinds = new Set(['subnet', 'gateway', 'attachment', 'drg', 'routetable', 'project']);
+      const tables = await generatedRouteTables(model);
       for (const activeFlow of ['prod:egress:web', 'prod:ingress:web', 'prod:east-west:web', 'prod:services:web']) {
-        const graph = buildGraph(model, 3, { activeFlows: [activeFlow] });
+        const graph = buildGraph(model, 3, { activeFlows: [activeFlow] }, undefined, tables);
         const flow = graph.edges.find((edge) => edge.id.startsWith('flow-'))!;
         const points = flow.points ?? [];
         const rects = absoluteNodeRects(graph.nodes);
@@ -312,15 +464,18 @@ describe('generator-aligned graph', () => {
     },
   );
 
-  it('shows shared DRG route tables on each attachment and keeps attachment lines distinct', () => {
+  it('shows shared DRG route tables on each attachment and keeps attachment lines distinct', async () => {
     const model: LzModel = {
       ...emptyLzModel(),
       platforms: [newPlatform('custom', [])],
       sharedPlatforms: [newSharedPlatform('custom', [])],
     };
-    const graph = buildGraph(model, 4, { showDots: true });
-    const spokeDots = graph.nodes.filter((node) => node.kind === 'rtdot' && node.rtDotTableId === 'rt-drg-spokes');
-    expect(spokeDots).toHaveLength(5);
+    const tables = await generatedRouteTables(model);
+    const graph = buildGraph(model, 4, { showDots: true }, undefined, tables);
+    const spokeTable = tables.find((table) => table.associations.some((association) => association.nodeId === 'attach-cmp-env-0' && association.kind === 'drg-attachment'))!;
+    const spokeDots = graph.nodes.filter((node) => node.kind === 'rtdot' && node.rtDotTableId === spokeTable.id);
+    expect(spokeDots).toHaveLength(spokeTable.associations.length);
+    expect(spokeDots.length).toBeGreaterThanOrEqual(5);
 
     const drgEdges = graph.edges.filter((edge) => edge.target === 'drg' && edge.source.startsWith('attach-'));
     expect(drgEdges).toHaveLength(6);

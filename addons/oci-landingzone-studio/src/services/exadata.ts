@@ -322,6 +322,11 @@ export function exadataDiagramPlatforms(model: LzModel): {
   return { platforms, sharedPlatforms, sharedWithoutNetwork, environmentsWithoutNetwork, sharedChildren, environmentChildren, projectChildren };
 }
 
+export function exacsVcnError(cidr: string): string | null {
+  const parsed = parseCidr(cidr);
+  return !parsed || parsed.prefix > 23 ? 'Enter a valid VCN CIDR with room for db and backup /24 subnets (use /23 or larger).' : null;
+}
+
 /** Check placement, references, recipients and CIDR safety before generation. */
 export function validateExadataModel(model: LzModel): string[] {
   const errors: string[] = [];
@@ -433,8 +438,7 @@ export function validateExadataModel(model: LzModel): string[] {
   for (let i = 0; i < ranges.length; i += 1) {
     const range = ranges[i];
     if (range.name.endsWith('exacs')) {
-      const parsed = parseCidr(range.cidr);
-      if (!parsed || parsed.prefix > 23) errors.push(`${range.name} needs a valid VCN CIDR large enough for db and backup /24 subnets.`);
+      if (exacsVcnError(range.cidr)) errors.push(`${range.name} needs a valid VCN CIDR large enough for db and backup /24 subnets.`);
     }
     for (let j = i + 1; j < ranges.length; j += 1) {
       if (overlaps(range.cidr, ranges[j].cidr)) errors.push(`${range.name} (${range.cidr}) overlaps ${ranges[j].name} (${ranges[j].cidr}).`);

@@ -1,5 +1,5 @@
 /**
- * SavedLzList — the grid of saved Landing Zones, with open / duplicate /
+ * SavedLzList — the grid of saved Landing Zones, with open, Create DR and
  * delete. Saved names are intentionally read-only here; Foundation owns naming.
  *
  * When `currentId` is set the matching card is marked as the one being edited and
@@ -10,12 +10,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oracle } from '../theme';
-import { deleteLZ, duplicateLZ, getLZ, getOutputs, listLZs, saveOutputs, restoreCombinedDesign, type LzMeta } from '../services/lzStore';
+import { createDrLZ, deleteLZ, getLZ, getOutputs, listLZs, saveOutputs, restoreCombinedDesign, type LzMeta } from '../services/lzStore';
 import { serializeConfig } from '../services/lzConfig';
 import { CONFIG_FILENAME, isCurrentOutputSet } from '../generator/outputNames';
 import { bundleFilename, downloadBlob, zipTextFiles } from '../export/zip';
 import { drRegionOptions } from '../services/disasterRecoveryDesign';
 import { drDesignFingerprint, isCurrentDrOutputSet } from '../services/disasterRecoverySavedDesign';
+import { ErrorNotice } from './FieldError';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 
@@ -76,13 +77,9 @@ function summaryChips(id: string): string[] {
 }
 
 interface CardOutputs {
-  combined: boolean;
-  fileCount: number;
   generatedAt: string;
   /** The design changed or the output uses an older deployment contract. */
   stale: boolean;
-  files: Record<string, string>;
-  config: string;
 }
 
 /** The generator run saved against a Landing Zone, if any, and whether it still matches. */
@@ -91,12 +88,8 @@ function cardOutputs(id: string): CardOutputs | null {
   if (!saved) return null;
   const rec = getLZ(id);
   return {
-    combined: !!rec?.disasterRecovery,
-    fileCount: Object.keys(saved.files).length,
     generatedAt: saved.generatedAt,
     stale: !rec || (rec.disasterRecovery ? !isCurrentDrOutputSet(rec, saved) : !isCurrentOutputSet(saved, serializeConfig(rec.model))),
-    files: saved.files,
-    config: saved.config,
   };
 }
 
@@ -112,9 +105,18 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
   const navigate = useNavigate();
   const [records, setRecords] = useState<LzMeta[]>(() => listLZs());
   const [storageError, setStorageError] = useState<string | null>(null);
-  const [downloading, setDownloading] = useState<{ id: string; scope: 'Home' | 'DR' } | null>(null);
+  const [downloading, setDownloading] = useState<{ id: string; scope?: 'Home' | 'DR' } | null>(null);
 
   const reload = () => setRecords(listLZs());
+  useEffect(() => {
+    const refresh = () => setRecords(listLZs());
+    window.addEventListener('storage', refresh);
+    window.addEventListener('focus', refresh);
+    return () => {
+      window.removeEventListener('storage', refresh);
+      window.removeEventListener('focus', refresh);
+    };
+  }, []);
   useEffect(() => { onCountChange?.(records.length); }, [records.length, onCountChange]);
   // Per-card summaries + saved generator artifacts, recomputed only when the
   // record set changes (both read straight from the store).
@@ -131,41 +133,43 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
   const descriptions = useMemo(() => Object.fromEntries(records.map((record) => [record.id, getLZ(record.id)?.model.foundation.description?.trim() ?? ''])), [records]);
   const combinedDesigns = useMemo(() => new Set(records.filter((record) => getLZ(record.id)?.disasterRecovery).map((record) => record.id)), [records]);
 
-  async function downloadRegionalConfig(id: string, scope: 'Home' | 'DR') {
+  async function downloadConfig(id: string, scope?: 'Home' | 'DR') {
     if (downloading) return;
     const record = getLZ(id);
-    if (!record?.disasterRecovery) { setStorageError('This Home and DR design is no longer available.'); return; }
+    if (!record || (scope && !record.disasterRecovery)) { setStorageError('This Landing Zone is no longer available.'); return; }
     setDownloading({ id, scope });
     setStorageError(null);
     try {
-      const saved = getOutputs(id);
-      let files = saved && isCurrentDrOutputSet(record, saved) ? saved.files : null;
-      let warning: string | null = null;
-      if (!files) {
+      let files: Record<string, string>;
+      let config: string;
+      if (record.disasterRecovery) {
         const { generateDrFileBundle } = await import('../services/disasterRecoveryGeneration');
-        const fingerprint = drDesignFingerprint(record.model, record.disasterRecovery.draft);
-        files = { ...(saved?.config === fingerprint ? saved.files : {}), ...await generateDrFileBundle(record.model, record.disasterRecovery.draft) };
-        const persisted = saveOutputs(id, { config: fingerprint, files });
-        if (!persisted.ok) warning = 'The configuration was downloaded, but its files could not be retained in browser storage.';
-        reload();
+        files = await generateDrFileBundle(record.model, record.disasterRecovery.draft);
+        config = drDesignFingerprint(record.model, record.disasterRecovery.draft);
+      } else {
+        const { generateOutputs } = await import('../generator/generate');
+        ({ config, files } = await generateOutputs(record.model));
       }
-      const regionalFiles = Object.fromEntries(Object.entries(files)
+      const persisted = saveOutputs(id, { config, files });
+      const downloadable = scope ? Object.fromEntries(Object.entries(files)
         .filter(([path]) => path.startsWith(`${scope}/`) || path === 'README.txt')
-        .map(([path, body]) => [path.replace(`${scope}/`, ''), body]));
-      downloadBlob(bundleFilename(`${record.name}-${scope.toLowerCase()}`), zipTextFiles(regionalFiles));
-      setStorageError(warning);
-    } catch (error) { setStorageError(error instanceof Error ? error.message : 'Could not generate the regional configuration. Open the design to review it.'); }
+        .map(([path, body]) => [path.replace(`${scope}/`, ''), body]))
+        : { [CONFIG_FILENAME]: config, ...files };
+      downloadBlob(bundleFilename(`${record.name}${scope ? `-${scope.toLowerCase()}` : ''}`), zipTextFiles(downloadable));
+      setStorageError(persisted.ok ? null : persisted.message ?? 'The configuration was downloaded, but its files could not be retained in browser storage.');
+      reload();
+    } catch (error) { setStorageError(error instanceof Error ? error.message : 'Could not generate the configuration. Open the design to review it.'); }
     finally { setDownloading(null); }
   }
 
-  function handleDuplicate(id: string) {
-    const result = duplicateLZ(id);
-    if (!result.ok) {
-      setStorageError(result.message ?? 'Could not duplicate the Landing Zone.');
+  function handleCreateDr(id: string) {
+    const result = createDrLZ(id);
+    if (!result.ok || !result.record) {
+      setStorageError(result.message ?? 'Could not create the DR Landing Zone.');
       return;
     }
     setStorageError(result.message ?? null);
-    reload();
+    navigate(`/lz/${result.record.id}`);
   }
 
   function handleDelete(id: string, name: string) {
@@ -186,7 +190,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
         <div style={s.sectionTitle}>{title}</div>
         <span style={s.count}>{records.length} saved</span>
       </div>
-      {storageError && <div role="alert" style={{ color: '#9f1d1d', fontSize: 13, margin: '-6px 0 12px' }}>{storageError}</div>}
+      {storageError && <ErrorNotice>{storageError}</ErrorNotice>}
 
       <div style={s.grid}>
         {records.map((r) => {
@@ -194,13 +198,15 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
           const chips = summaries[r.id] ?? [];
           const out = outputs[r.id];
           const combined = combinedDesigns.has(r.id);
+          const record = getLZ(r.id);
+          const regional = record?.model.foundation.stackScope === 'regional';
           return (
             <div key={r.id} style={isCurrent ? { ...s.card, ...s.cardCurrent } : s.card}>
               <div style={s.accent} />
               <div style={s.body}>
                 <div style={s.nameRow}>
                   <span style={s.name}>{r.name}</span>
-                  {(combined || getLZ(r.id)?.model.foundation.stackScope === 'regional') && <span style={s.badge}>DR</span>}
+                  {(combined || regional) && <span style={s.badge}>DR</span>}
                   {isCurrent && <span style={s.badge}>This one</span>}
                 </div>
                 {descriptions[r.id] && <p style={{ margin: '0 0 12px', fontSize: 13, lineHeight: 1.5, color: oracle.textMuted, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{descriptions[r.id]}</p>}
@@ -217,35 +223,33 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                       <span style={s.outTitle}>LZ config</span>
                       {out.stale
                         ? <span style={s.staleTag} title="The design or deployment format changed. Open step 5 to regenerate these files.">Stale</span>
-                        : <span style={s.outMeta}>{formatTime(out.generatedAt)}</span>}
+                        : <span style={s.outMeta}>Last generated {formatTime(out.generatedAt)}</span>}
                     </div>
                   )}
                   <div style={s.outRow}>
                     {combined && <>
                       <button type="button" style={{ ...s.zipBtn, opacity: downloading?.id === r.id && downloading.scope === 'Home' ? 0.5 : 1 }} disabled={!!downloading}
-                        title="Download the Home stack configuration" onClick={() => void downloadRegionalConfig(r.id, 'Home')}>Download LZ config</button>
+                        title="Download the Home stack configuration" onClick={() => downloadConfig(r.id, 'Home')}>Download LZ config</button>
                       <button type="button" style={{ ...s.zipBtn, opacity: downloading?.id === r.id && downloading.scope === 'DR' ? 0.5 : 1 }} disabled={!!downloading}
-                        title="Download the DR stack configuration" onClick={() => void downloadRegionalConfig(r.id, 'DR')}>Download LZ DR config</button>
+                        title="Download the DR stack configuration" onClick={() => downloadConfig(r.id, 'DR')}>Download LZ DR config</button>
                     </>}
                     {!combined && out && !out.stale && (
                       <button
                         type="button"
-                        style={s.zipBtn}
-                        title={out.combined ? `${out.fileCount} files for Home and DR` : `${out.fileCount} outputs + ${CONFIG_FILENAME}`}
-                        onClick={() => downloadBlob(
-                          bundleFilename(r.name),
-                          zipTextFiles(out.combined ? out.files : { [CONFIG_FILENAME]: out.config, ...out.files }),
-                        )}
+                        style={{ ...s.zipBtn, opacity: downloading?.id === r.id ? 0.5 : 1 }}
+                        disabled={!!downloading}
+                        title="Generate and download the current configuration"
+                        onClick={() => downloadConfig(r.id)}
                       >
-                        {out.combined ? 'Download Home + DR config' : 'Download LZ config'}
+                        Download LZ config
                       </button>
                     )}
                   </div>
                 </div>}
               </div>
               <div style={s.actions}>
-                {getLZ(r.id)?.previousCombinedDesign && <button type="button" style={s.btn} onClick={() => {
-                  if (!window.confirm('Restore the original Home + DR design? This replaces the current regional edits. Duplicate this design first if you want to keep both.')) return;
+                {record?.previousCombinedDesign && <button type="button" style={s.btn} onClick={() => {
+                  if (!window.confirm('Restore the original Home + DR design? This replaces the current regional edits.')) return;
                   const restored = restoreCombinedDesign(r.id);
                   setStorageError(restored.ok ? null : restored.message ?? 'Could not restore the original design.');
                   reload();
@@ -253,7 +257,7 @@ export default function SavedLzList({ title = 'Your Landing Zones', currentId, o
                 {!isCurrent && (
                   <button type="button" style={s.open} onClick={() => navigate(`/lz/${r.id}`)}>Open</button>
                 )}
-                <button type="button" style={s.btn} onClick={() => handleDuplicate(r.id)}>Duplicate</button>
+                {record && !combined && !regional && <button type="button" style={{ ...s.btn, minHeight: 44 }} onClick={() => handleCreateDr(r.id)}>Create DR</button>}
                 <button type="button" style={s.danger} onClick={() => handleDelete(r.id, r.name)}>Delete</button>
               </div>
             </div>

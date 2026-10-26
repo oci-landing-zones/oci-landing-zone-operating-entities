@@ -1,4 +1,4 @@
-import { newLzModel } from '../model/defaults';
+import { emptyLzModel } from '../model/defaults';
 import type { LzModel } from '../model/types';
 import { configuredVcnCidrs, exadataEntries, exadataNotificationSource } from './exadata';
 import { findRegion } from './regions';
@@ -7,19 +7,18 @@ import { drPlatformProjection } from './disasterRecoveryPlatformProjection';
 import { drPlatformNotificationScopes } from './disasterRecoveryNotifications';
 
 export function createRegionalModel(): LzModel {
-  const model = newLzModel();
-  model.foundation = { ...model.foundation, stackScope: 'regional', homeRegion: '', region: '', regionShortName: '', homePrerequisitesConfirmed: false };
+  const model = { ...emptyLzModel(), environments: [], projects: [] };
+  model.foundation = { ...model.foundation, stackScope: 'regional', homeRegion: '', region: '', regionShortName: '' };
   model.remotePeeringConnections = [];
   return model;
 }
 
 export function validateRegionalDeployment(model: LzModel): string[] {
   if (model.foundation.stackScope !== 'regional') return [];
-  const { realm, region, homeRegion, homePrerequisitesConfirmed } = model.foundation;
+  const { realm, region, homeRegion } = model.foundation;
   return [
     ...(!findRegion(realm, region) ? ['Choose a DR region.'] : []),
-    ...(!homeRegion || !findRegion(realm, homeRegion) || homeRegion === region ? ['Choose a different Home region in the same realm.'] : []),
-    ...(!homePrerequisitesConfirmed ? ['Confirm the Home stack owns the matching compartments, IAM and governance prerequisites.'] : []),
+    ...(!homeRegion || !findRegion(realm, homeRegion) || homeRegion === region ? ['Choose a different Home Region in the same realm.'] : []),
   ];
 }
 
@@ -30,7 +29,7 @@ export function legacyRegionalModel(home: LzModel, draft: DrDesignDraft): LzMode
   const projection = drPlatformProjection(home, draft);
   model.foundation = { ...home.foundation, stackScope: 'regional', homeRegion: home.foundation.region,
     region: draft.region, regionShortName: region?.shortName ?? '', drRegion: undefined,
-    homePrerequisitesConfirmed: false, notifications: draft.notifications ?? home.foundation.notifications };
+    notifications: draft.notifications ?? home.foundation.notifications };
   model.network = { hubKind: draft.hubKind, ...(draft.hubNetwork ?? { hubVcnCidr: '', subnets: [] }) };
   const selected = new Set(draft.platformIds);
   const sourceEntries = exadataEntries(home);
@@ -48,20 +47,16 @@ export function legacyRegionalModel(home: LzModel, draft: DrDesignDraft): LzMode
     const environments = platform.environments === 'all' ? [...envIds] : platform.environments;
     return environments.map((envId) => {
       const id = `platform:${platform.id}:${envId}`;
-      if (platform.type === 'ocvs' && draft.platformSubnets?.[id]) throw new Error(`OCVS ${id}: legacy custom subnet settings cannot be preserved in the standard editor.`);
       const network = { ...platform.overrides?.[envId], vcnCidr: projection.cidrs[id] ?? '' };
       return { ...platform, id: `${platform.id}:${envId}`, environments: [envId],
         vcnCidr: network.vcnCidr, subnets: network.subnets ?? platform.subnets,
         overrides: { [envId]: network },
-        ...(platform.type === 'ocvs' && draft.platformOcvsParams?.[id] ? { ocvsParams: draft.platformOcvsParams[id] } : {}),
       };
     });
   });
   model.sharedPlatforms = projection.sharedPlatforms.map((platform) => {
     const id = `shared:${platform.id}`;
-    if (platform.type === 'ocvs' && draft.platformSubnets?.[id]) throw new Error(`OCVS ${id}: legacy custom subnet settings cannot be preserved in the standard editor.`);
     return { ...platform, vcnCidr: projection.cidrs[id] ?? '',
-      ...(platform.type === 'ocvs' && draft.platformOcvsParams?.[id] ? { ocvsParams: draft.platformOcvsParams[id] } : {}),
     };
   });
   const notificationScopes = drPlatformNotificationScopes(home, draft);

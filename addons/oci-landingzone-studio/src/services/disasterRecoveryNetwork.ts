@@ -1,8 +1,7 @@
 import type { EnvNetworkConfig, LzModel, Subnet } from '../model/types';
 import { defaultDrPlatformCidrs, type DrDesignDraft } from './disasterRecoveryDesign';
-import { normalizeCidr, overlaps, parseCidr, shiftCidr, validateSubnetCidr, validateVcnCidr } from './cidr';
+import { overlaps, parseCidr, shiftCidr, validateSubnetCidr, validateVcnCidr } from './cidr';
 import { configuredVcnCidrs, exacsPreviewSubnets } from './exadata';
-import { ocvsDefaultSubnets } from './platforms';
 
 export function rebaseDrEnvironmentNetwork(source: EnvNetworkConfig, vcnCidr: string): EnvNetworkConfig {
   const previous = parseCidr(source.vcnCidr);
@@ -23,14 +22,6 @@ export function drEnvironmentNetworkError(model: LzModel, draft: DrDesignDraft, 
   if (Object.entries(draft.projectNetworks ?? {}).some(([key, other]) => key !== id && draft.projectNetworkIds.includes(key) && overlaps(network.vcnCidr, other.vcnCidr))) return 'Overlaps another DR environment VCN.';
   if (Object.entries({ ...defaultDrPlatformCidrs(model, draft), ...draft.platformVcnCidrs }).some(([key, cidr]) => key !== id && draft.platformIds.includes(key) && overlaps(network.vcnCidr, cidr))) return 'Overlaps another DR platform VCN.';
   return null;
-}
-
-export function drOcvsNetworkError(model: LzModel, draft: DrDesignDraft, id: string, vcnCidr: string): string | null {
-  const error = validateVcnCidr(vcnCidr);
-  if (error) return error;
-  if (![21, 22, 23, 24].includes(parseCidr(vcnCidr)!.prefix)) return 'OCVS platform VCN must use one of: /21, /22, /23, /24.';
-  if (normalizeCidr(vcnCidr) !== vcnCidr) return `Use the canonical VCN CIDR ${normalizeCidr(vcnCidr)}.`;
-  return drEnvironmentNetworkError(model, draft, id, { vcnCidr, subnets: ocvsDefaultSubnets(vcnCidr) });
 }
 
 export function drExacsNetworkError(model: LzModel, draft: DrDesignDraft, id: string, vcnCidr: string, subnets?: Subnet[]): string | null {

@@ -48,10 +48,10 @@ export default function Switch({
         role="switch"
         aria-checked={checked}
         aria-label={ariaLabel ?? label}
-        style={track}
+        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, padding: 0, border: 0, background: 'transparent', cursor: 'pointer' }}
         onClick={() => onChange(!checked)}
       >
-        <span style={thumb} />
+        <span style={track} aria-hidden="true"><span style={thumb} /></span>
       </button>
       {label !== undefined && (
         <span style={{ fontSize: 13, color: oracle.textMuted, fontWeight: 600, minWidth: 26 }}>{label}</span>

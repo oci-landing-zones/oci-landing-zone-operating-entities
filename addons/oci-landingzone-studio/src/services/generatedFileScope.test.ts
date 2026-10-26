@@ -9,7 +9,7 @@ describe('generated file scope', () => {
   it('distinguishes HR and DR regional networks and platform outputs', () => {
     expect(generatedFileScope('network.json', '{"network_configuration":{}}', 'HR')).toBe('Regional · Home region');
     expect(generatedFileScope('network.json', '{"network_configuration":{}}', 'DR')).toBe('Regional · DR');
-    expect(generatedFileScope('ocvs.json', '{"ocvs_configuration":{}}', 'DR')).toBe('Regional · DR');
+    expect(generatedFileScope('oke.json', '{"oke_clusters_configuration":{}}', 'DR')).toBe('Regional · DR');
   });
   it('identifies mixed Home security without treating dependency keys as global resources', () => {
     expect(generatedFileScope('security_cis2.json', JSON.stringify({ cloud_guard_configuration: {}, scanning_configuration: {} }), 'HR')).toBe('Global + Home region');

@@ -5,14 +5,6 @@ import { createDrDraft, createDrHubNetwork, drNetworkOptions, drRegionOptions } 
 import { validateSubnetCidr } from './cidr';
 
 describe('DR design selections', () => {
-  it('defaults OCVS production to its DR reservation without reusing Home addresses', () => {
-    const model = emptyLzModel();
-    const platform = newPlatform('ocvs', [], model.environments);
-    platform.environments = [model.environments[0].id];
-    model.platforms = [platform];
-    const draft = createDrDraft(model);
-    expect(draft.platformVcnCidrs?.[`platform:${platform.id}:${model.environments[0].id}`]).toBe('10.0.224.0/22');
-  });
   it('uses the requested EXACS DR ranges independently of the Home ranges', () => {
     const model = emptyLzModel();
     model.exadata.exacs.enabled = true;
@@ -65,10 +57,10 @@ describe('DR design selections', () => {
 
   it('uses actual per-environment VCNs and stable scope identities', () => {
     const model = emptyLzModel();
-    const platform = newPlatform('ocvs', [], model.environments);
+    const platform = newPlatform('custom', [], model.environments);
     platform.overrides = { [model.environments[1].id]: { vcnCidr: '10.20.0.0/21' } };
     model.platforms = [platform];
-    model.sharedPlatforms = [newSharedPlatform('ocvs', [])];
+    model.sharedPlatforms = [newSharedPlatform('custom', [])];
     const options = drNetworkOptions(model);
     expect(options.platforms).toHaveLength(3);
     expect(options.platforms.some((option) => option.vcnCidr === '10.20.0.0/21')).toBe(true);
