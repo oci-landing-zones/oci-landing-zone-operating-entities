@@ -40,12 +40,21 @@ export interface PlatformConfigEntry {
 
 /** One environment in the config — its spoke network, projects, and platforms. */
 export interface EnvConfigEntry {
-  project_network: { network: { vcn: string; subnets: Record<string, string> } };
+  project_network?: { network: { vcn: string; subnets: Record<string, string> } };
   projects: Record<string, Record<string, never>>;
   platforms: Record<string, PlatformConfigEntry>;
 }
 
 export interface LzConfig {
+  stack_scope?: 'complete' | 'regional';
+  dr_region?: string;
+  remote_peering_connections?: Record<string, {
+    remote_cidrs: string[];
+    peer_region_name: string;
+    peer_id?: string;
+    peer_tenancy_ocid?: string;
+    requestor_group_ocid?: string;
+  }>;
   realm: string;
   region: string;
   region_short_name: string;
@@ -72,23 +81,20 @@ function projectsForEnv(model: LzModel, envId: string): string[] {
     .filter(Boolean);
 }
 
-function ocvsExtension(p: NonNullable<PlatformConfig['ocvsParams']>): NonNullable<PlatformConfigEntry['extension']> {
+export function okeExtension(p: NonNullable<PlatformConfig['okeParams']>): NonNullable<PlatformConfigEntry['extension']> {
   return {
-    type: 'ocvs',
+    type: 'oke_simple',
     params: {
-      ssh_authorized_keys: p.sshAuthorizedKeys,
-      cluster: {
-        sddc_display_name: p.sddcDisplayName,
-        cluster_display_name: p.clusterDisplayName,
-        vmware_software_version: p.vmwareSoftwareVersion,
-        is_hcx_enabled: false,
-        compute_availability_domain: p.computeAvailabilityDomain,
-        esxi_hosts_count: p.esxiHostsCount,
-        vsphere_type: p.vsphereType,
-        initial_host_ocpu_count: p.initialHostOcpuCount,
-        initial_host_shape_name: p.initialHostShapeName,
-        workload_network_cidr: p.workloadNetworkCidr,
-      },
+      kubernetes_version: p.kubernetesVersion,
+      services_cidr: p.servicesCidr,
+      api_endpoint_allowed_cidrs: p.apiAllowedCidrs,
+      worker_image: p.workerImage,
+      worker_boot_volume_size: p.workerBootVolumeSize,
+      cni_type: p.cniType,
+      ...(p.clusterSize ? { cluster_size: p.clusterSize } : {}),
+      ...(p.podsCidr ? { pods_cidr: p.podsCidr } : {}),
+      create_fss: p.createFss,
+      public_load_balancer: p.publicLoadBalancer,
     },
   };
 }
@@ -101,7 +107,7 @@ function platformEntryFor(platform: PlatformConfig, envId: string, index: number
     if (!k) continue;
     subnets[k] = sn.cidr.trim();
   }
-  const profileOwnedSubnets = (platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize) || platform.type === 'ocvs';
+  const profileOwnedSubnets = platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize;
   const network = {
     vcn: platformVcnForEnv(platform, envId, index).trim(),
     ...(profileOwnedSubnets ? {} : { subnets }),
@@ -110,27 +116,7 @@ function platformEntryFor(platform: PlatformConfig, envId: string, index: number
     const p = platform.okeParams;
     return {
       network,
-      extension: {
-        type: 'oke_simple',
-        params: {
-          kubernetes_version: p.kubernetesVersion,
-          services_cidr: p.servicesCidr,
-          api_endpoint_allowed_cidrs: p.apiAllowedCidrs,
-          worker_image: p.workerImage,
-          worker_boot_volume_size: p.workerBootVolumeSize,
-          cni_type: p.cniType,
-          ...(p.clusterSize ? { cluster_size: p.clusterSize } : {}),
-          ...(p.podsCidr ? { pods_cidr: p.podsCidr } : {}),
-          create_fss: p.createFss,
-          public_load_balancer: p.publicLoadBalancer,
-        },
-      },
-    };
-  }
-  if (platform.type === 'ocvs' && platform.ocvsParams) {
-    return {
-      network,
-      extension: ocvsExtension(platform.ocvsParams),
+      extension: okeExtension(p),
     };
   }
   // `custom` is a UI label for a plain platform network, not a registered
@@ -180,6 +166,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
       projects,
       platforms,
     };
+    if (env.projectNetworkEnabled === false) delete environments[name].project_network;
   });
 
   const shared_platforms: LzConfig['shared_platforms'] = {};
@@ -192,11 +179,8 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
       const k = sn.name.trim();
       if (k) sharedSubnets[k] = sn.cidr.trim();
     }
-    if (platform.type === 'ocvs' && platform.ocvsParams) {
-      shared_platforms[sharedName] = { network: { vcn: sharedVcn }, extension: ocvsExtension(platform.ocvsParams) };
-    } else {
-      shared_platforms[sharedName] = { network: { vcn: sharedVcn, subnets: sharedSubnets } };
-    }
+    shared_platforms[sharedName] = { network: { vcn: sharedVcn, subnets: sharedSubnets },
+      ...(platform.type !== undefined && platform.type !== 'custom' ? { extension: { type: platform.type } } : {}) };
   }
   Object.assign(shared_platforms, exadata.shared);
 
@@ -208,6 +192,15 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
   }
 
   return {
+    ...(f.stackScope ? { stack_scope: f.stackScope } : {}),
+    ...(f.stackScope !== 'regional' && f.drRegion ? { dr_region: f.drRegion } : {}),
+    ...((model.remotePeeringConnections?.length ?? 0) ? { remote_peering_connections: Object.fromEntries(model.remotePeeringConnections!.map((connection) => [connection.name.trim(), {
+      remote_cidrs: connection.remoteCidrs.map((cidr) => cidr.trim()),
+      peer_region_name: connection.peerRegionName,
+      ...(connection.role === 'requester' ? { peer_id: connection.peerId?.trim() } : {}),
+      ...(connection.peerTenancyOcid?.trim() ? { peer_tenancy_ocid: connection.peerTenancyOcid.trim() } : {}),
+      ...(connection.role === 'acceptor' && connection.requestorGroupOcid?.trim() ? { requestor_group_ocid: connection.requestorGroupOcid.trim() } : {}),
+    }])) } : {}),
     realm: f.realm,
     region: f.region,
     region_short_name: f.regionShortName,
@@ -287,8 +280,8 @@ function jsonnetValue(v: unknown): string {
 
 /** Lines for one environment entry (step 3): its spoke network + projects (+ platforms at step 4). */
 function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: boolean): string[] {
-  const net = entry.project_network.network;
-  const subEntries = Object.entries(net.subnets).map(([k, v]) => `${key(k)}: ${quote(v)}`);
+  const net = entry.project_network?.network;
+  const subEntries = Object.entries(net?.subnets ?? {}).map(([k, v]) => `${key(k)}: ${quote(v)}`);
   const subnetLines = subEntries.length === 0
     ? ['          subnets: {},']
     : ['          subnets: {', ...pairLines(subEntries, '            '), '          },'];
@@ -302,12 +295,12 @@ function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: bo
       : ['      platforms: {', ...platformKeys.flatMap((p) => platformEntryLines(p, entry.platforms[p])), '      },'];
   return [
     `    ${key(name)}: {`,
-    '      project_network: {',
+    ...(net ? ['      project_network: {',
     '        network: {',
-    `          vcn: ${quote(net.vcn)},`,
+    `          vcn: ${quote(net!.vcn)},`,
     ...subnetLines,
     '        },',
-    '      },',
+    '      },'] : []),
     projectsLine,
     ...platformsLines,
     '    },',
@@ -388,8 +381,11 @@ export function serializeConfig(model: LzModel, upToStep = Infinity): string {
     `  region: ${quote(c.region)},`,
     `  region_short_name: ${quote(c.region_short_name)},`,
     `  cis_level: ${c.cis_level},`,
+    ...(c.stack_scope ? [`  stack_scope: ${quote(c.stack_scope)},`] : []),
+    ...(c.dr_region ? [`  dr_region: ${quote(c.dr_region)},`] : []),
     ...(c.notification_emails ? [`  notification_emails: ${jsonnetValue(c.notification_emails)},`] : []),
     ...hubBlock,
+    ...(c.remote_peering_connections ? [`  remote_peering_connections: ${jsonnetValue(c.remote_peering_connections)},`] : []),
     ...environmentsBlock,
     ...sharedPlatformsBlock,
     `  security_targets: ${securityTargets},`,

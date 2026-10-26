@@ -9,6 +9,7 @@
 import React, { useState } from 'react';
 import { useWizard } from '../wizardContext';
 import DeleteButton from '../../components/DeleteButton';
+import RemotePeeringEditor from '../../components/RemotePeeringEditor';
 import { oracle } from '../../theme';
 import { HUB_KINDS, getHubKind, hubKindDefaults } from '../../services/hubKinds';
 import {
@@ -18,13 +19,15 @@ import {
 } from '../../services/cidr';
 import type { HubKind, NetworkConfig, Subnet } from '../../model/types';
 import { FONT, s } from './networkEditorStyles';
+import FieldError from '../../components/FieldError';
+import InfoButton from '../../components/InfoButton';
+import { configKeyError, fieldErrorProps } from '../../services/fieldErrors';
 
 const HUB_MODELS_DOCUMENTATION_URL = 'https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models';
 
 /** Per-hub-kind documentation shown by the ⓘ button; placeholders have none yet. */
-const HUB_INFO: Partial<Record<HubKind, { title: string; body: React.ReactNode }>> = {
+const HUB_INFO: Partial<Record<HubKind, { body: React.ReactNode }>> = {
   hub_a: {
-    title: 'Hub A — Landing Zone',
     body: (
       <>
         <div style={s.docH}>Overview</div>
@@ -38,7 +41,7 @@ const HUB_INFO: Partial<Record<HubKind, { title: string; body: React.ReactNode }
         <ul style={s.docUl}>
           <li>One hub virtual cloud network (VCN)</li>
           <li>
-            Two regional public subnets (shown in green)
+            Two regional public subnets
             <ul style={s.docUl}>
               <li>DMZ firewall subnet. The firewall uses a private IP; placement in a public subnet does not give it a public interface.</li>
               <li>Public load-balancer subnet</li>
@@ -67,26 +70,6 @@ const HUB_INFO: Partial<Record<HubKind, { title: string; body: React.ReactNode }
     ),
   },
 };
-
-function HubInfoModal({ title, body, onClose }: { title: string; body: React.ReactNode; onClose: () => void }) {
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  return (
-    <div style={s.overlay} role="dialog" aria-modal="true" aria-label={title} onClick={onClose}>
-      <div style={s.modal} onClick={(e) => e.stopPropagation()}>
-        <div style={s.modalHead}>
-          <div style={s.modalTitle}>{title}</div>
-          <button type="button" style={s.modalClose} aria-label="Close" onClick={onClose}>✕</button>
-        </div>
-        <div style={s.modalBody}>{body}</div>
-      </div>
-    </div>
-  );
-}
 
 /** Live VCN CIDR calculator — ported from the standalone OCI VCN CIDR Calculator. */
 export function CidrCalculator({ vcnCidr, subnets }: { vcnCidr: string; subnets: { name: string; cidr: string }[] }) {
@@ -171,11 +154,12 @@ export function CidrCalculator({ vcnCidr, subnets }: { vcnCidr: string; subnets:
  * subnet re-basing, the subnet table, the add-subnet suggestions, and the live
  * CIDR calculator. Used by the hub VCN and by every environment VCN.
  */
-export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
+export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply, conflicts = [] }: {
   idPrefix: string;
   vcnCidr: string;
   subnets: Subnet[];
   emptyNote: string;
+  conflicts?: string[];
   onApply: (patch: { vcnCidr?: string; subnets?: Subnet[] }) => void;
 }) {
   const [newName, setNewName] = useState('');
@@ -219,6 +203,7 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
 
   const resolvedSubnets = subnets.map((sn) => ({ name: sn.name, cidr: sn.cidr }));
   const vcnError = validateVcnCidr(vcnCidr);
+  const vcnErrors = vcnError ? [vcnError] : conflicts;
   const activeBase = baseRangeOf(vcnCidr);
   function subnetError(i: number): string | null {
     return validateSubnetCidr(subnets[i].cidr, vcnCidr, resolvedSubnets.filter((_, idx) => idx !== i));
@@ -230,8 +215,10 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
   const newSubnetError = newSubnetCidr
     ? validateSubnetCidr(newSubnetCidr, vcnCidr, resolvedSubnets)
     : 'No free block — enter a CIDR manually';
+  const newNameError = configKeyError(newName.trim() || 'custom', subnets.map((subnet) => subnet.name));
+  const visibleNewSubnetError = cidrChoice !== 'custom' || newCidr.trim() ? newSubnetError : null;
   function addSubnet() {
-    if (newSubnetError) return;
+    if (newSubnetError || newNameError) return;
     setSubnets([...subnets, { name: newName.trim() || 'custom', cidr: newSubnetCidr }]);
     setNewName('');
     setNewCidr('');
@@ -242,15 +229,18 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
     <>
       <div className="network-vcn-settings" style={{ marginTop: 16 }}>
         <div>
-          <label style={s.label} htmlFor={`${idPrefix}-vcn-cidr`}>VCN CIDR</label>
+          <div className="studio-info-heading"><label style={s.label} htmlFor={`${idPrefix}-vcn-cidr`}>VCN CIDR</label>
+            <InfoButton title="VCN and subnet ranges"><p>The VCN range contains this network's subnets. Every subnet must fit inside it, and subnet ranges must not overlap.</p><p>Choose a VCN range separate from the other connected networks. Changing a valid VCN range shifts its subnets by the same amount. Review any errors and suggested replacements below.</p></InfoButton>
+          </div>
           <input
             id={`${idPrefix}-vcn-cidr`}
-            style={vcnError ? { ...s.input, ...s.errInput } : s.input}
+            style={s.input}
             value={vcnCidr}
             placeholder="10.0.0.0/21"
+            {...fieldErrorProps(`${idPrefix}-vcn-error`, vcnErrors)}
             onChange={(e) => applyVcnCidr(e.target.value)}
           />
-          {vcnError && <div style={s.errText}>{vcnError}</div>}
+          <FieldError id={`${idPrefix}-vcn-error`} error={vcnErrors} />
         </div>
         <div>
           <label style={s.label}>Private address range</label>
@@ -275,7 +265,7 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
       </div>
 
       <div style={{ marginTop: 18 }}>
-        <div style={s.tableHead} className="network-subnet-grid">
+        <div style={s.tableHead} className="network-subnet-grid network-subnet-heading">
           <span>Subnet</span>
           <span>CIDR</span>
           <span />
@@ -284,22 +274,36 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
         {subnets.map((sn, i) => {
           const resolved = sn.name;
           const err = subnetError(i);
+          const errorId = `${idPrefix}-subnet-${i}-error`;
+          const nameError = configKeyError(sn.name, subnets.filter((_, index) => index !== i).map((subnet) => subnet.name));
+          const suggestion = err && !vcnError ? suggestSubnetCidrs(vcnCidr, subnets.filter((_, index) => index !== i).map((subnet) => subnet.cidr), parseCidr(sn.cidr)?.prefix ?? 24)[0] : undefined;
           return (
             <div key={i} style={s.row} className="network-subnet-grid">
-              <input
-                aria-label={`Subnet ${i + 1} name`}
-                style={s.rowInput}
-                value={resolved}
-                onChange={(e) => updateSubnet(i, { name: e.target.value })}
-              />
+              <label>
+                <span className="network-subnet-field-label">Subnet name</span>
+                <input
+                  aria-label={`Subnet ${i + 1} name`}
+                  {...fieldErrorProps(`${idPrefix}-subnet-${i}-name-error`, nameError)}
+                  style={s.rowInput}
+                  value={resolved}
+                  onChange={(e) => updateSubnet(i, { name: e.target.value })}
+                />
+                <FieldError id={`${idPrefix}-subnet-${i}-name-error`} error={nameError} />
+              </label>
               <div>
+                <span className="network-subnet-field-label">CIDR</span>
                 <input
                   aria-label={`Subnet ${i + 1} CIDR`}
                   style={err ? { ...s.rowInput, ...s.errInput } : s.rowInput}
                   value={sn.cidr}
+                  aria-invalid={!!err}
+                  aria-describedby={err ? errorId : undefined}
                   onChange={(e) => updateSubnet(i, { cidr: e.target.value })}
                 />
-                {err && <div style={s.errText}>{err}</div>}
+                <FieldError id={errorId} error={err} />
+                {err && !vcnError && (suggestion
+                  ? <button type="button" style={{ ...s.addBtn, marginTop: 6, padding: '8px 10px', fontSize: 12, minHeight: 44 }} onClick={() => updateSubnet(i, { cidr: suggestion })}>Use {suggestion}</button>
+                  : <div className="field-error">No free subnet range remains in this VCN.</div>)}
               </div>
               {sn.locked
                 ? <span title="Mandatory subnet — can't be removed" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, color: oracle.textMuted, fontSize: 15 }} aria-label="Locked subnet">🔒</span>
@@ -315,18 +319,20 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
               <label style={s.addLabel} htmlFor={`${idPrefix}-new-subnet-name`}>Name</label>
               <input
                 id={`${idPrefix}-new-subnet-name`}
+                {...fieldErrorProps(`${idPrefix}-new-subnet-name-error`, newNameError)}
                 style={s.rowInput}
                 placeholder="custom"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') addSubnet(); }}
               />
+              <FieldError id={`${idPrefix}-new-subnet-name-error`} error={newNameError} />
             </div>
             <div>
               <label style={s.addLabel} htmlFor={`${idPrefix}-new-subnet-cidr`}>CIDR</label>
               <select
                 id={`${idPrefix}-new-subnet-cidr`}
-                style={s.select}
+                {...fieldErrorProps(`${idPrefix}-new-subnet-error`, cidrChoice !== 'custom' ? visibleNewSubnetError : null)}
                 value={cidrChoice}
                 onChange={(e) => setCidrChoice(e.target.value)}
               >
@@ -344,6 +350,7 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
               {cidrChoice === 'custom' && (
                 <input
                   aria-label="Custom subnet CIDR"
+                  {...fieldErrorProps(`${idPrefix}-new-subnet-error`, visibleNewSubnetError)}
                   style={{ ...s.rowInput, marginTop: 8, ...(newCidr.trim() && newSubnetError ? s.errInput : {}) }}
                   placeholder="10.0.6.0/24"
                   value={newCidr}
@@ -351,17 +358,15 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
                   onKeyDown={(e) => { if (e.key === 'Enter') addSubnet(); }}
                 />
               )}
-              {newSubnetError && (cidrChoice !== 'custom' || newCidr.trim() !== '') && (
-                <div style={s.errText}>{newSubnetError}</div>
-              )}
+              <FieldError id={`${idPrefix}-new-subnet-error`} error={visibleNewSubnetError} />
             </div>
             <button
               type="button"
-              style={newSubnetError ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn}
-              disabled={!!newSubnetError}
+              style={newSubnetError || newNameError ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn}
+              disabled={!!newSubnetError || !!newNameError}
               onClick={addSubnet}
             >
-              Add Subnet
+              Add subnet
             </button>
           </div>
         </div>
@@ -373,11 +378,10 @@ export function VcnEditor({ idPrefix, vcnCidr, subnets, emptyNote, onApply }: {
 }
 
 export default function HubNetworkStep() {
-  const { model, setField } = useWizard();
+  const { model, setField, vcnErrors } = useWizard();
   const n = model.network;
   const kind = getHubKind(n.hubKind);
 
-  const [infoOpen, setInfoOpen] = useState(false);
   const info = HUB_INFO[n.hubKind];
 
   function setNetwork(patch: Partial<NetworkConfig>) {
@@ -393,11 +397,10 @@ export default function HubNetworkStep() {
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Hub network</div>
-          <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>
-            The hub is the shared network that connects environments and controls traffic to the internet and between workloads.{' '}
-            <a className="guide-link" href={HUB_MODELS_DOCUMENTATION_URL} target="_blank" rel="noreferrer">Review the hub models in the documentation ↗</a>
-          </div>
+          <h2 style={s.title}>Hub network</h2>
+          <p style={s.intro}>Choose how the shared hub routes traffic between environments and the internet.{' '}
+            <a className="guide-link" href={HUB_MODELS_DOCUMENTATION_URL} target="_blank" rel="noreferrer">Compare hub models</a>
+          </p>
 
           <label style={s.label}>Network model</label>
           <div style={s.kindRow} role="group" aria-label="Hub kind">
@@ -418,19 +421,11 @@ export default function HubNetworkStep() {
           </div>
           <div style={s.helpRow}>
             <div style={s.help}>{kind?.description}</div>
-            {info && (
-              <button
-                type="button"
-                style={s.infoBtn}
-                aria-label={`About ${kind?.label}`}
-                title={`About ${kind?.label}`}
-                onClick={() => setInfoOpen(true)}
-              >
-                i
-              </button>
-            )}
+            {kind && <InfoButton title={kind.label}>
+              {info?.body ?? <><p>{kind.description}</p><p>Default subnets: {kind.defaultSubnets.map((subnet) => subnet.name).join(', ')}.</p></>}
+              <p>Changing the network model replaces the hub's VCN range and subnets with that model's defaults.</p>
+            </InfoButton>}
           </div>
-          {infoOpen && info && <HubInfoModal title={info.title} body={info.body} onClose={() => setInfoOpen(false)} />}
 
           {!kind?.implemented ? (
             <div style={{ ...s.empty, borderTop: `1px dashed ${oracle.border}`, borderRadius: 6 }}>
@@ -440,6 +435,7 @@ export default function HubNetworkStep() {
             <>
               <VcnEditor
                 idPrefix="hub"
+                conflicts={vcnErrors.hub}
                 vcnCidr={n.hubVcnCidr}
                 subnets={n.subnets}
                 emptyNote="No default subnets for this hub kind — add custom subnets below."
@@ -452,6 +448,7 @@ export default function HubNetworkStep() {
           )}
         </div>
       </section>
+      <RemotePeeringEditor />
     </div>
   );
 }

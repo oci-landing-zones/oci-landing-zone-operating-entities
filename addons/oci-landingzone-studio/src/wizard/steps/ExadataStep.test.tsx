@@ -11,7 +11,7 @@ describe.each(['exacc', 'exacs'] as const)('%s placement fields', (type) => {
     model.exadata = addExadataPlatform(model, type, true);
     const markup = renderToStaticMarkup(<WizardProvider initialModel={model}><ExadataStep type={type} placement="shared" /></WizardProvider>);
     expect(model.exadata[type].notifications.useSingleRecipient).toBe(true);
-    expect(markup).toMatch(/<input type="checkbox"[^>]*checked=""\/>Use one email for all notifications/);
+    expect(markup).toMatch(/<input type="checkbox"[^>]*checked=""\/>Use the same recipients for all topics/);
     expect(markup).not.toContain(`Include ${type.toUpperCase()} in this landing zone`);
     expect(markup).toContain('Notification emails *');
     expect(markup).not.toContain('Shared DBA team emails');
@@ -25,7 +25,7 @@ describe.each(['exacc', 'exacs'] as const)('%s placement fields', (type) => {
     const markup = renderToStaticMarkup(<WizardProvider initialModel={model}><ExadataStep type={type} placement="shared" /></WizardProvider>);
     expect(markup).toContain('Shared infrastructure team emails');
     expect(markup).toContain('infra@example.com');
-    expect(markup).not.toMatch(/<input type="checkbox"[^>]*checked=""\/>Use one email for all notifications/);
+    expect(markup).not.toMatch(/<input type="checkbox"[^>]*checked=""\/>Use the same recipients for all topics/);
   });
 
   it('fixes shared infrastructure while allowing shared or dedicated VMCs', () => {
@@ -89,7 +89,7 @@ describe.each(['exacc', 'exacs'] as const)('%s placement fields', (type) => {
       expect(environment).toContain(field);
     }
     expect(environment).not.toContain('Shared infrastructure team emails');
-    expect(environment).not.toContain('Use one email for all notifications');
+    expect(environment).not.toContain('Use the same recipients for all topics');
     expect(environment).not.toContain(`<select id="${type}-database"`);
     if (type === 'exacs') expect(environment).toContain('prod AVMC/VMC VCN CIDR');
     else expect(environment).not.toContain('VCN CIDR');
@@ -105,6 +105,6 @@ describe.each(['exacc', 'exacs'] as const)('%s placement fields', (type) => {
     expect(markup).toContain('ops@example.com');
     expect(markup).toContain('Shared Platforms');
     expect(markup).not.toContain(`<input id="${type}-default"`);
-    expect(markup).not.toContain('Use one email for all notifications');
+    expect(markup).not.toContain('Use the same recipients for all topics');
   });
 });

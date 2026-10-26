@@ -17,19 +17,24 @@ import { oracle } from '../../theme';
 import { getHubKind } from '../../services/hubKinds';
 import type { Environment, EnvNetworkConfig, ProjectConfig } from '../../model/types';
 import { VcnEditor } from './HubNetworkStep';
-import { generatorNames } from '../../services/generatorNaming';
 import { s } from './networkEditorStyles';
 import DeleteButton from '../../components/DeleteButton';
 import EditButton from '../../components/EditButton';
 import SaveButton from '../../components/SaveButton';
 import CancelButton from '../../components/CancelButton';
+import Switch from '../../components/Switch';
+import FieldError from '../../components/FieldError';
+import InfoButton from '../../components/InfoButton';
+import ValidatedInput from '../../components/ValidatedInput';
+import { configKeyError, fieldErrorProps } from '../../services/fieldErrors';
+import { placementsOverlap } from '../../services/platforms';
 
 const local: Record<string, CSSProperties> = {
   // Fixed action column (not `auto`) so the header and every row share identical
   // column widths — otherwise the empty header cell and the icon-filled row cells
   // resolve different `auto` widths and the Environments column drifts out of line.
   // Sized for two 34px icon buttons (Edit+Delete in view, Save+Cancel in edit).
-  projGrid:   { display: 'grid', gridTemplateColumns: '1fr 1.5fr 84px', gap: 12, alignItems: 'center' },
+  projGrid:   { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.5fr) 84px', gap: 12, alignItems: 'center', overflowWrap: 'anywhere' },
   allBadge:   { display: 'inline-block', padding: '3px 14px', fontSize: 12.5, fontWeight: 700, color: oracle.compYellowBorder, background: oracle.compYellowFill, border: `1px solid ${oracle.compYellowBorder}`, borderRadius: 999 },
   envPill:    { display: 'inline-block', padding: '3px 10px', fontSize: 12, fontWeight: 600, color: oracle.textMuted, background: oracle.surfaceAlt, border: `1px solid ${oracle.border}`, borderRadius: 999 },
   pillWrap:   { display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' },
@@ -75,15 +80,14 @@ function ProjectsPanel({ projects, envs, onChange }: {
   const [editName, setEditName] = useState('');
   const [editEnvs, setEditEnvs] = useState<'all' | string[]>('all');
 
-  const nameTaken = (name: string, ignore = -1) =>
-    projects.some((p, i) => i !== ignore && p.name.trim().toLowerCase() === name.toLowerCase());
   // Blank field → use the next free generator-aligned key (also the placeholder).
   const suggestedName = nextProjectName(projects);
   const effectiveName = newName.trim() || suggestedName;
-  const addError = nameTaken(effectiveName)
-    ? 'A project with this name already exists'
-    : (newEnvs !== 'all' && newEnvs.length === 0) ? 'Select at least one environment'
-    : null;
+  const addNameError = configKeyError(effectiveName, projects.filter((project) => placementsOverlap(newEnvs, project.environments)).map((project) => project.name));
+  const addPlacementError = newEnvs !== 'all' && newEnvs.length === 0 ? 'Select at least one environment.' : null;
+  const addError = addNameError || addPlacementError;
+  const editNameError = configKeyError(editName, projects.filter((project, index) => index !== editIdx && placementsOverlap(editEnvs, project.environments)).map((project) => project.name));
+  const editPlacementError = editEnvs !== 'all' && !editEnvs.length ? 'Select at least one environment.' : null;
 
   function add() {
     if (addError) return;
@@ -101,8 +105,8 @@ function ProjectsPanel({ projects, envs, onChange }: {
     setEditEnvs(projects[i].environments);
   }
   function saveEdit() {
-    if (editIdx === null) return;
-    onChange(projects.map((p, idx) => idx === editIdx ? { ...p, name: editName.trim() || 'project', environments: editEnvs } : p));
+    if (editIdx === null || editNameError || editPlacementError) return;
+    onChange(projects.map((p, idx) => idx === editIdx ? { ...p, name: editName.trim(), environments: editEnvs } : p));
     setEditIdx(null);
   }
   function toggleEnv(env: string) {
@@ -113,10 +117,12 @@ function ProjectsPanel({ projects, envs, onChange }: {
     <section style={s.panel}>
       <div style={s.accent} />
       <div style={s.body}>
-        <div style={s.title}>Projects</div>
-        <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>Use a project to group one application&apos;s resources. Projects do not create a separate network; use a platform when a workload needs one.</div>
+        <div className="studio-info-heading"><h2 style={s.title}>Projects</h2>
+          <InfoButton title="Projects and environment networks"><p>A project groups application resources in the environments you select. Its placement determines where its compartments are created.</p><p>Projects in an environment share its Projects VCN. Configure that network below. Turning the VCN off keeps the environment available for projects and platforms.</p></InfoButton>
+        </div>
+        <p style={s.intro}>Group application resources within selected environments. Configure each environment's network separately below.</p>
 
-        <div style={{ ...s.tableHead, ...local.projGrid }}>
+        <div style={{ ...s.tableHead, ...local.projGrid, textTransform: 'none', letterSpacing: 0 }}>
           <span>Project</span>
           <span>Environments</span>
           <span />
@@ -126,16 +132,16 @@ function ProjectsPanel({ projects, envs, onChange }: {
           <div key={p.id} style={{ ...s.row, ...local.projGrid }}>
             {editIdx === i ? (
               <>
-                <input aria-label="Project name" style={s.rowInput} value={editName} onChange={(e) => setEditName(e.target.value)} />
-                <div style={local.pillWrap}>
-                  <button type="button" style={editEnvs === 'all' ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => setEditEnvs('all')}>All</button>
+                <div><ValidatedInput id={`project-${p.id}-name`} error={editNameError} aria-label="Project name" style={s.rowInput} value={editName} onChange={(e) => setEditName(e.target.value)} /></div>
+                <div><div style={local.pillWrap} role="group" aria-label="Project environments" {...fieldErrorProps(`project-${p.id}-placement-error`, editPlacementError)}>
+                  <button type="button" aria-pressed={editEnvs === 'all'} style={editEnvs === 'all' ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => setEditEnvs('all')}>All</button>
                   {envs.map((env) => {
                     const active = editEnvs !== 'all' && editEnvs.includes(env.id);
                     return (
-                      <button key={env.id} type="button" style={active ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => toggleEnv(env.id)}>{env.name}</button>
+                      <button key={env.id} type="button" aria-pressed={active} style={active ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => toggleEnv(env.id)}>{env.name}</button>
                     );
                   })}
-                </div>
+                </div><FieldError id={`project-${p.id}-placement-error`} error={editPlacementError} /></div>
                 <div style={local.rowActions}>
                   <SaveButton label="Save project" onClick={saveEdit} />
                   <CancelButton label="Cancel edit" onClick={() => setEditIdx(null)} />
@@ -160,8 +166,9 @@ function ProjectsPanel({ projects, envs, onChange }: {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end' }}>
               <div>
                 <label style={s.addLabel} htmlFor="new-project-name">Project name</label>
-                <input
+                <ValidatedInput
                   id="new-project-name"
+                  error={addNameError}
                   style={s.rowInput}
                   placeholder={suggestedName}
                   value={newName}
@@ -181,18 +188,18 @@ function ProjectsPanel({ projects, envs, onChange }: {
             </div>
             <div>
               <label style={s.addLabel}>Apply to</label>
-              <div style={{ ...local.pillWrap, marginTop: 2 }} role="group" aria-label="Apply project to environments">
-                <button type="button" style={newEnvs === 'all' ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => setNewEnvs('all')}>All</button>
+              <div style={{ ...local.pillWrap, marginTop: 2 }} role="group" aria-label="Apply project to environments" {...fieldErrorProps('new-project-placement-error', addPlacementError)}>
+                <button type="button" aria-pressed={newEnvs === 'all'} style={newEnvs === 'all' ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => setNewEnvs('all')}>All</button>
                 {envs.map((env) => {
                   const active = newEnvs !== 'all' && newEnvs.includes(env.id);
                   return (
-                    <button key={env.id} type="button" style={active ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => toggleNewEnv(env.id)}>{env.name}</button>
+                    <button key={env.id} type="button" aria-pressed={active} style={active ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => toggleNewEnv(env.id)}>{env.name}</button>
                   );
                 })}
               </div>
+              <FieldError id="new-project-placement-error" error={addPlacementError} />
             </div>
           </div>
-          {addError && <div style={{ ...s.errText, marginTop: 8 }}>{addError}</div>}
         </div>
       </div>
     </section>
@@ -200,9 +207,8 @@ function ProjectsPanel({ projects, envs, onChange }: {
 }
 
 export default function EnvNetworkStep() {
-  const { model, setField } = useWizard();
+  const { model, setField, vcnErrors: conflicts } = useWizard();
   const kind = getHubKind(model.network.hubKind);
-  const region = model.foundation.regionShortName;
   const envs = model.environments.map((env, index) => ({ id: env.id, name: env.name.trim() || `env${index + 1}` }));
   const [envOpen, setEnvOpen] = useState<Record<number, boolean>>({}); // collapsed by default
 
@@ -222,7 +228,7 @@ export default function EnvNetworkStep() {
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Projects</div>
+          <h2 style={s.title}>Projects</h2>
           <div style={{ ...s.empty, borderTop: `1px dashed ${oracle.border}`, borderRadius: 6 }}>
             Choose an implemented hub model in step 2 first — the environment (spoke) networks and projects build on it.
           </div>
@@ -233,16 +239,20 @@ export default function EnvNetworkStep() {
 
   return (
     <div style={s.col}>
-      <ProjectsPanel projects={model.projects} envs={envs} onChange={(next) => setField('projects', next)} />
+      {envs.length > 0 && <ProjectsPanel projects={model.projects} envs={envs} onChange={(next) => setField('projects', next)} />}
 
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Environments</div>
-          <div style={{ ...s.help, marginTop: -8, marginBottom: 16 }}>Set the private network range for each environment. Keep these ranges separate from each other and from any connected network.</div>
+          <h2 style={s.title}>Environment networks</h2>
+          <p style={s.intro}>Configure the Projects VCN for each environment. Keep its address range separate from the hub and other connected networks.</p>
+          {envs.length > 0 && <details style={{ ...s.help, marginBottom: 16 }}>
+            <summary style={{ cursor: 'pointer' }}>About default address ranges</summary>
+            <p style={{ marginTop: 8 }}>The prod, preprod, dr, dev and uat names use reserved ranges. Other names receive available <code>/21</code> blocks from <code>10.1.192.0/18</code>. If no block is available, enter a non-overlapping CIDR below.</p>
+          </details>}
           {model.environments.length === 0 ? (
             <div style={{ ...s.empty, borderTop: `1px dashed ${oracle.border}`, borderRadius: 6 }}>
-              No environments yet — add them in step 1, then their spoke networks appear here.
+              Hub and shared services only. Continue to Platforms to add shared services, or add environments in Foundation.
             </div>
           ) : (
             <div className="environment-network-list">
@@ -250,41 +260,41 @@ export default function EnvNetworkStep() {
                 const envName = env.name.trim() || `env${i + 1}`;
                 const net = envNetwork(i);
                 const open = envOpen[i] ?? false;
+                const enabled = env.projectNetworkEnabled !== false;
                 return (
                   <div key={i} style={{ borderTop: i > 0 ? `1px solid ${oracle.border}` : undefined }}>
-                    <button
-                      type="button"
-                      className="environment-network-header"
-                      style={s.envHead}
-                      aria-expanded={open}
-                      onClick={() => setEnvOpen((prev) => ({ ...prev, [i]: !open }))}
-                    >
-                      <span className="environment-network-heading">
-                        <span style={s.envHeadTitle}>{envName}</span>
-                        <span className="environment-network-kicker">Environment network</span>
-                      </span>
-                      <span className="environment-network-summary">
-                        <span style={s.envHeadSub}>{net.vcnCidr}</span>
-                        <span className="environment-network-chevron" aria-hidden="true">{open ? '▾' : '▸'}</span>
-                      </span>
-                    </button>
-                    {open && (
-                      <div className="environment-network-body">
-                        <div className="environment-network-generated">
-                          <span>VCN name</span>
-                          <code>{generatorNames.environmentVcn(region, envName)}</code>
-                          <span>Compartment</span>
-                          <code>{generatorNames.environmentChildCompartment(envName, 'network')}</code>
-                        </div>
+                    <div className="environment-network-header">
+                      <button
+                        type="button"
+                        className="environment-network-disclosure"
+                        aria-label={`Configure ${envName} network`}
+                        aria-expanded={open}
+                        aria-controls={`environment-network-${i}`}
+                        onClick={() => setEnvOpen((prev) => ({ ...prev, [i]: !open }))}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0, transform: open ? 'rotate(90deg)' : undefined }}>
+                          <path d="m6 4 4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <span className="environment-network-heading">
+                          <span style={s.envHeadTitle}>{envName}</span>
+                          <span className="environment-network-summary">{!enabled ? 'VCN disabled' : open ? 'Projects VCN' : net.vcnCidr}</span>
+                        </span>
+                      </button>
+                      <Switch checked={enabled} label={enabled ? 'On' : 'Off'} ariaLabel={`Projects VCN for ${envName}`} onChange={(checked) => setField('environments', model.environments.map((item, index) => index === i ? { ...item, projectNetworkEnabled: checked,
+                        network: checked && !net.vcnCidr ? envNetworkDefaults(i, item.name) : net } : item))} />
+                    </div>
+                    <div id={`environment-network-${i}`} hidden={!open} className="environment-network-body">
+                      {open && (!enabled ? <p style={{ ...s.help, paddingTop: 8 }}>The Projects VCN is disabled. This environment can still contain projects and platforms.</p> : <>
                         <VcnEditor
                           idPrefix={`env-${i}`}
+                          conflicts={conflicts[`environment:${env.id}`]}
                           vcnCidr={net.vcnCidr}
                           subnets={net.subnets}
                           emptyNote="No subnets in this environment — add one below."
                           onApply={(patch) => patchEnvNetwork(i, patch)}
                         />
-                      </div>
-                    )}
+                      </>)}
+                    </div>
                   </div>
                 );
               })}

@@ -79,6 +79,13 @@ function recipients(input: string | undefined): string[] {
 
 type ExadataTopic = 'dbWorkloads' | 'infraWorkloads' | 'projects';
 
+/** A preserved import fallback expires as soon as its visible recipients change. */
+export function exadataNotificationSource(input: ExadataNotifications): string {
+  const sortedMap = (value: Record<string, string> | undefined) => Object.entries(value ?? {}).sort(([a], [b]) => a.localeCompare(b));
+  return JSON.stringify([input.default, input.dbWorkloads ?? '', input.infraWorkloads ?? '', input.projects ?? '',
+    sortedMap(input.projectEmails), sortedMap(input.environmentInfraEmails), sortedMap(input.environmentDbEmails)]);
+}
+
 function notificationEmails(input: ExadataNotifications, allowed: ExadataTopic[], projectEnvironments: Array<{ id: string; name: string }>,
   environmentEnvironments: Array<{ id: string; name: string }> = []): Record<string, unknown> {
   const split = environmentEnvironments.length > 0;
@@ -95,7 +102,8 @@ function notificationEmails(input: ExadataNotifications, allowed: ExadataTopic[]
   const firstInfraEmail = Object.values(infraEmails)[0] as string[] | undefined;
   const firstDbEmail = Object.values(dbEmails)[0] as string[] | undefined;
   const result: Record<string, unknown> = {
-    default: allowed.map((field) => recipients(input[field])).find((values) => values.length > 0)
+    default: (input.fallbackDefault?.source === exadataNotificationSource(input) ? input.fallbackDefault.recipients : undefined)
+      ?? allowed.map((field) => recipients(input[field])).find((values) => values.length > 0)
       ?? firstInfraEmail ?? firstDbEmail ?? firstProjectEmail ?? [],
   };
   for (const [field, key] of [
@@ -205,7 +213,7 @@ export function exadataEntries(model: LzModel): {
     }
     if (useCase !== 1) {
       const occupied = [
-        model.network.hubVcnCidr, ...model.environments.map((env) => env.network.vcnCidr),
+        model.network.hubVcnCidr, ...model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env) => env.network.vcnCidr),
         ...model.sharedPlatforms.map((platform) => platform.vcnCidr),
         ...model.platforms.flatMap((platform) => platformEnvInstances(platform, model.environments).map((instance) => instance.vcnCidr)),
         ...Object.values(exacs.environmentVcnCidrs),
@@ -236,12 +244,12 @@ export function configuredVcnCidrs(model: LzModel): string[] {
   const entries = exadataEntries(model);
   return [
     model.network.hubVcnCidr,
-    ...model.environments.map((env) => env.network.vcnCidr),
+    ...model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env) => env.network.vcnCidr),
     ...model.sharedPlatforms.map((platform) => platform.vcnCidr),
     ...model.platforms.flatMap((platform) => platformEnvInstances(platform, model.environments).map((instance) => instance.vcnCidr)),
     ...Object.values(entries.shared).flatMap((entry) => entry.network ? [entry.network.vcn] : []),
     ...Object.values(entries.environments).flatMap((platforms) => Object.values(platforms).flatMap((entry) => entry.network ? [entry.network.vcn] : [])),
-  ];
+  ].filter(Boolean);
 }
 
 /** The generator auto-allocates ExaCS's db and backup /24s in this order. */
@@ -312,6 +320,11 @@ export function exadataDiagramPlatforms(model: LzModel): {
     }
   }
   return { platforms, sharedPlatforms, sharedWithoutNetwork, environmentsWithoutNetwork, sharedChildren, environmentChildren, projectChildren };
+}
+
+export function exacsVcnError(cidr: string): string | null {
+  const parsed = parseCidr(cidr);
+  return !parsed || parsed.prefix > 23 ? 'Enter a valid VCN CIDR with room for db and backup /24 subnets (use /23 or larger).' : null;
 }
 
 /** Check placement, references, recipients and CIDR safety before generation. */
@@ -412,7 +425,7 @@ export function validateExadataModel(model: LzModel): string[] {
   }
   const ranges = [
     { name: 'hub', cidr: model.network.hubVcnCidr },
-    ...model.environments.map((env) => ({ name: `${env.name} project`, cidr: env.network.vcnCidr })),
+    ...model.environments.filter((env) => env.projectNetworkEnabled !== false).map((env) => ({ name: `${env.name} project`, cidr: env.network.vcnCidr })),
     ...model.sharedPlatforms.map((platform) => ({ name: `shared ${platform.key}`, cidr: platform.vcnCidr })),
     ...model.platforms.flatMap((platform) => platformEnvInstances(platform, model.environments).map((instance) => ({ name: `${instance.name} ${platform.key}`, cidr: instance.vcnCidr }))),
   ];
@@ -425,8 +438,7 @@ export function validateExadataModel(model: LzModel): string[] {
   for (let i = 0; i < ranges.length; i += 1) {
     const range = ranges[i];
     if (range.name.endsWith('exacs')) {
-      const parsed = parseCidr(range.cidr);
-      if (!parsed || parsed.prefix > 23) errors.push(`${range.name} needs a valid VCN CIDR large enough for db and backup /24 subnets.`);
+      if (exacsVcnError(range.cidr)) errors.push(`${range.name} needs a valid VCN CIDR large enough for db and backup /24 subnets.`);
     }
     for (let j = i + 1; j < ranges.length; j += 1) {
       if (overlaps(range.cidr, ranges[j].cidr)) errors.push(`${range.name} (${range.cidr}) overlaps ${ranges[j].name} (${ranges[j].cidr}).`);

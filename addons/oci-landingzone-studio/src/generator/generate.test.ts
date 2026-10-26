@@ -5,10 +5,14 @@ import { evaluate, setAssetLoader } from './jsonnetVm';
 import { GeneratorError, generateFromUpstreamDefaults, generateOutputs } from './generate';
 import { buildVirtualFs } from './virtualFs';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
-import { newPlatform, newSharedPlatform } from '../services/platforms';
+import { applyPlatformPatch, newPlatform, newSharedPlatform, okeNetworkProfilePatch, platformEnvInstances } from '../services/platforms';
+import { configuredVcnCidrs } from '../services/exadata';
 import { getHubKind, hubKindDefaults } from '../services/hubKinds';
 import { generatorNames } from '../services/generatorNaming';
 import type { HubKind, LzModel } from '../model/types';
+import { createRegionalModel } from '../services/regionalDeployment';
+import { buildRouteTables } from '../services/routeTables';
+import { buildGraph } from '../diagram/buildGraph';
 
 /** The browser fetches the engine over HTTP; under vitest we read it off disk. */
 beforeAll(() => {
@@ -63,6 +67,74 @@ describe('virtualFs', () => {
 });
 
 describe('generator (go-jsonnet wasm)', () => {
+  it.each(['abcd', ' fr2', 'fr2 ', 'fr-2'])('rejects a custom region short name over three characters: %j', async (regionShortName) => {
+    const model = emptyLzModel();
+    model.foundation.regionShortName = regionShortName;
+    const output = generateOutputs(model);
+    await expect(output).rejects.toBeInstanceOf(GeneratorError);
+    await expect(output).rejects.toThrow('Use 3 characters or fewer for the region short name.');
+  });
+
+  it.each(['fr2', 'FR2'])('uses custom region short name %s in generated resource names', async (regionShortName) => {
+    const model = emptyLzModel();
+    model.foundation.regionShortName = regionShortName;
+    const out = await generateOutputs(model);
+    expect(out.config).toContain(`region_short_name: '${regionShortName}'`);
+    expect(out.files['network.json']).toContain('vcn-fr2-lz-hub');
+    expect(out.files['network.json']).not.toContain('vcn-fra-lz-hub');
+  }, 60_000);
+
+  it('rejects an oversized saved short name before evaluating topology naming limits', async () => {
+    const model = emptyLzModel();
+    model.foundation.regionShortName = 'custom';
+    model.sharedPlatforms = [{ ...newSharedPlatform('custom', []), key: 'core' }];
+    await expect(generateOutputs(model)).rejects.toThrow('Use 3 characters or fewer for the region short name.');
+  }, 60_000);
+
+  it('generates complete cross-tenancy acceptor and requester IAM from Studio RPC inputs', async () => {
+    const model = emptyLzModel();
+    model.environments = []; model.projects = [];
+    model.remotePeeringConnections = [
+      { id: 'accept', name: 'accept', role: 'acceptor', peerRegionName: 'eu-amsterdam-1', remoteCidrs: ['10.4.0.0/21'], peerTenancyOcid: 'ocid1.tenancy.oc1..requester', requestorGroupOcid: 'ocid1.group.oc1..networkadmin' },
+      { id: 'request', name: 'request', role: 'requester', peerRegionName: 'eu-paris-1', remoteCidrs: ['10.5.0.0/21'], peerId: 'RPC-PEER-KEY', peerTenancyOcid: 'ocid1.tenancy.oc1..acceptor' },
+    ];
+    const out = await generateOutputs(model);
+    expect(out.files['iam.json']).toContain('ocid1.tenancy.oc1..requester');
+    expect(out.files['iam.json']).toContain('ocid1.group.oc1..networkadmin');
+    expect(out.files['iam.json']).toContain('ocid1.tenancy.oc1..acceptor');
+    expect(out.files['network.json']).toContain('RPC-PEER-KEY');
+  }, 60_000);
+  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('generates %s regional DR with X-RPC and no environments', async (hubKind) => {
+    const model = createRegionalModel();
+    model.network = { hubKind, ...hubKindDefaults(hubKind) };
+    Object.assign(model.foundation, { homeRegion: 'eu-frankfurt-1', region: 'eu-amsterdam-1', regionShortName: 'ams' });
+    model.remotePeeringConnections = [{ id: 'home', name: 'home', role: 'requester', remoteCidrs: ['10.3.0.0/21'], peerRegionName: 'eu-frankfurt-1', peerId: 'RPC-HOME-KEY' }];
+    const out = await generateOutputs(model);
+    expect(out.files['iam.json']).toBeUndefined();
+    expect(out.files['governance.json']).toBeUndefined();
+    expect(out.files['security_cis2_pre.json']).toContain('vaults');
+    const security = JSON.stringify(JSON.parse(out.files['security_cis2.json']));
+    expect(security).not.toContain('security_zones');
+    expect(security).not.toContain('cloud_guard');
+    const objects = collectObjects(JSON.parse(out.files['network.json']));
+    expect(objects.some((object) => object.peer_key === 'RPC-HOME-KEY')).toBe(true);
+    expect(objects.some((object) => object.type === 'REMOTE_PEERING_CONNECTION')).toBe(true);
+    const rpcTable = objects.find((object) => object.display_name === 'drgrt-ams-lz-rpc-home')!;
+    const diagramTable = buildRouteTables(model, JSON.parse(out.files['network.json'])).find((table) => table.name === rpcTable.display_name)!;
+    expect(diagramTable.name).toBe(rpcTable.display_name);
+    expect(diagramTable.rules.some((rule) => rule.destination === '0.0.0.0/0')).toBe(hubKind !== 'hub_e');
+    expect(buildGraph(model, 5).nodes.some((node) => node.id === 'rpc-home')).toBe(true);
+  }, 60_000);
+  it.each<HubKind>(['hub_a', 'hub_b', 'hub_c', 'hub_e'])('generates %s without environments', async (hubKind) => {
+    const model = emptyLzModel();
+    model.environments = [];
+    model.projects = [];
+    model.network = { hubKind, ...hubKindDefaults(hubKind) };
+    const out = await generateOutputs(model);
+    expect(out.files['network.json']).toContain('0-shared');
+    expect(out.files['iam.json']).toBeDefined();
+    expect(out.config).toContain('environments: {}');
+  }, 60_000);
   it('keeps canonical identities for repeated and same-named relative imports', async () => {
     const files = {
       'main.jsonnet': `
@@ -300,36 +372,6 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.files['network.json']).toContain('SN-FRA-LZ-PROD-PLATFORM-OKE-FSS-KEY');
   }, 60_000);
 
-  it('generates an OCVS platform only after its required SSH key is supplied', async () => {
-    const base = emptyLzModel();
-    const ocvs = newPlatform('ocvs', [], [{ id: 'environment-1', name: 'prod' }]);
-    const model: LzModel = {
-      ...base,
-      environments: [{ id: 'environment-1', name: 'prod', securityZone: true, network: envNetworkDefaults(0) }],
-      platforms: [{ ...ocvs, ocvsParams: { ...ocvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' } }],
-    };
-    const out = await generateOutputs(model);
-
-    expect(out.files['ocvs.json']).toBeDefined();
-    expect(out.files['network.json']).toContain('PROVISIONING');
-    expect(out.config).toContain("type: 'ocvs'");
-  }, 60_000);
-
-  it('generates an OCVS management cluster from the supported shared-platform scope', async () => {
-    const base = emptyLzModel();
-    const ocvs = newPlatform('ocvs', [], [{ id: 'environment-1', name: 'prod' }]);
-    const model: LzModel = {
-      ...base,
-      sharedPlatforms: [{
-        id: 'shared-ocv', key: 'ocv', type: 'ocvs', vcnCidr: '10.170.0.0/21', subnets: [],
-        ocvsParams: { ...ocvs.ocvsParams!, sshAuthorizedKeys: 'ssh-rsa AAAATEST studio@example' },
-      }],
-    };
-    const out = await generateOutputs(model);
-    expect(out.files['ocvs.json']).toContain('CMP-LZ-SHARED-OCV-KEY');
-    expect(out.files['network.json']).toContain('SN-FRA-LZ-SHARED-PLATFORM-OCV-PROVISIONING-KEY');
-  }, 60_000);
-
   it('exports named One-OE networks and distinct additional networks through Jsonnet', async () => {
     const model = emptyLzModel();
     model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
@@ -338,19 +380,15 @@ describe('generator (go-jsonnet wasm)', () => {
       id: name, name, securityZone: false,
       network: envNetworkDefaults(index, name, index === 4 ? ['10.1.192.0/21'] : []),
     }));
-    model.platforms = [{ ...newPlatform('ocvs', [], model.environments.filter((env) => env.name === 'dr')), environments: ['dr'] }];
-    model.platforms[0].ocvsParams!.sshAuthorizedKeys = 'ssh-rsa AAAATEST studio@example';
     model.exadata.exacs = { ...model.exadata.exacs, enabled: true, service: 'vmc',
       database: 'per_environment', environments: model.environments.map((env) => env.id),
       notifications: { default: 'team@example.com' } };
     const out = await generateOutputs(model);
     const network = out.files['network.json'];
     for (const cidr of ['10.1.64.0/21', '10.1.128.0/21', '10.0.200.0/21',
-      '10.0.224.0/22',
       '10.1.104.0/21', '10.1.168.0/21', '10.0.240.0/22',
       '10.1.192.0/21', '10.1.200.0/21', '10.1.208.0/21', '10.1.216.0/21']) expect(network).toContain(cidr);
     expect(network).not.toContain('10.172.');
-    expect(Object.entries(out.files).filter(([name]) => name.startsWith('ocvs')).map(([, contents]) => contents).join('\n')).toContain('CMP-LZ-DR-OCV-KEY');
   }, 60_000);
 
   it('generates a Custom network-only platform without an unsupported extension', async () => {
@@ -403,3 +441,15 @@ describe('generator (go-jsonnet wasm)', () => {
     await expect(generateOutputs(model)).rejects.toThrow(GeneratorError);
   }, 60_000);
 });
+
+it.each(['medium', 'large'] as const)('generates OKE %s after resizing alongside default project networks', async (size) => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  model.platforms = [platform];
+  model.platforms = [applyPlatformPatch(platform, okeNetworkProfilePatch(platform, size), model.environments, configuredVcnCidrs(model))];
+  const out = await generateOutputs(model);
+  for (const instance of platformEnvInstances(model.platforms[0], model.environments)) {
+    expect(out.files['network.json']).toContain(instance.vcnCidr);
+  }
+  expect(Object.keys(out.files).some((file) => file.includes('oke'))).toBe(true);
+}, 60_000);

@@ -1,9 +1,9 @@
 /**
  * PlatformTemplatesStep — step 4 ("Platforms"). Two parts:
- *   1. Optional shared platforms — repeatable, removable Custom or OCVS entries.
+ *   1. Optional shared platforms — repeatable, removable Custom or Exadata entries.
  *   2. Environment platforms — VCN-bearing compartments dropped into one/all/a
- *      subset of the environments. Pick a supported type (OKE, OCVS, or
- *      Custom), name it, choose placement. OKE defaults to the generator-owned
+ *      subset of the environments. Pick a supported type (OKE, Custom, or
+ *      Exadata), name it, choose placement. OKE defaults to the generator-owned
  *      small profile and exposes its cluster settings; Custom starts empty. Each
  *      platform shows a generated per-environment table (its VCN per env) with a
  *      per-env override.
@@ -20,13 +20,17 @@ import { addExadataPlatform, configuredVcnCidrs } from '../../services/exadata';
 import { exadataReadiness } from '../../services/platformReadiness';
 import type { PlatformConfig, PlatformType, SharedPlatformConfig, Subnet } from '../../model/types';
 import {
-  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, ocvsDefaultParams, ocvsDefaultSubnets, okeDefaultParams, okeDefaultSubnets, okeProfileSubnets, platformEnvInstances, platformTypeMeta,
+  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, okeDefaultParams, okeProfileSubnets, placementsOverlap, platformEnvInstances, platformTypeMeta,
 } from '../../services/platforms';
 import { VcnEditor } from './HubNetworkStep';
 import { s } from './networkEditorStyles';
 import DeleteButton from '../../components/DeleteButton';
-import Switch from '../../components/Switch';
+import OkeSettingsFields from '../../components/OkeSettingsFields';
 import ExadataStep from './ExadataStep';
+import FieldError, { ErrorNotice } from '../../components/FieldError';
+import InfoButton from '../../components/InfoButton';
+import ValidatedInput from '../../components/ValidatedInput';
+import { configKeyError, fieldErrorProps } from '../../services/fieldErrors';
 
 type ExadataType = 'exacc' | 'exacs';
 type AddPlatformType = PlatformType | ExadataType;
@@ -45,7 +49,7 @@ const local: Record<string, CSSProperties> = {
   cardHead:   { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 16px', background: oracle.surfaceAlt, cursor: 'pointer', border: 'none', width: '100%', textAlign: 'left', fontFamily: 'inherit' },
   cardName:   { fontSize: 15, fontWeight: 800, color: oracle.ink },
   cardBody:   { padding: '4px 16px 18px' },
-  note:       { fontSize: 12.5, color: oracle.textMuted, marginBottom: 14, lineHeight: 1.5 },
+  note:       s.intro,
   okeGrid:    { display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginTop: 8, alignItems: 'start' },
   settingsFields: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px 24px' },
   group:      { border: `1px solid ${oracle.border}`, borderRadius: 6, padding: 16, background: oracle.surface, minWidth: 0 },
@@ -68,32 +72,6 @@ const local: Record<string, CSSProperties> = {
   fieldHint:  { fontSize: 11.5, color: oracle.textMuted, marginTop: 4 },
 };
 
-/** The currently supported one-SDDC OCVS input contract. */
-function OcvsSettingsFields({ id, value, onChange }: {
-  id: string;
-  value: ReturnType<typeof ocvsDefaultParams>;
-  onChange: (patch: Partial<ReturnType<typeof ocvsDefaultParams>>) => void;
-}) {
-  return (
-    <div style={s.subCard}>
-      <div style={s.subHead}>OCVS management cluster</div>
-      <div style={local.note}>One platform creates one SDDC management cluster. An SSH public key is required. HCX is not included in this deployment package.</div>
-      <div style={local.okeGrid}>
-        <div><label style={s.addLabel} htmlFor={`${id}-ssh`}>SSH public key</label><input id={`${id}-ssh`} style={s.rowInput} value={value.sshAuthorizedKeys} onChange={(e) => onChange({ sshAuthorizedKeys: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-sddc`}>SDDC name</label><input id={`${id}-sddc`} style={s.rowInput} value={value.sddcDisplayName} onChange={(e) => onChange({ sddcDisplayName: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-cluster`}>Cluster name</label><input id={`${id}-cluster`} style={s.rowInput} value={value.clusterDisplayName} onChange={(e) => onChange({ clusterDisplayName: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-hosts`}>ESXi hosts</label><input id={`${id}-hosts`} type="number" min="1" style={s.rowInput} value={value.esxiHostsCount} onChange={(e) => onChange({ esxiHostsCount: Number(e.target.value) })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-vmware`}>VMware version</label><input id={`${id}-vmware`} style={s.rowInput} value={value.vmwareSoftwareVersion} onChange={(e) => onChange({ vmwareSoftwareVersion: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-ad`}>Availability domain</label><input id={`${id}-ad`} style={s.rowInput} value={value.computeAvailabilityDomain} onChange={(e) => onChange({ computeAvailabilityDomain: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-vsphere`}>vSphere type</label><input id={`${id}-vsphere`} style={s.rowInput} value={value.vsphereType} onChange={(e) => onChange({ vsphereType: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-ocpu`}>Initial host OCPUs</label><input id={`${id}-ocpu`} type="number" min="1" style={s.rowInput} value={value.initialHostOcpuCount} onChange={(e) => onChange({ initialHostOcpuCount: Number(e.target.value) })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-shape`}>Initial host shape</label><input id={`${id}-shape`} style={s.rowInput} value={value.initialHostShapeName} onChange={(e) => onChange({ initialHostShapeName: e.target.value })} /></div>
-        <div><label style={s.addLabel} htmlFor={`${id}-workload`}>Workload network CIDR</label><input id={`${id}-workload`} style={s.rowInput} value={value.workloadNetworkCidr} onChange={(e) => onChange({ workloadNetworkCidr: e.target.value })} /></div>
-      </div>
-    </div>
-  );
-}
-
 /** One optional shared platform card. */
 function SharedPlatformPanel({ platform, open, onToggle, onChange, onDelete }: {
   platform: SharedPlatformConfig;
@@ -102,20 +80,19 @@ function SharedPlatformPanel({ platform, open, onToggle, onChange, onDelete }: {
   onChange: (patch: Partial<SharedPlatformConfig>) => void;
   onDelete: () => void;
 }) {
+  const { model, vcnErrors } = useWizard();
   const { key, vcnCidr, subnets } = platform;
-  const isOcvs = platform.type === 'ocvs';
-  const ocvs = platform.ocvsParams ?? ocvsDefaultParams();
   // The generator folds this name into an OCI DNS label capped at 15 chars
   // (`vcn` + region + `lz` + `sh` + name), leaving 5 with a 3-char region.
-  const nameLimit = isOcvs ? 3 : 5;
-  const nameErr = key.trim().length > nameLimit ? `Keep it to ${nameLimit} characters — it goes into a 15-char OCI DNS label.` : '';
+  const nameErr = configKeyError(key, model.sharedPlatforms.filter((other) => other.id !== platform.id).map((other) => other.key), 5);
+  const conflicts = vcnErrors[`shared:${platform.id}`] ?? [];
   return (
     <div style={local.card}>
       <button type="button" style={local.cardHead} onClick={onToggle} aria-expanded={open}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span>{open ? '▾' : '▸'}</span>
           <span style={local.cardName}>{key}</span>
-          <span style={local.typeBadge}>{isOcvs ? 'OCVS' : 'Custom'}</span>
+          <span style={local.typeBadge}>Custom</span>
         </span>
         <span style={local.fieldHint}>{vcnCidr}</span>
       </button>
@@ -124,67 +101,43 @@ function SharedPlatformPanel({ platform, open, onToggle, onChange, onDelete }: {
           <DeleteButton label={`Delete shared platform ${key}`} onClick={onDelete} />
         </div>
 
-        <label style={s.label} htmlFor={`shared-platform-${platform.id}-type`}>Platform type</label>
-        <select
-          id={`shared-platform-${platform.id}-type`}
-          style={{ ...s.select, marginBottom: 14 }}
-          value={isOcvs ? 'ocvs' : 'custom'}
-          onChange={(e) => {
-            const type = e.target.value as 'custom' | 'ocvs';
-            onChange(type === 'ocvs'
-              ? { type, key: platform.key.trim().length <= 3 ? platform.key : 'ocv', subnets: [], ocvsParams: platform.ocvsParams ?? ocvsDefaultParams() }
-              : { type, subnets: platform.subnets.length ? platform.subnets : [{ name: 'core', cidr: vcnCidr.replace(/\/\d+$/, '/24') }], ocvsParams: undefined });
-          }}
-        >
-          <option value="custom">Custom network</option>
-          <option value="ocvs">OCVS management cluster</option>
-        </select>
-
         <label style={s.label} htmlFor={`shared-platform-${platform.id}-key`}>Platform name</label>
-        <input id={`shared-platform-${platform.id}-key`} style={s.input} value={key} placeholder="core" onChange={(e) => onChange({ key: e.target.value })} />
+        <ValidatedInput id={`shared-platform-${platform.id}-key`} error={nameErr} style={s.input} value={key} placeholder="core" onChange={(e) => onChange({ key: e.target.value })} />
         <div style={local.fieldHint}>Used to create consistent names for this platform's OCI resources.</div>
-        {nameErr && <div style={s.errText}>{nameErr}</div>}
 
-        {isOcvs ? (
-          <>
-            <OcvsSettingsFields id={`shared-ocvs-${platform.id}`} value={ocvs} onChange={(patch) => onChange({ ocvsParams: { ...ocvs, ...patch } })} />
-            <div style={{ ...s.subCard, marginTop: 12 }}>
-              <div style={s.subHead}>OCVS platform VCN</div>
-              <input id={`shared-ocvs-${platform.id}-vcn`} aria-label={`VCN CIDR for shared platform ${key}`} style={s.rowInput} value={vcnCidr} onChange={(e) => onChange({ vcnCidr: e.target.value, subnets: [] })} />
-              <div style={local.fieldHint}>Use /21, /22, /23, or /24. The deployment package reserves this provisioning subnet: {ocvsDefaultSubnets(vcnCidr)[0]?.cidr ?? 'choose a supported VCN prefix'}.</div>
-            </div>
-          </>
-        ) : (
-          <VcnEditor
-            idPrefix={`shared-platform-${platform.id}`}
-            vcnCidr={vcnCidr}
-            subnets={subnets}
-            emptyNote="The shared platform needs at least one subnet — add one below."
-            onApply={(patch) => onChange(patch)}
-          />
-        )}
+        <VcnEditor
+          idPrefix={`shared-platform-${platform.id}`}
+          conflicts={conflicts}
+          vcnCidr={vcnCidr}
+          subnets={subnets}
+          emptyNote="The shared platform needs at least one subnet — add one below."
+          onApply={(patch) => onChange(patch)}
+        />
       </div>}
     </div>
   );
 }
 
 /** All/subset placement chips (mirrors the projects "Apply to" control). */
-function PlacementChips({ value, environments, onChange }: {
+function PlacementChips({ id, value, environments, onChange }: {
+  id: string;
   value: 'all' | string[];
   environments: { id: string; name: string }[];
   onChange: (next: 'all' | string[]) => void;
 }) {
+  const error = value !== 'all' && (!value.length || value.some((env) => !environments.some((candidate) => candidate.id === env)))
+    ? 'Select at least one available environment.' : null;
   function toggle(env: string) {
     onChange(value === 'all' ? [env] : value.includes(env) ? value.filter((x) => x !== env) : [...value, env]);
   }
   return (
-    <div style={local.pillWrap} role="group" aria-label="Platform placement">
+    <div><div style={local.pillWrap} role="group" aria-label="Platform placement" {...fieldErrorProps(`${id}-placement-error`, error)}>
       <button type="button" style={value === 'all' ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => onChange('all')}>All</button>
       {environments.map((env) => {
         const active = value !== 'all' && value.includes(env.id);
         return <button key={env.id} type="button" style={active ? { ...local.chip, ...local.chipActive } : local.chip} onClick={() => toggle(env.id)}>{env.name}</button>;
       })}
-    </div>
+    </div><FieldError id={`${id}-placement-error`} error={error} /></div>
   );
 }
 
@@ -194,7 +147,7 @@ function PerEnvTable({ platform, environments, onPlatform }: {
   environments: { id: string; name: string }[];
   onPlatform: (patch: Partial<PlatformConfig>) => void;
 }) {
-  const { model } = useWizard();
+  const { model, vcnErrors: conflicts } = useWizard();
   const [editEnv, setEditEnv] = useState<string | null>(null);
   const instances = platformEnvInstances(platform, environments);
   const profileOwned = platform.type === 'oke_simple' && !!platform.okeParams?.clusterSize;
@@ -231,14 +184,13 @@ function PerEnvTable({ platform, environments, onPlatform }: {
                 <td style={local.genTd}>{inst.name}</td>
                 <td style={local.genTd}>
                   {inst.vcnCidr}
-                  {inst.overridden && <span style={local.overrideTag}>override</span>}
+                  <FieldError id={`platform-${platform.id}-${inst.id}-conflict`} error={conflicts[`platform:${platform.id}:${inst.id}`]} />
+                  {inst.overridden && !profileOwned && <span style={local.overrideTag}>override</span>}
                 </td>
                 <td style={local.genTd}>{inst.subnets.length === 0 ? 'auto' : `${inst.subnets.length} subnet${inst.subnets.length === 1 ? '' : 's'}`}</td>
                 <td style={{ ...local.genTd, textAlign: 'right' }}>
                   {profileOwned ? (
-                    inst.overridden
-                      ? <button type="button" style={{ ...local.linkBtn, color: oracle.red }} onClick={() => resetOverride(inst.id)}>Reset stale override</button>
-                      : <span style={local.fieldHint}>Automatic</span>
+                    <span style={local.fieldHint}>Automatic</span>
                   ) : (
                     <>
                       <button type="button" style={local.linkBtn} onClick={() => setEditEnv(editEnv === inst.id ? null : inst.id)}>
@@ -260,20 +212,14 @@ function PerEnvTable({ platform, environments, onPlatform }: {
         return (
           <div style={{ ...s.subCard, marginTop: 14 }}>
             <div style={s.subHead}>Override — {inst.name}</div>
-            {platform.type === 'ocvs' ? (
-              <>
-                <label style={s.label} htmlFor={`plat-${platform.id}-ov-${editEnv}-vcn`}>VCN CIDR</label>
-                <input id={`plat-${platform.id}-ov-${editEnv}-vcn`} style={s.rowInput} value={inst.vcnCidr}
-                  onChange={(event) => setOverride(editEnv, { vcnCidr: event.target.value })} />
-                <div style={local.fieldHint}>Provisioning subnet: {ocvsDefaultSubnets(inst.vcnCidr)[0]?.cidr ?? 'enter a supported VCN CIDR'}.</div>
-              </>
-            ) : <VcnEditor
+            <VcnEditor
               idPrefix={`plat-${platform.id}-ov-${editEnv}`}
+              conflicts={conflicts[`platform:${platform.id}:${editEnv}`]}
               vcnCidr={inst.vcnCidr}
               subnets={inst.subnets}
               emptyNote="No subnets — add one below, or leave empty."
               onApply={(patch) => setOverride(editEnv, patch)}
-            />}
+            />
           </div>
         );
       })()}
@@ -290,13 +236,13 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
   onPlatform: (patch: Partial<PlatformConfig>) => void;
   onDelete: () => void;
 }) {
+  const { model, vcnErrors: conflicts } = useWizard();
   const meta = platformTypeMeta(platform.type);
+  const peers = model.platforms.filter((other) => other.id !== platform.id && placementsOverlap(platform.environments, other.environments));
+  const keyError = configKeyError(platform.key, peers.map((other) => other.key), 3);
+  const baseConflicts = platformEnvInstances(platform, environments).filter((instance) => instance.vcnCidr === platform.vcnCidr).flatMap((instance) => conflicts[`platform:${platform.id}:${instance.id}`] ?? []);
   const isOke = platform.type === 'oke_simple';
-  const isOcvs = platform.type === 'ocvs';
   const oke = platform.okeParams ?? okeDefaultParams();
-  const ocvs = platform.ocvsParams ?? ocvsDefaultParams();
-  function setOke(patch: Partial<typeof oke>) { onPlatform({ okeParams: { ...oke, ...patch } }); }
-  function setOcvs(patch: Partial<typeof ocvs>) { onPlatform({ ocvsParams: { ...ocvs, ...patch } }); }
 
   return (
     <div style={local.card}>
@@ -316,77 +262,18 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
             <div>
               <label style={s.label}>Placement</label>
-              <PlacementChips value={platform.environments} environments={environments} onChange={(next) => onPlatform({ environments: next })} />
+              <PlacementChips id={platform.id} value={platform.environments} environments={environments} onChange={(next) => onPlatform({ environments: next })} />
             </div>
             <DeleteButton label={`Delete platform ${platform.key}`} onClick={onDelete} />
           </div>
 
           <div style={{ marginBottom: 16 }}>
             <label style={s.label} htmlFor={`${platform.id}-key`}>Platform name</label>
-            <input id={`${platform.id}-key`} style={s.rowInput} value={platform.key} maxLength={3} onChange={(e) => onPlatform({ key: e.target.value })} />
+            <ValidatedInput id={`${platform.id}-key`} error={keyError} style={s.rowInput} value={platform.key} maxLength={3} onChange={(e) => onPlatform({ key: e.target.value })} />
             <div style={local.fieldHint}>Used to create consistent names for this platform's compartment, network, gateway, and DRG attachment.</div>
           </div>
 
-          {isOke && (
-            <div style={s.subCard}>
-              <div style={s.subHead}>OKE settings</div>
-              <div className="oke-settings-grid" style={local.okeGrid}>
-                <div style={local.group}>
-                  <div style={local.groupTitle}>Cluster</div>
-                  <div className="oke-fields-grid" style={local.settingsFields}>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-k8s`}>Kubernetes version</label><input id={`${platform.id}-k8s`} style={s.rowInput} value={oke.kubernetesVersion} onChange={(e) => setOke({ kubernetesVersion: e.target.value })} /></div>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-api`}>API endpoint allowed CIDRs</label><input id={`${platform.id}-api`} style={s.rowInput} value={oke.apiAllowedCidrs.join(', ')} onChange={(e) => setOke({ apiAllowedCidrs: e.target.value.split(',').map((x) => x.trim()).filter(Boolean) })} /></div>
-                  </div>
-                </div>
-                <div style={local.group}>
-                  <div style={local.groupTitle}>Networking</div>
-                  <div className="oke-fields-grid" style={local.settingsFields}>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-svc`}>Services CIDR</label><input id={`${platform.id}-svc`} style={s.rowInput} value={oke.servicesCidr} onChange={(e) => setOke({ servicesCidr: e.target.value })} /></div>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-cni`}>Pod networking</label><select id={`${platform.id}-cni`} style={s.select} value={oke.cniType} onChange={(e) => {
-                      const cniType = e.target.value as 'native' | 'overlay';
-                      if (cniType === 'overlay') onPlatform({ subnets: platform.subnets.filter((sn) => sn.name !== 'pods') });
-                      setOke({ cniType, ...(cniType === 'overlay' && !oke.podsCidr ? { podsCidr: '10.244.0.0/16' } : {}) });
-                    }}><option value="native">Native VCN</option><option value="overlay">Overlay (Flannel)</option></select></div>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-size`}>Network profile</label><select id={`${platform.id}-size`} style={s.select} value={oke.clusterSize ?? 'manual'} onChange={(e) => {
-                      const size = e.target.value === 'manual' ? undefined : e.target.value as 'small' | 'medium' | 'large';
-                      if (!size) {
-                        onPlatform({ subnets: okeDefaultSubnets(platform.vcnCidr).filter((sn) => oke.cniType === 'native' || sn.name !== 'pods') });
-                        setOke({ clusterSize: undefined });
-                        return;
-                      }
-                      const prefix = size === 'small' ? 20 : size === 'medium' ? 18 : 16;
-                      onPlatform({ subnets: [], vcnCidr: `${platform.vcnCidr.split('/')[0]}/${prefix}` });
-                      setOke({ clusterSize: size });
-                    }}><option value="manual">Manual subnets</option><option value="small">Small (/20)</option><option value="medium">Medium (/18)</option><option value="large">Large (/16)</option></select></div>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-pods`}>Pod CIDR</label><input id={`${platform.id}-pods`} style={s.rowInput} placeholder={oke.cniType === 'overlay' ? '10.244.0.0/16' : 'Optional for native'} value={oke.podsCidr ?? ''} onChange={(e) => setOke({ podsCidr: e.target.value || undefined })} /></div>
-                  </div>
-                </div>
-                <div style={local.group}>
-                  <div style={local.groupTitle}>Workers</div>
-                  <div className="oke-fields-grid" style={local.settingsFields}>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-img`}>Worker image selector</label><input id={`${platform.id}-img`} style={s.rowInput} value={oke.workerImage} onChange={(e) => setOke({ workerImage: e.target.value })} /></div>
-                    <div><label style={s.addLabel} htmlFor={`${platform.id}-boot`}>Worker boot volume (GB)</label><input id={`${platform.id}-boot`} type="number" min="50" max="32768" style={s.rowInput} value={oke.workerBootVolumeSize} onChange={(e) => setOke({ workerBootVolumeSize: Number(e.target.value) })} /></div>
-                  </div>
-                </div>
-                <div className="oke-features-group" style={{ ...local.group, gridColumn: '1 / -1' }}>
-                  <div style={local.groupTitle}>Optional features</div>
-                  <div className="oke-feature-grid" style={local.featureGrid}>
-                    <div style={{ ...local.switchRow, borderTop: 'none', paddingTop: 0 }}>
-                      <div style={local.switchCopy}><strong>Allow public load balancers</strong><div style={{ ...local.fieldHint, lineHeight: 1.5, marginTop: 5 }}>Creates the Hub frontend networking and IAM prerequisites. OCI creates a load balancer only when a Kubernetes Service requests one.</div></div>
-                      <Switch checked={oke.publicLoadBalancer} onChange={(checked) => setOke({ publicLoadBalancer: checked })} ariaLabel="Allow public load balancers" />
-                    </div>
-                    <div style={{ ...local.switchRow, borderTop: 'none', paddingTop: 0 }}>
-                      <div style={local.switchCopy}><strong>Enable File Storage support</strong><div style={{ ...local.fieldHint, lineHeight: 1.5, marginTop: 5 }}>Creates FSS networking and IAM prerequisites—not file systems, mount targets, or Kubernetes storage objects.</div></div>
-                      <Switch checked={oke.createFss} onChange={(checked) => setOke({ createFss: checked })} ariaLabel="Enable File Storage support" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {oke.clusterSize && <div style={local.fieldHint}>This network profile sets the subnet layout. To define subnets yourself, select Manual subnets.</div>}
-            </div>
-          )}
-
-          {isOcvs && <OcvsSettingsFields id={`${platform.id}-ocvs`} value={ocvs} onChange={setOcvs} />}
+          {isOke && <OkeSettingsFields platform={platform} onPlatform={onPlatform} />}
 
           <div style={{ marginTop: 6 }}>
             <label style={s.label}>Platform VCN &amp; subnets</label>
@@ -403,18 +290,13 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
                   ))}
                 </div>
               </div>
-            ) : isOcvs ? (
-              <div style={{ ...s.subCard, marginTop: 0 }}>
-                <div style={s.subHead}>OCVS provisioning network</div>
-                <input id={`${platform.id}-ocvs-vcn`} style={s.rowInput} value={platform.vcnCidr} onChange={(e) => onPlatform({ vcnCidr: e.target.value, subnets: [] })} />
-                <div style={local.fieldHint}>Use /21, /22, /23, or /24. The deployment package reserves this provisioning subnet: {ocvsDefaultSubnets(platform.vcnCidr)[0]?.cidr ?? 'choose a supported VCN prefix'}.</div>
-              </div>
             ) : (
               <VcnEditor
                 idPrefix={`plat-${platform.id}`}
+                conflicts={baseConflicts}
                 vcnCidr={platform.vcnCidr}
                 subnets={platform.subnets}
-                emptyNote={isOke ? 'Define the required OKE subnet roles for the selected CNI shape.' : isOcvs ? 'OCVS requires its provisioning subnet.' : 'No subnets yet — add one below with +.'}
+                emptyNote={isOke ? 'Define the required OKE subnet roles for the selected CNI shape.' : 'No subnets yet — add one below with +.'}
                 onApply={(patch) => onPlatform(patch)}
               />
             )}
@@ -476,7 +358,7 @@ export default function PlatformTemplatesStep() {
         {open && <div style={local.cardBody}>
           {errors.length > 0 && <details style={{ padding: '10px 4px', fontSize: 13 }}>
             <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Review {errors.length} issues across {type.toUpperCase()} platforms</summary>
-            <ul style={{ margin: '8px 0', paddingLeft: 20 }}>{errors.map((error) => <li key={error}>{error}</li>)}</ul>
+            <ErrorNotice><ul>{errors.map((error) => <li key={error}>{error}</li>)}</ul></ErrorNotice>
           </details>}
           <ExadataStep type={type} placement={placement} />
         </div>}
@@ -522,7 +404,7 @@ export default function PlatformTemplatesStep() {
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Platforms</div>
+          <h2 style={s.title}>Platforms</h2>
           <div style={{ ...s.empty, borderTop: `1px dashed ${oracle.border}`, borderRadius: 6 }}>
             Choose an implemented hub model in step 2 first — platforms build on the environment networks.
           </div>
@@ -536,10 +418,12 @@ export default function PlatformTemplatesStep() {
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Shared Platforms</div>
-          <div style={local.note}>Optional platforms for services shared by more than one environment. Add one only when the same service must be used across environments.</div>
+          <div className="studio-info-heading"><h2 style={s.title}>Shared platforms</h2>
+            <InfoButton title="Shared platforms"><p>Use a shared platform for services that several environments use. It has one shared placement rather than a separate copy in each environment.</p><p>Custom platforms have a shared VCN. Exadata networks depend on the infrastructure and database placement you select. A design can contain shared platforms without any environments.</p></InfoButton>
+          </div>
+          <p style={local.note}>Use shared platforms for services used by multiple environments. Add only the services your landing zone needs.</p>
           {model.sharedPlatforms.length === 0 && sharedExadata.length === 0 && (
-            <div style={{ ...s.empty, borderRadius: 6, borderTop: `1px dashed ${oracle.border}`, marginBottom: 14 }}>No shared platforms. Add one only when a workload must be shared across environments.</div>
+            <p style={{ ...s.help, marginBottom: 16 }}>No shared platforms configured.</p>
           )}
           {model.sharedPlatforms.map((platform) => (
             <SharedPlatformPanel
@@ -553,17 +437,16 @@ export default function PlatformTemplatesStep() {
           ))}
           {sharedExadata.map((type) => renderExadata(type, 'shared'))}
           <div style={s.subCard}>
-            <div style={s.subHead}>Add Shared Platform</div>
+            <h3 style={s.subHead}>Add shared platform</h3>
             <div className="platform-add-row" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end' }}>
               <div>
                 <label style={s.addLabel} htmlFor="new-shared-platform-type">Type</label>
-                <select id="new-shared-platform-type" style={s.select} value={newSharedType} onChange={(e) => setNewSharedType(e.target.value as Exclude<AddPlatformType, 'oke_simple'>)}>
+                <select id="new-shared-platform-type" value={newSharedType} onChange={(e) => setNewSharedType(e.target.value as Exclude<AddPlatformType, 'oke_simple'>)}>
                   <option value="custom">Custom network</option>
-                  <option value="ocvs">OCVS management cluster</option>
                   {EXADATA_TYPES.map((type) => <option key={type} value={type} disabled={model.exadata[type].enabled}>{type.toUpperCase()}{model.exadata[type].enabled ? ' (added)' : ''}</option>)}
                 </select>
               </div>
-              <button type="button" style={sharedTypeAdded ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn} disabled={sharedTypeAdded} onClick={addSharedPlatform}>Add Shared Platform</button>
+              <button type="button" style={sharedTypeAdded ? { ...s.addBtn, ...s.addBtnDisabled } : s.addBtn} disabled={sharedTypeAdded} onClick={addSharedPlatform}>Add shared platform</button>
             </div>
           </div>
         </div>
@@ -572,15 +455,13 @@ export default function PlatformTemplatesStep() {
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Environment Platforms</div>
-          <div style={local.note}>
-            Add OKE, OCVS, or Custom for a separate platform network in each selected environment. EXACC adds networkless compartments; EXACS creates networks where AVMC/VMCs are placed.
+          <div className="studio-info-heading"><h2 style={s.title}>Environment platforms</h2>
+            <InfoButton title="Environment platforms"><p>Place a workload platform in all environments or select individual environments. Each selected environment gets its own platform resources.</p><p>The placement table shows the resulting networks. Use an environment override when that instance needs a different address range; Reset restores its derived settings.</p></InfoButton>
           </div>
+          <p style={local.note}>Add a workload platform to one or more environments. Each selected environment receives its own platform resources.</p>
 
           {model.platforms.length === 0 && environmentExadata.length === 0 && (
-            <div style={{ ...s.empty, borderRadius: 6, borderTop: `1px dashed ${oracle.border}`, marginBottom: 14 }}>
-              No platforms yet — add one below.
-            </div>
+            <p style={{ ...s.help, marginBottom: 16 }}>No environment platforms configured.</p>
           )}
 
           {model.platforms.map((p) => (
@@ -601,7 +482,7 @@ export default function PlatformTemplatesStep() {
             <div className="platform-add-row" style={{ display: 'grid', gridTemplateColumns: isExadataType(newType) ? '1fr auto' : '1fr 1fr auto', gap: 12, alignItems: 'end' }}>
               <div>
                 <label style={s.addLabel} htmlFor="new-platform-type">Type</label>
-                <select id="new-platform-type" style={s.select} value={newType} onChange={(e) => setNewType(e.target.value as AddPlatformType)}>
+                <select id="new-platform-type" value={newType} onChange={(e) => setNewType(e.target.value as AddPlatformType)}>
                   {PLATFORM_TYPES.map((t) => (
                     <option key={t.type} value={t.type} disabled={!t.deployable}>
                       {t.label}{t.note ? ` (${t.note})` : ''}
@@ -615,7 +496,7 @@ export default function PlatformTemplatesStep() {
                 <input
                   id="new-platform-name"
                   style={s.rowInput}
-                  placeholder={newType === 'oke_simple' ? 'oke' : newType === 'ocvs' ? 'ocv' : 'cus'}
+                  placeholder={newType === 'oke_simple' ? 'oke' : 'cus'}
                   value={newName}
                   maxLength={3}
                   onChange={(e) => setNewName(e.target.value)}

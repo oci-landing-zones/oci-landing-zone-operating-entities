@@ -1,202 +1,187 @@
 import { describe, expect, it } from 'vitest';
-import { allFlowIds, buildFlowTraces, FLOW_KIND_COLORS, specFromId, traceFlow, type FlowSpec } from './flowTrace';
+import { allFlowIds, buildFlowTraces, FLOW_KIND_COLORS, matchRule, specFromId, traceFlow } from './flowTrace';
 import { emptyLzModel } from '../model/defaults';
 import { hubKindDefaults } from './hubKinds';
+import { newPlatform } from './platforms';
+import { generatedRouteTables } from './routingFixtures.testSupport';
+import type { RouteRule } from './routeTables';
 
 const C = '#2196F3';
-// Default model: hub subnets fw-dmz(0) lb(1) fw-int(2) mgmt(3) mon(4) dns(5);
-// envs prod(0) preprod(1), spoke subnets web/app/db/infra; dmzIp 10.0.0.4, intIp 10.0.2.4.
-const seq = (hops: { node: string; tableId?: string; rowIndex?: number }[]) =>
-  hops.map((h) => [h.node, h.tableId, h.rowIndex]);
-const segs = (s: { from: string; to: string }[]) => s.map((e) => `${e.from}->${e.to}`);
+const segments = (trace: ReturnType<typeof traceFlow>) => trace.segments.map((edge) => `${edge.from}->${edge.to}`);
+const rule = (id: string, cidr: string, target: string, routeType: 'Static' | 'Dynamic' = 'Static'): RouteRule => ({
+  id, destination: cidr, matchCidr: cidr, targetType: 'VCN Attachment', target, routeType,
+  nextHopKind: 'attachment', flowTarget: target, provenance: 'configured',
+});
 
-describe('flowTrace — walks the route tables per the validated OCI spec', () => {
-  it('EGRESS: spoke VM → DRG → hub ingress → INT FW → NAT GW', () => {
-    const t = traceFlow(emptyLzModel(), { id: 'prod:egress', kind: 'egress', color: C, srcEnv: 0, srcSubnet: 0 });
-    expect(t.ok).toBe(true);
-    expect(seq(t.hops)).toEqual([
-      ['cmp-env-0-vcn-sn-0', 'rt-ssn-0', 0],
-      ['attach-cmp-env-0', 'rt-drg-spokes', 0],
-      ['attach-hub', 'rt-hub-ingress', 0],
-      ['hub-vcn-sn-2', 'rt-hub-internal', 0],
-      ['gw-natgw', undefined, undefined],
-    ]);
-    expect(t.hops.find((h) => h.tableId === 'rt-hub-internal')!.inspected).toBe(true);
-    expect(t.highlights).toEqual([
-      { tableId: 'rt-ssn-0', rows: [0] },
-      { tableId: 'rt-drg-spokes', rows: [0] },
-      { tableId: 'rt-hub-ingress', rows: [0] },
-      { tableId: 'rt-hub-internal', rows: [0] },
-    ]);
-    expect(segs(t.segments)).toEqual([
-      'cmp-env-0-vcn-sn-0->attach-cmp-env-0',
-      'attach-cmp-env-0->drg',
-      'drg->attach-hub',
-      'attach-hub->hub-vcn-sn-2',
-      'hub-vcn-sn-2->gw-natgw',
-    ]);
-  });
-
-  it('SERVICES: spoke VM → spoke SGW → OSN (longest-prefix prefers OSN over 0/0)', () => {
-    const t = traceFlow(emptyLzModel(), { id: 'prod:services', kind: 'services', color: C, srcEnv: 0, srcSubnet: 0 });
-    expect(t.ok).toBe(true);
-    expect(seq(t.hops)).toEqual([
-      ['cmp-env-0-vcn-sn-0', 'rt-ssn-0', 1],
-      ['cmp-env-0-sgw', undefined, undefined],
-    ]);
-    expect(t.highlights).toEqual([{ tableId: 'rt-ssn-0', rows: [1] }]);
-    expect(segs(t.segments)).toEqual(['cmp-env-0-vcn-sn-0->cmp-env-0-sgw']);
-  });
-
-  it('EAST-WEST prod→preprod: INT-FW hairpin, longest-prefix picks the per-spoke rule', () => {
-    const t = traceFlow(emptyLzModel(), { id: 'prod>preprod:east-west', kind: 'east-west', color: C, srcEnv: 0, srcSubnet: 0, dstEnv: 1, dstSubnet: 0 });
-    expect(t.ok).toBe(true);
-    expect(seq(t.hops)).toEqual([
-      ['cmp-env-0-vcn-sn-0', 'rt-ssn-0', 0],
-      ['attach-cmp-env-0', 'rt-drg-spokes', 0],
-      ['attach-hub', 'rt-hub-ingress', 2],
-      ['hub-vcn-sn-2', 'rt-hub-internal', 2],
-      ['attach-hub', 'rt-drg-hub', 1],
-      ['cmp-env-1-vcn-sn-0', undefined, undefined],
-    ]);
-    // The hairpin retraces the hub attachment + DRG.
-    expect(segs(t.segments)).toEqual([
-      'cmp-env-0-vcn-sn-0->attach-cmp-env-0',
-      'attach-cmp-env-0->drg',
-      'drg->attach-hub',
-      'attach-hub->hub-vcn-sn-2',
-      'hub-vcn-sn-2->attach-hub',
-      'attach-hub->drg',
-      'drg->attach-cmp-env-1',
-      'attach-cmp-env-1->cmp-env-1-vcn-sn-0',
-    ]);
-    expect(t.highlights).toContainEqual({ tableId: 'rt-drg-hub', rows: [1] });
-  });
-
-  it('INGRESS: INET → IGW → DMZ FW → LB → INT FW → DRG → spoke VM (LB→backend inspected, post-fix)', () => {
-    const t = traceFlow(emptyLzModel(), { id: 'prod:ingress', kind: 'ingress', color: C, srcEnv: 0, dstEnv: 0, dstSubnet: 0 });
-    expect(t.ok).toBe(true);
-    expect(seq(t.hops)).toEqual([
-      ['gw-igw', 'rt-hub-igw', 0],
-      ['hub-vcn-sn-0', 'rt-hub-dmz', undefined],   // DMZ FW local-delivers to the LB
-      ['hub-vcn-sn-1', 'rt-hub-lb', 1],            // LB → INT FW (the bug-fix: not straight to DRG)
-      ['hub-vcn-sn-2', 'rt-hub-internal', 1],      // INT FW → DRG
-      ['attach-hub', 'rt-drg-hub', 0],             // prod VCN → prod attach
-      ['cmp-env-0-vcn-sn-0', undefined, undefined],
-    ]);
-    // The LB→backend leg is inspected by the internal firewall (regression guard for the rt-hub-lb fix).
-    expect(t.highlights).toContainEqual({ tableId: 'rt-hub-lb', rows: [1] });
-    expect(t.highlights.find((h) => h.tableId === 'rt-hub-internal')).toEqual({ tableId: 'rt-hub-internal', rows: [1] });
-    // rt-hub-ingress is NOT consulted on egress-to-DRG (only entering the VCN from the DRG).
-    expect(t.highlights.find((h) => h.tableId === 'rt-hub-ingress')).toBeUndefined();
-  });
-
-  it('specFromId resolves picker ids; east-west without a dest defaults to the first other env', () => {
-    const m = emptyLzModel();
-    expect(specFromId(m, 'prod:egress', C)).toMatchObject<Partial<FlowSpec>>({ kind: 'egress', srcEnv: 0 });
-    expect(specFromId(m, 'prod>preprod:east-west', C)).toMatchObject<Partial<FlowSpec>>({ kind: 'east-west', srcEnv: 0, dstEnv: 1 });
-    expect(specFromId(m, 'prod:east-west', C)).toMatchObject<Partial<FlowSpec>>({ kind: 'east-west', srcEnv: 0, dstEnv: 1 });
-    expect(specFromId(m, 'bogus:egress', C)).toBeNull();
-  });
-
-  it('buildFlowTraces expands each pick to all env endpoints, distinct colour per base flow', () => {
-    const traces = buildFlowTraces(emptyLzModel(), ['prod:egress', 'preprod:services']);
-    // 4 prod endpoints (egress) + 4 preprod endpoints (services).
+describe('flowTrace generated routing inventory', () => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('resolves every supported traffic kind from actual %s tables', async (hubKind) => {
+    const model = emptyLzModel();
+    model.network = { hubKind, ...hubKindDefaults(hubKind) };
+    const tables = await generatedRouteTables(model);
+    const traces = buildFlowTraces(model, allFlowIds(model), 'kind', tables);
     expect(traces).toHaveLength(8);
-    expect(traces.every((t) => t.ok)).toBe(true);
-    // One colour per base flow (shared across its endpoint sub-traces).
-    expect(new Set(traces.map((t) => t.color)).size).toBe(2);
-    expect(traces.map((t) => t.id)).toEqual([
+    expect(traces.map((trace) => [trace.id, trace.ok])).toEqual(traces.map((trace) => [trace.id, true]));
+    for (const trace of traces) {
+      expect(trace.color).toBe(FLOW_KIND_COLORS[trace.kind]);
+      for (const hop of trace.hops) {
+        const visits = [trace.segments[0]?.from, ...trace.segments.map((edge) => edge.to)];
+        expect(visits[hop.visitIndex]).toBe(hop.node);
+        if (!hop.tableId) continue;
+        const table = tables.find((table) => table.id === hop.tableId)!;
+        expect(table).toBeDefined();
+        expect(table.rules[hop.rowIndex!].id).toBe(hop.ruleId);
+        expect(table.associations.some((binding) => binding.nodeId === hop.tableOwner)).toBe(true);
+        const ingress = table.associations.some((binding) => binding.kind === 'vcn-ingress' && binding.nodeId === hop.tableOwner);
+        expect(hop.tableOwner).toBe(ingress ? 'hub-vcn' : hop.node);
+        if (ingress) expect(hop.node).toBe('attach-hub');
+      }
+    }
+    const egress = traces.find((trace) => trace.kind === 'egress')!;
+    expect(egress.hops.at(-1)?.label).toBe(`${hubKind === 'hub_c' ? 'Internet gateway' : 'NAT gateway'} → Internet`);
+    expect(traces.find((trace) => trace.kind === 'services')?.hops.at(-1)?.label).toBe('Service gateway → OCI Services');
+    const expectedEgress = {
+      hub_a: ['cmp-env-0-vcn-sn-0', 'attach-cmp-env-0', 'drg', 'attach-hub', 'hub-vcn-sn-2', 'gw-natgw'],
+      hub_b: ['cmp-env-0-vcn-sn-0', 'attach-cmp-env-0', 'drg', 'attach-hub', 'hub-vcn-sn-1', 'gw-natgw'],
+      hub_c: ['cmp-env-0-vcn-sn-0', 'attach-cmp-env-0', 'drg', 'attach-hub', 'hub-vcn-sn-1', 'hub-vcn-sn-0', 'gw-igw'],
+      hub_e: ['cmp-env-0-vcn-sn-0', 'cmp-env-0-natgw'],
+    }[hubKind];
+    expect(segments(egress)).toEqual(expectedEgress.slice(1).map((node, index) => `${expectedEgress[index]}->${node}`));
+    const ingress = traces.find((trace) => trace.kind === 'ingress')!;
+    expect(ingress.hops.filter((hop) => hop.inspected).map((hop) => hop.node)).toEqual({
+      hub_a: ['hub-vcn-sn-0'], hub_b: ['hub-vcn-sn-1'], hub_c: ['hub-vcn-sn-0'], hub_e: [],
+    }[hubKind]);
+  });
+
+  it('keeps repeated hub attachment occurrences distinct during a firewall hairpin', async () => {
+    const model = emptyLzModel();
+    const tables = await generatedRouteTables(model);
+    const [trace] = buildFlowTraces(model, ['prod>preprod:east-west:web'], 'flow', tables);
+    expect(trace.ok).toBe(true);
+    const visits = trace.hops.filter((hop) => hop.node === 'attach-hub');
+    expect(visits).toHaveLength(2);
+    expect(visits[1].visitIndex).toBeGreaterThan(visits[0].visitIndex);
+    expect(visits[0].tableId).not.toBe(visits[1].tableId);
+    expect(visits[0]).toMatchObject({ node: 'attach-hub', tableOwner: 'hub-vcn' });
+    expect(visits[1]).toMatchObject({ node: 'attach-hub', tableOwner: 'attach-hub' });
+    expect(segments(trace)).toContain('hub-vcn-sn-2->attach-hub');
+  });
+
+  it('does not use a VCN ingress table when leaving that VCN', async () => {
+    const model = emptyLzModel();
+    const tables = await generatedRouteTables(model);
+    const ingress = tables.find((table) => table.associations.some((binding) => binding.kind === 'vcn-ingress' && binding.nodeId === 'hub-vcn'))!;
+    const [trace] = buildFlowTraces(model, ['prod:ingress:web'], 'flow', tables);
+    expect(trace.ok).toBe(true);
+    expect(trace.hops.some((hop) => hop.tableId === ingress.id)).toBe(false);
+  });
+
+  it('follows changed generated rules and bindings without depending on table names', async () => {
+    const model = emptyLzModel();
+    const tables = structuredClone(await generatedRouteTables(model));
+    tables.forEach((table, index) => { table.id = `arbitrary-${index}`; });
+    const source = tables.find((table) => table.associations.some((binding) => binding.nodeId === 'cmp-env-0-vcn-sn-0' && binding.kind === 'subnet'))!;
+    source.rules = [{ ...source.rules[0], id: 'changed-default', nextHopKind: 'natgw', flowTarget: 'cmp-env-0-natgw', targetNodeId: 'cmp-env-0-natgw' }];
+    const [trace] = buildFlowTraces(model, ['prod:egress:web'], 'flow', tables);
+    expect(trace.ok).toBe(true);
+    expect(trace.hops[0]).toMatchObject({ tableId: source.id, ruleId: 'changed-default' });
+    expect(segments(trace)).toEqual(['cmp-env-0-vcn-sn-0->cmp-env-0-natgw']);
+  });
+
+  it('fails closed when generation is unavailable, a binding is missing or a target is unresolved', async () => {
+    const model = emptyLzModel();
+    const spec = { id: 'prod:egress', kind: 'egress' as const, color: C, srcEnv: 0 };
+    expect(traceFlow(model, spec).ok).toBe(false);
+    const tables = structuredClone(await generatedRouteTables(model));
+    const source = tables.find((table) => table.associations.some((binding) => binding.nodeId === 'cmp-env-0-vcn-sn-0' && binding.kind === 'subnet'))!;
+    source.rules[0].nextHopKind = 'unresolved';
+    expect(traceFlow(model, spec, tables).ok).toBe(false);
+    source.associations = [];
+    expect(traceFlow(model, spec, tables).ok).toBe(false);
+  });
+
+  it.each(['gateway', 'vcn-ingress'] as const)('fails closed on conflicting optional %s bindings', async (kind) => {
+    const model = emptyLzModel();
+    model.network = { hubKind: 'hub_e', ...hubKindDefaults('hub_e') };
+    const tables = structuredClone(await generatedRouteTables(model));
+    const binding = { nodeId: kind === 'gateway' ? 'gw-igw' : 'cmp-env-0-vcn', kind };
+    const template = tables.find((table) => table.kind === 'spoke')!;
+    tables.push({ ...template, id: 'conflict-one', associations: [binding] }, { ...template, id: 'conflict-two', associations: [binding] });
+    const trace = traceFlow(model, { id: 'prod:ingress', kind: 'ingress', color: C, srcEnv: 0, dstEnv: 0 }, tables);
+    expect(trace.ok).toBe(false);
+    expect(trace.segments.at(-1)?.to).not.toBe('cmp-env-0-vcn-sn-0');
+  });
+
+  it('uses the actual source attachment when a DRG table is shared', async () => {
+    const model = emptyLzModel();
+    const [trace] = buildFlowTraces(model, ['preprod:egress:web'], 'flow', await generatedRouteTables(model));
+    expect(trace.hops[1].node).toBe('attach-cmp-env-1');
+    expect(trace.hops[1].label).toMatch(/^preprod attachment: /);
+  });
+
+  it('matches east-west roles after reordering and retains every source when the destination is shorter', async () => {
+    const model = emptyLzModel();
+    model.environments[1].network.subnets.reverse();
+    let traces = buildFlowTraces(model, ['prod>preprod:east-west'], 'flow', await generatedRouteTables(model));
+    expect(traces).toHaveLength(4);
+    expect(traces.every((trace) => trace.ok)).toBe(true);
+    expect(traces.map((trace) => trace.segments.at(-1)?.to)).toEqual([
+      'cmp-env-1-vcn-sn-3', 'cmp-env-1-vcn-sn-2', 'cmp-env-1-vcn-sn-1', 'cmp-env-1-vcn-sn-0',
+    ]);
+    model.environments[1].network.subnets = model.environments[1].network.subnets.slice(0, 1);
+    traces = buildFlowTraces(model, ['prod>preprod:east-west'], 'flow', await generatedRouteTables(model));
+    expect(traces).toHaveLength(4);
+    expect(traces.every((trace) => trace.ok && trace.segments.at(-1)?.to === 'cmp-env-1-vcn-sn-0')).toBe(true);
+  });
+
+  it('expands endpoint picks with stable group colours and deduplicates all-endpoint picks', async () => {
+    const model = emptyLzModel();
+    const tables = await generatedRouteTables(model);
+    const traces = buildFlowTraces(model, ['prod:egress', 'prod:egress:web', 'preprod:services'], 'flow', tables);
+    expect(traces).toHaveLength(8);
+    expect(traces.slice(0, 4).map((trace) => trace.hops[0].tableOwner)).toEqual([
+      'cmp-env-0-vcn-sn-0', 'cmp-env-0-vcn-sn-1', 'cmp-env-0-vcn-sn-2', 'cmp-env-0-vcn-sn-3',
+    ]);
+    expect(traces.map((trace) => trace.id)).toEqual([
       'prod:egress#0', 'prod:egress#1', 'prod:egress#2', 'prod:egress#3',
       'preprod:services#0', 'preprod:services#1', 'preprod:services#2', 'preprod:services#3',
     ]);
-    // Each prod egress sub-trace starts at its own spoke subnet.
-    expect(traces.slice(0, 4).map((t) => t.hops[0].node)).toEqual([
-      'cmp-env-0-vcn-sn-0', 'cmp-env-0-vcn-sn-1', 'cmp-env-0-vcn-sn-2', 'cmp-env-0-vcn-sn-3',
-    ]);
-    expect(traces[4].hops[0].node).toBe('cmp-env-1-vcn-sn-0');
+    const roles = buildFlowTraces(model, ['prod:egress:web', 'preprod:services', 'prod:egress:infra'], 'flow', tables);
+    expect(roles[0].color).toBe(roles.at(-1)?.color);
+    expect(roles[0].color).not.toBe(roles[1].color);
   });
 
-  it('allFlowIds lists every flow from each environment\'s first endpoint', () => {
-    expect(allFlowIds(emptyLzModel())).toEqual([
-      'prod:egress:web', 'prod:ingress:web', 'prod>preprod:east-west:web', 'prod:services:web',
-      'preprod:egress:web', 'preprod:ingress:web', 'preprod>prod:east-west:web', 'preprod:services:web',
-    ]);
-  });
-
-  it('colours by traffic type in all-flows mode, so any number of flows stays legible', () => {
+  it('drops disabled networks, removed roles and ingress when OKE suppresses the hub LB', async () => {
     const model = emptyLzModel();
-    const traces = buildFlowTraces(model, allFlowIds(model), 'kind');
-    expect(traces).toHaveLength(8);
-    expect(traces.every((t) => t.ok)).toBe(true);
-    for (const t of traces) expect(t.color).toBe(FLOW_KIND_COLORS[t.kind]);
+    model.environments[1].projectNetworkEnabled = false;
+    expect(buildFlowTraces(model, ['prod>preprod:east-west:web', 'preprod:egress:web'], 'flow', await generatedRouteTables(model))).toEqual([]);
+    expect(specFromId(model, 'prod:east-west', C)).toBeNull();
+    expect(specFromId(model, 'prod:egress:removed', C)).toBeNull();
+    model.platforms = [newPlatform('oke_simple', [], model.environments)];
+    expect(specFromId(model, 'prod:ingress:web', C)).toBeNull();
+    expect(allFlowIds(model).some((id) => id.includes(':ingress'))).toBe(false);
+    model.environments[0].network.subnets = [];
+    expect(allFlowIds(model)).toEqual([]);
   });
 
-  it('names the attachment the packet actually leaves through, not the shared DRG table owner', () => {
-    const [trace] = buildFlowTraces(emptyLzModel(), ['preprod:egress:web']);
-    expect(trace.hops[1].node).toBe('attach-cmp-env-1');
-    expect(trace.hops[1].label).toMatch(/^preprod attach: /);
+  it('resolves explicit/default east-west destinations and rejects invalid picker IDs', () => {
+    const model = emptyLzModel();
+    expect(specFromId(model, 'prod:egress', C)).toMatchObject({ kind: 'egress', srcEnv: 0 });
+    expect(specFromId(model, 'prod>preprod:east-west', C)).toMatchObject({ srcEnv: 0, dstEnv: 1 });
+    expect(specFromId(model, 'prod:east-west', C)).toMatchObject({ srcEnv: 0, dstEnv: 1 });
+    expect(specFromId(model, 'prod>prod:east-west', C)).toBeNull();
+    expect(specFromId(model, 'bogus:egress', C)).toBeNull();
   });
+});
 
-  it('buildFlowTraces keeps one colour when single endpoints of the same flow are picked', () => {
-    const traces = buildFlowTraces(emptyLzModel(), ['prod:egress:web', 'preprod:services', 'prod:egress:infra']);
-    const colourOf = (id: string) => traces.find((t) => t.id === id)?.color;
-    expect(colourOf('prod:egress:web#0')).toBe(colourOf('prod:egress:infra#3'));
-    expect(colourOf('prod:egress:web#0')).not.toBe(colourOf('preprod:services#0'));
+describe('effective rule selection', () => {
+  it('prefers longest prefix, then static, without treating import priority as forwarding preference', () => {
+    const rules = [rule('default', '0.0.0.0/0', 'hub'), rule('dynamic', '10.0.0.0/16', 'dynamic', 'Dynamic'), rule('static', '10.0.0.0/16', 'static')];
+    expect(matchRule(rules, '10.0.1.10/32')?.rule.id).toBe('static');
+    const imported = [{ ...rules[1], id: 'later', importPriority: 20 }, { ...rules[1], id: 'first', flowTarget: 'first', importPriority: 10 }];
+    expect(matchRule(imported, '10.0.1.10/32')).toBeNull();
   });
-
-  it('Hub E traces local spoke egress and direct spoke-to-spoke routing', () => {
-    const base = emptyLzModel();
-    const model = { ...base, network: { ...base.network, hubKind: 'hub_e' as const, ...hubKindDefaults('hub_e') } };
-    const egress = traceFlow(model, { id: 'prod:egress', kind: 'egress', color: C, srcEnv: 0, srcSubnet: 0 });
-    expect(egress.ok).toBe(true);
-    expect(segs(egress.segments)).toEqual(['cmp-env-0-vcn-sn-0->cmp-env-0-natgw']);
-    const eastWest = traceFlow(model, { id: 'prod>preprod:east-west', kind: 'east-west', color: C, srcEnv: 0, srcSubnet: 0, dstEnv: 1, dstSubnet: 0 });
-    expect(eastWest.ok).toBe(true);
-    expect(segs(eastWest.segments)).toEqual([
-      'cmp-env-0-vcn-sn-0->attach-cmp-env-0', 'attach-cmp-env-0->drg',
-      'drg->attach-cmp-env-1', 'attach-cmp-env-1->cmp-env-1-vcn-sn-0',
-    ]);
-  });
-
-  it('Hub B traces all routed traffic through its single OCI Network Firewall', () => {
-    const base = emptyLzModel();
-    const model = { ...base, network: { ...base.network, hubKind: 'hub_b' as const, ...hubKindDefaults('hub_b') } };
-    const egress = traceFlow(model, { id: 'prod:egress', kind: 'egress', color: C, srcEnv: 0, srcSubnet: 0 });
-    expect(egress.ok).toBe(true);
-    expect(segs(egress.segments)).toEqual([
-      'cmp-env-0-vcn-sn-0->attach-cmp-env-0', 'attach-cmp-env-0->drg', 'drg->attach-hub',
-      'attach-hub->hub-vcn-sn-1', 'hub-vcn-sn-1->gw-natgw',
-    ]);
-    expect(egress.hops.find((h) => h.tableId === 'rt-hub-fw')!.inspected).toBe(true);
-    const ingress = traceFlow(model, { id: 'prod:ingress', kind: 'ingress', color: C, srcEnv: 0, dstEnv: 0, dstSubnet: 0 });
-    expect(ingress.ok).toBe(true);
-    expect(segs(ingress.segments)).toEqual([
-      'gw-igw->hub-vcn-sn-0', 'hub-vcn-sn-0->hub-vcn-sn-1', 'hub-vcn-sn-1->attach-hub',
-      'attach-hub->drg', 'drg->attach-cmp-env-0', 'attach-cmp-env-0->cmp-env-0-vcn-sn-0',
-    ]);
-    const eastWest = traceFlow(model, { id: 'prod>preprod:east-west', kind: 'east-west', color: C, srcEnv: 0, srcSubnet: 0, dstEnv: 1, dstSubnet: 0 });
-    expect(eastWest.ok).toBe(true);
-    expect(eastWest.hops.some((h) => h.tableId === 'rt-hub-fw')).toBe(true);
-  });
-
-  it('Hub C traces traffic through trust and untrust NLB/firewall pairs', () => {
-    const base = emptyLzModel();
-    const model = { ...base, network: { ...base.network, hubKind: 'hub_c' as const, ...hubKindDefaults('hub_c') } };
-    const egress = traceFlow(model, { id: 'prod:egress', kind: 'egress', color: C, srcEnv: 0, srcSubnet: 0 });
-    expect(egress.ok).toBe(true);
-    expect(segs(egress.segments)).toEqual([
-      'cmp-env-0-vcn-sn-0->attach-cmp-env-0', 'attach-cmp-env-0->drg', 'drg->attach-hub',
-      'attach-hub->hub-vcn-sn-1', 'hub-vcn-sn-1->hub-vcn-sn-0', 'hub-vcn-sn-0->gw-igw',
-    ]);
-    const ingress = traceFlow(model, { id: 'prod:ingress', kind: 'ingress', color: C, srcEnv: 0, dstEnv: 0, dstSubnet: 0 });
-    expect(ingress.ok).toBe(true);
-    expect(segs(ingress.segments)).toEqual([
-      'gw-igw->hub-vcn-sn-0', 'hub-vcn-sn-0->hub-vcn-sn-2', 'hub-vcn-sn-2->attach-hub',
-      'attach-hub->drg', 'drg->attach-cmp-env-0', 'attach-cmp-env-0->cmp-env-0-vcn-sn-0',
-    ]);
-    const eastWest = traceFlow(model, { id: 'prod>preprod:east-west', kind: 'east-west', color: C, srcEnv: 0, srcSubnet: 0, dstEnv: 1, dstSubnet: 0 });
-    expect(eastWest.ok).toBe(true);
-    expect(eastWest.hops.some((h) => h.node === 'hub-vcn-sn-1')).toBe(true);
+  it('does not guess between equal-cost different targets or confuse an SGW default with OSN routing', () => {
+    expect(matchRule([rule('one', '10.0.0.0/16', 'one'), rule('two', '10.0.0.0/16', 'two')], '10.0.1.10/32')).toBeNull();
+    expect(matchRule([{ ...rule('one', '0.0.0.0/0', 'sgw'), nextHopKind: 'sgw' }], 'OSN')).toBeNull();
   });
 });

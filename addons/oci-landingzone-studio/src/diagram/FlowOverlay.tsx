@@ -1,52 +1,16 @@
-/**
- * Flow overlay — an SVG layer drawn inside the viewport (so it pans/zooms with
- * the diagram). For each traced path it draws:
- *   - a white casing under a solid line with softly rounded corners, so the route
- *     reads over busy compartments;
- *   - its own parallel lane where flows share a leg, instead of overlapping;
- *   - a ring where the flow starts, evenly spaced chevrons for direction (visible
- *     even when paused), and an arrowhead where it ends;
- *   - a small packet dot that loops the route, or — when stepping — rests on the
- *     current hop with the travelled part solid and the rest faded;
- *   - numbered hop badges (ink on white, ringed in the flow colour), with a green
- *     check on firewall-inspected hops, slotted side by side where flows meet;
- *   - one static label riding on its own line, so text never covers resource names.
- *
- * Paths are clickable: clicking one selects that flow (others fade, it gains a
- * glow) and clicking it again clears the selection. Hovering a path or a sidebar
- * row (`focus`) previews the same emphasis. With all flows shown, badges and
- * labels appear only on the emphasised flow so the overview stays readable.
- * `prefers-reduced-motion` turns all motion off.
- */
-
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { DiagramEdge } from '../model/types';
 import { oracle } from '../theme';
 import {
-  badgeSlots, flowGroup, fractionNearest, labelAnchor, laneOffsets, marksAlong, offsetPolyline, pathLengths, type Point,
+  flowGroup, labelAnchor, marksAlong, type Point,
 } from './flowOverlayGeometry';
+import { flowDisplayPoints, polylinePath } from './displayGeometry';
+import { createFlowPlayback, flowHopMarkers, sampleFlowPlayback, pointAtDistance, type ActiveRouteRule } from './flowPlayback';
 
 export interface FlowFocus {
   group: string;
   /** 0-based hop to emphasise, when hovering a hop row. */
   hop?: number;
-}
-
-/** Rounded orthogonal polyline through precomputed (already right-angled) vertices. */
-function roundedPolyline(pts: Point[], r = 10): string {
-  if (pts.length < 2) return '';
-  let d = `M${pts[0].x},${pts[0].y}`;
-  for (let i = 1; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1], p1 = pts[i], p2 = pts[i + 1];
-    const l1 = Math.hypot(p1.x - p0.x, p1.y - p0.y) || 1;
-    const l2 = Math.hypot(p2.x - p1.x, p2.y - p1.y) || 1;
-    const rr = Math.min(r, l1 / 2, l2 / 2);
-    const a = { x: p1.x - ((p1.x - p0.x) / l1) * rr, y: p1.y - ((p1.y - p0.y) / l1) * rr };
-    const b = { x: p1.x + ((p2.x - p1.x) / l2) * rr, y: p1.y + ((p2.y - p1.y) / l2) * rr };
-    d += ` L${a.x},${a.y} Q${p1.x},${p1.y} ${b.x},${b.y}`;
-  }
-  const last = pts[pts.length - 1];
-  return `${d} L${last.x},${last.y}`;
 }
 
 function useReducedMotion(): boolean {
@@ -62,65 +26,6 @@ function useReducedMotion(): boolean {
   return reduced;
 }
 
-/** The packet: loops the route in auto mode; glides along it to the current hop when stepping. */
-function FlowPacket({ path, color, step, frac, dur, reducedMotion }: {
-  path: string;
-  color: string;
-  step: number | null | undefined;
-  frac: number;
-  dur: string;
-  reducedMotion: boolean;
-}) {
-  const ref = useRef<SVGPathElement>(null);
-  const [pos, setPos] = useState<Point | null>(null);
-  const from = useRef(0);
-  const raf = useRef(0);
-  useEffect(() => {
-    if (step == null) { setPos(null); return; }
-    const el = ref.current;
-    if (!el) return;
-    const target = Math.max(0, Math.min(1, frac)) * (el.getTotalLength() || 1);
-    if (reducedMotion) {
-      const p = el.getPointAtLength(target);
-      setPos({ x: p.x, y: p.y });
-      from.current = target;
-      return;
-    }
-    const start = from.current;
-    let t0 = 0;
-    cancelAnimationFrame(raf.current);
-    const tick = (t: number) => {
-      if (!t0) t0 = t;
-      const k = Math.min(1, (t - t0) / 450);
-      const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; // ease-in-out
-      const p = el.getPointAtLength(start + (target - start) * e);
-      setPos({ x: p.x, y: p.y });
-      if (k < 1) raf.current = requestAnimationFrame(tick);
-      else from.current = target;
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [step, frac, path, reducedMotion]);
-
-  const dot = (
-    <g>
-      <circle r={11} fill={color} opacity={0.22} />
-      <circle r={5.5} fill={color} stroke="#fff" strokeWidth={2} />
-    </g>
-  );
-  return (
-    <>
-      <path ref={ref} d={path} fill="none" stroke="none" />
-      {step == null ? (!reducedMotion && (
-        <g>
-          <animateMotion dur={dur} repeatCount="indefinite" path={path} />
-          {dot}
-        </g>
-      )) : pos ? <g transform={`translate(${pos.x},${pos.y})`}>{dot}</g> : null}
-    </>
-  );
-}
-
 /** Arrowhead at the end of a route, pointing along its last leg. */
 function arrowHead(pts: Point[]): { x: number; y: number; angle: number } {
   const end = pts[pts.length - 1];
@@ -128,7 +33,7 @@ function arrowHead(pts: Point[]): { x: number; y: number; angle: number } {
   return { x: end.x, y: end.y, angle: (Math.atan2(end.y - prev.y, end.x - prev.x) * 180) / Math.PI };
 }
 
-export default function FlowOverlay({ flowEdges, steps, width, height, focus, selected, allFlows = false, onSelect, onHover }: {
+export default function FlowOverlay({ flowEdges, steps, width, height, focus, selected, allFlows = false, onSelect, onHover, onRulesChange }: {
   flowEdges: DiagramEdge[];
   steps: Record<string, number | null | undefined>;
   width: number;
@@ -141,50 +46,84 @@ export default function FlowOverlay({ flowEdges, steps, width, height, focus, se
   allFlows?: boolean;
   onSelect?: (group: string) => void;
   onHover?: (group: string | null) => void;
+  onRulesChange?: (rules: ActiveRouteRule[]) => void;
 }) {
   const reducedMotion = useReducedMotion();
   const emphasis = focus?.group ?? selected ?? null;
-  // Lanes: one per flow, or one per traffic type when every flow is drawn —
-  // same-coloured flows then share a lane rather than fanning out across the hub.
-  const laneKey = (group: string) => (allFlows ? group.split(':')[1] : group);
-  const lanes = laneOffsets(flowEdges.map((edge) => laneKey(flowGroup(edge.id.replace(/^flow-/, '')))));
-  // Hop badges are drawn for the first endpoint of each flow; other endpoints of
-  // the same flow rest their packet against those same hops.
-  const groupBadges = new Map<string, NonNullable<DiagramEdge['badges']>>();
-  const flows = flowEdges.flatMap((edge) => {
-    const raw = edge.points ?? [];
-    if (raw.length < 2) return [];
+  const paths = useMemo(() => flowEdges.flatMap((edge) => {
+    const pts = flowDisplayPoints(edge);
+    if (pts.length < 2) return [];
+    const playback = createFlowPlayback(edge);
+    return playback.valid ? [{ edge, pts, path: polylinePath(pts), playback }] : [];
+  }), [flowEdges]);
+  const packetNodes = useRef(new Map<string, SVGGElement>());
+  const [currentHops, setCurrentHops] = useState<Record<string, number | undefined>>({});
+  const hopKey = useRef('');
+  const rulesKey = useRef('');
+  const stepsKey = JSON.stringify(steps);
+  const playbackSteps = useMemo(() => JSON.parse(stepsKey) as typeof steps, [stepsKey]);
+  useEffect(() => {
+    let animationFrame = 0;
+    let start: number | undefined;
+    const update = (elapsed: number) => {
+      const hops: Record<string, number | undefined> = {};
+      const rules = new Map<string, ActiveRouteRule>();
+      for (const { edge, pts, playback } of paths) {
+        const group = flowGroup(edge.id.replace(/^flow-/, ''));
+        const frame = sampleFlowPlayback(playback, elapsed, playbackSteps[group], reducedMotion);
+        const position = pointAtDistance(pts, frame.distance);
+        packetNodes.current.get(edge.id)?.setAttribute('transform', `translate(${position.x},${position.y})`);
+        hops[edge.id] = frame.hopIndex;
+        if (frame.rule) rules.set(`${frame.rule.tableId}\0${frame.rule.ruleId}`, frame.rule);
+      }
+      const nextHopKey = JSON.stringify(hops);
+      if (hopKey.current !== nextHopKey) { hopKey.current = nextHopKey; setCurrentHops(hops); }
+      const activeRules = [...rules.values()].sort((a, b) => a.tableId.localeCompare(b.tableId) || a.ruleId.localeCompare(b.ruleId));
+      const nextRulesKey = JSON.stringify(activeRules);
+      if (rulesKey.current !== nextRulesKey) { rulesKey.current = nextRulesKey; onRulesChange?.(activeRules); }
+    };
+    update(0);
+    const playing = !reducedMotion && paths.some(({ edge }) => playbackSteps[flowGroup(edge.id.replace(/^flow-/, ''))] == null);
+    if (!playing) return;
+    const tick = (now: number) => {
+      start ??= now;
+      update(now - start);
+      animationFrame = requestAnimationFrame(tick);
+    };
+    animationFrame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [paths, playbackSteps, reducedMotion, onRulesChange]);
+  useEffect(() => () => onRulesChange?.([]), [onRulesChange]);
+  const flows = paths.map(({ edge, pts, path, playback }) => {
     const group = flowGroup(edge.id.replace(/^flow-/, ''));
-    const badges = edge.badges ?? [];
-    if (badges.length && !groupBadges.has(group)) groupBadges.set(group, badges);
-    const pts = offsetPolyline(raw, lanes.get(laneKey(group)) ?? 0);
     const detailed = !allFlows || group === emphasis;
-    return [{ edge, group, badges: detailed ? badges : [], detailed, pts, path: roundedPolyline(pts), color: edge.color ?? oracle.ink }];
-  });
-  const slots = badgeSlots(flows.flatMap((flow) => flow.badges));
-  const slotStarts = flows.map((_, i) => flows.slice(0, i).reduce((sum, flow) => sum + flow.badges.length, 0));
-
-  const layers = flows.map((flow, index) => {
-    const { group, pts } = flow;
     const step = steps[group];
-    const restOn = step != null ? groupBadges.get(group)?.[step] : undefined;
-    const frac = restOn ? fractionNearest(pts, restOn) : 0;
-    const { total } = pathLengths(pts);
+    const frame = sampleFlowPlayback(playback, 0, step, reducedMotion);
+    return { edge, group, pts, path, step, frame, playback, detailed,
+      position: pointAtDistance(pts, frame.distance),
+      currentHop: currentHops[edge.id], badges: detailed ? flowHopMarkers(edge) : [], color: edge.color ?? oracle.ink };
+  });
+
+  const layers = flows.map((flow) => {
+    const { group, pts } = flow;
     return {
       ...flow,
-      step,
-      frac,
-      dur: `${Math.min(12, Math.max(3.5, total / 120)).toFixed(1)}s`,
+      frac: flow.playback.totalDistance ? flow.frame.distance / flow.playback.totalDistance : 0,
       opacity: emphasis && emphasis !== group ? 0.14 : 1,
       chosen: emphasis === group,
       // Sparse direction marks; sparser still when every flow is drawn, except on the emphasised one.
       marks: marksAlong(pts, allFlows && emphasis !== group ? 170 : 96),
       head: arrowHead(pts),
-      badgeItems: flow.badges.map((badge, i) => ({ badge, i, slot: slots[slotStarts[index] + i] })),
+      badgeItems: flow.badges,
     };
   });
   // Emphasised flow on top of the others.
   const ordered = [...layers].sort((a, b) => Number(a.chosen) - Number(b.chosen));
+  const numberedBadges = ordered.flatMap(({ edge, group, color, opacity, chosen, currentHop, badgeItems }) => badgeItems.map((badge) => ({
+    edge, color, opacity, chosen, badge,
+    hovered: focus?.group === group && focus.hop === badge.seq - 1,
+    current: currentHop === badge.seq - 1 || (focus?.group === group && focus.hop === badge.seq - 1),
+  }))).sort((a, b) => Number(a.chosen) - Number(b.chosen) || Number(a.hovered) - Number(b.hovered) || Number(a.current) - Number(b.current));
 
   return (
     <svg width={Math.max(1, width)} height={Math.max(1, height)} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 2500 }}>
@@ -217,16 +156,18 @@ export default function FlowOverlay({ flowEdges, steps, width, height, focus, se
         </g>
       ))}
 
-      {ordered.map(({ edge, color, opacity, step, frac, dur, path }) => (
-        <g key={`packet-${edge.id}`} opacity={opacity}>
-          <FlowPacket path={path} color={color} step={step} frac={frac} dur={dur} reducedMotion={reducedMotion} />
+      {ordered.map(({ edge, color, opacity, position }) => (
+        <g key={`packet-${edge.id}`} data-flow-packet={edge.id} opacity={opacity}>
+          <g ref={(node) => { if (node) packetNodes.current.set(edge.id, node); else packetNodes.current.delete(edge.id); }} transform={`translate(${position.x},${position.y})`}>
+            <circle r={11} fill={color} opacity={0.22} />
+            <circle r={5.5} fill={color} stroke="#fff" strokeWidth={2} />
+          </g>
         </g>
       ))}
 
-      {ordered.map(({ edge, group, color, opacity, step, badgeItems }) => badgeItems.map(({ badge, i, slot }) => {
-        const current = step === i || (focus?.group === group && focus.hop === i);
+      {numberedBadges.map(({ edge, color, opacity, badge, current }) => {
         return (
-          <g key={`badge-${edge.id}-${i}`} opacity={opacity} transform={`translate(${badge.x + slot * 22},${badge.y - 20})`}>
+          <g key={`badge-${edge.id}-${badge.seq}`} data-flow-hop={`${edge.id}:${badge.seq}`} data-route-dot={badge.anchorId} opacity={opacity} transform={`translate(${badge.x},${badge.y})`}>
             {current && <circle r={13} fill={color} className="lz-flow-pulse" />}
             <circle r={current ? 11 : 9} fill="#fff" stroke={color} strokeWidth={current ? 3.5 : 2} />
             <text textAnchor="middle" dominantBaseline="central" fontSize={current ? 11.5 : 10.5} fontWeight={800} fill={oracle.ink}>{badge.seq}</text>
@@ -238,7 +179,7 @@ export default function FlowOverlay({ flowEdges, steps, width, height, focus, se
             )}
           </g>
         );
-      }))}
+      })}
 
       {/* One static label per path, riding on its own line — text stays in ink, the ring carries identity. */}
       {ordered.map(({ edge, color, opacity, pts, detailed }) => {

@@ -40,12 +40,16 @@ export const oracle = {
   edge:          '#C74634',
 
   /* Compartment fills (diagram) */
-  compYellowFill:   '#FCF3CF',
+  compYellowFill:   '#FAF8D6',
+  compEnvironmentFill: '#FCF9BD',
   compYellowBorder: '#C9A227',
   compGreenFill:    '#E3F3E3',
   compGreenBorder:  '#3A8A4E',
   compGrayFill:     '#EEEDEB',
   compGrayBorder:   '#9B9690',
+  compPlatformFill: '#999999',
+  compProjectsFill: '#F5F3F1',
+  compProjectFill:  '#ECEAE8',
 } as const;
 
 /** Dark "night" palette for the JSON viewer (VS Code-ish, on-brand red accents). */

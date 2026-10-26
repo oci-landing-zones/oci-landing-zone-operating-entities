@@ -1,3 +1,5 @@
+import type { ResourceKind } from '../services/generatedResources';
+
 /**
  * Canonical Landing Zone model — the single source of truth.
  *
@@ -10,6 +12,13 @@
  */
 
 export interface FoundationConfig {
+  stackScope?: 'complete' | 'regional';
+  /** Regional stacks reuse tenancy-level prerequisites from this Home region. */
+  homeRegion?: string;
+  /** Complete stacks grant DR Object Storage access to their encryption keys. */
+  drRegion?: string;
+  /** Browser-only note for distinguishing saved designs; not a generator input. */
+  description?: string;
   realm: string;           // e.g. oc1
   region: string;          // region identifier, e.g. eu-frankfurt-1
   regionShortName: string; // three-letter region key, e.g. fra
@@ -35,6 +44,7 @@ export interface EnvNetworkConfig {
 }
 
 export interface Environment {
+  projectNetworkEnabled?: boolean;
   /** Stable browser identity; editable names never serve as relationships. */
   id: string;
   name: string;            // e.g. prod
@@ -68,7 +78,7 @@ export interface Subnet {
 }
 
 /** Platform types currently exposed by the config-driven Studio. */
-export type PlatformType = 'oke_simple' | 'ocvs' | 'custom';
+export type PlatformType = 'oke_simple' | 'custom';
 
 /** OKE settings — the extension params for an oke_simple platform. */
 export interface OkePlatformParams {
@@ -84,20 +94,6 @@ export interface OkePlatformParams {
   podsCidr?: string;
   createFss: boolean;
   publicLoadBalancer: boolean;
-}
-
-/** OCVS's one-SDDC management-cluster input contract. */
-export interface OcvsPlatformParams {
-  sshAuthorizedKeys: string;
-  sddcDisplayName: string;
-  clusterDisplayName: string;
-  vmwareSoftwareVersion: string;
-  computeAvailabilityDomain: string;
-  esxiHostsCount: number;
-  vsphereType: string;
-  initialHostOcpuCount: number;
-  initialHostShapeName: string;
-  workloadNetworkCidr: string;
 }
 
 /** Per-environment override for a platform: a custom VCN and/or subnet set. */
@@ -126,8 +122,6 @@ export interface PlatformConfig {
   subnets: Subnet[];
   /** OKE settings — present only when type === 'oke_simple'. */
   okeParams?: OkePlatformParams;
-  /** OCVS settings — present only when type === 'ocvs'. */
-  ocvsParams?: OcvsPlatformParams;
   /** Per-env VCN / subnet overrides, keyed by stable environment ID. */
   overrides?: Record<string, PlatformEnvOverride>;
 }
@@ -141,8 +135,7 @@ export interface SharedPlatformConfig {
   id: string;
   /** Key in the top-level shared_platforms map. */
   key: string;
-  /** Shared OCVS uses the same extension contract as an environment platform. */
-  type?: 'custom' | 'ocvs';
+  type?: 'custom';
   /**
    * Keys the `shared_platforms` config block and names the generated VCN. The
    * generator folds it into an OCI DNS label (`vcn` + region + `lz` + `sh` + name),
@@ -154,8 +147,6 @@ export interface SharedPlatformConfig {
    * (`lib/subnets.libsonnet`), so the shared platform always carries one.
    */
   subnets: Subnet[];
-  /** Present only when this shared platform is an OCVS management cluster. */
-  ocvsParams?: OcvsPlatformParams;
 }
 
 export interface NetworkConfig {
@@ -169,6 +160,8 @@ export interface ExadataNotifications {
   /** Omitted in older drafts; a populated default implies the single-recipient mode. */
   useSingleRecipient?: boolean;
   default: string;
+  /** Preserve an imported split-topic fallback independently of environment order. */
+  fallbackDefault?: { recipients: string[]; source: string };
   dbWorkloads?: string;
   infraWorkloads?: string;
   environmentInfraEmails?: Record<string, string>;
@@ -213,6 +206,7 @@ export interface ExadataDesign {
 }
 
 export interface LzModel {
+  remotePeeringConnections?: RemotePeeringConnection[];
   /** Schema version of this canonical object. */
   version: string;
   foundation: FoundationConfig;
@@ -228,6 +222,17 @@ export interface LzModel {
   exadata: ExadataDesign;
 }
 
+export interface RemotePeeringConnection {
+  id: string;
+  name: string;
+  role: 'acceptor' | 'requester';
+  remoteCidrs: string[];
+  peerRegionName: string;
+  peerId?: string;
+  peerTenancyOcid?: string;
+  requestorGroupOcid?: string;
+}
+
 /**
  * Renderer-agnostic diagram intermediate. `buildGraph(model)` produces this;
  * the React Flow renderer and the drawio/SVG exporters both consume it, so the
@@ -237,10 +242,12 @@ export interface LzModel {
 export interface DiagramNode {
   id: string;
   /** Semantic kind — drives styling in each renderer. */
-  kind: 'region' | 'tenancy' | 'landingzone' | 'compartment' | 'vcn' | 'subnet' | 'gateway' | 'drg' | 'attachment' | 'routetable' | 'rtdot' | 'project';
+  kind: 'region' | 'tenancy' | 'landingzone' | 'compartment' | 'vcn' | 'subnet' | 'gateway' | 'drg' | 'attachment' | 'routetable' | 'rtdot' | 'project' | 'resourcegroup';
   label: string;
   /** Compartment fill: yellow (shared), green (environment) or gray (projects). */
-  tone?: 'yellow' | 'green' | 'gray';
+  tone?: 'yellow' | 'green' | 'gray' | 'platform' | 'projects';
+  /** Actual compartment ancestry determines the shared/environment palette. */
+  compartmentScope?: 'shared' | 'environment';
   /** Compartment explicitly targeted by an OCI Security Zone (shows a shield). */
   secure?: boolean;
   /** Compartment that holds nested children — label renders top-left. */
@@ -258,8 +265,11 @@ export interface DiagramNode {
   endpointIp?: string;
   /** Public subnet (IGW-routed) — e.g. the hub LB / DMZ-firewall subnets. */
   publicSubnet?: boolean;
+  /** Resource names and grouping come from the generated deployment artifacts. */
+  resourceKind?: ResourceKind;
+  resourceItems?: { key: string; name: string }[];
   /** Route-table box payload (kind === 'routetable'). */
-  rtRows?: { destination: string; targetType: string; target: string; routeType: string }[];
+  rtRows?: { id?: string; destination: string; targetType: string; target: string; routeType: string }[];
   rtColumns?: 'vcn' | 'drg';
   rtNote?: string;
   rtTone?: 'hub' | 'gateway' | 'drg' | 'spoke';
@@ -267,6 +277,7 @@ export interface DiagramNode {
   rtHighlight?: number[];
   /** Route-table dot (kind === 'rtdot'): the table it opens, its state, its colour. */
   rtDotTableId?: string;
+  rtDotOwnerId?: string;
   rtDotOpen?: boolean;
   rtDotConfigured?: boolean;
   rtDotTone?: 'hub' | 'gateway' | 'drg' | 'spoke';
@@ -292,11 +303,14 @@ export interface DiagramEdge {
   /** Flow overlay: ordered node ids the packet visits (used by the .drawio export
    * + auto-fit). The on-screen path uses the precomputed `points` below. */
   waypoints?: string[];
-  /** Flow overlay: the absolute obstacle-aware orthogonal polyline, precomputed
-   * by buildGraph and consumed unchanged by the live and Draw.io renderers. */
+  /** Canonical absolute orthogonal path for connections, table associations and
+   * packet flows. Renderers only deduplicate shared same-table annotation runs. */
   points?: { x: number; y: number }[];
-  /** Flow overlay: numbered hop badges with their precomputed absolute centres. */
-  badges?: { node: string; seq: number; x: number; y: number; inspected?: boolean }[];
+  /** Ordered processing anchors retain exact path positions and repeated occurrences. */
+  visits?: { node: string; pointIndex: number; distance: number; anchorId?: string }[];
+  flowHops?: { seq: number; node: string; visitIndex: number; tableId?: string; tableOwner?: string; ruleId?: string; rowIndex?: number; inspected?: boolean }[];
+  /** Show numbered markers once per flow group, even when tracing multiple endpoints. */
+  showHopMarkers?: boolean;
   /** Fixed connection sides — pins endpoints to a specific border for clean routing. */
   sourceSide?: EdgeSide;
   targetSide?: EdgeSide;
@@ -314,6 +328,8 @@ export interface DiagramEdge {
 }
 
 export interface DiagramModel {
+  display?: { allFlows?: boolean; focusFlow?: string };
+  flowErrors?: string[];
   nodes: DiagramNode[];
   edges: DiagramEdge[];
 }

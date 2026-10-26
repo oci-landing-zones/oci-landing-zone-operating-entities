@@ -6,6 +6,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { getRouterBasename } from './services/pagesBase';
 import './index.css';
+import { ErrorNotice } from './components/FieldError';
 
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const WizardShell = React.lazy(() => import('./pages/WizardShell'));
@@ -37,12 +38,13 @@ class AppErrorBoundary extends React.Component<React.PropsWithChildren, ErrorBou
   render() {
     if (this.state.hasError) {
       return (
-        <div role="alert" style={{ padding: 40, fontFamily: 'system-ui, sans-serif', color: '#7b1e17', background: '#fdf0ef', minHeight: '100vh' }}>
-          <h2>Something went wrong</h2>
+        <div style={{ padding: 40, fontFamily: 'system-ui, sans-serif', minHeight: '100vh' }}>
+          <ErrorNotice title="Something went wrong">
           <p>Reload the page and try again. Your work remains in this browser when storage is available.</p>
           <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '8px 16px', cursor: 'pointer' }}>
             Reload Page
           </button>
+          </ErrorNotice>
         </div>
       );
     }

@@ -1,21 +1,27 @@
-import type { CSSProperties } from 'react';
+import { useId, type CSSProperties } from 'react';
 import { useWizard } from '../wizardContext';
 import type { ExaccDesign, ExacsDesign, ExadataNotifications } from '../../model/types';
 import { oracle } from '../../theme';
 import { exadataEntries, exadataProjectTopicEnvironments } from '../../services/exadata';
+import { s as form } from './networkEditorStyles';
+import FieldError from '../../components/FieldError';
+import ValidatedInput from '../../components/ValidatedInput';
+import { fieldErrorProps } from '../../services/fieldErrors';
+import { notificationEmailError } from '../../services/notificationEmails';
+import { exacsVcnError } from '../../services/exadata';
 
 type PlatformPlacement = 'shared' | 'environment';
 
 const styles: Record<string, CSSProperties> = {
   card: { border: `1px solid ${oracle.border}`, borderTop: `3px solid ${oracle.red}`, borderRadius: 8, background: oracle.surface, padding: 20 },
   title: { fontSize: 16, fontWeight: 800, color: oracle.ink, marginBottom: 4 },
-  hint: { fontSize: 12.5, color: oracle.textMuted, lineHeight: 1.55, marginBottom: 16 },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginTop: 14 },
-  field: { display: 'grid', gap: 5, fontSize: 12.5, fontWeight: 700, color: oracle.text },
+  hint: { ...form.help, marginBottom: 16 },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: 14, marginTop: 14 },
+  field: { display: 'grid', gap: 6, fontSize: 13, lineHeight: 1.4, fontWeight: 600, color: oracle.text },
   value: { fontSize: 13, fontWeight: 400 },
-  input: { minWidth: 0, width: '100%', padding: '9px 10px', border: `1px solid ${oracle.borderStrong}`, borderRadius: 5, background: oracle.surface, color: oracle.text, fontSize: 13 },
+  input: { ...form.input, minWidth: 0 },
   option: { display: 'flex', gap: 9, alignItems: 'center', fontSize: 13, color: oracle.text, lineHeight: 1.4 },
-  group: { border: `1px solid ${oracle.border}`, borderRadius: 6, padding: 13, marginTop: 14 },
+  group: { minWidth: 0, border: `1px solid ${oracle.border}`, borderRadius: 6, padding: 13, marginTop: 14 },
   legend: { fontSize: 12.5, fontWeight: 800, color: oracle.ink, padding: '0 5px' },
   options: { display: 'grid', gap: 8, marginTop: 4 },
   warning: { border: `1px solid ${oracle.red}`, background: oracle.redTint, color: oracle.redDark, padding: '10px 12px', borderRadius: 6, fontSize: 12.5, lineHeight: 1.5 },
@@ -37,6 +43,7 @@ function NotificationFields({ value, onChange, prefix, useCase, placement, proje
     <legend style={styles.legend}>Notification recipients</legend>
     <p style={styles.hint}>Uses the email configured in Shared Platforms for all {prefix.toUpperCase()} notifications.{exacs ? ' ExaCS network events and alarms use the One-OE Network recipient in Foundation.' : ''}</p>
     <div style={styles.value}>{value.default || 'Set notification emails in Shared Platforms.'}</div>
+    <FieldError id={`${prefix}-linked-notification-error`} error={notificationEmailError(value.default)} />
   </fieldset>;
   const infraEvents = exacs ? (useCase === 1 ? 63 : 36) : (useCase === 1 ? 46 : 32);
   const environmentInfraEvents = exacs ? (useCase === 2 ? 27 : 48) : (useCase === 2 ? 14 : 31);
@@ -52,12 +59,13 @@ function NotificationFields({ value, onChange, prefix, useCase, placement, proje
         : 'Fill each visible topic, or use one email for all Exadata notifications.'}{exacs ? ' ExaCS network events and alarms use the One-OE Network recipient in Foundation.' : ''}</div>
       {!singleRecipient && <div style={styles.grid}>
         {fields.filter(({ visible }) => visible).map(({ key, label, help }) => (
-          <label key={key} style={styles.field} htmlFor={`${prefix}-${key}`}>
-            {label} *
-            <input id={`${prefix}-${key}`} type="text" style={styles.input} value={value[key] ?? ''}
+          <div key={key} style={styles.field}>
+            <label htmlFor={`${prefix}-${key}`}>{label} *</label>
+            <ValidatedInput id={`${prefix}-${key}`} error={notificationEmailError(value[key])} inputMode="email" type="text" style={styles.input} value={value[key] ?? ''}
+              required helpId={`${prefix}-${key}-help`}
               placeholder="team@example.com" onChange={(event) => onChange({ ...value, [key]: event.target.value })} />
-            <span style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>{help}</span>
-          </label>
+            <span id={`${prefix}-${key}-help`} style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>{help}</span>
+          </div>
         ))}
         {environmentEnvironments.flatMap((env) => ([
           { key: 'environmentInfraEmails' as const, team: 'Infrastructure team',
@@ -65,40 +73,43 @@ function NotificationFields({ value, onChange, prefix, useCase, placement, proje
           { key: 'environmentDbEmails' as const, team: 'DBA team',
             help: '57 database event types. 3 database/cluster alarm definitions are disabled by default.' },
         ]).map(({ key, team, help }) => (
-          <label key={`${env.id}-${key}`} style={styles.field} htmlFor={`${prefix}-${key}-${env.id}`}>
-            {env.name} {team} emails *
-            <input id={`${prefix}-${key}-${env.id}`} type="text" style={styles.input}
+          <div key={`${env.id}-${key}`} style={styles.field}>
+            <label htmlFor={`${prefix}-${key}-${env.id}`}>{env.name} {team} emails *</label>
+            <ValidatedInput id={`${prefix}-${key}-${env.id}`} error={notificationEmailError(value[key]?.[env.id])} inputMode="email" type="text" style={styles.input}
+              required helpId={`${prefix}-${key}-${env.id}-help`}
               value={value[key]?.[env.id] ?? ''} placeholder="team@example.com"
               onChange={(event) => onChange({ ...value, [key]: { ...value[key], [env.id]: event.target.value } })} />
-            <span style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>{help}</span>
-          </label>
+            <span id={`${prefix}-${key}-${env.id}-help`} style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>{help}</span>
+          </div>
         )))}
         {projectEnvironments.map((env) => (
-          <label key={env.id} style={styles.field} htmlFor={`${prefix}-projects-${env.id}`}>
-            {env.name} Autonomous project DBA emails *
-            <input id={`${prefix}-projects-${env.id}`} type="text" style={styles.input}
-              value={value.projectEmails?.[env.id] ?? value.projects ?? ''} placeholder="team@example.com"
+          <div key={env.id} style={styles.field}>
+            <label htmlFor={`${prefix}-projects-${env.id}`}>{env.name} Autonomous project DBA emails *</label>
+            <ValidatedInput id={`${prefix}-projects-${env.id}`} error={notificationEmailError(value.projectEmails ? value.projectEmails[env.id] : value.projects)} inputMode="email" type="text" style={styles.input}
+              required helpId={`${prefix}-projects-${env.id}-help`}
+              value={(value.projectEmails ? value.projectEmails[env.id] : value.projects) ?? ''} placeholder="team@example.com"
               onChange={(event) => onChange({ ...value, projectEmails: {
                 ...Object.fromEntries(projectEnvironments.map((candidate) => [candidate.id, value.projectEmails?.[candidate.id] ?? value.projects ?? ''])),
                 [env.id]: event.target.value,
               } })} />
-            <span style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>
+            <span id={`${prefix}-projects-${env.id}-help`} style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>
               Separate {env.name} project topic: 57 database event types from each selected Autonomous project DB compartment.
             </span>
-          </label>
+          </div>
         ))}
       </div>}
       {!linkedEnvironment && <label style={{ ...styles.option, marginTop: 18, fontWeight: 700 }}>
         <input type="checkbox" checked={singleRecipient} onChange={(event) => onChange({ ...value, useSingleRecipient: event.target.checked })} />
-        Use one email for all notifications
+        Use the same recipients for all topics
       </label>}
       {useCase === 2 && placement === 'shared' && <p style={{ ...styles.hint, marginTop: 10 }}>The single-email option applies to both shared infrastructure and linked environment platforms. Configure per-topic environment recipients in Environment Platforms.</p>}
-      {singleRecipient && <label style={{ ...styles.field, marginTop: 14 }} htmlFor={`${prefix}-default`}>
-        Notification emails *
-        <input id={`${prefix}-default`} type="text" style={styles.input} value={value.default}
+      {singleRecipient && <div style={{ ...styles.field, marginTop: 14 }}>
+        <label htmlFor={`${prefix}-default`}>Notification emails *</label>
+        <ValidatedInput id={`${prefix}-default`} error={notificationEmailError(value.default)} inputMode="email" type="text" style={styles.input} value={value.default}
+          required helpId={`${prefix}-default-help`}
           placeholder="ops@example.com" onChange={(event) => onChange({ ...value, default: event.target.value })} />
-        <span style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>Sends this extension's infrastructure, DBA, and Autonomous project notifications to the same recipients.</span>
-      </label>}
+        <span id={`${prefix}-default-help`} style={{ color: oracle.textMuted, fontSize: 12, fontWeight: 400, lineHeight: 1.45 }}>Sends this extension's infrastructure, DBA, and Autonomous project notifications to the same recipients.</span>
+      </div>}
     </fieldset>
   );
 }
@@ -109,8 +120,10 @@ function EnvironmentChoices({ selected, onChange, legend }: {
   legend: string;
 }) {
   const { model } = useWizard();
+  const errorId = useId();
+  const error = !selected.length || selected.some((id) => !model.environments.some((env) => env.id === id)) ? 'Select at least one available environment.' : null;
   return (
-    <fieldset style={styles.group}>
+    <fieldset style={styles.group} {...fieldErrorProps(errorId, error)}>
       <legend style={styles.legend}>{legend}</legend>
       <div style={styles.options}>
         {model.environments.map((env) => (
@@ -121,6 +134,7 @@ function EnvironmentChoices({ selected, onChange, legend }: {
           </label>
         ))}
       </div>
+      <FieldError id={errorId} error={error} />
     </fieldset>
   );
 }
@@ -158,7 +172,9 @@ function DatabaseServiceChoices({ service, onChange }: {
   service: DatabaseService;
   onChange: (next: DatabaseService) => void;
 }) {
-  return <fieldset style={styles.group}>
+  const errorId = useId();
+  const error = service === 'none' ? 'Select at least one database service.' : null;
+  return <fieldset style={styles.group} {...fieldErrorProps(errorId, error)}>
     <legend style={styles.legend}>Database services</legend>
     <div style={styles.options}>
       <label style={styles.option}>
@@ -176,6 +192,7 @@ function DatabaseServiceChoices({ service, onChange }: {
         Include Autonomous Database Dedicated (AVMC)
       </label>
     </div>
+    <FieldError id={errorId} error={error} />
   </fieldset>;
 }
 
@@ -241,7 +258,7 @@ function ExaccSection({ placement }: { placement: PlatformPlacement }) {
           </div>
           {placement === 'shared' ? <label style={styles.field} htmlFor="exacc-database">
             VMC placement
-            <select id="exacc-database" style={styles.input} value={database} onChange={(event) => update({
+            <select id="exacc-database" value={database} onChange={(event) => update({
               database: event.target.value as ExaccDesign['database'],
               environments: event.target.value === 'per_environment' && !value.environments.length
                 ? model.environments.map((env) => env.id) : value.environments,
@@ -272,7 +289,7 @@ function ExaccSection({ placement }: { placement: PlatformPlacement }) {
 }
 
 function ExacsSection({ placement }: { placement: PlatformPlacement }) {
-  const { model, setField } = useWizard();
+  const { model, setField, vcnErrors: conflicts } = useWizard();
   const value = model.exadata.exacs;
   const update = (patch: Partial<ExacsDesign>) => setField('exadata.exacs', { ...value, ...patch });
   const useCase = value.infrastructure === 'per_environment' ? 3 : value.database === 'per_environment' ? 2 : 1;
@@ -291,7 +308,7 @@ function ExacsSection({ placement }: { placement: PlatformPlacement }) {
           </div>
           {placement === 'shared' ? <label style={styles.field} htmlFor="exacs-database">
             VMC placement
-            <select id="exacs-database" style={styles.input} value={value.database} onChange={(event) => {
+            <select id="exacs-database" value={value.database} onChange={(event) => {
               const database = event.target.value as ExacsDesign['database'];
               update({ database,
                 environments: database === 'per_environment' && !value.environments.length ? model.environments.map((env) => env.id) : value.environments });
@@ -311,22 +328,22 @@ function ExacsSection({ placement }: { placement: PlatformPlacement }) {
           projectDb: next === 'autonomous' || next === 'both' ? value.projectDb : {} })} />}
         {databaseHere && (useCase === 1 ? (
           <div style={styles.grid}>
-            <label style={styles.field} htmlFor="exacs-shared-vcn">Shared AVMC/VMC VCN CIDR
-              <input id="exacs-shared-vcn" style={styles.input} value={value.sharedVcnCidr}
+            <div style={styles.field}><label htmlFor="exacs-shared-vcn">Shared AVMC/VMC VCN CIDR</label>
+              <ValidatedInput id="exacs-shared-vcn" error={exacsVcnError(value.sharedVcnCidr) || conflicts['exadata:exacs:shared']} style={styles.input} value={value.sharedVcnCidr}
                 onChange={(event) => update({ sharedVcnCidr: event.target.value })} />
-            </label>
+            </div>
           </div>
         ) : <>
           <EnvironmentChoices selected={value.environments} onChange={(environments) => update({ environments })}
             legend="Environments with AVMC/VMC networks" />
           <div style={styles.grid}>
             {model.environments.filter((env) => value.environments.includes(env.id)).map((env) => (
-              <label key={env.id} style={styles.field} htmlFor={`exacs-vcn-${env.id}`}>
-                {env.name} AVMC/VMC VCN CIDR
-                <input id={`exacs-vcn-${env.id}`} style={styles.input}
+              <div key={env.id} style={styles.field}>
+                <label htmlFor={`exacs-vcn-${env.id}`}>{env.name} AVMC/VMC VCN CIDR</label>
+                <ValidatedInput id={`exacs-vcn-${env.id}`} error={exacsVcnError(value.environmentVcnCidrs[env.id] ?? exadataEntries(model).environments[env.id]?.exacs.network?.vcn ?? '') || conflicts[`exadata:exacs:${env.id}`]} style={styles.input}
                   value={value.environmentVcnCidrs[env.id] ?? exadataEntries(model).environments[env.id]?.exacs.network?.vcn ?? ''}
                   onChange={(event) => update({ environmentVcnCidrs: { ...value.environmentVcnCidrs, [env.id]: event.target.value } })} />
-              </label>
+              </div>
             ))}
           </div>
         </>)}

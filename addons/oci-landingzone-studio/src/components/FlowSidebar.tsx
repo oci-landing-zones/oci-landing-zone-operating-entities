@@ -39,12 +39,12 @@ export interface FlowChoice {
 }
 
 /** Concrete choices for one source environment, including every east-west destination. */
-export function flowChoices(environments: { name: string }[], sourceIndex: number): FlowChoice[] {
+export function flowChoices(environments: { name: string }[], sourceIndex: number, ingressAvailable = true): FlowChoice[] {
   const source = environments[sourceIndex];
   if (!source) return [];
   return [
     { id: flowId(source.name, 'egress'), label: 'Spoke → Internet', sub: 'egress' },
-    { id: flowId(source.name, 'ingress'), label: 'Internet → Spoke', sub: 'ingress' },
+    ...(ingressAvailable ? [{ id: flowId(source.name, 'ingress'), label: 'Internet → Spoke', sub: 'ingress' }] : []),
     ...environments
       .filter((_, index) => index !== sourceIndex)
       .map((destination) => ({
@@ -52,7 +52,7 @@ export function flowChoices(environments: { name: string }[], sourceIndex: numbe
         label: `Spoke → ${destination.name}`,
         sub: 'east-west',
       })),
-    { id: flowId(source.name, 'services'), label: 'Spoke → OCI Services', sub: 'SGW' },
+    { id: flowId(source.name, 'services'), label: 'Spoke → OCI Services', sub: 'Service Gateway' },
   ];
 }
 
@@ -96,30 +96,29 @@ const styles = {
   envGroup: { marginBottom: 10, borderBottom: `1px solid ${oracle.border}`, paddingBottom: 6 } as React.CSSProperties,
   envHead: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    margin: '4px 2px 6px', fontSize: 11, fontWeight: 800, letterSpacing: 0.5,
-    textTransform: 'uppercase', color: oracle.textMuted,
+    margin: '8px 2px 6px', fontSize: 13, fontWeight: 700, color: oracle.text,
   } as React.CSSProperties,
   envToggle: {
     display: 'flex', alignItems: 'center', gap: 6, padding: 0, background: 'none', border: 'none', cursor: 'pointer',
-    fontSize: 11, fontWeight: 800, letterSpacing: 0.5, textTransform: 'uppercase', color: oracle.textMuted,
+    fontSize: 13, lineHeight: 1.4, fontWeight: 700, minHeight: 32, color: oracle.text,
   } as React.CSSProperties,
   envCount: { padding: '0 6px', borderRadius: 8, background: oracle.redTint, color: oracle.redDark, letterSpacing: 0 } as React.CSSProperties,
   envLink: { fontSize: 10.5, fontWeight: 700, color: oracle.red, background: 'none', border: 'none', cursor: 'pointer', padding: 0 } as React.CSSProperties,
   row: {
-    display: 'flex', alignItems: 'center', gap: 9, padding: '6px 8px', borderRadius: 6, cursor: 'pointer',
+    display: 'flex', alignItems: 'center', gap: 9, minHeight: 44, padding: '8px', borderRadius: 6, cursor: 'pointer',
   } as React.CSSProperties,
   rowOn: { background: oracle.redTint } as React.CSSProperties,
-  flowLabel: { fontSize: 12.5, fontWeight: 600, color: oracle.ink, lineHeight: 1.2 } as React.CSSProperties,
-  flowSub: { fontSize: 10.5, fontWeight: 600, color: oracle.textMuted } as React.CSSProperties,
-  empty: { fontSize: 12, color: oracle.textMuted, lineHeight: 1.5, padding: '8px 4px' } as React.CSSProperties,
-  guidance: { fontSize: 11.5, color: oracle.textMuted, lineHeight: 1.45, margin: '0 2px 12px' } as React.CSSProperties,
+  flowLabel: { fontSize: 13, fontWeight: 600, color: oracle.ink, lineHeight: 1.4 } as React.CSSProperties,
+  flowSub: { fontSize: 12, lineHeight: 1.45, fontWeight: 400, color: oracle.textMuted } as React.CSSProperties,
+  empty: { fontSize: 13, color: oracle.textMuted, lineHeight: 1.5, padding: '8px 4px' } as React.CSSProperties,
+  guidance: { fontSize: 13, color: oracle.textMuted, lineHeight: 1.5, margin: '0 2px 16px' } as React.CSSProperties,
   swatch: { width: 10, height: 10, borderRadius: 2, flexShrink: 0, border: '1px solid rgba(0,0,0,0.15)' } as React.CSSProperties,
   detail: { margin: '2px 0 10px 26px' } as React.CSSProperties,
   chipsRow: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 5, margin: '1px 0 8px 26px' } as React.CSSProperties,
   chip: { padding: '2px 9px', fontSize: 10.5, fontWeight: 700, borderRadius: 11, cursor: 'pointer', border: `1px solid ${oracle.border}`, lineHeight: 1.35, userSelect: 'none' } as React.CSSProperties,
   chipOff: { background: oracle.surfaceAlt, color: oracle.textMuted } as React.CSSProperties,
   allRow: { display: 'flex', alignItems: 'flex-start', gap: 10, padding: '2px 2px 12px', marginBottom: 10, borderBottom: `1px solid ${oracle.border}` } as React.CSSProperties,
-  allTitle: { fontSize: 12.5, fontWeight: 700, color: oracle.ink } as React.CSSProperties,
+  allTitle: { fontSize: 14, lineHeight: 1.4, fontWeight: 600, color: oracle.ink } as React.CSSProperties,
   legend: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px 10px', margin: '0 2px 12px' } as React.CSSProperties,
   legendItem: { display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600, color: oracle.text } as React.CSSProperties,
   legendLine: { width: 18, height: 3, borderRadius: 2, flexShrink: 0 } as React.CSSProperties,
@@ -137,11 +136,11 @@ const styles = {
   badgeWarn: { background: oracle.redTint, color: oracle.redDark } as React.CSSProperties,
   focusRow: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4, marginBottom: 6 } as React.CSSProperties,
   focusBtn: { padding: '2px 8px', fontSize: 10.5, fontWeight: 700, borderRadius: 4, cursor: 'pointer', background: oracle.surface, color: oracle.text, border: `1px solid ${oracle.border}` } as React.CSSProperties,
-  stepBar: { display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 } as React.CSSProperties,
+  stepBar: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginBottom: 8 } as React.CSSProperties,
   stepBtn: { minWidth: 26, padding: '3px 6px', fontSize: 11, fontWeight: 800, color: oracle.text, background: oracle.surface, border: `1px solid ${oracle.border}`, borderRadius: 5, cursor: 'pointer', lineHeight: 1, whiteSpace: 'nowrap', flexShrink: 0 } as React.CSSProperties,
   stepBtnOn: { background: oracle.red, border: `1px solid ${oracle.redDark}`, color: '#fff' } as React.CSSProperties,
   stepBtnDisabled: { opacity: 0.4, cursor: 'not-allowed' } as React.CSSProperties,
-  stepInfo: { fontSize: 10.5, fontWeight: 700, color: oracle.textMuted, marginLeft: 4 } as React.CSSProperties,
+  stepInfo: { flexBasis: '100%', fontSize: 12, lineHeight: 1.5, color: oracle.textMuted } as React.CSSProperties,
   // Step-by-step hop list: each hop is a button that pauses the packet on it.
   hops: { listStyle: 'none', margin: 0, padding: 0 } as React.CSSProperties,
   hop: {
@@ -154,8 +153,8 @@ const styles = {
     position: 'relative', width: 20, height: 20, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box',
     fontSize: 10.5, fontWeight: 800, color: oracle.ink, background: '#fff', fontVariantNumeric: 'tabular-nums',
   } as React.CSSProperties,
-  hopPlace: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 5, fontSize: 11.5, fontWeight: 700, color: oracle.ink, lineHeight: 1.3 } as React.CSSProperties,
-  hopRoute: { fontSize: 10.5, color: oracle.textMuted, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', lineHeight: 1.35, overflowWrap: 'anywhere' } as React.CSSProperties,
+  hopPlace: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 5, fontSize: 13, fontWeight: 600, color: oracle.ink, lineHeight: 1.4 } as React.CSSProperties,
+  hopRoute: { fontSize: 12, color: oracle.textMuted, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', lineHeight: 1.5, overflowWrap: 'anywhere' } as React.CSSProperties,
   hopTag: { padding: '0 6px', borderRadius: 8, fontSize: 9.5, fontWeight: 800, background: oracle.greenFill, color: oracle.greenDark } as React.CSSProperties,
   hopWarn: { padding: '4px 6px', fontSize: 10.5, fontWeight: 700, color: oracle.red } as React.CSSProperties,
 
@@ -209,7 +208,7 @@ function FlowDetail({ trace, step, roles, focus, onFocus, onStep, onHoverHop }: 
         <button type="button" disabled={atStart} style={{ ...styles.stepBtn, ...(atStart ? styles.stepBtnDisabled : null) }} title="Previous hop" aria-label="Previous hop" onClick={() => onStep('prev')}>◀</button>
         <button type="button" style={{ ...styles.stepBtn, ...(step == null ? styles.stepBtnOn : null) }} title="Auto-play" onClick={() => onStep('play')}>▶ Auto</button>
         <button type="button" disabled={atEnd} style={{ ...styles.stepBtn, ...(atEnd ? styles.stepBtnDisabled : null) }} title="Next hop" aria-label="Next hop" onClick={() => onStep('next')}>▶</button>
-        <span style={styles.stepInfo}>{step == null ? 'playing — click a hop to pause on it' : `hop ${step + 1} of ${total}`}</span>
+        <span style={styles.stepInfo}>{step == null ? 'Select a hop to pause the animation.' : `Hop ${step + 1} of ${total}`}</span>
       </div>
       <ol style={styles.hops}>
         {trace.hops.map((hop, index) => {
@@ -240,9 +239,10 @@ const KIND_ORDER: FlowKind[] = ['egress', 'ingress', 'east-west', 'services'];
 
 export default function FlowSidebar({
   environments, active, traces, steps, onStep, onChange, collapsed, onToggleCollapse, onFocusChange,
-  allFlows = false, onAllFlowsChange, selected = null, onSelect,
+  allFlows = false, onAllFlowsChange, selected = null, onSelect, ingressAvailable = true,
 }: {
   environments: { name: string; roles: string[] }[];
+  ingressAvailable?: boolean;
   active: string[];
   traces: FlowTrace[];
   steps: Record<string, number | null | undefined>;
@@ -333,7 +333,7 @@ export default function FlowSidebar({
             <Switch checked={allFlows} onChange={onAllFlowsChange} ariaLabel="Show all flows" />
             <span>
               <span style={{ ...styles.allTitle, display: 'block' }}>Show all flows</span>
-              <span style={{ ...styles.flowSub, fontWeight: 500 }}>Every flow from each environment, coloured by traffic type. Click a path to select it and open its route tables.</span>
+              <span style={{ ...styles.flowSub, display: 'block', marginTop: 4 }}>Compare all routes, coloured by traffic type.</span>
             </span>
           </div>
         )}
@@ -348,7 +348,7 @@ export default function FlowSidebar({
               ))}
             </div>
             {environments.map((env, envIndex) => {
-              const choices = flowChoices(environments, envIndex);
+              const choices = flowChoices(environments, envIndex, ingressAvailable);
               const hasSelected = choices.some((choice) => choice.id === selected);
               const open = hasSelected || (openEnvs[env.name] ?? true);
               return (
@@ -398,12 +398,12 @@ export default function FlowSidebar({
           </>
         ) : <>
         {selectedCount >= MAX_FLOWS && <p style={styles.capNote} role="status">Up to {MAX_FLOWS} flows can be traced at once, so each keeps a colour you can tell apart. Clear one to add another.</p>}
-        <p style={styles.guidance}>Tick a flow to trace it from one endpoint. Use the endpoint chips to add others, or <strong>all</strong> to compare every branch. Click a path on the diagram to select it, or a hop to pause the packet there.</p>
+        <p style={styles.guidance}>{selectedCount ? 'Choose endpoints below. Select a path to focus on its flow.' : 'Select a traffic flow to trace its route.'}</p>
         {environments.length === 0 ? (
           <div style={styles.empty}>No environments yet — add one in the form to pick flows.</div>
         ) : (
           environments.map((env, envIndex) => {
-            const choices = flowChoices(environments, envIndex);
+            const choices = flowChoices(environments, envIndex, ingressAvailable);
             const activeChoices = choices.filter((choice) => set.has(choice.id) || env.roles.some((role) => set.has(`${choice.id}:${role}`)));
             const open = choices.some((choice) => choice.id === selected) || (openEnvs[env.name] ?? (envIndex === 0 || activeChoices.length > 0));
             return (

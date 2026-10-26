@@ -13,8 +13,8 @@
  * these helpers so the diagram, the JSON, and the form never disagree.
  */
 
-import type { PlatformConfig, PlatformType, OkePlatformParams, OcvsPlatformParams, SharedPlatformConfig, Subnet } from '../model/types';
-import { firstFreeBlock, formatIp, parseCidr, shiftCidr, totalIps } from './cidr';
+import type { PlatformConfig, PlatformType, OkePlatformParams, SharedPlatformConfig, Subnet } from '../model/types';
+import { BASE_RANGES, baseRangeOf, firstFreeBlock, formatIp, normalizeCidr, overlaps, parseCidr, shiftCidr, totalIps } from './cidr';
 import { environmentPlatformCidr, OPTIONAL_SHARED_CIDR } from './oneOeCidrs';
 
 export interface PlatformTypeMeta {
@@ -29,7 +29,6 @@ export interface PlatformTypeMeta {
 /** The selectable platform engines, in picker order. */
 export const PLATFORM_TYPES: PlatformTypeMeta[] = [
   { type: 'oke_simple', label: 'OKE', deployable: true },
-  { type: 'ocvs', label: 'OCVS', deployable: true },
   { type: 'custom', label: 'Custom', deployable: true },
 ];
 
@@ -128,23 +127,22 @@ export function okeDefaultParams(): OkePlatformParams {
   };
 }
 
-/** OCVS requires a public key; keep it blank until the operator provides one. */
-export function ocvsDefaultParams(): OcvsPlatformParams {
-  return {
-    sshAuthorizedKeys: '', sddcDisplayName: 'ocvs', clusterDisplayName: 'ocvs-cluster',
-    vmwareSoftwareVersion: '7.0 update 3', computeAvailabilityDomain: '1', esxiHostsCount: 3,
-    vsphereType: 'MANAGEMENT', initialHostOcpuCount: 52, initialHostShapeName: 'BM.DenseIO2.52',
-    workloadNetworkCidr: '172.16.0.0/24',
-  };
-}
-
-/** The extension owns one provisioning subnet: the first block at VCN prefix + 4. */
-export function ocvsDefaultSubnets(baseVcn: string): Subnet[] {
-  const parsed = parseCidr(baseVcn);
-  if (!parsed || ![21, 22, 23, 24].includes(parsed.prefix)) return [];
-  const prefix = parsed.prefix;
-  const start = parsed.start;
-  return [{ name: 'provisioning', cidr: `${formatIp(start)}/${prefix + 4}`, locked: true }];
+/** A profile change replaces the automatic address plan as one atomic edit. */
+export function okeNetworkProfilePatch(platform: PlatformConfig, size: OkePlatformParams['clusterSize']): Partial<PlatformConfig> {
+  const okeParams = { ...platform.okeParams ?? okeDefaultParams(), clusterSize: size };
+  if (size) {
+    const vcnCidr = normalizeCidr(`${platform.vcnCidr.split('/')[0]}/${OKE_PROFILE_PREFIX[size]}`) ?? platform.vcnCidr;
+    return { okeParams, vcnCidr, subnets: [], overrides: {} };
+  }
+  const previousSize = platform.okeParams?.clusterSize;
+  const manual = (vcn: string) => previousSize
+    ? okeProfileSubnets(vcn, previousSize, okeParams.cniType, okeParams.createFss)
+    : okeDefaultSubnets(vcn).filter((sn) => okeParams.cniType === 'native' || sn.name !== 'pods');
+  return { okeParams, subnets: manual(platform.vcnCidr), overrides: Object.fromEntries(
+    Object.entries(platform.overrides ?? {}).map(([id, override]) => [id, { ...override,
+      subnets: previousSize && override.vcnCidr === undefined ? undefined : manual(override.vcnCidr ?? platform.vcnCidr),
+    }]),
+  ) };
 }
 
 /**
@@ -154,7 +152,7 @@ export function ocvsDefaultSubnets(baseVcn: string): Subnet[] {
  * Network Firewall address-list names remain within the 28-character limit.
  */
 function nextPlatformId(type: PlatformType, existing: PlatformConfig[]): string {
-  const stem = type === 'oke_simple' ? 'oke' : type === 'ocvs' ? 'ocv' : 'cus';
+  const stem = type === 'oke_simple' ? 'oke' : 'cus';
   if (!existing.some((p) => p.id === stem || p.key === stem)) return stem;
   let n = 2;
   const candidate = () => `${stem.slice(0, Math.max(1, 3 - String(n).length))}${n}`;
@@ -163,7 +161,7 @@ function nextPlatformId(type: PlatformType, existing: PlatformConfig[]): string 
 }
 
 /**
- * New Custom/OCVS platforms use One-OE reservations pinned to environment IDs.
+ * New Custom platforms use One-OE reservations pinned to environment IDs.
  * OKE keeps its existing profile and index-based allocation.
  */
 export function newPlatform(type: PlatformType, existing: PlatformConfig[],
@@ -185,14 +183,12 @@ export function newPlatform(type: PlatformType, existing: PlatformConfig[],
   const occupied = [...occupiedCidrs, ...existing.flatMap((platform) => platformEnvInstances(platform, environments).map((instance) => instance.vcnCidr))];
   const overrides: NonNullable<PlatformConfig['overrides']> = {};
   for (const env of environments) {
-    const vcnCidr = environmentPlatformCidr(type, env.name, occupied);
+    const vcnCidr = environmentPlatformCidr(env.name, occupied);
     overrides[env.id] = { vcnCidr, ...(type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}) };
     if (vcnCidr) occupied.push(vcnCidr);
   }
   const vcnCidr = overrides[environments[0]?.id]?.vcnCidr ?? '';
-  return type === 'ocvs'
-    ? { ...common, vcnCidr, overrides, subnets: [], ocvsParams: ocvsDefaultParams() }
-    : { ...common, vcnCidr, overrides, subnets: customDefaultSubnets(vcnCidr) };
+  return { ...common, vcnCidr, overrides, subnets: customDefaultSubnets(vcnCidr) };
 }
 
 /** Keep the base editor and pinned One-OE networks aligned; allocate new placements once. */
@@ -200,20 +196,42 @@ export function applyPlatformPatch(platform: PlatformConfig, patch: Partial<Plat
   environments: Array<{ id: string; name: string }>, occupied: string[],
 ): PlatformConfig {
   const next = { ...platform, ...patch };
-  if (next.type === 'oke_simple') return next;
+  if (next.type === 'oke_simple' && patch.okeParams?.clusterSize && patch.vcnCidr !== undefined) {
+    // Release only this platform's old allocations. Equal CIDRs owned by other
+    // resources must remain occupied, including when repairing an invalid design.
+    const used = [...occupied];
+    for (const instance of platformEnvInstances(platform, environments)) {
+      const index = used.indexOf(instance.vcnCidr);
+      if (index >= 0) used.splice(index, 1);
+    }
+    used.push(next.okeParams!.servicesCidr);
+    if (next.okeParams!.cniType === 'overlay' && next.okeParams!.podsCidr) used.push(next.okeParams!.podsCidr);
+    const prefix = OKE_PROFILE_PREFIX[patch.okeParams.clusterSize];
+    const overrides: NonNullable<PlatformConfig['overrides']> = {};
+    for (const instance of platformEnvInstances(next, environments)) {
+      const range = BASE_RANGES.find((r) => r.id === baseRangeOf(instance.vcnCidr));
+      const available = range && !used.some((cidr) => overlaps(instance.vcnCidr, cidr));
+      const vcnCidr = available ? instance.vcnCidr : range ? firstFreeBlock(range.cidr, used, prefix) ?? '' : '';
+      overrides[instance.id] = { vcnCidr };
+      if (vcnCidr) used.push(vcnCidr);
+    }
+    // Pin each selected environment so subsequent index shifts cannot undo the
+    // allocation. An exhausted range remains empty for normal input validation.
+    return { ...next, vcnCidr: Object.values(overrides)[0]?.vcnCidr ?? next.vcnCidr, overrides };
+  }
   const overrides = { ...next.overrides };
   const firstId = environments[0]?.id;
-  if (firstId && overrides[firstId] && (patch.vcnCidr !== undefined || patch.subnets !== undefined)) {
+  if (firstId && overrides[firstId] && patch.overrides === undefined && (patch.vcnCidr !== undefined || patch.subnets !== undefined)) {
     overrides[firstId] = { ...overrides[firstId],
       ...(patch.vcnCidr !== undefined ? { vcnCidr: patch.vcnCidr } : {}),
       ...(patch.subnets !== undefined ? { subnets: patch.subnets } : {}),
     };
   }
-  if (patch.environments !== undefined) {
+  if (next.type !== 'oke_simple' && patch.environments !== undefined) {
     const used = [...occupied];
     for (const env of environments) {
       if (!platformInEnv(next, env.id) || overrides[env.id]) continue;
-      const vcnCidr = environmentPlatformCidr(next.type, env.name, used);
+      const vcnCidr = environmentPlatformCidr(env.name, used);
       overrides[env.id] = { vcnCidr, ...(next.type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}) };
       if (vcnCidr) used.push(vcnCidr);
     }
@@ -234,13 +252,13 @@ export function resetPlatformEnvironment(platform: PlatformConfig, id: string,
   const occupied = [...occupiedCidrs];
   const current = occupied.indexOf(platformVcnForEnv(platform, id, index));
   if (current >= 0) occupied.splice(current, 1);
-  const vcnCidr = environmentPlatformCidr(platform.type, environments[index].name, occupied);
+  const vcnCidr = environmentPlatformCidr(environments[index].name, occupied);
   overrides[id] = { vcnCidr, ...(platform.type === 'custom' ? { subnets: customDefaultSubnets(vcnCidr) } : {}) };
   return { ...platform, overrides };
 }
 
-function nextSharedKey(type: SharedPlatformConfig['type'], existing: SharedPlatformConfig[]): string {
-  const stem = type === 'ocvs' ? 'ocv' : 'core';
+function nextSharedKey(existing: SharedPlatformConfig[]): string {
+  const stem = 'core';
   if (!existing.some((p) => p.key === stem)) return stem;
   let n = 2;
   while (existing.some((p) => p.key === `${stem.slice(0, 3)}${n}`)) n += 1;
@@ -253,7 +271,7 @@ export function newSharedPlatform(
   existing: SharedPlatformConfig[],
   occupiedCidrs: string[] = [],
 ): SharedPlatformConfig {
-  const key = nextSharedKey(type, existing);
+  const key = nextSharedKey(existing);
   const vcnCidr = firstFreeBlock(
     SHARED_PLATFORM_ALLOCATION,
     [...occupiedCidrs, ...existing.map((platform) => platform.vcnCidr)],
@@ -263,9 +281,12 @@ export function newSharedPlatform(
   let id = idStem;
   let n = 2;
   while (existing.some((platform) => platform.id === id)) id = `${idStem}-${n++}`;
-  return type === 'ocvs'
-    ? { id, key, type, vcnCidr, subnets: [], ocvsParams: ocvsDefaultParams() }
-    : { id, key, type, vcnCidr, subnets: customDefaultSubnets(vcnCidr) };
+  return { id, key, type, vcnCidr, subnets: customDefaultSubnets(vcnCidr) };
+}
+
+/** Do two project or platform placements share an environment? */
+export function placementsOverlap(left: PlatformConfig['environments'], right: PlatformConfig['environments']): boolean {
+  return left === 'all' || right === 'all' || left.some((id) => right.includes(id));
 }
 
 /** Does a platform apply to the stable environment identity? */
@@ -301,9 +322,6 @@ export function platformSubnetsForEnv(platform: PlatformConfig, envId: string, i
     // per-environment override so the diagram remains identical to serialized
     // config (which deliberately omits profile-owned subnets).
     return okeProfileSubnets(envVcn, platform.okeParams.clusterSize, platform.okeParams.cniType, platform.okeParams.createFss);
-  }
-  if (platform.type === 'ocvs') {
-    return ocvsDefaultSubnets(envVcn);
   }
   const ov = platform.overrides?.[envId]?.subnets;
   if (ov !== undefined) return ov;

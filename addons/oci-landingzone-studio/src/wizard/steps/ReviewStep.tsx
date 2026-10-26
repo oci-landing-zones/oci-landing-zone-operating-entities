@@ -27,6 +27,11 @@ import { validatePlatformContracts } from '../../services/platformValidation';
 import { validateExadataModel } from '../../services/exadata';
 import { exadataReadiness, platformReadiness } from '../../services/platformReadiness';
 import { validateNotificationEmails } from '../../services/notificationEmails';
+import { validateRemotePeering } from '../../services/remotePeering';
+import { validateRegionalDeployment } from '../../services/regionalDeployment';
+import { regionShortNameError } from '../../services/regions';
+import { ErrorNotice } from '../../components/FieldError';
+import type { DiagramModel } from '../../model/types';
 
 interface RunResult {
   config: string;
@@ -38,28 +43,26 @@ function splitOutputs(config: string, files: Record<string, string>): RunResult 
 }
 
 const local: Record<string, CSSProperties> = {
-  note:      { fontSize: 12.5, color: oracle.textMuted, marginBottom: 16, lineHeight: 1.55 },
-  sumGrid:   { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 8, marginBottom: 24 },
-  sumCell:   { background: oracle.surface, padding: '11px 13px', border: `1px solid ${oracle.border}`, borderRadius: 4 },
-  sumLabel:  { fontSize: 10.5, fontWeight: 700, color: oracle.textMuted, textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 3 },
-  sumValue:  { fontSize: 14, fontWeight: 700, color: oracle.ink, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
+  note:      { ...s.intro, marginBottom: 16 },
+  sumGrid:   { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '0 24px', margin: '8px 0 12px' },
+  sumCell:   { padding: '10px 0', borderBottom: `1px solid ${oracle.border}`, minWidth: 0 },
+  sumLabel:  { fontSize: 13, color: oracle.textMuted, marginBottom: 3 },
+  sumValue:  { fontSize: 15, fontWeight: 600, color: oracle.ink, margin: 0, overflowWrap: 'anywhere' },
+  counts:    { display: 'flex', flexWrap: 'wrap', gap: '6px 20px', padding: 0, margin: '0 0 24px', listStyle: 'none', fontSize: 13, lineHeight: 1.5, color: oracle.textMuted },
 
   runRow:    { display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginTop: 18, marginBottom: 8 },
   primary:   { padding: '11px 20px', fontSize: 13.5, fontWeight: 800, border: `1px solid ${oracle.redDark}`, borderRadius: 4, background: oracle.red, color: '#fff', cursor: 'pointer', fontFamily: 'inherit' },
-  primaryOff:{ opacity: 0.55, cursor: 'progress' },
+  primaryOff:{ opacity: 0.55 },
   secondary: { padding: '11px 20px', fontSize: 13.5, fontWeight: 700, border: `1px solid ${oracle.borderStrong}`, borderRadius: 4, background: oracle.surface, color: oracle.text, cursor: 'pointer', fontFamily: 'inherit' },
   stale:     { display: 'flex', gap: 8, alignItems: 'center', padding: '9px 12px', border: `1px solid ${oracle.borderStrong}`, background: oracle.surfaceAlt, borderRadius: 6, fontSize: 12.5, color: oracle.text, margin: '14px 0 0' },
 
-  errBox:    { marginTop: 16, border: `1px solid ${oracle.red}`, borderRadius: 6, overflow: 'hidden' },
-  errHead:   { padding: '9px 13px', background: oracle.redTint, color: oracle.redDark, fontSize: 12.5, fontWeight: 800 },
-  errBody:   { margin: 0, padding: '12px 13px', background: oracle.surface, fontSize: 12, lineHeight: 1.55, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', color: oracle.text, whiteSpace: 'pre-wrap', overflowX: 'auto', maxHeight: 260 },
 
   deployGrid: { display: 'grid', gap: 14, marginTop: 20 },
   deployCard: { border: `1px solid ${oracle.border}`, borderRadius: 6, padding: 16, background: oracle.surfaceAlt },
   deployTitle: { fontSize: 13.5, fontWeight: 800, color: oracle.ink, marginBottom: 5 },
   fileList: { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 9 },
   fileChip: { padding: '3px 7px', borderRadius: 4, border: `1px solid ${oracle.border}`, background: oracle.surface, fontSize: 11.5, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
-  ordered: { margin: '14px 0 0 22px', padding: 0, color: oracle.text, fontSize: 13, lineHeight: 1.7 },
+  ordered: { margin: '12px 0 0 20px', padding: 0, color: oracle.text, fontSize: 14, lineHeight: 1.6 },
   links: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, marginTop: 8, fontSize: 12.5 },
   guide: { marginTop: 16, padding: 16, border: `1px solid ${oracle.borderStrong}`, borderRadius: 6, background: oracle.surfaceAlt },
   guideTitle: { fontSize: 13.5, fontWeight: 800, color: oracle.ink },
@@ -67,9 +70,9 @@ const local: Record<string, CSSProperties> = {
   phaseChangeTitle: { fontWeight: 800, color: oracle.redDark },
 };
 
-function expectedCoreFiles(cisLevel: 1 | 2): string[] {
+function expectedCoreFiles(cisLevel: 1 | 2, regional: boolean): string[] {
   return [
-    'iam.json', 'governance.json', 'network.json',
+    ...(regional ? [] : ['iam.json', 'governance.json']), 'network.json',
     `security_cis${cisLevel}_pre.json`, `security_cis${cisLevel}.json`,
     `observability_cis${cisLevel}_pre.json`, `observability_cis${cisLevel}.json`,
   ];
@@ -96,15 +99,6 @@ function Setting({ name, value }: { name: string; value?: string }) {
 }
 
 function HubDeploymentGuide({ hubKind }: { hubKind: string }) {
-  if (hubKind === 'hub_a' || hubKind === 'hub_b') {
-    return (
-      <div style={local.guide}>
-        <div style={local.guideTitle}>Hub routing</div>
-        <p style={local.note}>The Orchestrator resolves OCI Network Firewall route targets from the resource keys in <code>network.json</code>. Retain this network file in both phases.</p>
-      </div>
-    );
-  }
-
   if (hubKind === 'hub_c') {
     return (
       <div style={local.guide}>
@@ -122,13 +116,13 @@ function HubDeploymentGuide({ hubKind }: { hubKind: string }) {
   return null;
 }
 
-export default function ReviewStep({ designName }: { designName: string }) {
+export default function ReviewStep({ designName, getDiagram, diagramReady = true }: { designName: string; getDiagram?: () => DiagramModel; diagramReady?: boolean }) {
   const { model } = useWizard();
+  const regional = model.foundation.stackScope === 'regional';
   const { id } = useParams();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Seed from the last saved run, so leaving and returning to step 5 (or reloading)
-  // doesn't lose artifacts that are already on disk.
+  // Show the last generated file list when returning to Review.
   const [result, setResult] = useState<RunResult | null>(() => {
     const saved = id ? getOutputs(id) : null;
     return saved ? splitOutputs(saved.config, saved.files) : null;
@@ -140,15 +134,20 @@ export default function ReviewStep({ designName }: { designName: string }) {
   const hub = getHubKind(model.network.hubKind);
   const exacc = exadataReadiness(model, 'exacc');
   const exacs = exadataReadiness(model, 'exacs');
-  const contractErrors = useMemo(() => [...new Set([
-    ...validatePlatformContracts(model), ...validateExadataModel(model),
-    ...validateNotificationEmails(model.foundation.notifications),
-    ...platformReadiness(model, 'oke_simple').errors, ...platformReadiness(model, 'ocvs').errors,
-  ])], [model]);
+  const contractErrors = useMemo(() => {
+    const shortNameError = regionShortNameError(model.foundation.regionShortName);
+    return [...new Set([
+      ...(shortNameError ? [shortNameError] : []),
+      ...validatePlatformContracts(model), ...validateExadataModel(model),
+      ...validateNotificationEmails(model.foundation.notifications, regional),
+      ...validateRemotePeering(model), ...validateRegionalDeployment(model),
+      ...platformReadiness(model, 'oke_simple').errors,
+    ])];
+  }, [model, regional]);
   const stale = result !== null && !isCurrentOutputSet(result, configText);
   const deployFiles = result && !stale
     ? Object.keys(result.files)
-    : expectedCoreFiles(model.foundation.cisLevel);
+    : expectedCoreFiles(model.foundation.cisLevel, regional);
   const deployStages = deploymentStages(deployFiles);
   const [firstStage, ...remainingStages] = deployStages;
 
@@ -176,17 +175,12 @@ export default function ReviewStep({ designName }: { designName: string }) {
       }
       return out;
     } catch (err) {
-      // Keep the previous snapshot; download eligibility still checks config and output format.
+      // Retain the previous generated file list when a new run fails.
       setError(err instanceof Error ? err.message : String(err));
       return null;
     } finally {
       setBusy(false);
     }
-  }
-
-  function downloadBundle() {
-    if (!result || !isCurrentOutputSet(result, currentConfig.current)) return;
-    downloadResult(result);
   }
 
   async function generateAndDownload() {
@@ -195,19 +189,18 @@ export default function ReviewStep({ designName }: { designName: string }) {
       setError(contractErrors.join('\n'));
       return;
     }
-    if (result && !stale) {
-      downloadBundle();
-      return;
-    }
     const generated = await run();
     if (generated && isCurrentOutputSet(generated, currentConfig.current)) downloadResult(generated);
   }
 
   function downloadDrawio() {
     const filename = bundleFilename(designName).replace(/-lz-outputs\.zip$/, '.drawio');
-    // Review export is always the complete structural model. Diagram-only
-    // endpoint, route-table, and packet-flow overlays are deliberately omitted.
-    downloadTextFile(filename, toDrawioXml(buildGraph(model, 5, {})), 'application/xml');
+    setError(null);
+    try {
+      downloadTextFile(filename, toDrawioXml(getDiagram?.() ?? buildGraph(model, 5)), 'application/xml');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : String(error));
+    }
   }
 
   const envCount = model.environments.filter((e) => e.name.trim()).length;
@@ -217,57 +210,60 @@ export default function ReviewStep({ designName }: { designName: string }) {
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Review your landing zone</div>
-          <div className="review-summary-grid" style={local.sumGrid}>
+          <h2 style={s.title}>Review your landing zone</h2>
+          {regional && <p style={local.note}><strong>DR regional stack.</strong> IAM, governance, Cloud Guard and Security Zones are excluded from this download.</p>}
+          {!!model.remotePeeringConnections?.length && <p style={local.note}><strong>RPC:</strong> deploy each acceptor first. Supply its RPC OCID or network dependency output to the requester. Review remote CIDRs, learned routes and firewall policies on both sides before allowing traffic.</p>}
+          <dl className="review-summary-grid" style={local.sumGrid}>
             {[
+              ['Deployment', regional ? 'DR' : 'Home Region'],
               ['Region', model.foundation.region],
-              ['Realm', model.foundation.realm],
               ['CIS benchmark', `Level ${model.foundation.cisLevel}`],
               ['Hub', hub?.label ?? model.network.hubKind],
-              ['Environments', String(envCount)],
-              ['Projects', String(model.projects.length)],
-              ['Platforms', String(model.platforms.length)],
-              ['Shared platforms', String(model.sharedPlatforms.length)],
-              ['EXACC', exacc.status],
-              ['EXACS', exacs.status],
             ].map(([label, value]) => (
               <div key={label} style={local.sumCell}>
-                <div style={local.sumLabel}>{label}</div>
-                <div style={local.sumValue}>{value}</div>
+                <dt style={local.sumLabel}>{label}</dt>
+                <dd style={local.sumValue}>{value}</dd>
               </div>
             ))}
-          </div>
+          </dl>
+          <ul style={local.counts} aria-label="Workloads and realm">
+            <li>Realm {model.foundation.realm.toUpperCase()}</li>
+            <li>{envCount} {envCount === 1 ? 'environment' : 'environments'}</li>
+            <li>{model.projects.length} {model.projects.length === 1 ? 'project' : 'projects'}</li>
+            {model.platforms.length > 0 && <li>{model.platforms.length} environment platforms</li>}
+            {model.sharedPlatforms.length > 0 && <li>{model.sharedPlatforms.length} shared platforms</li>}
+            {model.exadata.exacc.enabled && <li>EXACC: {exacc.status}</li>}
+            {model.exadata.exacs.enabled && <li>EXACS: {exacs.status}</li>}
+          </ul>
 
-          <div style={s.title}>Download deployment files</div>
+          <h3 style={{ ...s.title, fontSize: 16 }}>Download deployment files</h3>
           <div style={local.note}>
-            Download one package containing a record of this design and the deployment files. Review the files and resolve every placeholder before you deploy.
+            Download this design and its deployment files as a ZIP. Review the files and replace placeholders before deploying.
           </div>
           {contractErrors.length > 0 && (
-            <div style={local.errBox}>
-              <div style={local.errHead}>Resolve these conflicts before downloading</div>
-              <pre style={local.errBody}>{contractErrors.join('\n')}</pre>
-            </div>
+            <ErrorNotice title="Complete these settings before downloading">
+              <ul>{contractErrors.map((message) => <li key={message}>{message}</li>)}</ul>
+            </ErrorNotice>
           )}
 
           <div style={local.runRow}>
             <button
               type="button"
-              style={busy ? { ...local.primary, ...local.primaryOff } : local.primary}
+              style={busy || contractErrors.length > 0 ? { ...local.primary, ...local.primaryOff, cursor: busy ? 'progress' : 'not-allowed' } : local.primary}
               onClick={generateAndDownload}
               disabled={busy || contractErrors.length > 0}
             >
               {busy ? 'Preparing download…' : 'Download files'}
             </button>
-            <button type="button" style={local.secondary} onClick={downloadDrawio}>
+            <button type="button" style={local.secondary} onClick={downloadDrawio} disabled={!diagramReady}>
               Export diagram (.drawio)
             </button>
           </div>
 
+          {!diagramReady && <p role="status" style={local.note}>Diagram export is waiting for the current preview.</p>}
+
           {error && (
-            <div style={local.errBox}>
-              <div style={local.errHead}>Could not prepare the download</div>
-              <pre style={local.errBody}>{error}</pre>
-            </div>
+            <ErrorNotice title="Could not prepare the download">{error}</ErrorNotice>
           )}
         </div>
       </section>
@@ -275,13 +271,14 @@ export default function ReviewStep({ designName }: { designName: string }) {
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div style={s.title}>Deploy with OCI Resource Manager</div>
+          <h2 style={s.title}>Deploy with OCI Resource Manager</h2>
           <div style={local.note}>
             Resource Manager runs the <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_RELEASE_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator v2.2.0 ↗</a>. The files from Studio are a separate configuration source for that stack. Use one stack for both phases; phase 2 updates its security, observability, and workload files.
           </div>
           <div style={local.guide}>
             <div style={local.guideTitle}>Create and run the stack</div>
             <ol style={local.ordered}>
+              {regional && <li>Deploy the Home Region stack first with matching compartments, project and platform IAM, and governance. Select this DR region in that stack to grant Object Storage access to its encryption keys. Pass its compartment outputs and required network outputs to a separate DR stack.</li>}
               <li>Unzip the download. Keep the generated files in a customer-controlled private Object Storage bucket or approved private GitHub repository. Do not mix them with published blueprint files.</li>
               <li>Open <a className="guide-link" href={DEPLOY_TO_OCI_URL} target="_blank" rel="noreferrer">Deploy to OCI ↗</a> for a prefilled <strong>Create Stack</strong> wizard using the Landing Zone Orchestrator and private Object Storage configuration source. Select <code>rms-facade</code> as the working directory.</li>
               <li>In the stack variables, confirm <Setting name="configuration_source" value="ocibucket" />. Then enter the bucket name in <Setting name="oci_configuration_bucket" /> and the current phase's file list in <Setting name="oci_configuration_objects" />. You can instead use an approved private GitHub source.</li>

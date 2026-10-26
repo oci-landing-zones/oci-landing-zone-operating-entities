@@ -7,7 +7,7 @@
  * tracing is enabled only where an equivalent derived route adapter exists.
  */
 
-import type { HubKind, Subnet } from '../model/types';
+import type { HubKind, LzModel, Subnet } from '../model/types';
 
 export interface HubKindDef {
   id: HubKind;
@@ -82,6 +82,12 @@ export const HUB_KINDS: HubKindDef[] = [
 
 export function getHubKind(id: HubKind): HubKindDef | undefined {
   return HUB_KINDS.find((k) => k.id === id);
+}
+
+/** The generator omits the hub L7 load balancer when an OKE extension is placed. */
+export function hasHubLoadBalancer(model: LzModel): boolean {
+  return !model.platforms.some((platform) => platform.type === 'oke_simple'
+    && model.environments.some((env) => platform.environments === 'all' || platform.environments.includes(env.id)));
 }
 
 /** Default VCN CIDR + config-keyed subnets for a hub kind. */

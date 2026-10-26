@@ -12,6 +12,8 @@ import LicenseNotice from '../components/LicenseNotice';
 import SavedLzList from '../components/SavedLzList';
 import { oracle } from '../theme';
 import { createLZ, listLZs } from '../services/lzStore';
+import ImportLandingZoneDialog from '../components/ImportLandingZoneDialog';
+import { ErrorNotice } from '../components/FieldError';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
 
@@ -25,17 +27,15 @@ export default function Dashboard() {
   // Seeded from the store, then kept in step with the list — deleting the last
   // build has to bring the full-size Hero back.
   const [count, setCount] = useState(() => listLZs().length);
+  const [showImport, setShowImport] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
   const hasRecords = count > 0;
   const onCountChange = useCallback((n: number) => setCount(n), []);
 
   function handleNew() {
-    const created = createLZ();
-    if (!created.ok || !created.record) {
-      setStorageError(created.message ?? 'Could not create the Landing Zone.');
-      return;
-    }
-    navigate(`/lz/${created.record.id}`);
+    const result = createLZ();
+    if (!result.ok || !result.record) { setStorageError(result.message ?? 'Could not create the Landing Zone.'); return; }
+    navigate(`/lz/${result.record.id}`);
   }
 
   return (
@@ -43,9 +43,10 @@ export default function Dashboard() {
       <TopBar />
       {/* The intro band always sits at the top; it shrinks to a slim header once
           there are saved builds to list below it. */}
-      <Hero onNew={handleNew} compact={hasRecords} />
+      <Hero onNew={handleNew} onImport={() => setShowImport(true)} compact={hasRecords} />
+      {showImport && <ImportLandingZoneDialog onClose={() => setShowImport(false)} onImported={(id) => navigate(`/lz/${id}`)} />}
+      {storageError && <div style={s.page}><ErrorNotice>{storageError}</ErrorNotice></div>}
 
-      {storageError && <div role="alert" style={{ ...s.page, paddingTop: 12, paddingBottom: 0, color: '#9f1d1d' }}>{storageError}</div>}
 
       {hasRecords && (
         <div style={s.page}>

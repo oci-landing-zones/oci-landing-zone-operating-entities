@@ -1,15 +1,18 @@
+import { overlaps, parseCidr } from "./cidr";
+
 import { describe, expect, it } from 'vitest';
 import {
-  PLATFORM_TYPES, newPlatform, newSharedPlatform, ocvsDefaultSubnets, okeDefaultSubnets, okeProfileSubnets, platformEnvInstances,
-  platformSubnetsForEnv, platformVcnForEnv,
+  PLATFORM_TYPES, applyPlatformPatch, newPlatform, newSharedPlatform, okeDefaultSubnets, okeNetworkProfilePatch,
+  okeProfileSubnets, placementsOverlap, platformEnvInstances, platformSubnetsForEnv, platformVcnForEnv,
 } from './platforms';
+import { validateOkePlatform } from './okeValidation';
 
 const ENVS = [{ id: 'prod', name: 'prod' }, { id: 'preprod', name: 'preprod' }, { id: 'dev', name: 'dev' }];
 
 describe('platform catalog', () => {
   it('exposes only the currently supported generator extensions', () => {
     const deployable = PLATFORM_TYPES.filter((t) => t.deployable).map((t) => t.type);
-    expect(deployable).toEqual(['oke_simple', 'ocvs', 'custom']);
+    expect(deployable).toEqual(['oke_simple', 'custom']);
     expect(PLATFORM_TYPES.map((t) => t.type)).not.toContain('exacc');
     expect(PLATFORM_TYPES.map((t) => t.type)).not.toContain('exacs');
   });
@@ -36,12 +39,6 @@ describe('newPlatform', () => {
     expect(p.okeParams).toBeUndefined();
   });
 
-  it('seeds OCVS with generator-owned provisioning networking and an incomplete credential field', () => {
-    const p = newPlatform('ocvs', []);
-    expect(p).toMatchObject({ id: 'ocv', type: 'ocvs', subnets: [] });
-    expect(p.ocvsParams?.sshAuthorizedKeys).toBe('');
-  });
-
   it('gives each new platform a non-overlapping base VCN + a unique id', () => {
     const a = newPlatform('oke_simple', []);
     const b = newPlatform('oke_simple', [a]);
@@ -63,15 +60,15 @@ describe('okeDefaultSubnets', () => {
 });
 
 describe('newSharedPlatform', () => {
-  it('allocates repeatable Custom and OCVS platforms from the first free /21', () => {
+  it('allocates repeatable Custom platforms from the first free /21', () => {
     const custom = newSharedPlatform('custom', [], ['10.0.32.0/21']);
-    const ocvs = newSharedPlatform('ocvs', [custom], ['10.0.32.0/21']);
-    const nextCustom = newSharedPlatform('custom', [custom, ocvs], ['10.0.32.0/21']);
+    const second = newSharedPlatform('custom', [custom], ['10.0.32.0/21']);
+    const nextCustom = newSharedPlatform('custom', [custom, second], ['10.0.32.0/21']);
 
     expect(custom).toMatchObject({ id: 'shared-core', key: 'core', type: 'custom', vcnCidr: '10.0.40.0/21' });
     expect(custom.subnets).toEqual([{ name: 'core', cidr: '10.0.40.0/24' }]);
-    expect(ocvs).toMatchObject({ id: 'shared-ocv', key: 'ocv', type: 'ocvs', vcnCidr: '10.0.48.0/21', subnets: [] });
-    expect(nextCustom).toMatchObject({ id: 'shared-cor2', key: 'cor2', vcnCidr: '10.0.56.0/21' });
+    expect(second).toMatchObject({ id: 'shared-cor2', key: 'cor2', type: 'custom', vcnCidr: '10.0.48.0/21', subnets: [{ name: 'core', cidr: '10.0.48.0/24' }] });
+    expect(nextCustom).toMatchObject({ id: 'shared-cor3', key: 'cor3', vcnCidr: '10.0.56.0/21' });
   });
 });
 
@@ -85,11 +82,36 @@ describe('okeProfileSubnets', () => {
   });
 });
 
-describe('ocvsDefaultSubnets', () => {
-  it('derives the provisioning subnet at VCN prefix + 4', () => {
-    expect(ocvsDefaultSubnets('10.140.0.0/21')).toEqual([{ name: 'provisioning', cidr: '10.140.0.0/25', locked: true }]);
-    expect(ocvsDefaultSubnets('10.140.0.0/24')).toEqual([{ name: 'provisioning', cidr: '10.140.0.0/28', locked: true }]);
-    expect(ocvsDefaultSubnets('10.140.0.0/20')).toEqual([]);
+describe('OKE profile to manual subnets', () => {
+  const cases = (['small', 'medium', 'large'] as const).flatMap((size) =>
+    (['native', 'overlay'] as const).flatMap((cniType) => [false, true].map((createFss) => ({ size, cniType, createFss }))));
+  it.each(cases)('preserves $size / $cniType / FSS=$createFss networks and environment overrides', ({ size, cniType, createFss }) => {
+    const created = newPlatform('oke_simple', []);
+    const profile = { ...created, ...okeNetworkProfilePatch(created, size) };
+    profile.okeParams = { ...profile.okeParams!, cniType, createFss, ...(cniType === 'overlay' ? { podsCidr: '10.244.0.0/16' } : {}) };
+    const prefix = profile.vcnCidr.split('/')[1];
+    profile.overrides = {
+      prod: { vcnCidr: `10.140.0.0/${prefix}`, subnets: [{ name: 'stale', cidr: '10.140.0.0/24' }] },
+      preprod: { vcnCidr: `10.141.0.0/${prefix}` },
+      dev: { subnets: [{ name: 'stale', cidr: '10.142.0.0/24' }] },
+    };
+    const environments = [...ENVS, { id: 'uat', name: 'uat' }];
+    const before = platformEnvInstances(profile, environments);
+    const manual = applyPlatformPatch(profile, okeNetworkProfilePatch(profile, undefined), environments, []);
+    expect(manual.okeParams?.clusterSize).toBeUndefined();
+    expect(manual.subnets).toEqual(okeProfileSubnets(profile.vcnCidr, size, cniType, createFss));
+    expect(platformEnvInstances(manual, environments)).toEqual(before);
+    expect(validateOkePlatform(manual)).toEqual([]);
+    expect(manual.subnets.some((subnet) => subnet.name === 'fss')).toBe(createFss);
+  });
+});
+
+describe('environment placement overlap', () => {
+  it.each([
+    ['all', ['prod'], true], [['prod'], 'all', true],
+    [['prod'], ['prod', 'dev'], true], [['prod'], ['dev'], false],
+  ] as const)('compares %j and %j', (left, right, expected) => {
+    expect(placementsOverlap(left === 'all' ? left : [...left], right === 'all' ? right : [...right])).toBe(expected);
   });
 });
 
@@ -121,9 +143,51 @@ describe('per-environment derivation', () => {
     const p = { ...newPlatform('custom', []), environments: ['prod', 'dev'] };
     expect(platformEnvInstances(p, ENVS).map((x) => x.name)).toEqual(['prod', 'dev']);
   });
+});
 
-  it('derives the OCVS provisioning subnet for each environment VCN', () => {
-    const p = newPlatform('ocvs', [], ENVS);
-    expect(platformSubnetsForEnv(p, 'preprod', 1)).toEqual([{ name: 'provisioning', cidr: '10.0.152.0/25', locked: true }]);
+describe('OKE profile resizing avoids configured networks', () => {
+  const occupied = ['10.0.0.0/21', '10.0.64.0/21', '10.0.128.0/21', '10.0.192.0/18'];
+
+  it.each(['medium', 'large'] as const)('allocates distinct %s VCNs clear of hub, projects and other platforms', (size) => {
+    const original = newPlatform('oke_simple', []);
+    const oldNetworks = platformEnvInstances(original, ENVS).map((p) => p.vcnCidr);
+    const updated = applyPlatformPatch(original, okeNetworkProfilePatch(original, size), ENVS, [...occupied, ...oldNetworks]);
+    const instances = platformEnvInstances(updated, ENVS);
+    expect(instances).toHaveLength(3);
+    const all = [...occupied];
+    for (const instance of instances) {
+      expect(parseCidr(instance.vcnCidr)?.prefix).toBe(size === 'medium' ? 18 : 16);
+      expect(all.some((cidr) => overlaps(cidr, instance.vcnCidr))).toBe(false);
+      expect(instance.subnets.length).toBeGreaterThan(0);
+      all.push(instance.vcnCidr);
+    }
+    expect(original.vcnCidr).toBe('10.0.80.0/20');
+  });
+
+  it('repairs an already overlapping medium profile and only allocates selected environments', () => {
+    const original = { ...newPlatform('oke_simple', []), environments: ['prod'], vcnCidr: '10.0.64.0/18' };
+    const updated = applyPlatformPatch(original, okeNetworkProfilePatch(original, 'medium'), ENVS, [...occupied, original.vcnCidr]);
+    expect(platformEnvInstances(updated, ENVS).map((p) => p.vcnCidr)).toEqual(['10.1.0.0/18']);
+    expect(Object.keys(updated.overrides!)).toEqual(['prod']);
+  });
+
+  it('preserves a nonconflicting resized range and stays stable when reapplied', () => {
+    const original = { ...newPlatform('oke_simple', []), environments: ['prod'], vcnCidr: '10.140.0.0/20' };
+    const updated = applyPlatformPatch(original, okeNetworkProfilePatch(original, 'medium'), ENVS, [...occupied, original.vcnCidr]);
+    expect(updated.vcnCidr).toBe('10.140.0.0/18');
+    expect(applyPlatformPatch(updated, okeNetworkProfilePatch(updated, 'medium'), ENVS, [...occupied, updated.vcnCidr])).toEqual(updated);
+  });
+
+  it('does not release another resource with the same CIDR', () => {
+    const original = { ...newPlatform('oke_simple', []), environments: ['prod'] };
+    const updated = applyPlatformPatch(original, okeNetworkProfilePatch(original, 'small'), ENVS, [original.vcnCidr, original.vcnCidr]);
+    expect(overlaps(updated.vcnCidr, original.vcnCidr)).toBe(false);
+  });
+
+  it('leaves an exhausted private range empty rather than allocating overlapping addresses', () => {
+    const original = { ...newPlatform('oke_simple', []), environments: ['prod'], vcnCidr: '192.168.80.0/20' };
+    const updated = applyPlatformPatch(original, okeNetworkProfilePatch(original, 'large'), ENVS, ['192.168.0.0/16', original.vcnCidr]);
+    expect(updated.vcnCidr).toBe('');
+    expect(platformEnvInstances(updated, ENVS)[0].vcnCidr).toBe('');
   });
 });

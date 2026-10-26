@@ -12,11 +12,11 @@ export function notificationEmailError(value: string | undefined): string | null
   return null;
 }
 
-export function validateNotificationEmails(notifications: OneOeNotifications | undefined): string[] {
+export function validateNotificationEmails(notifications: OneOeNotifications | undefined, regional = false): string[] {
   const single = notifications?.useSingleRecipient ?? Boolean(notifications?.default);
   const topics = single ? ['default'] as const : ['cloudguard', 'iam', 'network', 'security'] as const;
-  return topics.flatMap((topic) => {
+  return topics.filter((topic) => !regional || topic === 'default' || topic === 'network' || topic === 'security').flatMap((topic) => {
     const error = notificationEmailError(notifications?.[topic]);
-    return error ? [`Observability (${topic === 'default' ? 'all notifications' : topic}): ${error}`] : [];
+    return error ? [`Foundation notifications (${topic === 'default' ? 'all topics' : topic}): ${error}`] : [];
   });
 }
