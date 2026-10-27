@@ -6,7 +6,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { ReactFlowProvider } from '@xyflow/react';
 import { WizardProvider, useWizard, type HomeRegionSource } from '../wizard/wizardContext';
 import { getLZ, linkedHomeRecord, renameLZ, saveLZ } from '../services/lzStore';
@@ -87,7 +87,8 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   saveRevision: number;
 }) {
   const { model, reset, homeSource } = useWizard();
-  const [activeStep, setActiveStep] = React.useState(1);
+  const [searchParams] = useSearchParams();
+  const [activeStep, setActiveStep] = React.useState(() => searchParams.get('step') === 'review' ? WIZARD_STEPS.length : 1);
   const [flowsCollapsed, setFlowsCollapsed] = React.useState(false);
   const [flowSteps, setFlowSteps] = React.useState<Record<string, number | null>>({});
   const [flowFocus, setFlowFocus] = React.useState<FlowFocus | null>(null);
@@ -327,7 +328,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 ) : activeStep === 4 ? (
                   <PlatformsStep />
                 ) : activeStep === 5 ? (
-                  <ReviewStep designName={name} getDiagram={exportDiagram} diagramReady={diagramStatus === 'ready'} />
+                  <ReviewStep designName={name} getDiagram={exportDiagram} diagramOptions={chosenOpts} diagramReady={diagramStatus === 'ready'} generatedFiles={routing.status === 'ready' && routing.snapshot?.model === model ? routing.snapshot.preview.files : undefined} />
                 ) : null}
               </div>
             )}

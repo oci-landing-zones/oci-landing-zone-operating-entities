@@ -34,7 +34,7 @@ export default function RemotePeeringEditor() {
       </div>
       <p style={s.intro}>Connect this hub to another landing zone. Create an acceptor connection on one side, then a requester on the other.</p>
       {regional && <p style={{ ...s.help, marginBottom: 12 }}>DR supports same-tenancy peering. Cross-tenancy peering requires IAM from a Home Region deployment.</p>}
-      {!connections.length && <p style={{ ...s.help, marginBottom: 16 }}>No remote connections. RPC is optional.</p>}
+      {!connections.length && <p style={{ ...s.help, marginBottom: 16 }}>No remote connections configured.</p>}
       {connections.map((connection, index) => <div key={connection.id} className="rpc-connection" role="group" aria-labelledby={`rpc-${connection.id}-title`}>
         <div className="rpc-connection-header">
           <h3 id={`rpc-${connection.id}-title`}>Connection {index + 1}</h3>

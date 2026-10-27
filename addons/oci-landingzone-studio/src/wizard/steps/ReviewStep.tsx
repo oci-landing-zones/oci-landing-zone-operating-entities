@@ -8,8 +8,8 @@
  * just in the browser. Nothing here reimplements it, so the outputs are the outputs.
  */
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { useWizard } from '../wizardContext';
 import { oracle } from '../../theme';
 import { s } from './networkEditorStyles';
@@ -21,17 +21,20 @@ import { getOutputs, saveOutputs } from '../../services/lzStore';
 import { CONFIG_FILENAME, deploymentStages, isCurrentOutputSet } from '../../generator/outputNames';
 import { bundleFilename, downloadBlob, zipTextFiles } from '../../export/zip';
 import { buildGraph } from '../../diagram/buildGraph';
-import { toDrawioXml } from '../../export/toDrawio';
+import { toDrawioPagesXml, toDrawioXml } from '../../export/toDrawio';
+import { createDiagramGraph } from '../diagramGraph';
+import { loadDiagramPreview } from '../../services/diagramPreview';
 import { downloadTextFile } from '../../export/download';
 import { validatePlatformContracts } from '../../services/platformValidation';
-import { validateExadataModel } from '../../services/exadata';
+import { reconcileExadata, validateExadataModel } from '../../services/exadata';
 import { exadataReadiness, platformReadiness } from '../../services/platformReadiness';
 import { validateNotificationEmails } from '../../services/notificationEmails';
 import { validateRemotePeering } from '../../services/remotePeering';
 import { validateRegionalDeployment } from '../../services/regionalDeployment';
 import { regionShortNameError } from '../../services/regions';
 import { ErrorNotice } from '../../components/FieldError';
-import type { DiagramModel } from '../../model/types';
+import InfoButton from '../../components/InfoButton';
+import type { DiagramModel, DiagramOptions, LzModel } from '../../model/types';
 
 interface RunResult {
   config: string;
@@ -59,9 +62,15 @@ const local: Record<string, CSSProperties> = {
 
   deployGrid: { display: 'grid', gap: 14, marginTop: 20 },
   deployCard: { border: `1px solid ${oracle.border}`, borderRadius: 6, padding: 16, background: oracle.surfaceAlt },
-  deployTitle: { fontSize: 13.5, fontWeight: 800, color: oracle.ink, marginBottom: 5 },
+  deployTitle: { fontSize: 13.5, fontWeight: 800, color: oracle.ink, margin: '0 0 5px' },
+  deployBody: { fontSize: 12.5, color: oracle.textMuted, lineHeight: 1.5, overflowWrap: 'anywhere' },
   fileList: { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 9 },
   fileChip: { padding: '3px 7px', borderRadius: 4, border: `1px solid ${oracle.border}`, background: oracle.surface, fontSize: 11.5, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
+  taskGroup: { marginTop: 14, maxWidth: '80ch' },
+  taskHeading: { display: 'flex', alignItems: 'center', gap: 6, color: oracle.ink, fontWeight: 700 },
+  taskList: { margin: '6px 0 0', paddingLeft: 18, display: 'grid', gap: 5 },
+  dependencyList: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '10px 24px', margin: '12px 0', maxWidth: '80ch' },
+  dependencyPurpose: { margin: '5px 0 0', color: oracle.textMuted },
   ordered: { margin: '12px 0 0 20px', padding: 0, color: oracle.text, fontSize: 14, lineHeight: 1.6 },
   links: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, marginTop: 8, fontSize: 12.5 },
   guide: { marginTop: 16, padding: 16, border: `1px solid ${oracle.borderStrong}`, borderRadius: 6, background: oracle.surfaceAlt },
@@ -89,26 +98,41 @@ const DEPLOY_TO_OCI_URL = `${RESOURCE_MANAGER_STACKS_URL}/create?${new URLSearch
   zipUrlVariables: JSON.stringify({ configuration_source: 'ocibucket' }),
 })}`;
 
-function Setting({ name, value }: { name: string; value?: string }) {
+function Setting({ name, value }: { name: string; value?: string | boolean }) {
   return (
     <code className="required-setting">
       <span className="required-setting-name">{name}</span>
-      {value && <><span className="required-setting-equals"> = </span><span className="required-setting-value">&quot;{value}&quot;</span></>}
+      {value !== undefined && <><span className="required-setting-equals"> = </span><span className="required-setting-value">{typeof value === 'boolean' ? String(value) : <>&quot;{value}&quot;</>}</span></>}
     </code>
   );
 }
 
-function HubDeploymentGuide({ hubKind }: { hubKind: string }) {
+function DeploymentCard({ title, description, files }: { title: string; description: ReactNode; files?: readonly string[] }) {
+  return <div style={local.deployCard}>
+    <h3 style={local.deployTitle}>{title}</h3>
+    <div style={local.deployBody}>{description}</div>
+    <DeploymentFiles files={files} />
+  </div>;
+}
+
+function DeploymentFiles({ files }: { files?: readonly string[] }) {
+  return !!files?.length && <div style={local.fileList}>
+    {files.map((file) => <code key={file} style={local.fileChip}>{file}</code>)}
+  </div>;
+}
+
+function HubDeploymentGuide({ hubKind, numbered = true }: { hubKind: string; numbered?: boolean }) {
+  const List = numbered ? 'ol' : 'ul';
   if (hubKind === 'hub_c') {
     return (
       <div style={local.guide}>
         <div style={local.guideTitle}>Prepare Hub C firewall backends</div>
-        <ol style={local.ordered}>
+        <List style={local.ordered}>
           <li>NLB route targets resolve from generated resource keys in <code>network.json</code>. Before sending traffic, configure the third-party firewall VMs outside Studio.</li>
           <li>In <code>network_backends.json</code>, set each firewall backend <code>target_id</code> to a private-IP OCID, instance OCID, bare instance key, or qualified <code>instance.vnic</code> key.</li>
           <li>A bare instance key targets the primary interface. It resolves through <code>instances_dependency</code> first; if absent there, it can resolve through the primary private-IP target map. For separate trust and untrust interfaces, use the appropriate qualified <code>instance.vnic</code> key or private-IP OCID.</li>
           <li>Once the firewall backends are ready, update the same stack to use <code>network_backends.json</code> instead of <code>network.json</code>. Supply exactly one network file, then plan and apply.</li>
-        </ol>
+        </List>
       </div>
     );
   }
@@ -116,11 +140,98 @@ function HubDeploymentGuide({ hubKind }: { hubKind: string }) {
   return null;
 }
 
-export default function ReviewStep({ designName, getDiagram, diagramReady = true }: { designName: string; getDiagram?: () => DiagramModel; diagramReady?: boolean }) {
-  const { model } = useWizard();
+function DrDeploymentGuide({ model, stages, homeId }: { model: LzModel; stages?: ReturnType<typeof deploymentStages>; homeId?: string }) {
+  const homeConnections = (model.remotePeeringConnections ?? []).filter((connection) => connection.peerRegionName === model.foundation.homeRegion);
+  const drAcceptor = homeConnections.length > 0 && homeConnections.every((connection) => connection.role === 'acceptor');
+  const needsHomeRequester = homeConnections.some((connection) => connection.role === 'acceptor');
+  const dependencies = ['home/compartments_output.json', ...(drAcceptor ? [] : ['home/network_output.json'])];
+  const steps: { title: string; description: ReactNode; files?: string[] }[] = [
+    { title: 'Deploy Home Region', description: <>
+      {homeId ? <Link className="guide-link" to={`/lz/${encodeURIComponent(homeId)}?step=review`} target="_blank" rel="noreferrer">Open Home Region Review ↗</Link> : 'Open your Home Region design and select Review.'} Use its deployment steps and file lists.
+      <p style={{ margin: '8px 0 0' }}>In Home’s Foundation step, set <strong>DR region</strong> to <code>{model.foundation.region || 'your DR region'}</code> so its IAM policies allow DR Object Storage to use encryption keys.</p>
+      <p style={{ margin: '8px 0 0' }}>{needsHomeRequester
+        ? <>{drAcceptor ? 'DR is the acceptor and Home is the requester.' : 'Home and DR have both acceptor and requester connections.'} Deploy the Home baseline with its acceptors configured, leaving out requesters whose DR acceptors do not exist yet. Add those requesters after DR applies.</>
+        : 'Home is the acceptor and DR is the requester. Configure the Home acceptor in Hub Network with the DR peer region and reviewed DR VCN CIDRs.'} Review copied networks: Home and DR need non-overlapping routable ranges.</p>
+      <div style={local.taskGroup}>
+        <div style={local.taskHeading}>Check configuration storage and replication</div>
+        <ul style={local.taskList}>
+          <li>Reuse Home’s private configuration bucket, or create a Standard-tier source bucket. For a new tenancy, use the root or a bootstrap compartment before Home’s first apply. <a className="guide-link" href="https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/usingversioning.htm" target="_blank" rel="noreferrer">Enable versioning on the Home source ↗</a>.</li>
+          <li>Reuse its existing DR replica, or create a Standard-tier destination bucket in DR with versioning disabled and no retention rules. <a className="guide-link" href="https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/usingreplication.htm" target="_blank" rel="noreferrer">Enable replication ↗</a> before publishing new files. The DR replica is read-only.</li>
+          <li>During replication setup, let the Console create any missing Object Storage service replication policy.</li>
+        </ul>
+      </div>
+      <p style={{ margin: '12px 0 0' }}>Before applying Home, set <Setting name="save_output" value={true} />, <Setting name="output_format" value="json" /> and <Setting name="oci_object_prefix" value="home" />. If Home is already deployed, update its existing ORM stack using final configuration files; do not switch back to <code>_pre</code> files.</p>
+    </> },
+    { title: 'Use Home’s saved outputs', description: <>
+      <p style={{ margin: '8px 0 0', maxWidth: '80ch' }}>Home saves these JSON outputs automatically after a successful apply. Object Storage replicates them to DR; no manual JSON transfer is needed. Confirm the latest outputs have arrived before planning DR.</p>
+      <dl style={local.dependencyList}>
+        {dependencies.map((file) => <div key={file} style={{ minWidth: 0 }}>
+          <dt><code style={local.fileChip}>{file}</code></dt>
+          <dd style={local.dependencyPurpose}>{file.endsWith('compartments_output.json') ? 'References to the compartments created by Home.' : 'Home network references, including the acceptor RPC.'}</dd>
+        </div>)}
+      </dl>
+      <div className="studio-info-heading"><span>These runtime output files are not included in the Studio ZIP.</span><InfoButton title="Home dependency outputs">
+        <p>Replication is asynchronous. Compare source and replica ETags or checksums for the required files before creating a new DR plan. Do not apply an older saved plan after publishing newer inputs.</p>
+        <p>Objects uploaded before replication was enabled are not backfilled. For an existing Home stack, publish under a new, unused output prefix and use that prefix in DR’s dependency paths. Review any impact on existing output consumers.</p>
+        <p>Keep one document for each top-level dependency block; do not load both regions’ network outputs together. Add other Home outputs only when your platforms need them.</p>
+      </InfoButton></div>
+    </> },
+    { title: 'Finish and download DR files', description: <>
+      <div style={local.taskGroup}>
+        <div style={local.taskHeading}>Configure RPC in Hub Network {!drAcceptor && <InfoButton title="Acceptor RPC reference">
+          <p>Copy the Home acceptor RPC’s OCID from the OCI Console after Home applies. An exact generated resource key can instead resolve through Home’s <code>network_output.json</code> dependency.</p>
+        </InfoButton>}</div>
+        <ul style={local.taskList}>
+          <li><strong>Role:</strong> {drAcceptor ? 'Keep DR as acceptor.' : homeConnections.length === 0 ? 'Add or update a DR connection as requester to Home.' : 'Use the requester connections to Home.'}</li>
+          <li><strong>Peer region:</strong> <code>{model.foundation.homeRegion || 'Home Region'}</code>.</li>
+          {!drAcceptor && <li><strong>Acceptor RPC:</strong> enter the Home RPC’s OCID from the OCI Console.</li>}
+          <li><strong>Remote CIDRs:</strong> Home networks that should be reachable.</li>
+        </ul>
+        {needsHomeRequester && !drAcceptor && <p style={{ margin: '8px 0 0' }}>Keep DR acceptors as acceptors; Home will connect to them after DR applies.</p>}
+      </div>
+      <div style={local.taskGroup}>
+        <div style={local.taskHeading}>Download and upload</div>
+        <p style={{ margin: '6px 0 0' }}>Return to Review and select <strong>Download files</strong> after these edits. Unzip the fresh download and upload its deployment JSON files under <code>dr/</code> in the Home source bucket. Wait for the current files to replicate to DR; do not upload directly to the read-only replica.</p>
+        <p style={{ margin: '8px 0 0' }}>Keep <code>config.jsonnet</code> as the Studio design source. Do not list it as an ORM configuration file.</p>
+      </div>
+    </> },
+    { title: 'Create the DR stack', description: <>
+      Open <a className="guide-link" href={DEPLOY_TO_OCI_URL} target="_blank" rel="noreferrer">Deploy to OCI ↗</a> in <code>{model.foundation.region || 'the DR region'}</code> and choose <code>rms-facade</code>. Home and DR use separate stacks and state.
+      <p style={{ margin: '8px 0 0' }}>Set <Setting name="configuration_source" value="ocibucket" /> and <Setting name="oci_configuration_bucket" /> to the DR replica bucket. Set <Setting name="oci_dependency_objects" /> to the Home output paths from step 2; ORM reads those objects automatically on each new plan. Set <Setting name="oci_configuration_objects" /> to the first-apply files below. Keep <Setting name="save_output" value={false} /> in both DR phases because the replica is read-only. Select <strong>Create</strong> without running an apply.</p>
+    </> },
+    { title: 'First apply: DR prerequisites', files: stages?.[0]?.files.map((file) => `dr/${file}`), description: <>
+      {stages ? 'Use exactly these objects' : 'The current Blueprint Factory preview is preparing the prerequisite file list. Once ready, use that list'} in <Setting name="oci_configuration_objects" />. Run <strong>Plan</strong>, review the changes, then <strong>Apply</strong>. Wait for success. Keep the Home outputs in <Setting name="oci_dependency_objects" />.
+    </> },
+    { title: 'Second apply: controls and workloads', files: stages?.slice(1).flatMap((stage) => stage.files.map((file) => `dr/${file}`)), description: <>
+      {stages ? <>Replace the same DR stack’s <Setting name="oci_configuration_objects" /> with exactly these objects.</> : <>The current Blueprint Factory preview is preparing the final file list, including selected workloads.</>} Retain the network file, replace the security and observability <code>_pre</code> variants with their final counterparts, and add the generated workload files. Never supply both variants. Keep the Home dependencies, then plan and apply again.
+    </> },
+    ...(needsHomeRequester ? [{ title: 'Complete the Home requester', description: <>
+      In the OCI Console, get the deployed DR acceptor RPC’s OCID. Enter that literal OCID in Home Hub Network’s requester, with the DR peer region and DR remote CIDRs. Download Home’s updated files and upload them to the Home source bucket, retain its final configuration files and plan/apply Home. A literal RPC OCID needs no DR network-output JSON or reverse replication. Keep DR output saving disabled.
+    </> }] : []),
+    { title: 'Verify the connection', description: <>
+      Confirm RPC status is <strong>Peered</strong>. Check reciprocal DRG and VCN routes, firewall rules and approved traffic in both directions. For later changes, apply Home successfully, upload any updated DR configurations to the Home source, wait for current files and outputs to replicate, then create a fresh DR plan. No manual JSON transfer is needed.
+      {model.foundation.cisLevel === 2 && <p style={{ margin: '8px 0 0' }}>DR creates regional Vaults and keys. Existing key material, secrets and workload data need their own recovery or replication plan.</p>}
+    </> },
+  ];
+  return <div style={local.deployGrid}>
+    <DeploymentCard title="Before you start" description={<>
+      Subscribe to both regions.
+    </>} />
+    {steps.map((step, index) => <div key={step.title}>
+      <DeploymentCard {...step} title={`${index + 1}. ${step.title}`} />
+      {step.title === 'Second apply: controls and workloads' && <HubDeploymentGuide hubKind={model.network.hubKind} numbered={false} />}
+    </div>)}
+  </div>;
+}
+
+export default function ReviewStep({ designName, getDiagram, diagramOptions, diagramReady = true, generatedFiles }: { designName: string; getDiagram?: () => DiagramModel; diagramOptions?: DiagramOptions; diagramReady?: boolean; generatedFiles?: readonly string[] }) {
+  const { model, homeSource } = useWizard();
   const regional = model.foundation.stackScope === 'regional';
   const { id } = useParams();
   const [busy, setBusy] = useState(false);
+  const [diagramBusy, setDiagramBusy] = useState(false);
+  const diagramRequest = useRef<AbortController | null>(null);
+  useEffect(() => () => { diagramRequest.current?.abort(); }, [model, homeSource?.model, diagramOptions, diagramReady]);
   const [error, setError] = useState<string | null>(null);
   // Show the last generated file list when returning to Review.
   const [result, setResult] = useState<RunResult | null>(() => {
@@ -145,10 +256,10 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
     ])];
   }, [model, regional]);
   const stale = result !== null && !isCurrentOutputSet(result, configText);
-  const deployFiles = result && !stale
+  const deployFiles = generatedFiles ?? (result && !stale
     ? Object.keys(result.files)
-    : expectedCoreFiles(model.foundation.cisLevel, regional);
-  const deployStages = deploymentStages(deployFiles);
+    : expectedCoreFiles(model.foundation.cisLevel, regional));
+  const deployStages = deploymentStages([...deployFiles]);
   const [firstStage, ...remainingStages] = deployStages;
 
   function downloadResult(runResult: RunResult) {
@@ -193,13 +304,34 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
     if (generated && isCurrentOutputSet(generated, currentConfig.current)) downloadResult(generated);
   }
 
-  function downloadDrawio() {
+  async function downloadDrawio() {
     const filename = bundleFilename(designName).replace(/-lz-outputs\.zip$/, '.drawio');
+    const controller = new AbortController();
+    diagramRequest.current?.abort();
+    diagramRequest.current = controller;
+    setDiagramBusy(true);
     setError(null);
     try {
-      downloadTextFile(filename, toDrawioXml(getDiagram?.() ?? buildGraph(model, 5)), 'application/xml');
+      const diagram = getDiagram?.() ?? buildGraph(model, 5);
+      let xml: string;
+      if (regional && homeSource) {
+        if (!homeSource.model) throw new Error('The linked Home Region design is unavailable. Restore it before exporting both diagrams.');
+        const homeModel = reconcileExadata(homeSource.model);
+        const preview = await loadDiagramPreview(homeModel, controller.signal);
+        if (controller.signal.aborted) return;
+        const homeDiagram = createDiagramGraph(homeModel, preview)(5, diagramOptions ?? {});
+        xml = toDrawioPagesXml([{ name: 'DR', diagram }, { name: 'Home Region', diagram: homeDiagram }]);
+      } else {
+        xml = toDrawioXml(diagram, regional ? 'DR' : 'Landing Zone');
+      }
+      if (!controller.signal.aborted) downloadTextFile(filename, xml, 'application/xml');
     } catch (error) {
-      setError(error instanceof Error ? error.message : String(error));
+      if (!controller.signal.aborted) setError(error instanceof Error ? error.message : String(error));
+    } finally {
+      if (diagramRequest.current === controller) {
+        diagramRequest.current = null;
+        setDiagramBusy(false);
+      }
     }
   }
 
@@ -255,10 +387,14 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
             >
               {busy ? 'Preparing download…' : 'Download files'}
             </button>
-            <button type="button" style={local.secondary} onClick={downloadDrawio} disabled={!diagramReady}>
-              Export diagram (.drawio)
+            <button type="button" style={local.secondary} onClick={downloadDrawio} disabled={!diagramReady || diagramBusy}>
+              {diagramBusy ? 'Preparing diagram…' : 'Export diagram (.drawio)'}
             </button>
           </div>
+
+          {regional && <p style={s.help}>{homeSource
+            ? 'The .drawio file includes separate DR and Home Region pages. The linked Home Region design must be available.'
+            : 'This standalone DR design has no linked Home Region. Its export contains only the DR diagram.'}</p>}
 
           {!diagramReady && <p role="status" style={local.note}>Diagram export is waiting for the current preview.</p>}
 
@@ -273,28 +409,20 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
         <div style={s.body}>
           <h2 style={s.title}>Deploy with OCI Resource Manager</h2>
           <div style={local.note}>
-            Resource Manager runs the <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_RELEASE_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator v2.2.0 ↗</a>. The files from Studio are a separate configuration source for that stack. Use one stack for both phases; phase 2 updates its security, observability, and workload files.
+            Resource Manager runs the <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_RELEASE_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator v2.2.0 ↗</a>. {regional ? 'Home and DR use separate stacks and state; keep the same stack for both phases within each region.' : 'Use one stack for both phases.'} The files from Studio are a separate configuration source for the stack. Phase 2 updates its security, observability, and workload files.
           </div>
+          {regional ? <DrDeploymentGuide model={model} stages={generatedFiles !== undefined || (result && !stale) ? deployStages : undefined} homeId={homeSource?.id} /> : <>
           <div style={local.guide}>
             <div style={local.guideTitle}>Create and run the stack</div>
             <ol style={local.ordered}>
-              {regional && <li>Deploy the Home Region stack first with matching compartments, project and platform IAM, and governance. Select this DR region in that stack to grant Object Storage access to its encryption keys. Pass its compartment outputs and required network outputs to a separate DR stack.</li>}
-              <li>Unzip the download. Keep the generated files in a customer-controlled private Object Storage bucket or approved private GitHub repository. Do not mix them with published blueprint files.</li>
+              <li>Unzip the download. Keep the generated files in a customer-controlled private Object Storage bucket. Do not mix them with published blueprint files.</li>
               <li>Open <a className="guide-link" href={DEPLOY_TO_OCI_URL} target="_blank" rel="noreferrer">Deploy to OCI ↗</a> for a prefilled <strong>Create Stack</strong> wizard using the Landing Zone Orchestrator and private Object Storage configuration source. Select <code>rms-facade</code> as the working directory.</li>
-              <li>In the stack variables, confirm <Setting name="configuration_source" value="ocibucket" />. Then enter the bucket name in <Setting name="oci_configuration_bucket" /> and the current phase's file list in <Setting name="oci_configuration_objects" />. You can instead use an approved private GitHub source.</li>
+              <li>In the stack variables, confirm <Setting name="configuration_source" value="ocibucket" />. Then enter the bucket name in <Setting name="oci_configuration_bucket" /> and the current phase's file list in <Setting name="oci_configuration_objects" />.</li>
               <li>Select <strong>Create</strong> without running an apply. From the stack details page, select <strong>Plan</strong>, review the changes and policy impact, then select <strong>Apply</strong>. Wait for a successful apply before starting phase 2.</li>
             </ol>
           </div>
           <div style={local.deployGrid}>
-            {firstStage && (
-              <div style={local.deployCard}>
-                <div style={local.deployTitle}>{firstStage.title}</div>
-                <div style={{ fontSize: 12.5, color: oracle.textMuted, lineHeight: 1.5 }}>{firstStage.description}</div>
-                <div style={local.fileList}>
-                  {firstStage.files.map((file) => <code key={file} style={local.fileChip}>{file}</code>)}
-                </div>
-              </div>
-            )}
+            {firstStage && <DeploymentCard {...firstStage} />}
             <div style={local.phaseChange}>
               <div>
                 <div style={local.phaseChangeTitle}>Important — update the configuration before phase 2</div>
@@ -304,16 +432,9 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
               </div>
             </div>
             <HubDeploymentGuide hubKind={model.network.hubKind} />
-            {remainingStages.map((deployment) => (
-              <div key={deployment.title} style={local.deployCard}>
-                <div style={local.deployTitle}>{deployment.title}</div>
-                <div style={{ fontSize: 12.5, color: oracle.textMuted, lineHeight: 1.5 }}>{deployment.description}</div>
-                <div style={local.fileList}>
-                  {deployment.files.map((file) => <code key={file} style={local.fileChip}>{file}</code>)}
-                </div>
-              </div>
-            ))}
+            {remainingStages.map((deployment) => <DeploymentCard key={deployment.title} {...deployment} />)}
           </div>
+          </>}
           <div className="deployment-links-heading">OCI Resource Manager resources</div>
           <div className="deployment-links" style={local.links} aria-label="OCI Resource Manager resources">
             <a href={RESOURCE_MANAGER_STACKS_URL} target="_blank" rel="noreferrer"><span>Open Resource Manager stacks</span><span aria-hidden="true">↗</span></a>
