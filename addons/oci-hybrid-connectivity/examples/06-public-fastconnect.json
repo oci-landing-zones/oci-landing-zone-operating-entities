@@ -1,0 +1,40 @@
+{
+    "region"                           : "eu-frankfurt-1",
+    "region_short_name"                : "fra",
+    "cis_level"                        : 2,
+
+    "hub": {
+        "kind"                         : "hub_a",
+
+        "network": {
+            "vcn"                      : "10.0.0.0/21"
+        }
+    },
+
+    "environments": {
+        "production": {
+            "project_network": {
+                "network": {
+                    "vcn"              : "10.0.64.0/21"
+                }
+            }
+        }
+    },
+
+    "hybrid_connectivity": {
+        "fast_connect_virtual_circuits": {
+            "public": {
+                "type"                 : "PUBLIC",
+                "bandwidth_shape_name" : "1 Gbps",
+                "customer_asn"         : "64496",
+                "provider_service_id"  : "ocid1.providerservice.oc1..REPLACE_WITH_PROVIDER_SERVICE",
+
+                "public_prefixes": {
+                    "owned": {
+                        "cidr_block"   : "203.0.113.0/24"
+                    }
+                }
+            }
+        }
+    }
+}

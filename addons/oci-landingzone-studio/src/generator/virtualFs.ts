@@ -7,7 +7,7 @@
 /** Repository generator sources, keyed by path relative to the top-level `gen/`. */
 const RAW: Record<string, string> = Object.fromEntries(
   Object.entries(
-    import.meta.glob('../../../../gen/**/*.{jsonnet,libsonnet}', { query: '?raw', import: 'default', eager: true }),
+    import.meta.glob('../../../../gen/**/*.{json,jsonnet,libsonnet}', { query: '?raw', import: 'default', eager: true }),
   ).map(([k, v]) => [k.replace(/^\.\.\/\.\.\/\.\.\/\.\.\/gen\//, ''), v as string]),
 );
 

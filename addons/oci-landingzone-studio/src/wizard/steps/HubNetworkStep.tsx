@@ -6,7 +6,7 @@
  * Switching hub kind resets the subnets to that kind's canonical defaults.
  */
 
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import { useWizard } from '../wizardContext';
 import DeleteButton from '../../components/DeleteButton';
 import RemotePeeringEditor from '../../components/RemotePeeringEditor';
@@ -22,6 +22,8 @@ import { FONT, s } from './networkEditorStyles';
 import FieldError from '../../components/FieldError';
 import InfoButton from '../../components/InfoButton';
 import { configKeyError, fieldErrorProps } from '../../services/fieldErrors';
+import ConnectivityEditor, { Chevron } from './ConnectivityEditor';
+import { validateHybridRoutes } from '../../services/hybridConnectivity';
 
 const HUB_MODELS_DOCUMENTATION_URL = 'https://github.com/oci-landing-zones/oci-landing-zone-operating-entities/tree/master/addons/oci-hub-models';
 
@@ -382,6 +384,9 @@ export default function HubNetworkStep() {
   const n = model.network;
   const kind = getHubKind(n.hubKind);
 
+  const [connectivityOpen, setConnectivityOpen] = useState({ vpn: false, fastconnect: false });
+  const connectivityId = useId();
+  const connectivityErrors = validateHybridRoutes(model);
   const info = HUB_INFO[n.hubKind];
 
   function setNetwork(patch: Partial<NetworkConfig>) {
@@ -449,6 +454,22 @@ export default function HubNetworkStep() {
         </div>
       </section>
       <RemotePeeringEditor />
+      {(['vpn', 'fastconnect'] as const).map((connection) => {
+        const h = model.hybridConnectivity;
+        const counts = connection === 'vpn'
+          ? [[Object.keys(h?.ipsecs ?? {}).length, 'VPN'], [Object.keys(h?.customer_premises_equipments ?? {}).length, 'CPE']] as const
+          : [[Object.keys(h?.fast_connect_virtual_circuits ?? {}).length, 'circuit'], [Object.keys(h?.cross_connect_groups ?? {}).length, 'physical group']] as const;
+        const summary = counts.filter(([count]) => count > 0).map(([count, label]) => `${count} ${label}${count === 1 ? '' : 's'}`).join(' · ') || 'Optional';
+        return <section key={connection} style={s.panel}>
+        <div style={s.accent} />
+        <button type="button" className="connectivity-service-toggle" style={s.calcHead} aria-expanded={connectivityOpen[connection]} aria-controls={`${connectivityId}-${connection}`} onClick={() => setConnectivityOpen({ ...connectivityOpen, [connection]: !connectivityOpen[connection] })}>
+          <span style={s.envHeadTitle}>{connection === 'vpn' ? 'VPN' : 'FastConnect'}</span>
+          <span className="connectivity-service-summary" style={{ ...s.help, flex: 'none' }}><span>{summary}</span><Chevron /></span>
+        </button>
+        <div id={`${connectivityId}-${connection}`} hidden={!connectivityOpen[connection]} style={{ ...s.body, paddingTop: 0 }}><ConnectivityEditor kind={connection} /></div>
+      </section>;
+      })}
+      {connectivityErrors.length > 0 && <div role="status" style={{ ...s.errText, marginTop: 0 }}>{connectivityErrors.map((error) => <p key={error}>{error}</p>)}</div>}
     </div>
   );
 }

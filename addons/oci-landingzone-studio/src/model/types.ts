@@ -11,6 +11,8 @@ import type { ResourceKind } from '../services/generatedResources';
  * exercise the whole pipeline (two nodes + one edge → live diagram → drawio).
  */
 
+import type { HybridConnectivity } from './hybridConnectivity';
+
 export interface FoundationConfig {
   stackScope?: 'complete' | 'regional';
   /** Regional stacks reuse tenancy-level prerequisites from this Home region. */
@@ -207,6 +209,7 @@ export interface ExadataDesign {
 
 export interface LzModel {
   remotePeeringConnections?: RemotePeeringConnection[];
+  hybridConnectivity?: HybridConnectivity;
   /** Schema version of this canonical object. */
   version: string;
   foundation: FoundationConfig;

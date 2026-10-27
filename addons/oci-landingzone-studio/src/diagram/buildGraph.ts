@@ -8,6 +8,7 @@ import { withFlowFocus } from './flowFocus';
 import { platformInEnv, platformSubnetsForEnv, platformVcnForEnv } from '../services/platforms';
 import { exadataDiagramPlatforms } from '../services/exadata';
 import { generatorNames } from '../services/generatorNaming';
+import { hybridRoutes } from '../services/hybridConnectivity';
 import { absoluteNodeRects, createLocalFlowRouter, flowAnchorPoint } from './flowGeometry';
 import { connectionFlowGeometry, routeStructuralEdges, type FlowVisitAnchor } from './displayGeometry';
 import { createFlowPlayback } from './flowPlayback';
@@ -302,6 +303,10 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   projectEnvironmentIds?: string[];
   environmentLayout?: Record<string, { networkHeight: number; platformTop: number }>;
 }, routeTables: RouteTable[] = [], inventory?: GeneratedResourceInventory): DiagramModel {
+  const hybrid = upToStep >= 2 ? hybridRoutes(model) : [];
+  const publicCircuits = upToStep >= 2 ? Object.entries(model.hybridConnectivity?.fast_connect_virtual_circuits ?? {}).filter(([, circuit]) => circuit.type === 'PUBLIC') : [];
+  const physicalGroups = upToStep >= 2 ? Object.keys(model.hybridConnectivity?.cross_connect_groups ?? {}) : [];
+  const hybridHeight = (hybrid.length + publicCircuits.length + physicalGroups.length) * 80;
   // Placeholder hub kinds (b/c) aren't specified yet — the network layer
   // stays hidden until an implemented hub kind is selected.
   const hubImplemented = getHubKind(model.network.hubKind)?.implemented ?? false;
@@ -532,7 +537,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     ? sharedInstances.reduce((height, instance) => height + instance.vcnH, 0) + sharedInstances.length * PLAT_VCN_GAP
     : 0;
   const netCompH = showHub
-    ? TITLE + PAD + hubVcnH + sharedNetworkH + HUB_ATTACH_GAP + clusterH + PAD
+    ? TITLE + PAD + hubVcnH + sharedNetworkH + HUB_ATTACH_GAP + clusterH + PAD + hybridHeight
     : COMP_H;
   const sharedRows = [
     ...sharedInstances.map((instance) => ({ key: instance.platform.key, height: nestedHeight(exadata.sharedChildren[instance.platform.key]?.length ?? 0) })),
@@ -678,6 +683,18 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       });
     });
 
+  }
+
+  if (showHub && hybridHeight) {
+    const entries = [
+      ...hybrid.map((connection) => ({ id: connection.id, label: `${connection.type} ${connection.name}${connection.type === 'VPN' ? ' (2 tunnels)' : ''}\n${connection.cidrs.join(', ')}`, routed: true })),
+      ...publicCircuits.map(([name]) => ({ id: `hybrid-public-${name}`, label: `Public FastConnect ${name}\nOCI public services; no DRG attachment`, routed: false })),
+      ...physicalGroups.map((name) => ({ id: `hybrid-physical-${name}`, label: `Cross-connect group ${name}\nPhysical preparation`, routed: false })),
+    ];
+    entries.forEach((entry, index) => {
+      nodes.push({ id: entry.id, kind: 'attachment', label: entry.label, parentId: 'cmp-network', x: PAD, y: netCompH - hybridHeight + index * 80, width: netCompW - 2 * PAD, height: 60 });
+      if (entry.routed) edges.push({ id: `e-${entry.id}-drg`, source: entry.id, target: 'drg', sourceSide: 'left', targetSide: 'left' });
+    });
   }
 
   // security compartment (plain row under the network compartment)

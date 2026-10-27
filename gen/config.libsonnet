@@ -5,6 +5,7 @@ local cidrs = import 'lib/cidrs.libsonnet';
 local collections = import 'lib/collections.libsonnet';
 local subnet_utils = import 'lib/subnets.libsonnet';
 local validation = import 'lib/validation.libsonnet';
+local hybrid_contract = import 'addons/oci-hybrid-connectivity/config.libsonnet';
 
 {
   local hub_subnet_order = {
@@ -465,16 +466,20 @@ local validation = import 'lib/validation.libsonnet';
     ]);
     local local_vcn_entries =
       [{ label: 'Hub VCN', cidr: hub_vcn }] + env_vcn_entries + shared_vcn_entries;
+    local hybrid = hybrid_contract.normalize(if std.objectHas(config, 'hybrid_connectivity') then config.hybrid_connectivity else {});
+    local hybrid_cidrs = hybrid_contract.remote_cidrs(hybrid);
+    local hybrid_entries = [{ label: 'Hybrid connectivity', cidr: c } for c in hybrid_cidrs];
     assert cidrs.assert_non_overlapping(
       local_vcn_entries,
       'VCN CIDRs'
     );
     assert cidrs.assert_non_overlapping(
-      local_vcn_entries + remote_vcn_entries,
+      local_vcn_entries + remote_vcn_entries + hybrid_entries,
       'Local and remote routed VCN CIDRs'
     );
 
     config {
+      [if std.objectHas(config, 'hybrid_connectivity') then 'hybrid_connectivity']: hybrid,
       region: region,
       region_short_name: region_short_name,
       realm: realm,

@@ -1,0 +1,87 @@
+{
+    "region"                                       : "eu-frankfurt-1",
+    "region_short_name"                            : "fra",
+    "cis_level"                                    : 2,
+
+    "hub": {
+        "kind"                                     : "hub_a",
+
+        "network": {
+            "vcn"                                  : "10.0.0.0/21"
+        }
+    },
+
+    "environments": {
+        "production": {
+            "project_network": {
+                "network": {
+                    "vcn"                          : "10.0.64.0/21"
+                }
+            }
+        }
+    },
+
+    "hybrid_connectivity": {
+        "customer_premises_equipments": {
+            "office": {
+                "ip_address"                       : "203.0.113.10"
+            }
+        },
+
+        "fast_connect_virtual_circuits": {
+            "primary": {
+                "type"                             : "PRIVATE",
+                "bandwidth_shape_name"             : "1 Gbps",
+                "customer_asn"                     : "65001",
+                "is_bfd_enabled"                   : false,
+                "remote_cidrs"                     : ["172.20.0.0/16"],
+
+                "cross_connect_mappings": {
+                    "primary": {
+                        "bgp_md5auth_key"          : "REPLACE_THIS_DEMONSTRATION_BGP_KEY",
+                        "customer_bgp_peering_ip"  : "192.168.254.1/30",
+                        "oracle_bgp_peering_ip"    : "192.168.254.2/30"
+                    }
+                },
+
+                "provider_service": {
+                    "provider_name"                : "Equinix",
+                    "provider_service_name"        : "Fabric"
+                }
+            }
+        },
+
+        "ipsecs": {
+            "office": {
+                "cpe_key"                          : "office",
+                "remote_cidrs"                     : ["172.20.0.0/16"],
+
+                "tunnels_management": {
+                    "tunnel_1": {
+                        "ike_version"              : "V2",
+                        "routing"                  : "BGP",
+                        "shared_secret"            : "EXAMPLE ONLY REPLACE ME",
+
+                        "bgp_session_info": {
+                            "customer_bgp_asn"     : "65001",
+                            "customer_interface_ip": "169.254.20.1/30",
+                            "oracle_interface_ip"  : "169.254.20.2/30"
+                        }
+                    },
+
+                    "tunnel_2": {
+                        "ike_version"              : "V2",
+                        "routing"                  : "BGP",
+                        "shared_secret"            : "ocid1.vaultsecret.oc1..REPLACE_WITH_EXISTING_SECRET",
+
+                        "bgp_session_info": {
+                            "customer_bgp_asn"     : "65001",
+                            "customer_interface_ip": "169.254.21.1/30",
+                            "oracle_interface_ip"  : "169.254.21.2/30"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -39,7 +39,7 @@ export interface FlowChoice {
 }
 
 /** Concrete choices for one source environment, including every east-west destination. */
-export function flowChoices(environments: { name: string }[], sourceIndex: number, ingressAvailable = true): FlowChoice[] {
+export function flowChoices(environments: { name: string }[], sourceIndex: number, ingressAvailable = true, externalConnections: { id: string; name: string; type: string }[] = []): FlowChoice[] {
   const source = environments[sourceIndex];
   if (!source) return [];
   return [
@@ -53,6 +53,10 @@ export function flowChoices(environments: { name: string }[], sourceIndex: numbe
         sub: 'east-west',
       })),
     { id: flowId(source.name, 'services'), label: 'Spoke → OCI Services', sub: 'Service Gateway' },
+    ...externalConnections.flatMap((connection) => [
+      { id: flowId(source.name, `hybrid-out@${connection.id}`), label: `Spoke → ${connection.name}`, sub: connection.type },
+      { id: flowId(source.name, `hybrid-in@${connection.id}`), label: `${connection.name} → Spoke`, sub: connection.type },
+    ]),
   ];
 }
 
@@ -235,13 +239,14 @@ function FlowDetail({ trace, step, roles, focus, onFocus, onStep, onHoverHop }: 
   );
 }
 
-const KIND_ORDER: FlowKind[] = ['egress', 'ingress', 'east-west', 'services'];
+const KIND_ORDER: FlowKind[] = ['egress', 'ingress', 'east-west', 'services', 'hybrid-in', 'hybrid-out'];
 
 export default function FlowSidebar({
-  environments, active, traces, steps, onStep, onChange, collapsed, onToggleCollapse, onFocusChange,
+  environments, externalConnections = [], active, traces, steps, onStep, onChange, collapsed, onToggleCollapse, onFocusChange,
   allFlows = false, onAllFlowsChange, selected = null, onSelect, ingressAvailable = true,
 }: {
   environments: { name: string; roles: string[] }[];
+  externalConnections?: { id: string; name: string; type: string }[];
   ingressAvailable?: boolean;
   active: string[];
   traces: FlowTrace[];
@@ -348,7 +353,7 @@ export default function FlowSidebar({
               ))}
             </div>
             {environments.map((env, envIndex) => {
-              const choices = flowChoices(environments, envIndex, ingressAvailable);
+              const choices = flowChoices(environments, envIndex, ingressAvailable, externalConnections);
               const hasSelected = choices.some((choice) => choice.id === selected);
               const open = hasSelected || (openEnvs[env.name] ?? true);
               return (
@@ -403,7 +408,7 @@ export default function FlowSidebar({
           <div style={styles.empty}>No environments yet — add one in the form to pick flows.</div>
         ) : (
           environments.map((env, envIndex) => {
-            const choices = flowChoices(environments, envIndex, ingressAvailable);
+            const choices = flowChoices(environments, envIndex, ingressAvailable, externalConnections);
             const activeChoices = choices.filter((choice) => set.has(choice.id) || env.roles.some((role) => set.has(`${choice.id}:${role}`)));
             const open = choices.some((choice) => choice.id === selected) || (openEnvs[env.name] ?? (envIndex === 0 || activeChoices.length > 0));
             return (

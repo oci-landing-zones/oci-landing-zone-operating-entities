@@ -11,6 +11,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useParams } from 'react-router-dom';
 import { useWizard } from '../wizardContext';
+import { containsInlineSecrets, hybridConfig, validateHybridConnectivity } from '../../services/hybridConnectivity';
 import { oracle } from '../../theme';
 import { s } from './networkEditorStyles';
 import { serializeConfig } from '../../services/lzConfig';
@@ -140,10 +141,12 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
       ...(shortNameError ? [shortNameError] : []),
       ...validatePlatformContracts(model), ...validateExadataModel(model),
       ...validateNotificationEmails(model.foundation.notifications, regional),
-      ...validateRemotePeering(model), ...validateRegionalDeployment(model),
+      ...validateHybridConnectivity(model), ...validateRemotePeering(model), ...validateRegionalDeployment(model),
       ...platformReadiness(model, 'oke_simple').errors,
     ])];
   }, [model, regional]);
+  const hasSecrets = containsInlineSecrets(model.hybridConnectivity);
+  const hasConnectivity = !!hybridConfig(model);
   const stale = result !== null && !isCurrentOutputSet(result, configText);
   const deployFiles = result && !stale
     ? Object.keys(result.files)
@@ -175,8 +178,8 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
       }
       return out;
     } catch (err) {
-      // Retain the previous generated file list when a new run fails.
-      setError(err instanceof Error ? err.message : String(err));
+      // Keep the previous snapshot; download eligibility still checks config and output format.
+      setError(hasSecrets ? 'Generation failed. Check connectivity settings and required fields; secret values are omitted from diagnostics.' : err instanceof Error ? err.message : String(err));
       return null;
     } finally {
       setBusy(false);
@@ -237,6 +240,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
           </ul>
 
           <h3 style={{ ...s.title, fontSize: 16 }}>Download deployment files</h3>
+          {hasSecrets && <p role="note">This download contains the secret values entered in this session. Store it privately. Secret values and these generated files are not retained in browser storage.</p>}
           <div style={local.note}>
             Download this design and its deployment files as a ZIP. Review the files and replace placeholders before deploying.
           </div>
@@ -271,7 +275,26 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <h2 style={s.title}>Deploy with OCI Resource Manager</h2>
+          <h2 style={s.title}>{hasConnectivity ? 'Deploy hybrid connectivity with Terraform CLI' : 'Deploy with OCI Resource Manager'}</h2>
+          {hasConnectivity ? <div style={local.guide}>
+            <p>Studio creates configuration files. Terraform creates or updates the OCI resources; your network team completes the external connection afterward.</p>
+            <div style={local.guideTitle}>Deploy the OCI resources</div>
+            <p>Your deployment team supplies OCI authentication, the tenancy OCID, region and protected Terraform state. Ask it to review and apply the downloaded file set.</p>
+            <ol style={local.ordered}>
+              <li>Unzip the download into a private directory. Use the root of <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_RELEASE_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator v2.2.0</a> with Terraform CLI and your approved OCI authentication. The pinned Resource Manager facade has an incompatible provider constraint for this add-on.</li>
+              <li>For an existing landing zone, retain its complete configuration and Terraform state. Adding a connection is an update to that deployment. A second state must not manage the same resources.</li>
+              <li>Supply your tenancy OCID and region to the orchestrator. Run <code>terraform init</code>, then <code>terraform plan</code> with one <code>-var-file</code> argument for each generated deployment file in the phase below. The source <code>{CONFIG_FILENAME}</code> is a design record, not a Terraform variable file.</li>
+              <li>Review the plan before applying. Investigate unexpected deletions or replacements. Apply the reviewed changes, then complete phase 2 using the same state and the final control files shown below.</li>
+            </ol>
+            <div style={local.guideTitle}>Complete the connection after deployment</div>
+            <ul style={local.ordered}>
+              {Object.keys(model.hybridConnectivity?.ipsecs ?? {}).length > 0 && <li><strong>VPN:</strong> obtain both Oracle tunnel endpoints and their keys from OCI. Your network team configures both router tunnels, matching IKE settings and return routes. For BGP, also configure the agreed neighbors and advertisements. A tunnel can remain Down until the router is ready.</li>}
+              {Object.keys(model.hybridConnectivity?.fast_connect_virtual_circuits ?? {}).length > 0 && <li><strong>FastConnect:</strong> complete the provider activation or physical connection work, then configure the peer's VLAN and BGP settings as required by the service. OCI resource creation does not activate the provider's side.</li>}
+              {Object.keys(model.hybridConnectivity?.cross_connect_groups ?? {}).length > 0 && <li><strong>Physical ports:</strong> complete cabling and activation before adding circuits that reference the provisioned port/group OCIDs. Keep the managed groups and ports in the design when adding the circuits.</li>}
+              <li><strong>Traffic and resilience:</strong> permit the approved traffic through firewall policies, network security groups and security lists. Check routes in both directions, test an application connection, and test each intended backup path with your network team.</li>
+            </ul>
+            <p>For router and provider procedures, see <a className="guide-link" href="https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/settingupIPsec.htm" target="_blank" rel="noreferrer">Oracle VPN setup</a> and <a className="guide-link" href="https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm" target="_blank" rel="noreferrer">Oracle FastConnect setup</a>.</p>
+          </div> : <>
           <div style={local.note}>
             Resource Manager runs the <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_RELEASE_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator v2.2.0 ↗</a>. The files from Studio are a separate configuration source for that stack. Use one stack for both phases; phase 2 updates its security, observability, and workload files.
           </div>
@@ -285,6 +308,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
               <li>Select <strong>Create</strong> without running an apply. From the stack details page, select <strong>Plan</strong>, review the changes and policy impact, then select <strong>Apply</strong>. Wait for a successful apply before starting phase 2.</li>
             </ol>
           </div>
+          </>}
           <div style={local.deployGrid}>
             {firstStage && (
               <div style={local.deployCard}>
@@ -314,6 +338,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
               </div>
             ))}
           </div>
+          {!hasConnectivity && <>
           <div className="deployment-links-heading">OCI Resource Manager resources</div>
           <div className="deployment-links" style={local.links} aria-label="OCI Resource Manager resources">
             <a href={RESOURCE_MANAGER_STACKS_URL} target="_blank" rel="noreferrer"><span>Open Resource Manager stacks</span><span aria-hidden="true">↗</span></a>
@@ -323,6 +348,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
             <a href={LANDING_ZONE_ORCHESTRATOR_URL} target="_blank" rel="noreferrer"><span>Landing Zone Orchestrator source</span><span aria-hidden="true">↗</span></a>
             <a href="https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/managingconfigurationsourceproviders.htm" target="_blank" rel="noreferrer"><span>Read: private configuration sources</span><span aria-hidden="true">↗</span></a>
           </div>
+          </>}
         </div>
       </section>
     </div>

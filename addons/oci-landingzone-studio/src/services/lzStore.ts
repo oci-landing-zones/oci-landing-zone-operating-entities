@@ -23,6 +23,7 @@ import { findRegion } from './regions';
 import { syncDrEnvironments } from './linkedDr';
 import { serializeConfig } from './lzConfig';
 import { isCurrentOutputSet } from '../generator/outputNames';
+import { containsInlineSecrets, stripInlineSecrets } from './hybridConnectivity';
 
 // Keep this namespace stable across the product rename so saved browser designs
 // remain available without introducing a pre-release migration solely for branding.
@@ -146,7 +147,7 @@ function readHomeRecord(id: string): LzRecord | null {
     const names = model.environments.map((env) => env.name.trim().toLowerCase());
     if (ids.some((id) => typeof id !== 'string' || !id.trim()) || new Set(ids).size !== ids.length
       || names.some((name) => !name) || new Set(names).size !== names.length) return null;
-    return { ...record, model: normalized };
+    return { ...record, model: stripInlineSecrets(normalized) };
   } catch {
     return null;
   }
@@ -160,7 +161,7 @@ export function getLZ(id: string): LzRecord | null {
   const record = readRecord(id);
   if (!record) return null;
   try {
-    const model = normalizeModel(record.model);
+    const model = stripInlineSecrets(normalizeModel(record.model));
     const home = linkedHomeRecord(record);
     return { ...record, model: home ? syncDrEnvironments(model, home.model) : model };
   } catch {
@@ -173,7 +174,7 @@ function createRecord(name: string, model: LzModel, clock: Date, homeLzId?: stri
   const record: LzRecord = { id: newId(), name, createdAt: ts, updatedAt: ts, model,
     ...(homeLzId ? { homeLzId } : {}) };
   try {
-    window.localStorage.setItem(recordKey(record.id), JSON.stringify(record));
+    window.localStorage.setItem(recordKey(record.id), JSON.stringify({ ...record, model: stripInlineSecrets(model) }));
   } catch {
     return { ok: false, message: STORAGE_FAILURE };
   }
@@ -206,12 +207,13 @@ export function saveLZ(id: string, model: LzModel): StoreResult {
   if (!stored || !existing) return { ok: false, message: 'This Landing Zone is no longer available in browser storage.' };
   const home = linkedHomeRecord(existing);
   if (existing.homeLzId && !home) return { ok: false, message: 'The linked Home Region design is unavailable or no longer uses the Home Region deployment type. This DR design was not changed.' };
-  const updated: LzRecord = { ...existing, model: home ? syncDrEnvironments(model, home.model) : model, updatedAt: now() };
+  const updated: LzRecord = { ...existing, model: stripInlineSecrets(home ? syncDrEnvironments(model, home.model) : model), updatedAt: now() };
   if (existing.disasterRecovery) {
     updated.previousCombinedDesign = { home: existing.model, ...existing.disasterRecovery };
     delete updated.disasterRecovery;
   }
   try {
+    if (containsInlineSecrets(model.hybridConnectivity)) window.localStorage.removeItem(outputsKey(id));
     window.localStorage.setItem(recordKey(id), JSON.stringify(updated));
   } catch {
     return { ok: false, message: STORAGE_FAILURE };
@@ -232,7 +234,7 @@ export function saveDisasterRecoveryLZ(input: { id?: string; name: string; model
     model: input.model, disasterRecovery: { draft: input.draft, sourceLabel: input.sourceLabel },
   };
   if (!record.name) return { ok: false, message: 'Landing Zone name cannot be empty.' };
-  try { window.localStorage.setItem(recordKey(record.id), JSON.stringify(record)); }
+  try { window.localStorage.setItem(recordKey(record.id), JSON.stringify({ ...record, model: stripInlineSecrets(record.model) })); }
   catch { return { ok: false, message: STORAGE_FAILURE }; }
   const indexed = upsertMeta({ id: record.id, name: record.name, createdAt: record.createdAt, updatedAt: record.updatedAt });
   if (indexed.ok) return { ok: true, record };
@@ -308,6 +310,12 @@ export function deleteLZ(id: string): StoreResult {
  */
 export function saveOutputs(id: string, outputs: Omit<LzOutputs, 'generatedAt'>): StoreResult {
   try {
+    if (Object.values(outputs.files).some((file) => {
+      try { return containsInlineSecrets(JSON.parse(file)); } catch { return true; }
+    })) {
+      window.localStorage.removeItem(outputsKey(id));
+      return { ok: true };
+    }
     const payload: LzOutputs = { ...outputs, generatedAt: now() };
     const packed = gzipSync(strToU8(JSON.stringify(payload)));
     window.localStorage.setItem(outputsKey(id), strFromU8(packed, true));

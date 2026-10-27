@@ -24,6 +24,7 @@ import { allFlowIds, buildFlowTraces, specFromId } from '../services/flowTrace';
 import { flowGroup } from '../diagram/flowOverlayGeometry';
 import LzDiagram, { DiagramZoomControls } from '../diagram/LzDiagram';
 import { serializeConfig } from '../services/lzConfig';
+import { hybridRoutes } from '../services/hybridConnectivity';
 import JsonViewer from '../components/JsonViewer';
 import ViewModeToggle, { type ViewMode } from '../components/ViewModeToggle';
 import FlowSidebar from '../components/FlowSidebar';
@@ -229,7 +230,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
       return { ...prev, [id]: next };
     });
   }
-  const configText = useMemo(() => serializeConfig(model, activeStep), [model, activeStep]);
+  const configText = useMemo(() => serializeConfig(model, activeStep, true), [model, activeStep]);
 
   function resetWizard() {
     if (!window.confirm('Clear all inputs for this Landing Zone?')) return;
@@ -378,6 +379,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
             {flowsOpen && (
               <div className="studio-flow-sidebar" style={{ height: 'calc(100vh - 185px)' }} inert={routing.pending || undefined}>
                 <FlowSidebar
+                  externalConnections={hybridRoutes(renderedModel)}
                   ingressAvailable={hasHubLoadBalancer(renderedModel)}
                   environments={renderedModel.environments.filter((env) => env.projectNetworkEnabled !== false).map((e, i) => ({
                     name: e.name.trim() || `env${i + 1}`,

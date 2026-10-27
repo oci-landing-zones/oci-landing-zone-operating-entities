@@ -94,6 +94,7 @@ Studio currently provides a guided interface for the following repository-suppor
 | Environments | Environment networks, optional OCI Security Zones, and projects |
 | Platforms | Environment OKE (`oke_simple`), Custom, EXACC, and EXACS platforms; shared Custom, EXACC, and EXACS platforms. Choose a type from each panel's dropdown. |
 | Exadata fields | Shared, hybrid, and dedicated EXACC/EXACS selections map to UC1, UC2, and UC3; EXACC stays networkless, while EXACS creates networks where AVMC/VMCs are placed. |
+| Hybrid connectivity | BGP/static VPNs with two tunnels, private/public FastConnect circuits, physical preparation, custom attachment routing, and inline VPN/BGP keys |
 | Outputs | Generated deployment ZIP, `config.jsonnet`, live diagram, and Draw.io export |
 | Deployment scope | Complete or regional DR using the standard wizard |
 | Remote peering | Multiple RPC acceptor/requester connections; same tenancy for regional DR, same or cross tenancy for complete deployments |
@@ -128,7 +129,9 @@ For deployment details, use the [Terraform deployment guide](../../commons/conte
 
 Studio runs entirely in the browser. It does not request OCI credentials, deploy to OCI, or send Landing Zone models or generated files to a service. Designs and the latest generated ZIP snapshot are retained only in the active browser profile using local storage.
 
-Use a browser profile controlled by the intended operator, and do not enter secrets into Studio. A downloaded ZIP remains usable if browser storage is unavailable, but the design may not be retained locally. Treat exported files as sensitive deployment artifacts and store them accordingly.
+Use a browser profile controlled by the intended operator. Connectivity keys entered in masked inputs remain in memory for the current session; saved designs retain the authentication mode and require key re-entry after reload. Secret-bearing generated outputs are not cached in browser storage. Explicit downloads contain the keys in `config.jsonnet` and generated network files. Keep those files, Terraform state and raw outputs private. Studio does not automatically copy keys into the landing zone Vault.
+
+Configure [OCI Hybrid Connectivity](../oci-hybrid-connectivity/README.md) in the separate optional VPN and FastConnect sections under Hub Network. Field information buttons provide explanations, illustrative examples and relevant Oracle documentation. Help supports pointer and keyboard access and closes with Escape or a click outside. Use the documented Terraform CLI handoff: the pinned Orchestrator v2.2.0 RMS facade's OCI provider constraint conflicts with Networking v0.9.0. Ready physical connection OCIDs and existing VPN secrets must be available before the connectivity apply.
 
 Studio displays a UPL license notice at the bottom of the dashboard. Your organization's architecture, security, compliance, and deployment approvals still apply.
 

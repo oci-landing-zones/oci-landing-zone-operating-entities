@@ -1,0 +1,109 @@
+{
+    "verified_on"                  : "2026-10-15",
+
+    "cpe_vendors": [
+        {
+            "name"                 : "Fortinet",
+            "label"                : "Fortinet",
+
+            "sources": [
+                "https://github.com/oci-landing-zones/terraform-oci-modules-networking/blob/v0.9.0/examples/edge-connectivity/ipsec-examples/generic-OCI-ipsec-bgp-vpn/README.md"
+            ]
+        },
+        {
+            "name"                 : "Other",
+            "label"                : "Other / generic",
+
+            "sources": [
+                "https://github.com/oci-landing-zones/terraform-oci-modules-networking/blob/v0.9.0/customer-premises-equipments.tf"
+            ]
+        }
+    ],
+
+    "provider_services": [
+        {
+            "key"                  : "equinix-fabric",
+            "label"                : "Equinix Fabric",
+            "provider_name"        : "Equinix",
+            "provider_service_name": "Fabric",
+
+            "regions": {
+                "oc19"             : ["eu-frankfurt-2"],
+
+                "oc1": [
+                    "ap-melbourne-1",
+                    "ap-osaka-1",
+                    "ap-seoul-1",
+                    "ap-singapore-1",
+                    "ap-sydney-1",
+                    "ap-tokyo-1",
+                    "ca-montreal-1",
+                    "ca-toronto-1",
+                    "eu-amsterdam-1",
+                    "eu-frankfurt-1",
+                    "eu-madrid-1",
+                    "eu-madrid-3",
+                    "eu-milan-1",
+                    "eu-paris-1",
+                    "eu-stockholm-1",
+                    "eu-zurich-1",
+                    "me-dubai-1",
+                    "mx-monterrey-1",
+                    "mx-queretaro-1",
+                    "sa-saopaulo-1",
+                    "sa-vinhedo-1",
+                    "uk-london-1",
+                    "us-ashburn-1",
+                    "us-phoenix-1",
+                    "us-sanjose-1"
+                ]
+            },
+
+            "sources": [
+                "https://www.oracle.com/cloud/networking/fastconnect/partners/",
+                "https://github.com/oci-landing-zones/terraform-oci-modules-networking/blob/v0.9.0/examples/edge-connectivity/fast-connect-examples/generic-oci-fastconnect-partner/README.md"
+            ]
+        },
+        {
+            "key"                  : "megaport-vxc",
+            "label"                : "Megaport VXC",
+            "provider_name"        : "Megaport",
+            "provider_service_name": "VXC",
+
+            "regions": {
+                "oc19"             : [],
+
+                "oc1": [
+                    "ap-melbourne-1",
+                    "ap-mumbai-1",
+                    "ap-osaka-1",
+                    "ap-singapore-1",
+                    "ap-singapore-2",
+                    "ap-sydney-1",
+                    "ap-tokyo-1",
+                    "ca-montreal-1",
+                    "ca-toronto-1",
+                    "eu-amsterdam-1",
+                    "eu-frankfurt-1",
+                    "eu-madrid-1",
+                    "eu-marseille-1",
+                    "eu-milan-1",
+                    "eu-paris-1",
+                    "eu-zurich-1",
+                    "sa-saopaulo-1",
+                    "sa-vinhedo-1",
+                    "uk-london-1",
+                    "us-ashburn-1",
+                    "us-chicago-1",
+                    "us-phoenix-1",
+                    "us-sanjose-1"
+                ]
+            },
+
+            "sources": [
+                "https://www.oracle.com/cloud/networking/fastconnect/partners/",
+                "https://docs.oracle.com/cd/F34086_01/database-migration-aws-to-oci-database_jp.pdf"
+            ]
+        }
+    ]
+}
