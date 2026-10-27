@@ -15,7 +15,7 @@ beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-j
 
 async function generated(model = emptyLzModel()) {
   const preview = await generatePreview(model);
-  return { model, preview: { tables: buildRouteTables(model, preview.network), inventory: preview.inventory } };
+  return { model, preview: { tables: buildRouteTables(model, preview.network), inventory: preview.inventory, files: preview.files } };
 }
 
 describe('diagram geometry and chosen export layers', () => {
@@ -38,7 +38,7 @@ describe('diagram geometry and chosen export layers', () => {
     const before = structuredClone(diagram);
     const build = vi.spyOn(graphBuilder, 'buildGraph').mockReturnValue(diagram);
     try {
-      const getDiagram = createDiagramGraph(emptyLzModel(), { tables: [], inventory: { compartments: [], groups: [] } });
+      const getDiagram = createDiagramGraph(emptyLzModel(), { tables: [], inventory: { compartments: [], groups: [] }, files: ['network.json'] });
       const all = getDiagram(5, { allFlows: true });
       const focused = getDiagram(5, { allFlows: true, focusFlow: 'prod:services' });
       const other = getDiagram(5, { allFlows: true, focusFlow: 'preprod:egress' });

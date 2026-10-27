@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useWizard } from '../wizardContext';
 import { containsInlineSecrets, validateHybridConnectivity } from '../../services/hybridConnectivity';
 import { oracle } from '../../theme';
@@ -21,10 +21,12 @@ import { getOutputs, saveOutputs } from '../../services/lzStore';
 // inside `run()`. Only its names — a dependency-free module — are imported here.
 import { CONFIG_FILENAME, deploymentStages, isCurrentOutputSet } from '../../generator/outputNames';
 import { bundleFilename, downloadBlob, zipTextFiles } from '../../export/zip';
-import { toDrawioXml } from '../../export/toDrawio';
+import { toDrawioPagesXml, toDrawioXml } from '../../export/toDrawio';
+import { createDiagramGraph, REVIEW_DIAGRAM_OPTIONS } from '../diagramGraph';
+import { loadDiagramPreview } from '../../services/diagramPreview';
 import { downloadTextFile } from '../../export/download';
 import { validatePlatformContracts } from '../../services/platformValidation';
-import { validateExadataModel } from '../../services/exadata';
+import { reconcileExadata, validateExadataModel } from '../../services/exadata';
 import { exadataReadiness, platformReadiness } from '../../services/platformReadiness';
 import { validateNotificationEmails } from '../../services/notificationEmails';
 import { validateRemotePeering } from '../../services/remotePeering';
@@ -89,11 +91,14 @@ function DeploymentText({ text }: { text: string }) {
     ? <code className="required-setting" key={index}>{part}</code> : part)}</>;
 }
 
-export default function ReviewStep({ designName, getDiagram, diagramReady = true }: { designName: string; getDiagram?: () => DiagramModel; diagramReady?: boolean }) {
-  const { model } = useWizard();
+export default function ReviewStep({ designName, getDiagram, diagramReady = true, generatedFiles }: { designName: string; getDiagram?: () => DiagramModel; diagramReady?: boolean; generatedFiles?: readonly string[] }) {
+  const { model, homeSource } = useWizard();
   const regional = model.foundation.stackScope === 'regional';
   const { id } = useParams();
   const [busy, setBusy] = useState(false);
+  const [diagramBusy, setDiagramBusy] = useState(false);
+  const diagramRequest = useRef<AbortController | null>(null);
+  useEffect(() => () => { diagramRequest.current?.abort(); }, [model, homeSource]);
   const [error, setError] = useState<string | null>(null);
   // Show the last generated file list when returning to Review.
   const [result, setResult] = useState<RunResult | null>(() => {
@@ -123,7 +128,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
   const handover = deploymentHandover(deploymentConfig);
   const stale = result !== null && (!isCurrentOutputSet(result, configText)
     || !Object.hasOwn(result.files, completionNetwork(deploymentConfig)));
-  const deployFiles = result && !stale
+  const deployFiles = generatedFiles ? [...generatedFiles] : result && !stale
     ? Object.keys(result.files)
     : expectedDeploymentFiles(deploymentConfig);
   const deployStages = deploymentStages(deployFiles, completionNetwork(deploymentConfig));
@@ -172,14 +177,35 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
     if (generated && isCurrentOutputSet(generated, currentConfig.current)) downloadResult(generated);
   }
 
-  function downloadDrawio() {
+  async function downloadDrawio() {
     const filename = bundleFilename(designName).replace(/-lz-outputs\.zip$/, '.drawio');
+    const controller = new AbortController();
+    diagramRequest.current?.abort();
+    diagramRequest.current = controller;
+    setDiagramBusy(true);
     setError(null);
     try {
       if (!getDiagram) throw new Error('Wait for the current diagram preview before exporting.');
-      downloadTextFile(filename, toDrawioXml(getDiagram()), 'application/xml');
+      const diagram = getDiagram();
+      let xml: string;
+      if (regional && homeSource) {
+        if (!homeSource.model) throw new Error('The linked Home Region design is unavailable. Restore it before exporting both diagrams.');
+        const homeModel = reconcileExadata(homeSource.model);
+        const preview = await loadDiagramPreview(homeModel, controller.signal);
+        if (controller.signal.aborted) return;
+        const homeDiagram = createDiagramGraph(homeModel, preview)(5, REVIEW_DIAGRAM_OPTIONS);
+        xml = toDrawioPagesXml([{ name: 'DR', diagram }, { name: 'Home Region', diagram: homeDiagram }]);
+      } else {
+        xml = toDrawioXml(diagram, regional ? 'DR' : 'Landing Zone');
+      }
+      if (!controller.signal.aborted) downloadTextFile(filename, xml, 'application/xml');
     } catch (error) {
-      setError(error instanceof Error ? error.message : String(error));
+      if (!controller.signal.aborted) setError(error instanceof Error ? error.message : String(error));
+    } finally {
+      if (diagramRequest.current === controller) {
+        diagramRequest.current = null;
+        setDiagramBusy(false);
+      }
     }
   }
 
@@ -235,11 +261,14 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
             >
               {busy ? 'Preparing download…' : 'Download files'}
             </button>
-            <button type="button" style={local.secondary} onClick={downloadDrawio} disabled={!diagramReady || !getDiagram}>
-              Export diagram (.drawio)
+            <button type="button" style={local.secondary} onClick={downloadDrawio} disabled={!diagramReady || !getDiagram || diagramBusy}>
+              {diagramBusy ? 'Preparing diagram…' : 'Export diagram (.drawio)'}
             </button>
           </div>
 
+          {regional && <p style={s.help}>{homeSource
+            ? 'The .drawio file includes separate DR and Home Region pages. The linked Home Region design must be available.'
+            : 'This standalone DR design has no linked Home Region. Its export contains only the DR diagram.'}</p>}
           {!diagramReady && <p role="status" style={local.note}>Diagram export is waiting for the current preview.</p>}
 
           {error && (
@@ -258,6 +287,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
           {(!result || stale) && <p style={local.note}>File lists are a preview of this design. Download the current files before deployment.</p>}
           <div style={local.guide}>
             <h3 style={local.guideTitle}>1. Prepare the files</h3>
+            {regional && homeSource && <p><Link className="guide-link" to={`/lz/${homeSource.id}?step=review`} target="_blank" rel="noreferrer">Open Home Region Review ↗</Link> to follow its deployment steps.</p>}
             <ul style={local.ordered}>
               {prerequisites.map((step) => <li key={step}><DeploymentText text={step} /></li>)}
               <li>{PRIVATE_SOURCE_STEP}</li>
