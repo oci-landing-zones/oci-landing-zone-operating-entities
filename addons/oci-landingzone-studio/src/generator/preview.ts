@@ -7,6 +7,7 @@ import { buildVirtualFs } from './virtualFs';
 export interface GeneratedPreview {
   network: unknown;
   inventory: GeneratedResourceInventory;
+  files: string[];
 }
 
 /** One canonical evaluation keeps the diagram's routes and resource inventory in the same snapshot. */
@@ -19,6 +20,7 @@ export async function generatePreview(model: LzModel): Promise<GeneratedPreview>
       local outputs = (import 'landing_zone_multi.jsonnet')(config);
       local configurations = ${JSON.stringify([...new Set(GENERATED_RESOURCE_COLLECTIONS.map((entry) => entry.configuration))])};
       {
+        files: std.objectFields(outputs),
         network: outputs['network.json'],
         artifacts: {
           [filename]: {
@@ -35,8 +37,9 @@ export async function generatePreview(model: LzModel): Promise<GeneratedPreview>
   }, { config: serializeConfig(model) });
   if (!result || typeof result !== 'object' || Array.isArray(result)) throw new Error('The generated diagram preview is unavailable.');
   const preview = result as Record<string, unknown>;
-  if (!preview.network || !preview.artifacts || typeof preview.artifacts !== 'object' || Array.isArray(preview.artifacts)) {
+  if (!preview.network || !preview.artifacts || typeof preview.artifacts !== 'object' || Array.isArray(preview.artifacts)
+    || !Array.isArray(preview.files) || !preview.files.every((file) => typeof file === 'string')) {
     throw new Error('The generated diagram preview is incomplete.');
   }
-  return { network: preview.network, inventory: extractGeneratedResources(preview.artifacts as Record<string, unknown>, preview.compartments) };
+  return { network: preview.network, inventory: extractGeneratedResources(preview.artifacts as Record<string, unknown>, preview.compartments), files: preview.files };
 }

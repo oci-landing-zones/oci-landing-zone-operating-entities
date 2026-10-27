@@ -10,6 +10,11 @@ import { serializeConfig } from '../services/lzConfig';
 import { generateOutputs } from '../generator/generate';
 import { generateDrFileBundle } from '../services/disasterRecoveryGeneration';
 import { downloadBlob } from '../export/zip';
+import { downloadTextFile } from '../export/download';
+import { loadDiagramPreview } from '../services/diagramPreview';
+import type { DiagramModel } from '../model/types';
+import type { DiagramPreview } from '../services/diagramPreview.worker';
+import type { HomeRegionSource } from '../wizard/wizardContext';
 import { WizardProvider } from '../wizard/wizardContext';
 import ReviewStep from '../wizard/steps/ReviewStep';
 import SavedLzList from './SavedLzList';
@@ -32,6 +37,8 @@ vi.mock('react/jsx-runtime', async (original) => {
 vi.mock('react-router-dom', async (original) => ({ ...await original<typeof import('react-router-dom')>(), useParams: () => ({ id: controls.id }) }));
 vi.mock('../generator/generate', () => ({ generateOutputs: vi.fn() }));
 vi.mock('../services/disasterRecoveryGeneration', () => ({ generateDrFileBundle: vi.fn() }));
+vi.mock('../services/diagramPreview', () => ({ loadDiagramPreview: vi.fn() }));
+vi.mock('../export/download', () => ({ downloadTextFile: vi.fn() }));
 vi.mock('../export/zip', async (original) => ({ ...await original<typeof import('../export/zip')>(), downloadBlob: vi.fn() }));
 
 beforeEach(() => {
@@ -43,6 +50,73 @@ beforeEach(() => {
     setItem: (key: string, value: string) => data.set(key, value),
     removeItem: (key: string) => data.delete(key),
   } } });
+});
+
+describe('diagram downloads', () => {
+  const preview: DiagramPreview = { tables: [], inventory: { compartments: [], groups: [] }, files: ['network.json'] };
+  const visible: DiagramModel = { nodes: [{ id: 'visible-dr', kind: 'region', label: 'Visible DR diagram', x: 0, y: 0, width: 100, height: 100 }], edges: [] };
+
+  function renderReview(regional: boolean, homeSource?: HomeRegionSource) {
+    const model = emptyLzModel();
+    model.foundation.stackScope = regional ? 'regional' : 'complete';
+    return renderToStaticMarkup(<MemoryRouter><WizardProvider initialModel={model} homeSource={homeSource}>
+      <ReviewStep designName="DR export" getDiagram={() => visible} diagramOptions={{ showEndpoints: true }} />
+    </WizardProvider></MemoryRouter>);
+  }
+
+  it('includes a fresh Home page and retains the visible DR page and selected layers', async () => {
+    const home = emptyLzModel();
+    vi.mocked(loadDiagramPreview).mockResolvedValue(preview);
+    const html = renderReview(true, { id: 'home', model: home });
+    expect(html).toContain('separate DR and Home Region pages');
+    await button('Export diagram (.drawio)')();
+    const xml = vi.mocked(downloadTextFile).mock.calls[0][1];
+    expect(xml.match(/<diagram\b/g)).toHaveLength(2);
+    expect(xml).toContain('name="DR"');
+    expect(xml).toContain('name="Home Region"');
+    expect(xml).toContain('Visible DR diagram');
+    expect(xml).toContain('sn-fra-lz-prod-web');
+    expect(xml).toContain('cmp-env-0-vcn-sn-0-ep-icon');
+    expect(vi.mocked(loadDiagramPreview).mock.calls[0][0]).toEqual(home);
+    expect(downloadTextFile).toHaveBeenCalledWith('dr-export.drawio', xml, 'application/xml');
+  });
+
+  it.each([false, true])('exports a single page without inventing a Home source: regional=%s', async (regional) => {
+    const html = renderReview(regional);
+    if (regional) expect(html).toContain('no linked Home Region');
+    await button('Export diagram (.drawio)')();
+    const xml = vi.mocked(downloadTextFile).mock.calls[0][1];
+    expect(xml.match(/<diagram\b/g)).toHaveLength(1);
+    expect(xml).toContain(`name="${regional ? 'DR' : 'Landing Zone'}"`);
+    expect(loadDiagramPreview).not.toHaveBeenCalled();
+  });
+
+  it('does not silently omit the Home page when the linked source is missing or generation fails', async () => {
+    renderReview(true, { id: 'missing-home' });
+    await button('Export diagram (.drawio)')();
+    expect(loadDiagramPreview).not.toHaveBeenCalled();
+    expect(downloadTextFile).not.toHaveBeenCalled();
+    controls.buttons = [];
+    renderReview(true, { id: 'home', model: emptyLzModel() });
+    vi.mocked(loadDiagramPreview).mockRejectedValueOnce(new Error('Home generation failed'));
+    await button('Export diagram (.drawio)')();
+    expect(downloadTextFile).not.toHaveBeenCalled();
+  });
+
+  it('cancels a superseded export and prevents its late result from downloading', async () => {
+    let finishFirst!: (value: DiagramPreview) => void;
+    vi.mocked(loadDiagramPreview)
+      .mockImplementationOnce(() => new Promise((resolve) => { finishFirst = resolve; }))
+      .mockResolvedValueOnce(preview);
+    renderReview(true, { id: 'home', model: emptyLzModel() });
+    const click = button('Export diagram (.drawio)');
+    const first = click();
+    await click();
+    finishFirst(preview);
+    await first;
+    expect(vi.mocked(loadDiagramPreview).mock.calls[0][1].aborted).toBe(true);
+    expect(downloadTextFile).toHaveBeenCalledTimes(1);
+  });
 });
 
 function button(label: string) {

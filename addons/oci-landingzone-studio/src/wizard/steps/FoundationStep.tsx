@@ -244,8 +244,9 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
       <section style={s.panel}>
         <div style={s.accent} />
         <div style={s.body}>
-          <div className="studio-info-heading"><h2 style={s.title}>{regional ? 'Environments to recover' : 'Environments'}</h2>
-            {!regional && <InfoButton title="Environments and Security Zones"><p>Environments separate stages such as production and development. Projects and workload platforms are placed within the environments you select.</p><p>A Security Zone applies additional restrictions to an environment. Check that those restrictions suit its workloads before enabling it.</p><p>You can remove every environment to design a hub with shared services only.</p></InfoButton>}
+          <div className="studio-info-heading"><h2 style={s.title}>{regional ? 'Home Region environments' : 'Environments'}</h2>
+            {regional ? <InfoButton title="Home Region environments"><p>These environments are expected to be deployed in the Home Region. DR reuses their existing compartments, IAM and governance.</p><p>{homeSource ? 'Environment names and membership sync from the Home Region design. Edit them there.' : 'Use the same environment names as your Home Region deployment.'}</p></InfoButton>
+              : <InfoButton title="Environments and Security Zones"><p>Environments separate stages such as production and development. Projects and workload platforms are placed within the environments you select.</p><p>A Security Zone applies additional restrictions to an environment. Check that those restrictions suit its workloads before enabling it.</p><p>You can remove every environment to design a hub with shared services only.</p></InfoButton>}
           </div>
           {homeSource ? <>
             <p id="foundation-environments-help" style={form.intro}>{homeSource.model
@@ -268,7 +269,7 @@ export default function FoundationStep({ name, onNameChange, onNameBlur, nameErr
             <span>Actions</span>
           </div>
           {envs.length === 0 && <div style={s.empty}>{regional
-            ? 'No recovery environments. Hub and shared services only.'
+            ? 'No Home Region environments. Hub and shared services only.'
             : 'Hub and shared services only. Environments are optional.'}</div>}
           {envs.map((env, i) => (
             <div key={i} style={{ ...s.row, ...environmentGrid }} className={regional ? undefined : 'foundation-environment-grid'}>

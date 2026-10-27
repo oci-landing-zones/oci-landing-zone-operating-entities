@@ -4,7 +4,7 @@ import type { DiagramPreview } from '../services/diagramPreview.worker';
 import { diagramPreviewView } from './useDiagramPreview';
 
 function preview(id: string): DiagramPreview {
-  return { tables: [], inventory: { compartments: [{ key: id, name: id }], groups: [] } };
+  return { tables: [], inventory: { compartments: [{ key: id, name: id }], groups: [] }, files: ['network.json'] };
 }
 
 describe('atomic diagram preview state', () => {

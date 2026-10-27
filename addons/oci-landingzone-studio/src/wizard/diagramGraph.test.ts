@@ -12,7 +12,7 @@ beforeAll(() => setAssetLoader(async () => ({ wasmBinary: readFileSync('3rd/go-j
 
 async function generated(model = emptyLzModel()) {
   const preview = await generatePreview(model);
-  return { model, preview: { tables: buildRouteTables(model, preview.network), inventory: preview.inventory } };
+  return { model, preview: { tables: buildRouteTables(model, preview.network), inventory: preview.inventory, files: preview.files } };
 }
 
 describe('diagram geometry and chosen export layers', () => {

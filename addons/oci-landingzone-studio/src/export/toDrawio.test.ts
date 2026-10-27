@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toDrawioXml } from './toDrawio';
+import { toDrawioPagesXml, toDrawioXml } from './toDrawio';
 import { buildGraph } from '../diagram/buildGraph';
 import { emptyLzModel } from '../model/defaults';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
@@ -11,6 +11,24 @@ import { resourceGroupLayout, resourceGroupSvg } from '../diagram/resourceGroups
 import { ATTACHMENT_LABEL, DRG_CAPTION } from '../diagram/layoutPolicy';
 
 describe('toDrawioXml', () => {
+  it('keeps each region on its own page with the same graph geometry as its single-page export', () => {
+    const home = buildGraph(emptyLzModel(), 5, { showEndpoints: true });
+    const drModel = emptyLzModel();
+    drModel.foundation = { ...drModel.foundation, stackScope: 'regional', region: 'eu-amsterdam-1', regionShortName: 'ams' };
+    const dr = buildGraph(drModel, 5, { showEndpoints: true });
+    const xml = toDrawioPagesXml([{ name: 'DR', diagram: dr }, { name: 'Home Region & source', diagram: home }]);
+    const pages = [...xml.matchAll(/<diagram\b[^>]*>[\s\S]*?<\/diagram>/g)].map((match) => match[0]);
+    expect(xml.match(/<mxfile\b/g)).toHaveLength(1);
+    expect(pages).toHaveLength(2);
+    expect(pages[0]).toBe(toDrawioXml(dr, 'DR').match(/<diagram\b[^>]*>[\s\S]*?<\/diagram>/)![0]);
+    expect(pages[1]).toBe(toDrawioXml(home, 'Home Region & source').match(/<diagram\b[^>]*>[\s\S]*?<\/diagram>/)![0].replace('id="lz"', 'id="lz-2"'));
+    expect(pages[1]).toContain('name="Home Region &amp; source"');
+    expect(pages[0]).toContain('eu-amsterdam-1');
+    expect(pages[0]).not.toContain('eu-frankfurt-1');
+    expect(pages[1]).toContain('eu-frankfurt-1');
+    expect(pages[1]).not.toContain('eu-amsterdam-1');
+  });
+
   it('embeds the exact resource block shown on the website at the model position and extent', () => {
     const resourceItems = [{ key: 'added-by-generator', name: 'new-generated-resource<&>' }];
     const width = 180;

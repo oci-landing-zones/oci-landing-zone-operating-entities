@@ -15,6 +15,7 @@ describe('canonical diagram preview', () => {
     const model = emptyLzModel();
     const preview = await generatePreview(model);
     const generated = await generateOutputs(model);
+    expect(preview.files).toEqual(Object.keys(generated.files).sort());
     const outputs = Object.fromEntries(Object.entries(generated.files).map(([name, value]) => [name, JSON.parse(value)]));
     expect(preview.network).toEqual(outputs['network.json']);
     expect(preview.inventory).toEqual(extractGeneratedResources(outputs, outputs['iam.json'].compartments_configuration));
@@ -76,6 +77,7 @@ describe('canonical diagram preview', () => {
       const preview = await generatePreview(emptyLzModel());
       expect(preview.inventory.groups.some((group) => group.kind === 'events')).toBe(true);
       expect(preview.network).toBeDefined();
+      expect(preview.files).toContain('runtime-workload.json');
     } finally { replacement.mockRestore(); }
   }, 60_000);
 
