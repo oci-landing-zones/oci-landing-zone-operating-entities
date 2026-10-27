@@ -12,6 +12,56 @@ function(config, n)
     default_compartment_id: 'TENANCY-ROOT',
 
     namespaces: {
+      [n.key_global('TAGNS', ['COST', 'GOVERNANCE'])]: {
+        name: n.display_global('tagns', ['cost', 'governance']),
+        description: 'Cost governance tags for FinOps reporting.',
+        is_retired: false,
+
+        tags: {
+          [n.key_global('TAG', ['COST', 'CENTER'])]: {
+            name: n.display_global('tag', ['cost', 'center']),
+            description: 'Cost center responsible for the resource.',
+            is_cost_tracking: false,
+            is_retired: false,
+            valid_values: ['none', 'CC12345'],
+          },
+          [n.key_global('TAG', ['PLATFORM'])]: {
+            name: n.display_global('tag', ['platform']),
+            description: 'Platform associated with the resource.',
+            is_cost_tracking: false,
+            is_retired: false,
+            valid_values: ['none', 'oke', 'ocvs', 'exacs', 'exacc', 'ebs', 'hpc', 'finops', 'ai-services'],
+          },
+          [n.key_global('TAG', ['ENVIRONMENT'])]: {
+            name: n.display_global('tag', ['environment']),
+            description: 'Deployment environment associated with the resource.',
+            is_cost_tracking: false,
+            is_retired: false,
+            valid_values: ['none', 'shared', 'prod', 'preprod', 'dev', 'uat', 'staging', 'test'],
+          },
+          [n.key_global('TAG', ['OWNER'])]: {
+            name: n.display_global('tag', ['owner']),
+            description: 'Person or team accountable for the resource.',
+            is_cost_tracking: false,
+            is_retired: false,
+            valid_values: ['none', 'email.address@example.com'],
+          },
+          [n.key_global('TAG', ['BUSINESS', 'UNIT'])]: {
+            name: n.display_global('tag', ['business', 'unit']),
+            description: 'Business unit responsible for the resource.',
+            is_cost_tracking: false,
+            is_retired: false,
+            valid_values: ['none', 'IT', 'Finance', 'Digital', 'Retail'],
+          },
+          [n.key_global('TAG', ['PROJECT'])]: {
+            name: n.display_global('tag', ['project']),
+            description: 'Project associated with the resource.',
+            is_cost_tracking: false,
+            is_retired: false,
+            valid_values: ['none', 'proj1'],
+          },
+        },
+      },
       [n.key_global('TAGNS', ['ROLE'])]: {
         name: n.display_global('tagns', ['role']),
         description: 'Tag namespace for Tag Based Access Controls of Landing Zone Roles.',
