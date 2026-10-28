@@ -146,7 +146,9 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   const flowLayer = diagramOnly && flowStepReached;
   const chosenOpts = useMemo<DiagramOptions>(
     () => {
-      if (!supportsFlowTracing) return { ...diagramOpts, activeFlows: [], allFlows: false, focusFlow: undefined };
+      // Hidden flows draw nothing, so their traces cannot keep the route tables open;
+      // the picks stay in state and return with Show flows.
+      if (!supportsFlowTracing || !diagramOpts.showFlows) return { ...diagramOpts, activeFlows: [], allFlows: false, focusFlow: undefined };
       // A clicked flow only stays selected while it is still being traced.
       const activeFlows = diagramOpts.activeFlows?.filter((id) => specFromId(renderedModel, id, '') !== null);
       const traced = diagramOpts.allFlows ? allFlowIds(renderedModel) : activeFlows ?? [];
@@ -158,6 +160,11 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   const effectiveOpts = useMemo<DiagramOptions>(() => flowLayer ? chosenOpts : {
     ...chosenOpts, showDots: false, showEndpoints: false, showFlows: false, activeFlows: [], allFlows: false, focusFlow: undefined,
   }, [flowLayer, chosenOpts]);
+  // The diagram's layer buttons hand back the rendered options; keep only the layer
+  // toggles so flow picks hidden by Hide flows are not overwritten.
+  function setDiagramLayers(next: DiagramOptions) {
+    setDiagramOpts((o) => ({ ...o, showFlows: next.showFlows, showEndpoints: next.showEndpoints, showDots: next.showDots, openTables: next.openTables }));
+  }
   // Clicking a flow path (or its sidebar row in all-flows mode) selects it; clicking it again clears.
   function selectFlow(group: string | null) {
     setDiagramOpts((o) => ({ ...o, focusFlow: group && o.focusFlow !== group ? group : undefined }));
@@ -355,7 +362,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 <div className="studio-diagram-canvas" aria-busy={routing.pending} data-preview-state={diagramStatus}
                   style={layout.diagramCanvas}>
                   {diagram ? <div style={{ height: '100%' }} inert={routing.pending || undefined}>
-                      <LzDiagram diagram={diagram} options={effectiveOpts} onOptionsChange={flowLayer ? setDiagramOpts : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} flowHint={flowHint} flowFocus={flowsOpen ? flowFocus : null}
+                      <LzDiagram diagram={diagram} options={effectiveOpts} onOptionsChange={flowLayer ? setDiagramLayers : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} flowHint={flowHint} flowFocus={flowsOpen ? flowFocus : null}
                         onFlowSelect={flowsOpen ? selectFlow : undefined} onFlowHover={(group) => setFlowFocus(group ? { group } : null)} />
                   </div> : <div role="status" style={{ height: '100%', display: 'grid', placeItems: 'center', color: oracle.textMuted, fontSize: 13 }}>
                     {diagramStatus === 'error' ? 'Diagram unavailable' : 'Preparing diagram…'}
