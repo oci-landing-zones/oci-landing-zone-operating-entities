@@ -4,12 +4,12 @@
       "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY": {
         "default_security_list": {
           "defined_tags": {
-            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
             "tagns-lz-cost-governance.tag-lz-environment": "prod",
-            "tagns-lz-cost-governance.tag-lz-owner": "none",
+            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform": "network",
-            "tagns-lz-cost-governance.tag-lz-project": "none"
+            "tagns-lz-cost-governance.tag-lz-project": "notapply"
           },
           "egress_rules": [],
           "ingress_rules": []
@@ -56,12 +56,12 @@
       "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY": {
         "default_security_list": {
           "defined_tags": {
-            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
             "tagns-lz-cost-governance.tag-lz-environment": "prod",
-            "tagns-lz-cost-governance.tag-lz-owner": "none",
+            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform": "network",
-            "tagns-lz-cost-governance.tag-lz-project": "none"
+            "tagns-lz-cost-governance.tag-lz-project": "notapply"
           },
           "egress_rules": [],
           "ingress_rules": []

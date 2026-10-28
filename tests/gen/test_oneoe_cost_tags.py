@@ -29,7 +29,7 @@ local p = publish(profiles.hub_e);
 """
         cls.outputs = json.loads(run_cmd([jsonnet_command(), "-e", code]).stdout)
 
-    def test_published_governance_has_required_defaults_for_new_compartments(self) -> None:
+    def test_published_governance_has_automatic_defaults_for_new_compartments(self) -> None:
         bootstrap = self.outputs["bootstrap"]["tags_configuration"]
         required = self.outputs["required"]["tags_configuration"]
         self.assertNotIn("default_defined_tags", required, "New tag definitions cannot use their own not-yet-created namespace")
@@ -37,11 +37,12 @@ local p = publish(profiles.hub_e);
         self.assertEqual(6, len(tags))
         for key, tag in tags.items():
             self.assertNotIn("tag_defaults", bootstrap["namespaces"]["TAGNS-LZ-COST-GOVERNANCE-KEY"]["tags"][key])
-            self.assertIn("none", tag["valid_values"])
+            self.assertIn("notapply" if key == "TAG-LZ-PROJECT-KEY" else "tobedefined", tag["valid_values"])
             self.assertEqual(1, len(tag["tag_defaults"]))
             default = next(iter(tag["tag_defaults"].values()))
             self.assertEqual(["CMP-LANDINGZONE-KEY"], default["compartment_ids"])
-            self.assertIs(True, default["is_user_required"])
+            self.assertIs(False, default["is_user_required"])
+            self.assertEqual("notapply" if key == "TAG-LZ-PROJECT-KEY" else "tobedefined", default["default_value"])
         self.assertIn("network", tags["TAG-LZ-PLATFORM-KEY"]["valid_values"])
         self.assertIn("security", tags["TAG-LZ-PLATFORM-KEY"]["valid_values"])
         self.assertIn("observability", tags["TAG-LZ-PLATFORM-KEY"]["valid_values"])
@@ -51,7 +52,7 @@ local p = publish(profiles.hub_e);
         lb = categories["0-shared"]["non_vcn_specific_gateways"]["l7_load_balancers"]["LB-FRA-LZ-PROD-01-KEY"]
         self.assertEqual("prod", lb["defined_tags"]["tagns-lz-cost-governance.tag-lz-environment"])
         self.assertEqual("network", lb["defined_tags"]["tagns-lz-cost-governance.tag-lz-platform"])
-        self.assertEqual("none", lb["defined_tags"]["tagns-lz-cost-governance.tag-lz-project"])
+        self.assertEqual("notapply", lb["defined_tags"]["tagns-lz-cost-governance.tag-lz-project"])
         nsg = categories["2-preprod"]["vcns"]["VCN-FRA-LZ-PREPROD-PROJECTS-KEY"]["network_security_groups"]["NSG-FRA-LZ-PREPROD-PROJ1-APP-KEY"]
         self.assertEqual("preprod", nsg["defined_tags"]["tagns-lz-cost-governance.tag-lz-environment"])
         self.assertEqual("proj1", nsg["defined_tags"]["tagns-lz-cost-governance.tag-lz-project"])
@@ -90,7 +91,7 @@ local p = publish(profiles.hub_e);
                 elif key.endswith("-SECURITY-KEY"):
                     self.assertEqual("security", compartment["defined_tags"][platform], key)
                 else:
-                    self.assertEqual("none", compartment["defined_tags"][platform], key)
+                    self.assertEqual("tobedefined", compartment["defined_tags"][platform], key)
 
     def test_tagging_preserves_every_other_configuration_field(self) -> None:
         def strip_cost_tags(value):

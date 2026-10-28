@@ -23,42 +23,42 @@ function(config, n)
             description: 'Cost center responsible for the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: ['none', 'CC12345'],
+            valid_values: ['tobedefined', 'CC12345'],
           },
           [n.key_global('TAG', ['PLATFORM'])]: {
             name: n.display_global('tag', ['platform']),
             description: 'Platform associated with the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: ['none', 'network', 'security', 'observability', 'oke', 'ocvs', 'exacs', 'exacc', 'ebs', 'hpc', 'finops', 'ai-services'],
+            valid_values: ['tobedefined', 'network', 'security', 'observability', 'oke', 'ocvs', 'exacs', 'exacc', 'ebs', 'hpc', 'finops', 'ai-services'],
           },
           [n.key_global('TAG', ['ENVIRONMENT'])]: {
             name: n.display_global('tag', ['environment']),
             description: 'Deployment environment associated with the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: std.set(['none', 'shared', 'prod', 'preprod', 'dev', 'uat', 'staging', 'test'] + std.objectFields(config.environments)),
+            valid_values: std.set(['tobedefined', 'shared', 'prod', 'preprod', 'dev', 'uat', 'staging', 'test'] + std.objectFields(config.environments)),
           },
           [n.key_global('TAG', ['OWNER'])]: {
             name: n.display_global('tag', ['owner']),
             description: 'Person or team accountable for the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: ['none', 'email.address@example.com'],
+            valid_values: ['tobedefined', 'email.address@example.com'],
           },
           [n.key_global('TAG', ['BUSINESS', 'UNIT'])]: {
             name: n.display_global('tag', ['business', 'unit']),
             description: 'Business unit responsible for the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: ['none', 'IT', 'Finance', 'Digital', 'Retail'],
+            valid_values: ['tobedefined', 'IT', 'Finance', 'Digital', 'Retail'],
           },
           [n.key_global('TAG', ['PROJECT'])]: {
             name: n.display_global('tag', ['project']),
             description: 'Project associated with the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: std.set(['none', 'proj1', 'proj2'] + std.flattenArrays([
+            valid_values: std.set(['notapply', 'proj1', 'proj2'] + std.flattenArrays([
               std.objectFields(config.environments[env].projects)
               for env in std.objectFields(config.environments)
               if std.objectHas(config.environments[env], 'projects')

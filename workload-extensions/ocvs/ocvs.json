@@ -4,12 +4,12 @@
         "default_ssh_authorized_keys"                              : "ssh-rsa REPLACE_WITH_CUSTOMER_PUBLIC_KEY",
 
         "default_defined_tags": {
-            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "ocvs",
-            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
         },
 
         "ocvs_clusters": {
@@ -27,12 +27,12 @@
                 "workload_network_cidr"                            : "172.16.0.0/24",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "ocvs",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                 },
 
                 "networking": {

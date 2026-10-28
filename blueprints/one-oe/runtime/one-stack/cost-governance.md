@@ -1,7 +1,7 @@
 # Cost governance tags
 
 One-OE uses one governance file, `oneoe_governance.json`, for the cost tag namespace,
-the six tag definitions, and six required Tag Defaults. The IAM, Hub A/B/C/E
+the six tag definitions, and six automatic Tag Defaults. The IAM, Hub A/B/C/E
 network, security, and observability files assign the six tags explicitly to
 resources that support them.
 
@@ -9,21 +9,21 @@ resources that support them.
 
 | Tag | Initial value |
 |---|---|
-| `tag-lz-cost-center` | `none` |
-| `tag-lz-business-unit` | `none` |
-| `tag-lz-owner` | `none` |
-| `tag-lz-platform` | `network` for network resources, `security` for security resources, `observability` for observability resources, and `none` for other IAM resources |
+| `tag-lz-cost-center` | `tobedefined` |
+| `tag-lz-business-unit` | `tobedefined` |
+| `tag-lz-owner` | `tobedefined` |
+| `tag-lz-platform` | `network` for network resources, `security` for security resources, `observability` for observability resources, and `tobedefined` for other IAM resources |
 | `tag-lz-environment` | `shared`, `prod`, or `preprod`, according to functional scope |
-| `tag-lz-project` | `proj1` for project-specific resources; otherwise `none` |
+| `tag-lz-project` | `proj1` for project-specific resources; otherwise `notapply` |
 
 Network compartments also use `platform=network`: `CMP-LZ-NETWORK-KEY`,
 `CMP-LZ-PROD-NETWORK-KEY`, and `CMP-LZ-PREPROD-NETWORK-KEY`. Security compartments
 use `platform=security`: `CMP-LZ-SECURITY-KEY`, `CMP-LZ-PROD-SECURITY-KEY`, and
-`CMP-LZ-PREPROD-SECURITY-KEY`. Other IAM resources retain `platform=none`.
+`CMP-LZ-PREPROD-SECURITY-KEY`. Other IAM resources retain `platform=tobedefined`.
 
 The public load balancer serves production and uses `environment=prod`, even
 though it resides in the shared hub. Shared project networks and subnets use
-`project=none`; project-specific NSGs use `project=proj1`. Existing IAM role tags
+`project=notapply`; project-specific NSGs use `project=proj1`. Existing IAM role tags
 are preserved. Components without their own tagging fields, such as listeners,
 backends, and NSG rules, do not receive a `defined_tags` field.
 
@@ -55,21 +55,25 @@ exported and re-imported just to create these Tag Defaults.
 The orchestrator orders a single apply as follows:
 
 ```text
-Namespaces and tag definitions
-          ↓ propagation wait
-Compartments with explicit tags
-          ↓
-Required Tag Defaults
-          ↓ propagation wait
-IAM services, network, security, observability, and workloads
-          (following their other resource dependencies)
+Tag namespaces and tag definitions
+                    ↓
+          Propagation wait
+                    ↓
+Compartments with all six tags explicitly assigned
+                    ↓
+         Automatic Tag Defaults
+                    ↓
+          Propagation wait
+                    ↓
+Networking, load balancers, Vault, buckets, and other services
+         according to their dependencies
 ```
 
 Compartments must carry explicit tags because their Tag Defaults are created
 after them. The tag definitions and namespaces themselves are not assigned cost
 tags that do not exist yet; the governance file avoids that bootstrap dependency.
 
-## Required Tag Defaults
+## Automatic Tag Defaults
 
 Each of the six definitions contains a block equivalent to:
 
@@ -77,30 +81,36 @@ Each of the six definitions contains a block equivalent to:
 "tag_defaults": {
   "TAG-LZ-PLATFORM-KEY-REQUIRED": {
     "compartment_ids": ["CMP-LANDINGZONE-KEY"],
-    "default_value": "none",
-    "is_user_required": true
+    "default_value": "tobedefined",
+    "is_user_required": false
   }
 }
 ```
 
 The orchestrator resolves `CMP-LANDINGZONE-KEY` from the compartment it creates.
-The schema requires `default_value`, but `is_user_required: true` selects the
-user-applied value requirement. It does not select automatic filling with `none`.
-`none`, `network`, `security`, and `observability` are accepted platform values, along with the
+Logical keys ending in `-REQUIRED` are retained to preserve existing Terraform
+addresses; the `is_user_required` flag controls whether a user-supplied value is required.
+With `is_user_required: false`, OCI applies `default_value: "tobedefined"`
+automatically when a newly created resource does not supply that tag. The project
+default is `notapply`; the other five defaults use `tobedefined`. Users do
+not have to enter the value themselves. Explicit resource values such as
+`network`, `security`, `observability`, `prod`, and `preprod` are preserved.
+`tobedefined`, `network`, `security`, and `observability` are accepted platform values, along with the
 other values declared in the definition.
 
-The requirement is inherited within `cmp-landingzone` and its descendants. It
+The defaults are inherited within `cmp-landingzone` and its descendants. It
 does not apply to tenancy-root resources or sibling compartments. It is not
 retroactive and does not prevent later tag modifications by authorized users.
 
 ## Validation
 
 Before applying, check the complete plan for six explicit tags on every taggable
-resource and six required Tag Defaults targeting the new landing-zone compartment.
+resource and six automatic Tag Defaults targeting the new landing-zone compartment.
 After applying, inspect the effective tags and confirm that all six defaults have
-`is-required=true`. Test that creating a resource inside the hierarchy without a
-required tag fails, and that creation with all six tags succeeds. Remove temporary
-test resources afterward.
+`is-required=false`, with `value=notapply` for project and `value=tobedefined`
+for the other five tags. Test that a new resource without
+explicit cost tags receives the defaults and that explicit values are preserved.
+Remove temporary test resources afterward.
 
 Existing deployments upgrading to the changed orchestrator ordering must review
 its state-address migration instructions before applying. Moving Tag Defaults
@@ -123,9 +133,9 @@ service load balancers. Service load balancers use `platform=network` and retain
 `tagns-lz-oke.platform`, which is required by their authorization policies.
 
 Static add-on inputs without a corresponding Jsonnet source carry explicit tags
-or supported module defaults. The illustrative values `none`, `CC12345`,
+or supported module defaults. The illustrative values `tobedefined`, `notapply`, `CC12345`,
 `email.address@example.com`, `proj1`, and `proj2` must be reviewed for the customer's
-organization. OpenShift and Secure Desktops currently use `platform=none` because
+organization. OpenShift and Secure Desktops currently use `platform=tobedefined` because
 no platform values for them are defined in this cost namespace. Archived and
 training exercise files are not part of the maintained deployment set.
 
@@ -133,7 +143,7 @@ training exercise files are not part of the maintained deployment set.
 
 Tags present in a JSON input do not prove that every resource created internally
 by its Terraform module receives them. Review the complete plan before using an
-extension under required Tag Defaults. In particular:
+extension with automatic Tag Defaults. In particular:
 
 - OCVS module `v1.1.0` accepts tag inputs but does not assign them to its SDDC or
   VLAN resources. Those resources require a downstream module correction; the
@@ -142,6 +152,49 @@ extension under required Tag Defaults. In particular:
   and boot volume created implicitly with an instance. Tagging the instance in
   DB Observability and other add-ons does not cover those implicit resources.
 
-These paths have not been certified for deployment with required tags until the
-module limitations are corrected and their complete resource plans are verified.
-Do not turn off required tags or treat a tagged input as proof of compliance.
+Automatic compartment defaults can fill omitted labels with `tobedefined`
+(`notapply` for project), but
+they do not infer the intended workload platform or environment. These module
+limitations still require verification of effective tags and, where necessary,
+a downstream correction to pass the intended values. A tagged input alone is
+not proof that each implicit resource receives its intended classification.
+
+Existing deployments are not modified by editing these files. Review a migration
+plan that updates resource values and tag validators together; changing a Tag
+Default does not rewrite tags already present on existing resources.
+
+## Monthly tag budgets
+
+`budgets_configuration` is a sibling of `tags_configuration` in the published
+`oneoe_governance.json`. Its publication source is
+`gen/blueprints/one-oe/runtime/one-stack/budgets.libsonnet`.
+
+| Tag | Value | Monthly amount |
+|---|---|---:|
+| `tag-lz-project` | `proj1` | 500 |
+| `tag-lz-environment` | `prod` | 3000 |
+| `tag-lz-environment` | `preprod` | 2000 |
+| `tag-lz-business-unit` | `IT` | 5000 |
+| `tag-lz-cost-center` | `CC12345` | 5000 |
+
+Amounts use the tenancy's rate-card currency. Each budget starts on day 1 of the
+month and has an actual-spend alert at 80%, addressed to
+`email.address@example.com`. Replace this example recipient before relying on
+email delivery. These are independent views of spending and must not be added:
+the same resource can count toward a project, environment, business unit, and
+cost-center budget simultaneously. Shared-resource spending is not included in
+the `prod` or `preprod` targets unless the resource has that environment value.
+
+Each target has the form `namespace.key.value`. The target selects the spending
+being measured; the budget's own `defined_tags` label the budget resource. Budget
+and alert metadata contain all six cost tags, using the module's inherited tags
+for the alert. The budgets are created in the tenancy root.
+
+The `IT` and `CC12345` budgets only count resources assigned those values. This
+budget configuration does not replace `tobedefined` on existing resource inputs.
+Confirm the organization and resource assignments before relying on those two
+budgets. Budgets generate alerts; they do not stop resources or enforce spending
+caps. See [OCI Budgets](https://docs.oracle.com/en-us/iaas/Content/Billing/Concepts/budgetsoverview.htm).
+
+`is_cost_tracking` can remain false: OCI Budgets supports all defined tags, as
+explained in the [June 2024 release note](https://docs.oracle.com/en-us/iaas/releasenotes/changes/04a707f1-e63f-4808-8662-d61a54f3a4ca/index.htm).

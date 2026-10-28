@@ -52,6 +52,7 @@ tags.apply({
     def test_lb_scope_does_not_blindly_follow_shared_compartment(self):
         lb = self.doc['network_configuration']['l7_load_balancers']['LB-PROD-KEY']
         self.assertEqual('prod', self.value(lb, 'environment'))
+        self.assertEqual('notapply', self.value(lb, 'project'))
         self.assertNotIn('defined_tags', lb['listeners']['main'])
 
     def test_oke_implicit_resources_keep_authorization(self):
@@ -73,7 +74,7 @@ tags.apply({
         cmps = self.doc['compartments_configuration']['compartments']
         self.assertEqual('oke', self.value(cmps['CMP-SANDBOX-KUBERNETES-KEY'], 'platform'))
         self.assertEqual('security', self.value(cmps['CMP-PROD-SECURITY-KEY'], 'platform'))
-        self.assertEqual('none', self.value(cmps['CMP-SHARED-ANALYTICS-KEY'], 'platform'))
+        self.assertEqual('tobedefined', self.value(cmps['CMP-SHARED-ANALYTICS-KEY'], 'platform'))
         obs = self.doc['notifications_configuration']
         self.assertEqual('observability', obs['default_defined_tags']['tagns-lz-cost-governance.tag-lz-platform'])
         self.assertNotIn('defined_tags', obs['topics']['TOPIC-SANDBOX-KEY']['subscriptions'][0])

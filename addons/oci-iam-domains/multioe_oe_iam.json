@@ -14,12 +14,12 @@
 
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role": "lz-network-admin",
-                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                            "tagns-lz-cost-governance.tag-lz-owner": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform": "network",
                             "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                         }
                     },
 
@@ -34,12 +34,12 @@
 
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role": "lz-network-admin",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform": "network",
                                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                 }
                             },
 
@@ -47,12 +47,12 @@
                                 "name"                                    : "cmp-lz-oe1-platform",
                                 "description"                             : "OE1 Shared Platform Compartment",
                                 "defined_tags" : {
-                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                 }
                             },
 
@@ -67,12 +67,12 @@
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role": "lz-network-admin",
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-platform": "network",
                                             "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -80,12 +80,12 @@
                                         "name"                            : "cmp-lz-oe1-preprod-platform",
                                         "description"                     : "OE1 Pre-Production Workload Environment, Common Platform Compartment",
                                         "defined_tags" : {
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -98,22 +98,22 @@
                                                 "name"                    : "cmp-lz-oe1-preprod-proj1",
                                                 "description"             : "OE1 Pre-Production environment, Project 1 compartment",
                                                 "defined_tags" : {
-                                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
                                                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                                                 }
                                             }
                                         },
                                         "defined_tags" : {
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -123,22 +123,22 @@
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role": "lz-security-admin",
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-platform": "security",
                                             "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     }
                                 },
                                 "defined_tags" : {
-                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                 }
                             },
 
@@ -153,12 +153,12 @@
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role": "lz-network-admin",
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-platform": "network",
                                             "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -166,12 +166,12 @@
                                         "name"                            : "cmp-lz-oe1-prod-platform",
                                         "description"                     : "OE1 Production Workload Environment, Common Platform Compartment",
                                         "defined_tags" : {
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -184,22 +184,22 @@
                                                 "name"                    : "cmp-lz-oe1-prod-proj1",
                                                 "description"             : "OE1 Production environment, Project 1 compartment",
                                                 "defined_tags" : {
-                                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
                                                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                                                 }
                                             }
                                         },
                                         "defined_tags" : {
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -209,22 +209,22 @@
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role": "lz-security-admin",
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-platform": "security",
                                             "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     }
                                 },
                                 "defined_tags" : {
-                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                 }
                             },
 
@@ -234,22 +234,22 @@
 
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role": "lz-security-admin",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform": "security",
                                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                 }
                             }
                         },
                         "defined_tags" : {
-                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                         }
                     },
 
@@ -264,12 +264,12 @@
 
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role": "lz-network-admin",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform": "network",
                                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                 }
                             },
 
@@ -277,12 +277,12 @@
                                 "name"                                    : "cmp-lz-oe2-platform",
                                 "description"                             : "OE2 Shared Platform Compartment",
                                 "defined_tags" : {
-                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                 }
                             },
 
@@ -297,12 +297,12 @@
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role": "lz-network-admin",
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-platform": "network",
                                             "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -310,12 +310,12 @@
                                         "name"                            : "cmp-lz-oe2-preprod-platform",
                                         "description"                     : "OE2 Pre-Production Workload Environment, Common Platform Compartment",
                                         "defined_tags" : {
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -328,22 +328,22 @@
                                                 "name"                    : "cmp-lz-oe2-preprod-proj1",
                                                 "description"             : "OE2 Pre-Production environment, Project 1 compartment",
                                                 "defined_tags" : {
-                                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
                                                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                                                 }
                                             }
                                         },
                                         "defined_tags" : {
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -353,22 +353,22 @@
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role": "lz-security-admin",
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-platform": "security",
                                             "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     }
                                 },
                                 "defined_tags" : {
-                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
-                                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                 }
                             },
 
@@ -383,12 +383,12 @@
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role": "lz-network-admin",
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-platform": "network",
                                             "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -396,12 +396,12 @@
                                         "name"                            : "cmp-lz-oe2-prod-platform",
                                         "description"                     : "OE2 Production Workload Environment, Common Platform Compartment",
                                         "defined_tags" : {
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -414,22 +414,22 @@
                                                 "name"                    : "cmp-lz-oe2-prod-proj1",
                                                 "description"             : "OE2 Production environment, Project 1 compartment",
                                                 "defined_tags" : {
-                                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
                                                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                                                 }
                                             }
                                         },
                                         "defined_tags" : {
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     },
 
@@ -439,22 +439,22 @@
 
                                         "defined_tags": {
                                             "tagns-lz-role.tag-lz-role": "lz-security-admin",
-                                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                            "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                             "tagns-lz-cost-governance.tag-lz-platform": "security",
                                             "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                         }
                                     }
                                 },
                                 "defined_tags" : {
-                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
-                                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                 }
                             },
 
@@ -464,22 +464,22 @@
 
                                 "defined_tags": {
                                     "tagns-lz-role.tag-lz-role": "lz-security-admin",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform": "security",
                                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                                 }
                             }
                         },
                         "defined_tags" : {
-                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                         }
                     },
 
@@ -487,12 +487,12 @@
                         "name"                                            : "cmp-lz-platform",
                         "description"                                     : "Shared Platform Compartment",
                         "defined_tags" : {
-                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                            "tagns-lz-cost-governance.tag-lz-owner": "none",
-                            "tagns-lz-cost-governance.tag-lz-platform": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                         }
                     },
 
@@ -502,32 +502,32 @@
 
                         "defined_tags": {
                             "tagns-lz-role.tag-lz-role": "lz-security-admin",
-                            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                            "tagns-lz-cost-governance.tag-lz-owner": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform": "security",
                             "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                            "tagns-lz-cost-governance.tag-lz-project": "none"
+                            "tagns-lz-cost-governance.tag-lz-project": "notapply"
                         }
                     }
                 },
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             }
         },
         "default_defined_tags" : {
-            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-            "tagns-lz-cost-governance.tag-lz-owner": "none",
-            "tagns-lz-cost-governance.tag-lz-platform": "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
             "tagns-lz-cost-governance.tag-lz-environment": "shared",
-            "tagns-lz-cost-governance.tag-lz-project": "none"
+            "tagns-lz-cost-governance.tag-lz-project": "notapply"
         }
     },
 
@@ -541,12 +541,12 @@
                 "description"                                             : "Tenancy-scoped audit and read-only access group.",
                 "identity_domain_id"                                      : "COMMON-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -555,12 +555,12 @@
                 "description"                                             : "Tenancy-scoped cost management access group.",
                 "identity_domain_id"                                      : "COMMON-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -569,12 +569,12 @@
                 "description"                                             : "Tenancy-scoped IAM administration access group.",
                 "identity_domain_id"                                      : "COMMON-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -583,12 +583,12 @@
                 "description"                                             : "Landing Zone shared network administration access group.",
                 "identity_domain_id"                                      : "COMMON-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -597,12 +597,12 @@
                 "description"                                             : "Landing Zone OE1 IAM administration access group.",
                 "identity_domain_id"                                      : "OE1-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -611,12 +611,12 @@
                 "description"                                             : "Landing Zone OE1 network administration access group.",
                 "identity_domain_id"                                      : "OE1-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -625,10 +625,10 @@
                 "description"                                             : "Landing Zone OE1 PreProduction environment, Project 1 administration access group.",
                 "identity_domain_id"                                      : "OE1-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -639,10 +639,10 @@
                 "description"                                             : "Landing Zone OE1 Production environment, Project 1 administration access group.",
                 "identity_domain_id"                                      : "OE1-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -653,12 +653,12 @@
                 "description"                                             : "Landing Zone OE1 security administration access group.",
                 "identity_domain_id"                                      : "OE1-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -667,12 +667,12 @@
                 "description"                                             : "Landing Zone OE2 IAM administration access group.",
                 "identity_domain_id"                                      : "OE2-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -681,12 +681,12 @@
                 "description"                                             : "Landing Zone OE2 network administration access group.",
                 "identity_domain_id"                                      : "OE2-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -695,10 +695,10 @@
                 "description"                                             : "Landing Zone OE2 PreProduction environment, Project 1 administration access group.",
                 "identity_domain_id"                                      : "OE2-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -709,10 +709,10 @@
                 "description"                                             : "Landing Zone OE2 Production environment, Project 1 administration access group.",
                 "identity_domain_id"                                      : "OE2-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -723,12 +723,12 @@
                 "description"                                             : "Landing Zone OE2 security administration access group.",
                 "identity_domain_id"                                      : "OE2-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -737,12 +737,12 @@
                 "description"                                             : "Landing Zone shared security administration access group.",
                 "identity_domain_id"                                      : "COMMON-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -751,34 +751,34 @@
                 "description"                                             : "Tenancy-scoped security service administration access group.",
                 "identity_domain_id"                                      : "COMMON-DOMAIN",
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             }
         },
         "default_defined_tags" : {
-            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-            "tagns-lz-cost-governance.tag-lz-owner": "none",
-            "tagns-lz-cost-governance.tag-lz-platform": "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
             "tagns-lz-cost-governance.tag-lz-environment": "shared",
-            "tagns-lz-cost-governance.tag-lz-project": "none"
+            "tagns-lz-cost-governance.tag-lz-project": "notapply"
         }
     },
 
     "identity_domains_configuration": {
         "default_compartment_id"                                          : null,
         "default_defined_tags"                                            : {
-            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-            "tagns-lz-cost-governance.tag-lz-owner": "none",
-            "tagns-lz-cost-governance.tag-lz-platform": "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
             "tagns-lz-cost-governance.tag-lz-environment": "shared",
-            "tagns-lz-cost-governance.tag-lz-project": "none"
+            "tagns-lz-cost-governance.tag-lz-project": "notapply"
         },
         "default_freeform_tags"                                           : null,
 
@@ -799,12 +799,12 @@
                 "license_type"                                            : "free",
                 "replica_region"                                          : null,
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -824,12 +824,12 @@
                 "license_type"                                            : "free",
                 "replica_region"                                          : null,
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -849,12 +849,12 @@
                 "license_type"                                            : "free",
                 "replica_region"                                          : null,
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             }
         }
@@ -894,12 +894,12 @@
                     "allow group 'id_lz_common'/'grp-auditors-admin' to use ons-family in tenancy where any {request.operation!=/Create*/, request.operation!=/Update*/, request.operation!=/Delete*/, request.operation!=/Change*/}"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -915,12 +915,12 @@
                     "allow group 'id_lz_common'/'grp-cost-admin' to manage usage-budgets in tenancy"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -938,12 +938,12 @@
                     "allow any-user to inspect tag-namespaces in tenancy where target.tag-namespace.name='tagns-lz-role'"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -968,12 +968,12 @@
                     "allow group 'id_lz_common'/'grp-iam-admin' to manage orm-config-source-providers in tenancy"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -1013,12 +1013,12 @@
                     "allow group 'id_lz_common'/'grp-lz-network-admin' to read logging-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -1034,12 +1034,12 @@
                     "allow group 'id_lz_oe1'/'grp-lz-oe1-iam-admin' to manage dynamic-groups in tenancy where target.resource.domain.name = 'id_lz_oe1'"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -1079,12 +1079,12 @@
                     "allow group 'id_lz_oe1'/'grp-lz-oe1-network-admin' to read logging-family in compartment cmp-lz-oe1 where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -1127,10 +1127,10 @@
                     "allow group 'id_lz_oe1'/'grp-lz-oe1-preprod-proj1-admin' to manage data-safe-family in compartment cmp-lz-oe1-preprod-proj1"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1148,10 +1148,10 @@
                     "allow group 'id_lz_oe1'/'grp-lz-oe1-preprod-proj1-admin' to manage private-ips in compartment cmp-lz-oe1-preprod-network"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1171,10 +1171,10 @@
                     "allow group 'id_lz_oe1'/'grp-lz-oe1-preprod-proj1-admin' to read logging-family in compartment cmp-lz-oe1-preprod-security"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1219,10 +1219,10 @@
                     "allow group 'id_lz_oe1'/'grp-lz-oe1-prod-proj1-admin' to manage data-safe-family in compartment cmp-lz-oe1-prod-proj1"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1240,10 +1240,10 @@
                     "allow group 'id_lz_oe1'/'grp-lz-oe1-prod-proj1-admin' to manage private-ips in compartment cmp-lz-oe1-prod-network"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1263,10 +1263,10 @@
                     "allow group 'id_lz_oe1'/'grp-lz-oe1-prod-proj1-admin' to read logging-family in compartment cmp-lz-oe1-prod-security"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1320,12 +1320,12 @@
                     "allow group 'id_lz_oe1'/'grp-lz-oe1-security-admin' to manage operator-control-family in compartment cmp-lz-oe1 where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -1341,12 +1341,12 @@
                     "allow group 'id_lz_oe2'/'grp-lz-oe2-iam-admin' to manage dynamic-groups in tenancy where target.resource.domain.name = 'id_lz_oe2'"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -1386,12 +1386,12 @@
                     "allow group 'id_lz_oe2'/'grp-lz-oe2-network-admin' to read logging-family in compartment cmp-lz-oe2 where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -1434,10 +1434,10 @@
                     "allow group 'id_lz_oe2'/'grp-lz-oe2-preprod-proj1-admin' to manage data-safe-family in compartment cmp-lz-oe2-preprod-proj1"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1455,10 +1455,10 @@
                     "allow group 'id_lz_oe2'/'grp-lz-oe2-preprod-proj1-admin' to manage private-ips in compartment cmp-lz-oe2-preprod-network"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1478,10 +1478,10 @@
                     "allow group 'id_lz_oe2'/'grp-lz-oe2-preprod-proj1-admin' to read logging-family in compartment cmp-lz-oe2-preprod-security"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "preprod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1526,10 +1526,10 @@
                     "allow group 'id_lz_oe2'/'grp-lz-oe2-prod-proj1-admin' to manage data-safe-family in compartment cmp-lz-oe2-prod-proj1"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1547,10 +1547,10 @@
                     "allow group 'id_lz_oe2'/'grp-lz-oe2-prod-proj1-admin' to manage private-ips in compartment cmp-lz-oe2-prod-network"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1570,10 +1570,10 @@
                     "allow group 'id_lz_oe2'/'grp-lz-oe2-prod-proj1-admin' to read logging-family in compartment cmp-lz-oe2-prod-security"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "prod",
                     "tagns-lz-cost-governance.tag-lz-project": "proj1"
                 }
@@ -1627,12 +1627,12 @@
                     "allow group 'id_lz_oe2'/'grp-lz-oe2-security-admin' to manage operator-control-family in compartment cmp-lz-oe2 where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -1684,12 +1684,12 @@
                     "allow group 'id_lz_common'/'grp-lz-security-admin' to manage operator-control-family in compartment cmp-landingzone where sets-intersect(target.resource.compartment.tag.tagns-lz-role.tag-lz-role, ('lz-security-admin'))"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -1704,12 +1704,12 @@
                     "allow group 'id_lz_common'/'grp-security-admin' to read tenancies in tenancy"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             },
 
@@ -1734,22 +1734,22 @@
                     "allow service blockstorage, oke, streaming, Fssoc1Prod, objectstorage-eu-frankfurt-1 to use keys in tenancy"
                 ],
                 "defined_tags" : {
-                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-owner": "none",
-                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment": "shared",
-                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                    "tagns-lz-cost-governance.tag-lz-project": "notapply"
                 }
             }
         },
         "default_defined_tags" : {
-            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
-            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-            "tagns-lz-cost-governance.tag-lz-owner": "none",
-            "tagns-lz-cost-governance.tag-lz-platform": "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform": "tobedefined",
             "tagns-lz-cost-governance.tag-lz-environment": "shared",
-            "tagns-lz-cost-governance.tag-lz-project": "none"
+            "tagns-lz-cost-governance.tag-lz-project": "notapply"
         }
     }
 }

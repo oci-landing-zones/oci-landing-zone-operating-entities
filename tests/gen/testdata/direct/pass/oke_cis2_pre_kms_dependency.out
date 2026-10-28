@@ -4,12 +4,12 @@
   "pre_key": {
     "compartment_id": "CMP-LZ-VALIDATION-OKE-KEY",
     "defined_tags": {
-      "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-      "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+      "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+      "tagns-lz-cost-governance.tag-lz-cost-center": "tobedefined",
       "tagns-lz-cost-governance.tag-lz-environment": "validation",
-      "tagns-lz-cost-governance.tag-lz-owner": "none",
+      "tagns-lz-cost-governance.tag-lz-owner": "tobedefined",
       "tagns-lz-cost-governance.tag-lz-platform": "security",
-      "tagns-lz-cost-governance.tag-lz-project": "none"
+      "tagns-lz-cost-governance.tag-lz-project": "notapply"
     },
     "name": "key-fra-lz-validation-oke-kube-secrets",
     "protection_mode": "HSM",

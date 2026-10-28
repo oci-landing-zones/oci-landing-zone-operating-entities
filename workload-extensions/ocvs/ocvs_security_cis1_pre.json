@@ -5,12 +5,12 @@
         "self_manage_resources"                                    : false,
 
         "default_defined_tags": {
-            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
-            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "security",
-            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
         },
 
         "targets": {
@@ -22,12 +22,12 @@
                 "use_cloned_recipes"                               : true,
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                 }
             }
         }
@@ -37,12 +37,12 @@
         "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
 
         "default_defined_tags": {
-            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
-            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "security",
-            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
         },
 
         "host_recipes": {
@@ -57,12 +57,12 @@
                 },
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                 },
 
                 "file_scan_settings": {
@@ -86,12 +86,12 @@
                 "target_compartment_id"                            : "CMP-LANDINGZONE-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                 }
             }
         }
@@ -102,12 +102,12 @@
         "tenancy_ocid"                                             : "TENANCY-ROOT",
 
         "default_defined_tags": {
-            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
-            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
             "tagns-lz-cost-governance.tag-lz-platform"             : "security",
-            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
         },
 
         "recipes": {
@@ -118,12 +118,12 @@
                 "cis_level"                                        : "1",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                 }
             },
 
@@ -134,12 +134,12 @@
                 "cis_level"                                        : "1",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                 },
 
                 "security_policies_ocids": [
@@ -157,12 +157,12 @@
                 "cis_level"                                        : "1",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                 },
 
                 "security_policies_ocids": [
@@ -203,12 +203,12 @@
                 "recipe_key"                                       : "SZ-RCP-LZ-01-CIS-L1-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
-                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"     : "security",
-                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                 }
             }
         }

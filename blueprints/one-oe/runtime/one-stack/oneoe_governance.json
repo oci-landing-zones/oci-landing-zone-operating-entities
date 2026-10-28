@@ -1,30 +1,218 @@
 {
+    "budgets_configuration": {
+        "budgets": {
+            "BUDGET-BUSINESS-UNIT-IT-KEY": {
+                "name"                                             : "budget-business-unit-it",
+                "description"                                      : "Monthly budget for tag-lz-business-unit=IT.",
+                "amount"                                           : 5000,
+
+                "alert_rule": {
+                    "name"                                         : "budget-business-unit-it-80",
+                    "message"                                      : "Actual spending for tag-lz-business-unit=IT has reached 80% of the monthly budget.",
+                    "recipients"                                   : "email.address@example.com",
+                    "threshold_metric"                             : "ACTUAL",
+                    "threshold_type"                               : "PERCENTAGE",
+                    "threshold_value"                              : 80
+                },
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "IT",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                },
+
+                "schedule": {
+                    "day_of_month_to_begin"                        : 1,
+                    "processing_period_type"                       : "MONTH",
+                    "reset_period"                                 : "MONTHLY"
+                },
+
+                "target": {
+                    "type"                                         : "TAG",
+                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-business-unit.IT"]
+                }
+            },
+
+            "BUDGET-COST-CENTER-CC12345-KEY": {
+                "name"                                             : "budget-cost-center-cc12345",
+                "description"                                      : "Monthly budget for tag-lz-cost-center=CC12345.",
+                "amount"                                           : 5000,
+
+                "alert_rule": {
+                    "name"                                         : "budget-cost-center-cc12345-80",
+                    "message"                                      : "Actual spending for tag-lz-cost-center=CC12345 has reached 80% of the monthly budget.",
+                    "recipients"                                   : "email.address@example.com",
+                    "threshold_metric"                             : "ACTUAL",
+                    "threshold_type"                               : "PERCENTAGE",
+                    "threshold_value"                              : 80
+                },
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "CC12345",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                },
+
+                "schedule": {
+                    "day_of_month_to_begin"                        : 1,
+                    "processing_period_type"                       : "MONTH",
+                    "reset_period"                                 : "MONTHLY"
+                },
+
+                "target": {
+                    "type"                                         : "TAG",
+                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-cost-center.CC12345"]
+                }
+            },
+
+            "BUDGET-ENV-PREPROD-KEY": {
+                "name"                                             : "budget-env-preprod",
+                "description"                                      : "Monthly budget for tag-lz-environment=preprod.",
+                "amount"                                           : 2000,
+
+                "alert_rule": {
+                    "name"                                         : "budget-env-preprod-80",
+                    "message"                                      : "Actual spending for tag-lz-environment=preprod has reached 80% of the monthly budget.",
+                    "recipients"                                   : "email.address@example.com",
+                    "threshold_metric"                             : "ACTUAL",
+                    "threshold_type"                               : "PERCENTAGE",
+                    "threshold_value"                              : 80
+                },
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                },
+
+                "schedule": {
+                    "day_of_month_to_begin"                        : 1,
+                    "processing_period_type"                       : "MONTH",
+                    "reset_period"                                 : "MONTHLY"
+                },
+
+                "target": {
+                    "type"                                         : "TAG",
+                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-environment.preprod"]
+                }
+            },
+
+            "BUDGET-ENV-PROD-KEY": {
+                "name"                                             : "budget-env-prod",
+                "description"                                      : "Monthly budget for tag-lz-environment=prod.",
+                "amount"                                           : 3000,
+
+                "alert_rule": {
+                    "name"                                         : "budget-env-prod-80",
+                    "message"                                      : "Actual spending for tag-lz-environment=prod has reached 80% of the monthly budget.",
+                    "recipients"                                   : "email.address@example.com",
+                    "threshold_metric"                             : "ACTUAL",
+                    "threshold_type"                               : "PERCENTAGE",
+                    "threshold_value"                              : 80
+                },
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
+                },
+
+                "schedule": {
+                    "day_of_month_to_begin"                        : 1,
+                    "processing_period_type"                       : "MONTH",
+                    "reset_period"                                 : "MONTHLY"
+                },
+
+                "target": {
+                    "type"                                         : "TAG",
+                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-environment.prod"]
+                }
+            },
+
+            "BUDGET-PROJ1-KEY": {
+                "name"                                             : "budget-proj1",
+                "description"                                      : "Monthly budget for tag-lz-project=proj1.",
+                "amount"                                           : 500,
+
+                "alert_rule": {
+                    "name"                                         : "budget-proj1-80",
+                    "message"                                      : "Actual spending for tag-lz-project=proj1 has reached 80% of the monthly budget.",
+                    "recipients"                                   : "email.address@example.com",
+                    "threshold_metric"                             : "ACTUAL",
+                    "threshold_type"                               : "PERCENTAGE",
+                    "threshold_value"                              : 80
+                },
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "proj1"
+                },
+
+                "schedule": {
+                    "day_of_month_to_begin"                        : 1,
+                    "processing_period_type"                       : "MONTH",
+                    "reset_period"                                 : "MONTHLY"
+                },
+
+                "target": {
+                    "type"                                         : "TAG",
+                    "values"                                       : ["tagns-lz-cost-governance.tag-lz-project.proj1"]
+                }
+            }
+        },
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+            "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
+        }
+    },
+
     "tags_configuration": {
-        "default_compartment_id"                               : "TENANCY-ROOT",
+        "default_compartment_id"                                   : "TENANCY-ROOT",
 
         "namespaces": {
             "TAGNS-LZ-COST-GOVERNANCE-KEY": {
-                "name"                                         : "tagns-lz-cost-governance",
-                "description"                                  : "Cost governance tags for FinOps reporting.",
-                "is_retired"                                   : false,
+                "name"                                             : "tagns-lz-cost-governance",
+                "description"                                      : "Cost governance tags for FinOps reporting.",
+                "is_retired"                                       : false,
 
                 "tags": {
                     "TAG-LZ-BUSINESS-UNIT-KEY": {
-                        "name"                                 : "tag-lz-business-unit",
-                        "description"                          : "Business unit responsible for the resource.",
-                        "is_cost_tracking"                     : false,
-                        "is_retired"                           : false,
+                        "name"                                     : "tag-lz-business-unit",
+                        "description"                              : "Business unit responsible for the resource.",
+                        "is_cost_tracking"                         : false,
+                        "is_retired"                               : false,
 
                         "tag_defaults": {
                             "TAG-LZ-BUSINESS-UNIT-KEY-REQUIRED": {
-                                "compartment_ids"              : ["CMP-LANDINGZONE-KEY"],
-                                "default_value"                : "none",
-                                "is_user_required"             : true
+                                "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
+                                "default_value"                    : "tobedefined",
+                                "is_user_required"                 : false
                             }
                         },
 
                         "valid_values": [
-                            "none",
+                            "tobedefined",
                             "IT",
                             "Finance",
                             "Digital",
@@ -33,79 +221,79 @@
                     },
 
                     "TAG-LZ-COST-CENTER-KEY": {
-                        "name"                                 : "tag-lz-cost-center",
-                        "description"                          : "Cost center responsible for the resource.",
-                        "is_cost_tracking"                     : false,
-                        "is_retired"                           : false,
-                        "valid_values"                         : ["none", "CC12345"],
+                        "name"                                     : "tag-lz-cost-center",
+                        "description"                              : "Cost center responsible for the resource.",
+                        "is_cost_tracking"                         : false,
+                        "is_retired"                               : false,
+                        "valid_values"                             : ["tobedefined", "CC12345"],
 
                         "tag_defaults": {
                             "TAG-LZ-COST-CENTER-KEY-REQUIRED": {
-                                "compartment_ids"              : ["CMP-LANDINGZONE-KEY"],
-                                "default_value"                : "none",
-                                "is_user_required"             : true
+                                "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
+                                "default_value"                    : "tobedefined",
+                                "is_user_required"                 : false
                             }
                         }
                     },
 
                     "TAG-LZ-ENVIRONMENT-KEY": {
-                        "name"                                 : "tag-lz-environment",
-                        "description"                          : "Deployment environment associated with the resource.",
-                        "is_cost_tracking"                     : false,
-                        "is_retired"                           : false,
+                        "name"                                     : "tag-lz-environment",
+                        "description"                              : "Deployment environment associated with the resource.",
+                        "is_cost_tracking"                         : false,
+                        "is_retired"                               : false,
 
                         "tag_defaults": {
                             "TAG-LZ-ENVIRONMENT-KEY-REQUIRED": {
-                                "compartment_ids"              : ["CMP-LANDINGZONE-KEY"],
-                                "default_value"                : "none",
-                                "is_user_required"             : true
+                                "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
+                                "default_value"                    : "tobedefined",
+                                "is_user_required"                 : false
                             }
                         },
 
                         "valid_values": [
                             "dev",
-                            "none",
                             "preprod",
                             "prod",
                             "shared",
                             "staging",
                             "test",
+                            "tobedefined",
                             "uat"
                         ]
                     },
 
                     "TAG-LZ-OWNER-KEY": {
-                        "name"                                 : "tag-lz-owner",
-                        "description"                          : "Person or team accountable for the resource.",
-                        "is_cost_tracking"                     : false,
-                        "is_retired"                           : false,
-                        "valid_values"                         : ["none", "email.address@example.com"],
+                        "name"                                     : "tag-lz-owner",
+                        "description"                              : "Person or team accountable for the resource.",
+                        "is_cost_tracking"                         : false,
+                        "is_retired"                               : false,
+                        "valid_values"                             : ["tobedefined", "email.address@example.com"],
 
                         "tag_defaults": {
                             "TAG-LZ-OWNER-KEY-REQUIRED": {
-                                "compartment_ids"              : ["CMP-LANDINGZONE-KEY"],
-                                "default_value"                : "none",
-                                "is_user_required"             : true
+                                "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
+                                "default_value"                    : "tobedefined",
+                                "is_user_required"                 : false
                             }
                         }
                     },
 
                     "TAG-LZ-PLATFORM-KEY": {
-                        "name"                                 : "tag-lz-platform",
-                        "description"                          : "Platform associated with the resource.",
-                        "is_cost_tracking"                     : false,
-                        "is_retired"                           : false,
+                        "name"                                     : "tag-lz-platform",
+                        "description"                              : "Platform associated with the resource.",
+                        "is_cost_tracking"                         : false,
+                        "is_retired"                               : false,
 
                         "tag_defaults": {
                             "TAG-LZ-PLATFORM-KEY-REQUIRED": {
-                                "compartment_ids"              : ["CMP-LANDINGZONE-KEY"],
-                                "default_value"                : "none",
-                                "is_user_required"             : true
+                                "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
+                                "default_value"                    : "tobedefined",
+                                "is_user_required"                 : false
                             }
                         },
 
                         "valid_values": [
-                            "none",
+                            "tobedefined",
                             "network",
                             "security",
                             "observability",
@@ -121,21 +309,21 @@
                     },
 
                     "TAG-LZ-PROJECT-KEY": {
-                        "name"                                 : "tag-lz-project",
-                        "description"                          : "Project associated with the resource.",
-                        "is_cost_tracking"                     : false,
-                        "is_retired"                           : false,
+                        "name"                                     : "tag-lz-project",
+                        "description"                              : "Project associated with the resource.",
+                        "is_cost_tracking"                         : false,
+                        "is_retired"                               : false,
 
                         "tag_defaults": {
                             "TAG-LZ-PROJECT-KEY-REQUIRED": {
-                                "compartment_ids"              : ["CMP-LANDINGZONE-KEY"],
-                                "default_value"                : "none",
-                                "is_user_required"             : true
+                                "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
+                                "default_value"                    : "notapply",
+                                "is_user_required"                 : false
                             }
                         },
 
                         "valid_values": [
-                            "none",
+                            "notapply",
                             "proj1",
                             "proj2"
                         ]
@@ -144,16 +332,16 @@
             },
 
             "TAGNS-LZ-ROLE-KEY": {
-                "name"                                         : "tagns-lz-role",
-                "description"                                  : "Tag namespace for Tag Based Access Controls of Landing Zone Roles.",
-                "is_retired"                                   : false,
+                "name"                                             : "tagns-lz-role",
+                "description"                                      : "Tag namespace for Tag Based Access Controls of Landing Zone Roles.",
+                "is_retired"                                       : false,
 
                 "tags": {
                     "TAG-LZ-ROLE-KEY": {
-                        "name"                                 : "tag-lz-role",
-                        "description"                          : "Tag used to identify different administrative roles within the Landing Zone, across network and security compartments",
-                        "is_cost_tracking"                     : false,
-                        "is_retired"                           : false
+                        "name"                                     : "tag-lz-role",
+                        "description"                              : "Tag used to identify different administrative roles within the Landing Zone, across network and security compartments",
+                        "is_cost_tracking"                         : false,
+                        "is_retired"                               : false
                     }
                 }
             }

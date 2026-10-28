@@ -16,7 +16,7 @@
                         "is_retired"          : false,
 
                         "valid_values": [
-                            "none",
+                            "tobedefined",
                             "IT",
                             "Finance",
                             "Digital",
@@ -29,7 +29,7 @@
                         "description"         : "Cost center responsible for the resource.",
                         "is_cost_tracking"    : false,
                         "is_retired"          : false,
-                        "valid_values"        : ["none", "CC12345"]
+                        "valid_values"        : ["tobedefined", "CC12345"]
                     },
 
                     "TAG-LZ-ENVIRONMENT-KEY": {
@@ -40,12 +40,12 @@
 
                         "valid_values": [
                             "dev",
-                            "none",
                             "preprod",
                             "prod",
                             "shared",
                             "staging",
                             "test",
+                            "tobedefined",
                             "uat"
                         ]
                     },
@@ -55,7 +55,7 @@
                         "description"         : "Person or team accountable for the resource.",
                         "is_cost_tracking"    : false,
                         "is_retired"          : false,
-                        "valid_values"        : ["none", "email.address@example.com"]
+                        "valid_values"        : ["tobedefined", "email.address@example.com"]
                     },
 
                     "TAG-LZ-PLATFORM-KEY": {
@@ -65,7 +65,7 @@
                         "is_retired"          : false,
 
                         "valid_values": [
-                            "none",
+                            "tobedefined",
                             "network",
                             "security",
                             "observability",
@@ -87,7 +87,7 @@
                         "is_retired"          : false,
 
                         "valid_values": [
-                            "none",
+                            "notapply",
                             "proj1",
                             "proj2"
                         ]

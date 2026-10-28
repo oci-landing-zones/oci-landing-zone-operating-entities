@@ -14,12 +14,12 @@
                         "description"                                      : "Pre-Production Platform ExaDB-C@C Database Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
-                            "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                            "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform"     : "exacc",
-                            "tagns-lz-cost-governance.tag-lz-project"      : "none",
+                            "tagns-lz-cost-governance.tag-lz-project"      : "notapply",
                             "tagns-lz-role.tag-lz-role"                    : "lz-exacc-db-admin"
                         }
                     },
@@ -29,24 +29,24 @@
                         "description"                                      : "Pre-Production Platform ExaDB-C@C Infrastructure Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
-                            "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                            "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform"     : "exacc",
-                            "tagns-lz-cost-governance.tag-lz-project"      : "none",
+                            "tagns-lz-cost-governance.tag-lz-project"      : "notapply",
                             "tagns-lz-role.tag-lz-role"                    : "lz-exacc-infra-admin"
                         }
                     }
                 },
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"             : "exacc",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply",
                     "tagns-lz-role.tag-lz-role"                            : "lz-exacc-admin"
                 }
             },
@@ -57,10 +57,10 @@
                 "parent_id"                                                : "CMP-LZ-PREPROD-PROJ1-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"             : "exacc",
                     "tagns-lz-cost-governance.tag-lz-project"              : "proj1",
                     "tagns-lz-role.tag-lz-role"                            : "lz-exacc-project-db-admin"
@@ -78,12 +78,12 @@
                         "description"                                      : "Production Platform ExaDB-C@C Database Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
-                            "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                            "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform"     : "exacc",
-                            "tagns-lz-cost-governance.tag-lz-project"      : "none",
+                            "tagns-lz-cost-governance.tag-lz-project"      : "notapply",
                             "tagns-lz-role.tag-lz-role"                    : "lz-exacc-db-admin"
                         }
                     },
@@ -93,24 +93,24 @@
                         "description"                                      : "Production Platform ExaDB-C@C Infrastructure Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
-                            "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                            "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform"     : "exacc",
-                            "tagns-lz-cost-governance.tag-lz-project"      : "none",
+                            "tagns-lz-cost-governance.tag-lz-project"      : "notapply",
                             "tagns-lz-role.tag-lz-role"                    : "lz-exacc-infra-admin"
                         }
                     }
                 },
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"             : "exacc",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply",
                     "tagns-lz-role.tag-lz-role"                            : "lz-exacc-admin"
                 }
             },
@@ -121,10 +121,10 @@
                 "parent_id"                                                : "CMP-LZ-PROD-PROJ1-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-platform"             : "exacc",
                     "tagns-lz-cost-governance.tag-lz-project"              : "proj1",
                     "tagns-lz-role.tag-lz-role"                            : "lz-exacc-project-db-admin"
@@ -142,12 +142,12 @@
                 "description"                                              : "Landing Zone Pre-Production environment ExaDB-C@C platform database administration access group.",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 }
             },
 
@@ -156,12 +156,12 @@
                 "description"                                              : "Landing Zone Pre-Production environment ExaDB-C@C platform infrastructure administration access group.",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 }
             },
 
@@ -170,11 +170,11 @@
                 "description"                                              : "Landing Zone Pre-Production environment, Project 1 ExaDB-C@C database administration access group.",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-project"              : "proj1"
                 }
             },
@@ -184,12 +184,12 @@
                 "description"                                              : "Landing Zone Production environment ExaDB-C@C platform database administration access group.",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 }
             },
 
@@ -198,12 +198,12 @@
                 "description"                                              : "Landing Zone Production environment ExaDB-C@C platform infrastructure administration access group.",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 }
             },
 
@@ -212,11 +212,11 @@
                 "description"                                              : "Landing Zone Production environment, Project 1 ExaDB-C@C database administration access group.",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-project"              : "proj1"
                 }
             }
@@ -231,12 +231,12 @@
                 "compartment_id"                                           : "CMP-LZ-PREPROD-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 },
 
                 "statements": [
@@ -264,12 +264,12 @@
                 "compartment_id"                                           : "CMP-LZ-PREPROD-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 },
 
                 "statements": [
@@ -289,12 +289,12 @@
                 "compartment_id"                                           : "CMP-LZ-PREPROD-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 },
 
                 "statements": [
@@ -323,11 +323,11 @@
                 "compartment_id"                                           : "CMP-LZ-PREPROD-PROJ1-EXACC-DB-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-project"              : "proj1"
                 },
 
@@ -350,12 +350,12 @@
                 "compartment_id"                                           : "CMP-LZ-PREPROD-EXACC-DB-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 },
 
                 "statements": [
@@ -369,12 +369,12 @@
                 "compartment_id"                                           : "CMP-LZ-PROD-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 },
 
                 "statements": [
@@ -402,12 +402,12 @@
                 "compartment_id"                                           : "CMP-LZ-PROD-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 },
 
                 "statements": [
@@ -427,12 +427,12 @@
                 "compartment_id"                                           : "CMP-LZ-PROD-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 },
 
                 "statements": [
@@ -461,11 +461,11 @@
                 "compartment_id"                                           : "CMP-LZ-PROD-PROJ1-EXACC-DB-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-project"              : "proj1"
                 },
 
@@ -488,12 +488,12 @@
                 "compartment_id"                                           : "CMP-LZ-PROD-EXACC-DB-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                     "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
-                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
-                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "tobedefined",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                 },
 
                 "statements": [

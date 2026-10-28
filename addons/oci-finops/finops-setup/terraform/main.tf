@@ -32,12 +32,12 @@ resource "oci_database_autonomous_database" "autonomous_database_private" {
 
 locals {
   cost_governance_tags = {
-    "tagns-lz-cost-governance.tag-lz-cost-center"   = "none"
-    "tagns-lz-cost-governance.tag-lz-business-unit" = "none"
-    "tagns-lz-cost-governance.tag-lz-owner"         = "none"
-    "tagns-lz-cost-governance.tag-lz-platform"      = "none"
-    "tagns-lz-cost-governance.tag-lz-environment"   = "none"
-    "tagns-lz-cost-governance.tag-lz-project"       = "none"
+    "tagns-lz-cost-governance.tag-lz-cost-center"   = "tobedefined"
+    "tagns-lz-cost-governance.tag-lz-business-unit" = "tobedefined"
+    "tagns-lz-cost-governance.tag-lz-owner"         = "tobedefined"
+    "tagns-lz-cost-governance.tag-lz-platform"      = "tobedefined"
+    "tagns-lz-cost-governance.tag-lz-environment"   = "tobedefined"
+    "tagns-lz-cost-governance.tag-lz-project"       = "notapply"
   }
   iam_defined_tags = merge(local.cost_governance_tags, var.defined_tags)
   database_defined_tags = merge(local.iam_defined_tags, {

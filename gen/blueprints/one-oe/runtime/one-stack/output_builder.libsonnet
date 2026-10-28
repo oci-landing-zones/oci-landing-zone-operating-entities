@@ -1,5 +1,6 @@
 // Published One-OE cost tags and governance for single-apply Tag Default ordering.
 local lz = import '../../../../landing_zone.libsonnet';
+local budgets = import './budgets.libsonnet';
 local namespace = 'tagns-lz-cost-governance';
 local collections = [
   'compartments', 'children', 'groups', 'identity_domains', 'supplied_policies',
@@ -12,26 +13,26 @@ local collections = [
   'network_firewalls', 'network_firewall_policies', 'nlbs', 'log_groups', 'flow_logs',
 ];
 
-local values(path, platform='none') =
+local values(path, platform='tobedefined') =
   local words = std.asciiUpper(std.join('/', path));
   local contains(word) = std.length(std.findSubstr(word, words)) > 0;
   local resourceKey = if std.length(path) > 0 then std.asciiUpper(path[std.length(path) - 1]) else '';
   local compartmentPlatform =
     if std.startsWith(resourceKey, 'CMP-') && std.endsWith(resourceKey, '-NETWORK-KEY') then 'network'
     else if std.startsWith(resourceKey, 'CMP-') && std.endsWith(resourceKey, '-SECURITY-KEY') then 'security'
-    else 'none';
+    else 'tobedefined';
   {
-    [namespace + '.tag-lz-cost-center']: 'none',
-    [namespace + '.tag-lz-business-unit']: 'none',
-    [namespace + '.tag-lz-owner']: 'none',
-    [namespace + '.tag-lz-platform']: if platform == 'none' then compartmentPlatform else platform,
+    [namespace + '.tag-lz-cost-center']: 'tobedefined',
+    [namespace + '.tag-lz-business-unit']: 'tobedefined',
+    [namespace + '.tag-lz-owner']: 'tobedefined',
+    [namespace + '.tag-lz-platform']: if platform == 'tobedefined' then compartmentPlatform else platform,
     [namespace + '.tag-lz-environment']: if contains('PREPROD') then 'preprod' else if contains('PROD') then 'prod' else 'shared',
-    [namespace + '.tag-lz-project']: if contains('PROJ1') then 'proj1' else 'none',
+    [namespace + '.tag-lz-project']: if contains('PROJ1') then 'proj1' else 'notapply',
   };
 
 local existingTags(resource, field='defined_tags') =
   if std.objectHas(resource, field) && resource[field] != null then resource[field] else {};
-local tagResources(obj, path=[], platform='none') =
+local tagResources(obj, path=[], platform='tobedefined') =
   if std.type(obj) == 'array' then [tagResources(v, path, platform) for v in obj]
   else if std.type(obj) != 'object' then obj
   else {
@@ -69,7 +70,7 @@ local tagObservability(doc) =
     for family in std.objectFields(tagged)
   };
 
-local requiredGovernance(governance) =
+local defaultGovernance(governance) =
   local cfg = governance.tags_configuration;
   local costKey = 'TAGNS-LZ-COST-GOVERNANCE-KEY';
   local cost = cfg.namespaces[costKey];
@@ -82,8 +83,8 @@ local requiredGovernance(governance) =
               tag_defaults: {
                 [key + '-REQUIRED']: {
                   compartment_ids: ['CMP-LANDINGZONE-KEY'],
-                  default_value: 'none',
-                  is_user_required: true,
+                  default_value: if key == 'TAG-LZ-PROJECT-KEY' then 'notapply' else 'tobedefined',
+                  is_user_required: false,
                 },
               },
             }
@@ -107,5 +108,5 @@ function(profile) {
   security_cis1_pre: tagSecurity(rendered.security_cis1_pre),
   security_cis2: tagSecurity(rendered.security_cis2),
   security_cis2_pre: tagSecurity(rendered.security_cis2_pre),
-  governance: requiredGovernance(rendered.governance),
+  governance: defaultGovernance(rendered.governance) + { budgets_configuration: budgets },
 }

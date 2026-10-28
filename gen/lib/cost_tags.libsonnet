@@ -48,13 +48,13 @@ local collections = [
 local sections = {
   network_configuration: 'network',
   nlb_configuration: 'network',
-  compartments_configuration: 'none',
-  groups_configuration: 'none',
-  dynamic_groups_configuration: 'none',
-  policies_configuration: 'none',
-  identity_domains_configuration: 'none',
-  identity_domain_groups_configuration: 'none',
-  identity_domain_dynamic_groups_configuration: 'none',
+  compartments_configuration: 'tobedefined',
+  groups_configuration: 'tobedefined',
+  dynamic_groups_configuration: 'tobedefined',
+  policies_configuration: 'tobedefined',
+  identity_domains_configuration: 'tobedefined',
+  identity_domain_groups_configuration: 'tobedefined',
+  identity_domain_dynamic_groups_configuration: 'tobedefined',
   alarms_configuration: 'observability',
   events_configuration: 'observability',
   home_region_events_configuration: 'observability',
@@ -134,18 +134,18 @@ local token(text, word) =
       local compartment = std.startsWith(resource_key, 'CMP-');
       local matched_platforms = most_specific([name for name in std.objectFields(platform_types) if token(resource_key, name)]);
       local actual_platform =
-        if platform != 'none' then platform
+        if platform != 'tobedefined' then platform
         else if compartment && token(resource_key, 'NETWORK') then 'network'
         else if compartment && token(resource_key, 'SECURITY') then 'security'
         else if compartment && std.length(matched_platforms) == 1 && std.member(workload_platforms, platform_types[matched_platforms[0]]) then platform_types[matched_platforms[0]]
-        else 'none';
+        else 'tobedefined';
       {
-        [namespace + 'cost-center']: 'none',
-        [namespace + 'business-unit']: 'none',
-        [namespace + 'owner']: 'none',
+        [namespace + 'cost-center']: 'tobedefined',
+        [namespace + 'business-unit']: 'tobedefined',
+        [namespace + 'owner']: 'tobedefined',
         [namespace + 'platform']: actual_platform,
         [namespace + 'environment']: if std.length(matched_envs) == 1 then matched_envs[0] else 'shared',
-        [namespace + 'project']: if std.length(matched_projects) == 1 then matched_projects[0] else 'none',
+        [namespace + 'project']: if std.length(matched_projects) == 1 then matched_projects[0] else 'notapply',
       };
     local resource(obj, path, platform) =
       if std.type(obj) != 'object' then obj else
@@ -164,7 +164,7 @@ local token(text, word) =
         (if std.member(path, 'node_pools') && std.objectHas(obj, 'node_config_details') then {
            node_config_details+: { defined_tags: values(path, 'oke', obj) + tags(obj.node_config_details) },
          } else {}),
-          walk(obj, path=[], platform='none') =
+          walk(obj, path=[], platform='tobedefined') =
       if std.type(obj) == 'array' then [walk(v, path=path, platform=platform) for v in obj]
       else if std.type(obj) != 'object' then obj
       else {

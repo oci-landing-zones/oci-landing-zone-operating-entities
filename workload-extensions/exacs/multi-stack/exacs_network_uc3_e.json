@@ -28,12 +28,12 @@
                                 "security_list_keys"                                   : ["SL-FRA-LZ-PREPROD-PLATFORM-EXACS-GENERIC-KEY"],
 
                                 "defined_tags": {
-                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "none",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "preprod",
-                                    "tagns-lz-cost-governance.tag-lz-owner"            : "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "none"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
                                 }
                             },
 
@@ -48,12 +48,12 @@
                                 "security_list_keys"                                   : ["SL-FRA-LZ-PREPROD-PLATFORM-EXACS-GENERIC-KEY"],
 
                                 "defined_tags": {
-                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "none",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "preprod",
-                                    "tagns-lz-cost-governance.tag-lz-owner"            : "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "none"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
                                 }
                             }
                         },
@@ -63,12 +63,12 @@
                                 "display_name"                                         : "rt-fra-lz-preprod-exacs-generic",
 
                                 "defined_tags": {
-                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "none",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "preprod",
-                                    "tagns-lz-cost-governance.tag-lz-owner"            : "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "none"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
                                 },
 
                                 "route_rules": {
@@ -122,12 +122,12 @@
                             "egress_rules"                                             : [],
 
                             "defined_tags": {
-                                "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                                "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                                "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                                 "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
-                                "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                                "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                                 "tagns-lz-cost-governance.tag-lz-platform"             : "network",
-                                "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                                "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                             }
                         },
 
@@ -182,23 +182,23 @@
                                 ],
 
                                 "defined_tags": {
-                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "none",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "preprod",
-                                    "tagns-lz-cost-governance.tag-lz-owner"            : "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "none"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
                                 }
                             }
                         },
 
                         "defined_tags": {
-                            "tagns-lz-cost-governance.tag-lz-business-unit"            : "none",
-                            "tagns-lz-cost-governance.tag-lz-cost-center"              : "none",
+                            "tagns-lz-cost-governance.tag-lz-business-unit"            : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"              : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-environment"              : "preprod",
-                            "tagns-lz-cost-governance.tag-lz-owner"                    : "none",
+                            "tagns-lz-cost-governance.tag-lz-owner"                    : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform"                 : "network",
-                            "tagns-lz-cost-governance.tag-lz-project"                  : "none"
+                            "tagns-lz-cost-governance.tag-lz-project"                  : "notapply"
                         },
 
                         "vcn_specific_gateways": {
@@ -208,12 +208,12 @@
                                     "block_traffic"                                    : false,
 
                                     "defined_tags": {
-                                        "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                        "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                                        "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                        "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
-                                        "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                                        "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                                     }
                                 }
                             },
@@ -224,12 +224,12 @@
                                     "services"                                         : "all-services",
 
                                     "defined_tags": {
-                                        "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                        "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                                        "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                        "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
-                                        "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                                        "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                                     }
                                 }
                             }
@@ -265,12 +265,12 @@
                                 "security_list_keys"                                   : ["SL-FRA-LZ-PROD-PLATFORM-EXACS-GENERIC-KEY"],
 
                                 "defined_tags": {
-                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "none",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
-                                    "tagns-lz-cost-governance.tag-lz-owner"            : "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "none"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
                                 }
                             },
 
@@ -285,12 +285,12 @@
                                 "security_list_keys"                                   : ["SL-FRA-LZ-PROD-PLATFORM-EXACS-GENERIC-KEY"],
 
                                 "defined_tags": {
-                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "none",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
-                                    "tagns-lz-cost-governance.tag-lz-owner"            : "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "none"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
                                 }
                             }
                         },
@@ -300,12 +300,12 @@
                                 "display_name"                                         : "rt-fra-lz-prod-exacs-generic",
 
                                 "defined_tags": {
-                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "none",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
-                                    "tagns-lz-cost-governance.tag-lz-owner"            : "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "none"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
                                 },
 
                                 "route_rules": {
@@ -359,12 +359,12 @@
                             "egress_rules"                                             : [],
 
                             "defined_tags": {
-                                "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
-                                "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                                "tagns-lz-cost-governance.tag-lz-business-unit"        : "tobedefined",
+                                "tagns-lz-cost-governance.tag-lz-cost-center"          : "tobedefined",
                                 "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
-                                "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                                "tagns-lz-cost-governance.tag-lz-owner"                : "tobedefined",
                                 "tagns-lz-cost-governance.tag-lz-platform"             : "network",
-                                "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                                "tagns-lz-cost-governance.tag-lz-project"              : "notapply"
                             }
                         },
 
@@ -419,23 +419,23 @@
                                 ],
 
                                 "defined_tags": {
-                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "none",
-                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "tobedefined",
+                                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
-                                    "tagns-lz-cost-governance.tag-lz-owner"            : "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner"            : "tobedefined",
                                     "tagns-lz-cost-governance.tag-lz-platform"         : "network",
-                                    "tagns-lz-cost-governance.tag-lz-project"          : "none"
+                                    "tagns-lz-cost-governance.tag-lz-project"          : "notapply"
                                 }
                             }
                         },
 
                         "defined_tags": {
-                            "tagns-lz-cost-governance.tag-lz-business-unit"            : "none",
-                            "tagns-lz-cost-governance.tag-lz-cost-center"              : "none",
+                            "tagns-lz-cost-governance.tag-lz-business-unit"            : "tobedefined",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"              : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-environment"              : "prod",
-                            "tagns-lz-cost-governance.tag-lz-owner"                    : "none",
+                            "tagns-lz-cost-governance.tag-lz-owner"                    : "tobedefined",
                             "tagns-lz-cost-governance.tag-lz-platform"                 : "network",
-                            "tagns-lz-cost-governance.tag-lz-project"                  : "none"
+                            "tagns-lz-cost-governance.tag-lz-project"                  : "notapply"
                         },
 
                         "vcn_specific_gateways": {
@@ -445,12 +445,12 @@
                                     "block_traffic"                                    : false,
 
                                     "defined_tags": {
-                                        "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                        "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                                        "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                        "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
-                                        "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                                        "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                                     }
                                 }
                             },
@@ -461,12 +461,12 @@
                                     "services"                                         : "all-services",
 
                                     "defined_tags": {
-                                        "tagns-lz-cost-governance.tag-lz-business-unit": "none",
-                                        "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                                        "tagns-lz-cost-governance.tag-lz-business-unit": "tobedefined",
+                                        "tagns-lz-cost-governance.tag-lz-cost-center"  : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
-                                        "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                                        "tagns-lz-cost-governance.tag-lz-owner"        : "tobedefined",
                                         "tagns-lz-cost-governance.tag-lz-platform"     : "network",
-                                        "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                                        "tagns-lz-cost-governance.tag-lz-project"      : "notapply"
                                     }
                                 }
                             }
