@@ -1,122 +1,224 @@
 {
     "compartments_configuration": {
-        "enable_delete"                                : "true",
+        "enable_delete"                                                    : "true",
 
         "compartments": {
             "CMP-LZ-PREPROD-EXACS-KEY": {
-                "name"                                 : "cmp-lz-preprod-exacs",
-                "description"                          : "Pre-Production Platform ExaDB-D Compartment",
-                "parent_id"                            : "CMP-LZ-PREPROD-PLATFORM-KEY",
+                "name"                                                     : "cmp-lz-preprod-exacs",
+                "description"                                              : "Pre-Production Platform ExaDB-D Compartment",
+                "parent_id"                                                : "CMP-LZ-PREPROD-PLATFORM-KEY",
 
                 "children": {
                     "CMP-LZ-PREPROD-EXACS-DB-KEY": {
-                        "name"                         : "cmp-lz-preprod-exacs-db",
-                        "description"                  : "Pre-Production Platform ExaDB-D Database Compartment",
+                        "name"                                             : "cmp-lz-preprod-exacs-db",
+                        "description"                                      : "Pre-Production Platform ExaDB-D Database Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-role.tag-lz-role": "lz-exacs-db-admin"
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                            "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                            "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                            "tagns-lz-cost-governance.tag-lz-platform"     : "exacs",
+                            "tagns-lz-cost-governance.tag-lz-project"      : "none",
+                            "tagns-lz-role.tag-lz-role"                    : "lz-exacs-db-admin"
                         }
                     },
 
                     "CMP-LZ-PREPROD-EXACS-INFRA-KEY": {
-                        "name"                         : "cmp-lz-preprod-exacs-infra",
-                        "description"                  : "Pre-Production Platform ExaDB-D Infrastructure Compartment",
+                        "name"                                             : "cmp-lz-preprod-exacs-infra",
+                        "description"                                      : "Pre-Production Platform ExaDB-D Infrastructure Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-role.tag-lz-role": "lz-exacs-infra-admin"
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                            "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                            "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                            "tagns-lz-cost-governance.tag-lz-platform"     : "exacs",
+                            "tagns-lz-cost-governance.tag-lz-project"      : "none",
+                            "tagns-lz-role.tag-lz-role"                    : "lz-exacs-infra-admin"
                         }
                     }
                 },
 
                 "defined_tags": {
-                    "tagns-lz-role.tag-lz-role"        : "lz-exacs-admin"
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "exacs",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none",
+                    "tagns-lz-role.tag-lz-role"                            : "lz-exacs-admin"
                 }
             },
 
             "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY": {
-                "name"                                 : "cmp-lz-preprod-proj1-exacs-db",
-                "description"                          : "Pre-Production environment, Project 1 ExaDB-D database compartment",
-                "parent_id"                            : "CMP-LZ-PREPROD-PROJ1-KEY",
+                "name"                                                     : "cmp-lz-preprod-proj1-exacs-db",
+                "description"                                              : "Pre-Production environment, Project 1 ExaDB-D database compartment",
+                "parent_id"                                                : "CMP-LZ-PREPROD-PROJ1-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-role.tag-lz-role"        : "lz-exacs-project-db-admin"
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "exacs",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "proj1",
+                    "tagns-lz-role.tag-lz-role"                            : "lz-exacs-project-db-admin"
                 }
             },
 
             "CMP-LZ-PROD-EXACS-KEY": {
-                "name"                                 : "cmp-lz-prod-exacs",
-                "description"                          : "Production Platform ExaDB-D Compartment",
-                "parent_id"                            : "CMP-LZ-PROD-PLATFORM-KEY",
+                "name"                                                     : "cmp-lz-prod-exacs",
+                "description"                                              : "Production Platform ExaDB-D Compartment",
+                "parent_id"                                                : "CMP-LZ-PROD-PLATFORM-KEY",
 
                 "children": {
                     "CMP-LZ-PROD-EXACS-DB-KEY": {
-                        "name"                         : "cmp-lz-prod-exacs-db",
-                        "description"                  : "Production Platform ExaDB-D Database Compartment",
+                        "name"                                             : "cmp-lz-prod-exacs-db",
+                        "description"                                      : "Production Platform ExaDB-D Database Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-role.tag-lz-role": "lz-exacs-db-admin"
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                            "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                            "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                            "tagns-lz-cost-governance.tag-lz-platform"     : "exacs",
+                            "tagns-lz-cost-governance.tag-lz-project"      : "none",
+                            "tagns-lz-role.tag-lz-role"                    : "lz-exacs-db-admin"
                         }
                     },
 
                     "CMP-LZ-PROD-EXACS-INFRA-KEY": {
-                        "name"                         : "cmp-lz-prod-exacs-infra",
-                        "description"                  : "Production Platform ExaDB-D Infrastructure Compartment",
+                        "name"                                             : "cmp-lz-prod-exacs-infra",
+                        "description"                                      : "Production Platform ExaDB-D Infrastructure Compartment",
 
                         "defined_tags": {
-                            "tagns-lz-role.tag-lz-role": "lz-exacs-infra-admin"
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                            "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                            "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                            "tagns-lz-cost-governance.tag-lz-platform"     : "exacs",
+                            "tagns-lz-cost-governance.tag-lz-project"      : "none",
+                            "tagns-lz-role.tag-lz-role"                    : "lz-exacs-infra-admin"
                         }
                     }
                 },
 
                 "defined_tags": {
-                    "tagns-lz-role.tag-lz-role"        : "lz-exacs-admin"
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "exacs",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none",
+                    "tagns-lz-role.tag-lz-role"                            : "lz-exacs-admin"
                 }
             },
 
             "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY": {
-                "name"                                 : "cmp-lz-prod-proj1-exacs-db",
-                "description"                          : "Production environment, Project 1 ExaDB-D database compartment",
-                "parent_id"                            : "CMP-LZ-PROD-PROJ1-KEY",
+                "name"                                                     : "cmp-lz-prod-proj1-exacs-db",
+                "description"                                              : "Production environment, Project 1 ExaDB-D database compartment",
+                "parent_id"                                                : "CMP-LZ-PROD-PROJ1-KEY",
 
                 "defined_tags": {
-                    "tagns-lz-role.tag-lz-role"        : "lz-exacs-project-db-admin"
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "exacs",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "proj1",
+                    "tagns-lz-role.tag-lz-role"                            : "lz-exacs-project-db-admin"
                 }
             }
         }
     },
 
     "identity_domain_groups_configuration": {
-        "default_identity_domain_id"                   : "COMMON-DOMAIN",
+        "default_identity_domain_id"                                       : "COMMON-DOMAIN",
 
         "groups": {
             "GRP-LZ-PREPROD-EXACS-DB-ADMIN-KEY": {
-                "name"                                 : "grp-lz-preprod-exacs-db-admin",
-                "description"                          : "Landing Zone Pre-Production environment ExaDB-D platform database administration access group."
+                "name"                                                     : "grp-lz-preprod-exacs-db-admin",
+                "description"                                              : "Landing Zone Pre-Production environment ExaDB-D platform database administration access group.",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                }
             },
 
             "GRP-LZ-PREPROD-EXACS-INFRA-ADMIN-KEY": {
-                "name"                                 : "grp-lz-preprod-exacs-infra-admin",
-                "description"                          : "Landing Zone Pre-Production environment ExaDB-D platform infrastructure administration access group."
+                "name"                                                     : "grp-lz-preprod-exacs-infra-admin",
+                "description"                                              : "Landing Zone Pre-Production environment ExaDB-D platform infrastructure administration access group.",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                }
             },
 
             "GRP-LZ-PREPROD-EXACS-PROJ1-ADMIN-KEY": {
-                "name"                                 : "grp-lz-preprod-proj1-exacs-admin",
-                "description"                          : "Landing Zone Pre-Production environment, Project 1 ExaDB-D database administration access group."
+                "name"                                                     : "grp-lz-preprod-proj1-exacs-admin",
+                "description"                                              : "Landing Zone Pre-Production environment, Project 1 ExaDB-D database administration access group.",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "proj1"
+                }
             },
 
             "GRP-LZ-PROD-EXACS-DB-ADMIN-KEY": {
-                "name"                                 : "grp-lz-prod-exacs-db-admin",
-                "description"                          : "Landing Zone Production environment ExaDB-D platform database administration access group."
+                "name"                                                     : "grp-lz-prod-exacs-db-admin",
+                "description"                                              : "Landing Zone Production environment ExaDB-D platform database administration access group.",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                }
             },
 
             "GRP-LZ-PROD-EXACS-INFRA-ADMIN-KEY": {
-                "name"                                 : "grp-lz-prod-exacs-infra-admin",
-                "description"                          : "Landing Zone Production environment ExaDB-D platform infrastructure administration access group."
+                "name"                                                     : "grp-lz-prod-exacs-infra-admin",
+                "description"                                              : "Landing Zone Production environment ExaDB-D platform infrastructure administration access group.",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                }
             },
 
             "GRP-LZ-PROD-EXACS-PROJ1-ADMIN-KEY": {
-                "name"                                 : "grp-lz-prod-proj1-exacs-admin",
-                "description"                          : "Landing Zone Production environment, Project 1 ExaDB-D database administration access group."
+                "name"                                                     : "grp-lz-prod-proj1-exacs-admin",
+                "description"                                              : "Landing Zone Production environment, Project 1 ExaDB-D database administration access group.",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "proj1"
+                }
             }
         }
     },
@@ -124,9 +226,18 @@
     "policies_configuration": {
         "supplied_policies": {
             "PCY-LZ-PREPROD-EXACS-DB-ADMIN-KEY": {
-                "name"                                 : "pcy-lz-preprod-exacs-db-admin",
-                "description"                          : "Grants grp-lz-preprod-exacs-db-admin ExaDB-D database administration access in the Pre-Production environment ExaDB-D platform scope.",
-                "compartment_id"                       : "CMP-LZ-PREPROD-KEY",
+                "name"                                                     : "pcy-lz-preprod-exacs-db-admin",
+                "description"                                              : "Grants grp-lz-preprod-exacs-db-admin ExaDB-D database administration access in the Pre-Production environment ExaDB-D platform scope.",
+                "compartment_id"                                           : "CMP-LZ-PREPROD-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-exacs-db-admin' to use cloud-exadata-infrastructures in compartment cmp-lz-preprod-platform:cmp-lz-preprod-exacs:cmp-lz-preprod-exacs-infra where all{request.operation !='UpdateCloudExadataInfrastructure', request.operation !='ChangeCloudExadataInfrastructureCompartment', request.operation !='AddStorageCapacityCloudExadataInfrastructure', request.operation !='ConfigureExascaleCloudExadataInfrastructure'}",
@@ -148,9 +259,18 @@
             },
 
             "PCY-LZ-PREPROD-EXACS-GENERIC-ADMIN-KEY": {
-                "name"                                 : "pcy-lz-preprod-exacs-generic",
-                "description"                          : "Grants the Pre-Production environment ExaDB-D administration groups shared administration service access in the Pre-Production environment.",
-                "compartment_id"                       : "CMP-LZ-PREPROD-KEY",
+                "name"                                                     : "pcy-lz-preprod-exacs-generic",
+                "description"                                              : "Grants the Pre-Production environment ExaDB-D administration groups shared administration service access in the Pre-Production environment.",
+                "compartment_id"                                           : "CMP-LZ-PREPROD-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-exacs-infra-admin','id_lz_common'/'grp-lz-preprod-exacs-db-admin' to read all-resources in compartment cmp-lz-preprod-platform:cmp-lz-preprod-exacs",
@@ -164,9 +284,18 @@
             },
 
             "PCY-LZ-PREPROD-EXACS-INFRA-ADMIN-KEY": {
-                "name"                                 : "pcy-lz-preprod-exacs-infra-admin",
-                "description"                          : "Grants grp-lz-preprod-exacs-infra-admin ExaDB-D infrastructure administration access in the Pre-Production environment ExaDB-D platform scope.",
-                "compartment_id"                       : "CMP-LZ-PREPROD-KEY",
+                "name"                                                     : "pcy-lz-preprod-exacs-infra-admin",
+                "description"                                              : "Grants grp-lz-preprod-exacs-infra-admin ExaDB-D infrastructure administration access in the Pre-Production environment ExaDB-D platform scope.",
+                "compartment_id"                                           : "CMP-LZ-PREPROD-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-exacs-infra-admin' to manage cloud-exadata-infrastructures in compartment cmp-lz-preprod-platform:cmp-lz-preprod-exacs:cmp-lz-preprod-exacs-infra",
@@ -189,9 +318,18 @@
             },
 
             "PCY-LZ-PREPROD-EXACS-PROJ1-ADMIN-KEY": {
-                "name"                                 : "pcy-lz-preprod-exacs-proj1-admin",
-                "description"                          : "Grants grp-lz-preprod-proj1-exacs-admin ExaDB-D Autonomous Database administration access in the Project 1 database compartment in the Pre-Production environment.",
-                "compartment_id"                       : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
+                "name"                                                     : "pcy-lz-preprod-exacs-proj1-admin",
+                "description"                                              : "Grants grp-lz-preprod-proj1-exacs-admin ExaDB-D Autonomous Database administration access in the Project 1 database compartment in the Pre-Production environment.",
+                "compartment_id"                                           : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacs-admin' to read all-resources in compartment cmp-lz-preprod-proj1-exacs-db",
@@ -207,9 +345,18 @@
             },
 
             "PCY-LZ-PREPROD-EXACS-PROJECT-ACD-READ-KEY": {
-                "name"                                 : "pcy-lz-preprod-exacs-project-acd-read",
-                "description"                          : "Grants Exadata Database Service on Dedicated Infrastructure Project DBA groups read access to the hosting Autonomous Container Databases.",
-                "compartment_id"                       : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "name"                                                     : "pcy-lz-preprod-exacs-project-acd-read",
+                "description"                                              : "Grants Exadata Database Service on Dedicated Infrastructure Project DBA groups read access to the hosting Autonomous Container Databases.",
+                "compartment_id"                                           : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-exacs-admin' to read autonomous-container-databases in compartment cmp-lz-preprod-exacs-db"
@@ -217,9 +364,18 @@
             },
 
             "PCY-LZ-PROD-EXACS-DB-ADMIN-KEY": {
-                "name"                                 : "pcy-lz-prod-exacs-db-admin",
-                "description"                          : "Grants grp-lz-prod-exacs-db-admin ExaDB-D database administration access in the Production environment ExaDB-D platform scope.",
-                "compartment_id"                       : "CMP-LZ-PROD-KEY",
+                "name"                                                     : "pcy-lz-prod-exacs-db-admin",
+                "description"                                              : "Grants grp-lz-prod-exacs-db-admin ExaDB-D database administration access in the Production environment ExaDB-D platform scope.",
+                "compartment_id"                                           : "CMP-LZ-PROD-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-exacs-db-admin' to use cloud-exadata-infrastructures in compartment cmp-lz-prod-platform:cmp-lz-prod-exacs:cmp-lz-prod-exacs-infra where all{request.operation !='UpdateCloudExadataInfrastructure', request.operation !='ChangeCloudExadataInfrastructureCompartment', request.operation !='AddStorageCapacityCloudExadataInfrastructure', request.operation !='ConfigureExascaleCloudExadataInfrastructure'}",
@@ -241,9 +397,18 @@
             },
 
             "PCY-LZ-PROD-EXACS-GENERIC-ADMIN-KEY": {
-                "name"                                 : "pcy-lz-prod-exacs-generic",
-                "description"                          : "Grants the Production environment ExaDB-D administration groups shared administration service access in the Production environment.",
-                "compartment_id"                       : "CMP-LZ-PROD-KEY",
+                "name"                                                     : "pcy-lz-prod-exacs-generic",
+                "description"                                              : "Grants the Production environment ExaDB-D administration groups shared administration service access in the Production environment.",
+                "compartment_id"                                           : "CMP-LZ-PROD-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-exacs-infra-admin','id_lz_common'/'grp-lz-prod-exacs-db-admin' to read all-resources in compartment cmp-lz-prod-platform:cmp-lz-prod-exacs",
@@ -257,9 +422,18 @@
             },
 
             "PCY-LZ-PROD-EXACS-INFRA-ADMIN-KEY": {
-                "name"                                 : "pcy-lz-prod-exacs-infra-admin",
-                "description"                          : "Grants grp-lz-prod-exacs-infra-admin ExaDB-D infrastructure administration access in the Production environment ExaDB-D platform scope.",
-                "compartment_id"                       : "CMP-LZ-PROD-KEY",
+                "name"                                                     : "pcy-lz-prod-exacs-infra-admin",
+                "description"                                              : "Grants grp-lz-prod-exacs-infra-admin ExaDB-D infrastructure administration access in the Production environment ExaDB-D platform scope.",
+                "compartment_id"                                           : "CMP-LZ-PROD-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-exacs-infra-admin' to manage cloud-exadata-infrastructures in compartment cmp-lz-prod-platform:cmp-lz-prod-exacs:cmp-lz-prod-exacs-infra",
@@ -282,9 +456,18 @@
             },
 
             "PCY-LZ-PROD-EXACS-PROJ1-ADMIN-KEY": {
-                "name"                                 : "pcy-lz-prod-exacs-proj1-admin",
-                "description"                          : "Grants grp-lz-prod-proj1-exacs-admin ExaDB-D Autonomous Database administration access in the Project 1 database compartment in the Production environment.",
-                "compartment_id"                       : "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY",
+                "name"                                                     : "pcy-lz-prod-exacs-proj1-admin",
+                "description"                                              : "Grants grp-lz-prod-proj1-exacs-admin ExaDB-D Autonomous Database administration access in the Project 1 database compartment in the Production environment.",
+                "compartment_id"                                           : "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "proj1"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacs-admin' to read all-resources in compartment cmp-lz-prod-proj1-exacs-db",
@@ -300,9 +483,18 @@
             },
 
             "PCY-LZ-PROD-EXACS-PROJECT-ACD-READ-KEY": {
-                "name"                                 : "pcy-lz-prod-exacs-project-acd-read",
-                "description"                          : "Grants Exadata Database Service on Dedicated Infrastructure Project DBA groups read access to the hosting Autonomous Container Databases.",
-                "compartment_id"                       : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "name"                                                     : "pcy-lz-prod-exacs-project-acd-read",
+                "description"                                              : "Grants Exadata Database Service on Dedicated Infrastructure Project DBA groups read access to the hosting Autonomous Container Databases.",
+                "compartment_id"                                           : "CMP-LZ-PROD-EXACS-DB-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "none",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                },
 
                 "statements": [
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-exacs-admin' to read autonomous-container-databases in compartment cmp-lz-prod-exacs-db"

@@ -1,5 +1,5 @@
 variable "tenancy_ocid" {
-  type = string
+  type        = string
   description = "Tenancy ocid"
 }
 
@@ -25,44 +25,44 @@ variable "autonomous_database_license_model" {
 }
 
 variable "adw_display_name" {
-  type = string
+  type        = string
   description = "ADW display name"
-  default = "FINOPS"
+  default     = "FINOPS"
 }
 
 variable "adw_db_name" {
-  type = string
+  type        = string
   description = "ADW database name"
-  default = "FINOPS"
+  default     = "FINOPS"
 }
 
 variable "db_version" {
-  type = string
+  type        = string
   description = "Database version."
-  default = "23ai"
+  default     = "23ai"
 }
 
 variable "finops_dynamic_group_name" {
-  type = string
+  type        = string
   description = "Finops dynamic groups name"
-  default = "FinOps-DG"
+  default     = "FinOps-DG"
 }
 
 variable "defined_tags" {
-  type = map(string)
-  default = {}
-  description = "Defined Tags"
+  type        = map(string)
+  default     = {}
+  description = "Defined tags merged with the six cost governance tags. Set environment, project, owner, business unit and cost center for the deployment; the database platform is finops. The cost governance namespace must already exist."
 }
 
 variable "finops_policy_name" {
-  type = string
+  type        = string
   description = "Finops policy name"
-  default = "FinOps-policy"
+  default     = "FinOps-policy"
 }
 
 variable "create_policy" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Whether to create dynamic group and policy or not"
 }
 

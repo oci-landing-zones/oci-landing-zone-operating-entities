@@ -39,14 +39,14 @@
                         "is_retired"          : false,
 
                         "valid_values": [
-                            "none",
-                            "shared",
-                            "prod",
-                            "preprod",
                             "dev",
-                            "uat",
+                            "none",
+                            "preprod",
+                            "prod",
+                            "shared",
                             "staging",
-                            "test"
+                            "test",
+                            "uat"
                         ]
                     },
 
@@ -66,6 +66,9 @@
 
                         "valid_values": [
                             "none",
+                            "network",
+                            "security",
+                            "observability",
                             "oke",
                             "ocvs",
                             "exacs",
@@ -82,7 +85,12 @@
                         "description"         : "Project associated with the resource.",
                         "is_cost_tracking"    : false,
                         "is_retired"          : false,
-                        "valid_values"        : ["none", "proj1"]
+
+                        "valid_values": [
+                            "none",
+                            "proj1",
+                            "proj2"
+                        ]
                     }
                 }
             },

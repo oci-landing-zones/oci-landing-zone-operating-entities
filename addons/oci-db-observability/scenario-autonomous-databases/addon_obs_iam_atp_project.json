@@ -1,6 +1,13 @@
 {
     "identity_domain_dynamic_groups_configuration": {
-        "default_defined_tags"                    : null,
+        "default_defined_tags"                    : {
+            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+            "tagns-lz-cost-governance.tag-lz-owner": "none",
+            "tagns-lz-cost-governance.tag-lz-platform": "none",
+            "tagns-lz-cost-governance.tag-lz-environment": "shared",
+            "tagns-lz-cost-governance.tag-lz-project": "none"
+        },
         "default_freeform_tags"                   : null,
         "default_identity_domain_id"              : "COMMON-DOMAIN",
 
@@ -8,7 +15,15 @@
             "DG-LZ-MON": {
                 "name"                            : "dg-lz-mon-dynamic-group",
                 "description"                     : "dynamic group for security functions execution, required for Logging Analytics",
-                "matching_rule"                   : "ALL {resource.type='managementagent'}"
+                "matching_rule"                   : "ALL {resource.type='managementagent'}",
+                "defined_tags" : {
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-environment": "shared",
+                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                }
             }
         }
     },
@@ -25,7 +40,15 @@
                 "statements": [
                     "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to use metrics in tenancy",
                     "Allow dynamic-group 'id_lz_common'/'dg-lz-mon-dynamic-group' to {LOG_ANALYTICS_LOG_GROUP_UPLOAD_LOGS} in tenancy"
-                ]
+                ],
+                "defined_tags" : {
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-environment": "shared",
+                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                }
             },
 
             "PCY-MON-SERVICES": {
@@ -40,7 +63,15 @@
                     "Allow service loganalytics to use metrics in tenancy",
                     "Allow service loganalytics to read loganalytics-features-family in tenancy",
                     "Allow service dpd to read secret-family in tenancy"
-                ]
+                ],
+                "defined_tags" : {
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-environment": "shared",
+                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                }
             },
 
             "PCY-PREPROD-PROJ1-MON-ADMINISTRATION": {
@@ -62,7 +93,15 @@
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage loganalytics-resources-family in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage management-dashboard in compartment cmp-lz-preprod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-preprod-proj1-admin' to manage management-saved-search in compartment cmp-lz-preprod-proj1"
-                ]
+                ],
+                "defined_tags" : {
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-environment": "preprod",
+                    "tagns-lz-cost-governance.tag-lz-project": "proj1"
+                }
             },
 
             "PCY-PROD-PROJ1-MON-ADMINISTRATION": {
@@ -84,8 +123,24 @@
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage loganalytics-resources-family in compartment cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-dashboard in compartment cmp-lz-prod-proj1",
                     "allow group 'id_lz_common'/'grp-lz-prod-proj1-admin' to manage management-saved-search in compartment cmp-lz-prod-proj1"
-                ]
+                ],
+                "defined_tags" : {
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                    "tagns-lz-cost-governance.tag-lz-platform": "none",
+                    "tagns-lz-cost-governance.tag-lz-environment": "prod",
+                    "tagns-lz-cost-governance.tag-lz-project": "proj1"
+                }
             }
+        },
+        "default_defined_tags" : {
+            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+            "tagns-lz-cost-governance.tag-lz-owner": "none",
+            "tagns-lz-cost-governance.tag-lz-platform": "none",
+            "tagns-lz-cost-governance.tag-lz-environment": "shared",
+            "tagns-lz-cost-governance.tag-lz-project": "none"
         }
     }
 }

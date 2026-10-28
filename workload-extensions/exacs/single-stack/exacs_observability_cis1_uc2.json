@@ -9,6 +9,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-SECURITY-KEY",
@@ -24,6 +33,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : false,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -41,6 +59,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-SECURITY-KEY",
@@ -56,6 +83,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -73,6 +109,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -88,6 +133,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -105,6 +159,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -120,6 +183,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : false,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -137,6 +209,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -152,6 +233,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -169,6 +259,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : false,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -184,6 +283,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -201,6 +309,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : false,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -216,6 +333,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -233,6 +359,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-SECURITY-KEY",
@@ -248,6 +383,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -265,6 +409,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -280,6 +433,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : false,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -297,6 +459,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : false,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -312,6 +483,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : false,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -329,6 +509,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : false,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -344,6 +533,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -361,6 +559,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "namespace"                                    : "oci_database",
@@ -375,6 +582,15 @@
                 "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -391,6 +607,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "namespace"                                    : "oci_database_cluster",
@@ -405,6 +630,15 @@
                 "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -421,6 +655,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "namespace"                                    : "oci_database_cluster",
@@ -435,6 +678,15 @@
                 "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -451,6 +703,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "namespace"                                    : "oci_database",
@@ -465,6 +726,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -482,6 +752,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-PREPROD-NETWORK-KEY",
@@ -497,6 +776,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : false,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -514,6 +802,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-PREPROD-NETWORK-KEY",
@@ -529,6 +826,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : false,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -546,6 +852,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-PREPROD-NETWORK-KEY",
@@ -561,6 +876,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -578,6 +902,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-PREPROD-NETWORK-KEY",
@@ -593,6 +926,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -610,6 +952,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-PREPROD-NETWORK-KEY",
@@ -626,6 +977,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "namespace"                                    : "oci_database",
@@ -640,6 +1000,15 @@
                 "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -656,6 +1025,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "namespace"                                    : "oci_database_cluster",
@@ -670,6 +1048,15 @@
                 "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -686,6 +1073,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "namespace"                                    : "oci_database_cluster",
@@ -700,6 +1096,15 @@
                 "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -716,6 +1121,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "is_enabled"                                       : "false",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "namespace"                                    : "oci_database",
@@ -730,6 +1144,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -747,6 +1170,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-PROD-NETWORK-KEY",
@@ -762,6 +1194,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : false,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -779,6 +1220,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-PROD-NETWORK-KEY",
@@ -794,6 +1244,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : false,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -811,6 +1270,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-PROD-NETWORK-KEY",
@@ -826,6 +1294,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -843,6 +1320,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-PROD-NETWORK-KEY",
@@ -858,6 +1344,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -875,6 +1370,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-PROD-NETWORK-KEY",
@@ -890,6 +1394,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -907,6 +1420,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -922,6 +1444,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : false,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -939,6 +1470,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -954,6 +1494,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : false,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -971,6 +1520,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -986,6 +1544,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -1003,6 +1570,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -1018,6 +1594,15 @@
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
@@ -1035,6 +1620,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "is_enabled"                                       : true,
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_alarm": {
                     "message_format"                               : "PRETTY_JSON",
                     "metric_compartment_id"                        : "CMP-LZ-NETWORK-KEY",
@@ -1044,17 +1638,44 @@
                     "severity"                                     : "CRITICAL"
                 }
             }
+        },
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
         }
     },
 
     "events_configuration": {
         "default_compartment_id"                                   : "CMP-LANDINGZONE-KEY",
 
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+        },
+
         "event_rules": {
             "RUL-LZ-NOTIFICATION-EXACS-OPERATOR-ACCESS-CONTROL-KEY": {
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-EXACS-SHARED-INFRA-WORKLOADS-KEY"],
                 "event_display_name"                               : "rul-lz-notify-on-opctl-events",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.operatorcontrol.UpdateOperatorControl",
@@ -1079,6 +1700,15 @@
                 "compartment_id"                                   : "CMP-LZ-SHARED-EXACS-INFRA-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-EXACS-SHARED-INFRA-WORKLOADS-KEY"],
                 "event_display_name"                               : "rul-lz-notify-on-exacs-infra-events",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changecloudexadatainfrastructurecompartment.begin",
@@ -1109,6 +1739,15 @@
                 "compartment_id"                                   : "CMP-LZ-NETWORK-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "event_display_name"                               : "rul-lz-notify-network",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.virtualnetwork.createvcn",
@@ -1162,6 +1801,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "event_display_name"                               : "rul-lz-notify-security",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
                     "com.oraclecloud.notification.deletesubscription",
@@ -1176,6 +1824,15 @@
                 "compartment_id"                                   : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
                 "event_display_name"                               : "rul-lz-preprod-notify-on-notifications",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
@@ -1243,6 +1900,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
                 "event_display_name"                               : "rul-lz-preprod-notify-on-exacs-db-events",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
                     "com.oraclecloud.databaseservice.updatebackupdestination",
@@ -1309,6 +1975,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
                 "event_display_name"                               : "rul-lz-preprod-notify-on-exacs-vmc-events",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changecloudvmclustercompartment.begin",
                     "com.oraclecloud.databaseservice.changecloudvmclustercompartment.end",
@@ -1344,6 +2019,15 @@
                 "compartment_id"                                   : "CMP-LZ-PREPROD-NETWORK-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "event_display_name"                               : "rul-lz-preprod-notify-network",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.virtualnetwork.createvcn",
@@ -1397,6 +2081,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "event_display_name"                               : "rul-lz-preprod-notify-security",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
                     "com.oraclecloud.notification.deletesubscription",
@@ -1411,6 +2104,15 @@
                 "compartment_id"                                   : "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "event_display_name"                               : "rul-lz-prod-notify-on-notifications",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
@@ -1478,6 +2180,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "event_display_name"                               : "rul-lz-prod-notify-on-exacs-db-events",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
                     "com.oraclecloud.databaseservice.updatebackupdestination",
@@ -1544,6 +2255,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
                 "event_display_name"                               : "rul-lz-prod-notify-on-exacs-vmc-events",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changecloudvmclustercompartment.begin",
                     "com.oraclecloud.databaseservice.changecloudvmclustercompartment.end",
@@ -1579,6 +2299,15 @@
                 "compartment_id"                                   : "CMP-LZ-PROD-NETWORK-KEY",
                 "destination_topic_ids"                            : ["NOTT-LZ-NETWORK-KEY"],
                 "event_display_name"                               : "rul-lz-prod-notify-network",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.virtualnetwork.createvcn",
@@ -1632,6 +2361,15 @@
                 "destination_topic_ids"                            : ["NOTT-LZ-SECURITY-KEY"],
                 "event_display_name"                               : "rul-lz-prod-notify-security",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "supplied_events": [
                     "com.oraclecloud.notification.createsubscription",
                     "com.oraclecloud.notification.deletesubscription",
@@ -1647,10 +2385,28 @@
     "home_region_events_configuration": {
         "default_compartment_id"                                   : "TENANCY-ROOT",
 
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+        },
+
         "event_rules": {
             "RUL-LZ-CLOUDGUARD-KEY": {
                 "destination_topic_ids"                            : ["NOTT-LZ-CLOUDGUARD-KEY"],
                 "event_display_name"                               : "rul-lz-notify-on-cloudguard-changes",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.cloudguard.problemdetected",
@@ -1665,6 +2421,15 @@
             "RUL-LZ-IAM-KEY": {
                 "destination_topic_ids"                            : ["NOTT-LZ-IAM-KEY"],
                 "event_display_name"                               : "rul-lz-notify-on-iam-changes",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.identitycontrolplane.createidentityprovider",
@@ -1696,58 +2461,148 @@
     "logging_configuration": {
         "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
 
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+        },
+
         "flow_logs": {
             "LOG-LZ-PREPROD-SUBNET-FLOW-KEY": {
                 "log_group_id"                                     : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-PREPROD-NETWORK-KEY"],
-                "target_resource_type"                             : "subnet"
+                "target_resource_type"                             : "subnet",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LOG-LZ-PREPROD-VCN-FLOW-KEY": {
                 "log_group_id"                                     : "LGRP-LZ-PREPROD-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-PREPROD-NETWORK-KEY"],
-                "target_resource_type"                             : "vcn"
+                "target_resource_type"                             : "vcn",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LOG-LZ-PROD-SUBNET-FLOW-KEY": {
                 "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-PROD-NETWORK-KEY"],
-                "target_resource_type"                             : "subnet"
+                "target_resource_type"                             : "subnet",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LOG-LZ-PROD-VCN-FLOW-KEY": {
                 "log_group_id"                                     : "LGRP-LZ-PROD-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-PROD-NETWORK-KEY"],
-                "target_resource_type"                             : "vcn"
+                "target_resource_type"                             : "vcn",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LOG-LZ-SUBNET-FLOW-KEY": {
                 "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-NETWORK-KEY"],
-                "target_resource_type"                             : "subnet"
+                "target_resource_type"                             : "subnet",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LOG-LZ-VCN-FLOW-KEY": {
                 "log_group_id"                                     : "LGRP-LZ-VCN-FLOW-KEY",
                 "target_compartment_ids"                           : ["CMP-LZ-NETWORK-KEY"],
-                "target_resource_type"                             : "vcn"
+                "target_resource_type"                             : "vcn",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             }
         },
 
         "log_groups": {
             "LGRP-LZ-PREPROD-VCN-FLOW-KEY": {
                 "name"                                             : "lgrp-lz-preprod-vcn-flow",
-                "compartment_id"                                   : "CMP-LZ-PREPROD-SECURITY-KEY"
+                "compartment_id"                                   : "CMP-LZ-PREPROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LGRP-LZ-PROD-VCN-FLOW-KEY": {
                 "name"                                             : "lgrp-lz-prod-vcn-flow",
-                "compartment_id"                                   : "CMP-LZ-PROD-SECURITY-KEY"
+                "compartment_id"                                   : "CMP-LZ-PROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LGRP-LZ-VCN-FLOW-KEY": {
                 "name"                                             : "lgrp-lz-vcn-flow",
-                "compartment_id"                                   : "CMP-LZ-SECURITY-KEY"
+                "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             }
         }
     },
@@ -1755,11 +2610,29 @@
     "notifications_configuration": {
         "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
 
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+        },
+
         "topics": {
             "NOTT-LZ-CLOUDGUARD-KEY": {
                 "name"                                             : "nott-lz-cloudguard",
                 "description"                                      : "Topic for Cloud Guard related notifications.",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "subscriptions": [
                     {
@@ -1774,6 +2647,15 @@
                 "description"                                      : "Topic for shared ExaDB-D infrastructure workload notifications.",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "subscriptions": [
                     {
                         "protocol"                                 : "EMAIL",
@@ -1786,6 +2668,15 @@
                 "name"                                             : "nott-lz-iam",
                 "description"                                      : "Topic for IAM related notifications.",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "subscriptions": [
                     {
@@ -1800,6 +2691,15 @@
                 "description"                                      : "Topic for network related notifications.",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "subscriptions": [
                     {
                         "protocol"                                 : "EMAIL",
@@ -1812,6 +2712,15 @@
                 "name"                                             : "nott-lz-preprod-exacs-projects",
                 "description"                                      : "Topic for Pre-Production ExaDB-D project notifications.",
                 "compartment_id"                                   : "CMP-LZ-PREPROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "subscriptions": [
                     {
@@ -1826,6 +2735,15 @@
                 "description"                                      : "Topic for Production ExaDB-D project notifications.",
                 "compartment_id"                                   : "CMP-LZ-PROD-SECURITY-KEY",
 
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
+
                 "subscriptions": [
                     {
                         "protocol"                                 : "EMAIL",
@@ -1838,6 +2756,15 @@
                 "name"                                             : "nott-lz-security",
                 "description"                                      : "Topic for notifications.",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "subscriptions": [
                     {
@@ -1856,13 +2783,40 @@
             "BKT-LZ-SERVICE-CONNECTOR-KEY": {
                 "name"                                             : "bkt-lz-service-connector",
                 "compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
-                "cis_level"                                        : "1"
+                "cis_level"                                        : "1",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             }
+        },
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
         },
 
         "service_connectors": {
             "SCH-LZ-MONITOR-KEY": {
                 "display_name"                                     : "sch-lz-monitor",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "policy": {
                     "name"                                         : "service-connector-audit-policy",

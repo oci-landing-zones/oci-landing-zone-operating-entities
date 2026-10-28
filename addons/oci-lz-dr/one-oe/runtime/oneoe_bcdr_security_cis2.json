@@ -1,56 +1,110 @@
 {
     "scanning_configuration": {
-        "default_compartment_id"              : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "security",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+        },
 
         "host_recipes": {
             "VSS-RCPH-AMS-LZ-KEY": {
-                "name"                        : "vss-rcph-ams-lz",
-                "port_scan_level"             : "STANDARD",
+                "name"                                             : "vss-rcph-ams-lz",
+                "port_scan_level"                                  : "STANDARD",
 
                 "agent_settings": {
-                    "cis_benchmark_scan_level": "STRICT",
-                    "scan_level"              : "STANDARD",
-                    "vendor"                  : "OCI"
+                    "cis_benchmark_scan_level"                     : "STRICT",
+                    "scan_level"                                   : "STANDARD",
+                    "vendor"                                       : "OCI"
+                },
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "security",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
                 },
 
                 "file_scan_settings": {
-                    "enable"                  : true,
-                    "folders_to_scan"         : ["/"],
-                    "operating_system"        : "LINUX",
-                    "scan_recurrence"         : "FREQ=WEEKLY;INTERVAL=2;WKST=SU"
+                    "enable"                                       : true,
+                    "folders_to_scan"                              : ["/"],
+                    "operating_system"                             : "LINUX",
+                    "scan_recurrence"                              : "FREQ=WEEKLY;INTERVAL=2;WKST=SU"
                 },
 
                 "schedule_settings": {
-                    "type"                    : "WEEKLY",
-                    "day_of_week"             : "SUNDAY"
+                    "type"                                         : "WEEKLY",
+                    "day_of_week"                                  : "SUNDAY"
                 }
             }
         },
 
         "host_targets": {
             "VSS-TGTH-AMS-LZ-KEY": {
-                "name"                        : "vss-tgth-ams-lz",
-                "host_recipe_id"              : "VSS-RCPH-AMS-LZ-KEY",
-                "target_compartment_id"       : "CMP-LANDINGZONE-KEY"
+                "name"                                             : "vss-tgth-ams-lz",
+                "host_recipe_id"                                   : "VSS-RCPH-AMS-LZ-KEY",
+                "target_compartment_id"                            : "CMP-LANDINGZONE-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "security",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             }
         }
     },
 
     "vaults_configuration": {
-        "default_compartment_id"              : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "security",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+        },
 
         "keys": {
             "KEY-LZ-SHARED-OSS-AUDIT-BKT-KEY": {
-                "name"                        : "key-lz-shared-oss-audit-bkt",
-                "protection_mode"             : "SOFTWARE",
-                "vault_key"                   : "VLT-LZ-SHARED-SECURITY-KEY",
-                "versions"                    : ["1", "2"]
+                "name"                                             : "key-lz-shared-oss-audit-bkt",
+                "protection_mode"                                  : "SOFTWARE",
+                "vault_key"                                        : "VLT-LZ-SHARED-SECURITY-KEY",
+                "versions"                                         : ["1", "2"],
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "security",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             }
         },
 
         "vaults": {
             "VLT-LZ-SHARED-SECURITY-KEY": {
-                "name"                        : "vlt-lz-shared-security"
+                "name"                                             : "vlt-lz-shared-security",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "shared",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "security",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             }
         }
     }

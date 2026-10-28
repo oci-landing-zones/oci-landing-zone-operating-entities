@@ -38,7 +38,11 @@ local dedicated = prod_vcn.subnets['SN-FRA-LZ-PROD-API-JOBS-KEY'];
 {
   dedicated_subnet_cidr: dedicated.cidr_block,
   dedicated_subnet_display_name: dedicated.display_name,
-  dedicated_subnet_is_untagged: !std.objectHas(dedicated, 'defined_tags'),
+  dedicated_subnet_cost_scope: {
+    environment: dedicated.defined_tags['tagns-lz-cost-governance.tag-lz-environment'],
+    project: dedicated.defined_tags['tagns-lz-cost-governance.tag-lz-project'],
+    platform: dedicated.defined_tags['tagns-lz-cost-governance.tag-lz-platform'],
+  },
   empty_shared_map_emits_no_subnets: std.length(std.objectFields(dev_vcn.subnets)) == 0,
   omitted_shared_map_emits_defaults: std.objectFields(test_vcn.subnets) == [
     'SN-FRA-LZ-TEST-APP-KEY',

@@ -5,6 +5,7 @@
 //
 // function(raw_config) → { network, network_backends?, ... }
 //
+local cost_tags = import 'lib/cost_tags.libsonnet';
 local governance_builder = import 'builders/governance.libsonnet';
 local hub_integration_builder = import 'builders/hub_integration.libsonnet';
 local iam_builder = import 'builders/iam.libsonnet';
@@ -150,7 +151,7 @@ function(raw_config)
     else network_base;
 
   // --- Compose output ---
-  {
+  cost_tags.apply({
     // Normalized config-mode selector used by landing_zone_multi.jsonnet.
     cis_level: config.cis_level,
     stack_scope: config.stack_scope,
@@ -187,4 +188,4 @@ function(raw_config)
 
     // Extra outputs from extensions (e.g. oke_clusters, oke_workers)
     [if std.length(std.objectFields(extension_extra)) > 0 then 'extra']: extension_extra,
-  }
+  }, config)

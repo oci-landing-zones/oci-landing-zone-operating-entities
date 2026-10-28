@@ -43,6 +43,14 @@
                                         "protocol"                            : "ALL",
                                         "stateless"                           : true
                                     }
+                                },
+                                "defined_tags" : {
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                    "tagns-lz-cost-governance.tag-lz-platform": "network",
+                                    "tagns-lz-cost-governance.tag-lz-environment": "shared",
+                                    "tagns-lz-cost-governance.tag-lz-project": "none"
                                 }
                             }
                         }
@@ -76,6 +84,14 @@
                                         "protocol"                            : "TCP",
                                         "stateless"                           : false
                                     }
+                                },
+                                "defined_tags" : {
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                    "tagns-lz-cost-governance.tag-lz-platform": "network",
+                                    "tagns-lz-cost-governance.tag-lz-environment": "preprod",
+                                    "tagns-lz-cost-governance.tag-lz-project": "proj1"
                                 }
                             }
                         }
@@ -109,12 +125,28 @@
                                         "protocol"                            : "TCP",
                                         "stateless"                           : false
                                     }
+                                },
+                                "defined_tags" : {
+                                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                                    "tagns-lz-cost-governance.tag-lz-platform": "network",
+                                    "tagns-lz-cost-governance.tag-lz-environment": "prod",
+                                    "tagns-lz-cost-governance.tag-lz-project": "proj1"
                                 }
                             }
                         }
                     }
                 }
             }
+        },
+        "default_defined_tags" : {
+            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+            "tagns-lz-cost-governance.tag-lz-owner": "none",
+            "tagns-lz-cost-governance.tag-lz-platform": "network",
+            "tagns-lz-cost-governance.tag-lz-environment": "shared",
+            "tagns-lz-cost-governance.tag-lz-project": "none"
         }
     }
 }

@@ -1,37 +1,64 @@
 {
     "oke_workers_configuration": {
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"            : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"              : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"              : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                    : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"                 : "oke",
+            "tagns-lz-cost-governance.tag-lz-project"                  : "none"
+        },
+
         "node_pools": {
             "NDP-FRA-LZ-PROD-OKE-KEY": {
-                "name"                   : "ndp-fra-lz-prod-oke",
-                "compartment_id"         : "CMP-LZ-PROD-OKE-KEY",
-                "cis_level"              : "1",
-                "cluster_id"             : "CLR-FRA-LZ-PROD-OKE-KEY",
-                "enable_cycling"         : false,
-                "size"                   : 1,
+                "name"                                                 : "ndp-fra-lz-prod-oke",
+                "compartment_id"                                       : "CMP-LZ-PROD-OKE-KEY",
+                "cis_level"                                            : "1",
+                "cluster_id"                                           : "CLR-FRA-LZ-PROD-OKE-KEY",
+                "enable_cycling"                                       : false,
+                "size"                                                 : 1,
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"    : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"      : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"      : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"            : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"         : "oke",
+                    "tagns-lz-cost-governance.tag-lz-project"          : "none"
+                },
 
                 "freeform_tags": {
-                    "cluster"            : "clr-fra-lz-prod-oke"
+                    "cluster"                                          : "clr-fra-lz-prod-oke"
                 },
 
                 "networking": {
-                    "pods_nsg_ids"       : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"],
-                    "pods_subnet_id"     : "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
-                    "workers_nsg_ids"    : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"],
-                    "workers_subnet_id"  : "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
+                    "pods_nsg_ids"                                     : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY"],
+                    "pods_subnet_id"                                   : "SN-FRA-LZ-PROD-PLATFORM-OKE-PODS-KEY",
+                    "workers_nsg_ids"                                  : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"],
+                    "workers_subnet_id"                                : "SN-FRA-LZ-PROD-PLATFORM-OKE-WORKERS-KEY"
                 },
 
                 "node_config_details": {
-                    "boot_volume_size"   : 60,
-                    "image"              : "9\\.[0-9]+",
-                    "node_shape"         : "VM.Standard.E5.Flex",
+                    "boot_volume_size"                                 : 60,
+                    "image"                                            : "9\\.[0-9]+",
+                    "node_shape"                                       : "VM.Standard.E5.Flex",
 
                     "cloud_init": {
-                        "heredoc_script" : "#!/bin/bash\n\nsudo /usr/libexec/oci-growfs -y\n\ncurl --fail -H \"Authorization: Bearer Oracle\" -L0 http://169.254.169.254/opc/v2/instance/metadata/oke_init_script | base64 --decode >/var/run/oke-init.sh\nbash /var/run/oke-init.sh\n"
+                        "heredoc_script"                               : "#!/bin/bash\n\nsudo /usr/libexec/oci-growfs -y\n\ncurl --fail -H \"Authorization: Bearer Oracle\" -L0 http://169.254.169.254/opc/v2/instance/metadata/oke_init_script | base64 --decode >/var/run/oke-init.sh\nbash /var/run/oke-init.sh\n"
+                    },
+
+                    "defined_tags": {
+                        "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                        "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                        "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                        "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                        "tagns-lz-cost-governance.tag-lz-platform"     : "oke",
+                        "tagns-lz-cost-governance.tag-lz-project"      : "none"
                     },
 
                     "flex_shape_settings": {
-                        "memory"         : 8,
-                        "ocpus"          : 1
+                        "memory"                                       : 8,
+                        "ocpus"                                        : 1
                     }
                 }
             }

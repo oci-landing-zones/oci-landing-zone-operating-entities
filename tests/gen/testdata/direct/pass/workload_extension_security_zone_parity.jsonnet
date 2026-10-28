@@ -1,5 +1,18 @@
-// workload extension published security-zone configs match One-OE by CIS level
-local security_zones(doc) = doc.security_zones_configuration;
+// Security-zone controls match by CIS level; publication-only cost tags may differ.
+local remaining_tags(tags) = {
+  [tag]: tags[tag]
+  for tag in std.objectFields(tags)
+  if !std.startsWith(tag, 'tagns-lz-cost-governance.')
+};
+local without_cost_tags(value) =
+  if std.type(value) == 'array' then [without_cost_tags(item) for item in value]
+  else if std.type(value) != 'object' then value
+  else {
+    [key]: if std.member(['defined_tags', 'default_defined_tags'], key) then remaining_tags(value[key]) else without_cost_tags(value[key])
+    for key in std.objectFields(value)
+    if if std.member(['defined_tags', 'default_defined_tags'], key) then std.length(remaining_tags(value[key])) > 0 else true
+  };
+local security_zones(doc) = without_cost_tags(doc.security_zones_configuration);
 
 local oneoe = {
   cis1_pre: import 'gen/blueprints/one-oe/runtime/one-stack/oneoe_security_cis1_pre.jsonnet',

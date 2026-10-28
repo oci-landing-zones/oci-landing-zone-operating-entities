@@ -1,3 +1,4 @@
+local cost_tags = import '../../../../lib/cost_tags.libsonnet';
 local extensions = import '../../../../extensions.libsonnet';
 local lz = import '../../../../landing_zone.libsonnet';
 local publication_network = import '../../../../lib/publication_network.libsonnet';
@@ -5,7 +6,7 @@ local render_context = import '../../../../render_context.libsonnet';
 local oke_builder = import '../oke_builder.libsonnet';
 local public_lb = import '../oke_public_load_balancer.libsonnet';
 
-function(profile, env_name='prod', platform_name='oke') {
+function(profile, env_name='prod', platform_name='oke') cost_tags.apply({
   local cis1_config = profile.cis1_config,
   local iam_cis2_config = profile.iam_cis2_config,
   local ctx = render_context.from_raw_config(cis1_config),
@@ -126,4 +127,4 @@ function(profile, env_name='prod', platform_name='oke') {
   oke_observability_cis2_pre: rendered_lz.observability_cis2_pre,
   oke_clusters: rendered_lz.extra.oke_clusters,
   oke_workers: rendered_lz.extra.oke_workers,
-}
+}, profile.cis1_config)

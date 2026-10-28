@@ -32,6 +32,9 @@ The deployment menu includes several Hub architectures, each with distinct netwo
 
 Review the [known issues](known_issues.md) for any potential problems, and feel free to contact us.
 
+For explicit resource tags and mandatory Tag Defaults in a single apply, see
+[Cost governance tags](cost-governance.md).
+
 &nbsp; 
 
 # License

@@ -1,3 +1,4 @@
+local cost_tags = import '../../../lib/cost_tags.libsonnet';
 local extensions = import '../../../extensions.libsonnet';
 local lz = import '../../../landing_zone.libsonnet';
 local publication_network = import '../../../lib/publication_network.libsonnet';
@@ -212,7 +213,7 @@ local products = import '../../exadb/products.libsonnet';
         },
       } else {};
 
-    {
+    cost_tags.apply({
       network_pre: {
         network_configuration: {
           network_configuration_categories: network_pre_categories,
@@ -235,5 +236,5 @@ local products = import '../../exadb/products.libsonnet';
       },
       observability_pre: extension_observability,
       observability: extension_observability + flow_logging_overlay,
-    },
+    }, ctx.config),
 }

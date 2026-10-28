@@ -20,17 +20,30 @@ resource "oci_database_autonomous_database" "autonomous_database_private" {
   data_storage_size_in_tbs = "1"
   db_name                  = var.adw_db_name
 
-  db_version   = var.db_version
-  display_name = var.adw_display_name
+  db_version                          = var.db_version
+  display_name                        = var.adw_display_name
   is_auto_scaling_enabled             = "true"
   is_auto_scaling_for_storage_enabled = "true"
   license_model                       = var.autonomous_database_license_model
-  subnet_id = var.private_subnet_id 
-  nsg_ids = [var.nsg_id]
+  subnet_id                           = var.private_subnet_id
+  nsg_ids                             = [var.nsg_id]
+  defined_tags                        = local.database_defined_tags
 }
 
 locals {
-  adw_ocid = oci_database_autonomous_database.autonomous_database_private.id
+  cost_governance_tags = {
+    "tagns-lz-cost-governance.tag-lz-cost-center"   = "none"
+    "tagns-lz-cost-governance.tag-lz-business-unit" = "none"
+    "tagns-lz-cost-governance.tag-lz-owner"         = "none"
+    "tagns-lz-cost-governance.tag-lz-platform"      = "none"
+    "tagns-lz-cost-governance.tag-lz-environment"   = "none"
+    "tagns-lz-cost-governance.tag-lz-project"       = "none"
+  }
+  iam_defined_tags = merge(local.cost_governance_tags, var.defined_tags)
+  database_defined_tags = merge(local.iam_defined_tags, {
+    "tagns-lz-cost-governance.tag-lz-platform" = "finops"
+  })
+  adw_ocid           = oci_database_autonomous_database.autonomous_database_private.id
   dynamic_group_rule = "ALL {resource.type = 'autonomousdatabase',resource.id='${local.adw_ocid}'}"
   policy_statements = ["define tenancy reporting as ocid1.tenancy.oc1..aaaaaaaaned4fkpkisbwjlr56u7cj63lf3wffbilvqknstgtvzub7vhqkggq",
   "endorse dynamic-group ${var.finops_dynamic_group_name} to read objects in tenancy reporting"]
@@ -38,21 +51,21 @@ locals {
 
 #To create dynamic group
 resource "oci_identity_dynamic_group" "finops_dynamic_group" {
-    count = var.create_policy ? 1 : 0
-    depends_on = [ oci_database_autonomous_database.autonomous_database_private ]
-    compartment_id = var.tenancy_ocid
-    description = "Dynamic group for FinOps Autonomous database"
-    matching_rule = local.dynamic_group_rule
-    name = var.finops_dynamic_group_name
-    defined_tags = var.defined_tags
+  count          = var.create_policy ? 1 : 0
+  depends_on     = [oci_database_autonomous_database.autonomous_database_private]
+  compartment_id = var.tenancy_ocid
+  description    = "Dynamic group for FinOps Autonomous database"
+  matching_rule  = local.dynamic_group_rule
+  name           = var.finops_dynamic_group_name
+  defined_tags   = local.iam_defined_tags
 }
 
 # To create IAM policies
 resource "oci_identity_policy" "finops_policy" {
-    count = var.create_policy ? 1 : 0
-    compartment_id = var.tenancy_ocid
-    description = "FinOps policies to read objects from cost tenancy"
-    name = var.finops_policy_name
-    statements = local.policy_statements
-    defined_tags = var.defined_tags
+  count          = var.create_policy ? 1 : 0
+  compartment_id = var.tenancy_ocid
+  description    = "FinOps policies to read objects from cost tenancy"
+  name           = var.finops_policy_name
+  statements     = local.policy_statements
+  defined_tags   = local.iam_defined_tags
 }

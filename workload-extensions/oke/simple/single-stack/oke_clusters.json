@@ -2,39 +2,74 @@
     "oke_clusters_configuration": {
         "clusters": {
             "CLR-FRA-LZ-PROD-OKE-KEY": {
-                "name"                                 : "clr-fra-lz-prod-oke",
-                "compartment_id"                       : "CMP-LZ-PROD-OKE-KEY",
-                "cis_level"                            : "1",
-                "cni_type"                             : "native",
-                "is_enhanced"                          : true,
-                "kubernetes_version"                   : "v1.35.2",
+                "name"                                                     : "clr-fra-lz-prod-oke",
+                "compartment_id"                                           : "CMP-LZ-PROD-OKE-KEY",
+                "cis_level"                                                : "1",
+                "cni_type"                                                 : "native",
+                "is_enhanced"                                              : true,
+                "kubernetes_version"                                       : "v1.35.2",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"             : "oke",
+                    "tagns-lz-cost-governance.tag-lz-project"              : "none"
+                },
 
                 "networking": {
-                    "api_endpoint_nsg_ids"             : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY"],
-                    "api_endpoint_subnet_id"           : "SN-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
-                    "assign_public_ip_to_control_plane": false,
-                    "is_api_endpoint_public"           : false,
-                    "services_subnet_id"               : ["SN-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY"],
-                    "vcn_id"                           : "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY"
+                    "api_endpoint_nsg_ids"                                 : ["NSG-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY"],
+                    "api_endpoint_subnet_id"                               : "SN-FRA-LZ-PROD-PLATFORM-OKE-CP-KEY",
+                    "assign_public_ip_to_control_plane"                    : false,
+                    "is_api_endpoint_public"                               : false,
+                    "services_subnet_id"                                   : ["SN-FRA-LZ-PROD-PLATFORM-OKE-INT-LB-KEY"],
+                    "vcn_id"                                               : "VCN-FRA-LZ-PROD-PLATFORM-OKE-KEY"
                 },
 
                 "options": {
                     "add_ons": {
-                        "dashboard_enabled"            : false,
-                        "tiller_enabled"               : false
+                        "dashboard_enabled"                                : false,
+                        "tiller_enabled"                                   : false
                     },
 
                     "kubernetes_network_config": {
-                        "services_cidr"                : "10.96.0.0/16"
+                        "services_cidr"                                    : "10.96.0.0/16"
+                    },
+
+                    "persistent_volume_config": {
+                        "defined_tags": {
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                            "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                            "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                            "tagns-lz-cost-governance.tag-lz-platform"     : "oke",
+                            "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                        }
                     },
 
                     "service_lb_config": {
                         "defined_tags": {
-                            "tagns-lz-oke.platform"    : "prod-oke"
+                            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                            "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                            "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                            "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                            "tagns-lz-cost-governance.tag-lz-platform"     : "network",
+                            "tagns-lz-cost-governance.tag-lz-project"      : "none",
+                            "tagns-lz-oke.platform"                        : "prod-oke"
                         }
                     }
                 }
             }
+        },
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"                : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"                  : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"                  : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                        : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"                     : "oke",
+            "tagns-lz-cost-governance.tag-lz-project"                      : "none"
         }
     }
 }

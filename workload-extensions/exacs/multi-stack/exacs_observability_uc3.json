@@ -1,228 +1,381 @@
 {
     "alarms_configuration": {
-        "default_compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
+        "default_compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
 
         "alarms": {
             "AL-LZ-PREPROD-EXACS-CPUUTIL-KEY": {
-                "display_name"                                    : "al-lz-preprod-db-cpuutil",
-                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-preprod-db-cpuutil",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "CpuUtilization[1m].mean() >= 90",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PREPROD-EXACS-DB-CLUSTER-CPUUTIL-KEY": {
-                "display_name"                                    : "al-lz-preprod-vmc-cpuutil",
-                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-preprod-vmc-cpuutil",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database_cluster",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "CpuUtilization[1m].mean() >= 90",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database_cluster",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PREPROD-EXACS-DB-CLUSTER-DISKUTIL-KEY": {
-                "display_name"                                    : "al-lz-preprod-vmc-dgutil",
-                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-preprod-vmc-dgutil",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database_cluster",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "ASMDiskgroupUtilization[1m].mean() >= 90",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database_cluster",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "ASMDiskgroupUtilization[1m].mean() >= 90",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PREPROD-EXACS-DB-CLUSTER-FSUTIL-KEY": {
-                "display_name"                                    : "al-lz-preprod-vmc-fsutil",
-                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-preprod-vmc-fsutil",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database_cluster",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "FilesystemUtilization[1m].mean() >= 90",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database_cluster",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "FilesystemUtilization[1m].mean() >= 90",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PREPROD-EXACS-DB-CLUSTER-MEMUTIL-KEY": {
-                "display_name"                                    : "al-lz-preprod-vmc-memutil",
-                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-preprod-vmc-memutil",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database_cluster",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "MemoryUtilization[1m].mean() >= 80",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database_cluster",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "MemoryUtilization[1m].mean() >= 80",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PREPROD-EXACS-DB-CLUSTER-SWAPUTIL-KEY": {
-                "display_name"                                    : "al-lz-preprod-vmc-swaputil",
-                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-preprod-vmc-swaputil",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database_cluster",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "SwapUtilization[1m].mean() >= 75",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database_cluster",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "SwapUtilization[1m].mean() >= 75",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PREPROD-EXACS-STORAGEUTIL-KEY": {
-                "display_name"                                    : "al-lz-preprod-db-storageutil",
-                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-preprod-db-storageutil",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "StorageUtilization[1m].mean() >= 90",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "StorageUtilization[1m].mean() >= 90",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PROD-EXACS-CPUUTIL-KEY": {
-                "display_name"                                    : "al-lz-prod-db-cpuutil",
-                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-prod-db-cpuutil",
+                "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "CpuUtilization[1m].mean() >= 90",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PROD-EXACS-DB-CLUSTER-CPUUTIL-KEY": {
-                "display_name"                                    : "al-lz-prod-vmc-cpuutil",
-                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-prod-vmc-cpuutil",
+                "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database_cluster",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "CpuUtilization[1m].mean() >= 90",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database_cluster",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "CpuUtilization[1m].mean() >= 90",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PROD-EXACS-DB-CLUSTER-DISKUTIL-KEY": {
-                "display_name"                                    : "al-lz-prod-vmc-dgutil",
-                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-prod-vmc-dgutil",
+                "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database_cluster",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "ASMDiskgroupUtilization[1m].mean() >= 90",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database_cluster",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "ASMDiskgroupUtilization[1m].mean() >= 90",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PROD-EXACS-DB-CLUSTER-FSUTIL-KEY": {
-                "display_name"                                    : "al-lz-prod-vmc-fsutil",
-                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-prod-vmc-fsutil",
+                "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database_cluster",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "FilesystemUtilization[1m].mean() >= 90",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database_cluster",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "FilesystemUtilization[1m].mean() >= 90",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PROD-EXACS-DB-CLUSTER-MEMUTIL-KEY": {
-                "display_name"                                    : "al-lz-prod-vmc-memutil",
-                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-prod-vmc-memutil",
+                "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database_cluster",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "MemoryUtilization[1m].mean() >= 80",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database_cluster",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "MemoryUtilization[1m].mean() >= 80",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PROD-EXACS-DB-CLUSTER-SWAPUTIL-KEY": {
-                "display_name"                                    : "al-lz-prod-vmc-swaputil",
-                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-prod-vmc-swaputil",
+                "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database_cluster",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "SwapUtilization[1m].mean() >= 75",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database_cluster",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "SwapUtilization[1m].mean() >= 75",
+                    "severity"                                     : "CRITICAL"
                 }
             },
 
             "AL-LZ-PROD-EXACS-STORAGEUTIL-KEY": {
-                "display_name"                                    : "al-lz-prod-db-storageutil",
-                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "is_enabled"                                      : "false",
+                "display_name"                                     : "al-lz-prod-db-storageutil",
+                "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "is_enabled"                                       : "false",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_alarm": {
-                    "message_format"                              : "PRETTY_JSON",
-                    "namespace"                                   : "oci_database",
-                    "pending_duration"                            : "PT5M",
-                    "query"                                       : "StorageUtilization[1m].mean() >= 90",
-                    "severity"                                    : "CRITICAL"
+                    "message_format"                               : "PRETTY_JSON",
+                    "namespace"                                    : "oci_database",
+                    "pending_duration"                             : "PT5M",
+                    "query"                                        : "StorageUtilization[1m].mean() >= 90",
+                    "severity"                                     : "CRITICAL"
                 }
             }
+        },
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "prod",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
         }
     },
 
     "events_configuration": {
-        "default_compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+        },
 
         "event_rules": {
             "RUL-LZ-PREPROD-EXACS-NOTIFICATION-PROJECTS-KEY": {
-                "compartment_id"                                  : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "event_display_name"                              : "rul-lz-preprod-notify-on-notifications",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-PROJ1-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                               : "rul-lz-preprod-notify-on-notifications",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
@@ -286,9 +439,18 @@
             },
 
             "RUL-LZ-PREPROD-NOTIFICATION-PLATFORM-EXACS-DB-KEY": {
-                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "event_display_name"                              : "rul-lz-preprod-notify-on-exacs-db-events",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                               : "rul-lz-preprod-notify-on-exacs-db-events",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
@@ -352,9 +514,18 @@
             },
 
             "RUL-LZ-PREPROD-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY": {
-                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-INFRA-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "event_display_name"                              : "rul-lz-preprod-notify-on-exacs-infra-events",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-INFRA-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                               : "rul-lz-preprod-notify-on-exacs-infra-events",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changecloudexadatainfrastructurecompartment.begin",
@@ -382,9 +553,18 @@
             },
 
             "RUL-LZ-PREPROD-NOTIFICATION-PLATFORM-EXACS-VMC-KEY": {
-                "compartment_id"                                  : "CMP-LZ-PREPROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
-                "event_display_name"                              : "rul-lz-preprod-notify-on-exacs-vmc-events",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                               : "rul-lz-preprod-notify-on-exacs-vmc-events",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changecloudvmclustercompartment.begin",
@@ -418,9 +598,18 @@
             },
 
             "RUL-LZ-PROD-EXACS-NOTIFICATION-PROJECTS-KEY": {
-                "compartment_id"                                  : "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "event_display_name"                              : "rul-lz-prod-notify-on-notifications",
+                "compartment_id"                                   : "CMP-LZ-PROD-PROJ1-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                               : "rul-lz-prod-notify-on-notifications",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
@@ -484,9 +673,18 @@
             },
 
             "RUL-LZ-PROD-NOTIFICATION-PLATFORM-EXACS-DB-KEY": {
-                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "event_display_name"                              : "rul-lz-prod-notify-on-exacs-db-events",
+                "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                               : "rul-lz-prod-notify-on-exacs-db-events",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.deletebackupdestination",
@@ -550,9 +748,18 @@
             },
 
             "RUL-LZ-PROD-NOTIFICATION-PLATFORM-EXACS-INFRA-KEY": {
-                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-INFRA-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "event_display_name"                              : "rul-lz-prod-notify-on-exacs-infra-events",
+                "compartment_id"                                   : "CMP-LZ-PROD-EXACS-INFRA-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                               : "rul-lz-prod-notify-on-exacs-infra-events",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changecloudexadatainfrastructurecompartment.begin",
@@ -580,9 +787,18 @@
             },
 
             "RUL-LZ-PROD-NOTIFICATION-PLATFORM-EXACS-VMC-KEY": {
-                "compartment_id"                                  : "CMP-LZ-PROD-EXACS-DB-KEY",
-                "destination_topic_ids"                           : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
-                "event_display_name"                              : "rul-lz-prod-notify-on-exacs-vmc-events",
+                "compartment_id"                                   : "CMP-LZ-PROD-EXACS-DB-KEY",
+                "destination_topic_ids"                            : ["NOTT-LZ-PROD-EXACS-PROJECTS-KEY"],
+                "event_display_name"                               : "rul-lz-prod-notify-on-exacs-vmc-events",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "supplied_events": [
                     "com.oraclecloud.databaseservice.changecloudvmclustercompartment.begin",
@@ -618,73 +834,163 @@
     },
 
     "logging_configuration": {
-        "default_compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+        },
 
         "flow_logs": {
             "LOG-LZ-PREPROD-PLATFORM-EXACS-SUBNET-FLOW-KEY": {
-                "log_group_id"                                    : "LGRP-LZ-PREPROD-PLATFORM-EXACS-VCN-FLOW-KEY",
-                "target_compartment_ids"                          : ["CMP-LZ-PREPROD-NETWORK-KEY"],
-                "target_resource_type"                            : "subnet"
+                "log_group_id"                                     : "LGRP-LZ-PREPROD-PLATFORM-EXACS-VCN-FLOW-KEY",
+                "target_compartment_ids"                           : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"                             : "subnet",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LOG-LZ-PREPROD-PLATFORM-EXACS-VCN-FLOW-KEY": {
-                "log_group_id"                                    : "LGRP-LZ-PREPROD-PLATFORM-EXACS-VCN-FLOW-KEY",
-                "target_compartment_ids"                          : ["CMP-LZ-PREPROD-NETWORK-KEY"],
-                "target_resource_type"                            : "vcn"
+                "log_group_id"                                     : "LGRP-LZ-PREPROD-PLATFORM-EXACS-VCN-FLOW-KEY",
+                "target_compartment_ids"                           : ["CMP-LZ-PREPROD-NETWORK-KEY"],
+                "target_resource_type"                             : "vcn",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LOG-LZ-PROD-PLATFORM-EXACS-SUBNET-FLOW-KEY": {
-                "log_group_id"                                    : "LGRP-LZ-PROD-PLATFORM-EXACS-VCN-FLOW-KEY",
-                "target_compartment_ids"                          : ["CMP-LZ-PROD-NETWORK-KEY"],
-                "target_resource_type"                            : "subnet"
+                "log_group_id"                                     : "LGRP-LZ-PROD-PLATFORM-EXACS-VCN-FLOW-KEY",
+                "target_compartment_ids"                           : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"                             : "subnet",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LOG-LZ-PROD-PLATFORM-EXACS-VCN-FLOW-KEY": {
-                "log_group_id"                                    : "LGRP-LZ-PROD-PLATFORM-EXACS-VCN-FLOW-KEY",
-                "target_compartment_ids"                          : ["CMP-LZ-PROD-NETWORK-KEY"],
-                "target_resource_type"                            : "vcn"
+                "log_group_id"                                     : "LGRP-LZ-PROD-PLATFORM-EXACS-VCN-FLOW-KEY",
+                "target_compartment_ids"                           : ["CMP-LZ-PROD-NETWORK-KEY"],
+                "target_resource_type"                             : "vcn",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             }
         },
 
         "log_groups": {
             "LGRP-LZ-PREPROD-PLATFORM-EXACS-VCN-FLOW-KEY": {
-                "name"                                            : "lgrp-lz-preprod-exacs-vcn-flow",
-                "compartment_id"                                  : "CMP-LZ-PREPROD-SECURITY-KEY"
+                "name"                                             : "lgrp-lz-preprod-exacs-vcn-flow",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             },
 
             "LGRP-LZ-PROD-PLATFORM-EXACS-VCN-FLOW-KEY": {
-                "name"                                            : "lgrp-lz-prod-exacs-vcn-flow",
-                "compartment_id"                                  : "CMP-LZ-PROD-SECURITY-KEY"
+                "name"                                             : "lgrp-lz-prod-exacs-vcn-flow",
+                "compartment_id"                                   : "CMP-LZ-PROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                }
             }
         }
     },
 
     "notifications_configuration": {
-        "default_compartment_id"                                  : "CMP-LZ-SECURITY-KEY",
+        "default_compartment_id"                                   : "CMP-LZ-SECURITY-KEY",
+
+        "default_defined_tags": {
+            "tagns-lz-cost-governance.tag-lz-business-unit"        : "none",
+            "tagns-lz-cost-governance.tag-lz-cost-center"          : "none",
+            "tagns-lz-cost-governance.tag-lz-environment"          : "shared",
+            "tagns-lz-cost-governance.tag-lz-owner"                : "none",
+            "tagns-lz-cost-governance.tag-lz-platform"             : "observability",
+            "tagns-lz-cost-governance.tag-lz-project"              : "none"
+        },
 
         "topics": {
             "NOTT-LZ-PREPROD-EXACS-PROJECTS-KEY": {
-                "name"                                            : "nott-lz-preprod-exacs-projects",
-                "description"                                     : "Topic for Pre-Production ExaDB-D project notifications.",
-                "compartment_id"                                  : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "name"                                             : "nott-lz-preprod-exacs-projects",
+                "description"                                      : "Topic for Pre-Production ExaDB-D project notifications.",
+                "compartment_id"                                   : "CMP-LZ-PREPROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "preprod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "subscriptions": [
                     {
-                        "protocol"                                : "EMAIL",
-                        "values"                                  : ["exacs-project-team@example.com"]
+                        "protocol"                                 : "EMAIL",
+                        "values"                                   : ["exacs-project-team@example.com"]
                     }
                 ]
             },
 
             "NOTT-LZ-PROD-EXACS-PROJECTS-KEY": {
-                "name"                                            : "nott-lz-prod-exacs-projects",
-                "description"                                     : "Topic for Production ExaDB-D project notifications.",
-                "compartment_id"                                  : "CMP-LZ-PROD-SECURITY-KEY",
+                "name"                                             : "nott-lz-prod-exacs-projects",
+                "description"                                      : "Topic for Production ExaDB-D project notifications.",
+                "compartment_id"                                   : "CMP-LZ-PROD-SECURITY-KEY",
+
+                "defined_tags": {
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-cost-center"  : "none",
+                    "tagns-lz-cost-governance.tag-lz-environment"  : "prod",
+                    "tagns-lz-cost-governance.tag-lz-owner"        : "none",
+                    "tagns-lz-cost-governance.tag-lz-platform"     : "observability",
+                    "tagns-lz-cost-governance.tag-lz-project"      : "none"
+                },
 
                 "subscriptions": [
                     {
-                        "protocol"                                : "EMAIL",
-                        "values"                                  : ["exacs-project-team@example.com"]
+                        "protocol"                                 : "EMAIL",
+                        "values"                                   : ["exacs-project-team@example.com"]
                     }
                 ]
             }

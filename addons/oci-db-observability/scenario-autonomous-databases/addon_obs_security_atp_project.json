@@ -10,7 +10,15 @@
                 "protection_mode"   : "SOFTWARE",
                 "service_grantees"  : ["objectstorage-eu-frankfurt-1"],
                 "vault_key"         : "VLT-LZ-PREPROD-MON-KEY",
-                "versions"          : ["1", "2"]
+                "versions"          : ["1", "2"],
+                "defined_tags" : {
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                    "tagns-lz-cost-governance.tag-lz-platform": "security",
+                    "tagns-lz-cost-governance.tag-lz-environment": "preprod",
+                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                }
             },
 
             "KEY-LZ-PROD-MON-KEY": {
@@ -20,20 +28,52 @@
                 "protection_mode"   : "SOFTWARE",
                 "service_grantees"  : ["objectstorage-eu-frankfurt-1"],
                 "vault_key"         : "VLT-LZ-PROD-MON-KEY",
-                "versions"          : ["1", "2"]
+                "versions"          : ["1", "2"],
+                "defined_tags" : {
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                    "tagns-lz-cost-governance.tag-lz-platform": "security",
+                    "tagns-lz-cost-governance.tag-lz-environment": "prod",
+                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                }
             }
         },
 
         "vaults": {
             "VLT-LZ-PREPROD-MON-KEY": {
                 "name"              : "vlt-lz-preprod-mon-security",
-                "compartment_id"    : "CMP-LZ-PREPROD-SECURITY-KEY"
+                "compartment_id"    : "CMP-LZ-PREPROD-SECURITY-KEY",
+                "defined_tags" : {
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                    "tagns-lz-cost-governance.tag-lz-platform": "security",
+                    "tagns-lz-cost-governance.tag-lz-environment": "preprod",
+                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                }
             },
 
             "VLT-LZ-PROD-MON-KEY": {
                 "name"              : "vlt-lz-prod-mon-security",
-                "compartment_id"    : "CMP-LZ-PROD-SECURITY-KEY"
+                "compartment_id"    : "CMP-LZ-PROD-SECURITY-KEY",
+                "defined_tags" : {
+                    "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+                    "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+                    "tagns-lz-cost-governance.tag-lz-owner": "none",
+                    "tagns-lz-cost-governance.tag-lz-platform": "security",
+                    "tagns-lz-cost-governance.tag-lz-environment": "prod",
+                    "tagns-lz-cost-governance.tag-lz-project": "none"
+                }
             }
+        },
+        "default_defined_tags" : {
+            "tagns-lz-cost-governance.tag-lz-cost-center": "none",
+            "tagns-lz-cost-governance.tag-lz-business-unit": "none",
+            "tagns-lz-cost-governance.tag-lz-owner": "none",
+            "tagns-lz-cost-governance.tag-lz-platform": "security",
+            "tagns-lz-cost-governance.tag-lz-environment": "shared",
+            "tagns-lz-cost-governance.tag-lz-project": "none"
         }
     }
 }

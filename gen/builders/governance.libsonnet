@@ -30,14 +30,14 @@ function(config, n)
             description: 'Platform associated with the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: ['none', 'oke', 'ocvs', 'exacs', 'exacc', 'ebs', 'hpc', 'finops', 'ai-services'],
+            valid_values: ['none', 'network', 'security', 'observability', 'oke', 'ocvs', 'exacs', 'exacc', 'ebs', 'hpc', 'finops', 'ai-services'],
           },
           [n.key_global('TAG', ['ENVIRONMENT'])]: {
             name: n.display_global('tag', ['environment']),
             description: 'Deployment environment associated with the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: ['none', 'shared', 'prod', 'preprod', 'dev', 'uat', 'staging', 'test'],
+            valid_values: std.set(['none', 'shared', 'prod', 'preprod', 'dev', 'uat', 'staging', 'test'] + std.objectFields(config.environments)),
           },
           [n.key_global('TAG', ['OWNER'])]: {
             name: n.display_global('tag', ['owner']),
@@ -58,7 +58,11 @@ function(config, n)
             description: 'Project associated with the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: ['none', 'proj1'],
+            valid_values: std.set(['none', 'proj1', 'proj2'] + std.flattenArrays([
+              std.objectFields(config.environments[env].projects)
+              for env in std.objectFields(config.environments)
+              if std.objectHas(config.environments[env], 'projects')
+            ])),
           },
         },
       },
