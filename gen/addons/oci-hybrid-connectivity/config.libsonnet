@@ -141,37 +141,21 @@ local mapping(raw, label) =
       }
     );
     local circuits = named_map(get(root, 'fast_connect_virtual_circuits', {}), 'hybrid_connectivity.fast_connect_virtual_circuits', function(raw, label)
-      local o = object(raw, label, ['type', 'remote_cidrs', 'bandwidth_shape_name', 'bgp_admin_state', 'cross_connect_mappings', 'customer_asn', 'ip_mtu', 'is_bfd_enabled', 'provider_service_id', 'provider_service', 'provider_service_key_name', 'public_prefixes', 'routing_policy', 'provision_fc_virtual_circuit']);
-      local provider = if get(o, 'provider_service') == null then null else object(o.provider_service, label + '.provider_service', ['provider_name', 'provider_service_name']);
-      assert provider == null || get(o, 'provider_service_id') == null : label + ' must choose provider_service or provider_service_id, not both';
-      assert std.member(['PRIVATE', 'PUBLIC'], get(o, 'type')) : label + '.type must be PRIVATE or PUBLIC';
+      local o = object(raw, label, ['type', 'remote_cidrs', 'bandwidth_shape_name', 'bgp_admin_state', 'cross_connect_mappings', 'customer_asn', 'ip_mtu', 'is_bfd_enabled', 'provider_service_id', 'provider_service_key_name', 'provision_fc_virtual_circuit']);
+      assert get(o, 'type') == 'PRIVATE' : label + ': only private FastConnect circuits are supported; set type to PRIVATE';
       assert !std.objectHas(o, 'bandwidth_shape_name') || (
         local parts = std.split(text(o.bandwidth_shape_name, label + '.bandwidth_shape_name'), ' ');
         std.length(parts) == 2 && parts[1] == 'Gbps'
         && cidrs.is_canonical_decimal_string(parts[0])
         && cidrs.parse_decimal(label + '.bandwidth_shape_name', parts[0]) > 0
       ) : label + '.bandwidth_shape_name must be a positive integer followed by " Gbps", for example "20 Gbps"';
-      assert o.type != 'PUBLIC' || get(o, 'remote_cidrs') == null : label + ' public circuits cannot route private remote_cidrs';
       local mappings = named_map(get(o, 'cross_connect_mappings', {}), label + '.cross_connect_mappings', mapping);
-      assert get(o, 'provider_service_id') != null || provider != null || std.length([m for m in std.objectValues(mappings) if get(m, 'cross_connect_or_cross_connect_group_id') != null]) > 0 : label + ' requires a provider service OCID, provider_service names or existing cross-connect OCID';
+      assert get(o, 'provider_service_id') != null || std.length([m for m in std.objectValues(mappings) if get(m, 'cross_connect_or_cross_connect_group_id') != null]) > 0 : label + ' requires a provider service OCID or existing cross-connect OCID';
       assert get(o, 'provider_service_id') == null || std.startsWith(text(o.provider_service_id, label), 'ocid1.') : label + '.provider_service_id must be an OCID';
       assert get(o, 'is_bfd_enabled') == null || std.type(o.is_bfd_enabled) == 'boolean' : label + '.is_bfd_enabled must be boolean';
       assert std.type(get(o, 'provision_fc_virtual_circuit', true)) == 'boolean' : label + '.provision_fc_virtual_circuit must be boolean';
-      assert o.type != 'PUBLIC' || get(o, 'public_prefixes') != null : label + ' public circuits require public_prefixes';
       o + {
-        [if provider != null then 'provider_service']: {
-          [k]:
-            local field_label = label + '.provider_service.' + k;
-            local value = text(v.required(provider, k, field_label), field_label);
-            assert std.length(std.stripChars(value, ' \t\r\n')) > 0 : field_label + ' must be a nonblank string';
-            assert value == std.stripChars(value, ' \t\r\n') : field_label + ' must not have leading or trailing whitespace';
-            assert collections.all([std.codepoint(c) >= 32 && std.codepoint(c) <= 126 for c in std.stringChars(value)]) : field_label + ' must use printable ASCII; use provider_service_id for other names';
-            assert !std.startsWith(value, 'ocid1.') : field_label + ' must be a service name; use provider_service_id for an OCID';
-            value
-          for k in ['provider_name', 'provider_service_name']
-        },
-        [if o.type == 'PRIVATE' then 'remote_cidrs']: cidr_list(v.required(o, 'remote_cidrs', label + '.remote_cidrs'), label + '.remote_cidrs'),
-        [if get(o, 'public_prefixes') != null then 'public_prefixes']: named_map(o.public_prefixes, label + '.public_prefixes', function(p, l) { cidr_block: cidrs.validate(l, v.required(p, 'cidr_block', l)) }),
+        remote_cidrs: cidr_list(v.required(o, 'remote_cidrs', label + '.remote_cidrs'), label + '.remote_cidrs'),
         [if get(o, 'customer_asn') != null then 'customer_asn']: asn(o.customer_asn, label + '.customer_asn'),
         cross_connect_mappings: mappings,
         provision_fc_virtual_circuit: get(o, 'provision_fc_virtual_circuit', true),

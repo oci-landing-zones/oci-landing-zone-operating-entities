@@ -11,6 +11,20 @@ import { resourceGroupLayout, resourceGroupSvg } from '../diagram/resourceGroups
 import { ATTACHMENT_LABEL, DRG_CAPTION } from '../diagram/layoutPolicy';
 
 describe('toDrawioXml', () => {
+  it('includes external root nodes in the export origin without clipping their negative model coordinates', () => {
+    const diagram: DiagramModel = { nodes: [
+      { id: 'region', kind: 'region', label: 'OCI Region', x: 0, y: 0, width: 1000, height: 1000 },
+      { id: 'vpn', kind: 'attachment', label: 'VPN office', x: -300, y: 300, width: 200, height: 60 },
+    ], edges: [] };
+    const xml = toDrawioXml(diagram);
+    const vpn = xml.match(/<mxCell id="vpn"[^]*?<\/mxCell>/)?.[0] ?? '';
+    expect(vpn).toContain('parent="1"');
+    expect(vpn).toContain('x="20" y="350" width="200" height="60"');
+    const region = xml.match(/<mxCell id="region"[^]*?<\/mxCell>/)?.[0] ?? '';
+    expect(region).toContain('x="320" y="50"');
+    expect(diagram.nodes[1].x).toBe(-300);
+  });
+
   it('embeds the exact resource block shown on the website at the model position and extent', () => {
     const resourceItems = [{ key: 'added-by-generator', name: 'new-generated-resource<&>' }];
     const width = 180;

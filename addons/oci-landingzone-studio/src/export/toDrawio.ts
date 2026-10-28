@@ -3,7 +3,7 @@ import { oracle } from '../theme';
 import { SHIELD_SVG } from '../diagram/shieldSvg';
 import { ROUTE_TABLE_SVG } from '../diagram/routeTableSvg';
 import { IGW_SVG, NATGW_SVG, SGW_SVG, FIREWALL_SVG, LB_SVG, OSN_SVG, DRG_SVG, VM_SVG } from '../diagram/icons';
-import { absoluteNodeRects } from '../diagram/flowGeometry';
+import { absoluteNodeRects, diagramBounds } from '../diagram/flowGeometry';
 import { associationDisplaySegments, flowDisplayPoints, structuralEdgePoints } from '../diagram/displayGeometry';
 import { flowGroup, labelAnchor, marksAlong, type Point } from '../diagram/flowOverlayGeometry';
 import { createFlowPlayback, flowHopMarkers } from '../diagram/flowPlayback';
@@ -267,10 +267,9 @@ function edgeGeometry(points: Point[], offsetX: number, offsetY: number): string
 }
 
 export function toDrawioXml(diagram: DiagramModel, diagramName = 'Landing Zone'): string {
-  // Centre the root container on the page (children move with it).
-  const root = diagram.nodes.find((n) => !n.parentId);
-  const offsetX = Math.max(20, Math.round((PAGE_W - (root?.width ?? 0)) / 2));
-  const offsetY = Math.max(20, Math.round((PAGE_H - (root?.height ?? 0)) / 2));
+  const bounds = diagramBounds(diagram.nodes);
+  const offsetX = Math.max(20, Math.round((PAGE_W - bounds.width) / 2)) - bounds.x;
+  const offsetY = Math.max(20, Math.round((PAGE_H - bounds.height) / 2)) - bounds.y;
   const nodeCells = diagram.nodes.map((n) =>
     n.parentId ? nodeCell(n) : nodeCell(n, offsetX, offsetY),
   );

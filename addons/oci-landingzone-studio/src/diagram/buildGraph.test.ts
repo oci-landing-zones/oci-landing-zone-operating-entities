@@ -6,7 +6,8 @@ import { newPlatform, newSharedPlatform } from '../services/platforms';
 import type { Environment, LzModel } from '../model/types';
 import { generatedRouteTables } from '../services/routingFixtures.testSupport';
 import { buildFlowTraces } from '../services/flowTrace';
-import { absoluteNodeRects, flowAnchorPoint, type FlowPoint, type FlowRect } from './flowGeometry';
+import { absoluteNodeRects, diagramBounds, flowAnchorPoint, type FlowPoint, type FlowRect } from './flowGeometry';
+import { emptyHybridConnectivity, newVpn } from '../services/hybridConnectivity';
 
 function env(name: string, securityZone: boolean, index: number): Environment {
   return { id: `environment-${index + 1}`, name, securityZone, network: envNetworkDefaults(index) };
@@ -35,6 +36,36 @@ function crossesInterior(from: FlowPoint, to: FlowPoint, rect: FlowRect): boolea
 }
 
 describe('generator-aligned graph', () => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('places VPN outside the OCI region for %s without reserving space inside the network compartment', (kind) => {
+    const model = emptyLzModel();
+    model.network = { hubKind: kind, ...hubKindDefaults(kind) };
+    const baseline = buildGraph(model, 2);
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    for (const name of ['office', 'backup']) hybrid.ipsecs[name] = { ...newVpn('router'), remote_cidrs: ['172.20.0.0/16'] };
+    for (const step of [2, 5]) {
+      const graph = buildGraph(model, step);
+      const rects = absoluteNodeRects(graph.nodes);
+      const region = rects.get('region')!;
+      const vpns = ['office', 'backup'].map((name) => rects.get(`hybrid-vpn-${name}`)!);
+      for (const vpn of vpns) {
+        expect(vpn.node.parentId).toBeUndefined();
+        expect(vpn.x + vpn.width).toBeLessThan(region.x);
+        expect(graph.edges).toContainEqual(expect.objectContaining({ source: vpn.id, target: 'drg', points: expect.any(Array) }));
+      }
+      expect(vpns[0].y + vpns[0].height).toBeLessThan(vpns[1].y);
+    }
+    expect(buildGraph(model, 2).nodes.find((node) => node.id === 'cmp-network')?.height)
+      .toBe(baseline.nodes.find((node) => node.id === 'cmp-network')?.height);
+    const before = buildGraph(model, 2);
+    hybrid.ipsecs.office.remote_cidrs = Array.from({ length: 12 }, (_, index) => `172.${20 + index}.0.0/16`);
+    const widened = buildGraph(model, 2);
+    expect(widened.nodes).toHaveLength(before.nodes.length);
+    expect(diagramBounds(widened.nodes).width).toBeGreaterThan(diagramBounds(before.nodes).width);
+    expect(buildGraph(model, 1).nodes.some((node) => node.id.startsWith('hybrid-vpn-'))).toBe(false);
+    hybrid.fast_connect_virtual_circuits.primary = { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'] };
+    expect(buildGraph(model, 2).nodes.find((node) => node.id === 'hybrid-fc-primary')?.parentId).toBe('cmp-network');
+  });
+
   it('uses the normalized custom region key for VCN names and firewall captions', () => {
     const model = emptyLzModel();
     model.foundation.regionShortName = ' FR2 ';

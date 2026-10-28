@@ -1,7 +1,8 @@
 import { useId, type ReactNode } from 'react';
 
-export default function InfoButton({ title, children }: { title: string; children: ReactNode }) {
-  const id = useId();
+export default function InfoButton({ id: suppliedId, title, children }: { id?: string; title: string; children: ReactNode }) {
+  const generatedId = useId();
+  const id = suppliedId ?? generatedId;
   return <>
     <button type="button" className="studio-info-button" aria-label={`About ${title}`} aria-haspopup="dialog" popoverTarget={id}>
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">

@@ -4,10 +4,11 @@ import type { CrossConnectMapping, FastConnectConfig, VpnTunnel } from '../../mo
 import { ipsecPhaseOptions } from '../../model/hybridConnectivity';
 import { bandwidthShapeError, bgpMd5KeyError, emptyHybridConnectivity, newVpn, vpnIdentityError, vpnSharedSecretError } from '../../services/hybridConnectivity';
 import { FONT, s } from './networkEditorStyles';
-import { connectivityCatalog, cpeDeviceError, knownProviderService, providerSelectionError, providerServicesForRegion, selectCpeDevice, selectProviderService } from '../../services/connectivityCatalog';
+import { connectivityCatalog, cpeDeviceError, providerSelectionError, providerServicesForRegion, selectCpeDevice, selectProviderService } from '../../services/connectivityCatalog';
 import DeleteButton from '../../components/DeleteButton';
 import Switch from '../../components/Switch';
 import FieldHelp, { type FieldHelpContent } from './FieldHelp';
+import FieldError from '../../components/FieldError';
 import { connectivityHelp as help } from './connectivityHelp';
 import { oracle } from '../../theme';
 import './ConnectivityEditor.css';
@@ -26,7 +27,7 @@ function Field({ label, ariaLabel, help, value, onChange, secret = false, type =
   label: string; ariaLabel?: string; help: FieldHelpContent; value?: string | number; onChange: (value: string) => void; secret?: boolean; type?: string; note?: string; invalid?: boolean;
 }) {
   const id = useId();
-  return <div><div style={labelRow}><label style={fieldLabel} htmlFor={id}>{label}</label><FieldHelp id={`${id}-help`} label={ariaLabel ?? label} help={help} /></div><input id={id} aria-label={ariaLabel} aria-invalid={invalid || undefined} aria-describedby={`${id}-help${note ? ` ${id}-note` : ''}`} style={{ ...s.rowInput, minHeight: 38, lineHeight: '20px', ...(invalid ? s.errInput : {}) }} type={secret ? 'password' : type} autoComplete={secret ? 'new-password' : 'off'} autoCapitalize="none" spellCheck={false} value={value ?? ''} onChange={(e) => onChange(e.target.value)} />{note && <p id={`${id}-note`} style={{ ...(invalid ? s.errText : s.help), marginTop: 6, fontWeight: 400 }}>{note}</p>}</div>;
+  return <div><div style={labelRow}><label style={fieldLabel} htmlFor={id}>{label}</label><FieldHelp id={`${id}-help`} label={ariaLabel ?? label} help={help} /></div><input id={id} aria-label={ariaLabel} aria-invalid={invalid || undefined} aria-describedby={`${id}-help${note ? ` ${id}-note` : ''}`} style={{ ...s.rowInput, minHeight: 38, lineHeight: '20px', ...(invalid ? s.errInput : {}) }} type={secret ? 'password' : type} autoComplete={secret ? 'new-password' : 'off'} autoCapitalize="none" spellCheck={false} value={value ?? ''} onChange={(e) => onChange(e.target.value)} />{invalid ? <FieldError id={`${id}-note`} error={note} /> : note && <p id={`${id}-note`} style={{ ...s.help, marginTop: 6, fontWeight: 400 }}>{note}</p>}</div>;
 }
 
 function Choice({ label, ariaLabel, help, value, options, onChange, note }: {
@@ -34,7 +35,7 @@ function Choice({ label, ariaLabel, help, value, options, onChange, note }: {
 }) {
   const id = useId();
   const unsupported = !options.some(([option]) => option === value);
-  return <div><div style={labelRow}><label style={fieldLabel} htmlFor={id}>{label}</label><FieldHelp id={`${id}-help`} label={ariaLabel ?? label} help={help} /></div><span className="connectivity-select"><select id={id} aria-label={ariaLabel} aria-invalid={unsupported || undefined} aria-describedby={`${id}-help${unsupported || note ? ` ${id}-note` : ''}`} style={{ ...s.input, appearance: 'none', paddingRight: 36, minHeight: 38, lineHeight: '20px', ...(unsupported ? s.errInput : {}) }} value={value} onChange={(e) => onChange(e.target.value)}>{unsupported && <option value={value} disabled>Unsupported value: {value}</option>}{options.map(([v, text]) => <option key={v} value={v}>{text}</option>)}</select><Chevron /></span>{(unsupported || note) && <p id={`${id}-note`} style={{ ...(unsupported ? s.errText : s.help), marginTop: 6, fontWeight: 400 }}>{unsupported ? 'Choose a supported value from the list.' : note}</p>}</div>;
+  return <div><div style={labelRow}><label style={fieldLabel} htmlFor={id}>{label}</label><FieldHelp id={`${id}-help`} label={ariaLabel ?? label} help={help} /></div><span className="connectivity-select"><select id={id} aria-label={ariaLabel} aria-invalid={unsupported || undefined} aria-describedby={`${id}-help${unsupported || note ? ` ${id}-note` : ''}`} style={{ ...s.input, appearance: 'none', paddingRight: 36, minHeight: 38, lineHeight: '20px', ...(unsupported ? s.errInput : {}) }} value={value} onChange={(e) => onChange(e.target.value)}>{unsupported && <option value={value} disabled>Unsupported value: {value}</option>}{options.map(([v, text]) => <option key={v} value={v}>{text}</option>)}</select><Chevron /></span>{unsupported ? <FieldError id={`${id}-note`} error="Choose a supported value from the list." /> : note && <p id={`${id}-note`} style={{ ...s.help, marginTop: 6, fontWeight: 400 }}>{note}</p>}</div>;
 }
 
 const commonBandwidths = ['1 Gbps', '10 Gbps', '100 Gbps'];
@@ -54,25 +55,25 @@ function BandwidthField({ value, onChange }: { value?: string; onChange: (value:
 }
 
 function ProviderServiceField({ circuit, realm, region, onChange }: { circuit: FastConnectConfig; realm: string; region: string; onChange: (circuit: FastConnectConfig) => void }) {
-  const scopeId = useId();
   const available = providerServicesForRegion(realm, region);
-  const known = knownProviderService(circuit);
-  const saved = circuit.provider_service;
-  const value = saved ? known?.key ?? 'saved' : circuit.provider_service_id !== undefined ? 'ocid' : '';
+  const selected = available.find((service) => service.ocid === circuit.provider_service_id);
+  const value = selected?.ocid ?? (circuit.provider_service_id !== undefined ? 'ocid' : '');
   const error = providerSelectionError(circuit, realm, region);
-  return <div role="group" aria-label="Provider service selection" aria-describedby={scopeId} style={{ gridColumn: '1 / -1' }}>
-    <Choice label="Provider service" help={help.provider} value={value} options={[
+  const manual = !available.length || value === 'ocid' || Boolean(error);
+  return <div role="group" aria-label="Provider service selection" style={{ gridColumn: '1 / -1' }}>
+    {available.length > 0 && <Choice label="Provider service" help={help.provider} value={value} options={[
       ['', 'Direct / physical connection'],
-      ...available.map((service): [string, string] => [service.key, service.label]),
-      ...(saved && !known ? [['saved', `Saved: ${saved.provider_name} / ${saved.provider_service_name}`] as [string, string]] : []),
+      ...available.map((service): [string, string] => [service.ocid, service.label]),
       ['ocid', 'Other provider service (enter OCID)'],
-    ]} onChange={(selection) => onChange(selectProviderService(circuit, selection, realm, region))} />
-    <p id={scopeId} style={{ ...(error ? s.errText : s.help), marginTop: 6 }}>{error || (available.length ? `Known choices for ${realm} / ${region}, reviewed ${connectivityCatalog.verified_on}. The selected service is resolved during deployment in this region. Choose Other for an unlisted service.` : `No maintained service options for ${realm} / ${region}. Enter the provider service OCID supplied for this location, or leave it empty for a direct connection.`)}</p>
-    {(value === 'ocid' || !available.length || Boolean(saved && error)) && <div style={{ marginTop: 12 }}><Field label="Provider service OCID" help={help.provider} note={error || 'For partner connections; leave empty for a direct connection.'} value={circuit.provider_service_id} invalid={Boolean(error)} onChange={(provider_service_id) => {
-      const next = { ...circuit, provider_service_id };
-      delete next.provider_service;
-      onChange(next);
-    }} /></div>}
+    ]} onChange={(selection) => onChange(selectProviderService(circuit, selection, realm, region))} />}
+    {manual && <div style={available.length ? { marginTop: 12 } : undefined}>
+      <Field label="Provider service OCID" help={help.provider} note={error || 'Leave empty for a direct physical connection.'} value={circuit.provider_service_id} invalid={Boolean(error)} onChange={(provider_service_id) => {
+        const next = selectProviderService(circuit, '', realm, region);
+        if (provider_service_id) next.provider_service_id = provider_service_id;
+        else delete next.provider_service_id;
+        onChange(next);
+      }} />
+    </div>}
   </div>;
 }
 
@@ -197,9 +198,9 @@ export default function ConnectivityEditor({ kind }: { kind: 'vpn' | 'fastconnec
           <li><strong>Add a VPN connection.</strong> Select the equipment and enter the remote networks that OCI needs to reach.</li>
           <li><strong>Configure both tunnels.</strong> Choose static or BGP routing and each tunnel's key source. Match IKE settings with your router administrator.</li>
         </> : <>
-          <li><strong>Confirm the connection details.</strong> Choose a known provider service for your region, or obtain its OCID if unlisted. Direct connections need a provisioned physical cross-connect/group OCID.</li>
-          <li><strong>Add a circuit.</strong> Choose private peering for landing zone networks or public peering for OCI public services. Select bandwidth offered for your service.</li>
-          <li><strong>Configure BGP.</strong> Use the settings agreed with your network team or provider. If the provider operates BGP, follow its instructions. OCI supplies peering addresses for public circuits after creation.</li>
+          <li><strong>Confirm the connection details.</strong> Select a provider service when choices are available, or enter its OCID for your region. Direct connections need a provisioned physical cross-connect/group OCID.</li>
+          <li><strong>Add a circuit.</strong> Connect your private network to the landing zone. Select bandwidth offered for your service.</li>
+          <li><strong>Configure BGP.</strong> Use the settings agreed with your network team or provider. If the provider operates BGP, follow its instructions.</li>
         </>}
       </ol>
       <p><strong>Then deploy and complete the connection.</strong> In Review, download the files for your Terraform deployment. Your network team must configure the router{kind === 'fastconnect' && ' and complete provider or physical activation'}. Allow the required traffic in firewall policies, network security groups and security lists, then test the path. Downloading files does not establish connectivity.</p>
@@ -248,11 +249,10 @@ export default function ConnectivityEditor({ kind }: { kind: 'vpn' | 'fastconnec
           if (value === '') delete next[key];
           v.fast_connect_virtual_circuits[name] = next;
         });
-        const partner = Boolean(circuit.provider_service || circuit.provider_service_id);
+        const partner = Boolean(circuit.provider_service_id);
         return <Card key={name} name={name} type="FastConnect" attention={Boolean(providerSelectionError(circuit, model.foundation.realm, model.foundation.region)) || Boolean(bandwidthShapeError(circuit.bandwidth_shape_name)) || Object.values(circuit.cross_connect_mappings ?? {}).some((mapping) => Boolean(bgpMd5KeyError(mapping)))} onDelete={() => update((v) => { delete v.fast_connect_virtual_circuits[name]; })}>
           <fieldset className="connectivity-settings"><legend style={{ ...s.subHead, fontSize: 13 }}>Circuit settings</legend><div className="connectivity-grid">
-          <Choice label="Peering" help={help.peering} value={circuit.type} options={[["PRIVATE", 'Private'], ["PUBLIC", 'Public']]} note={circuit.type === 'PRIVATE' ? 'Connect to private landing zone addresses through the hub routing gateway (DRG).' : 'Reach OCI public services. This does not provide access to private landing zone addresses.'} onChange={(value) => update((v) => { const c = v.fast_connect_virtual_circuits[name]; c.type = value as typeof c.type; if (value === 'PUBLIC') { delete c.remote_cidrs; c.public_prefixes = {}; } else { c.remote_cidrs = []; delete c.public_prefixes; } })} />
-          {circuit.type === 'PRIVATE' ? <Field label="Remote IPv4 CIDRs" help={help.remote} note="Networks on your side that OCI should reach. Agree these ranges and BGP advertisements with your network team." value={circuit.remote_cidrs?.join(', ')} onChange={(value) => field('remote_cidrs', list(value))} /> : <Field label="Owned public IPv4 prefixes" help={help.publicPrefixes} note="Enter public networks your organization owns. OCI must verify ownership before you can advertise them." value={Object.values(circuit.public_prefixes ?? {}).map((p) => p.cidr_block).join(', ')} onChange={(value) => field('public_prefixes', Object.fromEntries(list(value).map((cidr_block, i) => [`prefix${i + 1}`, { cidr_block }])))} />}
+          <Field label="Remote IPv4 CIDRs" help={help.remote} note="Networks on your side that OCI should reach. Agree these ranges and BGP advertisements with your network team." value={circuit.remote_cidrs?.join(', ')} onChange={(value) => field('remote_cidrs', list(value))} />
           <ProviderServiceField circuit={circuit} realm={model.foundation.realm} region={model.foundation.region} onChange={(value) => update((v) => { v.fast_connect_virtual_circuits[name] = value; })} />
           <BandwidthField value={circuit.bandwidth_shape_name} onChange={(value) => field('bandwidth_shape_name', value)} />
           <div style={{ alignSelf: 'start' }}><Field label="Customer ASN" help={help.fcAsn} note="The number identifying your network in BGP. If the provider operates BGP, ask it which values you should supply." value={circuit.customer_asn} onChange={(value) => field('customer_asn', value)} /></div>
@@ -268,9 +268,9 @@ export default function ConnectivityEditor({ kind }: { kind: 'vpn' | 'fastconnec
                 <h3 style={{ ...s.subHead, margin: 0, minWidth: 0, overflowWrap: 'anywhere' }}>BGP mapping: {key}</h3>
                 <DeleteButton label={`Remove BGP mapping ${key} from FastConnect ${name}`} onClick={() => update((v) => { delete v.fast_connect_virtual_circuits[name].cross_connect_mappings![key]; })} />
               </div>
-              <p style={{ ...s.help, marginBottom: 12 }}>{partner ? 'Use the peering details supplied for your partner service. A mapping describes this circuit; it does not order another provider connection.' : 'Map this circuit to a provisioned physical cross-connect/group. Use its real OCID and the VLAN agreed with your network team.'}{circuit.type === 'PRIVATE' ? ' The customer and Oracle addresses are different hosts in the same subnet; these are BGP interface IPs, not the remote networks.' : ' OCI supplies the public circuit peering addresses after creation.'}</p>
+              <p style={{ ...s.help, marginBottom: 12 }}>{partner ? 'Use the peering details supplied for your partner service. A mapping describes this circuit; it does not order another provider connection.' : 'Map this circuit to a provisioned physical cross-connect/group. Use its real OCID and the VLAN agreed with your network team.'} The customer and Oracle addresses are different hosts in the same subnet; these are BGP interface IPs, not the remote networks.</p>
               <div className="connectivity-grid">
-              {circuit.type === 'PRIVATE' && <><Field label="Customer BGP IP/prefix" help={help.customerPeeringIp} value={mapping.customer_bgp_peering_ip} onChange={(value) => mapField('customer_bgp_peering_ip', value)} /><Field label="Oracle BGP IP/prefix" help={help.oraclePeeringIp} value={mapping.oracle_bgp_peering_ip} onChange={(value) => mapField('oracle_bgp_peering_ip', value)} /></>}
+              <Field label="Customer BGP IP/prefix" help={help.customerPeeringIp} value={mapping.customer_bgp_peering_ip} onChange={(value) => mapField('customer_bgp_peering_ip', value)} /><Field label="Oracle BGP IP/prefix" help={help.oraclePeeringIp} value={mapping.oracle_bgp_peering_ip} onChange={(value) => mapField('oracle_bgp_peering_ip', value)} />
               <Choice label="BGP authentication" help={help.bgpAuth} value={mapping.bgp_md5auth_mode ?? 'none'} options={[["none", 'Disabled'], ["inline", 'MD5 key for this session']]} note={mapping.bgp_md5auth_mode === 'inline' ? 'Use the key agreed with your BGP peer. Downloads include it; Studio clears it when you reopen the design.' : 'Enable only when your provider or router administrator requires a matching MD5 key.'} onChange={(value) => update((v) => { const m = v.fast_connect_virtual_circuits[name].cross_connect_mappings![key]; m.bgp_md5auth_mode = value as 'none' | 'inline'; delete m.bgp_md5auth_key; })} />
               {mapping.bgp_md5auth_mode === 'inline' && <Field label="BGP MD5 key (session only)" help={help.bgpKey} secret value={mapping.bgp_md5auth_key} invalid={Boolean(keyError)} note={keyError} onChange={(value) => mapField('bgp_md5auth_key', value)} />}
               <details className="connectivity-disclosure" open={!partner || Boolean(mapping.cross_connect_or_cross_connect_group_id || mapping.vlan)} style={{ gridColumn: '1 / -1' }}>
@@ -290,7 +290,6 @@ export default function ConnectivityEditor({ kind }: { kind: 'vpn' | 'fastconnec
               <Choice label="BGP administrative state" help={help.bgpState} value={circuit.bgp_admin_state ?? 'ENABLED'} options={[["ENABLED", 'Enabled'], ["DISABLED", 'Disabled']]} onChange={(value) => field('bgp_admin_state', value)} />
               <Field label="IP MTU (optional)" help={help.mtu} type="number" value={circuit.ip_mtu} onChange={(value) => field('ip_mtu', value ? Number(value) : '')} />
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}><span style={{ ...fieldLabel, display: 'inline-flex', alignItems: 'center', gap: 4 }}>BFD<FieldHelp label="BFD" help={help.bfd} /></span><Switch checked={circuit.is_bfd_enabled ?? false} ariaLabel="Enable FastConnect BFD" onChange={(checked) => field('is_bfd_enabled', checked)} /></div>
-              {circuit.type === 'PUBLIC' && <Field label="Routing policy (comma-separated)" help={help.policy} value={circuit.routing_policy?.join(', ')} onChange={(value) => field('routing_policy', list(value))} />}
             </div>
           </details>
         </Card>;

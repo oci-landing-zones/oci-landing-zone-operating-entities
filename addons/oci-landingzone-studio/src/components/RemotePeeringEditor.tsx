@@ -27,12 +27,11 @@ export default function RemotePeeringEditor() {
   function update(id: string, patch: Partial<RemotePeeringConnection>) {
     setField('remotePeeringConnections', connections.map((connection) => connection.id === id ? { ...connection, ...patch } : connection));
   }
-  return <section style={s.panel} aria-labelledby="rpc-title">
-    <div style={s.accent} /><div style={s.body}>
-      <div className="studio-info-heading"><h2 id="rpc-title" style={s.title}>Remote peering connection (RPC)</h2>
+  return <>
+      <div className="studio-info-heading">
+        <p style={{ ...s.intro, marginBottom: 0 }}>Connect this hub to another landing zone. Create an acceptor connection on one side, then a requester on the other.</p>
         <InfoButton title="Remote peering connection (RPC)"><p>Configure an <strong>acceptor</strong> in one landing zone first. Its deployment provides the RPC OCID or dependency output used by the <strong>requester</strong> in the other landing zone.</p><p>Enter only the remote VCN ranges that should be reachable. Keep them separate from local and other remote ranges, and review routing and firewall policies on both sides.</p><p>{regional ? 'DR supports same-tenancy peering. Cross-tenancy peering requires IAM from a Home Region deployment.' : 'Leave the peer tenancy blank for same-tenancy peering. A cross-tenancy acceptor also needs the foreign requester network-admin group OCID.'}</p></InfoButton>
       </div>
-      <p style={s.intro}>Connect this hub to another landing zone. Create an acceptor connection on one side, then a requester on the other.</p>
       {regional && <p style={{ ...s.help, marginBottom: 12 }}>DR supports same-tenancy peering. Cross-tenancy peering requires IAM from a Home Region deployment.</p>}
       {!connections.length && <p style={{ ...s.help, marginBottom: 16 }}>No remote connections. RPC is optional.</p>}
       {connections.map((connection, index) => <div key={connection.id} className="rpc-connection" role="group" aria-labelledby={`rpc-${connection.id}-title`}>
@@ -73,6 +72,5 @@ export default function RemotePeeringEditor() {
         </>}
       </div>)}
       <button type="button" style={s.addBtn} onClick={() => setField('remotePeeringConnections', [...connections, { id: createModelId('rpc'), name: '', role: regional ? 'requester' : 'acceptor', remoteCidrs: [], peerRegionName: model.foundation.homeRegion ?? '' }])}>Add remote connection</button>
-    </div>
-  </section>;
+  </>;
 }

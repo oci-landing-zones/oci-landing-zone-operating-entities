@@ -304,9 +304,10 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
   environmentLayout?: Record<string, { networkHeight: number; platformTop: number }>;
 }, routeTables: RouteTable[] = [], inventory?: GeneratedResourceInventory): DiagramModel {
   const hybrid = upToStep >= 2 ? hybridRoutes(model) : [];
-  const publicCircuits = upToStep >= 2 ? Object.entries(model.hybridConnectivity?.fast_connect_virtual_circuits ?? {}).filter(([, circuit]) => circuit.type === 'PUBLIC') : [];
+  const vpns = hybrid.filter((connection) => connection.type === 'VPN');
+  const circuits = hybrid.filter((connection) => connection.type === 'FastConnect');
   const physicalGroups = upToStep >= 2 ? Object.keys(model.hybridConnectivity?.cross_connect_groups ?? {}) : [];
-  const hybridHeight = (hybrid.length + publicCircuits.length + physicalGroups.length) * 80;
+  const hybridHeight = (circuits.length + physicalGroups.length) * 80;
   // Placeholder hub kinds (b/c) aren't specified yet — the network layer
   // stays hidden until an implemented hub kind is selected.
   const hubImplemented = getHubKind(model.network.hubKind)?.implemented ?? false;
@@ -687,8 +688,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
 
   if (showHub && hybridHeight) {
     const entries = [
-      ...hybrid.map((connection) => ({ id: connection.id, label: `${connection.type} ${connection.name}${connection.type === 'VPN' ? ' (2 tunnels)' : ''}\n${connection.cidrs.join(', ')}`, routed: true })),
-      ...publicCircuits.map(([name]) => ({ id: `hybrid-public-${name}`, label: `Public FastConnect ${name}\nOCI public services; no DRG attachment`, routed: false })),
+      ...circuits.map((connection) => ({ id: connection.id, label: `${connection.type} ${connection.name}\n${connection.cidrs.join(', ')}`, routed: true })),
       ...physicalGroups.map((name) => ({ id: `hybrid-physical-${name}`, label: `Cross-connect group ${name}\nPhysical preparation`, routed: false })),
     ];
     entries.forEach((entry, index) => {
@@ -880,6 +880,17 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
     for (const node of nodes.filter((node) => ['landingzone', 'tenancy', 'region'].includes(node.id))) node.height += growth;
   }
 
+  if (showHub && vpns.length) {
+    const drg = absoluteNodeRects(nodes).get('drg')!;
+    const entries = vpns.map((vpn) => ({ id: vpn.id, label: `VPN ${vpn.name} (2 tunnels)\n${vpn.cidrs.join(', ')}` }));
+    const width = Math.max(300, ...entries.map((entry) => attachmentLabelLayout(entry.label).width));
+    const top = Math.max(PAD, drg.y + drg.height / 2 - (entries.length * 80 - 20) / 2);
+    entries.forEach((entry, index) => {
+      nodes.push({ id: entry.id, kind: 'attachment', label: entry.label, x: -width - ROUTE_GUTTER, y: top + index * 80, width, height: 60 });
+      edges.push({ id: `e-${entry.id}-drg`, source: entry.id, target: 'drg', sourceSide: 'right', targetSide: 'left' });
+    });
+  }
+
   // Resource ports stay on their owners independently of callout placement and table colour.
   if (showDots && allRouteTables.length > 0) {
     const rects = absoluteNodeRects(nodes);
@@ -892,7 +903,8 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
       for (const [index, association] of table.associations.entries()) {
         const rect = rects.get(association.nodeId);
         if (!rect) continue;
-        const side = association.kind === 'vcn-ingress' ? 'bottom' : lane === 'left' ? 'left' : 'right';
+        const external = !rect.node.parentId;
+        const side = association.kind === 'vcn-ingress' ? 'bottom' : external ? 'right' : lane === 'left' ? 'left' : 'right';
         let x = side === 'left' ? rect.x : side === 'right' ? rect.x + rect.width : rect.x + rect.width / 2;
         let y = side === 'bottom' ? rect.y + rect.height : rect.y + rect.height / 2;
         if (association.kind === 'gateway') {
@@ -903,9 +915,9 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
         const dotId = index === 0 ? `dot-${table.id}` : `dot-${table.id}-${index}`;
         tablePorts.push({ dotId, x, y, side });
         nodes.push({
-          id: dotId, kind: 'rtdot', label: '', parentId: 'landingzone',
+          id: dotId, kind: 'rtdot', label: '', parentId: external ? undefined : 'landingzone',
           rtDotTableId: table.id, rtDotOwnerId: association.nodeId, rtDotOpen: openSet.has(table.id), rtDotConfigured: table.rules.length > 0, rtDotTone: table.kind,
-          x: x - DOT / 2, y: y - DOT / 2, width: DOT, height: DOT,
+          x: x - DOT / 2 + (external ? lz.x : 0), y: y - DOT / 2 + (external ? lz.y : 0), width: DOT, height: DOT,
         });
       }
       ports.set(table.id, tablePorts);
@@ -943,7 +955,7 @@ export function buildGraph(model: LzModel, upToStep = Infinity, opts: DiagramOpt
         edges.push({
           id: index === 0 ? `e-${table.id}` : `e-${table.id}-${index}`,
           source: port.dotId, target: table.id,
-          sourceSide: port.side, targetSide: lane === 'left' ? 'right' : 'left',
+          sourceSide: port.side, targetSide: lane === 'left' && port.x >= columns[lane] ? 'right' : 'left',
         });
       });
     }

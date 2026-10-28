@@ -66,6 +66,7 @@ export function hybridConfig(model: LzModel): HybridConnectivity | undefined {
   }
   for (const circuit of Object.values(hybrid.fast_connect_virtual_circuits)) {
     if (circuit.bandwidth_shape_name === '') delete circuit.bandwidth_shape_name;
+    if (circuit.provider_service_id === '') delete circuit.provider_service_id;
     for (const mapping of Object.values(circuit.cross_connect_mappings ?? {})) {
       if (mapping.bgp_md5auth_mode === 'none') delete mapping.bgp_md5auth_key;
       delete mapping.bgp_md5auth_mode;
@@ -144,6 +145,9 @@ export function validateHybridConnectivity(model: LzModel): string[] {
 
 export function validateHybridRoutes(model: LzModel): string[] {
   const errors: string[] = [];
+  for (const [name, circuit] of Object.entries(model.hybridConnectivity?.fast_connect_virtual_circuits ?? {})) {
+    if (circuit.type !== 'PRIVATE') errors.push(`FastConnect ${name}: only private FastConnect circuits are supported. Remove this circuit from the design.`);
+  }
   const connections = hybridRoutes(model);
   const routes = connections.flatMap((r) => r.cidrs.map((cidr) => ({ name: r.name, cidr })));
   for (const r of connections) if (r.cidrs.length === 0) errors.push(`${r.type} ${r.name}: enter at least one remote CIDR.`);

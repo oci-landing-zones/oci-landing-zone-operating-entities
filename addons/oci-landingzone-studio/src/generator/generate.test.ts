@@ -173,8 +173,7 @@ describe('hybrid CPE device selector', () => {
 });
 
 describe('hybrid FastConnect provider selector', () => {
-  const provider = { provider_name: 'Example_Provider', provider_service_name: 'Cloud Connect' };
-  const circuit = { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service: provider };
+  const circuit = { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: 'ocid1.providerservice.oc1.eu-frankfurt-1.example' };
   async function renderCircuits(circuits: Record<string, unknown>, realm = 'oc1', region = 'eu-frankfurt-1', short = 'fra') {
     const { files } = buildVirtualFs();
     const config = {
@@ -187,45 +186,25 @@ describe('hybrid FastConnect provider selector', () => {
     return evaluate('provider-check.jsonnet', files) as Promise<Record<string, Record<string, unknown>>>;
   }
 
-  it.each([
-    ['oc1', 'eu-frankfurt-1', 'fra'],
-    ['oc19', 'eu-frankfurt-2', 'fr2'],
-  ])('emits circuit-specific module lookup keys without OCIDs in %s', async (realm, region, short) => {
-    const rendered = await renderCircuits({
-      primary_link: { ...circuit, provider_service_key_name: 'ACTIVATION-REFERENCE' },
-      backup: circuit,
-    }, realm, region, short);
-    expect(rendered[`FCVC-${short.toUpperCase()}-LZ-HUB-PRIMARY-LINK-KEY`]).toMatchObject({
-      display_name: `fcvc-${short}-lz-hub-primary-link`,
-      provider_service_key: `FCVC-${short.toUpperCase()}-LZ-HUB-PRIMARY-LINK-EXAMPLE-PROVIDER-CLOUD-CONNECT-KEY`,
-      provider_service_key_name: 'ACTIVATION-REFERENCE',
-      show_available_fc_virtual_circuit_providers: false,
-    });
-    expect(rendered[`FCVC-${short.toUpperCase()}-LZ-HUB-BACKUP-KEY`].provider_service_key)
-      .toBe(`FCVC-${short.toUpperCase()}-LZ-HUB-BACKUP-EXAMPLE-PROVIDER-CLOUD-CONNECT-KEY`);
-    for (const value of Object.values(rendered)) {
-      expect(value).not.toHaveProperty('provider_service');
-      expect(value).not.toHaveProperty('provider_service_id');
-    }
+  it('rejects public FastConnect in Blueprint Factory source', async () => {
+    await expect(renderCircuits({ primary: { ...circuit, type: 'PUBLIC' } }))
+      .rejects.toThrow('only private FastConnect circuits are supported');
+  });
+
+  it.each(['public_prefixes', 'routing_policy'])('rejects the removed public-circuit field %s', async (field) => {
+    await expect(renderCircuits({ primary: { ...circuit, [field]: {} } })).rejects.toThrow('unsupported keys');
   });
 
   it('preserves explicit provider OCIDs without creating a name lookup key', async () => {
-    const rendered = await renderCircuits({ primary: { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: 'ocid1.providerservice.oc1..example' } });
+    const rendered = await renderCircuits({ primary: { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: 'ocid1.providerservice.oc1..example', provider_service_key_name: 'ACTIVATION-REFERENCE' } });
     expect(rendered['FCVC-FRA-LZ-HUB-PRIMARY-KEY'].provider_service_id).toBe('ocid1.providerservice.oc1..example');
     expect(rendered['FCVC-FRA-LZ-HUB-PRIMARY-KEY']).not.toHaveProperty('provider_service_key');
+    expect(rendered['FCVC-FRA-LZ-HUB-PRIMARY-KEY'].provider_service_key_name).toBe('ACTIVATION-REFERENCE');
   });
 
-  it.each([
-    [{ provider_service: {}, provider_service_id: 'ocid1.providerservice.oc1..example' }, 'must choose provider_service or provider_service_id, not both'],
-    [{ provider_service: { ...provider, unknown: true } }, 'unsupported keys'],
-    [{ provider_service: { provider_name: 'Example' } }, 'provider_service_name'],
-    [{ provider_service: { ...provider, provider_name: '   ' } }, 'must be a nonblank string'],
-    [{ provider_service: { ...provider, provider_service_name: 42 } }, 'must be a non-empty string'],
-    [{ provider_service: { ...provider, provider_name: ' Example' } }, 'must not have leading or trailing whitespace'],
-    [{ provider_service: { ...provider, provider_name: 'Réseau' } }, 'must use printable ASCII'],
-    [{ provider_service: { ...provider, provider_service_name: 'ocid1.providerservice.oc1..example' } }, 'use provider_service_id for an OCID'],
-  ])('rejects a malformed or conflicting provider selector: %j', async (input, error) => {
-    await expect(renderCircuits({ primary: { ...circuit, ...input } })).rejects.toThrow(String(error));
+  it('rejects the removed name-based provider selector', async () => {
+    await expect(renderCircuits({ primary: { ...circuit, provider_service: { provider_name: 'Equinix', provider_service_name: 'Fabric' } } }))
+      .rejects.toThrow('unsupported keys');
   });
 });
 
@@ -326,6 +305,23 @@ describe('generator (go-jsonnet wasm)', () => {
     }
     expect(Object.keys(gateways.ipsecs)).toHaveLength(1);
     expect(Object.keys(gateways.fast_connect_virtual_circuits)).toHaveLength(1);
+  }, 60_000);
+
+  it('generates direct physical FastConnect after the provider OCID is cleared', async () => {
+    const model = emptyLzModel();
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.fast_connect_virtual_circuits.direct = {
+      type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: '', customer_asn: '65001',
+      cross_connect_mappings: { primary: {
+        cross_connect_or_cross_connect_group_id: 'ocid1.crossconnectgroup.oc1..example', vlan: '100',
+        customer_bgp_peering_ip: '192.168.254.1/30', oracle_bgp_peering_ip: '192.168.254.2/30',
+      } },
+    };
+    const out = await generateOutputs(model);
+    const gateways = JSON.parse(out.files['network.json']).network_configuration.network_configuration_categories['0-shared'].non_vcn_specific_gateways;
+    const circuit = gateways.fast_connect_virtual_circuits['FCVC-FRA-LZ-HUB-DIRECT-KEY'];
+    expect(circuit).not.toHaveProperty('provider_service_id');
+    expect(circuit.cross_connect_mappings.primary.cross_connect_or_cross_connect_group_id).toBe('ocid1.crossconnectgroup.oc1..example');
   }, 60_000);
 
   it('rejects OCI-reserved inside-tunnel addresses before producing configuration', async () => {

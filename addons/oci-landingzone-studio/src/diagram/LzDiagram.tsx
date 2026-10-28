@@ -48,7 +48,7 @@ const CAPTION_COLORS = { green: '#1E7B2F', orange: '#C25425' } as const;
 import type { DiagramModel, DiagramNode, DiagramOptions } from '../model/types';
 import { oracle } from '../theme';
 import { attachCooperativeGestures, type DiagramGestureHint } from './cooperativeGestures';
-import { absoluteNodeRects } from './flowGeometry';
+import { absoluteNodeRects, diagramBounds } from './flowGeometry';
 import { resourceGroupSvg } from './resourceGroups';
 import { compartmentStyle } from './compartmentStyle';
 import { associationDisplaySegments, polylinePath, structuralEdgePoints } from './displayGeometry';
@@ -454,7 +454,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   useEffect(() => () => clearTimeout(hintTimer.current), []);
   // Flow overlay inputs: the waypoint edges + the diagram's outer bounds.
   const flowEdges = useMemo(() => diagram.edges.filter((e) => !!e.waypoints), [diagram]);
-  const region = diagram.nodes.find((n) => n.kind === 'region');
+  const modelBounds = useMemo(() => diagramBounds(diagram.nodes), [diagram.nodes]);
   // Pane width — so switching view modes (or resizing the window) re-centres the
   // diagram instead of leaving it pinned to its previous-layout position.
   const paneWidth = useStore((s) => s.width);
@@ -505,7 +505,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       return { x, y };
     };
     diagram.nodes
-      .filter((node) => node.kind === 'routetable')
+      .filter((node) => node.kind === 'routetable' || !node.parentId && node.kind !== 'region')
       .forEach((node) => {
         const position = absolutePosition(node);
         points.push(position, { x: position.x + node.width, y: position.y + node.height });
@@ -525,10 +525,13 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
     : '';
 
   // Re-fit on STRUCTURAL change (environments/subnets/hubs) or a pane resize —
-  // but NOT on adding/removing projects or route tables, so the user keeps their
-  // zoom/pan while editing those. When a flow is active, frame the flow instead.
+  // or external resource bounds, while preserving zoom/pan for project and table
+  // edits. When a flow is active, frame the flow instead.
   const layoutKey = useMemo(
-    () => `${diagram.nodes.filter((n) => n.kind !== 'routetable' && n.kind !== 'rtdot' && n.kind !== 'project').length}:${Math.round(paneWidth)}`,
+    () => {
+      const external = diagramBounds(diagram.nodes.filter((node) => !node.parentId && node.kind !== 'region'));
+      return `${diagram.nodes.filter((n) => n.kind !== 'routetable' && n.kind !== 'rtdot' && n.kind !== 'project').length}:${Math.round(paneWidth)}:${external.x}:${external.y}:${external.width}:${external.height}`;
+    },
     [diagram, paneWidth],
   );
   // Re-fit ONLY when the structural layout key or the active-flow set actually
@@ -538,18 +541,18 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
   // an unchanged key is a no-op and the user keeps their zoom/pan.
   const lastFitKey = useRef('');
   useLayoutEffect(() => {
-    if (paneWidth <= 0 || paneHeight <= 0 || !viewportInitialized || !region) return;
+    if (paneWidth <= 0 || paneHeight <= 0 || !viewportInitialized || !modelBounds.width || !modelBounds.height) return;
     const key = `${layoutKey}|${Math.round(paneHeight)}|${flowKey}|${flowBoundsKey}`;
     if (framed && key === lastFitKey.current) return;
     lastFitKey.current = key;
     // Model bounds are already final; fit them before revealing the first frame.
-    const bounds = flowBounds ?? { x: region.x, y: region.y, width: region.width, height: region.height };
+    const bounds = flowBounds ?? modelBounds;
     const viewport = getViewportForBounds(bounds, paneWidth, paneHeight, minZoom, 1, FIT_PADDING);
     let cancelled = false;
     void setViewport(viewport, { duration: framed ? (flowBounds ? 350 : 250) : 0 })
       .then(() => { if (!cancelled && !framed) setFramed(true); });
     return () => { cancelled = true; };
-  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, paneWidth, paneHeight, viewportInitialized, framed, region, setViewport, minZoom]);
+  }, [layoutKey, flowKey, flowBoundsKey, flowBounds, paneWidth, paneHeight, viewportInitialized, framed, modelBounds, setViewport, minZoom]);
 
   return (
     <RtContext.Provider value={toggleTables}>
@@ -578,7 +581,7 @@ export default function LzDiagram({ diagram, options, onOptionsChange, flowSteps
       <Background />
       {flowEdges.length > 0 && (
         <ViewportPortal>
-          <FlowOverlay flowEdges={flowEdges} steps={flowSteps ?? {}} width={region?.width ?? 2000} height={region?.height ?? 2000} focus={flowFocus} selected={options?.focusFlow ?? null} allFlows={!!options?.allFlows}
+          <FlowOverlay flowEdges={flowEdges} steps={flowSteps ?? {}} width={modelBounds.width} height={modelBounds.height} focus={flowFocus} selected={options?.focusFlow ?? null} allFlows={!!options?.allFlows}
             onSelect={onFlowSelect} onHover={onFlowHover} onRulesChange={setActiveRules} />
         </ViewportPortal>
       )}

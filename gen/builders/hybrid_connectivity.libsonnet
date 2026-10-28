@@ -14,7 +14,7 @@ function(params)
   local hub_attachment = n.key('DRGATT', ['HUB', 'VCN']);
   local remote_cidrs = contract.remote_cidrs(c);
   local types = (if std.length(std.objectFields(c.ipsecs)) > 0 then [{ name: 'VPN', type: 'IPSEC_TUNNEL', selector: 'ipsec_tunnel' }] else [])
-              + (if std.length([v for v in std.objectValues(c.fast_connect_virtual_circuits) if v.type == 'PRIVATE' && v.provision_fc_virtual_circuit]) > 0 then [{ name: 'FASTCONNECT', type: 'VIRTUAL_CIRCUIT', selector: 'virtual_circuit' }] else []);
+              + (if std.length([v for v in std.objectValues(c.fast_connect_virtual_circuits) if v.provision_fc_virtual_circuit]) > 0 then [{ name: 'FASTCONNECT', type: 'VIRTUAL_CIRCUIT', selector: 'virtual_circuit' }] else []);
   local routes = [
     { name: 'hybrid-%d' % i, display: 'External network', vcn: remote_cidrs[i], kind: 'remote',
       priority: 50000 + i, vcn_key: null, drg_att_key: null,
@@ -58,12 +58,9 @@ function(params)
     fast_connect_virtual_circuits: {
       [key('FCVC', name)]:
         local circuit = c.fast_connect_virtual_circuits[name];
-        local display_name = n.display('fcvc', ['hub', segment(name)]);
-        without(circuit, ['remote_cidrs', 'provider_service']) + {
-          display_name: display_name,
-          [if std.objectHas(circuit, 'provider_service') && circuit.provider_service != null then 'provider_service_key']:
-            std.strReplace(std.strReplace(std.asciiUpper(std.join('-', [display_name, circuit.provider_service.provider_name, circuit.provider_service.provider_service_name, 'KEY'])), '_', '-'), ' ', '-'),
-          [if circuit.type == 'PRIVATE' then 'gateway_key']: drg_key,
+        without(circuit, ['remote_cidrs']) + {
+          display_name: n.display('fcvc', ['hub', segment(name)]),
+          gateway_key: drg_key,
         }
       for name in std.objectFields(c.fast_connect_virtual_circuits)
     },

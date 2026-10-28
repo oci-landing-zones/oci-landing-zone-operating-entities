@@ -330,10 +330,10 @@ This section documents the factory input, not the full downstream networking-mod
 |---|---|---|
 | `customer_premises_equipments` | object of named CPE objects | Create OCI metadata for customer VPN equipment. |
 | `ipsecs` | object of named VPN objects | Create connections, manage both tunnels and prepare private routing. |
-| `fast_connect_virtual_circuits` | object of named circuit objects | Create private or public FastConnect circuits. |
+| `fast_connect_virtual_circuits` | object of named circuit objects | Create private FastConnect circuits. |
 | `cross_connect_groups` | object of named physical group objects | Prepare groups and physical ports before creating final circuits. |
 
-Configuration names contain 1–40 lowercase letters, digits, hyphens or underscores. Underscores become hyphens in generated names: `branch_a` and `branch-a` therefore cannot coexist in the same map. Studio additionally requires a name to start with a letter or digit. The same naming rules apply to circuit mappings, public prefixes and physical ports.
+Configuration names contain 1–40 lowercase letters, digits, hyphens or underscores. Underscores become hyphens in generated names: `branch_a` and `branch-a` therefore cannot coexist in the same map. Studio additionally requires a name to start with a letter or digit. The same naming rules apply to circuit mappings and physical ports.
 
 ### 9.2 Customer equipment
 
@@ -407,26 +407,25 @@ The factory also checks types and positive lifetimes. OCI and the peer must acce
 
 ### 9.5 FastConnect virtual circuits
 
+Only private FastConnect circuits are supported. `type: 'PUBLIC'`, `public_prefixes` and `routing_policy` are rejected; existing public-circuit configurations are not converted automatically.
+
 Each `fast_connect_virtual_circuits.<name>` accepts:
 
 | Field | Type | Required / default | Meaning and example |
 |---|---|---|---|
-| `type` | string | Required | `PRIVATE` for landing zone networks; `PUBLIC` for OCI public services. |
-| `remote_cidrs` | non-empty array of IPv4 CIDRs | Required for private; omit for public | Expected private reachability, for example `['172.20.0.0/16']`. |
-| `provider_service_id` | string | Choose this or `provider_service`; a physical mapping is the alternative | OCI FastConnect provider service-offering OCID. Mutually exclusive with `provider_service`. |
-| `provider_service` | object | Choose this or `provider_service_id`; a physical mapping is the alternative | Exact `provider_name` and `provider_service_name` strings from OCI's service catalog. Both names are required, must use printable ASCII, and must not contain leading/trailing whitespace. The deployment resolves them to the provider service OCID in its configured OCI region and realm. |
+| `type` | string | Required | Must be `PRIVATE` for landing zone networks. Public circuits are unsupported. |
+| `remote_cidrs` | non-empty array of IPv4 CIDRs | Required | Expected private reachability, for example `['172.20.0.0/16']`. |
+| `provider_service_id` | string | For provider connections; a physical mapping is the alternative | OCI FastConnect provider service-offering OCID for the target realm and region. |
 | `provider_service_key_name` | string | Optional | Provider's service/activation key, separate from BGP authentication. |
 | `bandwidth_shape_name` | string | Optional in input; select the required shape for your service | A positive integer followed by one space and `Gbps`, for example `1 Gbps`, `20 Gbps` or `400 Gbps`. Leading zeros, fractions and other units are rejected. Available shapes depend on the provider and region; valid format does not confirm availability. |
-| `customer_asn` | number or decimal string | When your router peers with Oracle | Customer ASN, excluding 65534. Public peering needs a public ASN. |
+| `customer_asn` | number or decimal string | When your router peers with Oracle | Customer ASN, excluding 65534. |
 | `cross_connect_mappings` | object of named mappings | `{}` | Physical/BGP mapping settings described below. Requirements depend on the provider or direct connection. |
-| `public_prefixes` | object of named prefix objects | Required for public circuits | Each prefix object contains `cidr_block`, an owned public IPv4 CIDR. OCI verifies ownership. |
-| `routing_policy` | array of strings | Optional, public peering | `ORACLE_SERVICE_NETWORK`, `REGIONAL`, `MARKET_LEVEL`, `GLOBAL`; for example `['ORACLE_SERVICE_NETWORK']`. |
 | `bgp_admin_state` | string | OCI default `ENABLED` | `ENABLED` or `DISABLED`; disabling the session interrupts its routes. |
 | `ip_mtu` | number | Optional | Layer 3 MTU in bytes, for example `1500`; maximum 9000. |
 | `is_bfd_enabled` | boolean | OCI default `false` | Enable BFD for IPv4 BGP peers when supported on both ends. |
 | `provision_fc_virtual_circuit` | boolean | `true` | `false` suppresses circuit creation and its generated private routes. Required input fields still apply; omit circuits entirely during physical preparation. |
 
-For a name-based selection, use `"provider_service": {"provider_name": "<exact provider name>", "provider_service_name": "<exact service name>"}`. Copy both names from the service available in your target region; a portable name does not guarantee that the service is offered there. See the [Oracle partner connection guide](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectprovider.htm). The factory emits the Networking module's circuit-specific lookup key without embedding a provider OCID. This lookup key is separate from `provider_service_key_name`, which remains the provider's activation reference. Use `provider_service_id` for names outside the supported ASCII format.
+Use `provider_service_id` from the service available in your target realm and region. Name-based `provider_service` input is not accepted. `provider_service_key_name` is a separate provider activation reference. See the [Oracle partner connection guide](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectprovider.htm).
 
 Each `cross_connect_mappings.<name>` accepts:
 
@@ -438,19 +437,7 @@ Each `cross_connect_mappings.<name>` accepts:
 | `vlan` | number or decimal string | According to physical/provider service | Direct VLAN 100–4094, for example `100`. |
 | `bgp_md5auth_key` | string | Optional | Literal BGP MD5 key agreed with the peer. Existing Vault secret OCIDs are not resolved for this field. |
 
-Public prefixes use this shape; the range below is documentation-only and must be replaced by one you own:
-
-```json
-{
-  "public_prefixes": {
-    "customer": {
-      "cidr_block": "203.0.113.0/24"
-    }
-  }
-}
-```
-
-OCI supplies BGP addresses for public circuits. For private circuits, the customer/provider supplies the agreed address pair. See [FastConnect requirements](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectrequirements.htm) and the [Oracle partner connection guide](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectprovider.htm).
+The customer/provider supplies the agreed private BGP address pair. See [FastConnect requirements](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectrequirements.htm) and the [Oracle partner connection guide](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectprovider.htm).
 
 ### 9.6 Physical groups and ports
 
@@ -476,7 +463,7 @@ Create the physical group/ports first, complete cabling and activation, then add
 ### 9.7 Routing, keys and deployment
 
 - Remote networks must not overlap local hub, spoke, platform or remote-peering ranges. Identical VPN/private FastConnect prefixes can be reused for backup; partial overlaps are rejected.
-- Both VPN tunnel attachments and private circuit attachments receive custom ingress tables. Hubs A/B/C retain the existing firewall path; Hub E routes directly to local VCNs. Public circuits receive no private DRG routes.
+- Both VPN tunnel attachments and private circuit attachments receive custom ingress tables. Hubs A/B/C retain the existing firewall path; Hub E routes directly to local VCNs.
 - The factory assigns tables to managed attachments. It does not change DRG-wide defaults for future attachments outside this configuration. ECMP is disabled; actual BGP advertisements and OCI route selection decide the active path.
 - VPN `shared_secret` accepts a literal key or existing secret OCID. Literal VPN keys use letters, digits and spaces. BGP MD5 keys are literal values only. There is no separate secrets file or automatic copy into the LZ Vault.
 - In Studio, entered keys are session-only and masked in previews; exports contain the actual values. Saved designs require key re-entry, and secret-bearing outputs are not cached.
@@ -484,7 +471,7 @@ Create the physical group/ports first, complete cabling and activation, then add
 
 **Manual post-deployment configuration required:** configure peer equipment and advertisements, complete carrier work, and permit approved traffic in firewall policy, NSGs and security lists. The customer owns those resources' lifecycle, drift management and compliance review.
 
-Follow the [customer guide](../oci-hybrid-connectivity/README.md) for Studio steps, generation, staged deployment, verification and the impact of unavailable prerequisites. Start from the [complete examples](../oci-hybrid-connectivity/examples/) for static VPN, BGP VPN, FastConnect with VPN backup, existing physical connections, physical preparation or public peering.
+Follow the [customer guide](../oci-hybrid-connectivity/README.md) for Studio steps, generation, staged deployment, verification and the impact of unavailable prerequisites. Start from the [complete examples](../oci-hybrid-connectivity/examples/) for static VPN, BGP VPN, FastConnect with VPN backup, existing physical connections or physical preparation.
 
 ## References
 

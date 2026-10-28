@@ -41,7 +41,7 @@ Your network team still configures the customer router, approves traffic through
 | CIDR / remote network | An address range, such as `172.20.0.0/16`. Here, **remote** means the networks on your side that OCI must reach. |
 | Route / route table | Instructions telling a router where to send traffic for an address range. Routes must exist for the return journey too. Firewall rules separately decide which traffic is permitted. |
 | BGP / ASN | BGP lets routers exchange reachable networks. An autonomous system number (ASN) identifies the network in that exchange. Your network team supplies the customer ASN. |
-| FastConnect virtual circuit | A logical connection over an activated provider or physical service. A private circuit connects to the landing zone DRG; a public circuit reaches OCI public services. |
+| FastConnect virtual circuit | A logical connection over an activated provider or physical service. This add-on supports private circuits connected to the landing zone DRG. |
 | Cross-connect / group | A physical connection at a FastConnect location, or a group of those connections. The circuit refers to an already provisioned connection by its OCID. |
 | OCID | OCI's resource identifier. Copy the identifier for the requested resource, rather than its display name or the name used in your source configuration. |
 
@@ -68,10 +68,11 @@ The examples are working shapes for configuration, not an address allocation for
 | Your VPN router sits behind a device that translates its address | [NAT / peer identity](#case-3-vpn-behind-nat-or-with-a-different-ike-identity), with static or BGP routing | The translated public IP and the actual IKE identity sent by the router. NAT is an additional VPN consideration, not a third routing choice. |
 | An Oracle partner supplies your dedicated connection to private OCI networks | [Private provider FastConnect](#case-4-private-fastconnect-through-an-oracle-partner) | Provider service OCID, offered bandwidth, activation details and the BGP settings that the provider asks you to supply. |
 | You have ready physical cross-connects, or need to arrange them | [Direct / physical FastConnect](#case-5-private-fastconnect-over-physical-connections) | Provisioned physical OCIDs, VLAN and BGP settings; new ports also require cabling and activation. |
-| You need OCI public service addresses over FastConnect | [Public peering](#case-6-public-fastconnect) | Provider/physical service, owned public prefixes and the required public ASN. This does not connect private landing zone addresses. |
-| Private FastConnect needs an alternative internet path | [FastConnect with VPN backup](#case-7-fastconnect-with-vpn-backup) | Both working services, identical reviewed remote prefixes and a tested routing preference policy. |
+| Private FastConnect needs an alternative internet path | [FastConnect with VPN backup](#case-6-fastconnect-with-vpn-backup) | Both working services, identical reviewed remote prefixes and a tested routing preference policy. |
 
-This version supports IPv4, static or BGP VPN routing, both VPN tunnels, private/public circuits, and physical cross-connect preparation. It uses the released Orchestrator **v2.2.0**, Networking **v0.9.0** and Security **v0.2.3** modules without requiring changes to those repositories.
+Only private FastConnect circuits are supported. Existing public-circuit source configurations are rejected and are never converted to private circuits automatically.
+
+This version supports IPv4, static or BGP VPN routing, both VPN tunnels, private circuits, and physical cross-connect preparation. It uses the released Orchestrator **v2.2.0**, Networking **v0.9.0** and Security **v0.2.3** modules without requiring changes to those repositories.
 
 Every case follows the same handover: agree the values, enter them in Studio or private Blueprint Factory source, generate and review a Terraform update, configure the customer/provider side, then test the complete path. **A successful Terraform apply means OCI resources were configured; it does not mean that the external peer is ready.**
 
@@ -113,12 +114,12 @@ Add the optional top-level `hybrid_connectivity` object to your landing zone JSO
 |---|---|
 | `customer_premises_equipments` | Create OCI records for your VPN equipment. |
 | `ipsecs` | Configure VPN connections and both tunnels. |
-| `fast_connect_virtual_circuits` | Configure private or public circuits. |
+| `fast_connect_virtual_circuits` | Configure private circuits. |
 | `cross_connect_groups` | Prepare physical FastConnect groups and ports. |
 
 The [complete configuration reference](../oci-lz-blueprint-factory/blueprint-factory-configuration-reference.md#9-vpn-and-fastconnect) lists every accepted field, required values and defaults. Studio exposes the main connection settings; use the factory input for optional fields that Studio does not expose, such as the circuit provisioning flag.
 
-Studio offers maintained device-vendor and provider-service choices. Provider choices are filtered by the design's region and realm; for example, OC1 Frankfurt includes Equinix Fabric and Megaport VXC. The deployment resolves named choices against OCI in that location. These lists are incomplete: use the existing identifier fields for an unlisted choice, and verify the identifier in the target realm and region. Vendor selection uses OCI's first matching device template; use an explicit shape identifier when you need an exact model.
+Studio offers maintained device-vendor choices and provider services with verified OCIDs for the design's realm and region. If no verified provider OCIDs are available, Studio shows the OCID field directly. Use manual identifier entry for an unlisted service; its information button includes the OCI CLI list command. Vendor selection uses OCI's first matching device template; use an explicit shape identifier when you need an exact model.
 
 Choose the closest complete example:
 
@@ -129,7 +130,6 @@ Choose the closest complete example:
 | [FastConnect and VPN](examples/03-fastconnect-vpn-backup.json) | Private provider circuit and VPN with identical remote prefixes. |
 | [Existing physical connections](examples/04-existing-physical.json) | A circuit referring to ready cross-connect/group OCIDs. |
 | [Physical preparation](examples/05-physical-preparation.json) | Groups and ports, with final circuits omitted. |
-| [Public FastConnect](examples/06-public-fastconnect.json) | Public peering and illustrative public-prefix settings. |
 
 Each example includes an illustrative landing zone baseline. For an existing landing zone, merge the relevant `hybrid_connectivity` settings into its current private source configuration; preserve its region, hub, networks and workloads. Do not replace an existing design with an example or apply it as a second copy of the landing zone.
 
@@ -196,16 +196,16 @@ Oracle's [supported IPSec parameters guide](https://docs.oracle.com/en-us/iaas/C
 
 ## 6. FastConnect Configuration
 
-Choose the connection model first: an Oracle partner supplies a provider service, while direct/third-party physical connectivity uses provisioned cross-connects. Then choose private or public peering for the required destinations. A physical service and a virtual circuit are separate resources; creating a circuit does not order or activate a cable.
+Choose the connection model first: an Oracle partner supplies a provider service, while direct/third-party physical connectivity uses provisioned cross-connects. The circuit connects private networks to the landing zone DRG. A physical service and a virtual circuit are separate resources; creating a circuit does not order or activate a cable.
 
 ### Case 4: Private FastConnect through an Oracle partner
 
 Use this case for private landing zone access over a partner service. The circuit in [the FastConnect and VPN example](examples/03-fastconnect-vpn-backup.json) is a starting point; include its VPN entries only if you also need the backup path.
 
 1. **Gather:** obtain the provider service-offering OCID, offered bandwidth and activation/service key instructions. Agree the remote CIDRs and ask who operates the BGP session. If your router peers with Oracle, collect its ASN and the agreed customer/Oracle peering IP pair. If the provider owns BGP, follow its instructions about which fields to supply.
-2. **Enter in Studio:** expand **FastConnect**, add a circuit, select **Private**, enter **Remote IPv4 CIDRs** and choose **Provider service**, then select **Provisioned bandwidth**. For an unlisted service, choose **Other provider service (enter OCID)** and supply its identifier for this location. Common bandwidth choices are conveniences; use **Other bandwidth** for a different agreed shape. Exact availability depends on the service and region.
+2. **Enter in Studio:** expand **FastConnect**, add a circuit, enter **Remote IPv4 CIDRs** and select a **Provider service** when the dropdown is available. Otherwise enter **Provider service OCID** for this location; the dropdown's **Other provider service (enter OCID)** option also allows manual entry. Then select **Provisioned bandwidth**. Common bandwidth choices are conveniences; use **Other bandwidth** for a different agreed shape. Exact availability depends on the service and region.
 3. **Configure peering:** enter **Customer ASN** and the **BGP mapping** settings that apply to your service. Private IP pairs use `/28` through `/31`; `192.168.254.1/30` and `192.168.254.2/30` are illustrative. Enable MD5 authentication only when the peer uses the same agreed key. Enter an activation key under **Advanced circuit settings** if your provider requires it. The **Cross-connect and VLAN** section is for physical mapping details required by your connection model; do not invent a physical OCID for a provider-managed service.
-4. **Generate and apply:** use [the deployment procedure](#9-deployment). Factory source uses `fast_connect_virtual_circuits`, either `provider_service` names or `provider_service_id`, `bandwidth_shape_name` and the applicable mapping fields. Keep the existing landing zone and its state intact.
+4. **Generate and apply:** use [the deployment procedure](#9-deployment). Factory source uses `fast_connect_virtual_circuits`, `provider_service_id`, `bandwidth_shape_name` and the applicable mapping fields. Keep the existing landing zone and its state intact.
 5. **Complete the provider handover:** give the provider the new virtual circuit OCID and its requested activation details. **Manual post-deployment configuration required:** the provider completes its end, and the customer team configures its router where applicable. A circuit can remain **Pending partner** with BGP down until this work is complete. Verify activation, BGP and an approved private application flow. See [Oracle's partner workflow](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectprovider.htm).
 
 ### Case 5: Private FastConnect over physical connections
@@ -215,20 +215,11 @@ Use [the existing physical connection example](examples/04-existing-physical.jso
 1. **Gather:** agree the FastConnect location, port speed, service arrangement, redundancy, VLAN, circuit bandwidth, customer ASN, remote CIDRs and BGP peering pair. An OCI region name is not a physical location name; use values offered for your actual location and service.
 2. **Prepare new ports if needed:** expand **Physical FastConnect preparation** in Studio and add a group and its ports, or add `cross_connect_groups` in factory source. Enter the offered location/port-speed names and any agreed proximity/reference settings. Generate and apply with final virtual circuits omitted. Skip this step when referencing physical resources already provisioned outside this configuration.
 3. **Complete the physical work:** obtain the OCI letter of authorization for each port, arrange the provider/datacenter cabling, verify light levels and activate the connections using [Oracle's physical setup procedure](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectcolocate.htm). Confirm that the referenced cross-connect/group is provisioned before creating the circuit. **Manual external configuration required:** Terraform does not order the service, cable a port or certify that the link is ready.
-4. **Add the private circuit:** in Studio, select **Direct / physical connection** for **Provider service**, enter the remote CIDRs/bandwidth/ASN, and open the BGP mapping's **Cross-connect and VLAN**. Enter the actual **Cross-connect/group OCID** and agreed **VLAN**, plus the private customer/Oracle BGP pair. Factory input uses `cross_connect_or_cross_connect_group_id`; the group name from step 2 is not accepted as an OCID.
+4. **Add the private circuit:** in Studio, select **Direct / physical connection** for **Provider service**, or leave **Provider service OCID** empty when the dropdown is unavailable. Enter the remote CIDRs/bandwidth/ASN and open the BGP mapping's **Cross-connect and VLAN**. Enter the actual **Cross-connect/group OCID** and agreed **VLAN**, plus the private customer/Oracle BGP pair. Factory input uses `cross_connect_or_cross_connect_group_id`; the group name from step 2 is not accepted as an OCID.
 5. **Apply the circuit update:** regenerate and review a plan in the same state. Keep any managed groups/ports in the source when adding circuits; removing their definitions can plan their destruction. Apply only the reviewed changes.
 6. **Configure and verify the peer:** the network team configures its physical interface, any required link aggregation, VLAN and BGP neighbor. Check physical link readiness, BGP establishment, the assigned DRG table and an approved application flow. A good optical link with BGP down still needs correct activation, VLAN and peering settings.
 
-### Case 6: Public FastConnect
-
-Use [the public peering example](examples/06-public-fastconnect.json) when the destination is an OCI public service. The sample public prefix and ASN are documentation values; replace them with values you are authorized to use.
-
-1. **Gather:** obtain the provider or provisioned physical service, offered bandwidth, your owned public IPv4 prefixes and the required public ASN/BGP arrangement. Agree the public route scope with your network team.
-2. **Enter in Studio:** add a FastConnect circuit and select **Public**. Enter **Owned public IPv4 prefixes**, the connection details, bandwidth and applicable public ASN. Do not enter private remote CIDRs or private BGP interface pairs; Oracle supplies the public circuit's peering addresses. **Routing policy** is available under advanced settings when you need to specify public route scope.
-3. **Generate and apply:** factory source uses `"type": "PUBLIC"` and `public_prefixes`, with `remote_cidrs` omitted. Apply through the same [deployment procedure](#9-deployment), then complete the provider/physical handover.
-4. **Configure and verify:** the network team configures the public BGP session and route preferences using the real assigned addresses. Confirm that OCI has verified the owned prefixes and test the intended public service over FastConnect. A public circuit does not attach to the landing zone DRG or create access to private VCN addresses. Prefix verification and external peering remain required even after Terraform succeeds. See [Oracle's public/private circuit setup](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectprovider.htm).
-
-### Case 7: FastConnect with VPN backup
+### Case 6: FastConnect with VPN backup
 
 Start from [the FastConnect and VPN example](examples/03-fastconnect-vpn-backup.json). It uses identical reviewed remote CIDRs for the private circuit and BGP VPN.
 
@@ -249,7 +240,6 @@ See [the generated routing behavior](#7-routing) before agreeing a failover poli
 | Private FastConnect | Each managed private circuit attachment receives the custom FastConnect ingress table. |
 | Hubs A/B/C | Incoming local destinations pass through the existing hub/firewall path. |
 | Hub E | Incoming traffic routes directly to hub, environment and platform VCNs. |
-| Public FastConnect | No private DRG attachment or landing zone private routes are generated. |
 
 The ingress tables contain local destinations, rather than an unrestricted default route. They do not intentionally enable transit between external connections. The add-on assigns these tables to its managed attachments; it does not change DRG-wide defaults for future attachments created elsewhere. See [OCI's default table assignment guidance](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/drg-rt-default-assignment.htm).
 
@@ -348,7 +338,6 @@ After applying, check the connection with your network team:
 | BGP stays down | ASN, inside/peering address pair, VLAN, optional MD5 key and provider activation. |
 | FastConnect stays pending provider activation | Complete the provider's order/activation process and give it the circuit OCID and required service details. |
 | Physical link is ready but a direct circuit is down | Cross-connect activation/provisioning, VLAN and the external BGP configuration. |
-| Public circuit cannot reach the expected service | Public prefix ownership verification, public BGP routes, routing policy and customer-side path preference. |
 | Connection is up but traffic fails | Routes in both directions, effective DRG table assignments and traffic permissions. |
 | Failover does not behave as expected | Advertisements, route preference and the health of every alternate path. |
 | Terraform cannot read a referenced secret | Secret existence, region and deployment principal permissions. |

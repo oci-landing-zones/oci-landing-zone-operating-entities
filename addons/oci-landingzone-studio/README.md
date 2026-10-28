@@ -94,7 +94,7 @@ Studio currently provides a guided interface for the following repository-suppor
 | Environments | Environment networks, optional OCI Security Zones, and projects |
 | Platforms | Environment OKE (`oke_simple`), Custom, EXACC, and EXACS platforms; shared Custom, EXACC, and EXACS platforms. Choose a type from each panel's dropdown. |
 | Exadata fields | Shared, hybrid, and dedicated EXACC/EXACS selections map to UC1, UC2, and UC3; EXACC stays networkless, while EXACS creates networks where AVMC/VMCs are placed. |
-| Hybrid connectivity | BGP/static VPNs with two tunnels, private/public FastConnect circuits, physical preparation, custom attachment routing, and inline VPN/BGP keys |
+| Hybrid connectivity | BGP/static VPNs with two tunnels, private FastConnect circuits, physical preparation, custom attachment routing, and inline VPN/BGP keys |
 | Outputs | Generated deployment ZIP, `config.jsonnet`, live diagram, and Draw.io export |
 | Deployment scope | Complete or regional DR using the standard wizard |
 | Remote peering | Multiple RPC acceptor/requester connections; same tenancy for regional DR, same or cross tenancy for complete deployments |

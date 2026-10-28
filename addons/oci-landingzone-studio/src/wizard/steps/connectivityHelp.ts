@@ -2,10 +2,8 @@ import type { FieldHelpContent } from './FieldHelp';
 
 const vpn = 'https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/settingupIPsec.htm';
 const ipsec = 'https://docs.oracle.com/en-us/iaas/Content/Network/Reference/supportedIPsecparams.htm';
-const fc = 'https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectoverview.htm';
 const requirements = 'https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectrequirements.htm';
 const provider = 'https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectprovider.htm';
-const routing = 'https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/routingonprem.htm';
 const physical = 'https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/fastconnectcolocate.htm';
 
 export const connectivityHelp = {
@@ -35,22 +33,19 @@ export const connectivityHelp = {
   phase1Lifetime: { description: 'Phase 1 key lifetime, in seconds. Leaving it empty keeps the downstream default.', example: '28800 (8 hours)', docs: ipsec },
   phase2Lifetime: { description: 'Phase 2 key lifetime, in seconds. Leaving it empty keeps the downstream default.', example: '3600 (1 hour)', docs: ipsec },
   pfs: { description: 'Perfect forward secrecy performs a new key exchange for phase 2. The published commercial-cloud setting is enabled with GROUP5 when no override is sent. Coordinate the state and group with your peer and verify settings for your region/realm.', example: 'Enabled with GROUP5, or another agreed supported group', docs: ipsec },
-  peering: { description: 'Private peering connects to landing zone networks through the DRG. Public peering reaches OCI public services and does not attach to the landing zone DRG.', example: 'Private for access to application private addresses', docs: fc },
-  publicPrefixes: { description: 'Public IPv4 networks you own and will advertise. OCI must verify ownership. The documentation-only range below is illustrative and cannot establish ownership.', example: '203.0.113.0/24', docs: requirements },
-  provider: { description: 'Choose a known provider service for the selected region and realm. The deployment resolves its identifier using OCI’s current service list. For an unlisted service, enter the provider service OCID from that location. Direct connections use a provisioned cross-connect/group instead. This is separate from the provider activation key.', example: 'Equinix Fabric in OC1 Frankfurt, or a provider service OCID supplied for your location', docs: provider },
+  provider: { description: 'Select a provider service from the list, or enter its OCID for the selected realm and region.', example: 'ocid1.providerservice.oc1.eu-frankfurt-1.example', docs: provider, cli: 'oci network fast-connect-provider-service list \\\n  --compartment-id <tenancy-ocid> \\\n  --region <region> --all' },
   bandwidth: { description: 'Select a common bandwidth or enter another shape offered by your provider. Use a positive whole number followed by Gbps. Studio validates the format; it does not retrieve provider or region availability from OCI.', example: '1 Gbps, or 20 Gbps when offered by your provider', docs: provider },
-  fcAsn: { description: 'Your ASN when your router peers directly with Oracle. If the provider owns the BGP session, follow its instructions. Public peering requires a public ASN; 65534 is unavailable.', example: '65001 for private peering; your assigned public ASN for public peering', docs: requirements },
+  fcAsn: { description: 'Your ASN when your router peers directly with Oracle. If the provider owns the BGP session, follow its instructions. The ASN 65534 is unavailable.', example: '65001 for private peering', docs: requirements },
   physicalId: { description: 'The real OCID of a provisioned cross-connect or group used by this mapping. Complete physical preparation first. A configuration name cannot replace this OCID.', example: 'ocid1.crossconnectgroup.oc1.eu-frankfurt-1.example', docs: physical },
   vlan: { description: 'The VLAN assigned to this circuit on the cross-connect/group. For direct connections use 100–4094; coordinate provider-owned settings with the provider.', example: '100', docs: requirements },
   customerPeeringIp: { description: 'The IPv4 BGP address at the customer/provider end of private peering. Use /28 through /31 and pair it with Oracle’s address in the same subnet.', example: '192.168.254.1/30', docs: requirements },
-  oraclePeeringIp: { description: 'Oracle’s IPv4 BGP address for private peering. Match the agreed pair and prefix. Oracle supplies addresses for public circuits.', example: '192.168.254.2/30', docs: requirements },
+  oraclePeeringIp: { description: 'Oracle’s IPv4 BGP address for private peering. Match the agreed pair and prefix.', example: '192.168.254.2/30', docs: requirements },
   bgpAuth: { description: 'Enable MD5 authentication only when the BGP peer uses the same authentication key. This is separate from the VPN pre-shared key.', example: 'Disabled when the BGP peer does not require MD5', docs: requirements },
   bgpKey: { description: 'Literal MD5 authentication value agreed with the BGP peer. Vault secret OCIDs are not resolved for this field. Studio clears it on reopen; downloads include it.', example: 'Enter your agreed key; no sample key is prefilled', docs: requirements },
   partnerKey: { description: 'Optional service or activation key supplied by the FastConnect provider. This is not the BGP MD5 authentication key.', example: 'The activation reference supplied with your provider order', docs: provider },
   bgpState: { description: 'Enabled activates the circuit’s BGP session. Disabled deactivates it and can interrupt connectivity.', example: 'Enabled for a circuit intended to carry traffic', docs: provider },
   mtu: { description: 'The layer 3 packet size in bytes. Agree the value across the connection and peer. FastConnect’s maximum IP MTU is 9000.', example: '1500', docs: requirements },
   bfd: { description: 'Bidirectional Forwarding Detection can detect failure of IPv4 BGP peers. Enable it only with matching peer support.', example: 'Disabled unless agreed with your peer/provider', docs: provider },
-  policy: { description: 'Public-peering route scope. Accepted values are ORACLE_SERVICE_NETWORK, REGIONAL, MARKET_LEVEL and GLOBAL. Separate multiple values with commas.', example: 'ORACLE_SERVICE_NETWORK', docs: routing },
   location: { description: 'The exact FastConnect physical location name returned by OCI for the selected region. A region name alone is not a location name.', example: 'Copy a location_name from OCI’s available FastConnect locations', docs: physical },
   portSpeed: { description: 'The physical port-speed shape available at that FastConnect location. This is distinct from the virtual circuit’s bandwidth.', example: '10 Gbps', docs: physical },
   reference: { description: 'Optional customer/provider reference identifying this physical port or cable for operations and troubleshooting.', example: 'branch-primary-fiber', docs: physical },

@@ -35,19 +35,16 @@ export interface CrossConnectMapping {
 }
 
 export interface FastConnectConfig {
-  type: 'PRIVATE' | 'PUBLIC';
+  type: 'PRIVATE';
   remote_cidrs?: string[];
   provider_service_id?: string;
-  provider_service?: { provider_name: string; provider_service_name: string };
   provider_service_key_name?: string;
   bandwidth_shape_name?: string;
   customer_asn?: string;
   cross_connect_mappings?: Record<string, CrossConnectMapping>;
-  public_prefixes?: Record<string, { cidr_block: string }>;
   ip_mtu?: number;
   is_bfd_enabled?: boolean;
   bgp_admin_state?: 'ENABLED' | 'DISABLED';
-  routing_policy?: string[];
   provision_fc_virtual_circuit?: boolean;
 }
 

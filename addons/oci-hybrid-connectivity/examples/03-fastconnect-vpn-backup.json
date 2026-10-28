@@ -34,6 +34,7 @@
                 "bandwidth_shape_name"             : "1 Gbps",
                 "customer_asn"                     : "65001",
                 "is_bfd_enabled"                   : false,
+                "provider_service_id"              : "ocid1.providerservice.oc1.eu-frankfurt-1.REPLACE_WITH_PROVIDER_SERVICE_OCID",
                 "remote_cidrs"                     : ["172.20.0.0/16"],
 
                 "cross_connect_mappings": {
@@ -42,11 +43,6 @@
                         "customer_bgp_peering_ip"  : "192.168.254.1/30",
                         "oracle_bgp_peering_ip"    : "192.168.254.2/30"
                     }
-                },
-
-                "provider_service": {
-                    "provider_name"                : "Equinix",
-                    "provider_service_name"        : "Fabric"
                 }
             }
         },

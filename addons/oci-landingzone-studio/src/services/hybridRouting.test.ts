@@ -7,6 +7,8 @@ import { emptyHybridConnectivity, newVpn } from './hybridConnectivity';
 import { hubKindDefaults } from './hubKinds';
 import { generatedRouteTables } from './routingFixtures.testSupport';
 import { generateNetwork } from '../generator/network';
+import { absoluteNodeRects } from '../diagram/flowGeometry';
+import { structuralCrossings } from '../diagram/layoutQuality';
 
 describe('hybrid routing views', () => {
   for (const kind of ['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const) {
@@ -24,7 +26,8 @@ describe('hybrid routing views', () => {
       const graph = buildGraph(model);
       expect(graph.nodes.some((node) => node.id === 'hybrid-vpn-office')).toBe(true);
       for (const direction of ['out', 'in']) {
-        const traces = buildFlowTraces(model, [`prod:hybrid-${direction}@hybrid-vpn-office:web`], 'flow', tables);
+        const flowId = `prod:hybrid-${direction}@hybrid-vpn-office:web`;
+        const traces = buildFlowTraces(model, [flowId], 'flow', tables);
         expect(traces).toHaveLength(1);
         expect(traces[0].ok).toBe(true);
         const nodes = traces[0].segments.flatMap((segment) => [segment.from, segment.to]);
@@ -32,6 +35,15 @@ describe('hybrid routing views', () => {
         expect(nodes).toContain('drg');
         const firewall = model.network.subnets.findIndex((sn) => ['fw-int', 'fw', 'trust'].includes(sn.name));
         if (kind !== 'hub_e') expect(nodes).toContain(`hub-vcn-sn-${firewall}`);
+        const rendered = buildGraph(model, 5, { activeFlows: [flowId] }, undefined, tables);
+        expect(rendered.flowErrors).toBeUndefined();
+        expect(rendered.edges.some((edge) => edge.waypoints?.includes('hybrid-vpn-office'))).toBe(true);
+        const rects = absoluteNodeRects(rendered.nodes);
+        const vpn = rects.get('hybrid-vpn-office')!;
+        const port = rendered.nodes.find((node) => node.rtDotOwnerId === vpn.id)!;
+        expect(port.parentId).toBeUndefined();
+        expect(rects.get(port.id)!.x + port.width / 2).toBe(vpn.x + vpn.width);
+        expect(structuralCrossings(rendered)).toEqual([]);
       }
     }, 60_000);
   }

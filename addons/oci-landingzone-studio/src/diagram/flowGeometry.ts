@@ -16,6 +16,18 @@ const CLEARANCE = 10;
 export const BEND_COST = 24;
 const EPS = 0.001;
 
+export function diagramBounds(nodes: DiagramNode[]) {
+  const roots = nodes.filter((node) => !node.parentId);
+  if (!roots.length) return { x: 0, y: 0, width: 0, height: 0 };
+  const x = Math.min(...roots.map((node) => node.x));
+  const y = Math.min(...roots.map((node) => node.y));
+  return {
+    x, y,
+    width: Math.max(...roots.map((node) => node.x + node.width)) - x,
+    height: Math.max(...roots.map((node) => node.y + node.height)) - y,
+  };
+}
+
 /** Absolute rectangles derived from the same parent-relative model used by both renderers. */
 export function absoluteNodeRects(nodes: DiagramNode[]): Map<string, FlowRect> {
   const byId = new Map(nodes.map((node) => [node.id, node]));

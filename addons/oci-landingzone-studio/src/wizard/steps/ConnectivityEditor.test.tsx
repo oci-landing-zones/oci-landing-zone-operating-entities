@@ -3,6 +3,7 @@ import { expect, it } from 'vitest';
 import { emptyLzModel } from '../../model/defaults';
 import type { FastConnectConfig } from '../../model/hybridConnectivity';
 import { emptyHybridConnectivity, newVpn } from '../../services/hybridConnectivity';
+import { providerServicesForRegion } from '../../services/connectivityCatalog';
 import { WizardProvider } from '../wizardContext';
 import ConnectivityEditor from './ConnectivityEditor';
 import HubNetworkStep from './HubNetworkStep';
@@ -39,46 +40,53 @@ it('adapts visible guidance to tunnel routing, key source and circuit connection
   expect(render('vpn')).toContain('Inside-tunnel IPs are the two ends of the BGP session');
   expect(render('vpn')).toContain('The LZ Vault can host it; this form does not create the secret.');
   const circuit = hybrid.fast_connect_virtual_circuits.primary = {
-    type: 'PRIVATE' as 'PRIVATE' | 'PUBLIC', provider_service_id: 'ocid1.providerservice.oc1..example', cross_connect_mappings: { primary: {} },
+    type: 'PRIVATE' as const, provider_service_id: 'ocid1.providerservice.oc1..example', cross_connect_mappings: { primary: {} },
   };
   expect(render('fastconnect')).toContain('Use the peering details supplied for your partner service.');
   expect(render('fastconnect')).toContain('these are BGP interface IPs, not the remote networks.');
   circuit.provider_service_id = '';
-  circuit.type = 'PUBLIC';
   const physical = render('fastconnect');
   expect(physical).toContain('Map this circuit to a provisioned physical cross-connect/group.');
-  expect(physical).toContain('OCI supplies the public circuit peering addresses after creation.');
-  expect(physical).not.toContain('these are BGP interface IPs, not the remote networks.');
+  expect(physical).toContain('these are BGP interface IPs, not the remote networks.');
+  expect(physical).not.toContain('<option value="PUBLIC"');
+  expect(physical).not.toMatch(/<label[^>]*>Peering<\/label>/);
+  expect(physical).not.toContain('Owned public IPv4 prefixes');
+  expect(physical).not.toContain('Routing policy (comma-separated)');
 });
 
-it('offers scoped service and device dropdowns while retaining identifier entry for unknown choices', () => {
+it('uses provider OCID entry unless verified IDs exist for the selected location', () => {
   const model = emptyLzModel();
   const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
   hybrid.customer_premises_equipments.office = { ip_address: '203.0.113.10', cpe_device_shape_vendor_name: 'Fortinet' };
-  const circuit: FastConnectConfig = hybrid.fast_connect_virtual_circuits.primary = { type: 'PRIVATE', provider_service: { provider_name: 'Equinix', provider_service_name: 'Fabric' } };
+  const circuit: FastConnectConfig = hybrid.fast_connect_virtual_circuits.primary = { type: 'PRIVATE' };
   const render = (kind: 'vpn' | 'fastconnect') => renderToStaticMarkup(
     <WizardProvider initialModel={model}><ConnectivityEditor kind={kind} /></WizardProvider>,
   );
-  const devices = render('vpn');
-  expect(devices).toContain('<option value="Fortinet" selected="">Fortinet</option>');
-  expect(devices).toContain('Other device (enter shape ID / OCID)');
-  expect(devices).not.toMatch(/<label[^>]*>Device shape ID \/ OCID<\/label>/);
-  const fra = render('fastconnect');
-  expect(fra).toContain('<option value="equinix-fabric" selected="">Equinix Fabric</option>');
-  expect(fra).toContain('<option value="megaport-vxc">Megaport VXC</option>');
-  expect(fra).not.toMatch(/<label[^>]*>Provider service OCID<\/label>/);
-  expect(fra).not.toContain('terraform-provider-oci');
+  expect(render('vpn')).toContain('<option value="Fortinet" selected="">Fortinet</option>');
+  expect(render('vpn')).toContain('Other device (enter shape ID / OCID)');
   model.foundation.realm = 'oc19';
   model.foundation.region = 'eu-frankfurt-2';
-  expect(render('fastconnect')).not.toContain('<option value="megaport-vxc">');
-  model.foundation.region = 'eu-madrid-2';
-  expect(render('fastconnect')).toContain('This service is not in the maintained list');
-  delete circuit.provider_service;
-  const noCoverage = render('fastconnect');
-  expect(noCoverage).toContain('No maintained service options for oc19 / eu-madrid-2');
-  expect(noCoverage).toMatch(/<label[^>]*>Provider service OCID<\/label>/);
-  Object.assign(circuit, { provider_service_id: 'ocid1.providerservice.oc19.eu-madrid-2.example' });
-  expect(render('fastconnect')).toContain('value="ocid1.providerservice.oc19.eu-madrid-2.example"');
+  const manual = render('fastconnect');
+  expect(manual).not.toMatch(/<label[^>]*>Provider service<\/label>/);
+  expect(manual).toMatch(/<label[^>]*>Provider service OCID<\/label>/);
+  expect(manual).not.toContain('Known choices for');
+  expect(manual).not.toContain('reviewed 2026-10-15');
+
+  model.foundation.realm = 'oc1';
+  model.foundation.region = 'eu-frankfurt-1';
+  const { ocid, label } = providerServicesForRegion('oc1', 'eu-frankfurt-1').find((s) => s.label === 'Equinix / Fabric')!;
+  circuit.provider_service_id = ocid;
+  const verified = render('fastconnect');
+  expect(verified).toContain(`<option value="${ocid}" selected="">${label}</option>`);
+  expect(verified).not.toContain('Known choices for');
+  expect(verified).not.toContain('Saved:');
+  expect(verified).toContain('Select a provider service from the list, or enter its OCID');
+  model.foundation.realm = 'oc19';
+  model.foundation.region = 'eu-frankfurt-2';
+  const elsewhere = render('fastconnect');
+  expect(elsewhere).not.toContain(`<option value="${ocid}"`);
+  expect(elsewhere).toContain(`value="${ocid}"`);
+  expect(elsewhere).toContain('belongs to another location');
   hybrid.customer_premises_equipments.office = { ip_address: '203.0.113.10', cpe_device_shape_id: '51d06bb2-cbf6-44df-8e7b-3e8bf1750c47' };
   expect(render('vpn')).toContain('value="51d06bb2-cbf6-44df-8e7b-3e8bf1750c47"');
 });
@@ -97,7 +105,6 @@ it('keeps services separate and describes every editable field, including condit
   hybrid.fast_connect_virtual_circuits.private = {
     type: 'PRIVATE', cross_connect_mappings: { primary: { bgp_md5auth_mode: 'inline' } },
   };
-  hybrid.fast_connect_virtual_circuits.public = { type: 'PUBLIC' };
   hybrid.cross_connect_groups.primary = { cross_connects: { port: { location_name: '', port_speed_shape_name: '' } } };
 
   const render = (kind: 'vpn' | 'fastconnect') => renderToStaticMarkup(
@@ -108,7 +115,7 @@ it('keeps services separate and describes every editable field, including condit
   expect(vpnHtml).toContain('Customer tunnel IP/prefix');
   expect(vpnHtml).toContain('Vault secret OCID');
   expect(vpnHtml).not.toContain('FastConnect circuits');
-  expect(fcHtml).toContain('Owned public IPv4 prefixes');
+  expect(fcHtml).toContain('Customer BGP IP/prefix');
   expect(fcHtml).toContain('BGP MD5 key (session only)');
   expect(fcHtml).toContain('Physical FastConnect preparation');
   expect(fcHtml).not.toContain('Customer VPN equipment');
@@ -124,6 +131,9 @@ it('keeps services separate and describes every editable field, including condit
     });
     expect(new Set(ids).size).toBe(ids.length);
     expect(html).toContain('<strong>Example:</strong>');
+    expect(html).toContain('class="studio-info-button"');
+    expect(html).toContain('class="studio-info-popover"');
+    expect(html).not.toContain('field-help-trigger');
     expect(html).toContain('href="https://docs.oracle.com/');
     expect([...html.matchAll(/<div[^>]*role="dialog"[\s\S]*?<\/div>/g)].join('')).not.toContain('SessionExampleKey');
   }
@@ -140,7 +150,10 @@ it('keeps services separate and describes every editable field, including condit
   expect(tunnels[1][2]).toContain('Static');
   expect(fcHtml).toContain('Add BGP mapping to FastConnect private');
   expect(fcHtml).toContain('aria-label="BGP mapping name for FastConnect private"');
-  expect(fcHtml).toContain('Known choices for oc1 / eu-frankfurt-1');
+  expect(fcHtml).not.toContain('Known choices for');
+  expect(fcHtml).toContain('oci network fast-connect-provider-service list');
+  expect(fcHtml).toContain('--compartment-id &lt;tenancy-ocid&gt;');
+  expect(fcHtml).not.toContain('--auth');
   expect(fcHtml).toContain('Use lowercase letters, numbers, hyphens or underscores. Up to 40 characters.');
 });
 
@@ -210,6 +223,7 @@ it('lists phase-specific proposal options and keeps invalid imported values visi
   expect(invalid).toContain('Unsupported value: HMAC_SHA2_256_128');
   expect(invalid).toMatch(/<select[^>]*aria-label="Phase 1 authentication algorithm"[^>]*aria-invalid="true"/);
   expect(invalid).toContain('Choose a supported value from the list.');
+  expect(invalid).toMatch(/class="field-error" aria-live="polite"><div>Choose a supported value from the list\./);
 });
 
 it('shows automatic proposals and inherited PFS without writing algorithm overrides', () => {
@@ -273,6 +287,7 @@ it('places a missing session key warning beside its field and flags the affected
   const noteId = field?.match(/aria-describedby="[^"]+ ([^"]+)"/)?.[1];
   expect(noteId).toBeDefined();
   expect(html).toContain(`id="${noteId}"`);
+  expect(html).toContain(`id="${noteId}" class="field-error" aria-live="polite"`);
   expect(html).toContain('Re-enter the pre-shared key. Studio clears entered keys when you reopen a design.');
   expect(html).toContain('Key needs attention');
   expect(html).not.toContain('VPN office Tunnel 1:');

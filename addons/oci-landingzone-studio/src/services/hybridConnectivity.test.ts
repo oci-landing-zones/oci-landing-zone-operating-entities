@@ -59,6 +59,16 @@ describe('FastConnect bandwidth format', () => {
 });
 
 describe('hybrid connectivity secrets', () => {
+  it('rejects a saved public circuit without converting or discarding its source', () => {
+    const model = emptyLzModel();
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    const legacy = { type: 'PUBLIC', provider_service_id: 'ocid1.providerservice.oc1..example', public_prefixes: { customer: { cidr_block: '203.0.113.0/24' } } };
+    Object.assign(hybrid.fast_connect_virtual_circuits, { legacy });
+    expect(validateHybridConnectivity(model).join(' ')).toContain('only private FastConnect circuits are supported');
+    expect(validateHybridRoutes(model).join(' ')).toContain('only private FastConnect circuits are supported');
+    expect(buildConfig(model).hybrid_connectivity?.fast_connect_virtual_circuits.legacy).toEqual(legacy);
+  });
+
   it.each<[VpnConfig['cpe_local_identifier_type'], string | undefined, boolean]>([
     [undefined, undefined, false],
     ['IP_ADDRESS', undefined, false],
