@@ -374,7 +374,11 @@ The supported path above works with today's released modules. These additional o
 
 This version does not support policy-based VPN, IPv6 routing, MACsec, IPsec over FastConnect, carrier ordering or customer-router automation. Do not add unrecognized configuration keys to try to enable them.
 
-These deployment instructions are based on the released source contracts. No live OCI plan/apply or end-to-end traffic test was performed during development.
+Generated VPN objects and DRG routing were validated in `eu-frankfurt-1` through Networking `v0.9.0` with OCI provider `7.27.0`, using a strongSwan/FRRouting Linux peer. Eight configuration profiles passed 219 live assertions covering bidirectional private traffic, static/BGP routing, IKEv1/IKEv2, custom cryptography, IKE identities, tunnel outages, recovery and peer-initiated rekeying.
+
+The tests used a minimal Hub E-style fixture with two reused VMs. They did not apply a complete landing zone or validate the pinned Resource Manager facade, FastConnect activation, live Vault-secret references or hardware CPE interoperability. These functional checks do not establish a failover SLA.
+
+An existing-VPN replacement test exposed a stale attachment binding in OCI provider `7.27.0`. When replacing a CPE recreates the VPN tunnels under the same configuration key, the affected `oci_core_drg_attachment_management` bindings require explicit replacement. An ordinary retry does not repair the stale bindings. This replacement transition remains a known limitation.
 
 &nbsp;
 
