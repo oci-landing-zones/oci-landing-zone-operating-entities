@@ -1,7 +1,7 @@
 # Cost governance tags
 
 One-OE uses one governance file, `oneoe_governance.json`, for the cost tag namespace,
-the six tag definitions, and six automatic Tag Defaults. The IAM, Hub A/B/C/E
+the six tag definitions, and six required Tag Defaults. The IAM, Hub A/B/C/E
 network, security, and observability files assign the six tags explicitly to
 resources that support them.
 
@@ -61,7 +61,7 @@ Tag namespaces and tag definitions
                     ↓
 Compartments with all six tags explicitly assigned
                     ↓
-         Automatic Tag Defaults
+         Mandatory Tag Defaults
                     ↓
           Propagation wait
                     ↓
@@ -73,7 +73,7 @@ Compartments must carry explicit tags because their Tag Defaults are created
 after them. The tag definitions and namespaces themselves are not assigned cost
 tags that do not exist yet; the governance file avoids that bootstrap dependency.
 
-## Automatic Tag Defaults
+## Mandatory Tag Defaults
 
 Each of the six definitions contains a block equivalent to:
 
@@ -82,34 +82,31 @@ Each of the six definitions contains a block equivalent to:
   "TAG-LZ-PLATFORM-KEY-REQUIRED": {
     "compartment_ids": ["CMP-LANDINGZONE-KEY"],
     "default_value": "tobedefined",
-    "is_user_required": false
+    "is_user_required": true
   }
 }
 ```
 
 The orchestrator resolves `CMP-LANDINGZONE-KEY` from the compartment it creates.
-Logical keys ending in `-REQUIRED` are retained to preserve existing Terraform
-addresses; the `is_user_required` flag controls whether a user-supplied value is required.
-With `is_user_required: false`, OCI applies `default_value: "tobedefined"`
-automatically when a newly created resource does not supply that tag. The project
-default is `notapply`; the other five defaults use `tobedefined`. Users do
-not have to enter the value themselves. Explicit resource values such as
-`network`, `security`, `observability`, `prod`, and `preprod` are preserved.
+The six defaults use `is_user_required: true`: resources created in the landing-zone
+hierarchy must supply values for all six tags. The `default_value` fields remain
+`tobedefined` (`notapply` for project), as required by the input schema; this mode
+does not automatically fill missing values. Explicit values such as `network`,
+`security`, `observability`, `prod`, and `preprod` are preserved.
 `tobedefined`, `network`, `security`, and `observability` are accepted platform values, along with the
 other values declared in the definition.
 
-The defaults are inherited within `cmp-landingzone` and its descendants. It
-does not apply to tenancy-root resources or sibling compartments. It is not
-retroactive and does not prevent later tag modifications by authorized users.
+The defaults are inherited within `cmp-landingzone` and its descendants. They
+do not apply to tenancy-root resources or sibling compartments. They are not
+retroactive and do not prevent later tag modifications by authorized users.
 
 ## Validation
 
 Before applying, check the complete plan for six explicit tags on every taggable
-resource and six automatic Tag Defaults targeting the new landing-zone compartment.
+resource and six required Tag Defaults targeting the new landing-zone compartment.
 After applying, inspect the effective tags and confirm that all six defaults have
-`is-required=false`, with `value=notapply` for project and `value=tobedefined`
-for the other five tags. Test that a new resource without
-explicit cost tags receives the defaults and that explicit values are preserved.
+`is-required=true`. Test that a new resource without all six explicit cost tags
+is rejected and that creation with valid values succeeds.
 Remove temporary test resources afterward.
 
 Existing deployments upgrading to the changed orchestrator ordering must review
@@ -143,7 +140,7 @@ training exercise files are not part of the maintained deployment set.
 
 Tags present in a JSON input do not prove that every resource created internally
 by its Terraform module receives them. Review the complete plan before using an
-extension with automatic Tag Defaults. In particular:
+extension with required Tag Defaults. In particular:
 
 - OCVS module `v1.1.0` accepts tag inputs but does not assign them to its SDDC or
   VLAN resources. Those resources require a downstream module correction; the
@@ -152,12 +149,9 @@ extension with automatic Tag Defaults. In particular:
   and boot volume created implicitly with an instance. Tagging the instance in
   DB Observability and other add-ons does not cover those implicit resources.
 
-Automatic compartment defaults can fill omitted labels with `tobedefined`
-(`notapply` for project), but
-they do not infer the intended workload platform or environment. These module
-limitations still require verification of effective tags and, where necessary,
-a downstream correction to pass the intended values. A tagged input alone is
-not proof that each implicit resource receives its intended classification.
+These module paths require corrections and complete plan verification before
+using required tags. Required defaults do not fill missing values, so a tagged
+input alone is not proof that every implicit resource will receive its labels.
 
 Existing deployments are not modified by editing these files. Review a migration
 plan that updates resource values and tag validators together; changing a Tag

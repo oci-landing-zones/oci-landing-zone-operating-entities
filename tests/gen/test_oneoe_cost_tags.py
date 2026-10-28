@@ -29,7 +29,7 @@ local p = publish(profiles.hub_e);
 """
         cls.outputs = json.loads(run_cmd([jsonnet_command(), "-e", code]).stdout)
 
-    def test_published_governance_has_automatic_defaults_for_new_compartments(self) -> None:
+    def test_published_governance_has_required_defaults_for_new_compartments(self) -> None:
         bootstrap = self.outputs["bootstrap"]["tags_configuration"]
         required = self.outputs["required"]["tags_configuration"]
         self.assertNotIn("default_defined_tags", required, "New tag definitions cannot use their own not-yet-created namespace")
@@ -41,7 +41,7 @@ local p = publish(profiles.hub_e);
             self.assertEqual(1, len(tag["tag_defaults"]))
             default = next(iter(tag["tag_defaults"].values()))
             self.assertEqual(["CMP-LANDINGZONE-KEY"], default["compartment_ids"])
-            self.assertIs(False, default["is_user_required"])
+            self.assertIs(True, default["is_user_required"])
             self.assertEqual("notapply" if key == "TAG-LZ-PROJECT-KEY" else "tobedefined", default["default_value"])
         self.assertIn("network", tags["TAG-LZ-PLATFORM-KEY"]["valid_values"])
         self.assertIn("security", tags["TAG-LZ-PLATFORM-KEY"]["valid_values"])

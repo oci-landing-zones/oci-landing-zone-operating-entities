@@ -207,7 +207,7 @@
                             "TAG-LZ-BUSINESS-UNIT-KEY-REQUIRED": {
                                 "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
                                 "default_value"                    : "tobedefined",
-                                "is_user_required"                 : false
+                                "is_user_required"                 : true
                             }
                         },
 
@@ -231,7 +231,7 @@
                             "TAG-LZ-COST-CENTER-KEY-REQUIRED": {
                                 "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
                                 "default_value"                    : "tobedefined",
-                                "is_user_required"                 : false
+                                "is_user_required"                 : true
                             }
                         }
                     },
@@ -246,7 +246,7 @@
                             "TAG-LZ-ENVIRONMENT-KEY-REQUIRED": {
                                 "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
                                 "default_value"                    : "tobedefined",
-                                "is_user_required"                 : false
+                                "is_user_required"                 : true
                             }
                         },
 
@@ -273,7 +273,7 @@
                             "TAG-LZ-OWNER-KEY-REQUIRED": {
                                 "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
                                 "default_value"                    : "tobedefined",
-                                "is_user_required"                 : false
+                                "is_user_required"                 : true
                             }
                         }
                     },
@@ -288,7 +288,7 @@
                             "TAG-LZ-PLATFORM-KEY-REQUIRED": {
                                 "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
                                 "default_value"                    : "tobedefined",
-                                "is_user_required"                 : false
+                                "is_user_required"                 : true
                             }
                         },
 
@@ -318,7 +318,7 @@
                             "TAG-LZ-PROJECT-KEY-REQUIRED": {
                                 "compartment_ids"                  : ["CMP-LANDINGZONE-KEY"],
                                 "default_value"                    : "notapply",
-                                "is_user_required"                 : false
+                                "is_user_required"                 : true
                             }
                         },
 
