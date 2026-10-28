@@ -16,7 +16,6 @@
 [9. Deployment](#9-deployment)<br>
 [10. Validation and Troubleshooting](#10-validation-and-troubleshooting)<br>
 [11. External Work and Responsibilities](#11-external-work-and-responsibilities)<br>
-[12. Compatibility and Current Limits](#12-compatibility-and-current-limits)<br>
 
 &nbsp;
 
@@ -24,26 +23,11 @@
 
 Use this add-on to connect your on-premises network to OCI with Site-to-Site VPN, FastConnect, or both. You configure the connection in [Landing Zone Studio](../oci-landingzone-studio/README.md) or the [Blueprint Factory](../oci-lz-blueprint-factory/README.md). Terraform creates the OCI resources and the landing zone routes.
 
-Your network team still configures the customer router, approves traffic through security controls, and completes any carrier work. Creating routes alone does not make a connection operational.
+Network team owns configuration of the on-prem router, approves traffic through security controls, and completes any carrier work. Creating routes alone does not make a connection operational.
 
 &nbsp;
 
 ## 2. Connection Options
-
-### Connection Terms
-
-| Term | What it means for your setup |
-|---|---|
-| Customer premises equipment (CPE) | Your VPN router or firewall. The **CPE object** created in OCI records its reachable IP address and optional device model; it does not install settings on the physical device. |
-| IPSec connection | The OCI VPN resource connecting that equipment to the landing zone. It contains two tunnels. Configure both so that a single tunnel outage does not remove your only path. |
-| Tunnel | An encrypted path between your equipment and one Oracle VPN endpoint. Each tunnel has its own endpoint, key and settings. |
-| Dynamic Routing Gateway (DRG) | The OCI router connecting external networks to the landing zone. This add-on uses the landing zone's existing DRG and assigns routing tables to the connections it manages. |
-| CIDR / remote network | An address range, such as `172.20.0.0/16`. Here, **remote** means the networks on your side that OCI must reach. |
-| Route / route table | Instructions telling a router where to send traffic for an address range. Routes must exist for the return journey too. Firewall rules separately decide which traffic is permitted. |
-| BGP / ASN | BGP lets routers exchange reachable networks. An autonomous system number (ASN) identifies the network in that exchange. Your network team supplies the customer ASN. |
-| FastConnect virtual circuit | A logical connection over an activated provider or physical service. This add-on supports private circuits connected to the landing zone DRG. |
-| Cross-connect / group | A physical connection at a FastConnect location, or a group of those connections. The circuit refers to an already provisioned connection by its OCID. |
-| OCID | OCI's resource identifier. Copy the identifier for the requested resource, rather than its display name or the name used in your source configuration. |
 
 ### IP Addresses and Network Ranges
 
@@ -52,16 +36,16 @@ Several fields contain IP addresses, but they serve different purposes:
 | Address | Where it belongs | Illustrative value |
 |---|---|---|
 | Customer VPN public IP | The CPE object; Oracle must be able to reach this endpoint. Behind NAT, use the translated public address. | `203.0.113.10` |
-| Oracle VPN public IP | Your router's remote VPN endpoint. Obtain each tunnel's actual value from OCI after creation. | Supplied by OCI; do not invent it. |
+| Oracle VPN public IP | Your router's remote VPN endpoint. Obtain each tunnel's actual value from OCI after creation. | Supplied by OCI |
 | VPN inside-tunnel IP pair | The customer and Oracle interfaces inside one tunnel; required here for BGP. These are separate from the public endpoints. | Customer `169.254.20.1/30`, Oracle `169.254.20.2/30` |
 | Private FastConnect BGP IP pair | The two ends of the circuit's BGP session. | Customer `192.168.254.1/30`, Oracle `192.168.254.2/30` |
 | Remote network CIDR | The destination networks behind the customer router. | `172.20.0.0/16` |
 
-The examples are working shapes for configuration, not an address allocation for your network. Confirm every range with your network team before using it. See [OCI's VPN components](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/overviewIPsec.htm) for the service terminology.
+The examples are working shapes for configuration, not an address allocation for your network. Confirm ranges with your network team before using it. See [OCI's VPN components](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/overviewIPsec.htm) for the service terminology.
 
 ### Choose the Connection You Need
 
-| Your situation | Choose | What you need from your network team |
+|  Use case| Choose | Inputs needed     |
 |---|---|---|
 | You need encrypted connectivity over the internet, with a stable list of remote networks and no BGP setup | [Static VPN](#case-1-vpn-with-static-routes) | Reachable public equipment IP, remote CIDRs, both tunnel configurations and keys. Route changes need coordinated configuration updates. |
 | Your router supports BGP and your team wants routers to exchange routes | [BGP VPN](#case-2-vpn-with-bgp) | The VPN inputs above, customer ASN and a separate inside IP pair for each tunnel. |
@@ -70,11 +54,9 @@ The examples are working shapes for configuration, not an address allocation for
 | You have ready physical cross-connects, or need to arrange them | [Direct / physical FastConnect](#case-5-private-fastconnect-over-physical-connections) | Provisioned physical OCIDs, VLAN and BGP settings; new ports also require cabling and activation. |
 | Private FastConnect needs an alternative internet path | [FastConnect with VPN backup](#case-6-fastconnect-with-vpn-backup) | Both working services, identical reviewed remote prefixes and a tested routing preference policy. |
 
-Only private FastConnect circuits are supported. Existing public-circuit source configurations are rejected and are never converted to private circuits automatically.
+This version supports IPv4, static or BGP VPN routing, both VPN tunnels, private circuits, and physical cross-connect preparation.
 
-This version supports IPv4, static or BGP VPN routing, both VPN tunnels, private circuits, and physical cross-connect preparation. It uses the released Orchestrator **v2.2.0**, Networking **v0.9.0** and Security **v0.2.3** modules without requiring changes to those repositories.
-
-Every case follows the same handover: agree the values, enter them in Studio or private Blueprint Factory source, generate and review a Terraform update, configure the customer/provider side, then test the complete path. **A successful Terraform apply means OCI resources were configured; it does not mean that the external peer is ready.**
+Every case follows the same handover: agree the values, enter them in Studio or private Blueprint Factory source, generate and review a Terraform update, configure the on-prem/OCI side, then test the complete path. **A successful Terraform apply means OCI resources were configured, it does not mean that the external peer is ready.**
 
 &nbsp;
 
@@ -95,6 +77,8 @@ Use [OCI's VPN setup guide](https://docs.oracle.com/en-us/iaas/Content/Network/T
 ## 4. Configuration
 
 ### Configure in Landing Zone Studio
+
+[![Open Landing Zone Studio](https://img.shields.io/badge/Open%20Landing%20Zone%20Studio-C74634?style=for-the-badge)](https://oci-landing-zones.github.io/oci-landing-zone-operating-entities/)
 
 1. Open your design and select **Hub Network**.
 2. Expand **VPN** to configure equipment and VPN connections, or **FastConnect** to configure circuits and optional physical preparation. The sections open independently.
@@ -132,27 +116,18 @@ Choose the closest complete example:
 | [Physical preparation](examples/05-physical-preparation.json) | Groups and ports, with final circuits omitted. |
 
 Each example includes an illustrative landing zone baseline. For an existing landing zone, merge the relevant `hybrid_connectivity` settings into its current private source configuration; preserve its region, hub, networks and workloads. Do not replace an existing design with an example or apply it as a second copy of the landing zone.
-
-Keep the private source configuration and generated output in separate customer-controlled directories. From this repository, generate with your chosen paths:
-
-```sh
-bash gen/generate.sh --config /private/customer/lz/config.json /private/customer/lz/generated
-```
-
-Connectivity is included in `network.json` and the Hub C backend variant when applicable. Deploy only files from the same generation run. Do not combine them with published blueprint snapshots.
-
 &nbsp;
 
 ## 5. VPN Configuration
 
 ### Case 1: VPN with static routes
 
-Use this case when your team will maintain the network routes explicitly. Start from [the static VPN example](examples/01-vpn-static.json).
+Use this case when your team will maintain the network routes explicitly.
 
 1. **Gather:** obtain the reachable CPE public IP, the remote CIDRs, the OCI networks that the router must reach, the router's IKE version and the chosen source for each tunnel's key. Confirm whether the router's IKE identity differs from its public IP; if it does, follow [case 3](#case-3-vpn-behind-nat-or-with-a-different-ike-identity).
 2. **Enter in Studio:** under **VPN → Customer VPN equipment**, add a CPE and enter **Public IPv4 address**. Device shape is useful for matching an OCI router template but is not required. Under **Site-to-Site VPN**, add a VPN, select that **Customer equipment**, and enter **Remote IPv4 CIDRs**. Alternatively, select **Existing CPE OCID** and supply a CPE object already in OCI.
 3. **Configure both tunnels:** expand **Tunnel 1** and **Tunnel 2**. Set **Routing** to **Static**, match **IKE version** to the router and choose each **Key source**. For static routing, inside IP pairs are optional in factory input. Leave advanced proposals unchanged unless agreed with the router administrator.
-4. **Generate and apply:** review/export Studio's files, or add the equivalent `ipsecs` settings to private source and run the [Blueprint Factory command above](#configure-with-blueprint-factory). Follow [the deployment procedure](#9-deployment), using the existing landing zone's state for an update.
+4. **Generate and apply:** review/export Studio's files, or add the equivalent `ipsecs` settings to private source. Follow [the deployment procedure](#9-deployment), using the existing landing zone's state for an update.
 5. **Configure the peer and test:** obtain both Oracle public tunnel endpoints and the correct key for each tunnel from OCI through your approved process. Your network team configures both router tunnels and return routes to the OCI networks. Then follow [validation](#10-validation-and-troubleshooting). If a tunnel is down, first check endpoint reachability, keys, IKE identity and proposals; if it is up but traffic fails, check routes and permissions.
 
 **Manual post-deployment configuration required:** the add-on does not configure your router. A newly created tunnel can remain **Down** until the peer is configured and compatible IKE/IPSec negotiation succeeds. Terraform does not need a working router to create the OCI connection. Use the [CPE Configuration Helper](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/CPEconfigurationhelper.htm) or an equipment-specific Oracle guide to prepare the router handover.
@@ -251,13 +226,11 @@ For private FastConnect with VPN backup, configure identical reviewed remote pre
 
 ## 8. Keys and the Landing Zone Vault
 
-For a new VPN tunnel, omitting `shared_secret` lets OCI generate a key. Alternatively, put a literal key in that field or reference an existing secret OCID beginning `ocid1.vaultsecret.`. Removing a configured value does not promise to reset or regenerate an existing tunnel's key.
+For a new VPN tunnel, omitting `shared_secret` lets OCI generate a key. Alternatively, put a literal key in that field or reference an existing secret OCID beginning `ocid1.vaultsecret.`. Removing a configured value does not reset or regenerate an existing tunnel's key.
 
 Entered keys belong directly in the corresponding field of the private JSON configuration. This workflow does not require a separate secrets file. A Vault reference is a secret's OCID in that same field; it is not an instruction to create a new secret automatically.
 
 Literal VPN keys use letters, numbers and spaces. FastConnect BGP MD5 authentication uses the separate `bgp_md5auth_key` field and accepts a literal value; it does not resolve secret OCIDs.
-
-For CIS2, you can use the Vault created by the landing zone. You do not need another Vault for this purpose, but the add-on does not create the secret or copy inline keys into it. The secret must exist and the deployment principal must be allowed to read its contents before Terraform applies the VPN reference.
 
 If you want to use a secret in a newly created landing zone Vault:
 
@@ -271,52 +244,12 @@ See [OCI Secret Management](https://docs.oracle.com/en-us/iaas/Content/secret-ma
 
 ## 9. Deployment
 
-This version uses **Terraform CLI with the root of Orchestrator v2.2.0**. Its pinned Resource Manager facade constrains the OCI provider to `~> 5.0`, while Networking v0.9.0 requires at least `7.27.0`. The normal pinned facade cannot initialize with both constraints. If your organization permits only that Resource Manager flow, resolve the compatibility requirement before deploying this add-on.
+Deploy the complete configuration file set for your landing zone using the existing steps:
 
-Use a customer-controlled checkout of the orchestrator tag, approved OCI authentication and protected Terraform state. Keep the existing two deployment phases and use the same state for both. The paths below are examples; replace them with your private generated directory.
+1. [Oracle Resource Manager (ORM) deployment steps](../../commons/content/orm.md).
+2. [Terraform CLI deployment steps](../../commons/content/terraform.md).
 
-### Update an Existing Landing Zone
-
-1. Locate the private source configuration, current generated files and the Terraform state that already owns the landing zone. Use your approved state backup and access process.
-2. Confirm that the documented orchestrator-root CLI path can use that existing state safely. If the landing zone is managed through Resource Manager and you cannot access or transition its state through an approved process, resolve that ownership/deployment issue first. Do not create another state or stack to manage the same resources.
-3. Add the selected connection to the current JSON source, keeping existing hub, environment, workload and other managed resources. Regenerate into a separate private output directory and compare the new files with the current set.
-4. Plan against the existing state using its complete current file set, including any workload files. Review the new connections, attachment-table assignments and routes. Investigate unexpected deletions or replacements before applying.
-5. Apply the reviewed update, complete the external peer/provider work, and run the validation below. Use the phase-specific files that your generated set and existing deployment require; never load pre/final variants together.
-
-The following commands describe the generated-file handoff for both a new deployment and a reviewed update. They do not create a separate connectivity stack.
-
-### Apply the Generated File Set
-
-Before planning, set the orchestrator root variables `tenancy_ocid` and `region` to your tenancy and the region used in the generated design. For API-key authentication, also supply `user_ocid`, `fingerprint` and `private_key_path` through your approved local process; `private_key_password` is optional. Terraform accepts these through `TF_VAR_<variable_name>` environment variables. Generated JSON files do not contain these deployment credentials. See the pinned [root variable definitions](https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/blob/v2.2.0/variables.tf).
-
-From the orchestrator root, initialize and plan phase 1:
-
-```sh
-terraform init
-terraform plan \
-  -var-file=/private/customer/lz/generated/iam.json \
-  -var-file=/private/customer/lz/generated/governance.json \
-  -var-file=/private/customer/lz/generated/network.json \
-  -var-file=/private/customer/lz/generated/security_cis2_pre.json \
-  -var-file=/private/customer/lz/generated/observability_cis2_pre.json
-```
-
-Review the plan, then apply with the same phase-1 arguments through your approved process. Complete any prerequisites needed between phases, such as secret creation or physical activation.
-
-For phase 2, regenerate if those prerequisites changed the connection configuration, retain IAM/governance/network files and replace the temporary control files with their final variants:
-
-```sh
-terraform plan \
-  -var-file=/private/customer/lz/generated/iam.json \
-  -var-file=/private/customer/lz/generated/governance.json \
-  -var-file=/private/customer/lz/generated/network.json \
-  -var-file=/private/customer/lz/generated/security_cis2.json \
-  -var-file=/private/customer/lz/generated/observability_cis2.json
-```
-
-Add generated workload files when your design includes them. For CIS1, use the corresponding `cis1` filenames. If your design produces no `_pre` files, as with Hub E, omit those phase-1 arguments and add the final controls in phase 2. Use only files present in your generated set. Never pass both the `_pre` and final file for the same configuration family, and do not pass `config.json` to Terraform.
-
-For Hub C, follow the [firewall backend procedure](../oci-hub-models/hub_c/readme.md#backend-targets) and supply exactly one network variant. Existing landing zones use their current orchestrator state and a reviewed update plan, rather than creating a second stack for the same resources.
+For updates, use the existing landing zone's Terraform state and review the plan before applying.
 
 &nbsp;
 
@@ -340,8 +273,6 @@ After applying, check the connection with your network team:
 | Physical link is ready but a direct circuit is down | Cross-connect activation/provisioning, VLAN and the external BGP configuration. |
 | Connection is up but traffic fails | Routes in both directions, effective DRG table assignments and traffic permissions. |
 | Failover does not behave as expected | Advertisements, route preference and the health of every alternate path. |
-| Terraform cannot read a referenced secret | Secret existence, region and deployment principal permissions. |
-| Provider initialization reports incompatible constraints | Confirm you are using the orchestrator root and the documented provider-compatible CLI path. |
 
 &nbsp;
 
@@ -357,28 +288,6 @@ After applying, check the connection with your network team:
 | Configure route preference and run redundancy tests | Customer network team with the provider where applicable | Both services can exist without the required failover behavior. |
 
 The customer owns lifecycle, drift management and compliance review for the manual resources and configuration above.
-
-&nbsp;
-
-## 12. Compatibility and Current Limits
-
-The supported path above works with today's released modules. These additional outcomes need framework changes and a compatible release before customers can rely on them:
-
-| Desired outcome | Required framework change | Current alternative |
-|---|---|---|
-| Standard pinned Resource Manager deployment | Align facade and networking provider requirements, then validate the resulting release. | Use the documented orchestrator-root CLI path. |
-| Automatically store supplied keys as managed secrets | Add secret creation and ordering/permission support. | Use inline keys or create secrets in the LZ Vault before referencing them. |
-| Resolve Vault references for FastConnect MD5 keys | Add secret resolution for that field. | Supply the agreed literal BGP key. |
-| Refer to newly prepared physical connections by configuration name | Resolve those references in the networking module and respect activation readiness. | Prepare/activate ports first, then supply their real OCIDs. |
-| Change DRG-wide defaults for future unmanaged attachments | Add explicit supported service-default management. | The add-on assigns custom tables only to its managed attachments. |
-
-This version does not support policy-based VPN, IPv6 routing, MACsec, IPsec over FastConnect, carrier ordering or customer-router automation. Do not add unrecognized configuration keys to try to enable them.
-
-Generated VPN objects and DRG routing were validated in `eu-frankfurt-1` through Networking `v0.9.0` with OCI provider `7.27.0`, using a strongSwan/FRRouting Linux peer. Eight configuration profiles passed 219 live assertions covering bidirectional private traffic, static/BGP routing, IKEv1/IKEv2, custom cryptography, IKE identities, tunnel outages, recovery and peer-initiated rekeying.
-
-The tests used a minimal Hub E-style fixture with two reused VMs. They did not apply a complete landing zone or validate the pinned Resource Manager facade, FastConnect activation, live Vault-secret references or hardware CPE interoperability. These functional checks do not establish a failover SLA.
-
-An existing-VPN replacement test exposed a stale attachment binding in OCI provider `7.27.0`. When replacing a CPE recreates the VPN tunnels under the same configuration key, the affected `oci_core_drg_attachment_management` bindings require explicit replacement. An ordinary retry does not repair the stale bindings. This replacement transition remains a known limitation.
 
 &nbsp;
 
