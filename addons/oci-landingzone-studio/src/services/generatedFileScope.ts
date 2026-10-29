@@ -7,7 +7,7 @@ const regionalConfigurations = new Set([
   'network_configuration', 'scanning_configuration', 'vaults_configuration',
   'alarms_configuration', 'events_configuration', 'home_region_events_configuration',
   'notifications_configuration', 'service_connectors_configuration', 'logging_configuration',
-  'oke_clusters_configuration', 'oke_workers_configuration',
+  'oke_configuration', 'oke_clusters_configuration', 'oke_workers_configuration',
 ]);
 
 function hasIamGrants(value: unknown): boolean {

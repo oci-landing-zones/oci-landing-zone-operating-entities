@@ -1,3 +1,4 @@
+local peering = import './oke_peering.libsonnet';
 // OKE network resource assembly helpers.
 
 local rules = import './oke_network_rule_factories.libsonnet';
@@ -164,10 +165,19 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
         network_entity_key: ctx.sgw_key,
       },
     };
+    local internal_route_rules = route_rules + drg_route_rules;
+    local private_route_rules = {
+      [key]: internal_route_rules[key]
+      for key in std.objectFields(internal_route_rules)
+      if internal_route_rules[key].destination != '0.0.0.0/0'
+    };
     {
       [desc.key]: {
         display_name: n.display('rt', ctx.display_segments + [desc.suffix]),
-        route_rules: if desc.key == ctx.rt_fss_key then fss_route_rules else route_rules,
+        route_rules: if desc.key == ctx.rt_fss_key then fss_route_rules
+          else if (desc.key == ctx.rt_workers_key && !ctx.worker_internet_access) ||
+                  (desc.key == ctx.rt_pods_key && !ctx.pod_internet_access) then private_route_rules
+          else route_rules,
       }
       for desc in [
         { key: ctx.rt_cp_key, suffix: 'cp' },
@@ -269,7 +279,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
 
   network_security_groups(ctx)::
     local n = ctx.n;
-    ({
+    (peering.resources(ctx) + {
       [ctx.nsg_cp_key]: {
         display_name: n.display('nsg', ctx.display_segments + ['cp']),
 
@@ -356,7 +366,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
         display_name: n.display('nsg', ctx.display_segments + ['pods']),
 
         egress_rules: {
-          anywhere: {
+          [if ctx.pod_internet_access then 'anywhere']: {
             description: 'Allow ALL egress from pods to internet',
             protocol: 'ALL',
             dst: '0.0.0.0/0',
@@ -399,7 +409,7 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
         display_name: n.display('nsg', ctx.display_segments + ['workers']),
 
         egress_rules: {
-          anywhere: {
+          [if ctx.worker_internet_access then 'anywhere']: {
             description: 'Allow ALL egress from workers to internet',
             protocol: 'ALL',
             dst: '0.0.0.0/0',

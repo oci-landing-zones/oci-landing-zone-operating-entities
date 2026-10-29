@@ -166,3 +166,33 @@ describe('Studio config import', () => {
     expect(() => importConfig({ ...config, hub: { ...config.hub, network: { ...config.hub.network, subnets: [] } } })).toThrow(/subnets/);
   });
 });
+
+it('round-trips a cluster-only OKE design', async () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams!.createNodePools = false;
+  model.platforms = [platform];
+  const restored = await roundTrip(model);
+  expect(restored.model.platforms[0].okeParams?.createNodePools).toBe(false);
+});
+
+it('round-trips separate disabled worker and pod internet settings', async () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, workerInternetAccess: false, podInternetAccess: false };
+  model.platforms = [platform];
+  const restored = await roundTrip(model);
+  expect(restored.model.platforms[0].okeParams?.workerInternetAccess).toBe(false);
+  expect(restored.model.platforms[0].okeParams?.podInternetAccess).toBe(false);
+});
+
+it('round-trips independent worker and pod spoke connectivity selections', async () => {
+  const model = emptyLzModel();
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, workerSpokeAccess: true, podSpokeAccess: true, peerVcnCidrs: ['10.50.0.0/16'] };
+  model.platforms = [platform];
+  const restored = await roundTrip(model);
+  expect(restored.model.platforms[0].okeParams?.workerSpokeAccess).toBe(true);
+  expect(restored.model.platforms[0].okeParams?.podSpokeAccess).toBe(true);
+  expect(restored.model.platforms[0].okeParams?.peerVcnCidrs).toEqual(['10.50.0.0/16']);
+});

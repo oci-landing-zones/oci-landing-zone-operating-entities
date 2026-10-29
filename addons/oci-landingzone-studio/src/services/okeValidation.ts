@@ -1,6 +1,7 @@
 import type { LzModel, PlatformConfig } from '../model/types';
-import { overlaps, parseCidr, validateSubnetCidr } from './cidr';
-import { platformInEnv, platformVcnForEnv } from './platforms';
+import { OKE_VERSION_SUGGESTIONS } from './okeVersions';
+import { normalizeCidr, overlaps, parseCidr, validateSubnetCidr } from './cidr';
+import { okeProfileCidrError, platformInEnv, platformVcnForEnv } from './platforms';
 
 const SIZE_PREFIX = { small: 20, medium: 18, large: 16 } as const;
 
@@ -11,6 +12,10 @@ export function okePlatformIssues(platform: PlatformConfig): { field: string; me
   if (!p) return [{ field: 'settings', message: 'OKE settings are required.' }];
   const errors: { field: string; message: string }[] = [];
   const add = (field: string, message: string) => errors.push({ field, message });
+  if (!OKE_VERSION_SUGGESTIONS.some((version) => version === p.kubernetesVersion)) add('kubernetesVersion', 'Select a Kubernetes version from the list.');
+  for (const cidr of p.peerVcnCidrs ?? []) {
+    if (!parseCidr(cidr) || normalizeCidr(cidr) !== cidr || cidr === '0.0.0.0/0') add('peerVcnCidrs', 'Peer CIDRs must be IPv4 network addresses; 0.0.0.0/0 is not allowed.');
+  }
   if (!parseCidr(p.servicesCidr)) add('servicesCidr', 'OKE service CIDR must be a valid IPv4 CIDR.');
   if (!p.apiAllowedCidrs.length || p.apiAllowedCidrs.some((cidr) => !parseCidr(cidr))) add('apiAllowedCidrs', 'OKE API allowed CIDRs must contain one or more valid IPv4 CIDRs.');
   const prefix = parseCidr(platform.vcnCidr)?.prefix;
@@ -29,11 +34,11 @@ export function okePlatformIssues(platform: PlatformConfig): { field: string; me
     });
   }
   if (p.cniType === 'overlay' && !p.podsCidr) add('podsCidr', 'Overlay OKE networking requires a pod CIDR.');
-  if (p.podsCidr && !parseCidr(p.podsCidr)) add('podsCidr', 'OKE pod CIDR must be a valid IPv4 CIDR.');
-  if (p.podsCidr && overlaps(p.podsCidr, p.servicesCidr)) add('podsCidr', 'OKE pod CIDR must not overlap the service CIDR.');
+  if (p.cniType === 'overlay' && p.podsCidr && !parseCidr(p.podsCidr)) add('podsCidr', 'OKE pod CIDR must be a valid IPv4 CIDR.');
+  if (p.cniType === 'overlay' && p.podsCidr && overlaps(p.podsCidr, p.servicesCidr)) add('podsCidr', 'OKE pod CIDR must not overlap the service CIDR.');
   if (overlaps(p.servicesCidr, platform.vcnCidr)) add('servicesCidr', 'OKE service CIDR must not overlap the platform VCN.');
-  if (p.podsCidr && overlaps(p.podsCidr, platform.vcnCidr)) add('podsCidr', 'OKE pod CIDR must not overlap the platform VCN.');
-  if (!Number.isInteger(p.workerBootVolumeSize) || p.workerBootVolumeSize < 50 || p.workerBootVolumeSize > 32768) {
+  if (p.cniType === 'overlay' && p.podsCidr && overlaps(p.podsCidr, platform.vcnCidr)) add('podsCidr', 'OKE pod CIDR must not overlap the platform VCN.');
+  if (p.createNodePools !== false && (!Number.isInteger(p.workerBootVolumeSize) || p.workerBootVolumeSize < 50 || p.workerBootVolumeSize > 32768)) {
     add('workerBootVolumeSize', 'OKE worker boot volume must be an integer from 50 to 32768 GB.');
   }
   return errors;
@@ -57,15 +62,24 @@ export function okeModelIssues(model: LzModel): { platformId: string; field: str
     if (platform.type !== 'oke_simple' || !platform.okeParams) continue;
     const p = platform.okeParams;
     const add = (field: string, message: string) => errors.push({ platformId: platform.id, field, message });
+    model.environments.forEach((env, index) => {
+      if (platformInEnv(platform, env.id) && (p.peerVcnCidrs ?? []).some((cidr) => overlaps(cidr, platformVcnForEnv(platform, env.id, index)))) {
+        add('peerVcnCidrs', `Peer CIDRs must not overlap the OKE VCN for ${env.name}.`);
+      }
+    });
     if (p.clusterSize) {
       const expectedPrefix = SIZE_PREFIX[p.clusterSize];
       model.environments.forEach((env, index) => {
         if (!platformInEnv(platform, env.id)) return;
         const instance = platformVcnForEnv(platform, env.id, index);
         if (parseCidr(instance)?.prefix !== expectedPrefix) add('clusterSize', `OKE ${p.clusterSize} profile requires every environment VCN to use /${expectedPrefix}.`);
+        else {
+          const error = okeProfileCidrError(instance, p.clusterSize!);
+          if (error) add('clusterSize', error);
+        }
       });
     }
-    for (const [label, cidr] of [['service', p.servicesCidr], ['pod', p.podsCidr]] as const) {
+    for (const [label, cidr] of [['service', p.servicesCidr], ['pod', p.cniType === 'overlay' ? p.podsCidr : undefined]] as const) {
       if (!cidr || !parseCidr(cidr)) continue;
       // Its own platform VCN is already diagnosed above; this detects every
       // other configured OCI routed VCN, including per-environment instances.

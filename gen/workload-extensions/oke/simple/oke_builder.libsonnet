@@ -12,6 +12,7 @@
 //   params.topology      — platform scope semantics from topology.libsonnet
 //   params.routing       — explicit DRG route targets (null when not hub-backed)
 
+local oke_configuration = import './oke_configuration.libsonnet';
 local oke_workers = import './oke_workers.libsonnet';
 local oke_clusters = import './oke_clusters.libsonnet';
 local oke_network = import './oke_network.libsonnet';
@@ -148,8 +149,9 @@ local oke_context = import './oke_context.libsonnet';
       metadata: metadata,
 
       contributions: {
-        oke_workers: oke_workers(ctx),
-        oke_clusters: oke_clusters(ctx),
+        [if ctx.module_version == '0.2.9' && ctx.create_node_pools then 'oke_workers']: oke_workers(ctx),
+        [if ctx.module_version == '0.2.9' then 'oke_clusters']: oke_clusters(ctx),
+        [if ctx.module_version == '0.3.0' then 'oke']: oke_configuration(ctx),
         network: oke_network(ctx),
         iam: oke_iam(ctx),
         security_cis2: if ctx.cis_level == 2 then oke_security(ctx) else {},

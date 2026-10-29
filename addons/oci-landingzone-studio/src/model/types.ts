@@ -82,6 +82,13 @@ export type PlatformType = 'oke_simple' | 'custom';
 
 /** OKE settings — the extension params for an oke_simple platform. */
 export interface OkePlatformParams {
+  /** Defaults to true for previously saved designs. */
+  createNodePools?: boolean;
+  workerInternetAccess?: boolean;
+  podInternetAccess?: boolean;
+  workerSpokeAccess?: boolean;
+  podSpokeAccess?: boolean;
+  peerVcnCidrs?: string[];
   kubernetesVersion: string;   // e.g. v1.35.2
   servicesCidr: string;        // e.g. 10.96.0.0/16
   apiAllowedCidrs: string[];   // e.g. ['10.0.1.0/24']

@@ -102,6 +102,7 @@ describe('generated route preview parity', () => {
         routing: { hub: {route_key: 'hub', description: 'Hub', destination: '10.0.0.0/21'},
           peers: {peer: {description: 'Peer', destination: '10.1.0.0/21'}} },
         has_hub: true, use_local_natgw: false,
+        worker_internet_access: true, pod_internet_access: true,
         drg_key: 'DRG', ngw_key: 'NAT', sgw_key: 'SGW',
         rt_cp_key: 'cp', rt_lb_key: 'lb', rt_workers_key: 'workers', rt_pods_key: 'pods', rt_fss_key: 'fss',
         display_segments: ['prod', 'oke'], is_overlay_network: false, create_fss: true,

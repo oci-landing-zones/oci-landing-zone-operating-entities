@@ -40,7 +40,7 @@ describe('Resource Manager deployment link', () => {
     const url = new URL(link![1].replace(/&amp;/g, '&'));
 
     expect(`${url.origin}${url.pathname}`).toBe('https://cloud.oracle.com/resourcemanager/stacks/create');
-    expect(url.searchParams.get('zipUrl')).toBe('https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/tags/v2.2.0.zip');
+    expect(url.searchParams.get('zipUrl')).toBe('https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator/archive/refs/heads/release-2.4.0.zip');
     expect(JSON.parse(url.searchParams.get('zipUrlVariables')!)).toEqual({ configuration_source: 'ocibucket' });
     expect(markup).not.toContain('Hub routing');
     expect(markup).not.toContain('The Orchestrator resolves OCI Network Firewall route targets');

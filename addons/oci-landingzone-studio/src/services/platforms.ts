@@ -15,6 +15,7 @@
 
 import type { PlatformConfig, PlatformType, OkePlatformParams, SharedPlatformConfig, Subnet } from '../model/types';
 import { BASE_RANGES, baseRangeOf, firstFreeBlock, formatIp, normalizeCidr, overlaps, parseCidr, shiftCidr, totalIps } from './cidr';
+import { DEFAULT_OKE_VERSION } from './okeVersions';
 import { environmentPlatformCidr, OPTIONAL_SHARED_CIDR } from './oneOeCidrs';
 
 export interface PlatformTypeMeta {
@@ -74,7 +75,22 @@ export function okeDefaultSubnets(baseVcn: string): Subnet[] {
   ];
 }
 
-const OKE_PROFILE_PREFIX = { small: 20, medium: 18, large: 16 } as const;
+export const OKE_PROFILE_PREFIX = { small: 20, medium: 18, large: 16 } as const;
+
+export function okeProfileCidrError(cidr: string, size: NonNullable<OkePlatformParams['clusterSize']>): string | null {
+  const parsed = parseCidr(cidr);
+  if (!parsed || parsed.prefix !== OKE_PROFILE_PREFIX[size]) return `The ${size} profile requires an IPv4 /${OKE_PROFILE_PREFIX[size]} VCN.`;
+  if (normalizeCidr(cidr) !== cidr) return `Use the network address ${normalizeCidr(cidr)}.`;
+  return null;
+}
+
+/** Edit one profile VCN without shifting any other environment's allocation. */
+export function setOkeEnvironmentCidr(platform: PlatformConfig, environments: { id: string; name: string }[], id: string, cidr: string): Partial<PlatformConfig> {
+  const instances = platformEnvInstances(platform, environments);
+  const overrides = { ...platform.overrides };
+  for (const instance of instances) overrides[instance.id] = { vcnCidr: instance.id === id ? cidr : instance.vcnCidr };
+  return { overrides, ...(instances[0]?.id === id ? { vcnCidr: cidr } : {}) };
+}
 const OKE_PROFILE_SUBNETS = {
   small: { 'control-plane': 29, 'int-lb': 26, workers: 23, pods: 21, fss: 26 },
   medium: { 'control-plane': 29, 'int-lb': 25, workers: 22, pods: 19, fss: 25 },
@@ -114,7 +130,8 @@ export function okeProfileSubnets(
 /** Default OKE settings. */
 export function okeDefaultParams(): OkePlatformParams {
   return {
-    kubernetesVersion: 'v1.35.2',
+    createNodePools: false,
+    kubernetesVersion: DEFAULT_OKE_VERSION,
     servicesCidr: '10.96.0.0/16',
     apiAllowedCidrs: ['10.0.1.0/24'],
     // Generator contract: this is an image-name selector for the OL9 family,

@@ -83,9 +83,9 @@ const RESOURCE_MANAGER_CREATE_STACK_GUIDE_URL = 'https://docs.oracle.com/en-us/i
 const RESOURCE_MANAGER_PLAN_GUIDE_URL = 'https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-plan.htm';
 const RESOURCE_MANAGER_APPLY_GUIDE_URL = 'https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-apply.htm';
 const LANDING_ZONE_ORCHESTRATOR_URL = 'https://github.com/oci-landing-zones/terraform-oci-modules-orchestrator';
-const LANDING_ZONE_ORCHESTRATOR_RELEASE_URL = `${LANDING_ZONE_ORCHESTRATOR_URL}/releases/tag/v2.2.0`;
+const LANDING_ZONE_ORCHESTRATOR_RELEASE_URL = `${LANDING_ZONE_ORCHESTRATOR_URL}/tree/release-2.4.0`;
 const DEPLOY_TO_OCI_URL = `${RESOURCE_MANAGER_STACKS_URL}/create?${new URLSearchParams({
-  zipUrl: `${LANDING_ZONE_ORCHESTRATOR_URL}/archive/refs/tags/v2.2.0.zip`,
+  zipUrl: `${LANDING_ZONE_ORCHESTRATOR_URL}/archive/refs/heads/release-2.4.0.zip`,
   zipUrlVariables: JSON.stringify({ configuration_source: 'ocibucket' }),
 })}`;
 
@@ -273,7 +273,7 @@ export default function ReviewStep({ designName, getDiagram, diagramReady = true
         <div style={s.body}>
           <h2 style={s.title}>Deploy with OCI Resource Manager</h2>
           <div style={local.note}>
-            Resource Manager runs the <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_RELEASE_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator v2.2.0 ↗</a>. The files from Studio are a separate configuration source for that stack. Use one stack for both phases; phase 2 updates its security, observability, and workload files.
+            Resource Manager runs the <a className="guide-link" href={LANDING_ZONE_ORCHESTRATOR_RELEASE_URL} target="_blank" rel="noreferrer">Landing Zone Orchestrator release-2.4.0 (release testing) ↗</a>. The files from Studio are a separate configuration source for that stack. Use one stack for both phases; phase 2 updates its security, observability, and workload files.
           </div>
           <div style={local.guide}>
             <div style={local.guideTitle}>Create and run the stack</div>

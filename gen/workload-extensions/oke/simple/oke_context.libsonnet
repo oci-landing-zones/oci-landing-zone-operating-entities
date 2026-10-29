@@ -39,6 +39,11 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     if routing != null && std.objectHas(routing, 'internet_default_target')
     then routing.internet_default_target
     else 'local_natgw';
+  local internet_access(key, default=true) =
+    if std.objectHas(params.config_params, key) then
+      assert std.type(params.config_params[key]) == 'boolean' : 'config_params.%s must be a boolean' % key;
+      params.config_params[key]
+    else default;
   local use_local_natgw = internet_default_target == 'local_natgw';
 	  local category_key = '%s-platform-%s' % [std.asciiLower(scope.qualified_name), std.asciiLower(plat)];
   local services_cidr =
@@ -131,6 +136,18 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
       { pods_cidr: pods_cidr }
     else
       {};
+  local module_version =
+    if std.objectHas(params.config_params, 'module_version') then
+      assert std.member(['0.2.9', '0.3.0'], params.config_params.module_version) :
+        'config_params.module_version must be 0.2.9 or 0.3.0';
+      params.config_params.module_version
+    else '0.2.9';
+  local create_node_pools =
+    if std.objectHas(params.config_params, 'create_node_pools') then
+      assert std.type(params.config_params.create_node_pools) == 'boolean' :
+        'config_params.create_node_pools must be a boolean';
+      params.config_params.create_node_pools
+    else true;
   local worker_image =
     if std.objectHas(params.config_params, 'worker_image') && params.config_params.worker_image != null then
       assert std.type(params.config_params.worker_image) == 'string' :
@@ -190,6 +207,20 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     create_fss: create_fss,
     platform_tag_value: public_lb.platform_tag_value(scope.qualified_name, plat),
     internet_default_target: internet_default_target,
+    peer_vcn_cidrs:
+      local raw = if std.objectHas(params.config_params, 'peer_vcn_cidrs') then params.config_params.peer_vcn_cidrs else [];
+      assert std.type(raw) == 'array' : 'config_params.peer_vcn_cidrs must be an array';
+      std.set([
+        local cidr = cidrs.validate('config_params.peer_vcn_cidrs[%d]' % i, raw[i]);
+        assert cidr != '0.0.0.0/0' : 'Peering CIDRs must not include 0.0.0.0/0';
+        assert !cidrs.overlaps(cidr, params.network.vcn) : 'Peering CIDRs must not overlap the OKE VCN';
+        cidr
+        for i in std.range(0, std.length(raw) - 1)
+      ]),
+    worker_spoke_access: internet_access('worker_spoke_access', false),
+    pod_spoke_access: internet_access('pod_spoke_access', false),
+    worker_internet_access: internet_access('worker_internet_access'),
+    pod_internet_access: internet_access('pod_internet_access'),
     use_local_natgw: use_local_natgw,
     category_key: category_key,
     services_cidr: services_cidr,
@@ -201,6 +232,8 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
     cluster_cni_type: cluster_cni_type,
     is_overlay_network: is_overlay_network,
     optional_cluster_kubernetes_network_config: optional_cluster_kubernetes_network_config,
+    module_version: module_version,
+    create_node_pools: create_node_pools,
     worker_image: worker_image,
     worker_boot_volume_size: worker_boot_volume_size,
     cis_level: params.cis_level,

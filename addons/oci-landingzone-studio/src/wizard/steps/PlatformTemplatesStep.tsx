@@ -20,7 +20,7 @@ import { addExadataPlatform, configuredVcnCidrs } from '../../services/exadata';
 import { exadataReadiness } from '../../services/platformReadiness';
 import type { PlatformConfig, PlatformType, SharedPlatformConfig, Subnet } from '../../model/types';
 import {
-  PLATFORM_TYPES, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, okeDefaultParams, okeProfileSubnets, placementsOverlap, platformEnvInstances, platformTypeMeta,
+  PLATFORM_TYPES, OKE_PROFILE_PREFIX, okeProfileCidrError, setOkeEnvironmentCidr, applyPlatformPatch, resetPlatformEnvironment, newPlatform, newSharedPlatform, okeDefaultParams, okeProfileSubnets, placementsOverlap, platformEnvInstances, platformTypeMeta,
 } from '../../services/platforms';
 import { VcnEditor } from './HubNetworkStep';
 import { s } from './networkEditorStyles';
@@ -183,14 +183,21 @@ function PerEnvTable({ platform, environments, onPlatform }: {
               <tr key={inst.id}>
                 <td style={local.genTd}>{inst.name}</td>
                 <td style={local.genTd}>
-                  {inst.vcnCidr}
+                  {profileOwned ? <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}><ValidatedInput
+                    id={`platform-${platform.id}-${inst.id}-vcn`}
+                    aria-label={`${platform.key} ${inst.name} VCN CIDR`}
+                    style={s.rowInput}
+                    value={inst.vcnCidr.split('/')[0]}
+                    error={okeProfileCidrError(inst.vcnCidr, platform.okeParams!.clusterSize!)}
+                    onChange={(event) => onPlatform(setOkeEnvironmentCidr(platform, environments, inst.id, `${event.target.value.split('/')[0].trim()}/${OKE_PROFILE_PREFIX[platform.okeParams!.clusterSize!]}`))}
+                  /><span aria-label="Profile prefix">/{OKE_PROFILE_PREFIX[platform.okeParams!.clusterSize!]}</span></div> : inst.vcnCidr}
                   <FieldError id={`platform-${platform.id}-${inst.id}-conflict`} error={conflicts[`platform:${platform.id}:${inst.id}`]} />
                   {inst.overridden && !profileOwned && <span style={local.overrideTag}>override</span>}
                 </td>
                 <td style={local.genTd}>{inst.subnets.length === 0 ? 'auto' : `${inst.subnets.length} subnet${inst.subnets.length === 1 ? '' : 's'}`}</td>
                 <td style={{ ...local.genTd, textAlign: 'right' }}>
                   {profileOwned ? (
-                    <span style={local.fieldHint}>Automatic</span>
+                    <span style={local.fieldHint}>Automatic subnets</span>
                   ) : (
                     <>
                       <button type="button" style={local.linkBtn} onClick={() => setEditEnv(editEnv === inst.id ? null : inst.id)}>
@@ -270,7 +277,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
           <div style={{ marginBottom: 16 }}>
             <label style={s.label} htmlFor={`${platform.id}-key`}>Platform name</label>
             <ValidatedInput id={`${platform.id}-key`} error={keyError} style={s.rowInput} value={platform.key} maxLength={3} onChange={(e) => onPlatform({ key: e.target.value })} />
-            <div style={local.fieldHint}>Used to create consistent names for this platform's compartment, network, gateway, and DRG attachment.</div>
+            <div style={local.fieldHint}>Up to 3 characters. Used in generated resource names to keep OCI Network Firewall address-list names within their 28-character limit.</div>
           </div>
 
           {isOke && <OkeSettingsFields platform={platform} onPlatform={onPlatform} />}
@@ -280,7 +287,7 @@ function PlatformCard({ platform, environments, open, onToggle, onPlatform, onDe
             {isOke && oke.clusterSize ? (
               <div style={{ ...s.subCard, marginTop: 0 }}>
                 <div style={s.subHead}>{oke.clusterSize} network profile · {platform.vcnCidr}</div>
-                <div style={local.fieldHint}>This profile reserves the following subnets. Select Manual subnets only when you need a different address plan.</div>
+                <div style={local.fieldHint}>Edit each VCN CIDR in Per-environment settings below. Keep the profile prefix; subnets are recalculated automatically. Select Manual subnets to customize individual subnets.</div>
                 <div style={local.subnetGrid} role="list" aria-label="Network profile subnet allocation">
                   {okeProfileSubnets(platform.vcnCidr, oke.clusterSize, oke.cniType, oke.createFss).map((sn) => (
                     <div key={sn.name} style={local.subnetCell} role="listitem">
