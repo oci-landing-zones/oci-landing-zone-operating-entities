@@ -304,7 +304,8 @@
                             "ebs",
                             "hpc",
                             "finops",
-                            "ai-services"
+                            "ai-services",
+                            "apps"
                         ]
                     },
 

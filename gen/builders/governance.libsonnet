@@ -30,7 +30,7 @@ function(config, n)
             description: 'Platform associated with the resource.',
             is_cost_tracking: false,
             is_retired: false,
-            valid_values: ['tobedefined', 'network', 'security', 'observability', 'oke', 'ocvs', 'exacs', 'exacc', 'ebs', 'hpc', 'finops', 'ai-services'],
+            valid_values: ['tobedefined', 'network', 'security', 'observability', 'oke', 'ocvs', 'exacs', 'exacc', 'ebs', 'hpc', 'finops', 'ai-services', 'apps'],
           },
           [n.key_global('TAG', ['ENVIRONMENT'])]: {
             name: n.display_global('tag', ['environment']),
