@@ -154,6 +154,7 @@ Update this diagram when any of these change:
   - `gen/workload-extensions/exacs/single-stack/profiles.libsonnet`
   - `gen/workload-extensions/exacs/multi-stack/profiles.libsonnet`
   - `gen/addons/oci-hub-models/profiles.libsonnet`
+  - `gen/addons/oci-hybrid-connectivity/profiles.libsonnet`
   - `gen/addons/oci-x-rpc/profiles.libsonnet`
   - `gen/addons/oci-lz-dr/one-oe/profiles.libsonnet`
 - Published entrypoints must stay thin:

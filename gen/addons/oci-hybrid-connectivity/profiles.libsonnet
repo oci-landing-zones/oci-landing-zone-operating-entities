@@ -1,0 +1,54 @@
+{
+  hub_b_vpn_bgp: {
+    realm: 'oc1',
+    region: 'eu-frankfurt-1',
+    region_short_name: 'fra',
+    cis_level: 2,
+    security_targets: ['prod'],
+    hub: {
+      kind: 'hub_b',
+      network: { vcn: '10.0.0.0/21' },
+    },
+    environments: {
+      prod: {
+        project_network: { network: { vcn: '10.0.64.0/21' } },
+        projects: { proj1: {} },
+      },
+      preprod: {
+        project_network: { network: { vcn: '10.0.128.0/21' } },
+        projects: { proj1: {} },
+      },
+    },
+    hybrid_connectivity: {
+      customer_premises_equipments: {
+        office: { ip_address: '203.0.113.10' },
+      },
+      ipsecs: {
+        office: {
+          cpe_key: 'office',
+          remote_cidrs: ['172.20.0.0/16'],
+          tunnels_management: {
+            tunnel_1: {
+              routing: 'BGP',
+              ike_version: 'V2',
+              bgp_session_info: {
+                customer_bgp_asn: '65001',
+                customer_interface_ip: '169.254.20.1/30',
+                oracle_interface_ip: '169.254.20.2/30',
+              },
+            },
+            tunnel_2: {
+              routing: 'BGP',
+              ike_version: 'V2',
+              bgp_session_info: {
+                customer_bgp_asn: '65001',
+                customer_interface_ip: '169.254.21.1/30',
+                oracle_interface_ip: '169.254.21.2/30',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+}

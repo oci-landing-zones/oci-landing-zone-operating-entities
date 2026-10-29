@@ -244,6 +244,8 @@ See [OCI Secret Management](https://docs.oracle.com/en-us/iaas/Content/secret-ma
 
 ## 9. Deployment
 
+The committed [Hub B with BGP VPN network configuration](runtime/oneoe_network_hub_b_vpn_bgp.json) includes `prod` and `preprod` environments and two IKEv2 BGP tunnels. Use it as the network input with the other [One-OE configuration files](../../blueprints/one-oe/runtime/one-stack/readme.md). Replace the example router address, remote CIDRs and BGP values before deployment; OCI generates the tunnel keys.
+
 Deploy the complete configuration file set for your landing zone using the existing steps:
 
 1. [Oracle Resource Manager (ORM) deployment steps](../../commons/content/orm.md).
