@@ -2,9 +2,11 @@ import type { LzModel } from '../model/types';
 import { exadataDiagramPlatforms } from './exadata';
 import { displayName, generatorNames } from './generatorNaming';
 import { platformInEnv, platformSubnetsForEnv } from './platforms';
+import { hybridRoutes } from './hybridConnectivity';
+import { parseCidr } from './cidr';
 
-export type NextHopKind = 'igw' | 'natgw' | 'sgw' | 'drg' | 'firewall' | 'nlb' | 'attachment' | 'local' | 'unresolved';
-export type RouteProvenance = 'configured' | 'derived-import' | 'expected-remote';
+export type NextHopKind = 'igw' | 'natgw' | 'sgw' | 'drg' | 'firewall' | 'nlb' | 'attachment' | 'external' | 'local' | 'unresolved';
+export type RouteProvenance = 'configured' | 'derived-import' | 'expected-remote' | 'implicit-local';
 
 export interface RouteRule {
   id: string;
@@ -13,7 +15,8 @@ export interface RouteRule {
   matchCidr?: string;
   targetType: string;
   target: string;
-  routeType: 'Static' | 'Dynamic';
+  routeType: 'Static' | 'Dynamic' | 'Implicit';
+  superseded?: boolean;
   nextHopKind: NextHopKind;
   flowTarget?: string;
   targetKey?: string;
@@ -46,10 +49,30 @@ const object = (value: unknown): Obj => value !== null && typeof value === 'obje
 const entries = (value: unknown): [string, Obj][] => Object.entries(object(value)).map(([key, child]) => [key, object(child)]);
 const text = (value: unknown): string => typeof value === 'string' ? value : '';
 const strings = (value: unknown): string[] => Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
-type ResourceKind = 'vcn' | 'subnet' | 'igw' | 'natgw' | 'sgw' | 'drg' | 'attachment' | 'rpc' | 'firewall' | 'nlb' | 'table' | 'drg-table' | 'distribution';
+type ResourceKind = 'vcn' | 'subnet' | 'igw' | 'natgw' | 'sgw' | 'drg' | 'attachment' | 'rpc' | 'ipsec' | 'circuit' | 'firewall' | 'nlb' | 'table' | 'drg-table' | 'distribution';
 interface Resource { key: string; kind: ResourceKind; data: Obj; vcnKey?: string; drgKey?: string }
 
-/** Routing policy comes exclusively from the evaluated Blueprint Factory network. */
+export const routePriority = (rule: RouteRule): number => rule.routeType === 'Static' ? 0 : rule.routeType === 'Implicit' ? 1 : 2;
+
+function fullySuperseded(rule: RouteRule, rules: RouteRule[]): boolean {
+  const range = rule.matchCidr ? parseCidr(rule.matchCidr) : null;
+  if (!range) return false;
+  const preferred = rules.flatMap((other) => {
+    const candidate = other.matchCidr ? parseCidr(other.matchCidr) : null;
+    return candidate && candidate.start >= range.start && candidate.end <= range.end
+      && (candidate.prefix > range.prefix || candidate.prefix === range.prefix && routePriority(other) < routePriority(rule))
+      ? [candidate] : [];
+  }).sort((a, b) => a.start - b.start);
+  let cursor = range.start;
+  for (const candidate of preferred) {
+    if (candidate.start > cursor) return false;
+    cursor = Math.max(cursor, candidate.end + 1);
+    if (cursor > range.end) return true;
+  }
+  return false;
+}
+
+/** Generated routing policy plus OCI's implicit local routes for each VCN CIDR. */
 export function buildRouteTables(source: LzModel, network: unknown): RouteTable[] {
   const root = object(network);
   if (!root.network_configuration) throw new Error('The generated network configuration is unavailable.');
@@ -74,6 +97,22 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
       add(drg.drg_route_tables, 'drg-table', { drgKey: key });
       add(drg.drg_route_distributions, 'distribution', { drgKey: key });
       add(drg.remote_peering_connections, 'rpc', { drgKey: key });
+      // Networking creates these attachments implicitly; both VPN tunnels use the generated selector.
+      for (const [collection, kind, selector, type] of [
+        [nonVcn.ipsecs, 'ipsec', 'ipsec_tunnel', 'IPSEC_TUNNEL'],
+        [nonVcn.fast_connect_virtual_circuits, 'circuit', 'virtual_circuit', 'VIRTUAL_CIRCUIT'],
+      ] as const) {
+        for (const [resourceKey, data] of entries(collection)) {
+          if ((data.drg_key ?? data.gateway_key) !== key || data.provision_fc_virtual_circuit === false) continue;
+          resources.set(resourceKey, { key: resourceKey, kind, data, drgKey: key });
+          const attachmentKey = resourceKey + '/attachment';
+          resources.set(attachmentKey, { key: attachmentKey, kind: 'attachment', drgKey: key, data: {
+            display_name: data.display_name,
+            drg_route_table_key: object(object(drg.default_drg_route_tables)[selector]).drg_route_table_id,
+            network_details: { type, attached_resource_key: resourceKey },
+          } });
+        }
+      }
     }
     add(object(nonVcn.network_firewalls_configuration).network_firewalls, 'firewall');
   }
@@ -120,6 +159,9 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
     name(displayName('rpc', region, ['hub', segment]), 'rpc-' + connection.id);
     name(displayName('drgatt', region, ['hub', 'rpc', segment]), 'rpc-' + connection.id);
   }
+  for (const connection of hybridRoutes(model)) {
+    name(displayName(connection.type === 'VPN' ? 'ipsec' : 'fcvc', region, ['hub', connection.name.replaceAll('_', '-')]), connection.id);
+  }
   const nodeFor = (resource: Resource | undefined): string | undefined => {
     if (!resource) return undefined;
     if (resource.kind === 'firewall' || resource.kind === 'nlb') return nodeFor(resources.get(text(resource.data.subnet_key ?? resource.data.subnet_id)));
@@ -141,7 +183,9 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
     const table = tables.get(text(tableKey));
     const nodeId = nodeFor(resource);
     if (!table || !nodeId) return;
-    if (!table.associations.some((item) => item.nodeId === nodeId && item.kind === kind)) table.associations.push({ nodeId, kind });
+    const nodeIds = object(resource.data.network_details).type === 'IPSEC_TUNNEL'
+      ? [nodeId + ':tunnel-1', nodeId + ':tunnel-2'] : [nodeId];
+    for (const id of nodeIds) if (!table.associations.some((item) => item.nodeId === id && item.kind === kind)) table.associations.push({ nodeId: id, kind });
     if (kind === 'gateway') table.kind = 'gateway';
   };
   for (const resource of resources.values()) {
@@ -165,7 +209,11 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
     if (!resource) return { ...base, nextHopKind: 'unresolved', targetType: 'External target' };
     if (resource.kind === 'firewall') return { ...base, nextHopKind: 'firewall', targetType: 'Private IP', flowTarget: text(resource.data.ipv4address) || undefined };
     if (resource.kind === 'nlb') return { ...base, nextHopKind: 'nlb', targetType: 'Network Load Balancer', flowTarget: node };
-    if (resource.kind === 'attachment') return { ...base, nextHopKind: 'attachment', targetType: object(resource.data.network_details).type === 'REMOTE_PEERING_CONNECTION' ? 'RPC Attachment' : 'VCN Attachment', flowTarget: node };
+    if (resource.kind === 'attachment') {
+      const type = object(resource.data.network_details).type;
+      if (type === 'IPSEC_TUNNEL' || type === 'VIRTUAL_CIRCUIT') return { ...base, nextHopKind: 'external', targetType: type === 'IPSEC_TUNNEL' ? 'VPN tunnels' : 'FastConnect attachment', flowTarget: node };
+      return { ...base, nextHopKind: 'attachment', targetType: type === 'REMOTE_PEERING_CONNECTION' ? 'RPC Attachment' : 'VCN Attachment', flowTarget: node };
+    }
     const kinds = { igw: 'Internet Gateway', natgw: 'NAT Gateway', sgw: 'Service Gateway', drg: 'Dynamic Routing Gateway' } as const;
     if (resource.kind === 'igw' || resource.kind === 'natgw' || resource.kind === 'sgw' || resource.kind === 'drg') return { ...base, nextHopKind: resource.kind, targetType: kinds[resource.kind], flowTarget: node };
     return { ...base, nextHopKind: 'unresolved', targetType: 'Unresolved target' };
@@ -210,6 +258,9 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
             const node = nodeFor(attached);
             const connection = model.remotePeeringConnections?.find((entry) => 'rpc-' + entry.id === node);
             prefixes = (connection?.remoteCidrs ?? []).map((cidr) => ({ id: attached.key + '/' + cidr, cidr, provenance: 'expected-remote' }));
+          } else if (attached?.kind === 'ipsec' || attached?.kind === 'circuit') {
+            const connection = hybridRoutes(model).find((entry) => entry.id === nodeFor(attached));
+            prefixes = (connection?.cidrs ?? []).map((cidr) => ({ id: attached.key + '/' + cidr, cidr, provenance: 'expected-remote' }));
           }
           for (const prefix of prefixes) {
             const identity = attachment.key + '/' + prefix.cidr;
@@ -225,6 +276,15 @@ export function buildRouteTables(source: LzModel, network: unknown): RouteTable[
         }
       }
     }
+    if (resource.kind === 'table') {
+      const vcn = resources.get(resource.vcnKey!);
+      for (const cidr of strings(vcn?.data.cidr_blocks)) table.rules.push({
+        id: key + '/implicit-local/' + cidr, provenance: 'implicit-local', destination: cidr, matchCidr: cidr,
+        targetType: 'Local', target: 'Local VCN', targetKey: vcn!.key, targetNodeId: nodeFor(vcn),
+        routeType: 'Implicit', nextHopKind: 'local',
+      });
+    }
+    table.rules = table.rules.map((rule) => fullySuperseded(rule, table.rules) ? { ...rule, superseded: true } : rule);
     table.attachTo = table.associations[0]?.nodeId;
     table.attachExtra = [...new Set(table.associations.slice(1).map((item) => item.nodeId))];
     const notices: string[] = [];

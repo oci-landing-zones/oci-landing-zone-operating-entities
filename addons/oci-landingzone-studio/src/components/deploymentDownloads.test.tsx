@@ -63,8 +63,8 @@ describe('deployment downloads use the current factory', () => {
     const record = createLZ('Home', model).record!;
     controls.id = record.id;
     const config = serializeConfig(model);
-    saveOutputs(record.id, { config, files: { 'network.json': 'old', 'removed.json': 'old' } });
-    vi.mocked(generateOutputs).mockResolvedValue({ config, files: { 'network.json': 'fresh' }, primary: ['network.json'], secondary: [] });
+    saveOutputs(record.id, { config, files: { 'network.json': '{"revision":"old"}', 'removed.json': '{"revision":"old"}' } });
+    vi.mocked(generateOutputs).mockResolvedValue({ config, files: { 'network.json': '{"revision":"fresh"}' }, primary: ['network.json'], secondary: [] });
     renderToStaticMarkup(<MemoryRouter>{surface === 'Review'
       ? <WizardProvider initialModel={model}><ReviewStep designName="Home" /></WizardProvider>
       : <SavedLzList />}</MemoryRouter>);
@@ -74,8 +74,8 @@ describe('deployment downloads use the current factory', () => {
     await click();
 
     expect(generateOutputs).toHaveBeenCalledTimes(2);
-    expect(await downloadedFiles()).toEqual({ 'config.jsonnet': config, 'network.json': 'fresh' });
-    expect(getOutputs(record.id)?.files).toEqual({ 'network.json': 'fresh' });
+    expect(await downloadedFiles()).toEqual({ 'config.jsonnet': config, 'network.json': '{"revision":"fresh"}' });
+    expect(getOutputs(record.id)?.files).toEqual({ 'network.json': '{"revision":"fresh"}' });
   });
 
   it('regenerates each legacy regional download without merging cached files', async () => {
@@ -83,17 +83,17 @@ describe('deployment downloads use the current factory', () => {
     const draft = createDrDraft(model);
     const record = saveDisasterRecoveryLZ({ name: 'Combined', model, draft, sourceLabel: 'Home' }).record!;
     saveOutputs(record.id, { config: drDesignFingerprint(model, draft), files: {
-      'Home/config.jsonnet': '{}', 'Home/network.json': 'old', 'DR/config.jsonnet': '{}', 'DR/network.json': 'old', 'Home/removed.json': 'old',
+      'Home/config.jsonnet': '{}', 'Home/network.json': '{"revision":"old"}', 'DR/config.jsonnet': '{}', 'DR/network.json': '{"revision":"old"}', 'Home/removed.json': '{"revision":"old"}',
     } });
-    vi.mocked(generateDrFileBundle).mockResolvedValue({ 'Home/network.json': 'fresh-home', 'DR/network.json': 'fresh-dr' });
+    vi.mocked(generateDrFileBundle).mockResolvedValue({ 'Home/network.json': '{"revision":"fresh-home"}', 'DR/network.json': '{"revision":"fresh-dr"}' });
     renderToStaticMarkup(<MemoryRouter><SavedLzList /></MemoryRouter>);
 
     await button('Download LZ config')();
-    expect(await downloadedFiles()).toEqual({ 'network.json': 'fresh-home' });
+    expect(await downloadedFiles()).toEqual({ 'network.json': '{"revision":"fresh-home"}' });
     await button('Download LZ DR config')();
-    expect(await downloadedFiles()).toEqual({ 'network.json': 'fresh-dr' });
+    expect(await downloadedFiles()).toEqual({ 'network.json': '{"revision":"fresh-dr"}' });
     expect(generateDrFileBundle).toHaveBeenCalledTimes(2);
-    expect(getOutputs(record.id)?.files).toEqual({ 'Home/network.json': 'fresh-home', 'DR/network.json': 'fresh-dr' });
+    expect(getOutputs(record.id)?.files).toEqual({ 'Home/network.json': '{"revision":"fresh-home"}', 'DR/network.json': '{"revision":"fresh-dr"}' });
   });
 
   it.each(['Review', 'saved card', 'legacy card'])('retains the previous saved package without downloading it after %s generation fails', async (surface) => {
@@ -105,8 +105,8 @@ describe('deployment downloads use the current factory', () => {
       : createLZ('Home', model).record!;
     controls.id = record.id;
     const files: Record<string, string> = surface === 'legacy card'
-      ? { 'Home/config.jsonnet': '{}', 'Home/network.json': 'old', 'DR/config.jsonnet': '{}', 'DR/network.json': 'old' }
-      : { 'network.json': 'old' };
+      ? { 'Home/config.jsonnet': '{}', 'Home/network.json': '{"revision":"old"}', 'DR/config.jsonnet': '{}', 'DR/network.json': '{"revision":"old"}' }
+      : { 'network.json': '{"revision":"old"}' };
     saveOutputs(record.id, { config: surface === 'legacy card' ? drDesignFingerprint(model, draft) : serializeConfig(model), files });
     const saved = getOutputs(record.id);
     vi.mocked(generateOutputs).mockRejectedValue(new Error('Factory failed'));

@@ -1,0 +1,52 @@
+{
+    "region"                           : "eu-frankfurt-1",
+    "region_short_name"                : "fra",
+    "cis_level"                        : 2,
+
+    "hub": {
+        "kind"                         : "hub_a",
+
+        "network": {
+            "vcn"                      : "10.0.0.0/21"
+        }
+    },
+
+    "environments": {
+        "production": {
+            "project_network": {
+                "network": {
+                    "vcn"              : "10.0.64.0/21"
+                }
+            }
+        }
+    },
+
+    "hybrid_connectivity": {
+        "customer_premises_equipments": {
+            "office": {
+                "ip_address"           : "203.0.113.10"
+            }
+        },
+
+        "ipsecs": {
+            "office": {
+                "cpe_key"              : "office",
+                "remote_cidrs"         : ["172.20.0.0/16"],
+
+                "tunnels_management": {
+                    "tunnel_1": {
+                        "ike_version"  : "V2",
+                        "routing"      : "STATIC",
+                        "shared_secret": "REPLACE THIS DEMONSTRATION KEY 1"
+                    },
+
+                    "tunnel_2": {
+                        "ike_version"  : "V2",
+                        "routing"      : "STATIC",
+                        "shared_secret": "REPLACE THIS DEMONSTRATION KEY 2"
+                    }
+                }
+            }
+        }
+    }
+}

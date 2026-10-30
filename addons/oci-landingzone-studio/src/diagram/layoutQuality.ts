@@ -1,8 +1,9 @@
-import type { DiagramModel, DiagramNode } from '../model/types';
+import { tableAssociations } from './tablePlacement';
+import type { DiagramEdge, DiagramModel, DiagramNode } from '../model/types';
 import type { GeneratedResourceInventory } from '../services/generatedResources';
 import type { RouteTable } from '../services/routeTables';
 import { absoluteNodeRects } from './flowGeometry';
-import { associationDisplaySegments, routeStructuralEdges } from './displayGeometry';
+import { associationDisplaySegments, routeStructuralEdges, tableSourceAnchors } from './displayGeometry';
 import { createFlowPlayback, flowHopMarkers, pointAtDistance } from './flowPlayback';
 import { attachmentLabelLayout, DIAGRAM_LAYOUT, drgCaptionBounds, minimumOwnerWidths } from './layoutPolicy';
 import { resourceGroupLayout } from './resourceGroups';
@@ -11,6 +12,7 @@ import { oracle } from '../theme';
 
 export interface LayoutIssue { code: string; nodeIds: string[]; message: string }
 interface LayoutContext {
+  physicalPaths?: Record<string, { x: number; y: number }[]>;
   inventory?: GeneratedResourceInventory;
   routeTables?: RouteTable[];
   foundation?: boolean;
@@ -18,24 +20,31 @@ interface LayoutContext {
 }
 const EPS = 0.01;
 const overlay = (node: DiagramNode) => node.kind === 'rtdot';
+const physicalOwner = (node?: DiagramNode) => node?.rtDotPhysicalOwnerId ?? node?.rtDotOwnerId;
 const compartment = (node: DiagramNode) => ['compartment', 'project', 'landingzone', 'tenancy'].includes(node.kind);
 const samePoint = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.abs(a.x - b.x) < EPS && Math.abs(a.y - b.y) < EPS;
-const segmentEntersBox = (a: { x: number; y: number }, b: { x: number; y: number }, box: { x: number; y: number; width: number; height: number }) =>
-  Math.abs(a.y - b.y) < EPS
-    ? a.y > box.y + EPS && a.y < box.y + box.height - EPS
-      && Math.min(Math.max(a.x, b.x), box.x + box.width) - Math.max(Math.min(a.x, b.x), box.x) > EPS
-    : a.x > box.x + EPS && a.x < box.x + box.width - EPS
-      && Math.min(Math.max(a.y, b.y), box.y + box.height) - Math.max(Math.min(a.y, b.y), box.y) > EPS;
+const segmentEntersBox = (a: { x: number; y: number }, b: { x: number; y: number }, box: { x: number; y: number; width: number; height: number }) => {
+  if (Math.abs(a.y - b.y) < EPS) return a.y > box.y + EPS && a.y < box.y + box.height - EPS
+    && Math.min(Math.max(a.x, b.x), box.x + box.width) - Math.max(Math.min(a.x, b.x), box.x) > EPS;
+  if (Math.abs(a.x - b.x) < EPS) return a.x > box.x + EPS && a.x < box.x + box.width - EPS
+    && Math.min(Math.max(a.y, b.y), box.y + box.height) - Math.max(Math.min(a.y, b.y), box.y) > EPS;
+  // Separating axes measure slanted segments independently of the router's clipping test.
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const x = (a.x + b.x) / 2 - box.x - box.width / 2, y = (a.y + b.y) / 2 - box.y - box.height / 2;
+  const w = Math.max(0, box.width / 2 - EPS), h = Math.max(0, box.height / 2 - EPS);
+  return Math.abs(x) < w + Math.abs(dx) / 2 && Math.abs(y) < h + Math.abs(dy) / 2
+    && Math.abs(x * dy - y * dx) < w * Math.abs(dy) + h * Math.abs(dx);
+};
 
 /** Independent measurement; constrained diagrams may retain unavoidable intersections. */
-export function structuralCrossings(diagram: DiagramModel): { edgeId: string; nodeId: string }[] {
+export function structuralCrossings(diagram: DiagramModel, options: { includeOwnerBodies?: boolean } = {}): { edgeId: string; nodeId: string }[] {
   const rects = absoluteNodeRects(diagram.nodes);
   const byId = new Map(diagram.nodes.map((node) => [node.id, node]));
   const crossings: { edgeId: string; nodeId: string }[] = [];
   for (const edge of diagram.edges.filter((entry) => !entry.waypoints)) {
     const endpoints = new Set([edge.source, edge.target]);
     for (const id of [edge.source, edge.target]) {
-      const owner = byId.get(id)?.rtDotOwnerId;
+      const owner = physicalOwner(byId.get(id));
       if (owner) endpoints.add(owner);
     }
     const allowed = new Set<string>();
@@ -46,16 +55,21 @@ export function structuralCrossings(diagram: DiagramModel): { edgeId: string; no
         node = node.parentId ? byId.get(node.parentId) : undefined;
       }
     }
+    if (options.includeOwnerBodies) for (const id of [edge.source, edge.target]) {
+      const owner = physicalOwner(byId.get(id));
+      if (owner) allowed.delete(owner);
+    }
     const points = edge.points ?? [];
     for (const box of rects.values()) {
-      if (allowed.has(box.id) || box.node.rtDotOwnerId && endpoints.has(box.node.rtDotOwnerId)) continue;
+      const owner = physicalOwner(box.node);
+      if (allowed.has(box.id) || owner && endpoints.has(owner)) continue;
       if (points.slice(1).some((point, index) => segmentEntersBox(points[index], point, box))) crossings.push({ edgeId: edge.id, nodeId: box.id });
     }
   }
   return crossings;
 }
 
-/** Counts perpendicular contacts independently of the router's congestion costs. */
+/** Counts line contacts independently of the router's congestion costs. */
 export function structuralLineContacts(diagram: DiagramModel): { edgeIds: [string, string]; x: number; y: number }[] {
   const rects = absoluteNodeRects(diagram.nodes);
   const edges = diagram.edges.filter((edge) => !edge.waypoints);
@@ -63,12 +77,12 @@ export function structuralLineContacts(diagram: DiagramModel): { edgeIds: [strin
   const contacts = new Map<string, { edgeIds: [string, string]; x: number; y: number }>();
   const segments = (edge: typeof edges[number]) => (displayed.get(edge.id) ?? [edge.points ?? []])
     .flatMap((path) => path.slice(1).map((point, index) => [path[index], point] as const));
-  const owners = (edge: typeof edges[number]) => [edge.source, edge.target].map((id) => rects.get(id)?.node.rtDotOwnerId ?? id);
+  const owners = (edge: typeof edges[number]) => [edge.source, edge.target].map((id) => physicalOwner(rects.get(id)?.node) ?? id);
   const terminal = (edge: typeof edges[number], point: { x: number; y: number }) =>
     !!edge.points?.length && (samePoint(edge.points[0], point) || samePoint(edge.points.at(-1)!, point));
   const portJunction = (annotation: typeof edges[number], physical: typeof edges[number], point: { x: number; y: number }) => {
     if (!displayed.has(annotation.id) || displayed.has(physical.id)) return false;
-    const owner = rects.get(annotation.source)?.node.rtDotOwnerId;
+    const owner = physicalOwner(rects.get(annotation.source)?.node);
     if (!owner || physical.source !== owner && physical.target !== owner) return false;
     const start = annotation.points?.[0], end = annotation.points?.find((candidate) => start && !samePoint(candidate, start));
     if (!start || !end) return false;
@@ -85,12 +99,23 @@ export function structuralLineContacts(diagram: DiagramModel): { edgeIds: [strin
     const shared = owners(a).filter((id) => owners(b).includes(id));
     for (const [aa, ab] of segments(a)) for (const [ba, bb] of segments(b)) {
       if (samePoint(aa, ab) || samePoint(ba, bb)) continue;
-      const ah = Math.abs(aa.y - ab.y) < EPS, bh = Math.abs(ba.y - bb.y) < EPS;
-      if (ah === bh) continue;
-      const [ha, hb, va, vb] = ah ? [aa, ab, ba, bb] : [ba, bb, aa, ab];
-      const point = { x: va.x, y: ha.y };
-      if (point.x < Math.min(ha.x, hb.x) - EPS || point.x > Math.max(ha.x, hb.x) + EPS
-        || point.y < Math.min(va.y, vb.y) - EPS || point.y > Math.max(va.y, vb.y) + EPS) continue;
+      let point: { x: number; y: number };
+      const ax = ab.x - aa.x, ay = ab.y - aa.y, bx = bb.x - ba.x, by = bb.y - ba.y;
+      if (Math.abs(ax) >= EPS && Math.abs(ay) >= EPS || Math.abs(bx) >= EPS && Math.abs(by) >= EPS) {
+        const cross = ax * by - ay * bx;
+        if (Math.abs(cross) < 1e-9) continue;
+        const t = ((ba.x - aa.x) * by - (ba.y - aa.y) * bx) / cross;
+        const u = ((ba.x - aa.x) * ay - (ba.y - aa.y) * ax) / cross;
+        if (t < -1e-9 || t > 1 + 1e-9 || u < -1e-9 || u > 1 + 1e-9) continue;
+        point = { x: aa.x + t * ax, y: aa.y + t * ay };
+      } else {
+        const ah = Math.abs(ay) < EPS, bh = Math.abs(by) < EPS;
+        if (ah === bh) continue;
+        const [ha, hb, va, vb] = ah ? [aa, ab, ba, bb] : [ba, bb, aa, ab];
+        point = { x: va.x, y: ha.y };
+        if (point.x < Math.min(ha.x, hb.x) - EPS || point.x > Math.max(ha.x, hb.x) + EPS
+          || point.y < Math.min(va.y, vb.y) - EPS || point.y > Math.max(va.y, vb.y) + EPS) continue;
+      }
       if (a.target === b.target && displayed.has(a.id) && displayed.has(b.id)) continue;
       if (portJunction(a, b, point) || portJunction(b, a, point)) continue;
       const junction = terminal(a, point) && terminal(b, point) && shared.some((id) => {
@@ -110,17 +135,33 @@ export function structuralLineContacts(diagram: DiagramModel): { edgeIds: [strin
 export function physicalSharedSegments(diagram: DiagramModel): { edgeIds: [string, string]; length: number }[] {
   const nodes = new Map(diagram.nodes.map((node) => [node.id, node]));
   const edges = diagram.edges.filter((edge) => !edge.waypoints && nodes.get(edge.source)?.kind !== 'rtdot' && nodes.get(edge.target)?.kind !== 'routetable');
+  return sharedSegments(edges);
+}
+
+export function annotationSharedSegments(diagram: DiagramModel): { edgeIds: [string, string]; length: number }[] {
+  const nodes = new Map(diagram.nodes.map((node) => [node.id, node]));
+  const edges = diagram.edges.filter((edge) => !edge.waypoints && nodes.get(edge.source)?.kind === 'rtdot' && nodes.get(edge.target)?.kind === 'routetable');
+  return sharedSegments(edges, (a, b) => a.target !== b.target);
+}
+
+function sharedSegments(edges: DiagramEdge[], include: (a: DiagramEdge, b: DiagramEdge) => boolean = () => true): { edgeIds: [string, string]; length: number }[] {
   const shared: { edgeIds: [string, string]; length: number }[] = [];
   for (let i = 0; i < edges.length; i++) for (let j = i + 1; j < edges.length; j++) {
     const a = edges[i], b = edges[j], spans = new Map<string, [number, number][]>();
+    if (!include(a, b)) continue;
     for (let s = 1; s < (a.points?.length ?? 0); s++) for (let t = 1; t < (b.points?.length ?? 0); t++) {
       const aa = a.points![s - 1], ab = a.points![s], ba = b.points![t - 1], bb = b.points![t];
-      const horizontal = Math.abs(aa.y - ab.y) < EPS;
-      if (horizontal !== (Math.abs(ba.y - bb.y) < EPS) || (horizontal ? Math.abs(aa.y - ba.y) : Math.abs(aa.x - ba.x)) > EPS) continue;
-      const low = horizontal ? Math.max(Math.min(aa.x, ab.x), Math.min(ba.x, bb.x)) : Math.max(Math.min(aa.y, ab.y), Math.min(ba.y, bb.y));
-      const high = horizontal ? Math.min(Math.max(aa.x, ab.x), Math.max(ba.x, bb.x)) : Math.min(Math.max(aa.y, ab.y), Math.max(ba.y, bb.y));
+      const al = Math.hypot(ab.x - aa.x, ab.y - aa.y), bl = Math.hypot(bb.x - ba.x, bb.y - ba.y);
+      if (al < EPS || bl < EPS) continue;
+      const sign = ab.x > aa.x || ab.x === aa.x && ab.y > aa.y ? 1 : -1;
+      const x = (ab.x - aa.x) / al * sign, y = (ab.y - aa.y) / al * sign;
+      if (Math.abs(x * (bb.y - ba.y) - y * (bb.x - ba.x)) > 1e-9 * bl
+        || Math.abs(x * (ba.y - aa.y) - y * (ba.x - aa.x)) > EPS) continue;
+      const at = (p: { x: number; y: number }) => p.x * x + p.y * y;
+      const low = Math.max(Math.min(at(aa), at(ab)), Math.min(at(ba), at(bb)));
+      const high = Math.min(Math.max(at(aa), at(ab)), Math.max(at(ba), at(bb)));
       if (high - low <= EPS) continue;
-      const key = `${horizontal ? 'h' : 'v'}:${(horizontal ? aa.y : aa.x).toFixed(3)}`;
+      const key = `${x.toFixed(9)}:${y.toFixed(9)}:${(x * aa.y - y * aa.x).toFixed(3)}`;
       spans.set(key, [...(spans.get(key) ?? []), [low, high]]);
     }
     let length = 0;
@@ -318,7 +359,7 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
     if (actual.length !== context.routeTables.length) issue('routing-inventory', actual.map((node) => node.id), 'All generated route tables must remain visible in routing mode.');
     for (const table of context.routeTables) {
       const node = byId.get(table.id);
-      if (!node || JSON.stringify(node.rtRows) !== JSON.stringify(table.rules.map((rule) => ({ id: rule.id, destination: rule.destination, targetType: rule.targetType, target: rule.target, routeType: rule.routeType })))) {
+      if (!node || JSON.stringify(node.rtRows) !== JSON.stringify(table.rules.map((rule) => ({ id: rule.id, destination: rule.destination, targetType: rule.targetType, target: rule.target, routeType: rule.routeType, superseded: rule.superseded })))) {
         issue('routing-inventory', [table.id], 'Displayed route tables must retain all canonical rules.');
       }
       const dots = diagram.nodes.filter((entry) => entry.kind === 'rtdot' && entry.rtDotTableId === table.id);
@@ -346,71 +387,53 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
       issue('drg-caption', [caption.id, parent.id], 'The complete DRG caption must fit its compartment footprint.');
     }
   }
-  const rails = new Map<string, { x: number; low: number; high: number }>();
   const tableEntries = new Map<string, { x: number; y: number }>();
   for (const edge of diagram.edges.filter((entry) => !entry.waypoints
     && byId.get(entry.source)?.kind === 'rtdot' && byId.get(entry.target)?.kind === 'routetable')) {
-    const dot = rects.get(edge.source)!;
-    const owner = dot.node.rtDotOwnerId ? rects.get(dot.node.rtDotOwnerId) : undefined;
-    let escaping = true;
-    if (owner && edge.points?.slice(1).some((point, index) => {
-      const previous = edge.points![index];
-      const dx = point.x - previous.x, dy = point.y - previous.y;
-      const outward = edge.sourceSide === 'left' ? Math.abs(dy) < EPS && dx <= EPS
-        : edge.sourceSide === 'right' ? Math.abs(dy) < EPS && dx >= -EPS
-          : edge.sourceSide === 'top' ? Math.abs(dx) < EPS && dy <= EPS
-            : edge.sourceSide === 'bottom' ? Math.abs(dx) < EPS && dy >= -EPS : false;
-      escaping = escaping && outward;
-      if (escaping) return false;
-      if (!segmentEntersBox(previous, point, owner)) return false;
-      const horizontal = Math.abs(previous.y - point.y) < EPS;
-      const low = Math.max(horizontal ? owner.x : owner.y, horizontal ? Math.min(previous.x, point.x) : Math.min(previous.y, point.y));
-      const high = Math.min(horizontal ? owner.x + owner.width : owner.y + owner.height, horizontal ? Math.max(previous.x, point.x) : Math.max(previous.y, point.y));
-      const fixed = horizontal ? previous.y : previous.x;
-      const portLow = horizontal ? dot.x : dot.y, portHigh = horizontal ? dot.x + dot.width : dot.y + dot.height;
-      const portBand = horizontal ? fixed >= dot.y - EPS && fixed <= dot.y + dot.height + EPS : fixed >= dot.x - EPS && fixed <= dot.x + dot.width + EPS;
-      return !portBand || low < portLow - EPS || high > portHigh + EPS;
-    })) issue('annotation-owner-interior', [edge.id, owner.id], 'Annotation leaders must leave the owner at its port without crossing the owner body or label.');
-    const x = edge.centerX;
-    const joins = edge.points?.filter((point) => x != null && Math.abs(point.x - x) < EPS) ?? [];
-    if (x == null || !Number.isFinite(x) || !joins.length) {
-      issue('annotation-rail', [edge.id], 'Table associations must retain their dedicated rail and complete stored path.');
-      continue;
-    }
-    const previous = rails.get(edge.target);
-    if (previous && Math.abs(previous.x - x) > EPS) issue('annotation-rail', [edge.id, edge.target], 'All associations of one table must use the same rail.');
-    rails.set(edge.target, { x, low: Math.min(previous?.low ?? Infinity, ...joins.map((point) => point.y)), high: Math.max(previous?.high ?? -Infinity, ...joins.map((point) => point.y)) });
     const entry = edge.points!.at(-1)!;
+    const table = rects.get(edge.target)!;
+    const inside = entry && entry.x >= table.x - EPS && entry.x <= table.x + table.width + EPS
+      && entry.y >= table.y - EPS && entry.y <= table.y + table.height + EPS;
+    const border = entry && (Math.abs(entry.x - table.x) < EPS || Math.abs(entry.x - table.x - table.width) < EPS
+      || Math.abs(entry.y - table.y) < EPS || Math.abs(entry.y - table.y - table.height) < EPS);
+    if (!inside || !border) {
+      issue('annotation-junction', [edge.id, edge.target], 'A table leader must end at its card boundary.');
+    }
     if (tableEntries.has(edge.target) && !samePoint(tableEntries.get(edge.target)!, entry)) {
-      issue('annotation-junction', [edge.id, edge.target], 'A dedicated table rail must meet its table at one common entry.');
+      issue('annotation-junction', [edge.id, edge.target], 'Table associations must meet their table at one common entry.');
     }
     tableEntries.set(edge.target, entry);
   }
-  const tableRails = [...rails];
-  for (let i = 0; i < tableRails.length; i++) for (let j = i + 1; j < tableRails.length; j++) {
-    const [aId, a] = tableRails[i], [bId, b] = tableRails[j];
-    if (Math.abs(a.x - b.x) < EPS && Math.min(a.high, b.high) - Math.max(a.low, b.low) >= -EPS) {
-      issue('annotation-junction', [aId, bId], 'Overlapping rails for different tables must remain distinct rather than imply a shared association.');
-    }
+  for (const overlap of annotationSharedSegments(diagram)) {
+    issue('annotation-junction', overlap.edgeIds, 'Leaders for different tables must not share a visible segment.');
   }
-  const canonical = new Map(routeStructuralEdges(diagram.nodes, diagram.edges.filter((edge) => !edge.waypoints)
-    .map((edge) => ({ ...edge, points: undefined }))).map((edge) => [edge.id, edge.points ?? []]));
+  const structural = routeStructuralEdges(diagram.nodes, diagram.edges.filter((edge) => !edge.waypoints)
+    .map((edge) => ({ ...edge, points: undefined })));
+  const direct = new Set(diagram.edges.filter((edge) => edge.centerX == null && byId.get(edge.source)?.kind === 'rtdot' && byId.get(edge.target)?.kind === 'routetable').map((edge) => edge.id));
+  const directPaths = new Map(tableAssociations(diagram.nodes, tableSourceAnchors(diagram.nodes, structural)).map((edge) => [edge.id, edge]));
+  const canonical = new Map(structural.map((edge) => direct.has(edge.id) ? directPaths.get(edge.id)! : edge)
+    .map((edge) => [edge.id, edge.points ?? []]));
+  for (const [id, path] of Object.entries(context.physicalPaths ?? {})) canonical.set(id, path);
   for (const edge of diagram.edges) {
     const points = edge.points ?? [];
+    const directLeader = direct.has(edge.id);
     if (points.some((point) => !Number.isFinite(point.x) || !Number.isFinite(point.y))
-      || points.slice(1).some((point, index) => Math.abs(point.x - points[index].x) > EPS && Math.abs(point.y - points[index].y) > EPS)) {
-      issue('edge-geometry', [edge.id], 'Routing paths must be finite and orthogonal.');
+      || !directLeader && points.slice(1).some((point, index) => Math.abs(point.x - points[index].x) > EPS && Math.abs(point.y - points[index].y) > EPS)) {
+      issue('edge-geometry', [edge.id], 'Routing paths must be finite; physical and packet paths stay orthogonal.');
     }
     if (!edge.waypoints) {
-      for (const caption of captions) if (points.slice(1).some((point, index) => segmentEntersBox(points[index], point, caption))) {
+      for (const caption of captions) if (!directLeader && points.slice(1).some((point, index) => segmentEntersBox(points[index], point, caption))) {
         issue('drg-caption', [edge.id, caption.id], 'Connection paths must avoid the DRG caption, including when the DRG is their endpoint.');
       }
-      for (const box of rects.values()) if (box.node.kind === 'routetable'
+      for (const box of rects.values()) if (!directLeader && box.node.kind === 'routetable'
         && points.slice(1).some((point, index) => segmentEntersBox(points[index], point, box))) {
         issue('table-interior', [edge.id, box.id], 'Connector paths must stop at a table boundary without entering any table body.');
       }
-      const expected = canonical.get(edge.id) ?? [];
-      if (points.length < 2 || points.length !== expected.length || points.some((point, index) => !samePoint(point, expected[index]))) {
+      const canonicalPath = canonical.get(edge.id) ?? [];
+      const expected = !directLeader && !context.physicalPaths
+        ? [canonicalPath[0], canonicalPath.at(-1)].filter((point) => point != null) : canonicalPath;
+      const actual = !directLeader && !context.physicalPaths ? [points[0], points.at(-1)].filter((point) => point != null) : points;
+      if (points.length < 2 || actual.length !== expected.length || actual.some((point, index) => !samePoint(point, expected[index]))) {
         issue('structural-path', [edge.id], 'Stored connector geometry must use the shared renderer and export router.');
       }
       continue;
@@ -426,7 +449,7 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
       return false;
     };
     for (const connection of diagram.edges.filter((candidate) => !candidate.waypoints
-      && (byId.get(candidate.source)?.kind === 'attachment' || byId.get(candidate.target)?.kind === 'attachment'))) {
+      && (['attachment', 'vpn', 'vpntunnel', 'fastconnect', 'customerrouter'].includes(byId.get(candidate.source)?.kind ?? '') || byId.get(candidate.target)?.kind === 'attachment'))) {
       const used = edge.waypoints.some((node, index) => {
         const next = edge.waypoints![index + 1];
         return next && ((node === connection.source && next === connection.target) || (node === connection.target && next === connection.source)
@@ -434,7 +457,7 @@ export function validateDiagramLayout(diagram: DiagramModel, context: LayoutCont
             || (node === connection.target && belongsTo(next, connection.source)))));
       });
       if (!used) continue;
-      const physical = canonical.get(connection.id) ?? [];
+      const physical = context.physicalPaths?.[connection.id] ?? connection.points ?? canonical.get(connection.id) ?? [];
       const includes = (line: typeof points) => points.some((_, index) => line.every((point, offset) => points[index + offset] && samePoint(point, points[index + offset])));
       if (!includes(physical) && !includes([...physical].reverse())) issue('flow-connection', [edge.id, connection.id], 'Packet paths must reuse the complete physical attachment connection.');
     }

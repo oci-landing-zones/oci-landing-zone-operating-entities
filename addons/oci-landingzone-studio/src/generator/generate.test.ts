@@ -9,10 +9,12 @@ import { applyPlatformPatch, newPlatform, newSharedPlatform, okeNetworkProfilePa
 import { configuredVcnCidrs } from '../services/exadata';
 import { getHubKind, hubKindDefaults } from '../services/hubKinds';
 import { generatorNames } from '../services/generatorNaming';
+import { emptyHybridConnectivity, newVpn } from '../services/hybridConnectivity';
 import type { HubKind, LzModel } from '../model/types';
 import { createRegionalModel } from '../services/regionalDeployment';
 import { buildRouteTables } from '../services/routeTables';
 import { buildGraph } from '../diagram/buildGraph';
+import ipsecOptions from '../../../../gen/addons/oci-hybrid-connectivity/ipsec-options.json';
 
 /** The browser fetches the engine over HTTP; under vitest we read it off disk. */
 beforeAll(() => {
@@ -63,6 +65,137 @@ describe('virtualFs', () => {
     expect(files[entry]).toBeDefined();
     expect(files[defaults]).toBeDefined();
     expect(files['workload-extensions/oke/simple/oke_network_resources.libsonnet']).toBeDefined();
+  });
+});
+
+describe('hybrid IPSec proposal contract', () => {
+  const fields = Object.entries(ipsecOptions).flatMap(([phase, fields]) =>
+    Object.entries(fields).map(([field, values]) => ({ phase, field, values })),
+  );
+  async function normalizeTunnels(tunnels: Record<string, unknown>[]) {
+    const { files } = buildVirtualFs();
+    files['ipsec-check.jsonnet'] = `local c = import 'addons/oci-hybrid-connectivity/config.libsonnet'; [c.normalize({
+      ipsecs: { office: { cpe_id: 'ocid1.cpe.oc1..example', remote_cidrs: ['172.20.0.0/16'],
+        tunnels_management: { tunnel_1: tunnel, tunnel_2: { routing: 'STATIC' } },
+      } },
+    }).ipsecs.office.tunnels_management.tunnel_1 for tunnel in ${JSON.stringify(tunnels)}]`;
+    return evaluate('ipsec-check.jsonnet', files);
+  }
+
+  it.each(fields)('accepts every allowed $phase.$field value without enabling custom proposals', async ({ phase, field, values }) => {
+    const flag = phase === 'phase_one_details' ? 'is_custom_phase_one_config' : 'is_custom_phase_two_config';
+    const tunnels = values.map((value) => ({ routing: 'STATIC', [phase]: { [flag]: false, [field]: value } }));
+    await expect(normalizeTunnels(tunnels)).resolves.toEqual(tunnels.map((tunnel) => ({ ...tunnel, ike_version: 'V2' })));
+  });
+
+  it.each(fields)('rejects malformed or cross-phase $phase.$field values with the allowed choices', async ({ phase, field, values }) => {
+    const flag = phase === 'phase_one_details' ? 'is_custom_phase_one_config' : 'is_custom_phase_two_config';
+    const wrongPhase = phase === 'phase_one_details' ? 'HMAC_SHA1_128' : 'SHA1_96';
+    for (const value of [wrongPhase, 'not-an-option', 42]) {
+      await expect(normalizeTunnels([{ routing: 'STATIC', [phase]: { [flag]: false, [field]: value } }]))
+        .rejects.toThrow(`${phase}.${field} must be one of: ${values.join(', ')}`);
+    }
+  });
+
+  it('retains omitted and null proposal settings without selecting algorithms', async () => {
+    const tunnels = [
+      { routing: 'STATIC' },
+      { routing: 'STATIC', phase_one_details: null, phase_two_details: null },
+      { routing: 'STATIC', phase_one_details: { custom_authentication_algorithm: null }, phase_two_details: { dh_group: null } },
+    ];
+    await expect(normalizeTunnels(tunnels)).resolves.toEqual(tunnels.map((tunnel) => ({ ...tunnel, ike_version: 'V2' })));
+  });
+});
+
+describe('hybrid VPN identity contract', () => {
+  async function normalizeIdentity(identity: Record<string, unknown>) {
+    const { files } = buildVirtualFs();
+    files['identity-check.jsonnet'] = `local c = import 'addons/oci-hybrid-connectivity/config.libsonnet'; c.normalize({
+      ipsecs: { office: { cpe_id: 'ocid1.cpe.oc1..example', remote_cidrs: ['172.20.0.0/16'],
+        tunnels_management: { [key]: { routing: 'STATIC' } for key in ['tunnel_1', 'tunnel_2'] },
+      } + ${JSON.stringify(identity)} },
+    }).ipsecs.office`;
+    return evaluate('identity-check.jsonnet', files);
+  }
+
+  it.each([
+    {},
+    { cpe_local_identifier_type: 'IP_ADDRESS' },
+    { cpe_local_identifier_type: 'IP_ADDRESS', cpe_local_identifier: '203.0.113.10' },
+    { cpe_local_identifier_type: 'HOSTNAME', cpe_local_identifier: 'vpn.example.com' },
+  ])('keeps ordinary IP fallback or an explicit matching identity: %j', async (identity) => {
+    const normalized = await normalizeIdentity(identity);
+    expect(normalized).toMatchObject(identity);
+    if (!('cpe_local_identifier' in identity)) expect(normalized).not.toHaveProperty('cpe_local_identifier');
+  });
+
+  it.each([undefined, '', '   '])('requires a nonblank HOSTNAME identifier: %s', async (cpe_local_identifier) => {
+    await expect(normalizeIdentity({ cpe_local_identifier_type: 'HOSTNAME', cpe_local_identifier }))
+      .rejects.toThrow('cpe_local_identifier is required when cpe_local_identifier_type is HOSTNAME');
+  });
+
+  it('rejects an unsupported identity type', async () => {
+    await expect(normalizeIdentity({ cpe_local_identifier_type: 'OTHER' }))
+      .rejects.toThrow('cpe_local_identifier_type must be IP_ADDRESS or HOSTNAME');
+  });
+});
+
+describe('hybrid generic CPE contract', () => {
+  async function normalizeDevice(selector: Record<string, unknown>) {
+    const { files } = buildVirtualFs();
+    files['cpe-check.jsonnet'] = `(import 'addons/oci-hybrid-connectivity/config.libsonnet').normalize({
+      customer_premises_equipments: { office: { ip_address: '203.0.113.10' } + ${JSON.stringify(selector)} },
+    }).customer_premises_equipments.office`;
+    return evaluate('cpe-check.jsonnet', files);
+  }
+
+  it('accepts only the public IP for newly registered equipment', async () => {
+    await expect(normalizeDevice({})).resolves.toEqual({ ip_address: '203.0.113.10' });
+  });
+
+  it.each([
+    { cpe_device_shape_id: '51d06bb2-cbf6-44df-8e7b-3e8bf1750c47' },
+    { cpe_device_shape_vendor_name: 'Fortinet' },
+    { cpe_device_shape_vendor_name: 'Other' },
+    { cpe_device_shape_id: 'shape-id', cpe_device_shape_vendor_name: 'Fortinet' },
+  ])('rejects configurable device selectors: %j', async (selector) => {
+    await expect(normalizeDevice(selector)).rejects.toThrow('unsupported');
+  });
+});
+
+describe('hybrid FastConnect provider selector', () => {
+  const circuit = { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: 'ocid1.providerservice.oc1.eu-frankfurt-1.example' };
+  async function renderCircuits(circuits: Record<string, unknown>, realm = 'oc1', region = 'eu-frankfurt-1', short = 'fra') {
+    const { files } = buildVirtualFs();
+    const config = {
+      region, region_short_name: short, realm, cis_level: 1,
+      hub: { kind: 'hub_e', network: { vcn: '10.0.0.0/21' } },
+      environments: { production: { project_network: { network: { vcn: '10.0.64.0/21' } } } },
+      hybrid_connectivity: { fast_connect_virtual_circuits: circuits },
+    };
+    files['provider-check.jsonnet'] = `(import 'landing_zone.libsonnet')(${JSON.stringify(config)}).network.network_configuration.network_configuration_categories['0-shared'].non_vcn_specific_gateways.fast_connect_virtual_circuits`;
+    return evaluate('provider-check.jsonnet', files) as Promise<Record<string, Record<string, unknown>>>;
+  }
+
+  it('rejects public FastConnect in Blueprint Factory source', async () => {
+    await expect(renderCircuits({ primary: { ...circuit, type: 'PUBLIC' } }))
+      .rejects.toThrow('only private FastConnect circuits are supported');
+  });
+
+  it.each(['public_prefixes', 'routing_policy'])('rejects the removed public-circuit field %s', async (field) => {
+    await expect(renderCircuits({ primary: { ...circuit, [field]: {} } })).rejects.toThrow('unsupported keys');
+  });
+
+  it('preserves explicit provider OCIDs without creating a name lookup key', async () => {
+    const rendered = await renderCircuits({ primary: { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: 'ocid1.providerservice.oc1..example', provider_service_key_name: 'ACTIVATION-REFERENCE' } });
+    expect(rendered['FCVC-FRA-LZ-HUB-PRIMARY-KEY'].provider_service_id).toBe('ocid1.providerservice.oc1..example');
+    expect(rendered['FCVC-FRA-LZ-HUB-PRIMARY-KEY']).not.toHaveProperty('provider_service_key');
+    expect(rendered['FCVC-FRA-LZ-HUB-PRIMARY-KEY'].provider_service_key_name).toBe('ACTIVATION-REFERENCE');
+  });
+
+  it('rejects the removed name-based provider selector', async () => {
+    await expect(renderCircuits({ primary: { ...circuit, provider_service: { provider_name: 'Equinix', provider_service_name: 'Fabric' } } }))
+      .rejects.toThrow('unsupported keys');
   });
 });
 
@@ -134,6 +267,67 @@ describe('generator (go-jsonnet wasm)', () => {
     expect(out.files['network.json']).toContain('0-shared');
     expect(out.files['iam.json']).toBeDefined();
     expect(out.config).toContain('environments: {}');
+  }, 60_000);
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('%s assigns VPN and private circuits to one HC ingress table', async (hubKind) => {
+    const model = emptyLzModel();
+    model.network = { hubKind, ...hubKindDefaults(hubKind) };
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.customer_premises_equipments.office = { ip_address: '203.0.113.10' };
+    hybrid.ipsecs.office = { ...newVpn('office'), remote_cidrs: ['172.20.0.0/16'] };
+    hybrid.fast_connect_virtual_circuits.primary = {
+      type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: 'ocid1.providerservice.oc1..example',
+    };
+    const out = await generateOutputs(model);
+    const gateways = JSON.parse(out.files['network.json']).network_configuration.network_configuration_categories['0-shared'].non_vcn_specific_gateways;
+    const drg = gateways.dynamic_routing_gateways['DRG-FRA-LZ-HUB-KEY'];
+    const key = 'DRGRT-FRA-LZ-HUB-HC-KEY';
+    for (const selector of ['ipsec_tunnel', 'virtual_circuit']) {
+      expect(drg.default_drg_route_tables[selector]).toEqual({ drg_route_table_id: key });
+    }
+    expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-VPN-KEY');
+    expect(drg.drg_route_tables).not.toHaveProperty('DRGRT-FRA-LZ-HUB-FASTCONNECT-KEY');
+    const table = drg.drg_route_tables[key];
+    expect(table.display_name).toBe('drgrt-fra-lz-hub-hc');
+    expect(table.is_ecmp_enabled).toBe(false);
+    if (hubKind === 'hub_e') {
+      expect(table.import_drg_route_distribution_key).toBe('DRGRD-FRA-LZ-HUB-HYBRID-LOCAL-KEY');
+      expect(table.route_rules).toEqual({});
+    } else {
+      const rules = Object.values<Record<string, unknown>>(table.route_rules);
+      expect(rules.length).toBeGreaterThan(1);
+      expect(rules.every((rule) => rule.destination !== '0.0.0.0/0' && rule.next_hop_drg_attachment_key === 'DRGATT-FRA-LZ-HUB-VCN-KEY')).toBe(true);
+    }
+    expect(Object.keys(gateways.ipsecs)).toHaveLength(1);
+    expect(Object.keys(gateways.fast_connect_virtual_circuits)).toHaveLength(1);
+  }, 60_000);
+
+  it('generates direct physical FastConnect after the provider OCID is cleared', async () => {
+    const model = emptyLzModel();
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.fast_connect_virtual_circuits.direct = {
+      type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'], provider_service_id: '', customer_asn: '65001',
+      cross_connect_mappings: { primary: {
+        cross_connect_or_cross_connect_group_id: 'ocid1.crossconnectgroup.oc1..example', vlan: '100',
+        customer_bgp_peering_ip: '192.168.254.1/30', oracle_bgp_peering_ip: '192.168.254.2/30',
+      } },
+    };
+    const out = await generateOutputs(model);
+    const gateways = JSON.parse(out.files['network.json']).network_configuration.network_configuration_categories['0-shared'].non_vcn_specific_gateways;
+    const circuit = gateways.fast_connect_virtual_circuits['FCVC-FRA-LZ-HUB-DIRECT-KEY'];
+    expect(circuit).not.toHaveProperty('provider_service_id');
+    expect(circuit.cross_connect_mappings.primary.cross_connect_or_cross_connect_group_id).toBe('ocid1.crossconnectgroup.oc1..example');
+  }, 60_000);
+
+  it('rejects OCI-reserved inside-tunnel addresses before producing configuration', async () => {
+    const { files } = buildVirtualFs();
+    files['check.jsonnet'] = `local c = import 'addons/oci-hybrid-connectivity/config.libsonnet'; c.normalize({
+      ipsecs: { office: { cpe_id: 'ocid1.cpe.oc1..example', remote_cidrs: ['172.20.0.0/16'],
+        tunnels_management: { [k]: { routing: 'BGP', bgp_session_info: {
+          customer_bgp_asn: 65001, customer_interface_ip: '169.254.10.1/30', oracle_interface_ip: '169.254.10.2/30',
+        } } for k in ['tunnel_1', 'tunnel_2'] },
+      } },
+    })`;
+    await expect(evaluate('check.jsonnet', files)).rejects.toThrow(/OCI-reserved/);
   }, 60_000);
   it('keeps canonical identities for repeated and same-named relative imports', async () => {
     const files = {

@@ -24,6 +24,7 @@ import { allFlowIds, buildFlowTraces, specFromId } from '../services/flowTrace';
 import { flowGroup } from '../diagram/flowOverlayGeometry';
 import LzDiagram, { DiagramZoomControls } from '../diagram/LzDiagram';
 import { serializeConfig } from '../services/lzConfig';
+import { hybridRoutes } from '../services/hybridConnectivity';
 import JsonViewer from '../components/JsonViewer';
 import ViewModeToggle, { type ViewMode } from '../components/ViewModeToggle';
 import FlowSidebar from '../components/FlowSidebar';
@@ -32,7 +33,7 @@ import type { FlowFocus } from '../diagram/FlowOverlay';
 import TopBar from '../components/TopBar';
 import { oracle } from '../theme';
 import { EMPTY_DEBUG_SEQUENCE, registerDebugClick } from '../services/debugMode';
-import { ErrorNotice } from '../components/FieldError';
+import FieldError, { ErrorNotice } from '../components/FieldError';
 import InfoButton from '../components/InfoButton';
 import { useDiagramPreview } from '../wizard/useDiagramPreview';
 
@@ -229,7 +230,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
       return { ...prev, [id]: next };
     });
   }
-  const configText = useMemo(() => serializeConfig(model, activeStep), [model, activeStep]);
+  const configText = useMemo(() => serializeConfig(model, activeStep, true), [model, activeStep]);
 
   function resetWizard() {
     if (!window.confirm('Clear all inputs for this Landing Zone?')) return;
@@ -243,14 +244,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   }
 
   const previewError = diagramStatus === 'error' && <div style={{ margin: '0 20px 12px' }}>
-    <ErrorNotice title="Diagram unavailable">
-      <div>{diagramError?.split('\n')[0].replace(/^RUNTIME ERROR:\s*/, '')}</div>
-      {diagramError?.includes('\n') && <details style={{ marginTop: 8 }}>
-        <summary>Technical details</summary>
-        <pre style={{ maxHeight: 160, overflow: 'auto', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', fontSize: 12 }}>{diagramError}</pre>
-      </details>}
-    </ErrorNotice>
-    <button type="button" style={layout.secondary} onClick={routing.retry}>Retry diagram preview</button>
+    <FieldError id="diagram-preview-error" error={diagramError?.split('\n')[0].replace(/^RUNTIME ERROR:\s*/, '')} />
   </div>;
 
   // Back / Next live in one full-width footer beneath the workspace so they do
@@ -324,7 +318,6 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
             {showForm && (
               <div ref={formPanel} className="studio-form-panel" role="region" aria-label="Landing zone configuration" tabIndex={viewMode === 'split' ? 0 : undefined}
                 style={{ display: 'grid', gap: 14, alignContent: 'start' }}>
-                {!showDiagram && previewError}
                 {activeStep === 1 ? (
                   <FoundationStep name={name} onNameChange={onNameChange} onNameBlur={onNameBlur} nameError={nameError} />
                 ) : activeStep === 2 ? (
@@ -336,6 +329,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                 ) : activeStep === 5 ? (
                   <ReviewStep designName={name} getDiagram={exportDiagram} diagramReady={diagramStatus === 'ready'} />
                 ) : null}
+                {previewError}
               </div>
             )}
 
@@ -355,7 +349,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                   )}
                   <DiagramZoomControls disabled={!diagram || routing.pending} />
                 </div>
-                {previewError}
+                {!showForm && previewError}
                 {!!diagram?.flowErrors?.length && <div style={{ margin: '0 20px 12px' }}>
                   <ErrorNotice title="Flow preview unavailable">{diagram.flowErrors.map((message) => <div key={message}>{message}</div>)}</ErrorNotice>
                 </div>}
@@ -378,6 +372,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
             {flowsOpen && (
               <div className="studio-flow-sidebar" style={{ height: 'calc(100vh - 185px)' }} inert={routing.pending || undefined}>
                 <FlowSidebar
+                  externalConnections={hybridRoutes(renderedModel)}
                   ingressAvailable={hasHubLoadBalancer(renderedModel)}
                   environments={renderedModel.environments.filter((env) => env.projectNetworkEnabled !== false).map((e, i) => ({
                     name: e.name.trim() || `env${i + 1}`,

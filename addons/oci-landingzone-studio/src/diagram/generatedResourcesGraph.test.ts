@@ -1,8 +1,9 @@
+import { tableAssociations } from './tablePlacement';
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import type { GeneratedResourceInventory, ResourceKind } from '../services/generatedResources';
-import { buildGraph } from './buildGraph';
+import { buildGraphLayout as buildGraph } from './buildGraph';
 import { absoluteNodeRects } from './flowGeometry';
 import { resourceGroupLayout } from './resourceGroups';
 import { generatePreview } from '../generator/preview';
@@ -10,7 +11,7 @@ import { buildRouteTables } from '../services/routeTables';
 import { setAssetLoader } from '../generator/jsonnetVm';
 import { hubKindDefaults } from '../services/hubKinds';
 import { createFlowPlayback, flowHopMarkers, pointAtDistance } from './flowPlayback';
-import { routeStructuralEdges } from './displayGeometry';
+import { tableSourceAnchors, routeStructuralEdges } from './displayGeometry';
 import { DIAGRAM_LAYOUT, minimumOwnerWidths } from './layoutPolicy';
 import { generatorNames } from '../services/generatorNaming';
 
@@ -240,8 +241,9 @@ describe('generated diagram resource groups', () => {
     expect(graph.flowErrors).toBeUndefined();
     expect(graph.nodes.some((node) => node.kind === 'resourcegroup')).toBe(true);
     const rects = absoluteNodeRects(graph.nodes);
-    const canonical = new Map(routeStructuralEdges(graph.nodes, graph.edges.filter((edge) => !edge.waypoints)
-      .map((edge) => ({ ...edge, points: undefined }))).map((edge) => [edge.id, edge.points]));
+    const structural = routeStructuralEdges(graph.nodes, graph.edges.filter((edge) => !edge.waypoints)
+      .map((edge) => ({ ...edge, points: undefined })));
+    const canonical = new Map(tableAssociations(graph.nodes, tableSourceAnchors(graph.nodes, structural)).map((edge) => [edge.id, edge.points]));
     const flows = graph.edges.filter((edge) => edge.waypoints);
     expect(flows.length).toBeGreaterThan(0);
     for (const edge of graph.edges.filter((edge) => !edge.waypoints)) {

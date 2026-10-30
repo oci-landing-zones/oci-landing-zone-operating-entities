@@ -30,6 +30,8 @@ import type { HubKind, LzModel, PlatformConfig } from '../model/types';
 import { envNetworkDefaults } from '../model/defaults';
 import { platformSubnetsForEnv, platformVcnForEnv } from './platforms';
 import { exadataEntries } from './exadata';
+import { hybridConfig, stripInlineSecrets } from './hybridConnectivity';
+import type { HybridConnectivity } from '../model/hybridConnectivity';
 
 /** One platform in the config — a network and, where supported, an extension. */
 export interface PlatformConfigEntry {
@@ -55,6 +57,7 @@ export interface LzConfig {
     peer_tenancy_ocid?: string;
     requestor_group_ocid?: string;
   }>;
+  hybrid_connectivity?: HybridConnectivity;
   realm: string;
   region: string;
   region_short_name: string;
@@ -216,6 +219,7 @@ export function buildConfig(model: LzModel, includeExadata = true): LzConfig {
     environments,
     shared_platforms,
     security_targets,
+    ...(hybridConfig(model) ? { hybrid_connectivity: hybridConfig(model) } : {}),
   };
 }
 
@@ -225,7 +229,7 @@ function key(name: string): string {
 }
 
 function quote(value: string): string {
-  return `'${String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+  return `'${String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')}'`;
 }
 
 /** Render key:value entries two-per-line at the given indent (e.g. subnet maps). */
@@ -272,7 +276,7 @@ function platformEntryLines(name: string, entry: PlatformConfigEntry): string[] 
 function jsonnetValue(v: unknown): string {
   if (Array.isArray(v)) return `[${v.map((x) => quote(String(x))).join(', ')}]`;
   if (typeof v === 'object' && v !== null) {
-    return `{ ${Object.entries(v).map(([k, value]) => `${key(k)}: ${jsonnetValue(value)}`).join(', ')} }`;
+    return `{ ${Object.entries(v).filter(([, value]) => value !== undefined).map(([k, value]) => `${key(k)}: ${jsonnetValue(value)}`).join(', ')} }`;
   }
   if (typeof v === 'string') return quote(v);
   return String(v);
@@ -312,7 +316,8 @@ function envEntryLines(name: string, entry: EnvConfigEntry, includePlatforms: bo
  * `upToStep` limits the output to the blocks the wizard has reached — on
  * step 1 the hub block is left out, so the JSON tracks where you are.
  */
-export function serializeConfig(model: LzModel, upToStep = Infinity): string {
+export function serializeConfig(model: LzModel, upToStep = Infinity, redactSecrets = false): string {
+  if (redactSecrets) model = stripInlineSecrets(model, '[redacted]');
   const c = buildConfig(model, upToStep >= 4);
 
   const envNames = Object.keys(c.environments);
@@ -388,6 +393,7 @@ export function serializeConfig(model: LzModel, upToStep = Infinity): string {
     ...(c.remote_peering_connections ? [`  remote_peering_connections: ${jsonnetValue(c.remote_peering_connections)},`] : []),
     ...environmentsBlock,
     ...sharedPlatformsBlock,
+    ...(upToStep >= 2 && c.hybrid_connectivity ? [`  hybrid_connectivity: ${jsonnetValue(c.hybrid_connectivity)},`] : []),
     `  security_targets: ${securityTargets},`,
     '}',
     '',

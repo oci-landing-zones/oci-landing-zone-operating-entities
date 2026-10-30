@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildGraph } from './buildGraph';
+import { buildGraphLayout as buildGraph } from './buildGraph';
 import { emptyLzModel, envNetworkDefaults } from '../model/defaults';
 import { hubKindDefaults } from '../services/hubKinds';
 import { newPlatform, newSharedPlatform } from '../services/platforms';
@@ -7,6 +7,7 @@ import type { Environment, LzModel } from '../model/types';
 import { generatedRouteTables } from '../services/routingFixtures.testSupport';
 import { buildFlowTraces } from '../services/flowTrace';
 import { absoluteNodeRects, flowAnchorPoint, type FlowPoint, type FlowRect } from './flowGeometry';
+import { emptyHybridConnectivity, newVpn, vpnCpeNodeId } from '../services/hybridConnectivity';
 
 function env(name: string, securityZone: boolean, index: number): Environment {
   return { id: `environment-${index + 1}`, name, securityZone, network: envNetworkDefaults(index) };
@@ -35,6 +36,88 @@ function crossesInterior(from: FlowPoint, to: FlowPoint, rect: FlowRect): boolea
 }
 
 describe('generator-aligned graph', () => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('places VPN outside the OCI region for %s with only DRG port clearance inside the network compartment', (kind) => {
+    const model = emptyLzModel();
+    model.network = { hubKind: kind, ...hubKindDefaults(kind) };
+    const baseline = buildGraph(model, 2);
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    for (const [index, name] of ['office', 'backup'].entries()) {
+      hybrid.customer_premises_equipments[`router-${name}`] = { ip_address: `203.0.113.${10 + index}` };
+      hybrid.ipsecs[name] = { ...newVpn(`router-${name}`), remote_cidrs: ['172.20.0.0/16'] };
+    }
+    for (const step of [2, 5]) {
+      const graph = buildGraph(model, step);
+      const rects = absoluteNodeRects(graph.nodes);
+      const region = rects.get('region')!;
+      const vpns = ['office', 'backup'].map((name) => rects.get(`hybrid-cpe-router-${name}:premises`)!);
+      for (const [index, vpn] of vpns.entries()) {
+        expect(vpn.node.parentId).toBeUndefined();
+        expect(vpn.node.kind).toBe('premises');
+        expect(vpn.x + vpn.width).toBeLessThan(region.x);
+        const tunnels = graph.edges.filter((edge) => edge.source.startsWith(`hybrid-vpn-${['office', 'backup'][index]}:tunnel-`) && edge.target === 'drg');
+        expect(tunnels).toHaveLength(2);
+        expect(new Set(tunnels.map((edge) => edge.targetPort)).size).toBe(2);
+        expect(tunnels.every((edge) => edge.points!.length >= 2)).toBe(true);
+      }
+      expect(vpns[0].y + vpns[0].height).toBeLessThan(vpns[1].y);
+    }
+    const before = buildGraph(model, 2);
+    expect(before.nodes.find((node) => node.id === 'hub-vcn')!.height)
+      .toBe(baseline.nodes.find((node) => node.id === 'hub-vcn')!.height);
+    expect(before.nodes.find((node) => node.id === 'cmp-network')!.height - baseline.nodes.find((node) => node.id === 'cmp-network')!.height)
+      .toBe(before.nodes.find((node) => node.id === 'drg')!.height - baseline.nodes.find((node) => node.id === 'drg')!.height);
+    hybrid.ipsecs.office.remote_cidrs = Array.from({ length: 12 }, (_, index) => `172.${20 + index}.0.0/16`);
+    const widened = buildGraph(model, 2);
+    expect(widened.nodes).toHaveLength(before.nodes.length);
+    expect(widened.nodes.find((node) => node.id === 'hybrid-cpe-router-office:premises')!.height)
+      .toBeGreaterThan(before.nodes.find((node) => node.id === 'hybrid-cpe-router-office:premises')!.height);
+    expect(buildGraph(model, 1).nodes.some((node) => node.id.startsWith('hybrid-vpn-'))).toBe(false);
+    hybrid.fast_connect_virtual_circuits.primary = { type: 'PRIVATE', remote_cidrs: ['172.20.0.0/16'] };
+    expect(buildGraph(model, 2).nodes.find((node) => node.id === 'hybrid-fc-primary')?.parentId).toBeUndefined();
+  });
+
+  it('draws every CPE once and connects each VPN pair to its selected physical equipment', () => {
+    const model = emptyLzModel();
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.customer_premises_equipments = {
+      east: { ip_address: '203.0.113.10' }, west: { ip_address: '203.0.113.20' }, spare: { ip_address: '203.0.113.30' },
+    };
+    hybrid.ipsecs.office = { ...newVpn('east'), remote_cidrs: ['172.20.0.0/16'] };
+    hybrid.ipsecs.backup = { ...newVpn('east'), remote_cidrs: ['172.21.0.0/16'] };
+    hybrid.ipsecs.branch = { ...newVpn('west'), remote_cidrs: ['172.22.0.0/16'] };
+    for (const [name, id] of [['existing_a', 'ocid1.cpe.oc1..existingone'], ['existing_b', 'ocid1.cpe.oc1..existingone'], ['existing_c', 'ocid1.cpe.oc1..existingtwo']]) {
+      hybrid.ipsecs[name] = { ...newVpn(''), cpe_key: undefined, cpe_id: id, remote_cidrs: ['172.23.0.0/16'] };
+    }
+    const graph = buildGraph(model, 2);
+    expect(graph.nodes.filter((node) => node.kind === 'vpn')).toHaveLength(5);
+    expect(graph.nodes.filter((node) => node.kind === 'vpntunnel')).toHaveLength(12);
+    expect(new Set(graph.nodes.map((node) => node.id)).size).toBe(graph.nodes.length);
+    for (const [name, config] of Object.entries(hybrid.ipsecs)) {
+      const cpe = vpnCpeNodeId(config);
+      for (const tunnel of [1, 2]) expect(graph.edges).toContainEqual(expect.objectContaining({ source: cpe, target: `hybrid-vpn-${name}:tunnel-${tunnel}` }));
+    }
+    expect(graph.edges.some((edge) => edge.source === 'hybrid-cpe-spare' || edge.target === 'hybrid-cpe-spare')).toBe(false);
+    expect(graph.nodes.find((node) => node.id === 'hybrid-cpe-east:premises')?.premises?.cidrs).toEqual(['172.20.0.0/16', '172.21.0.0/16']);
+    expect(graph.nodes.find((node) => node.id === 'hybrid-cpe-west:premises')?.premises?.equipmentAddress).toBe('203.0.113.20');
+    const rects = absoluteNodeRects(graph.nodes);
+    const east = rects.get('hybrid-cpe-east:premises')!;
+    for (const name of ['office', 'backup']) for (const tunnel of [1, 2]) {
+      const row = rects.get(`hybrid-vpn-${name}:tunnel-${tunnel}`)!;
+      expect(row.y).toBeGreaterThanOrEqual(east.y + 30);
+      expect(row.y + row.height).toBeLessThanOrEqual(east.y + east.height);
+    }
+  });
+
+  it('shows configured CPEs without inventing a VPN or DRG connection', () => {
+    const model = emptyLzModel();
+    const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+    hybrid.customer_premises_equipments.unused = { ip_address: '203.0.113.30' };
+    const graph = buildGraph(model, 2);
+    expect(graph.nodes.find((node) => node.id === 'hybrid-cpe-unused')?.kind).toBe('vpn');
+    expect(graph.nodes.some((node) => node.kind === 'vpntunnel')).toBe(false);
+    expect(graph.edges.some((edge) => edge.source === 'hybrid-cpe-unused' || edge.target === 'hybrid-cpe-unused')).toBe(false);
+  });
+
   it('uses the normalized custom region key for VCN names and firewall captions', () => {
     const model = emptyLzModel();
     model.foundation.regionShortName = ' FR2 ';
@@ -368,7 +451,7 @@ describe('generator-aligned graph', () => {
       expect(tables.map((table) => table.id).sort()).toEqual(expected.map((table) => table.id).sort());
       for (const table of expected) {
         const node = tables.find((entry) => entry.id === table.id)!;
-        expect(node.rtRows, table.id).toEqual(table.rules.map(({ id, destination, targetType, target, routeType }) => ({ id, destination, targetType, target, routeType })));
+        expect(node.rtRows, table.id).toEqual(table.rules.map(({ id, destination, targetType, target, routeType, superseded }) => ({ id, destination, targetType, target, routeType, superseded })));
         expect(node.rtHighlight, table.id).toEqual(trace.highlights.find((entry) => entry.tableId === table.id)?.rows ?? []);
         const dots = graph.nodes.filter((entry) => entry.kind === 'rtdot' && entry.rtDotTableId === table.id);
         expect(dots, table.id).toHaveLength(table.associations.length);

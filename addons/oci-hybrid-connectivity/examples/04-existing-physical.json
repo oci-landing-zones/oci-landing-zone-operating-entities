@@ -1,0 +1,43 @@
+{
+    "region"                                                     : "eu-frankfurt-1",
+    "region_short_name"                                          : "fra",
+    "cis_level"                                                  : 2,
+
+    "hub": {
+        "kind"                                                   : "hub_a",
+
+        "network": {
+            "vcn"                                                : "10.0.0.0/21"
+        }
+    },
+
+    "environments": {
+        "production": {
+            "project_network": {
+                "network": {
+                    "vcn"                                        : "10.0.64.0/21"
+                }
+            }
+        }
+    },
+
+    "hybrid_connectivity": {
+        "fast_connect_virtual_circuits": {
+            "datacenter": {
+                "type"                                           : "PRIVATE",
+                "bandwidth_shape_name"                           : "1 Gbps",
+                "customer_asn"                                   : "65001",
+                "remote_cidrs"                                   : ["172.20.0.0/16"],
+
+                "cross_connect_mappings": {
+                    "primary": {
+                        "cross_connect_or_cross_connect_group_id": "ocid1.crossconnectgroup.oc1..REPLACE_WITH_READY_GROUP",
+                        "customer_bgp_peering_ip"                : "192.168.254.1/30",
+                        "oracle_bgp_peering_ip"                  : "192.168.254.2/30",
+                        "vlan"                                   : "100"
+                    }
+                }
+            }
+        }
+    }
+}

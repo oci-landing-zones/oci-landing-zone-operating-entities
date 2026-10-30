@@ -1,0 +1,41 @@
+{
+    "region"                                   : "eu-frankfurt-1",
+    "region_short_name"                        : "fra",
+    "cis_level"                                : 2,
+
+    "hub": {
+        "kind"                                 : "hub_a",
+
+        "network": {
+            "vcn"                              : "10.0.0.0/21"
+        }
+    },
+
+    "environments": {
+        "production": {
+            "project_network": {
+                "network": {
+                    "vcn"                      : "10.0.64.0/21"
+                }
+            }
+        }
+    },
+
+    "hybrid_connectivity": {
+        "cross_connect_groups": {
+            "datacenter": {
+                "cross_connects": {
+                    "first": {
+                        "location_name"        : "REPLACE_WITH_LOCATION",
+                        "port_speed_shape_name": "REPLACE_WITH_PORT_SPEED_SHAPE"
+                    },
+
+                    "second": {
+                        "location_name"        : "REPLACE_WITH_REDUNDANT_LOCATION",
+                        "port_speed_shape_name": "REPLACE_WITH_PORT_SPEED_SHAPE"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -37,6 +37,16 @@ describe('shared orthogonal visibility router', () => {
     expect(clearRoutingSegment(rects, { x: 0, y: 24 }, { x: -12, y: 24 }, ['router'], 0)).toBe(true);
   });
 
+  it('uses a hoisted route marker physical owner for routing exclusions', () => {
+    const rects = absoluteNodeRects([
+      { id: 'tunnel', kind: 'vpntunnel', label: '', x: -600, y: 60, width: 500, height: 96 },
+      { id: 'drg', kind: 'drg', label: '', x: 100, y: 76, width: 48, height: 48 },
+      { id: 'dot', kind: 'rtdot', label: '', rtDotOwnerId: 'tunnel', rtDotPhysicalOwnerId: 'drg', x: 92, y: 92, width: 16, height: 16 },
+    ]);
+    expect(clearRoutingSegment(rects, { x: 98, y: 100 }, { x: 104, y: 100 }, ['dot'], 0)).toBe(true);
+    expect(clearRoutingSegment(rects, { x: -200, y: 100 }, { x: -190, y: 100 }, ['dot'], 0)).toBe(false);
+  });
+
   it('keeps a constrained prefix inside its allowed arrival corridor', () => {
     const path = routeOrthogonalPoints(new Map(), { x: 0, y: 0 }, { x: 200, y: 0 }, [], undefined,
       [{ start: { x: 100, y: -10 }, end: { x: 100, y: 10 } }], [], { left: -24, right: 200, top: 0, bottom: 0 });

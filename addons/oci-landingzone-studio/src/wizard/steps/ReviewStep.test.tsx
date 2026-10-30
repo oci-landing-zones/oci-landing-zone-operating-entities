@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import { emptyLzModel } from '../../model/defaults';
 import { WizardProvider } from '../wizardContext';
+import { emptyHybridConnectivity, newVpn } from '../../services/hybridConnectivity';
 import ReviewStep from './ReviewStep';
 
 describe('Resource Manager deployment link', () => {
@@ -45,4 +46,28 @@ describe('Resource Manager deployment link', () => {
     expect(markup).not.toContain('Hub routing');
     expect(markup).not.toContain('The Orchestrator resolves OCI Network Firewall route targets');
   });
+});
+
+it('explains deployment and the applicable external handover inside Studio', () => {
+  const model = emptyLzModel();
+  const hybrid = model.hybridConnectivity = emptyHybridConnectivity();
+  hybrid.ipsecs.office = newVpn('office');
+  const render = () => renderToStaticMarkup(
+    <MemoryRouter><WizardProvider initialModel={model}><ReviewStep designName="Landing Zone" /></WizardProvider></MemoryRouter>,
+  );
+  const vpn = render();
+  expect(vpn).toContain('Studio creates configuration files.');
+  expect(vpn).toContain('terraform init');
+  expect(vpn).toContain('A second state must not manage the same resources.');
+  expect(vpn).toContain('obtain both Oracle tunnel endpoints and their keys from OCI.');
+  expect(vpn).not.toContain('complete the provider activation or physical connection work');
+  expect(vpn).not.toContain('>Deploy to OCI');
+  delete hybrid.ipsecs.office;
+  hybrid.fast_connect_virtual_circuits.primary = { type: 'PRIVATE' };
+  const fc = render();
+  expect(fc).toContain('complete the provider activation or physical connection work');
+  expect(fc).not.toContain('obtain both Oracle tunnel endpoints and their keys from OCI.');
+  delete hybrid.fast_connect_virtual_circuits.primary;
+  hybrid.cross_connect_groups.primary = { cross_connects: {} };
+  expect(render()).toContain('complete cabling and activation before adding circuits');
 });
