@@ -121,9 +121,11 @@ export interface PlatformConfig {
   /** Key in environments.<env>.platforms. */
   key: string;
   type: PlatformType;
+  /** OKE card owns a fixed network in one environment; older placements are expanded on load. */
+  environmentScoped?: boolean;
   /** 'all' applies it to every environment; otherwise the listed environment IDs. */
   environments: 'all' | string[];
-  /** Base VCN CIDR (env-0); other envs derive from it. */
+  /** Fixed CIDR for scoped OKE cards; base CIDR for shared placements. */
   vcnCidr: string;
   /** Default (locked) + custom subnets, relative to the base VCN. */
   subnets: Subnet[];

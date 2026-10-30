@@ -2,7 +2,7 @@ import { overlaps, parseCidr } from "./cidr";
 
 import { describe, expect, it } from 'vitest';
 import {
-  PLATFORM_TYPES, okeProfileCidrError, setOkeEnvironmentCidr, applyPlatformPatch, newPlatform, newSharedPlatform, okeDefaultSubnets, okeNetworkProfilePatch,
+  PLATFORM_TYPES, okeProfileCidrError, setOkeEnvironmentCidr, applyPlatformPatch, newPlatform, newSharedPlatform, okeDefaultParams, okeDefaultSubnets, okeNetworkProfilePatch,
   okeProfileSubnets, placementsOverlap, platformEnvInstances, platformSubnetsForEnv, platformVcnForEnv,
 } from './platforms';
 import { validateOkePlatform } from './okeValidation';
@@ -211,4 +211,12 @@ describe('editing profile-owned OKE VCNs', () => {
     expect(okeProfileCidrError('10.140.0.0/20', 'large')).toContain('/16');
     expect(okeProfileCidrError('', 'large')).toContain('/16');
   });
+});
+
+
+it('defaults API Server access to only the current hub management subnet', () => {
+  expect(okeDefaultParams().apiAllowedCidrs).toEqual(['10.0.3.0/24']);
+  const network = { subnets: [{ name: 'lb', cidr: '172.20.1.0/24' }, { name: 'mgmt', cidr: '172.20.3.0/24' }] };
+  expect(newPlatform('oke_simple', [], ENVS, [], network).okeParams!.apiAllowedCidrs).toEqual(['172.20.3.0/24']);
+  expect(okeDefaultParams({ subnets: [] }).apiAllowedCidrs).toEqual([]);
 });

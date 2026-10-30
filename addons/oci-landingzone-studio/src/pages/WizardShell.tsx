@@ -26,6 +26,7 @@ import LzDiagram, { DiagramZoomControls } from '../diagram/LzDiagram';
 import { serializeConfig } from '../services/lzConfig';
 import JsonViewer from '../components/JsonViewer';
 import ViewModeToggle, { type ViewMode } from '../components/ViewModeToggle';
+import { flowPickerEnvironments } from '../services/flowNetworks';
 import FlowSidebar from '../components/FlowSidebar';
 import { hasHubLoadBalancer } from '../services/hubKinds';
 import type { FlowFocus } from '../diagram/FlowOverlay';
@@ -34,6 +35,7 @@ import { oracle } from '../theme';
 import { EMPTY_DEBUG_SEQUENCE, registerDebugClick } from '../services/debugMode';
 import { ErrorNotice } from '../components/FieldError';
 import InfoButton from '../components/InfoButton';
+import { isDiagramTextControl } from '../wizard/diagramEditing';
 import { useDiagramPreview } from '../wizard/useDiagramPreview';
 
 const FONT = '"Oracle Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif';
@@ -87,6 +89,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   saveRevision: number;
 }) {
   const { model, reset, homeSource } = useWizard();
+  const [editingDiagramInput, setEditingDiagramInput] = React.useState(false);
   const [activeStep, setActiveStep] = React.useState(1);
   const [flowsCollapsed, setFlowsCollapsed] = React.useState(false);
   const [flowSteps, setFlowSteps] = React.useState<Record<string, number | null>>({});
@@ -125,7 +128,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
 
   const showForm = viewMode === 'split' || viewMode === 'form';
   const showDiagram = viewMode === 'split' || viewMode === 'diagram';
-  const routing = useDiagramPreview(model);
+  const routing = useDiagramPreview(model, editingDiagramInput);
   const snapshot = routing.snapshot;
   const renderedModel = snapshot?.model ?? model;
   React.useEffect(() => {
@@ -134,7 +137,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
       return activeFlows?.length === previous.activeFlows?.length ? previous : { ...previous, activeFlows };
     });
   }, [renderedModel]);
-  const supportsFlowTracing = renderedModel.environments.some((env) => env.projectNetworkEnabled !== false && env.network.subnets.length > 0)
+  const supportsFlowTracing = flowPickerEnvironments(renderedModel).length > 0
     && ['hub_a', 'hub_b', 'hub_c', 'hub_e'].includes(renderedModel.network.hubKind);
 
   // The endpoints / route-table dots and flows are a diagram-only-mode layer — in
@@ -148,14 +151,14 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
     () => {
       // Hidden flows draw nothing, so their traces cannot keep the route tables open;
       // the picks stay in state and return with Show flows.
-      if (!supportsFlowTracing || !diagramOpts.showFlows) return { ...diagramOpts, activeFlows: [], allFlows: false, focusFlow: undefined };
+      if (routing.pending || !supportsFlowTracing || !diagramOpts.showFlows) return { ...diagramOpts, activeFlows: [], allFlows: false, focusFlow: undefined };
       // A clicked flow only stays selected while it is still being traced.
       const activeFlows = diagramOpts.activeFlows?.filter((id) => specFromId(renderedModel, id, '') !== null);
       const traced = diagramOpts.allFlows ? allFlowIds(renderedModel) : activeFlows ?? [];
       const focusFlow = traced.some((id) => flowGroup(id) === diagramOpts.focusFlow) ? diagramOpts.focusFlow : undefined;
       return { ...diagramOpts, activeFlows, focusFlow };
     },
-    [diagramOpts, supportsFlowTracing, renderedModel],
+    [diagramOpts, supportsFlowTracing, renderedModel, routing.pending],
   );
   const effectiveOpts = useMemo<DiagramOptions>(() => flowLayer ? chosenOpts : {
     ...chosenOpts, showDots: false, showEndpoints: false, showFlows: false, activeFlows: [], allFlows: false, focusFlow: undefined,
@@ -218,7 +221,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
   );
   // Manual packet stepping: null = auto-play, a number = that 0-based hop.
   function onFlowStep(id: string, action: 'prev' | 'next' | 'play' | 'goto', hop?: number) {
-    const grp = (tid: string) => { const np = tid.split('#')[0].split(':'); return `${np[0]}:${np[1]}`; };
+    const grp = flowGroup;
     const n = flowTraces.find((t) => grp(t.id) === id)?.hops.length ?? 0;
     setFlowSteps((prev) => {
       const cur = prev[id];
@@ -323,6 +326,15 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
         >
             {showForm && (
               <div ref={formPanel} className="studio-form-panel" role="region" aria-label="Landing zone configuration" tabIndex={viewMode === 'split' ? 0 : undefined}
+                onChangeCapture={(event) => { if (isDiagramTextControl(event.target)) setEditingDiagramInput(true); }}
+                onBlurCapture={(event) => { if (isDiagramTextControl(event.target)) setEditingDiagramInput(false); }}
+                onKeyDownCapture={(event) => {
+                  if (event.key === 'Enter' && !event.nativeEvent.isComposing && isDiagramTextControl(event.target)
+                    && (event.target.tagName === 'INPUT' || event.ctrlKey || event.metaKey)) {
+                    event.preventDefault();
+                    event.target.blur();
+                  }
+                }}
                 style={{ display: 'grid', gap: 14, alignContent: 'start' }}>
                 {!showDiagram && previewError}
                 {activeStep === 1 ? (
@@ -365,10 +377,10 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
                       <LzDiagram diagram={diagram} options={effectiveOpts} onOptionsChange={flowLayer ? setDiagramLayers : undefined} flowSteps={flowSteps} showFlowControl={supportsFlowTracing} flowHint={flowHint} flowFocus={flowsOpen ? flowFocus : null}
                         onFlowSelect={flowsOpen ? selectFlow : undefined} onFlowHover={(group) => setFlowFocus(group ? { group } : null)} />
                   </div> : <div role="status" style={{ height: '100%', display: 'grid', placeItems: 'center', color: oracle.textMuted, fontSize: 13 }}>
-                    {diagramStatus === 'error' ? 'Diagram unavailable' : 'Preparing diagram…'}
+                    {diagramStatus === 'error' ? 'Diagram unavailable' : routing.deferred ? 'Complete the network fields to prepare the diagram.' : 'Preparing diagram…'}
                   </div>}
                   {diagram && routing.pending && <div style={{ position: 'absolute', inset: 0, zIndex: 3000 }}>
-                    <span role="status" style={{ position: 'absolute', top: 12, left: 12, padding: '4px 8px', background: oracle.surface, color: oracle.textMuted, fontSize: 13 }}>Updating diagram…</span>
+                    <span role="status" style={{ position: 'absolute', top: 12, left: 12, padding: '4px 8px', background: oracle.surface, color: oracle.textMuted, fontSize: 13 }}>{routing.deferred ? 'Finish editing and complete CIDR fields to update the diagram.' : 'Updating diagram…'}</span>
                   </div>}
                 </div>
               </section>
@@ -379,10 +391,7 @@ function WizardBody({ name, onNameChange, onNameBlur, nameError, saveState, save
               <div className="studio-flow-sidebar" style={{ height: 'calc(100vh - 185px)' }} inert={routing.pending || undefined}>
                 <FlowSidebar
                   ingressAvailable={hasHubLoadBalancer(renderedModel)}
-                  environments={renderedModel.environments.filter((env) => env.projectNetworkEnabled !== false).map((e, i) => ({
-                    name: e.name.trim() || `env${i + 1}`,
-                    roles: (e.network?.subnets ?? []).map((sn) => sn.name.split('-').pop() || ''),
-                  }))}
+                  environments={flowPickerEnvironments(renderedModel)}
                   active={effectiveOpts.activeFlows ?? []}
                   traces={flowTraces}
                   steps={flowSteps}

@@ -6,6 +6,8 @@ import { buildConfig } from '../../services/lzConfig';
 import { platformReadiness } from '../../services/platformReadiness';
 import { WizardProvider } from '../wizardContext';
 import PlatformsStep from './PlatformsStep';
+import { createOkeEntries } from '../../services/okePlacements';
+import { PlatformCard } from './PlatformTemplatesStep';
 import type { LzModel } from '../../model/types';
 
 function render(model: LzModel) {
@@ -134,4 +136,23 @@ describe('platform selection and readiness', () => {
   it('does not put custom networks in a separate legacy section', () => {
     expect(render(emptyLzModel())).not.toContain('Existing custom networks');
   });
+});
+
+
+it('shows an environment label instead of placement controls for each OKE card', () => {
+  const model = emptyLzModel();
+  model.platforms = createOkeEntries(model, []);
+  const platform = model.platforms[1];
+  const html = renderToStaticMarkup(<WizardProvider initialModel={model}><PlatformCard platform={platform}
+    environments={model.environments} open onToggle={() => {}} onPlatform={() => {}} onDelete={() => {}} /></WizardProvider>);
+  expect(html).toContain('aria-label="OKE environment"');
+  expect(html).toContain('preprod');
+  expect(html).not.toContain('aria-label="Platform placement"');
+  expect(html).not.toContain('all envs');
+  expect(html).toContain('Environment network');
+  const custom = newPlatform('custom', model.platforms, model.environments);
+  const customHtml = renderToStaticMarkup(<WizardProvider initialModel={{ ...model, platforms: [...model.platforms, custom] }}><PlatformCard platform={custom}
+    environments={model.environments} open onToggle={() => {}} onPlatform={() => {}} onDelete={() => {}} /></WizardProvider>);
+  expect(customHtml).toContain('aria-label="Platform placement"');
+  expect(customHtml).toContain('>All</button>');
 });

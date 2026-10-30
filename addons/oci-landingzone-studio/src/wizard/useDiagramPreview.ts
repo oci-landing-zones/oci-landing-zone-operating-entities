@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { LzModel } from '../model/types';
 import type { RouteTable } from '../services/routeTables';
+import { hasIncompleteNetworkInput } from './diagramEditing';
 import { loadDiagramPreview } from '../services/diagramPreview';
 import type { DiagramPreview } from '../services/diagramPreview.worker';
 
@@ -13,25 +14,28 @@ interface PreviewState {
 }
 
 /** A frozen preview always travels with the model that generated it. */
-export function diagramPreviewView(state: PreviewState | undefined, model: LzModel, attempt: number) {
+export function diagramPreviewView(state: PreviewState | undefined, model: LzModel, attempt: number, deferred = false) {
   const current = state?.outcome?.model === model && state.outcome.attempt === attempt ? state.outcome : undefined;
-  const status = current?.error !== undefined ? 'error' : current && state?.snapshot?.model === model ? 'ready' : 'loading';
+  const status = deferred ? 'editing' : current?.error !== undefined ? 'error' : current && state?.snapshot?.model === model ? 'ready' : 'loading';
   const snapshot = status === 'error' ? undefined : state?.snapshot;
   return {
     snapshot,
-    pending: status === 'loading',
+    pending: status === 'loading' || status === 'editing',
+    deferred,
     tables: snapshot?.preview.tables ?? NO_TABLES,
     inventory: snapshot?.preview.inventory,
     status,
-    error: current?.error,
+    error: deferred ? undefined : current?.error,
   };
 }
 
-export function useDiagramPreview(model: LzModel) {
+export function useDiagramPreview(model: LzModel, editing = false) {
+  const deferred = editing || hasIncompleteNetworkInput(model);
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState<PreviewState>();
   const previousRequest = useRef<PreviewRequest | undefined>(undefined);
   useEffect(() => {
+    if (deferred) return;
     const controller = new AbortController();
     const request = { model, attempt };
     const previous = previousRequest.current;
@@ -52,6 +56,6 @@ export function useDiagramPreview(model: LzModel) {
     const timer = debounce ? setTimeout(generate, 250) : undefined;
     if (!debounce) generate();
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [model, attempt]);
-  return { ...diagramPreviewView(state, model, attempt), retry: () => setAttempt((previous) => previous + 1) };
+  }, [model, attempt, deferred]);
+  return { ...diagramPreviewView(state, model, attempt, deferred), retry: () => setAttempt((previous) => previous + 1) };
 }

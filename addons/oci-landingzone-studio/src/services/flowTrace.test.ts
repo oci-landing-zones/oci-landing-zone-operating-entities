@@ -160,6 +160,8 @@ describe('flowTrace generated routing inventory', () => {
     expect(specFromId(model, 'prod:ingress:web', C)).toBeNull();
     expect(allFlowIds(model).some((id) => id.includes(':ingress'))).toBe(false);
     model.environments[0].network.subnets = [];
+    expect(allFlowIds(model).every((id) => id.includes('/oke:'))).toBe(true);
+    model.platforms = [];
     expect(allFlowIds(model)).toEqual([]);
   });
 

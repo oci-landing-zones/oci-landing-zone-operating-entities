@@ -51,7 +51,7 @@ Both deployment options provide:
 - **Service Gateway**: Direct connectivity to OCI services
 - **Optional File Storage prerequisites**: Config-driven generation can add a dedicated FSS subnet, NSG rules, and scoped IAM permission.
 
-For config-driven Hub A, B, and C deployments, OKE subnet route tables use the Service Gateway for OCI services and a default route through the DRG. Hub E uses a local NAT Gateway for the default route and explicit DRG routes for the Hub and peer networks. Outputs without a DRG default retain the explicit DRG routes; the optional FSS subnet uses only its Service Gateway route.
+By default, config-driven Hub A, B, and C OKE subnet route tables use the Service Gateway for OCI services and a default route through the DRG. Hub E uses a local NAT Gateway for the default route. Worker and pod route tables include only their opted-in peer CIDRs and, when public load balancers are enabled, the exact Hub LB subnet for responses. Internet access can be disabled independently per component. Explicit peer/LB prefixes are omitted when covered by a DRG internet default; they remain necessary with local NAT. Control-plane and internal-LB tables retain topology-derived routing. The optional FSS subnet uses only its Service Gateway route.
 
 ### Deployment Components
 

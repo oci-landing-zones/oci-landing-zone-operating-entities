@@ -533,7 +533,7 @@ it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('independently controls w
       const routes = Object.values(table.route_rules as Record<string, Record<string, unknown>>);
       expect(routes.some((route) => route.destination === '0.0.0.0/0')).toBe(enabled);
       expect(routes.some((route) => route.destination_type === 'SERVICE_CIDR_BLOCK')).toBe(true);
-      if (!enabled) expect(routes.some((route) => route.destination === model.network.hubVcnCidr)).toBe(true);
+      if (!enabled) expect(routes.filter((route) => route.destination_type === 'CIDR_BLOCK')).toEqual([]);
       const nsg = objects.find((entry) => entry.display_name === `nsg-fra-lz-prod-oke-${role}`)!;
       const egress = Object.values(nsg.egress_rules as Record<string, Record<string, unknown>>);
       expect(egress.some((rule) => rule.dst === '0.0.0.0/0' && rule.protocol === 'ALL')).toBe(enabled);
@@ -600,4 +600,29 @@ it.each(['0.0.0.0/0', '10.50.1.0/16', '10.0.80.0/20'])('rejects unsafe or malfor
   platform.okeParams = { ...platform.okeParams!, workerSpokeAccess: true, peerVcnCidrs: [cidr] };
   model.platforms = [platform];
   await expect(generateOutputs(model)).rejects.toThrow(/[Pp]eer|canonical/);
+}, 60_000);
+
+it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('limits worker and pod DRG routes to their configured peers and public LB in %s', async (hubKind) => {
+  const model = emptyLzModel();
+  model.network = { hubKind, ...hubKindDefaults(hubKind) };
+  model.environments = model.environments.slice(0, 1);
+  const platform = newPlatform('oke_simple', []);
+  platform.okeParams = { ...platform.okeParams!, workerInternetAccess: false, podInternetAccess: false,
+    workerSpokeAccess: true, podSpokeAccess: false, peerVcnCidrs: ['10.90.0.0/24', '10.91.0.0/24'] };
+  model.platforms = [platform];
+  for (const publicLoadBalancer of [false, true]) {
+    platform.okeParams.publicLoadBalancer = publicLoadBalancer;
+    const out = await generateOutputs(model);
+    const objects = collectObjects(JSON.parse(out.files['network.json']));
+    const lbCidr = model.network.subnets.find((sn) => sn.name === 'lb')!.cidr;
+    const getRules = (role: string) => Object.values(objects.find((entry) => entry.display_name === `rt-fra-lz-prod-oke-${role}`)!.route_rules as Record<string, Record<string, unknown>>);
+    for (const role of ['workers', 'pods']) {
+      const rules = getRules(role);
+      const expected = [...(role === 'workers' ? platform.okeParams.peerVcnCidrs! : []), ...(publicLoadBalancer ? [lbCidr] : [])];
+      expect(rules.filter((r) => r.destination_type === 'CIDR_BLOCK').map((r) => r.destination).sort()).toEqual(expected.sort());
+      expect(rules.filter((r) => r.destination_type === 'SERVICE_CIDR_BLOCK')).toHaveLength(1);
+    }
+    // Administrative return routing is owned by the control-plane table.
+    expect(getRules('cp').some((r) => r.destination === '0.0.0.0/0' || r.destination === model.network.hubVcnCidr)).toBe(true);
+  }
 }, 60_000);

@@ -165,18 +165,40 @@ local public_lb = import './oke_public_load_balancer.libsonnet';
         network_entity_key: ctx.sgw_key,
       },
     };
-    local internal_route_rules = route_rules + drg_route_rules;
-    local private_route_rules = {
-      [key]: internal_route_rules[key]
-      for key in std.objectFields(internal_route_rules)
-      if internal_route_rules[key].destination != '0.0.0.0/0'
-    };
+    local component_routes(internet_access, spoke_access) =
+      local peer_cidrs = if ctx.has_hub && spoke_access then std.set(ctx.peer_vcn_cidrs) else [];
+      local explicit_routes = {
+        [n.route_rule([n.region, 'peering', std.toString(i)])]: {
+          description: 'Route to configured OKE peer %s through DRG' % peer_cidrs[i],
+          destination: peer_cidrs[i],
+          destination_type: 'CIDR_BLOCK',
+          network_entity_key: ctx.drg_key,
+        }
+        for i in std.range(0, std.length(peer_cidrs) - 1)
+        if !ctx.public_load_balancer || peer_cidrs[i] != ctx.hub_lb_cidr
+      } + (if ctx.public_load_balancer then {
+        [n.route_rule([n.region, 'hub-public-lb'])]: {
+          description: 'Route for Hub public load balancer backend responses',
+          destination: ctx.hub_lb_cidr,
+          destination_type: 'CIDR_BLOCK',
+          network_entity_key: ctx.drg_key,
+        },
+      } else {});
+      fss_route_rules
+      + (if internet_access then {
+        [key]: route_rules[key]
+        for key in std.objectFields(route_rules)
+        if route_rules[key].destination == '0.0.0.0/0'
+      } else {})
+      // A DRG default already covers these destinations. A local NAT default
+      // does not: peer and public-LB prefixes must still select the DRG.
+      + (if internet_access && has_drg_default then {} else explicit_routes);
     {
       [desc.key]: {
         display_name: n.display('rt', ctx.display_segments + [desc.suffix]),
         route_rules: if desc.key == ctx.rt_fss_key then fss_route_rules
-          else if (desc.key == ctx.rt_workers_key && !ctx.worker_internet_access) ||
-                  (desc.key == ctx.rt_pods_key && !ctx.pod_internet_access) then private_route_rules
+          else if desc.key == ctx.rt_workers_key then component_routes(ctx.worker_internet_access, ctx.worker_spoke_access)
+          else if desc.key == ctx.rt_pods_key then component_routes(ctx.pod_internet_access, ctx.pod_spoke_access)
           else route_rules,
       }
       for desc in [

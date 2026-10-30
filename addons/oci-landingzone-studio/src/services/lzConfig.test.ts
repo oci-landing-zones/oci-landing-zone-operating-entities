@@ -190,7 +190,7 @@ describe('serializeConfig', () => {
       type: 'oke_simple',
       params: {
         module_version: '0.3.0',
-        kubernetes_version: 'v1.36.4', services_cidr: '10.96.0.0/16', api_endpoint_allowed_cidrs: ['10.0.1.0/24'],
+        kubernetes_version: 'v1.36.4', services_cidr: '10.96.0.0/16', api_endpoint_allowed_cidrs: ['10.0.3.0/24'],
         create_node_pools: false, cni_type: 'native', cluster_size: 'small', create_fss: false, public_load_balancer: false,
       },
     });
@@ -256,7 +256,7 @@ describe('serializeConfig', () => {
     expect(step4).toContain("            vcn: '10.0.80.0/20',");
     expect(step4).toContain("          extension: { type: 'oke_simple', params: {");
     expect(step4).toContain("            kubernetes_version: 'v1.36.4', services_cidr: '10.96.0.0/16',");
-    expect(step4).toContain("            api_endpoint_allowed_cidrs: ['10.0.1.0/24'], create_node_pools: false,");
+    expect(step4).toContain("            api_endpoint_allowed_cidrs: ['10.0.3.0/24'], create_node_pools: false,");
     expect(step4).toContain("  shared_platforms: {");
     expect(step4).toContain("    core: { network: { vcn: '10.0.32.0/21', subnets: { core: '10.0.32.0/24' } } },");
   });

@@ -26,8 +26,8 @@ const local: Record<string, CSSProperties> = {
 };
 
 export default function OkeSettingsFields({ platform, onPlatform }: { platform: PlatformConfig; onPlatform: (patch: Partial<PlatformConfig>) => void }) {
-  const oke = platform.okeParams ?? okeDefaultParams();
   const { model } = useWizard();
+  const oke = platform.okeParams ?? okeDefaultParams(model.network);
   const issues = okeModelIssues(model).filter((issue) => issue.platformId === platform.id);
   const errors = (field: string) => [...new Set(issues.filter((issue) => issue.field === field).map((issue) => issue.message))];
   function setOke(patch: Partial<typeof oke>) { onPlatform({ okeParams: { ...oke, ...patch } }); }
@@ -43,12 +43,12 @@ export default function OkeSettingsFields({ platform, onPlatform }: { platform: 
                       {OKE_VERSION_SUGGESTIONS.map((version) => <option key={version} value={version}>{version}</option>)}
                     </select><FieldError id={`${platform.id}-k8s-error`} error={errors('kubernetesVersion')} /></div>
                     <fieldset style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
-                      <legend style={s.addLabel}>API endpoint allowed CIDRs</legend>
+                      <legend style={s.addLabel}>API Server allowed CIDRs</legend>
                       {oke.apiAllowedCidrs.map((cidr, index) => <div key={index} style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
-                        <ValidatedInput id={index === 0 ? `${platform.id}-api` : `${platform.id}-api-${index}`} aria-label={`API endpoint allowed CIDR ${index + 1}`} style={s.rowInput} value={cidr}
+                        <ValidatedInput id={index === 0 ? `${platform.id}-api` : `${platform.id}-api-${index}`} aria-label={`API Server allowed CIDR ${index + 1}`} style={s.rowInput} autoFocus={cidr === ''} value={cidr}
                           error={!parseCidr(cidr) ? 'Enter a valid IPv4 CIDR block.' : null}
                           onChange={(event) => setOke({ apiAllowedCidrs: oke.apiAllowedCidrs.map((value, i) => i === index ? event.target.value : value) })} />
-                        <button type="button" aria-label={`Remove API endpoint CIDR ${index + 1}`} title="Remove CIDR block" style={{ ...local.cidrAction, background: oracle.red, borderRadius: '50%' }} onClick={() => setOke({ apiAllowedCidrs: oke.apiAllowedCidrs.filter((_, i) => i !== index) })}><span aria-hidden="true">×</span></button>
+                        <button type="button" aria-label={`Remove API Server CIDR ${index + 1}`} title="Remove CIDR block" style={{ ...local.cidrAction, background: oracle.red, borderRadius: '50%' }} onClick={() => setOke({ apiAllowedCidrs: oke.apiAllowedCidrs.filter((_, i) => i !== index) })}><span aria-hidden="true">×</span></button>
                       </div>)}
                       {oke.apiAllowedCidrs.length === 0 && <FieldError id={`${platform.id}-api-error`} error={errors('apiAllowedCidrs')} />}
                       <button type="button" aria-label="Add CIDR block" title="Add CIDR block" style={{ ...local.cidrAction, background: oracle.greenDark, borderRadius: 6 }} onClick={() => setOke({ apiAllowedCidrs: [...oke.apiAllowedCidrs, ''] })}><span aria-hidden="true">+</span></button>
@@ -110,7 +110,7 @@ export default function OkeSettingsFields({ platform, onPlatform }: { platform: 
                     <legend style={s.addLabel}>Peer VCN CIDR blocks</legend>
                     <div style={local.fieldHint}>Only these CIDRs are permitted by the peering NSG. Attach it using the worker or pod spoke-connectivity switch. External networks also require DRG routes and peering configured separately.</div>
                     {(oke.peerVcnCidrs ?? []).map((cidr, index) => <div key={index} style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 8 }}>
-                      <ValidatedInput id={`${platform.id}-peer-${index}`} aria-label={`Peer VCN CIDR ${index + 1}`} style={s.rowInput} value={cidr}
+                      <ValidatedInput id={`${platform.id}-peer-${index}`} aria-label={`Peer VCN CIDR ${index + 1}`} style={s.rowInput} autoFocus={cidr === ''} value={cidr}
                         error={!parseCidr(cidr) || cidr === '0.0.0.0/0' ? 'Enter a peer IPv4 CIDR; 0.0.0.0/0 is not allowed.' : null}
                         onChange={(event) => setOke({ peerVcnCidrs: (oke.peerVcnCidrs ?? []).map((value, i) => i === index ? event.target.value : value) })} />
                       <button type="button" aria-label={`Remove peer CIDR ${index + 1}`} title="Remove peer CIDR" style={{ ...local.cidrAction, background: oracle.red, borderRadius: '50%' }} onClick={() => setOke({ peerVcnCidrs: (oke.peerVcnCidrs ?? []).filter((_, i) => i !== index) })}><span aria-hidden="true">×</span></button>

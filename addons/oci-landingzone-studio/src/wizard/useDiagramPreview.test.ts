@@ -75,3 +75,20 @@ describe('atomic diagram preview state', () => {
     expect(diagramPreviewView(previousFailure, edited, 0)).toMatchObject({ status: 'loading', pending: true, snapshot, error: undefined });
   });
 });
+
+
+it('retains the last valid snapshot while editing, then resumes with the completed model', () => {
+  const original = emptyLzModel();
+  const generated = preview('last-valid');
+  const snapshot = { model: original, preview: generated };
+  const state = { snapshot, outcome: { model: original, attempt: 0 } };
+  const partial = { ...original, network: { ...original.network, hubVcnCidr: '10.' } };
+  const paused = diagramPreviewView(state, partial, 0, true);
+  expect(paused).toMatchObject({ status: 'editing', pending: true, deferred: true, error: undefined });
+  expect(paused.snapshot).toBe(snapshot);
+  expect(paused.inventory).toBe(generated.inventory);
+  const completed = { ...original, network: { ...original.network, hubVcnCidr: '10.8.0.0/21' } };
+  expect(diagramPreviewView(state, completed, 0)).toMatchObject({ status: 'loading', pending: true, snapshot });
+  const next = { snapshot: { model: completed, preview: preview('next') }, outcome: { model: completed, attempt: 0 } };
+  expect(diagramPreviewView(next, completed, 0)).toMatchObject({ status: 'ready', pending: false, deferred: false });
+});

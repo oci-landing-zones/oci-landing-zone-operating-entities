@@ -72,11 +72,12 @@ describe('generated route preview parity', () => {
       for (const suffix of ['CP', 'INT-LB', 'PODS', 'WORKERS']) {
         const key = `RT-FRA-LZ-${env.name.toUpperCase()}-PLATFORM-OKE-${suffix}-KEY`;
         const rules = resources.get(key)!.route_rules!;
-        expect(Object.keys(rules), key).toHaveLength(hubKind === 'hub_e' ? 10 : 2);
+        const unrestrictedTable = suffix === 'CP' || suffix === 'INT-LB';
+        expect(Object.keys(rules), key).toHaveLength(hubKind === 'hub_e' && unrestrictedTable ? 10 : 2);
         const defaultRule = Object.values(rules).find((rule) => rule.destination === '0.0.0.0/0')!;
         expect(defaultRule.network_entity_key).toBe(hubKind === 'hub_e'
           ? `NGW-FRA-LZ-${env.name.toUpperCase()}-PLATFORM-OKE-KEY` : 'DRG-FRA-LZ-HUB-KEY');
-        expect(Object.values(rules).some((rule) => rule.destination === '10.90.0.0/21')).toBe(hubKind === 'hub_e');
+        expect(Object.values(rules).some((rule) => rule.destination === '10.90.0.0/21')).toBe(hubKind === 'hub_e' && unrestrictedTable);
       }
       const fss = resources.get(`RT-FRA-LZ-${env.name.toUpperCase()}-PLATFORM-OKE-FSS-KEY`)!.route_rules!;
       expect(Object.values(fss).map((rule) => rule.destination)).toEqual(['all-services']);
@@ -103,6 +104,8 @@ describe('generated route preview parity', () => {
           peers: {peer: {description: 'Peer', destination: '10.1.0.0/21'}} },
         has_hub: true, use_local_natgw: false,
         worker_internet_access: true, pod_internet_access: true,
+        worker_spoke_access: false, pod_spoke_access: false, peer_vcn_cidrs: [],
+        public_load_balancer: false, hub_lb_cidr: null,
         drg_key: 'DRG', ngw_key: 'NAT', sgw_key: 'SGW',
         rt_cp_key: 'cp', rt_lb_key: 'lb', rt_workers_key: 'workers', rt_pods_key: 'pods', rt_fss_key: 'fss',
         display_segments: ['prod', 'oke'], is_overlay_network: false, create_fss: true,
@@ -110,6 +113,7 @@ describe('generated route preview parity', () => {
       {
         default_drg: resources.route_tables(ctx),
         local_nat: resources.route_tables(ctx + {use_local_natgw: true}),
+        selected_peer: resources.route_tables(ctx + {use_local_natgw: true, worker_spoke_access: true, peer_vcn_cidrs: ['10.2.0.0/24']}),
         no_default: resources.route_tables(ctx, overlay_output=true),
         standalone: resources.route_tables(ctx + {has_hub: false, routing: null}),
         manual_peer: resources.route_tables(ctx + {has_hub: false}),
@@ -123,6 +127,9 @@ describe('generated route preview parity', () => {
     expect(destinations('manual_peer')).toEqual(['10.1.0.0/21', 'all-services']);
     expect(destinations('overlay_cni')).toEqual(['0.0.0.0/0', 'all-services']);
     expect(result.overlay_cni.pods).toBeUndefined();
+    expect(Object.values(result.local_nat.workers.route_rules).map((r) => r.destination).sort()).toEqual(['0.0.0.0/0', 'all-services']);
+    expect(Object.values(result.selected_peer.workers.route_rules).map((r) => r.destination).sort()).toEqual(['0.0.0.0/0', '10.2.0.0/24', 'all-services']);
+    expect(Object.values(result.selected_peer.pods.route_rules).map((r) => r.destination).sort()).toEqual(['0.0.0.0/0', 'all-services']);
     for (const tables of Object.values(result)) {
       expect(Object.values(tables.fss.route_rules).map((rule) => rule.destination)).toEqual(['all-services']);
     }

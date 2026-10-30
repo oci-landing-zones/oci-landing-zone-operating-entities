@@ -6,7 +6,8 @@ export interface Point { x: number; y: number }
 
 /** `<scope>:<kind>` — the flow a trace id (`<scope>:<kind>[:<role>]#<idx>`) belongs to. */
 export function flowGroup(traceId: string): string {
-  return traceId.split('#')[0].split(':').slice(0, 2).join(':');
+  const parts = traceId.split('#')[0].split(':');
+  return parts.slice(0, parts[0].split('>')[0].includes('/') ? 4 : 2).join(':');
 }
 
 /** Cumulative length at each vertex, plus the total. */

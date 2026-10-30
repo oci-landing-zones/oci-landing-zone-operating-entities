@@ -482,3 +482,52 @@ describe('generator-aligned graph', () => {
     expect(new Set(drgEdges.map((edge) => edge.targetPort)).size).toBe(drgEdges.length);
   });
 });
+
+
+describe('OKE flow diagram', () => {
+  it('draws only selected OKE endpoints and resolves their routing geometry without Projects VCNs', async () => {
+    const model = emptyLzModel();
+    model.environments.forEach((env) => { env.projectNetworkEnabled = false; });
+    const oke = newPlatform('oke_simple', [], model.environments);
+    oke.environments = [model.environments[0].id];
+    model.platforms = [oke, newPlatform('custom', [oke], model.environments)];
+    const tables = await generatedRouteTables(model);
+    const graph = buildGraph(model, 4, { showFlows: true, activeFlows: ['prod/oke:services:workers'] }, undefined, tables);
+    const endpoints = graph.nodes.filter((node) => node.endpointName);
+    expect(endpoints).toHaveLength(1);
+    expect(endpoints[0].endpointName).toBe('prod-oke-workers');
+    expect(graph.flowErrors ?? []).toEqual([]);
+    expect(graph.edges.filter((edge) => edge.id.startsWith('flow-'))).toHaveLength(1);
+    expect(endpoints[0].id).toMatch(/^cmp-env-0-plat-0-sn-/);
+    expect(buildFlowTraces(model, ['prod/oke:services:workers'], 'flow', tables)[0].ok).toBe(true);
+    const allEndpoints = buildGraph(model, 4, { showEndpoints: true }, undefined, tables).nodes.filter((node) => node.endpointName && node.id.includes('-plat-'));
+    expect(allEndpoints.map((node) => node.endpointName).sort()).toEqual(['prod-oke-pods', 'prod-oke-workers']);
+  });
+});
+
+describe('OKE animation configuration', () => {
+  it.each(['hub_a', 'hub_b', 'hub_c', 'hub_e'] as const)('removes disabled OKE internet and peer animations for %s', async (hubKind) => {
+    const model = emptyLzModel();
+    model.network = { hubKind, ...hubKindDefaults(hubKind) };
+    model.environments.forEach((env) => { env.projectNetworkEnabled = false; });
+    model.platforms = [newPlatform('oke_simple', [], model.environments)];
+    model.platforms[0].environments = [model.environments[0].id];
+    model.environments[1].projectNetworkEnabled = true;
+    const oke = model.platforms[0].okeParams!;
+    oke.workerSpokeAccess = true;
+    oke.podSpokeAccess = true;
+    oke.peerVcnCidrs = [model.environments[1].network.vcnCidr];
+    const picks = ['prod/oke:egress:workers', 'prod/oke:egress:pods', 'prod/oke>preprod:east-west:workers', 'prod/oke>preprod:east-west:pods'];
+    let graph = buildGraph(model, 4, { showFlows: true, activeFlows: picks }, undefined, await generatedRouteTables(model));
+    expect(graph.flowErrors ?? []).toEqual([]);
+    expect(graph.edges.filter((edge) => edge.animated)).toHaveLength(4);
+    oke.workerInternetAccess = false;
+    oke.podInternetAccess = false;
+    oke.workerSpokeAccess = false;
+    oke.podSpokeAccess = false;
+    graph = buildGraph(model, 4, { showFlows: true, activeFlows: picks }, undefined, await generatedRouteTables(model));
+    expect(graph.edges.filter((edge) => edge.animated)).toEqual([]);
+    graph = buildGraph(model, 4, { showFlows: true, allFlows: true }, undefined, await generatedRouteTables(model));
+    expect(graph.edges.filter((edge) => edge.animated && edge.id.startsWith('flow-prod/oke:')).every((edge) => (edge.id.includes(':services:') || edge.id.includes(':api:')))).toBe(true);
+  });
+});

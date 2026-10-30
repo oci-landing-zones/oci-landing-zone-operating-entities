@@ -13,8 +13,9 @@
  * these helpers so the diagram, the JSON, and the form never disagree.
  */
 
-import type { PlatformConfig, PlatformType, OkePlatformParams, SharedPlatformConfig, Subnet } from '../model/types';
+import type { PlatformConfig, PlatformType, OkePlatformParams, SharedPlatformConfig, Subnet, NetworkConfig } from '../model/types';
 import { BASE_RANGES, baseRangeOf, firstFreeBlock, formatIp, normalizeCidr, overlaps, parseCidr, shiftCidr, totalIps } from './cidr';
+import { hubKindDefaults } from './hubKinds';
 import { DEFAULT_OKE_VERSION } from './okeVersions';
 import { environmentPlatformCidr, OPTIONAL_SHARED_CIDR } from './oneOeCidrs';
 
@@ -128,12 +129,13 @@ export function okeProfileSubnets(
 }
 
 /** Default OKE settings. */
-export function okeDefaultParams(): OkePlatformParams {
+export function okeDefaultParams(network: Pick<NetworkConfig, 'subnets'> = hubKindDefaults('hub_a')): OkePlatformParams {
+  const mgmt = network.subnets.find((sn) => sn.name === 'mgmt' || sn.name.endsWith('-mgmt'));
   return {
     createNodePools: false,
     kubernetesVersion: DEFAULT_OKE_VERSION,
     servicesCidr: '10.96.0.0/16',
-    apiAllowedCidrs: ['10.0.1.0/24'],
+    apiAllowedCidrs: mgmt ? [mgmt.cidr] : [],
     // Generator contract: this is an image-name selector for the OL9 family,
     // not a display version.
     workerImage: '9\\.[0-9]+',
@@ -184,6 +186,7 @@ function nextPlatformId(type: PlatformType, existing: PlatformConfig[]): string 
 export function newPlatform(type: PlatformType, existing: PlatformConfig[],
   environments: Array<{ id: string; name: string }> = [{ id: 'environment-1', name: 'prod' }, { id: 'environment-2', name: 'preprod' }],
   occupiedCidrs: string[] = [],
+  hubNetwork?: Pick<NetworkConfig, 'subnets'>,
 ): PlatformConfig {
   const id = nextPlatformId(type, existing);
   // Give each platform a generous stride so its per-env /21 shifts never overlap
@@ -195,7 +198,7 @@ export function newPlatform(type: PlatformType, existing: PlatformConfig[],
     // a Studio-maintained manual subnet map. Keep `subnets` absent so Jsonnet
     // owns allocation, while `platformSubnetsForEnv` previews it for the diagram.
     const vcnCidr = `${baseVcn.split('/')[0]}/20`;
-    return { ...common, vcnCidr, subnets: [], okeParams: { ...okeDefaultParams(), clusterSize: 'small' } };
+    return { ...common, vcnCidr, subnets: [], okeParams: { ...okeDefaultParams(hubNetwork), clusterSize: 'small' } };
   }
   const occupied = [...occupiedCidrs, ...existing.flatMap((platform) => platformEnvInstances(platform, environments).map((instance) => instance.vcnCidr))];
   const overrides: NonNullable<PlatformConfig['overrides']> = {};
@@ -237,7 +240,7 @@ export function applyPlatformPatch(platform: PlatformConfig, patch: Partial<Plat
     return { ...next, vcnCidr: Object.values(overrides)[0]?.vcnCidr ?? next.vcnCidr, overrides };
   }
   const overrides = { ...next.overrides };
-  const firstId = environments[0]?.id;
+  const firstId = next.environmentScoped ? platformEnvInstances(next, environments)[0]?.id : environments[0]?.id;
   if (firstId && overrides[firstId] && patch.overrides === undefined && (patch.vcnCidr !== undefined || patch.subnets !== undefined)) {
     overrides[firstId] = { ...overrides[firstId],
       ...(patch.vcnCidr !== undefined ? { vcnCidr: patch.vcnCidr } : {}),
@@ -327,6 +330,7 @@ export interface PlatformEnvInstance {
 export function platformVcnForEnv(platform: PlatformConfig, envId: string, index: number): string {
   const ov = platform.overrides?.[envId]?.vcnCidr;
   if (ov !== undefined) return ov;
+  if (platform.type === 'oke_simple' && platform.environmentScoped) return platform.vcnCidr;
   const size = totalIps(parseCidr(platform.vcnCidr)?.prefix ?? 21);
   return shiftCidr(platform.vcnCidr, index * size) ?? platform.vcnCidr;
 }

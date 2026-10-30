@@ -85,9 +85,9 @@ it('renders API endpoint CIDRs as individually validated list entries', () => {
   const platform = newPlatform('oke_simple', []);
   platform.okeParams!.apiAllowedCidrs = ['10.0.1.0/24', 'invalid'];
   const html = renderToStaticMarkup(<WizardProvider initialModel={{ ...model, platforms: [platform] }}><OkeSettingsFields platform={platform} onPlatform={() => {}} /></WizardProvider>);
-  expect(html).toContain('API endpoint allowed CIDR 1');
-  expect(html).toContain('API endpoint allowed CIDR 2');
-  expect(html).toContain('Remove API endpoint CIDR 2');
+  expect(html).toContain('API Server allowed CIDR 1');
+  expect(html).toContain('API Server allowed CIDR 2');
+  expect(html).toContain('Remove API Server CIDR 2');
   expect(html).toContain('Add CIDR block');
   expectLinkedError(html, `${platform.id}-api-1`);
 });
